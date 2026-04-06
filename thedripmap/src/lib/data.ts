@@ -93,13 +93,13 @@ export async function getAllCities() {
   try {
     const { data, error } = await supabase
       .from('cities')
-      .select('name, state_code, listings_count');
+      .select('name, state, listings_count');
 
     if (error) throw error;
     if (data && data.length > 0) {
       return data.map(c => ({
         city: c.name,
-        state: c.state_code,
+        state: c.state,
         count: c.listings_count || 0
       })).sort((a, b) => b.count - a.count);
     }
