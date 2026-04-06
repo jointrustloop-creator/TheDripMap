@@ -218,7 +218,7 @@ export interface Provider {
   amenities: string[];
   description: string;
   imageUrl: string;
-  featured: boolean;
+  is_featured: boolean;
   decisionDrivers: {
     medicalSupervision: boolean;
     luxuryExperience: number; // 1-5

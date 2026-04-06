@@ -35,7 +35,7 @@ export const ProviderCard = ({ provider, operatorProfile, className }: ProviderC
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           
           <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-            {provider.featured && (
+            {provider.is_featured && (
               <span className="bg-wellness-600 text-white px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1">
                 <Zap size={10} className="fill-white" /> Featured
               </span>

@@ -103,8 +103,8 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
     },
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": provider.rating.toString(),
-      "reviewCount": provider.reviewCount.toString()
+      "ratingValue": (provider.rating || 0).toString(),
+      "reviewCount": (provider.reviewCount || 0).toString()
     },
     "priceRange": provider.priceRange,
     "url": `https://thedripmap.com/provider/${slug}`
@@ -163,7 +163,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
             {/* Header Section */}
             <section>
               <div className="flex flex-wrap gap-2 mb-6">
-                {provider.featured && (
+                {provider.is_featured && (
                   <span className="bg-wellness-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1">
                     <Zap size={12} className="fill-white" /> Featured Provider
                   </span>

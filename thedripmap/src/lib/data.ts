@@ -58,7 +58,7 @@ export async function getListingsByCity(city: string) {
       .from('listings')
       .select('*')
       .ilike('city', city)
-      .order('featured', { ascending: false })
+      .order('is_featured', { ascending: false })
       .order('rating', { ascending: false });
 
     if (error) throw error;
@@ -93,13 +93,13 @@ export async function getAllCities() {
   try {
     const { data, error } = await supabase
       .from('cities')
-      .select('name, state, listings_count');
+      .select('*');
 
     if (error) throw error;
     if (data && data.length > 0) {
       return data.map(c => ({
         city: c.name,
-        state: c.state,
+        state: c.state_code || c.state || c.state_name || 'US',
         count: c.listings_count || 0
       })).sort((a, b) => b.count - a.count);
     }
@@ -115,13 +115,13 @@ export async function getAllStates() {
   try {
     const { data, error } = await supabase
       .from('states')
-      .select('name, code, listings_count');
+      .select('*');
 
     if (error) throw error;
     if (data && data.length > 0) {
       return data.map(s => ({
         state: s.name,
-        stateCode: s.code,
+        stateCode: s.code || s.state_code || s.abbr || 'US',
         count: s.listings_count || 0
       })).sort((a, b) => b.count - a.count);
     }
@@ -139,7 +139,7 @@ export async function getListingsByService(service: string, limit: number = 4) {
       .from('listings')
       .select('*')
       .contains('specialties', [service])
-      .order('featured', { ascending: false })
+      .order('is_featured', { ascending: false })
       .order('rating', { ascending: false })
       .limit(limit);
 
@@ -175,7 +175,7 @@ export async function searchListings(query: string, city?: string, type?: string
     }
 
     const { data, error } = await supabaseQuery
-      .order('featured', { ascending: false })
+      .order('is_featured', { ascending: false })
       .order('rating', { ascending: false });
 
     if (error) throw error;
@@ -193,7 +193,7 @@ export async function getFeaturedListings(limit: number = 6) {
     const { data, error } = await supabase
       .from('listings')
       .select('*')
-      .eq('featured', true)
+      .eq('is_featured', true)
       .order('rating', { ascending: false })
       .limit(limit);
 
