@@ -3,39 +3,42 @@ import "./globals.css";
 import Script from "next/script";
 import { ErrorBoundary } from "../src/components/ErrorBoundary";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://thedripmap.com';
+const siteName = process.env.NEXT_PUBLIC_SITE_NAME || 'TheDripMap';
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://thedripmap.com'),
+  metadataBase: new URL(siteUrl),
   title: {
-    default: "IV Therapy Near Me — Find Top Rated Clinics | TheDripMap",
-    template: "%s | TheDripMap",
+    default: `IV Therapy Near Me — Find Top Rated Clinics | ${siteName}`,
+    template: `%s | ${siteName}`,
   },
-  description: "Find and compare the best IV therapy clinics near you. Browse providers across the US or get matched to your perfect drip in 60 seconds.",
+  description: `Find and compare the best IV therapy clinics near you. Browse providers across the US or get matched to your perfect drip in 60 seconds.`,
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: "TheDripMap | Find Your Perfect IV Therapy Match",
-    description: "Find and compare the best IV therapy clinics near you.",
-    url: "https://thedripmap.com",
-    siteName: "TheDripMap",
+    title: `${siteName} | Find Your Perfect IV Therapy Match`,
+    description: `Find and compare the best IV therapy clinics near you.`,
+    url: siteUrl,
+    siteName: siteName,
     type: "website",
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'TheDripMap - Find Your Perfect IV Therapy Match',
+        alt: `${siteName} - Find Your Perfect IV Therapy Match`,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TheDripMap | Find Your Perfect IV Therapy Match',
-    description: 'Find and compare the best IV therapy clinics near you.',
+    title: `${siteName} | Find Your Perfect IV Therapy Match`,
+    description: `Find and compare the best IV therapy clinics near you.`,
     images: ['/og-image.png'],
   },
   verification: {
-    google: "PASTE_VERIFICATION_CODE_HERE",
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "",
   },
 };
 
@@ -49,9 +52,9 @@ export default function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "TheDripMap",
-    "url": "https://thedripmap.com",
-    "logo": "https://thedripmap.com/logo.png",
+    "name": siteName,
+    "url": siteUrl,
+    "logo": `${siteUrl}/logo.png`,
     "sameAs": [
       "https://facebook.com/thedripmap",
       "https://instagram.com/thedripmap",
@@ -62,11 +65,11 @@ export default function RootLayout({
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "TheDripMap",
-    "url": "https://thedripmap.com",
+    "name": siteName,
+    "url": siteUrl,
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://thedripmap.com/search?q={search_term_string}",
+      "target": `${siteUrl}/search?q={search_term_string}`,
       "query-input": "required name=search_term_string"
     }
   };

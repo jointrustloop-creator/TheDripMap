@@ -20,7 +20,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
-import { supabase } from '../../../src/lib/supabase';
+import { supabase, isSupabaseConfigured } from '../../../src/lib/supabase';
 
 export default function OperatorSetupPage() {
   const router = useRouter();
@@ -103,6 +103,10 @@ export default function OperatorSetupPage() {
   };
 
   const handleSubmit = async () => {
+    if (!isSupabaseConfigured()) {
+      alert('Supabase is not configured. Please set your environment variables.');
+      return;
+    }
     setIsSubmitting(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();

@@ -35,6 +35,7 @@ export const LocationIndicator = () => {
 
       try {
         const res = await fetch('https://ipapi.co/json/');
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
         if (data.city) {
           const detected = {
@@ -50,7 +51,8 @@ export const LocationIndicator = () => {
           sessionStorage.setItem('tdm_location', JSON.stringify(detected));
         }
       } catch (e) {
-        console.error("IP detection failed", e);
+        // Silently fail for IP detection to avoid console noise in restricted environments
+        // We'll just stay in the "Select Location" state
       }
 
       setIsDetecting(false);

@@ -1,5 +1,5 @@
 import { Provider, BlogPost, OperatorProfile } from '../types';
-import { supabase } from './supabase';
+import { supabase, isSupabaseConfigured } from './supabase';
 
 // Helper to slugify strings
 export const slugify = (text: string) => {
@@ -52,6 +52,7 @@ const getStateFromProvider = (provider: Provider): string => {
 };
 
 export async function getListingsByCity(city: string) {
+  if (!isSupabaseConfigured()) return [];
   try {
     const { data, error } = await supabase
       .from('listings')
@@ -70,6 +71,7 @@ export async function getListingsByCity(city: string) {
 }
 
 export async function getListingBySlug(slug: string) {
+  if (!isSupabaseConfigured()) return null;
   try {
     const { data, error } = await supabase
       .from('listings')
@@ -87,6 +89,7 @@ export async function getListingBySlug(slug: string) {
 }
 
 export async function getAllCities() {
+  if (!isSupabaseConfigured()) return [];
   try {
     const { data, error } = await supabase
       .from('cities')
@@ -108,6 +111,7 @@ export async function getAllCities() {
 }
 
 export async function getAllStates() {
+  if (!isSupabaseConfigured()) return [];
   try {
     const { data, error } = await supabase
       .from('states')
@@ -129,6 +133,7 @@ export async function getAllStates() {
 }
 
 export async function getListingsByService(service: string, limit: number = 4) {
+  if (!isSupabaseConfigured()) return [];
   try {
     const { data, error } = await supabase
       .from('listings')
@@ -148,6 +153,7 @@ export async function getListingsByService(service: string, limit: number = 4) {
 }
 
 export async function searchListings(query: string, city?: string, type?: string) {
+  if (!isSupabaseConfigured()) return [];
   try {
     let supabaseQuery = supabase.from('listings').select('*');
 
@@ -182,6 +188,7 @@ export async function searchListings(query: string, city?: string, type?: string
 }
 
 export async function getFeaturedListings(limit: number = 6) {
+  if (!isSupabaseConfigured()) return [];
   try {
     const { data, error } = await supabase
       .from('listings')
@@ -200,6 +207,7 @@ export async function getFeaturedListings(limit: number = 6) {
 }
 
 export async function getListingStats() {
+  if (!isSupabaseConfigured()) return { totalListings: 0, totalCities: 0, totalStates: 0 };
   try {
     const { data, error } = await supabase
       .from('listings')
@@ -238,6 +246,7 @@ export async function getListingStats() {
 }
 
 export async function getBlogPosts() {
+  if (!isSupabaseConfigured()) return [];
   try {
     const { data, error } = await supabase
       .from('blog_posts')
@@ -254,6 +263,7 @@ export async function getBlogPosts() {
 }
 
 export async function getBlogPostBySlug(slug: string) {
+  if (!isSupabaseConfigured()) return null;
   try {
     const { data, error } = await supabase
       .from('blog_posts')
@@ -281,6 +291,7 @@ export async function getAllUseCases() {
 }
 
 export async function getAllListings() {
+  if (!isSupabaseConfigured()) return [];
   try {
     const { data, error } = await supabase
       .from('listings')
@@ -295,6 +306,7 @@ export async function getAllListings() {
 }
 
 export async function getListingsByIds(ids: string[]) {
+  if (!isSupabaseConfigured()) return [];
   try {
     const { data, error } = await supabase
       .from('listings')
@@ -310,6 +322,7 @@ export async function getListingsByIds(ids: string[]) {
 }
 
 export async function getOperatorProfiles() {
+  if (!isSupabaseConfigured()) return [];
   try {
     const { data, error } = await supabase
       .from('operator_profiles')
