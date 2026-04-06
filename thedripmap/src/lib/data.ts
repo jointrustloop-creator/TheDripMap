@@ -144,7 +144,14 @@ export async function getListingsByService(service: string, limit: number = 4) {
       .order('rating', { ascending: false })
       .limit(limit);
 
-    if (error) throw error;
+    if (error) {
+      // If column doesn't exist, return empty array instead of crashing
+      if (error.code === '42703') {
+        console.warn('Supabase warning: specialties column missing in listings table');
+        return [];
+      }
+      throw error;
+    }
     if (data && data.length > 0) return data as Provider[];
   } catch (err) {
     console.error('Supabase error fetching listings by service:', err);
@@ -172,7 +179,9 @@ export async function searchListings(query: string, city?: string, type?: string
 
     if (query) {
       const q = `%${query}%`;
-      supabaseQuery = supabaseQuery.or(`name.ilike.${q},city.ilike.${q},specialties.cs.{${query}}`);
+      // Try to search by name and city first. 
+      // We avoid specialties here if it might be missing to prevent 42703 errors.
+      supabaseQuery = supabaseQuery.or(`name.ilike.${q},city.ilike.${q}`);
     }
 
     const { data, error } = await supabaseQuery
