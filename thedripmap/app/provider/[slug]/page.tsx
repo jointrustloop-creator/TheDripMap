@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
 
   return {
     title: `${provider.name} | Best IV Therapy in ${provider.city} | TheDripMap`,
-    description: `${provider.name} offers top-rated IV therapy in ${provider.city}. Specialties include ${provider.specialties.slice(0, 3).join(', ')}. Read reviews and book your drip today.`,
+    description: `${provider.name} offers top-rated IV therapy in ${provider.city}. Specialties include ${(provider.specialties || []).slice(0, 3).join(', ')}. Read reviews and book your drip today.`,
     alternates: {
       canonical: `/provider/${slug}`,
     },
@@ -223,7 +223,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 <div>
                   <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-4">Core Specialties</h3>
                   <div className="flex flex-wrap gap-2">
-                    {provider.specialties.map((specialty, idx) => (
+                    {(provider.specialties || []).map((specialty, idx) => (
                       <ServicePill key={idx} service={specialty} />
                     ))}
                   </div>
@@ -231,7 +231,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 <div>
                   <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-4">Amenities</h3>
                   <div className="flex flex-wrap gap-2">
-                    {provider.amenities.map((amenity, idx) => (
+                    {(provider.amenities || []).map((amenity, idx) => (
                       <span key={idx} className="px-3 py-1.5 bg-wellness-50 text-wellness-700 rounded-full text-xs font-bold border border-wellness-100">
                         {amenity}
                       </span>

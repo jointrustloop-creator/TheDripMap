@@ -94,7 +94,7 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, rank = 1, isPr
           </p>
 
           <div className="flex flex-wrap gap-2 mb-8">
-            {provider.specialties.slice(0, 4).map((specialty, idx) => (
+            {(provider.specialties || []).slice(0, 4).map((specialty, idx) => (
               <ServicePill key={idx} service={specialty} />
             ))}
           </div>
