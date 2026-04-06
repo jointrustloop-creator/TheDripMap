@@ -1,10 +1,10 @@
 declare global {
   interface Window {
-    gtag: (...args: any[]) => void;
+    gtag: (...args: unknown[]) => void;
   }
 }
 
-export const trackEvent = (eventName: string, properties?: Record<string, any>) => {
+export const trackEvent = (eventName: string, properties?: Record<string, unknown>) => {
   if (process.env.NODE_ENV === 'development') {
     console.log(`[Analytics] Event: ${eventName}`, properties);
   }

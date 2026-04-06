@@ -6,17 +6,11 @@ import { notFound } from 'next/navigation';
 import { 
   Clock, 
   User, 
-  ArrowLeft, 
   Share2, 
   Calendar, 
   MapPin, 
-  Droplets, 
   Zap, 
   ArrowRight,
-  Activity,
-  Heart,
-  Sparkles,
-  Dumbbell,
   Star,
   ShieldCheck
 } from 'lucide-react';
@@ -25,8 +19,7 @@ import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { BlogCard } from '../../../src/components/BlogCard';
-import { ProviderCard } from '../../../src/components/ProviderCard';
-import { getBlogPostBySlug, getBlogPosts, getListingsByCity, slugify, getListingsByIds } from '../../../src/lib/data';
+import { getBlogPostBySlug, getBlogPosts, slugify, getListingsByIds } from '../../../src/lib/data';
 import { cn } from '../../../src/lib/utils';
 
 export const revalidate = 86400; // 24 hours

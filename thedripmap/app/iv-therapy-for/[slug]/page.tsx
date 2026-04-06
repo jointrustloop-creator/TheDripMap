@@ -5,7 +5,6 @@ import { getUseCaseBySlug, getListingsByService, getAllUseCases } from '@/src/li
 import * as Icons from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { ProviderCard } from '@/src/components/ProviderCard';
-import { FAQSection } from '@/src/components/FAQSection';
 import { MedicalDisclaimer } from '@/src/components/MedicalDisclaimer';
 import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
 import { Navbar } from '@/src/components/Navbar';
@@ -46,7 +45,7 @@ export default async function UseCasePage({ params }: PageProps) {
   if (!useCase) notFound();
 
   const clinics = await getListingsByService(useCase.serviceTag, 4);
-  const IconComponent = (Icons as any)[useCase.icon] as LucideIcon;
+  const IconComponent = (Icons as unknown as Record<string, LucideIcon>)[useCase.icon];
 
   const breadcrumbs = [
     { label: 'Home', href: '/' },

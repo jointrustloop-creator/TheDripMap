@@ -34,7 +34,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
           <div className="max-w-7xl mx-auto px-6 py-32 text-center">
             <h1 className="text-4xl font-black text-slate-900 mb-6">Something went wrong</h1>
             <p className="text-lg text-slate-500 mb-12 max-w-2xl mx-auto">
-              We're sorry, but there was an error rendering this page. Our team has been notified.
+              We&apos;re sorry, but there was an error rendering this page. Our team has been notified.
             </p>
             <button 
               onClick={() => window.location.reload()}

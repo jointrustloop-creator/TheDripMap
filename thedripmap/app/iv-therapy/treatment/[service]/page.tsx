@@ -3,10 +3,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { 
-  MapPin, 
   Droplets, 
-  Star, 
-  Clock, 
   ShieldCheck, 
   Zap, 
   ArrowRight,
@@ -14,7 +11,6 @@ import {
   Heart,
   Sparkles,
   Dumbbell,
-  Search,
   CheckCircle2
 } from 'lucide-react';
 import { Navbar } from '../../../../src/components/Navbar';
@@ -23,7 +19,7 @@ import { ProviderCard } from '../../../../src/components/ProviderCard';
 import { FAQSection } from '../../../../src/components/FAQSection';
 import { BreadcrumbNav } from '../../../../src/components/BreadcrumbNav';
 import { CityGrid } from '../../../../src/components/CityGrid';
-import { getListingsByService, getAllCities, slugify } from '../../../../src/lib/data';
+import { getListingsByService, getAllCities } from '../../../../src/lib/data';
 
 export const revalidate = 86400; // 24 hours
 

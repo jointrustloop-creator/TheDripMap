@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   ShieldCheck, 
@@ -12,7 +12,6 @@ import {
   Mail,
   Stethoscope,
   Clock,
-  MapPin,
   Users,
   DollarSign,
   Sparkles
@@ -109,8 +108,6 @@ export default function OperatorSetupPage() {
     }
     setIsSubmitting(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
       const { error } = await supabase
         .from('operator_profiles')
         .insert([
@@ -175,7 +172,7 @@ export default function OperatorSetupPage() {
             >
               <div>
                 <h1 className="text-4xl font-black text-slate-900 mb-4">Basic Information</h1>
-                <p className="text-slate-500">Let's start with the essentials for your clinic profile.</p>
+                <p className="text-slate-500">Let&apos;s start with the essentials for your clinic profile.</p>
               </div>
 
               <div className="space-y-6">

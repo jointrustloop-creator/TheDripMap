@@ -1,13 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { 
   Zap, 
   Search, 
-  MapPin, 
   Droplets, 
-  Star, 
-  Clock, 
   ShieldCheck, 
   ArrowRight,
   Activity,

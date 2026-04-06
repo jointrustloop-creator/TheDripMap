@@ -8,8 +8,8 @@ import { cn } from '../lib/utils';
 const TOP_CITIES: City[] = [
   'New York', 'Los Angeles', 'Miami', 'Las Vegas', 'Austin', 
   'Chicago', 'Washington', 'Portland', 'San Francisco', 'San Diego',
-  'Dallas' as any, 'Houston' as any, 'Phoenix' as any, 'Atlanta' as any, 'Denver' as any,
-  'Seattle' as any, 'Boston' as any, 'Nashville' as any, 'Charlotte' as any, 'Orlando'
+  'Dallas' as City, 'Houston' as City, 'Phoenix' as City, 'Atlanta' as City, 'Denver' as City,
+  'Seattle' as City, 'Boston' as City, 'Nashville' as City, 'Charlotte' as City, 'Orlando' as City
 ];
 
 export const LocationIndicator = () => {
@@ -30,7 +30,9 @@ export const LocationIndicator = () => {
             setIsDetecting(false);
             return;
           }
-        } catch (e) {}
+        } catch {
+          // Ignore parse errors
+        }
       }
 
       try {
@@ -50,7 +52,7 @@ export const LocationIndicator = () => {
           setLocation(detected);
           sessionStorage.setItem('tdm_location', JSON.stringify(detected));
         }
-      } catch (e) {
+      } catch {
         // Silently fail for IP detection to avoid console noise in restricted environments
         // We'll just stay in the "Select Location" state
       }

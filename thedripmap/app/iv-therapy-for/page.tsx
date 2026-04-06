@@ -21,7 +21,7 @@ export default async function UseCaseHubPage() {
             IV Therapy for Every Need
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Whether you\'re recovering from a long night, preparing for a big event, or just looking for a wellness boost, discover how IV therapy is commonly used to support your goals.
+            Whether you&apos;re recovering from a long night, preparing for a big event, or just looking for a wellness boost, discover how IV therapy is commonly used to support your goals.
           </p>
         </div>
       </section>
@@ -31,7 +31,7 @@ export default async function UseCaseHubPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {useCases.map((useCase) => {
-              const IconComponent = (Icons as any)[useCase.icon] as LucideIcon;
+              const IconComponent = (Icons as unknown as Record<string, LucideIcon>)[useCase.icon];
               
               return (
                 <Link 

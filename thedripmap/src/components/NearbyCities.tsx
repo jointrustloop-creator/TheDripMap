@@ -8,7 +8,7 @@ interface NearbyCitiesProps {
   currentState: string;
 }
 
-export const NearbyCities = ({ cities, currentState }: NearbyCitiesProps) => {
+export const NearbyCities = ({ cities }: NearbyCitiesProps) => {
   return (
     <section className="py-24 px-6 bg-slate-50 border-y border-slate-100">
       <div className="max-w-7xl mx-auto">

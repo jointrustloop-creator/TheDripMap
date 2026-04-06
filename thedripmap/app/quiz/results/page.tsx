@@ -4,17 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   Sparkles, 
-  ArrowRight, 
-  Zap, 
-  MapPin, 
-  Droplets, 
-  Star, 
-  Clock, 
-  ShieldCheck, 
-  Activity,
-  Heart,
-  Dumbbell,
-  Search
+  ArrowRight
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { matchProviders } from '../../../src/lib/matching';
@@ -22,7 +12,7 @@ import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { ProviderCardFeatured } from '../../../src/components/ProviderCardFeatured';
 import { ProviderCard } from '../../../src/components/ProviderCard';
-import { SurveyState, OperatorProfile, Provider } from '../../../src/types';
+import { SurveyState, OperatorProfile, Provider, City, TreatmentType } from '../../../src/types';
 import { getOperatorProfiles, getAllListings } from '../../../src/lib/data';
 
 export default function ResultsPage() {
@@ -63,9 +53,9 @@ function ResultsContent() {
 
   const surveyData: SurveyState = useMemo(() => ({
     goal: searchParams.get('goal') || undefined,
-    city: searchParams.get('city') as any || undefined,
-    locationPreference: searchParams.get('type') as any || undefined,
-    urgency: searchParams.get('urgency') as any || undefined,
+    city: (searchParams.get('city') as City) || undefined,
+    locationPreference: (searchParams.get('type') as TreatmentType) || undefined,
+    urgency: (searchParams.get('urgency') as 'ASAP' | 'Today' | 'This Week') || undefined,
   }), [searchParams]);
 
   const scoredProviders = useMemo(() => {
@@ -130,7 +120,7 @@ function ResultsContent() {
             Your Personalized Matches
           </h1>
           <p className="text-lg text-slate-500 max-w-2xl mx-auto">
-            We've analyzed {listings.length} providers in <span className="text-slate-900 font-bold">{surveyData.city || 'your area'}</span> to find your best clinical fit.
+            We&apos;ve analyzed {listings.length} providers in <span className="text-slate-900 font-bold">{surveyData.city || 'your area'}</span> to find your best clinical fit.
           </p>
         </div>
 

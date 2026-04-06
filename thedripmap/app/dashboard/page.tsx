@@ -14,7 +14,6 @@ import {
   DollarSign,
   ArrowRight
 } from 'lucide-react';
-import { motion } from 'motion/react';
 
 export default function DashboardPage() {
   return (
@@ -103,7 +102,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-                Complete your clinical protocols to unlock the "Verified Partner" badge and get 2x more matches.
+                Complete your clinical protocols to unlock the &quot;Verified Partner&quot; badge and get 2x more matches.
               </p>
               <button className="w-full bg-white text-slate-900 py-4 rounded-2xl font-bold hover:bg-wellness-50 transition-all flex items-center justify-center gap-2">
                 Update Profile <Settings size={18} />

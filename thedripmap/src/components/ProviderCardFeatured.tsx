@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, Star, Clock, ShieldCheck, Zap, Home, Building2, Sparkles, ArrowRight } from 'lucide-react';
+import { MapPin, Sparkles, ArrowRight } from 'lucide-react';
 import { Provider, OperatorProfile } from '../types';
 import { RatingStars } from './RatingStars';
 import { ServicePill } from './ServicePill';
@@ -15,7 +15,7 @@ interface ProviderCardFeaturedProps {
   isPrimary?: boolean;
 }
 
-export const ProviderCardFeatured = ({ provider, operatorProfile, rank = 1, isPrimary = true }: ProviderCardFeaturedProps) => {
+export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = true }: ProviderCardFeaturedProps) => {
   const slug = slugify(provider.name);
   const priceAnchor = provider.priceRange === '$' ? '$99' : provider.priceRange === '$$' ? '$149' : provider.priceRange === '$$$' ? '$199' : '$249';
 
@@ -84,7 +84,7 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, rank = 1, isPr
           {operatorProfile?.profile_data.oneLiner && (
             <div className="mb-6 bg-wellness-50 p-4 rounded-2xl border border-wellness-100">
               <p className="text-sm text-wellness-900 font-bold italic leading-relaxed">
-                "{operatorProfile.profile_data.oneLiner}"
+                &quot;{operatorProfile.profile_data.oneLiner}&quot;
               </p>
             </div>
           )}

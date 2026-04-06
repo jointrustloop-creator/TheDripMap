@@ -2,7 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
-import { Mail, Phone, MapPin, MessageSquare } from 'lucide-react';
+import { Mail, MapPin, MessageSquare } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: "Contact Us | Get in Touch with TheDripMap | TheDripMap",
@@ -20,7 +20,7 @@ export default function ContactPage() {
             Get in <span className="text-wellness-600">Touch</span>
           </h1>
           <p className="text-xl text-slate-500 leading-relaxed">
-            Have questions about IV therapy or want to list your clinic? We're here to help.
+            Have questions about IV therapy or want to list your clinic? We&apos;re here to help.
           </p>
         </div>
 

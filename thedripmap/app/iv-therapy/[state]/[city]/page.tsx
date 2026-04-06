@@ -3,18 +3,10 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { 
   MapPin, 
-  Droplets, 
-  Star, 
-  Clock, 
   ShieldCheck, 
   Zap, 
-  ArrowRight,
-  Activity,
-  Heart,
-  Sparkles,
-  Dumbbell,
-  Search,
-  CheckCircle2
+  CheckCircle2,
+  Clock
 } from 'lucide-react';
 import { Navbar } from '../../../../src/components/Navbar';
 import { Footer } from '../../../../src/components/Footer';

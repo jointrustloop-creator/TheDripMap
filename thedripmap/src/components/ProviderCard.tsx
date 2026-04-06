@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, Star, Clock, ShieldCheck, Zap, Home, Building2, Sparkles } from 'lucide-react';
+import { MapPin, Clock, Zap, Home, Building2, Sparkles } from 'lucide-react';
 import { Provider, OperatorProfile } from '../types';
 import { RatingStars } from './RatingStars';
 import { ServicePill } from './ServicePill';
@@ -75,7 +75,7 @@ export const ProviderCard = ({ provider, operatorProfile, className }: ProviderC
 
           {operatorProfile?.profile_data.oneLiner && (
             <p className="text-sm text-slate-600 mb-4 line-clamp-2 italic font-medium">
-              "{operatorProfile.profile_data.oneLiner}"
+              &quot;{operatorProfile.profile_data.oneLiner}&quot;
             </p>
           )}
 

@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import Link from 'next/link';
-import { ShieldCheck, Zap, ArrowRight, Activity, Heart, Sparkles, Dumbbell, MapPin, Droplets } from 'lucide-react';
+import { ShieldCheck, Zap } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: "About TheDripMap | Our Mission & Clinical Standards | TheDripMap",
@@ -21,18 +21,18 @@ export default function AboutPage() {
             Our <span className="text-wellness-600">Mission</span>
           </h1>
           <p className="text-xl text-slate-500 leading-relaxed">
-            We're building the most trusted resource for IV therapy and clinical wellness in the United States. Our goal is to help you find the perfect provider based on your specific health goals and lifestyle needs.
+            We&apos;re building the most trusted resource for IV therapy and clinical wellness in the United States. Our goal is to help you find the perfect provider based on your specific health goals and lifestyle needs.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-20 items-center mb-32">
           <div>
-            <h2 className="text-4xl font-black text-slate-900 mb-8 tracking-tight">The Problem We're Solving</h2>
+            <h2 className="text-4xl font-black text-slate-900 mb-8 tracking-tight">The Problem We&apos;re Solving</h2>
             <p className="text-lg text-slate-500 leading-relaxed mb-8">
-              Finding a reputable IV therapy provider can be difficult. With so many options available, it's hard to know which clinics prioritize medical supervision, follow strict safety protocols, and offer the best value for your money.
+              Finding a reputable IV therapy provider can be difficult. With so many options available, it&apos;s hard to know which clinics prioritize medical supervision, follow strict safety protocols, and offer the best value for your money.
             </p>
             <p className="text-lg text-slate-500 leading-relaxed">
-              TheDripMap was created to bring transparency and trust to the IV therapy industry. We've analyzed hundreds of clinics across the country to provide you with the most accurate and up-to-date information.
+              TheDripMap was created to bring transparency and trust to the IV therapy industry. We&apos;ve analyzed hundreds of clinics across the country to provide you with the most accurate and up-to-date information.
             </p>
           </div>
           <div className="bg-wellness-50 rounded-[3rem] p-12 border border-wellness-100 shadow-xl shadow-wellness-100/50">

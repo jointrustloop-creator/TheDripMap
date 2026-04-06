@@ -2,27 +2,20 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
-  ClipboardList, 
-  ChevronRight, 
-  ChevronLeft, 
   Zap, 
   MapPin, 
   Droplets, 
-  Star, 
-  Clock, 
   ShieldCheck, 
   Activity,
   Heart,
   Sparkles,
   Dumbbell,
-  Coffee,
-  Moon,
   Sun,
-  X,
-  CheckCircle2
+  CheckCircle2,
+  ChevronLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { SurveyState, City, TreatmentType } from '../../src/types';
+import { SurveyState, City } from '../../src/types';
 import { cn } from '../../src/lib/utils';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
@@ -30,8 +23,8 @@ import { Footer } from '../../src/components/Footer';
 const TOP_CITIES: City[] = [
   'New York', 'Los Angeles', 'Miami', 'Las Vegas', 'Austin', 
   'Chicago', 'Washington', 'Portland', 'San Francisco', 'San Diego',
-  'Dallas' as any, 'Houston' as any, 'Phoenix' as any, 'Atlanta' as any, 'Denver' as any,
-  'Seattle' as any, 'Boston' as any, 'Nashville' as any, 'Charlotte' as any, 'Orlando'
+  'Dallas' as City, 'Houston' as City, 'Phoenix' as City, 'Atlanta' as City, 'Denver' as City,
+  'Seattle' as City, 'Boston' as City, 'Nashville' as City, 'Charlotte' as City, 'Orlando' as City
 ];
 
 const STEPS = [
@@ -86,7 +79,7 @@ export default function QuizPage() {
   const [data, setData] = useState<SurveyState>({});
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const handleOptionSelect = (id: string, value: any) => {
+  const handleOptionSelect = (id: string, value: string) => {
     const newData = { ...data, [id]: value };
     setData(newData);
     

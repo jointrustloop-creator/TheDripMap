@@ -1,16 +1,10 @@
 'use client';
-import React, { useState, useMemo, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { 
   Search, 
-  MapPin, 
   Filter, 
-  Zap, 
-  X, 
-  LayoutList, 
-  Map as MapIcon,
-  ChevronDown,
-  ChevronUp
+  Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Provider, City, TreatmentType } from '../../src/types';
@@ -39,7 +33,7 @@ function SearchContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   
-  const [selectedCity, setSelectedCity] = useState<City | 'All'>(searchParams.get('city') as any || 'All');
+  const [selectedCity, setSelectedCity] = useState<City | 'All'>((searchParams.get('city') as City) || 'All');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [typeFilter, setTypeFilter] = useState<TreatmentType | 'All'>('All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -126,7 +120,7 @@ function SearchContent() {
                       {topCities.map(c => (
                         <button 
                           key={c.city}
-                          onClick={() => setSelectedCity(c.city as any)}
+                          onClick={() => setSelectedCity(c.city as City)}
                           className={cn(
                             "px-4 py-2 rounded-xl text-xs font-bold border transition-all",
                             selectedCity === c.city ? "bg-wellness-50 border-wellness-600 text-wellness-700" : "bg-white border-slate-100 text-slate-600 hover:border-wellness-200"
@@ -144,7 +138,7 @@ function SearchContent() {
                       {['All', 'In-Clinic', 'Mobile'].map(type => (
                         <button 
                           key={type}
-                          onClick={() => setTypeFilter(type as any)}
+                          onClick={() => setTypeFilter(type as TreatmentType | 'All')}
                           className={cn(
                             "w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold border transition-all",
                             typeFilter === type ? "bg-wellness-50 border-wellness-600 text-wellness-700" : "bg-white border-slate-100 text-slate-600 hover:border-wellness-200"

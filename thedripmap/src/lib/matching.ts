@@ -77,8 +77,8 @@ export function matchProviders(answers: SurveyState, providers: Provider[], oper
     }
 
     // Randomize slightly for "clinical nuance" simulation
-    const finalScore = Math.min(100, score + Math.floor(Math.random() * 5));
+    // const finalScore = Math.min(100, score + Math.floor(Math.random() * 5));
 
-    return { ...p, matchScore: score }; // Using raw score for sorting, but can use finalScore for display
+    return { ...p, matchScore: score }; // Using raw score for sorting
   }).sort((a, b) => b.matchScore - a.matchScore);
 }

@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
-import { ShieldCheck, Zap, ArrowRight, BarChart, Users, Globe } from 'lucide-react';
+import { ShieldCheck, ArrowRight, BarChart, Users, Globe } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: "For Clinics | Grow Your IV Therapy Practice | TheDripMap",

@@ -4,24 +4,12 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { 
   MapPin, 
-  Droplets, 
-  Star, 
-  Clock, 
   ShieldCheck, 
   Zap, 
-  ArrowRight,
   Activity,
-  Heart,
-  Sparkles,
-  Dumbbell,
-  Search,
-  CheckCircle2,
   Phone,
-  Globe,
-  Navigation,
   Calendar,
-  Info,
-  AlertCircle,
+  Clock,
   Building2,
   Home
 } from 'lucide-react';
@@ -30,8 +18,7 @@ import { Footer } from '../../../src/components/Footer';
 import { RatingStars } from '../../../src/components/RatingStars';
 import { ServicePill } from '../../../src/components/ServicePill';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
-import { getListingBySlug, getListingsByCity, slugify, getAllListings } from '../../../src/lib/data';
-import { cn } from '../../../src/lib/utils';
+import { getListingBySlug, slugify, getAllListings } from '../../../src/lib/data';
 
 export const revalidate = 86400; // 24 hours
 
@@ -86,7 +73,6 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
 
   const citySlug = slugify(provider.city);
   // We don't have the state here easily, but we can find it from other listings in the same city
-  const cityListings = await getListingsByCity(provider.city);
   const stateCode = 'CA'; // Default fallback, should ideally be derived
   const stateSlug = slugify(stateCode);
 
@@ -135,6 +121,13 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
         "item": `https://thedripmap.com/provider/${slug}`
       }
     ]
+  };
+
+  const decisionDrivers = provider.decisionDrivers || {
+    luxuryExperience: 3,
+    speedOfService: 3,
+    valueForMoney: 3,
+    medicalSupervision: true
   };
 
   return (
@@ -254,33 +247,33 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 <div className="space-y-2">
                   <div className="flex justify-between items-end">
                     <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Luxury Experience</span>
-                    <span className="text-lg font-black text-wellness-400">{provider.decisionDrivers.luxuryExperience}/5</span>
+                    <span className="text-lg font-black text-wellness-400">{decisionDrivers.luxuryExperience}/5</span>
                   </div>
                   <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-wellness-500" style={{ width: `${(provider.decisionDrivers.luxuryExperience / 5) * 100}%` }} />
+                    <div className="h-full bg-wellness-500" style={{ width: `${(decisionDrivers.luxuryExperience / 5) * 100}%` }} />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between items-end">
                     <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Speed of Service</span>
-                    <span className="text-lg font-black text-wellness-400">{provider.decisionDrivers.speedOfService}/5</span>
+                    <span className="text-lg font-black text-wellness-400">{decisionDrivers.speedOfService}/5</span>
                   </div>
                   <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-wellness-500" style={{ width: `${(provider.decisionDrivers.speedOfService / 5) * 100}%` }} />
+                    <div className="h-full bg-wellness-500" style={{ width: `${(decisionDrivers.speedOfService / 5) * 100}%` }} />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between items-end">
                     <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Value for Money</span>
-                    <span className="text-lg font-black text-wellness-400">{provider.decisionDrivers.valueForMoney}/5</span>
+                    <span className="text-lg font-black text-wellness-400">{decisionDrivers.valueForMoney}/5</span>
                   </div>
                   <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-wellness-500" style={{ width: `${(provider.decisionDrivers.valueForMoney / 5) * 100}%` }} />
+                    <div className="h-full bg-wellness-500" style={{ width: `${(decisionDrivers.valueForMoney / 5) * 100}%` }} />
                   </div>
                 </div>
               </div>
               
-              {provider.decisionDrivers.medicalSupervision && (
+              {decisionDrivers.medicalSupervision && (
                 <div className="mt-10 pt-8 border-t border-slate-800 flex items-center gap-3 text-wellness-400">
                   <ShieldCheck size={24} />
                   <span className="font-bold">Medical Director Supervised Protocols</span>
