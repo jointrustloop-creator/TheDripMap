@@ -43,9 +43,11 @@ interface ProviderPageProps {
 
 export async function generateStaticParams() {
   const providers = await getAllListings();
-  return providers.map((p) => ({
-    slug: slugify(p.name),
-  }));
+  return providers
+    .filter(p => p.name)
+    .map((p) => ({
+      slug: slugify(p.name),
+    }));
 }
 
 export async function generateMetadata({ params }: ProviderPageProps): Promise<Metadata> {

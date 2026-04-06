@@ -2,7 +2,8 @@ import { Provider, BlogPost, OperatorProfile } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
 
 // Helper to slugify strings
-export const slugify = (text: string) => {
+export const slugify = (text: string | null | undefined) => {
+  if (!text) return '';
   return text
     .toString()
     .toLowerCase()

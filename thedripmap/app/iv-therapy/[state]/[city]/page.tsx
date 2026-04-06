@@ -35,10 +35,12 @@ interface CityPageProps {
 
 export async function generateStaticParams() {
   const cities = await getAllCities();
-  return cities.map((c) => ({
-    state: slugify(c.state),
-    city: slugify(c.city),
-  }));
+  return cities
+    .filter(c => c.state && c.city)
+    .map((c) => ({
+      state: slugify(c.state),
+      city: slugify(c.city),
+    }));
 }
 
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {

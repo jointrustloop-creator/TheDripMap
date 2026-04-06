@@ -24,12 +24,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // City Pages
   const cities = await getAllCities();
-  const cityRoutes = cities.map((c) => ({
-    url: `${baseUrl}/iv-therapy/${slugify(c.state)}/${slugify(c.city)}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
-  }));
+  const cityRoutes = cities
+    .filter(c => c.state && c.city)
+    .map((c) => ({
+      url: `${baseUrl}/iv-therapy/${slugify(c.state)}/${slugify(c.city)}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    }));
 
   // Provider Pages
   const providers = await getAllListings();
