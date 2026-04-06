@@ -222,7 +222,7 @@ export default async function CityPage({ params }: CityPageProps) {
           <div className="relative z-10 max-w-2xl">
             <h2 className="text-4xl font-black mb-6 tracking-tight">Why Get IV Therapy in {cityName}?</h2>
             <p className="text-lg text-wellness-100 leading-relaxed mb-8">
-              {cityName} is a hub for wellness and performance. Whether you're recovering from a long flight, prepping for a big event, or just maintaining your health, {cityName}'s top clinics offer cutting-edge protocols tailored to your lifestyle.
+              {cityName} is a hub for wellness and performance. Whether you&apos;re recovering from a long flight, prepping for a big event, or just maintaining your health, {cityName}&apos;s top clinics offer cutting-edge protocols tailored to your lifestyle.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="flex items-start gap-3">

@@ -83,13 +83,13 @@ export default async function HomePage() {
           <div className="text-center max-w-4xl mx-auto mb-16">
             <div className="inline-flex items-center gap-2 bg-wellness-50 text-wellness-700 px-4 py-1.5 rounded-full text-sm font-bold mb-8 border border-wellness-100">
               <Sparkles size={16} />
-              <span>The Nation's #1 IV Therapy Directory</span>
+              <span>The Nation&apos;s #1 IV Therapy Directory</span>
             </div>
             <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-8 tracking-tight leading-[1.1]">
               Find the Right IV Therapy — <span className="text-wellness-600">Without Guessing.</span>
             </h1>
             <p className="text-xl text-slate-500 mb-12 leading-relaxed max-w-2xl mx-auto">
-              We've analyzed {stats.totalListings} clinics across {stats.totalCities} cities. Get matched to your perfect drip in 60 seconds.
+              We&apos;ve analyzed {stats.totalListings} clinics across {stats.totalCities} cities. Get matched to your perfect drip in 60 seconds.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

@@ -218,7 +218,7 @@ export default async function ServicePage({ params }: ServicePageProps) {
           <div className="relative z-10 max-w-2xl">
             <h2 className="text-4xl font-black mb-6 tracking-tight">Understanding {service.name} IV Therapy</h2>
             <p className="text-lg text-slate-300 leading-relaxed mb-8">
-              {service.name} IV therapy is a powerful clinical tool for maintaining optimal health and recovering quickly from life's demands. By delivering nutrients directly into your bloodstream, you achieve 100% absorption, bypassing the digestive system for immediate cellular benefit.
+              {service.name} IV therapy is a powerful clinical tool for maintaining optimal health and recovering quickly from life&apos;s demands. By delivering nutrients directly into your bloodstream, you achieve 100% absorption, bypassing the digestive system for immediate cellular benefit.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="flex items-start gap-3">
