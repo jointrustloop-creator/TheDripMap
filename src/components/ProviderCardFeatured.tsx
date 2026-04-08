@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, Sparkles, ArrowRight } from 'lucide-react';
+import { MapPin, Sparkles, ArrowRight, Phone, Globe } from 'lucide-react';
 import { Provider, OperatorProfile } from '../types';
 import { RatingStars } from './RatingStars';
 import { ServicePill } from './ServicePill';
@@ -35,19 +35,27 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
           "relative overflow-hidden",
           isPrimary ? "md:w-80 h-72 md:h-auto rounded-[2rem]" : "h-48"
         )}>
-          <Image 
-            src={provider.imageUrl} 
-            alt={`${provider.name} IV therapy clinic in ${provider.city}`}
-            fill
-            referrerPolicy="no-referrer"
-            className="object-cover group-hover:scale-110 transition-transform duration-700"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <Link href={`/provider/${slug}`} className="block h-full">
+            <Image 
+              src={provider.imageUrl} 
+              alt={`${provider.name} IV therapy clinic in ${provider.city}`}
+              fill
+              referrerPolicy="no-referrer"
+              className="object-cover group-hover:scale-110 transition-transform duration-700"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          </Link>
           
           {isPrimary && (
             <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-wellness-700 px-4 py-2 rounded-2xl text-xs font-black shadow-xl flex items-center gap-2">
               <Sparkles size={14} /> YOUR BEST MATCH
+            </div>
+          )}
+
+          {provider.distance !== undefined && (
+            <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-slate-900 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg">
+              {provider.distance} miles away
             </div>
           )}
         </div>
@@ -59,12 +67,14 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
         )}>
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h3 className={cn(
-                "font-black text-slate-900 group-hover:text-wellness-600 transition-colors leading-tight",
-                isPrimary ? "text-3xl mb-2" : "text-xl mb-1"
-              )}>
-                {provider.name}
-              </h3>
+              <Link href={`/provider/${slug}`} className="block">
+                <h3 className={cn(
+                  "font-black text-slate-900 group-hover:text-wellness-600 transition-colors leading-tight",
+                  isPrimary ? "text-3xl mb-2" : "text-xl mb-1"
+                )}>
+                  {provider.name}
+                </h3>
+              </Link>
               <div className="flex items-center gap-3">
                 <RatingStars rating={provider.rating} count={provider.reviewCount} />
                 <div className="w-1 h-1 bg-slate-200 rounded-full" />
@@ -107,14 +117,26 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
             >
               View Full Details <ArrowRight size={20} />
             </Link>
-            <a 
-              href="#" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto bg-white border border-slate-200 text-slate-900 px-8 py-4 rounded-2xl font-bold hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
-            >
-              Book Now
-            </a>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              {provider.phone && (
+                <a 
+                  href={`tel:${provider.phone}`}
+                  className="flex-1 sm:flex-none bg-white border border-slate-200 text-slate-900 px-6 py-4 rounded-2xl font-bold hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
+                >
+                  <Phone size={18} /> Call
+                </a>
+              )}
+              {provider.website && (
+                <a 
+                  href={provider.website}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex-1 sm:flex-none bg-white border border-slate-200 text-slate-900 px-6 py-4 rounded-2xl font-bold hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
+                >
+                  <Globe size={18} /> Website
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </div>

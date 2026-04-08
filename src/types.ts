@@ -25,6 +25,7 @@ export interface Provider {
   description: string;
   imageUrl: string;
   is_featured: boolean;
+  distance?: number;
   decisionDrivers?: {
     medicalSupervision: boolean;
     luxuryExperience: number; // 1-5

@@ -14,6 +14,7 @@ import { ProviderCardFeatured } from '../../../src/components/ProviderCardFeatur
 import { ProviderCard } from '../../../src/components/ProviderCard';
 import { SurveyState, OperatorProfile, Provider, City, TreatmentType } from '../../../src/types';
 import { getOperatorProfiles, getAllListings } from '../../../src/lib/data';
+import { getUserLocation, UserLocation } from '../../../src/lib/geo';
 
 export default function ResultsPage() {
   return (
@@ -35,18 +36,27 @@ function ResultsContent() {
   const router = useRouter();
   const [operatorProfiles, setOperatorProfiles] = React.useState<OperatorProfile[]>([]);
   const [listings, setListings] = React.useState<Provider[]>([]);
+  const [userLocation, setUserLocation] = React.useState<UserLocation | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
     async function loadData() {
       setIsLoading(true);
-      const [profiles, allListings] = await Promise.all([
-        getOperatorProfiles(),
-        getAllListings()
-      ]);
-      setOperatorProfiles(profiles);
-      setListings(allListings);
-      setIsLoading(false);
+      try {
+        const [profiles, allListings, location] = await Promise.allSettled([
+          getOperatorProfiles(),
+          getAllListings(),
+          getUserLocation().catch(() => null)
+        ]);
+
+        if (profiles.status === 'fulfilled') setOperatorProfiles(profiles.value);
+        if (allListings.status === 'fulfilled') setListings(allListings.value);
+        if (location.status === 'fulfilled') setUserLocation(location.value as UserLocation);
+      } catch (err) {
+        console.error('Error loading results data:', err);
+      } finally {
+        setIsLoading(false);
+      }
     }
     loadData();
   }, []);
@@ -60,8 +70,8 @@ function ResultsContent() {
 
   const scoredProviders = useMemo(() => {
     if (listings.length === 0) return [];
-    return matchProviders(surveyData, listings, operatorProfiles);
-  }, [surveyData, operatorProfiles, listings]);
+    return matchProviders(surveyData, listings, operatorProfiles, userLocation || undefined);
+  }, [surveyData, operatorProfiles, listings, userLocation]);
 
   const topMatch = scoredProviders[0];
   const otherMatches = scoredProviders.slice(1, 4);
@@ -71,8 +81,41 @@ function ResultsContent() {
       <div className="min-h-screen bg-[#FDFDFB] flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-wellness-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-500 font-bold">Analyzing your results...</p>
+          <h2 className="text-2xl font-black text-slate-900 mb-2">Analyzing Clinical Data</h2>
+          <p className="text-slate-500 font-bold">Finding your perfect IV therapy match...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (scoredProviders.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#FDFDFB]">
+        <Navbar />
+        <div className="max-w-4xl mx-auto px-6 py-32 text-center">
+          <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-8 text-slate-400">
+            <Sparkles size={40} />
+          </div>
+          <h1 className="text-4xl font-black text-slate-900 mb-4">No Matches Found</h1>
+          <p className="text-lg text-slate-500 mb-12 max-w-lg mx-auto">
+            We couldn&apos;t find any clinics matching your specific criteria in {surveyData.city || 'your area'}. Try adjusting your search or browsing all providers.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button 
+              onClick={() => router.push('/quiz')}
+              className="w-full sm:w-auto bg-wellness-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-wellness-700 transition-all"
+            >
+              Retake Quiz
+            </button>
+            <Link 
+              href="/search"
+              className="w-full sm:w-auto bg-white text-slate-900 border-2 border-slate-900 px-8 py-4 rounded-2xl font-bold hover:bg-slate-900 hover:text-white transition-all"
+            >
+              Browse All Clinics
+            </Link>
+          </div>
+        </div>
+        <Footer />
       </div>
     );
   }

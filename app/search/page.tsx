@@ -13,6 +13,7 @@ import { Footer } from '../../src/components/Footer';
 import { ProviderCard } from '../../src/components/ProviderCard';
 import { cn } from '../../src/lib/utils';
 import { searchListings, getAllCities } from '../../src/lib/data';
+import { getUserLocation, UserLocation } from '../../src/lib/geo';
 
 export default function SearchPage() {
   return (
@@ -39,12 +40,20 @@ function SearchContent() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filteredProviders, setFilteredProviders] = useState<Provider[]>([]);
   const [topCities, setTopCities] = useState<{city: string, state: string, count: number}[]>([]);
+  const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       const cities = await getAllCities();
       setTopCities(cities.slice(0, 12));
+      
+      try {
+        const location = await getUserLocation();
+        setUserLocation(location);
+      } catch (err) {
+        console.warn('Geolocation not available:', err);
+      }
     };
     loadData();
   }, []);
@@ -52,13 +61,20 @@ function SearchContent() {
   useEffect(() => {
     const fetchListings = async () => {
       setIsLoading(true);
-      const results = await searchListings(searchQuery, selectedCity);
-      setFilteredProviders(results);
+      const results = await searchListings(searchQuery, selectedCity, userLocation || undefined);
+      
+      // Secondary filter for type
+      let filtered = results;
+      if (typeFilter !== 'All') {
+        filtered = results.filter(p => p.type === typeFilter);
+      }
+      
+      setFilteredProviders(filtered);
       setIsLoading(false);
     };
 
     fetchListings();
-  }, [selectedCity, searchQuery, typeFilter]);
+  }, [selectedCity, searchQuery, typeFilter, userLocation]);
 
   return (
     <div className="min-h-screen bg-[#FDFDFB]">

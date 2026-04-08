@@ -1,4 +1,5 @@
-import { Provider, BlogPost, OperatorProfile } from '../types';
+import { calculateDistance } from './geo';
+import { Provider, City, BlogPost, OperatorProfile } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
 import { MOCK_CITIES, MOCK_LISTINGS, MOCK_BLOG_POSTS } from './mock-data';
 
@@ -222,7 +223,11 @@ export async function getListingsByService(service: string, limit: number = 4) {
   }
 }
 
-export async function searchListings(query: string, city?: string) {
+export async function searchListings(
+  query: string, 
+  city?: string,
+  userLocation?: { latitude: number; longitude: number }
+) {
   if (!isSupabaseConfigured()) return [];
   try {
     let supabaseQuery = supabase.from('providers').select('*');
@@ -241,12 +246,28 @@ export async function searchListings(query: string, city?: string) {
 
     if (error) throw error;
     if (data && data.length > 0) {
-      return data.map(p => ({
+      const results = data.map(p => ({
         ...p,
         rating: Number(p.rating) || 0,
         reviewCount: Number(p.reviews) || 0,
-        imageUrl: p.imageUrl || `https://picsum.photos/seed/${p.id}/800/600`
+        imageUrl: p.imageUrl || `https://picsum.photos/seed/${p.id}/800/600`,
+        distance: userLocation && p.latitude && p.longitude 
+          ? calculateDistance(userLocation.latitude, userLocation.longitude, p.latitude, p.longitude)
+          : undefined
       })) as Provider[];
+
+      if (userLocation) {
+        results.sort((a, b) => {
+          if (a.distance !== undefined && b.distance !== undefined) {
+            return a.distance - b.distance;
+          }
+          if (a.distance !== undefined) return -1;
+          if (b.distance !== undefined) return 1;
+          return b.rating - a.rating;
+        });
+      }
+
+      return results;
     }
   } catch (err) {
     console.warn('Supabase info: searching listings:', err);
@@ -362,10 +383,12 @@ export async function getBlogPosts() {
         throw error;
       }
       if (data && data.length > 0) {
-        return (data as BlogPost[]).map(post => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (data as any[]).map(post => ({
           ...post,
+          content: post.content || post.body || post.markdown || post.text || '',
           imageUrl: post.imageUrl || `https://picsum.photos/seed/${post.slug}/800/600`
-        }));
+        })) as BlogPost[];
       }
     } catch {
       // Silent fail for blog posts
@@ -387,11 +410,16 @@ export async function getBlogPostBySlug(slug: string) {
 
       if (error && error.code !== 'PGRST116') throw error;
       if (data) {
-        const post = data as BlogPost;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const post = data as any;
+        // Handle potential column name variations
+        const content = post.content || post.body || post.markdown || post.text || '';
+        
         return {
           ...post,
+          content,
           imageUrl: post.imageUrl || `https://picsum.photos/seed/${post.slug}/800/600`
-        };
+        } as BlogPost;
       }
     } catch (_err) {
       console.error('Supabase error fetching blog post by slug:', _err);

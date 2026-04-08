@@ -1,10 +1,35 @@
 import { Provider, SurveyState, OperatorProfile } from '../types';
+import { calculateDistance } from './geo';
 
-export function matchProviders(answers: SurveyState, providers: Provider[], operatorProfiles: OperatorProfile[] = []) {
+export function matchProviders(
+  answers: SurveyState, 
+  providers: Provider[], 
+  operatorProfiles: OperatorProfile[] = [],
+  userLocation?: { latitude: number; longitude: number }
+) {
   return providers.map(p => {
     let score = 0;
     const profile = operatorProfiles.find(op => op.clinicId === p.id);
     
+    // 0. Distance Match (High Priority if location available)
+    let distance: number | undefined;
+    if (userLocation && p.latitude && p.longitude) {
+      distance = calculateDistance(
+        userLocation.latitude, 
+        userLocation.longitude, 
+        p.latitude, 
+        p.longitude
+      );
+      
+      // Bonus for proximity
+      if (distance <= 5) score += 500;
+      else if (distance <= 15) score += 300;
+      else if (distance <= 30) score += 100;
+      
+      // Penalty for very far (if not mobile)
+      if (distance > 50 && p.type !== 'Mobile') score -= 200;
+    }
+
     // 1. City Match (Highest Priority)
     if (answers.city && p.city === answers.city) {
       score += 1000;
@@ -79,6 +104,6 @@ export function matchProviders(answers: SurveyState, providers: Provider[], oper
     // Randomize slightly for "clinical nuance" simulation
     // const finalScore = Math.min(100, score + Math.floor(Math.random() * 5));
 
-    return { ...p, matchScore: score }; // Using raw score for sorting
+    return { ...p, matchScore: score, distance }; // Using raw score for sorting
   }).sort((a, b) => b.matchScore - a.matchScore);
 }

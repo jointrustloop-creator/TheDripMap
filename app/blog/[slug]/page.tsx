@@ -230,7 +230,15 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </div>
 
             <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline">
-              <ReactMarkdown>{post.content}</ReactMarkdown>
+              {post.content ? (
+                <ReactMarkdown>{post.content}</ReactMarkdown>
+              ) : (
+                <div className="bg-slate-50 border border-slate-100 rounded-3xl p-12 text-center">
+                  <Zap size={40} className="mx-auto mb-6 text-slate-300" />
+                  <h3 className="text-xl font-black text-slate-900 mb-2">Content Coming Soon</h3>
+                  <p className="text-slate-500">We are currently finalizing the medical review for this article. Please check back shortly.</p>
+                </div>
+              )}
             </div>
 
             {/* Related Cities Tags */}
