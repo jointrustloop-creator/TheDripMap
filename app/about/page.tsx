@@ -1,5 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
+import Image from 'next/image';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import Link from 'next/link';
@@ -26,6 +27,15 @@ export default function AboutPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-20 items-center mb-32">
+          <div className="relative h-[500px] rounded-[3rem] overflow-hidden shadow-2xl">
+            <Image 
+              src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=1200"
+              alt="Professional medical team at IV clinic"
+              fill
+              className="object-cover"
+              referrerPolicy="no-referrer"
+            />
+          </div>
           <div>
             <h2 className="text-4xl font-black text-slate-900 mb-8 tracking-tight">The Problem We&apos;re Solving</h2>
             <p className="text-lg text-slate-500 leading-relaxed mb-8">

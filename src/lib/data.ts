@@ -1,5 +1,5 @@
 import { calculateDistance } from './geo';
-import { Provider, City, BlogPost, OperatorProfile } from '../types';
+import { Provider, BlogPost, OperatorProfile } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
 import { MOCK_CITIES, MOCK_LISTINGS, MOCK_BLOG_POSTS } from './mock-data';
 

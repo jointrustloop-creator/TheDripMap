@@ -28,7 +28,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['NAD+ Plus', 'Immune Support', 'Beauty Glow'],
     amenities: ['Private Rooms', 'Free WiFi', 'Beverages'],
     description: 'Premier IV therapy clinic in the heart of Manhattan offering customized wellness solutions.',
-    imageUrl: 'https://picsum.photos/seed/wellness/800/600',
+    imageUrl: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=800',
     is_featured: true,
     decisionDrivers: {
       medicalSupervision: true,
@@ -49,7 +49,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Hangover', 'Recovery', 'Hydration'],
     amenities: ['Valet Parking', 'Luxury Lounge'],
     description: 'Hollywood\'s favorite hydration spot for quick recovery and performance boosts.',
-    imageUrl: 'https://picsum.photos/seed/la/800/600',
+    imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=800',
     is_featured: true,
     decisionDrivers: {
       medicalSupervision: true,
@@ -70,7 +70,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Beauty Glow', 'Weight Loss', 'Hydration'],
     amenities: ['Mobile Service', 'Group Discounts'],
     description: 'Expert mobile IV therapy bringing the glow directly to your home or hotel.',
-    imageUrl: 'https://picsum.photos/seed/miami/800/600',
+    imageUrl: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=800',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -126,7 +126,7 @@ While time is the only absolute cure for a hangover, IV therapy can compress a 2
     `,
     date: '2024-04-01',
     author: 'Dr. Sarah Chen',
-    imageUrl: 'https://picsum.photos/seed/hangover-science/1200/800'
+    imageUrl: 'https://images.unsplash.com/photo-1527613426441-4da17471b66d?auto=format&fit=crop&q=80&w=1200'
   },
   {
     slug: 'nad-plus-iv-therapy-cellular-longevity-guide',
@@ -168,7 +168,7 @@ Whether you are an executive looking for a cognitive edge, an athlete seeking fa
     `,
     date: '2024-03-28',
     author: 'Dr. James Wilson',
-    imageUrl: 'https://picsum.photos/seed/nad-longevity/1200/800'
+    imageUrl: 'https://images.unsplash.com/photo-1559839734-2b71f1536783?auto=format&fit=crop&q=80&w=1200'
   },
   {
     slug: 'myers-cocktail-iv-benefits-chronic-fatigue',
@@ -206,7 +206,7 @@ The Myers’ Cocktail is exceptionally safe for most adults. For chronic conditi
     `,
     date: '2024-03-25',
     author: 'Dr. Sarah Chen',
-    imageUrl: 'https://picsum.photos/seed/myers-cocktail/1200/800'
+    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=1200'
   },
   {
     slug: 'iv-hydration-for-athletic-performance-recovery',
@@ -243,7 +243,7 @@ For competitive athletes, it is important to note that WADA (World Anti-Doping A
     `,
     date: '2024-03-20',
     author: 'Coach Alex Rivera',
-    imageUrl: 'https://picsum.photos/seed/athlete-recovery/1200/800'
+    imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=1200'
   },
   {
     slug: 'iv-therapy-safety-side-effects-guide',
@@ -295,7 +295,7 @@ While rare, serious complications can occur if protocols are not followed:
     `,
     date: '2024-03-15',
     author: 'Dr. Sarah Chen',
-    imageUrl: 'https://picsum.photos/seed/iv-safety/1200/800'
+    imageUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1200'
   },
   {
     slug: 'mobile-iv-vs-in-clinic-comparison',
@@ -339,6 +339,6 @@ If you are feeling 10/10 and want to maintain your health, the **Wellness Lounge
     `,
     date: '2024-03-10',
     author: 'Mark Johnson',
-    imageUrl: 'https://picsum.photos/seed/mobile-vs-clinic/1200/800'
+    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=1200'
   }
 ];

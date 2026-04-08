@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   Zap, 
   Search, 
@@ -75,9 +76,9 @@ export default async function HomePage() {
       <section className="relative pt-32 pb-40 px-6 overflow-hidden bg-white">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center max-w-5xl mx-auto mb-20">
-            <h1 className="text-6xl md:text-9xl font-[900] text-slate-900 mb-8 tracking-tighter leading-[0.85] uppercase italic">
+            <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-8 tracking-tight leading-[1.1]">
               Stop <span className="text-wellness-600">Guessing.</span> <br />
-              Get The <span className="underline decoration-wellness-500 decoration-8 underline-offset-8">Exact</span> IV <br />
+              Get The <span className="underline decoration-wellness-500 decoration-4 underline-offset-4">Exact</span> IV <br />
               You Need.
             </h1>
             
@@ -208,6 +209,62 @@ export default async function HomePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Human Connection Section */}
+      <section className="py-24 px-6 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="relative h-[600px] rounded-[3rem] overflow-hidden shadow-2xl">
+              <Image 
+                src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=1200"
+                alt="Happy people at wellness clinic"
+                fill
+                className="object-cover"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent" />
+              <div className="absolute bottom-10 left-10 right-10">
+                <div className="bg-white/90 backdrop-blur-md p-6 rounded-2xl border border-white/20">
+                  <p className="text-slate-900 font-bold italic">&quot;The best IV experience I&apos;ve ever had. The matching quiz found me a clinic that specialized exactly in what I needed for my marathon recovery.&quot;</p>
+                  <div className="mt-4 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-wellness-100 rounded-full flex items-center justify-center text-wellness-600 font-bold">JD</div>
+                    <div>
+                      <div className="text-sm font-black text-slate-900">Jessica D.</div>
+                      <div className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Verified Patient</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-8 tracking-tight leading-tight">
+                Wellness is Better <br />
+                <span className="text-wellness-600">When It&apos;s Personal.</span>
+              </h2>
+              <p className="text-lg text-slate-500 leading-relaxed mb-10">
+                We believe that IV therapy isn&apos;t just about the vitamins—it&apos;s about the care, the environment, and the results. That&apos;s why we only partner with clinics that prioritize the human experience.
+              </p>
+              <div className="space-y-6">
+                {[
+                  { title: 'Group Friendly', desc: 'Find clinics that offer group drips for bridal parties, corporate events, or friends.' },
+                  { title: 'Luxury Environments', desc: 'Browse lounges designed for relaxation with massage chairs and premium amenities.' },
+                  { title: 'Expert Care', desc: 'Every provider in our network is vetted for medical supervision and licensed administration.' }
+                ].map((item, idx) => (
+                  <div key={idx} className="flex gap-4">
+                    <div className="w-6 h-6 bg-wellness-100 rounded-full flex items-center justify-center text-wellness-600 shrink-0 mt-1">
+                      <Zap size={14} fill="currentColor" />
+                    </div>
+                    <div>
+                      <h4 className="font-black text-slate-900">{item.title}</h4>
+                      <p className="text-sm text-slate-500">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>

@@ -41,8 +41,10 @@ export function matchProviders(
     }
 
     // 3. User Goal (Specialties)
-    if (answers.goal && p.specialties.some(s => s.toLowerCase().includes(answers.goal?.toLowerCase() || ''))) {
-      score += 50;
+    if (answers.goal && p.specialties && Array.isArray(p.specialties)) {
+      if (p.specialties.some(s => s && s.toLowerCase().includes(answers.goal?.toLowerCase() || ''))) {
+        score += 50;
+      }
     }
 
     // 4. Delivery Preference
@@ -74,19 +76,19 @@ export function matchProviders(
       score += 1;
 
       // clinic primary_specialty matches patient goal (+20 points)
-      if (answers.goal && data.primarySpecialty.toLowerCase().includes(answers.goal.toLowerCase())) {
+      if (answers.goal && data.primarySpecialty && typeof data.primarySpecialty === 'string' && data.primarySpecialty.toLowerCase().includes(answers.goal.toLowerCase())) {
         score += 20;
       }
 
       // clinic environment matches patient preference (+10 points)
       // Note: We need to map patient preference to environment if applicable
       // For now, let's assume if patient wants luxury and clinic is spa-like
-      if (data.environment === 'Spa-like lounge' && (answers.lifestyle === 'Luxury' || answers.goal === 'Beauty + glow')) {
+      if (data.environment && typeof data.environment === 'string' && data.environment === 'Spa-like lounge' && (answers.lifestyle === 'Luxury' || answers.goal === 'Beauty + glow')) {
         score += 10;
       }
 
       // clinic price_range matches patient budget (+10 points)
-      if (answers.budget && data.priceRange.includes(answers.budget)) {
+      if (answers.budget && data.priceRange && typeof data.priceRange === 'string' && data.priceRange.includes(answers.budget)) {
         score += 10;
       }
 
