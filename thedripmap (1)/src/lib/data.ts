@@ -284,7 +284,10 @@ export async function getFeaturedListings(limit: number = 6) {
 }
 
 export async function getListingStats() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const configured = isSupabaseConfigured();
+  
   if (configured) {
     try {
       // 1. Get total count of providers
@@ -302,8 +305,8 @@ export async function getListingStats() {
       if (error) throw error;
       
       if (data) {
-        const cities = new Set(data.map(p => p.city || p.City).filter(Boolean));
-        const states = new Set(data.map(p => p.state || p.State).filter(Boolean));
+        const cities = new Set(data.map((p: { city?: string; City?: string }) => p.city || p.City).filter(Boolean));
+        const states = new Set(data.map((p: { state?: string; State?: string }) => p.state || p.State).filter(Boolean));
         
         return {
           totalListings: totalListings || data.length,
@@ -316,24 +319,32 @@ export async function getListingStats() {
       const message = err instanceof Error ? err.message : String(err);
       console.warn('Supabase stats info:', message);
       
-      // If it's a real connection error (like invalid key), we should report it
-      if (message.includes('API key') || message.includes('connection')) {
-        return {
-          totalListings: 0,
-          totalCities: 0,
-          totalStates: 0,
-          isLive: true,
-          error: message
-        };
-      }
+      return {
+        totalListings: 0,
+        totalCities: 0,
+        totalStates: 0,
+        isLive: true,
+        error: message
+      };
     }
+  }
+
+  // If not configured, check if it's because of placeholders
+  let configError = undefined;
+  if (url && key) {
+    if (url.includes('placeholder') || key.includes('your_anon_key')) {
+      configError = 'Supabase keys appear to be placeholders. Please update them in Settings.';
+    }
+  } else if (!url || !key) {
+    configError = 'Supabase environment variables are missing.';
   }
 
   return {
     totalListings: MOCK_LISTINGS.length,
     totalCities: MOCK_CITIES.length,
     totalStates: 5,
-    isLive: false
+    isLive: false,
+    error: configError
   };
 }
 

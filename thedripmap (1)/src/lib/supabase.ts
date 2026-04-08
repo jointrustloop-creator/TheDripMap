@@ -6,22 +6,48 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 export const isSupabaseConfigured = () => {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  return !!(url && key && !url.includes('placeholder') && !key.includes('your_anon_key'));
+  
+  const isPlaceholder = (str: string | undefined) => {
+    if (!str) return true;
+    let val = str.trim();
+    // Strip accidental prefixes before checking
+    if (val.includes('your_key_here=')) val = val.split('your_key_here=')[1];
+    if (val.includes('your_anon_key=')) val = val.split('your_anon_key=')[1];
+    
+    const lower = val.toLowerCase();
+    return lower.includes('placeholder') || 
+           lower.includes('your_anon_key') || 
+           lower.includes('your_key_here') ||
+           lower.includes('your_project_ref') ||
+           val.length < 20; // Real keys are long JWTs
+  };
+
+  return !!(url && key && !isPlaceholder(url) && !isPlaceholder(key));
 };
 
-// Initialize the client lazily to ensure environment variables are loaded
+// Initialize the client lazily and allow re-initialization if keys change
 let supabaseClient: SupabaseClient | null = null;
+let lastUsedUrl: string | null = null;
+let lastUsedKey: string | null = null;
 
 export const getSupabaseClient = () => {
-  if (supabaseClient) return supabaseClient;
-  
   let url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+  // If keys have changed, reset the client
+  if (supabaseClient && (url !== lastUsedUrl || key !== lastUsedKey)) {
+    supabaseClient = null;
+  }
+
+  if (supabaseClient) return supabaseClient;
   
-  if (!url || !key || url.includes('placeholder')) {
+  if (!isSupabaseConfigured()) {
     return createClient('https://placeholder.supabase.co', 'placeholder');
   }
 
+  lastUsedUrl = url;
+  lastUsedKey = key;
+  
   // Auto-clean the URL
   url = url.trim();
   if (url.endsWith('/')) url = url.slice(0, -1);
@@ -31,8 +57,16 @@ export const getSupabaseClient = () => {
     // If they just put the project ref, fix it
     url = `https://${url}.supabase.co`;
   }
+
+  // Auto-clean the Key (strip common accidental prefixes)
+  let cleanKey = key.trim();
+  if (cleanKey.includes('your_key_here=')) {
+    cleanKey = cleanKey.split('your_key_here=')[1];
+  } else if (cleanKey.includes('your_anon_key=')) {
+    cleanKey = cleanKey.split('your_anon_key=')[1];
+  }
   
-  supabaseClient = createClient(url, key);
+  supabaseClient = createClient(url, cleanKey);
   return supabaseClient;
 };
 

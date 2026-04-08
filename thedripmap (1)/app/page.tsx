@@ -102,19 +102,25 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            {isLive && (
-              <div className="mt-16 flex flex-col items-center gap-4">
+            <div className="mt-16 flex flex-col items-center gap-4">
+              {isLive ? (
                 <div className="inline-flex items-center gap-3 text-slate-400 font-black text-xs uppercase tracking-[0.3em]">
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-ping" />
                   {stats.totalListings > 0 ? `${stats.totalListings} Clinics Verified` : 'Live Database Connected'}
                 </div>
-                {stats.error && (
-                  <div className="bg-red-50 text-red-600 px-6 py-3 rounded-xl text-sm font-bold border border-red-100 max-w-lg">
-                    Connection Issue: {stats.error}
-                  </div>
-                )}
-              </div>
-            )}
+              ) : (
+                <div className="inline-flex items-center gap-3 text-amber-500 font-black text-xs uppercase tracking-[0.3em]">
+                  <div className="w-3 h-3 bg-amber-500 rounded-full" />
+                  Demo Mode (Mock Data)
+                </div>
+              )}
+              
+              {stats.error && (
+                <div className="bg-red-50 text-red-600 px-6 py-3 rounded-xl text-sm font-bold border border-red-100 max-w-lg">
+                  Connection Issue: {stats.error}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Path Cards */}

@@ -5,27 +5,27 @@ export type TreatmentType = 'In-Clinic' | 'Mobile' | 'Both';
 export interface Provider {
   id: string;
   name: string;
-  category: string;
-  subtypes: string[];
+  category?: string;
+  subtypes?: string[];
   phone?: string;
   website?: string;
   city: City;
-  state: string;
-  postal_code: string;
-  country: string;
-  latitude: number;
-  longitude: number;
+  state?: string;
+  postal_code?: string;
+  country?: string;
+  latitude?: number;
+  longitude?: number;
   address: string;
   rating: number;
   reviewCount: number;
-  priceRange: '$' | '$$' | '$$$' | '$$$$';
-  type: TreatmentType;
+  priceRange?: '$' | '$$' | '$$$' | '$$$$';
+  type?: TreatmentType;
   specialties: string[];
   amenities: string[];
   description: string;
   imageUrl: string;
   is_featured: boolean;
-  decisionDrivers: {
+  decisionDrivers?: {
     medicalSupervision: boolean;
     luxuryExperience: number; // 1-5
     speedOfService: number; // 1-5

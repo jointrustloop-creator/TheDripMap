@@ -1,7 +1,18 @@
 import type { Metadata } from "next";
+import { Inter, Outfit } from 'next/font/google';
 import "./globals.css";
 import Script from "next/script";
 import { ErrorBoundary } from "../src/components/ErrorBoundary";
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+});
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-display',
+});
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://thedripmap.com';
 const siteName = process.env.NEXT_PUBLIC_SITE_NAME || 'TheDripMap';
@@ -75,28 +86,8 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
       <head>
-        <Script id="fix-fetch" strategy="beforeInteractive">
-          {`
-            (function() {
-              try {
-                const descriptor = Object.getOwnPropertyDescriptor(window, 'fetch');
-                if (descriptor && !descriptor.writable && descriptor.configurable) {
-                  const originalFetch = window.fetch;
-                  Object.defineProperty(window, 'fetch', {
-                    value: originalFetch,
-                    writable: true,
-                    configurable: true,
-                    enumerable: true
-                  });
-                }
-              } catch (e) {
-                // Silently fail if we can't patch fetch
-              }
-            })();
-          `}
-        </Script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

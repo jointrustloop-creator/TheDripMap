@@ -24,16 +24,16 @@
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
     "recharts": "^3.8.1",
-    "tailwind-merge": "^3.5.0"
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^4.2.2",
+    "@tailwindcss/postcss": "^4.2.2",
+    "postcss": "^8.5.8",
+    "autoprefixer": "^10.4.21"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "^22.14.0",
-    "autoprefixer": "^10.4.21",
     "eslint": "^9.39.4",
     "eslint-config-next": "^15.1.0",
-    "postcss": "^8.5.8",
-    "tailwindcss": "^4.2.2",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2"
   }

@@ -52,7 +52,7 @@ function SearchContent() {
   useEffect(() => {
     const fetchListings = async () => {
       setIsLoading(true);
-      const results = await searchListings(searchQuery, selectedCity, typeFilter);
+      const results = await searchListings(searchQuery, selectedCity);
       setFilteredProviders(results);
       setIsLoading(false);
     };
