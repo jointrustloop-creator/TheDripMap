@@ -293,7 +293,7 @@ export async function getListingStats() {
       // 1. Get total count of providers
       const { count: totalListings, error: countError } = await supabase
         .from('providers')
-        .select('*', { count: 'exact', head: true });
+        .select('id', { count: 'exact', head: true });
 
       if (countError) throw countError;
 

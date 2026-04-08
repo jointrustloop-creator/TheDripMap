@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+// Fresh build trigger
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
