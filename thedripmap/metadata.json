@@ -1,5 +1,0 @@
-{
-  "name": "TheDripMap",
-  "description": "The definitive map and matching engine for IV therapy and drip bars. Find your perfect clinical match through our proprietary diagnostic survey.",
-  "requestFramePermissions": ["geolocation"]
-}
