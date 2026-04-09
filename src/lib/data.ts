@@ -427,11 +427,24 @@ export async function getBlogPosts() {
       }
       if (data && data.length > 0) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (data as any[]).map(post => ({
-          ...post,
-          content: post.content || post.body || post.markdown || post.text || '',
-          imageUrl: post.imageUrl || `https://picsum.photos/seed/${post.slug}/800/600`
-        })) as BlogPost[];
+        return (data as any[]).map(post => {
+          const content = post.content || post.body || post.markdown || post.text || '';
+          const isPlaceholder = content.length < 200 || 
+                               content.toLowerCase().includes('placeholder') || 
+                               content.toLowerCase().includes('app code') ||
+                               content.toLowerCase().includes('coming soon');
+          
+          if (isPlaceholder) {
+            const mockPost = MOCK_BLOG_POSTS.find(p => p.slug === post.slug);
+            if (mockPost) return mockPost;
+          }
+
+          return {
+            ...post,
+            content,
+            imageUrl: post.imageUrl || `https://picsum.photos/seed/${post.slug}/800/600`
+          };
+        }) as BlogPost[];
       }
     } catch {
       // Silent fail for blog posts
@@ -458,6 +471,17 @@ export async function getBlogPostBySlug(slug: string) {
         // Handle potential column name variations
         const content = post.content || post.body || post.markdown || post.text || '';
         
+        // CRITICAL: If content is very short or looks like a placeholder, prefer our high-quality mock data
+        const isPlaceholder = content.length < 200 || 
+                             content.toLowerCase().includes('placeholder') || 
+                             content.toLowerCase().includes('app code') ||
+                             content.toLowerCase().includes('coming soon');
+        
+        if (isPlaceholder) {
+          const mockPost = MOCK_BLOG_POSTS.find(p => p.slug === slug);
+          if (mockPost) return mockPost;
+        }
+
         return {
           ...post,
           content,

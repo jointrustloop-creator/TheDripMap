@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { MapPin, Droplets, Zap, Menu, X } from 'lucide-react';
+import { Zap, Menu, X } from 'lucide-react';
+import { Logo } from './Logo';
 import { LocationIndicator } from './LocationIndicator';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -19,12 +20,8 @@ export const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-4">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="relative w-10 h-10 bg-wellness-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-wellness-200 group-hover:scale-105 transition-transform">
-            <MapPin size={22} className="absolute" />
-            <Droplets size={14} className="absolute mb-1 text-wellness-200" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-slate-900">TheDripMap</span>
+        <Link href="/">
+          <Logo />
         </Link>
 
         <div className="flex items-center gap-4">

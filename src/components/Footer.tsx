@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Droplets } from 'lucide-react';
+import { Logo } from './Logo';
 import { MedicalDisclaimer } from './MedicalDisclaimer';
 
 export const Footer = () => {
@@ -8,12 +8,9 @@ export const Footer = () => {
     <footer className="bg-white border-t border-slate-200 py-12 px-6 mt-20">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
         <div className="lg:col-span-2">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 bg-wellness-600 rounded-lg flex items-center justify-center text-white">
-              <Droplets size={18} />
-            </div>
-            <span className="text-lg font-bold tracking-tight">TheDripMap</span>
-          </div>
+          <Link href="/" className="inline-block mb-6">
+            <Logo />
+          </Link>
           <p className="text-slate-500 max-w-sm leading-relaxed">
             The premium directory for IV therapy and clinical wellness. We help you find the perfect provider based on your specific health goals and lifestyle needs.
           </p>

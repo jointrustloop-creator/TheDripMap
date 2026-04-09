@@ -22,7 +22,7 @@ import { BlogCard } from '../../../src/components/BlogCard';
 import { getBlogPostBySlug, getBlogPosts, slugify, getListingsByIds } from '../../../src/lib/data';
 import { cn } from '../../../src/lib/utils';
 
-export const revalidate = 86400; // 24 hours
+export const revalidate = 0; // Disable caching for development
 
 interface BlogPostPageProps {
   params: Promise<{
