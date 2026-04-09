@@ -44,6 +44,40 @@ function SearchContent() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Sync with session storage if no city in URL
+    if (!searchParams.get('city')) {
+      const cached = sessionStorage.getItem('tdm_location');
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (parsed.city) {
+            setSelectedCity(parsed.city as City);
+          }
+        } catch (e) {
+          console.error('Failed to parse cached location', e);
+        }
+      }
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const handleLocationChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const newLoc = customEvent.detail;
+      if (newLoc && newLoc.city) {
+        setSelectedCity(newLoc.city as City);
+        // Update URL to reflect the change
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('city', newLoc.city);
+        router.push(`/search?${params.toString()}`, { scroll: false });
+      }
+    };
+
+    window.addEventListener('tdm_location_change', handleLocationChange);
+    return () => window.removeEventListener('tdm_location_change', handleLocationChange);
+  }, [searchParams, router]);
+
+  useEffect(() => {
     const loadData = async () => {
       const cities = await getAllCities();
       setTopCities(cities.slice(0, 12));

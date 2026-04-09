@@ -43,17 +43,32 @@ export async function getListingsByCity(city: string) {
   const configured = isSupabaseConfigured();
   if (configured) {
     try {
-      let query = supabase
+      // Try both 'city' and 'City' column names
+      const { data, error } = await supabase
         .from('providers')
         .select('*')
-        .ilike('city', city);
-      
-      // Try to order by rating
-      query = query.order('rating', { ascending: false });
+        .or(`city.ilike.%${city}%,City.ilike.%${city}%`)
+        .order('rating', { ascending: false });
 
-      const { data, error } = await query;
+      if (error) {
+        // Fallback to simple city query if .or fails (e.g. if one column doesn't exist)
+        const { data: data2, error: error2 } = await supabase
+          .from('providers')
+          .select('*')
+          .ilike('city', city)
+          .order('rating', { ascending: false });
+        
+        if (!error2 && data2 && data2.length > 0) {
+          return data2.map(p => ({
+            ...p,
+            rating: Number(p.rating) || 0,
+            reviewCount: Number(p.reviews) || 0,
+            imageUrl: p.imageUrl || `https://picsum.photos/seed/${p.id}/800/600`
+          })) as Provider[];
+        }
+        throw error;
+      }
 
-      if (error) throw error;
       if (data && data.length > 0) {
         return data.map(p => ({
           ...p,
@@ -74,20 +89,38 @@ export async function getListingBySlug(slug: string) {
   const configured = isSupabaseConfigured();
   if (configured) {
     try {
+      // 1. Try direct slug match
       const { data, error } = await supabase
         .from('providers')
         .select('*')
         .eq('slug', slug)
         .single();
 
-      if (error && error.code !== 'PGRST116') throw error;
-      if (data) {
+      if (!error && data) {
         return {
           ...data,
           rating: Number(data.rating) || 0,
           reviewCount: Number(data.reviews) || 0,
           imageUrl: data.imageUrl || `https://picsum.photos/seed/${data.id}/800/600`
         } as Provider;
+      }
+
+      // 2. If not found by slug, try matching by slugified name
+      // This handles cases where the slug column is empty or mismatched
+      const { data: allData, error: allErr } = await supabase
+        .from('providers')
+        .select('*');
+
+      if (!allErr && allData) {
+        const found = allData.find(p => slugify(p.name) === slug);
+        if (found) {
+          return {
+            ...found,
+            rating: Number(found.rating) || 0,
+            reviewCount: Number(found.reviews) || 0,
+            imageUrl: found.imageUrl || `https://picsum.photos/seed/${found.id}/800/600`
+          } as Provider;
+        }
       }
     } catch (err) {
       console.error('Supabase error fetching listing by slug:', err);
@@ -99,53 +132,63 @@ export async function getListingBySlug(slug: string) {
 
 export async function getAllCities() {
   const configured = isSupabaseConfigured();
-  if (!configured) return MOCK_CITIES;
   
-  try {
-    // 1. Try to get cities from providers table (most accurate for current data)
-    const { data: providerCities, error: providerError } = await supabase
-      .from('providers')
-      .select('city, state');
+  // We'll collect cities from all sources to ensure we don't miss any
+  const allCitiesMap = new Map<string, { city: string, state: string, count: number }>();
 
-    if (!providerError && providerCities && providerCities.length > 0) {
-      const cityCounts = providerCities.reduce((acc: Record<string, number>, curr: { city?: string; City?: string; state?: string; State?: string }) => {
-        const city = curr.city || curr.City;
-        const state = curr.state || curr.State;
-        if (city && state) {
-          const key = `${city}, ${state}`;
-          acc[key] = (acc[key] || 0) + 1;
-        }
-        return acc;
-      }, {});
+  // Helper to add cities to our map
+  const addCity = (city: string, state: string, count: number) => {
+    const key = `${city.toLowerCase()}-${state.toLowerCase()}`;
+    if (!allCitiesMap.has(key) || (allCitiesMap.get(key)?.count || 0) < count) {
+      allCitiesMap.set(key, { city, state, count });
+    }
+  };
 
-      if (Object.keys(cityCounts).length > 0) {
-        return Object.entries(cityCounts).map(([key, count]) => {
-          const [city, state] = key.split(', ');
-          return { city, state, count: count as number };
-        }).sort((a, b) => b.count - a.count);
+  if (configured) {
+    try {
+      // 1. Get cities from providers table
+      const { data: providerCities, error: providerError } = await supabase
+        .from('providers')
+        .select('city, City, state, State');
+
+      if (!providerError && providerCities) {
+        (providerCities as { city?: string; City?: string; state?: string; State?: string }[]).forEach((curr) => {
+          const city = curr.city || curr.City;
+          const state = curr.state || curr.State;
+          if (city && state) {
+            const existing = Array.from(allCitiesMap.values()).find(c => c.city.toLowerCase() === city.toLowerCase());
+            if (existing) {
+              existing.count++;
+            } else {
+              addCity(city, state, 1);
+            }
+          }
+        });
       }
-    }
 
-    // 2. Fallback to cities table
-    const { data, error } = await supabase
-      .from('cities')
-      .select('*')
-      .order('listings_count', { ascending: false });
+      // 2. Get cities from cities table
+      const { data: citiesTable, error: citiesError } = await supabase
+        .from('cities')
+        .select('*');
 
-    if (!error && data && data.length > 0) {
-      return data.map(c => ({
-        city: c.name || c.city,
-        state: c.state_code || c.state || 'US',
-        count: c.listings_count || 0
-      }));
+      if (!citiesError && citiesTable) {
+        (citiesTable as { name?: string; city?: string; state_code?: string; state?: string; listings_count?: number }[]).forEach((c) => {
+          const name = c.name || c.city;
+          const state = c.state_code || c.state || 'US';
+          if (name) {
+            addCity(name, state, c.listings_count || 0);
+          }
+        });
+      }
+    } catch (err) {
+      console.warn('Supabase info: fetching all cities:', err);
     }
-    
-    // 3. Final fallback to mock data if DB is empty
-    return MOCK_CITIES;
-  } catch (err) {
-    console.warn('Supabase info: fetching all cities:', err);
-    return MOCK_CITIES;
   }
+
+  // 3. Always include mock cities to ensure we have a baseline
+  MOCK_CITIES.forEach(c => addCity(c.city, c.state, c.count));
+
+  return Array.from(allCitiesMap.values()).sort((a, b) => b.count - a.count);
 }
 
 export async function getAllStates() {
@@ -182,7 +225,7 @@ export async function getListingsByService(service: string, limit: number = 4) {
     const { data, error } = await supabase
       .from('providers')
       .select('*')
-      .or(`specialties.cs.{"${service}"},subtypes.ilike.%${service}%,name.ilike.%${service}%,category.ilike.%${service}%`)
+      .or(`specialties.cs.{"${service}"},subtypes.cs.{"${service}"},name.ilike.%${service}%,category.ilike.%${service}%`)
       .order('rating', { ascending: false })
       .limit(limit);
 
@@ -508,7 +551,7 @@ export async function getListingsByServiceAndCity(service: string, city: string,
       .from('providers')
       .select('*')
       .ilike('city', city)
-      .or(`specialties.cs.{"${service}"},subtypes.ilike.%${service}%,name.ilike.%${service}%,category.ilike.%${service}%`)
+      .or(`specialties.cs.{"${service}"},subtypes.cs.{"${service}"},name.ilike.%${service}%,category.ilike.%${service}%`)
       .order('rating', { ascending: false })
       .limit(limit);
 

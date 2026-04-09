@@ -15,7 +15,7 @@ interface ProviderCardProps {
 }
 
 export const ProviderCard = ({ provider, operatorProfile, className }: ProviderCardProps) => {
-  const slug = slugify(provider.name);
+  const slug = provider.slug || slugify(provider.name);
   const priceAnchor = provider.priceRange === '$' ? '$99' : provider.priceRange === '$$' ? '$149' : provider.priceRange === '$$$' ? '$199' : '$249';
 
   return (
@@ -88,13 +88,20 @@ export const ProviderCard = ({ provider, operatorProfile, className }: ProviderC
             </p>
           )}
 
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-2">
             <RatingStars rating={provider.rating} count={provider.reviewCount} />
             <div className="w-1 h-1 bg-slate-200 rounded-full" />
             <div className="text-xs font-bold text-slate-500 flex items-center gap-1">
-              <MapPin size={12} /> {provider.city}
+              <MapPin size={12} className="text-wellness-600" /> {provider.city}
             </div>
           </div>
+
+          {provider.address && (
+            <div className="flex items-start gap-2 mb-4 text-xs text-slate-500 font-medium">
+              <Building2 size={12} className="mt-0.5 shrink-0 text-slate-400" />
+              <span className="line-clamp-1">{provider.address}</span>
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-1.5 mb-6">
             {(provider.specialties || []).slice(0, 3).map((specialty, idx) => (
@@ -112,7 +119,7 @@ export const ProviderCard = ({ provider, operatorProfile, className }: ProviderC
             {provider.phone && (
               <a 
                 href={`tel:${provider.phone}`}
-                className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-wellness-50 hover:text-wellness-600 transition-all"
+                className="w-11 h-11 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-wellness-50 hover:text-wellness-600 transition-all"
                 title="Call Clinic"
               >
                 <Phone size={18} />
@@ -123,7 +130,7 @@ export const ProviderCard = ({ provider, operatorProfile, className }: ProviderC
                 href={provider.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-wellness-50 hover:text-wellness-600 transition-all"
+                className="w-11 h-11 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-wellness-50 hover:text-wellness-600 transition-all"
                 title="Visit Website"
               >
                 <Globe size={18} />
@@ -131,7 +138,7 @@ export const ProviderCard = ({ provider, operatorProfile, className }: ProviderC
             )}
             <Link 
               href={`/provider/${slug}`}
-              className="w-10 h-10 rounded-xl bg-wellness-600 flex items-center justify-center text-white hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-100"
+              className="w-11 h-11 rounded-xl bg-wellness-600 flex items-center justify-center text-white hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-100"
               title="View Details"
             >
               <Zap size={18} />

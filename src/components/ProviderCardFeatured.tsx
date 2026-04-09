@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, Sparkles, ArrowRight, Phone, Globe } from 'lucide-react';
+import { MapPin, Sparkles, ArrowRight, Phone, Globe, Building2 } from 'lucide-react';
 import { Provider, OperatorProfile } from '../types';
 import { RatingStars } from './RatingStars';
 import { ServicePill } from './ServicePill';
@@ -16,7 +16,7 @@ interface ProviderCardFeaturedProps {
 }
 
 export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = true }: ProviderCardFeaturedProps) => {
-  const slug = slugify(provider.name);
+  const slug = provider.slug || slugify(provider.name);
   const priceAnchor = provider.priceRange === '$' ? '$99' : provider.priceRange === '$$' ? '$149' : provider.priceRange === '$$$' ? '$199' : '$249';
 
   return (
@@ -75,13 +75,18 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
                   {provider.name}
                 </h3>
               </Link>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 mb-2">
                 <RatingStars rating={provider.rating} count={provider.reviewCount} />
                 <div className="w-1 h-1 bg-slate-200 rounded-full" />
                 <div className="text-xs font-bold text-slate-500 flex items-center gap-1">
-                  <MapPin size={12} /> {provider.city}
+                  <MapPin size={12} className="text-wellness-600" /> {provider.city}
                 </div>
               </div>
+              {provider.address && (
+                <div className="text-xs text-slate-400 font-medium mb-4 flex items-center gap-1.5">
+                  <Building2 size={12} /> {provider.address}
+                </div>
+              )}
             </div>
             <div className="text-right">
               <div className={cn(

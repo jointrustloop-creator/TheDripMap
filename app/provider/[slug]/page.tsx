@@ -33,7 +33,7 @@ export async function generateStaticParams() {
   return providers
     .filter(p => p.name)
     .map((p) => ({
-      slug: slugify(p.name),
+      slug: p.slug || slugify(p.name),
     }));
 }
 
@@ -281,6 +281,47 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 </div>
               )}
             </section>
+
+            {/* Safety & Protocols */}
+            <section className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-sm">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
+                  <ShieldCheck size={24} />
+                </div>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Safety & Clinical Standards</h2>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center shrink-0 text-slate-400 font-bold text-xs">01</div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 mb-1">Licensed Professionals</h4>
+                    <p className="text-sm text-slate-500">All treatments are administered by licensed Registered Nurses (RNs) or Nurse Practitioners (NPs).</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center shrink-0 text-slate-400 font-bold text-xs">02</div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 mb-1">Medical Oversight</h4>
+                    <p className="text-sm text-slate-500">Every clinic operates under the strict supervision of a Board-Certified Medical Director.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center shrink-0 text-slate-400 font-bold text-xs">03</div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 mb-1">USP 797 Compliance</h4>
+                    <p className="text-sm text-slate-500">Adherence to sterile compounding standards for all IV vitamin and nutrient mixtures.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center shrink-0 text-slate-400 font-bold text-xs">04</div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 mb-1">Patient Screening</h4>
+                    <p className="text-sm text-slate-500">Comprehensive health history review and vital sign check before every administration.</p>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
 
           {/* Right Column: Sidebar */}
@@ -310,12 +351,33 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               </div>
 
               <div className="space-y-3">
-                <button className="w-full bg-wellness-600 text-white px-8 py-5 rounded-2xl font-bold text-lg hover:bg-wellness-700 transition-all shadow-xl shadow-wellness-100 flex items-center justify-center gap-2">
-                  <Calendar size={20} /> Book Appointment
-                </button>
-                <button className="w-full bg-white border-2 border-slate-100 text-slate-900 px-8 py-5 rounded-2xl font-bold text-lg hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
-                  <Phone size={20} /> Call Clinic
-                </button>
+                {provider.website ? (
+                  <a 
+                    href={provider.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-wellness-600 text-white px-8 py-5 rounded-2xl font-bold text-lg hover:bg-wellness-700 transition-all shadow-xl shadow-wellness-100 flex items-center justify-center gap-2"
+                  >
+                    <Calendar size={20} /> Book Appointment
+                  </a>
+                ) : (
+                  <button className="w-full bg-wellness-600 text-white px-8 py-5 rounded-2xl font-bold text-lg hover:bg-wellness-700 transition-all shadow-xl shadow-wellness-100 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
+                    <Calendar size={20} /> Book Appointment
+                  </button>
+                )}
+                
+                {provider.phone ? (
+                  <a 
+                    href={`tel:${provider.phone}`}
+                    className="w-full bg-white border-2 border-slate-100 text-slate-900 px-8 py-5 rounded-2xl font-bold text-lg hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
+                  >
+                    <Phone size={20} /> Call Clinic
+                  </a>
+                ) : (
+                  <button className="w-full bg-white border-2 border-slate-100 text-slate-900 px-8 py-5 rounded-2xl font-bold text-lg hover:bg-slate-50 transition-all flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
+                    <Phone size={20} /> Call Clinic
+                  </button>
+                )}
               </div>
 
               <div className="mt-8 pt-8 border-t border-slate-50 text-center">

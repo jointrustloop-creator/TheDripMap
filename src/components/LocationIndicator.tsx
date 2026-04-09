@@ -4,6 +4,7 @@ import { MapPin, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { LocationInfo, City } from '../types';
 import { cn } from '../lib/utils';
+import { usePathname, useRouter } from 'next/navigation';
 
 const TOP_CITIES: City[] = [
   'New York', 'Los Angeles', 'Miami', 'Las Vegas', 'Austin', 
@@ -13,6 +14,8 @@ const TOP_CITIES: City[] = [
 ];
 
 export const LocationIndicator = () => {
+  const pathname = usePathname();
+  const router = useRouter();
   const [location, setLocation] = useState<LocationInfo | null>(null);
   const [isDetecting, setIsDetecting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -51,10 +54,10 @@ export const LocationIndicator = () => {
           };
           setLocation(detected);
           sessionStorage.setItem('tdm_location', JSON.stringify(detected));
+          window.dispatchEvent(new CustomEvent('tdm_location_change', { detail: detected }));
         }
       } catch {
         // Silently fail for IP detection to avoid console noise in restricted environments
-        // We'll just stay in the "Select Location" state
       }
 
       setIsDetecting(false);
@@ -99,13 +102,22 @@ export const LocationIndicator = () => {
                 <button 
                   key={city}
                   onClick={() => {
-                    setLocation({
+                    const newLocation = {
                       city,
-                      state: '', // We don't have state here easily, but it's fine for display
+                      state: '', 
                       country: 'US',
                       isPrecise: false,
                       detectedAt: Date.now()
-                    });
+                    };
+                    setLocation(newLocation);
+                    sessionStorage.setItem('tdm_location', JSON.stringify(newLocation));
+                    window.dispatchEvent(new CustomEvent('tdm_location_change', { detail: newLocation }));
+                    
+                    // If not on search page, redirect to search with this city
+                    if (pathname !== '/search') {
+                      router.push(`/search?city=${encodeURIComponent(city)}`);
+                    }
+                    
                     setIsEditing(false);
                   }}
                   className="text-left px-3 py-2 text-sm font-medium text-slate-600 hover:bg-wellness-50 hover:text-wellness-700 rounded-lg transition-colors"

@@ -24,6 +24,7 @@ export interface Provider {
   amenities: string[];
   description: string;
   imageUrl: string;
+  slug?: string;
   is_featured: boolean;
   distance?: number;
   decisionDrivers?: {

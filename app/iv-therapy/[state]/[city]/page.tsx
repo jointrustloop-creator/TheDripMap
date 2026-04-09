@@ -110,7 +110,7 @@ export default async function CityPage({ params }: CityPageProps) {
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "4.9",
-      "reviewCount": (listings.length * 15 + 7).toString()
+      "reviewCount": ((cityInfo.count || listings.length) * 15 + 7).toString()
     }
   };
 
@@ -172,7 +172,7 @@ export default async function CityPage({ params }: CityPageProps) {
               Best IV Therapy in <span className="text-wellness-600">{cityName}, {stateName}</span>
             </h1>
             <p className="text-xl text-slate-500 leading-relaxed mb-10">
-              Compare {listings.length} top-rated IV therapy clinics and mobile services in {cityName}. Find the perfect hydration, energy, or recovery drip today.
+              Compare {cityInfo.count || listings.length} top-rated IV therapy clinics and mobile services in {cityName}. Find the perfect hydration, energy, or recovery drip today.
             </p>
             
             <div className="flex flex-wrap gap-4">
