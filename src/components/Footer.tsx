@@ -31,8 +31,8 @@ export const Footer = () => {
             <li><Link href="/iv-therapy/new-york/new-york" className="hover:text-wellness-600 transition-colors">New York</Link></li>
             <li><Link href="/iv-therapy/california/los-angeles" className="hover:text-wellness-600 transition-colors">Los Angeles</Link></li>
             <li><Link href="/iv-therapy/florida/miami" className="hover:text-wellness-600 transition-colors">Miami</Link></li>
+            <li><Link href="/iv-therapy/ontario/toronto" className="hover:text-wellness-600 transition-colors">Toronto</Link></li>
             <li><Link href="/iv-therapy/illinois/chicago" className="hover:text-wellness-600 transition-colors">Chicago</Link></li>
-            <li><Link href="/iv-therapy/district-of-columbia/washington" className="hover:text-wellness-600 transition-colors">Washington</Link></li>
             <li><Link href="/iv-therapy/texas/austin" className="hover:text-wellness-600 transition-colors">Austin</Link></li>
           </ul>
         </div>

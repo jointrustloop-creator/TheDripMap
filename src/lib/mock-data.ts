@@ -1,18 +1,13 @@
 import { Provider, BlogPost } from '../types';
 
 export const MOCK_CITIES: { city: string, state: string, count: number }[] = [
-  { city: 'New York', state: 'NY', count: 42 },
-  { city: 'Los Angeles', state: 'CA', count: 38 },
-  { city: 'Miami', state: 'FL', count: 25 },
-  { city: 'Las Vegas', state: 'NV', count: 18 },
-  { city: 'Austin', state: 'TX', count: 15 },
-  { city: 'Chicago', state: 'IL', count: 22 },
-  { city: 'San Francisco', state: 'CA', count: 12 },
-  { city: 'San Diego', state: 'CA', count: 14 },
-  { city: 'Dallas', state: 'TX', count: 16 },
-  { city: 'Houston', state: 'TX', count: 19 },
-  { city: 'Phoenix', state: 'AZ', count: 11 },
-  { city: 'Philadelphia', state: 'PA', count: 9 }
+  { city: 'New York', state: 'NY', count: 3 },
+  { city: 'Los Angeles', state: 'CA', count: 2 },
+  { city: 'Miami', state: 'FL', count: 2 },
+  { city: 'Las Vegas', state: 'NV', count: 1 },
+  { city: 'Austin', state: 'TX', count: 1 },
+  { city: 'Chicago', state: 'IL', count: 1 },
+  { city: 'Toronto', state: 'ON', count: 2 },
 ];
 
 export const MOCK_LISTINGS: Provider[] = [
@@ -28,13 +23,55 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['NAD+ Plus', 'Immune Support', 'Beauty Glow'],
     amenities: ['Private Rooms', 'Free WiFi', 'Beverages'],
     description: 'Premier IV therapy clinic in the heart of Manhattan offering customized wellness solutions.',
-    imageUrl: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
     is_featured: true,
     decisionDrivers: {
       medicalSupervision: true,
       luxuryExperience: 5,
       speedOfService: 4,
       valueForMoney: 4
+    }
+  },
+  {
+    id: '1-2',
+    name: 'Gotham Hydration',
+    city: 'New York',
+    address: '456 Park Ave, New York, NY 10022',
+    rating: 4.7,
+    reviewCount: 85,
+    priceRange: '$$$',
+    type: 'In-Clinic',
+    specialties: ['Hangover', 'Recovery', 'NAD+ Plus'],
+    amenities: ['Luxury Lounge', 'Valet'],
+    description: 'Upscale IV hydration lounge catering to Manhattan\'s elite professionals.',
+    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 5,
+      speedOfService: 3,
+      valueForMoney: 3
+    }
+  },
+  {
+    id: '1-3',
+    name: 'Brooklyn Drip Co',
+    city: 'New York',
+    address: '789 Bedford Ave, Brooklyn, NY 11211',
+    rating: 4.8,
+    reviewCount: 112,
+    priceRange: '$',
+    type: 'Mobile',
+    specialties: ['Immune Support', 'Hydration'],
+    amenities: ['Mobile Service', 'Group Discounts'],
+    description: 'Fast, affordable mobile IV therapy serving all of Brooklyn and Queens.',
+    imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 2,
+      speedOfService: 5,
+      valueForMoney: 5
     }
   },
   {
@@ -49,13 +86,34 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Hangover', 'Recovery', 'Hydration'],
     amenities: ['Valet Parking', 'Luxury Lounge'],
     description: 'Hollywood\'s favorite hydration spot for quick recovery and performance boosts.',
-    imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
     is_featured: true,
     decisionDrivers: {
       medicalSupervision: true,
       luxuryExperience: 4,
       speedOfService: 5,
       valueForMoney: 3
+    }
+  },
+  {
+    id: '2-2',
+    name: 'Santa Monica Wellness',
+    city: 'Los Angeles',
+    address: '1200 Ocean Ave, Santa Monica, CA 90401',
+    rating: 4.9,
+    reviewCount: 156,
+    priceRange: '$$',
+    type: 'Both',
+    specialties: ['Beauty Glow', 'NAD+ Plus', 'Immune Support'],
+    amenities: ['Ocean View', 'Private Suites'],
+    description: 'Clinical excellence meets coastal luxury. The premier destination for NAD+ and beauty drips.',
+    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 5,
+      speedOfService: 4,
+      valueForMoney: 4
     }
   },
   {
@@ -70,13 +128,97 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Beauty Glow', 'Weight Loss', 'Hydration'],
     amenities: ['Mobile Service', 'Group Discounts'],
     description: 'Expert mobile IV therapy bringing the glow directly to your home or hotel.',
-    imageUrl: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=800',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
       luxuryExperience: 3,
       speedOfService: 4,
       valueForMoney: 5
+    }
+  },
+  {
+    id: '3-2',
+    name: 'Brickell Recovery Lounge',
+    city: 'Miami',
+    address: '1000 Brickell Ave, Miami, FL 33131',
+    rating: 4.6,
+    reviewCount: 78,
+    priceRange: '$$$',
+    type: 'In-Clinic',
+    specialties: ['Hangover', 'NAD+ Plus'],
+    amenities: ['Private Pods', 'Refreshments'],
+    description: 'High-tech recovery in the heart of the financial district.',
+    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 4,
+      valueForMoney: 3
+    }
+  },
+  {
+    id: '4',
+    name: 'The IV Health Centre',
+    city: 'Toronto',
+    address: '672 Dupont St Suite 206, Toronto, ON M6G 1Z5',
+    rating: 4.9,
+    reviewCount: 142,
+    priceRange: '$$',
+    type: 'In-Clinic',
+    specialties: ['Immune Support', 'NAD+ Plus', 'Chronic Fatigue'],
+    amenities: ['Clinical Environment', 'Expert Consultations'],
+    description: 'Toronto\'s premier clinical IV therapy centre specializing in functional medicine and personalized wellness.',
+    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    is_featured: true,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 3,
+      speedOfService: 4,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: '5',
+    name: 'Reviv Toronto',
+    city: 'Toronto',
+    address: '118 Yorkville Ave, Toronto, ON M5R 1C2',
+    rating: 4.8,
+    reviewCount: 89,
+    priceRange: '$$$',
+    type: 'In-Clinic',
+    specialties: ['Beauty Glow', 'Hangover', 'Hydration'],
+    amenities: ['Luxury Lounge', 'Yorkville Location'],
+    description: 'Global leader in IV wellness located in the heart of Yorkville, offering premium hydration and vitamin therapies.',
+    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 5,
+      speedOfService: 4,
+      valueForMoney: 3
+    }
+  },
+  {
+    id: '6',
+    name: 'Austin Drip Society',
+    city: 'Austin',
+    address: '500 San Marcos St, Austin, TX 78702',
+    rating: 4.9,
+    reviewCount: 167,
+    priceRange: '$$',
+    type: 'Both',
+    specialties: ['NAD+ Plus', 'Hangover', 'Immune Support'],
+    amenities: ['Modern Lounge', 'Complimentary Snacks'],
+    description: 'Austin\'s premier destination for clinical-grade IV therapy and wellness optimization.',
+    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    is_featured: true,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 4,
+      valueForMoney: 4
     }
   }
 ];

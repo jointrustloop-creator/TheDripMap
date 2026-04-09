@@ -8,7 +8,7 @@ import { usePathname, useRouter } from 'next/navigation';
 
 const TOP_CITIES: City[] = [
   'New York', 'Los Angeles', 'Miami', 'Las Vegas', 'Austin', 
-  'Chicago', 'Washington', 'Portland', 'San Francisco', 'San Diego',
+  'Chicago', 'Toronto' as City, 'Washington' as City, 'Portland' as City, 'San Francisco' as City, 'San Diego' as City,
   'Dallas' as City, 'Houston' as City, 'Phoenix' as City, 'Atlanta' as City, 'Denver' as City,
   'Seattle' as City, 'Boston' as City, 'Nashville' as City, 'Charlotte' as City, 'Orlando' as City
 ];
@@ -102,10 +102,22 @@ export const LocationIndicator = () => {
                 <button 
                   key={city}
                   onClick={() => {
+                    const cityStates: Record<string, { state: string, country: string }> = {
+                      'Toronto': { state: 'ON', country: 'CA' },
+                      'New York': { state: 'NY', country: 'US' },
+                      'Los Angeles': { state: 'CA', country: 'US' },
+                      'Miami': { state: 'FL', country: 'US' },
+                      'Las Vegas': { state: 'NV', country: 'US' },
+                      'Austin': { state: 'TX', country: 'US' },
+                      'Chicago': { state: 'IL', country: 'US' },
+                    };
+
+                    const cityInfo = cityStates[city] || { state: '', country: 'US' };
+
                     const newLocation = {
                       city,
-                      state: '', 
-                      country: 'US',
+                      state: cityInfo.state, 
+                      country: cityInfo.country,
                       isPrecise: false,
                       detectedAt: Date.now()
                     };

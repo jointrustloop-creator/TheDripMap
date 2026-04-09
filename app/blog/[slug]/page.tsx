@@ -221,7 +221,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <div className="relative h-[300px] md:h-[500px] rounded-[3rem] overflow-hidden mb-16 shadow-2xl">
               <Image 
                 src={post.imageUrl || `https://picsum.photos/seed/${post.slug}/1200/800`} 
-                alt={post.title}
+                alt={`Illustration for ${post.title} - Clinical IV Therapy and Wellness`}
                 fill
                 className="object-cover"
                 priority

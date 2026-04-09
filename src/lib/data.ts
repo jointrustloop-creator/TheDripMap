@@ -186,7 +186,12 @@ export async function getAllCities() {
   }
 
   // 3. Always include mock cities to ensure we have a baseline
-  MOCK_CITIES.forEach(c => addCity(c.city, c.state, c.count));
+  MOCK_CITIES.forEach(c => {
+    // Calculate actual count from MOCK_LISTINGS for this city
+    const actualCount = MOCK_LISTINGS.filter(l => l.city.toLowerCase() === c.city.toLowerCase()).length;
+    // Use actual count if available, otherwise use the mock count (but capped at a realistic number for demo)
+    addCity(c.city, c.state, actualCount || Math.min(c.count, 5));
+  });
 
   return Array.from(allCitiesMap.values()).sort((a, b) => b.count - a.count);
 }
@@ -266,12 +271,51 @@ export async function getListingsByService(service: string, limit: number = 4) {
   }
 }
 
+// Helper to filter mock listings for search
+const getMockSearchResults = (query: string, city?: string, userLocation?: { latitude: number; longitude: number }) => {
+  let results = [...MOCK_LISTINGS];
+  
+  if (city && city !== 'All') {
+    results = results.filter(l => l.city.toLowerCase() === city.toLowerCase());
+  }
+  
+  if (query) {
+    const q = query.toLowerCase();
+    results = results.filter(l => 
+      l.name.toLowerCase().includes(q) || 
+      l.city.toLowerCase().includes(q) ||
+      l.specialties.some(s => s.toLowerCase().includes(q)) ||
+      l.description.toLowerCase().includes(q)
+    );
+  }
+  
+  if (userLocation) {
+    results = results.map(p => ({
+      ...p,
+      distance: p.latitude && p.longitude 
+        ? calculateDistance(userLocation.latitude, userLocation.longitude, p.latitude, p.longitude)
+        : undefined
+    }));
+    
+    results.sort((a, b) => {
+      if (a.distance !== undefined && b.distance !== undefined) return a.distance - b.distance;
+      return b.rating - a.rating;
+    });
+  }
+  
+  return results;
+};
+
 export async function searchListings(
   query: string, 
   city?: string,
   userLocation?: { latitude: number; longitude: number }
 ) {
-  if (!isSupabaseConfigured()) return [];
+  // If Supabase is not configured, fall back to mock data
+  if (!isSupabaseConfigured()) {
+    return getMockSearchResults(query, city, userLocation);
+  }
+
   try {
     let supabaseQuery = supabase.from('providers').select('*');
 
@@ -316,7 +360,8 @@ export async function searchListings(
     console.warn('Supabase info: searching listings:', err);
   }
 
-  return [];
+  // Final fallback to mock data if Supabase returns nothing
+  return getMockSearchResults(query, city, userLocation);
 }
 
 export async function getFeaturedListings(limit: number = 6) {
@@ -344,7 +389,7 @@ export async function getFeaturedListings(limit: number = 6) {
     console.warn('Supabase info: fetching featured listings:', err);
   }
 
-  return [];
+  return MOCK_LISTINGS.filter(l => l.is_featured).slice(0, limit);
 }
 
 export async function getListingStats() {
@@ -528,12 +573,11 @@ export async function getAllListings() {
         imageUrl: p.imageUrl || p.image_url || `https://picsum.photos/seed/${p.id}/800/600`
       })) as Provider[];
     }
-    
-    return [];
   } catch (err) {
     console.error('Supabase error in getAllListings:', err);
-    return [];
   }
+
+  return MOCK_LISTINGS;
 }
 
 export async function getListingsByIds(ids: string[]) {

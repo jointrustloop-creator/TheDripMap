@@ -29,8 +29,8 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-20 items-center mb-32">
           <div className="relative h-[500px] rounded-[3rem] overflow-hidden shadow-2xl">
             <Image 
-              src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=1200"
-              alt="Professional medical team at IV clinic"
+              src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=1200"
+              alt="Professional medical staff preparing a clinical IV therapy treatment"
               fill
               className="object-cover"
               referrerPolicy="no-referrer"

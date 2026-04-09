@@ -18,6 +18,7 @@ import { CityGrid } from '../src/components/CityGrid';
 import { BlogCard } from '../src/components/BlogCard';
 import { ClinicianSection } from '../src/components/ClinicianSection';
 import { HowItWorks } from '../src/components/HowItWorks';
+import { DripBackground } from '../src/components/DripBackground';
 import { getAllCities, getListingStats, getBlogPosts } from '../src/lib/data';
 import { isSupabaseConfigured } from '../src/lib/supabase';
 import { Metadata } from 'next';
@@ -76,10 +77,14 @@ export default async function HomePage() {
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-40 px-6 overflow-hidden bg-white">
+        <DripBackground />
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center max-w-5xl mx-auto mb-20">
-            <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-8 tracking-tight leading-[1.1]">
-              Stop <span className="text-wellness-600">Guessing.</span> <br />
+            <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-8 tracking-tight leading-[1.1] drop-shadow-sm">
+              Stop <span className="text-wellness-600 relative">
+                Guessing.
+                <span className="absolute -inset-1 bg-wellness-100/30 blur-2xl -z-10 rounded-full" />
+              </span> <br />
               Get The <span className="underline decoration-wellness-500 decoration-4 underline-offset-4">Exact</span> IV <br />
               You Need.
             </h1>
@@ -199,8 +204,8 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="relative h-[600px] rounded-[3rem] overflow-hidden shadow-2xl">
               <Image 
-                src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=1200"
-                alt="Happy people at wellness clinic"
+                src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=1200"
+                alt="Modern luxury wellness lounge with comfortable seating for IV therapy patients"
                 fill
                 className="object-cover"
                 referrerPolicy="no-referrer"
