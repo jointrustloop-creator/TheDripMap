@@ -25,7 +25,7 @@ export const DripBackground = () => {
       duration: 5 + Math.random() * 10,
       height: Math.random() > 0.7 ? 4 : 40 + Math.random() * 100,
       opacity: 0.05 + Math.random() * 0.1,
-      type: Math.random() > 0.7 ? 'drop' : 'line',
+      type: (Math.random() > 0.7 ? 'drop' : 'line') as 'drop' | 'line',
     }));
     setDrips(newDrips);
   }, []);

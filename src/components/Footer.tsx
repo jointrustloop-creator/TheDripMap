@@ -1,9 +1,25 @@
-import React from 'react';
+'use client';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Logo } from './Logo';
 import { MedicalDisclaimer } from './MedicalDisclaimer';
+import { getAllCities } from '../lib/data';
 
 export const Footer = () => {
+  const [topCities, setTopCities] = useState<{ city: string; state: string }[]>([]);
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const cities = await getAllCities();
+        setTopCities(cities.slice(0, 20));
+      } catch (err) {
+        console.error('Failed to fetch cities for footer:', err);
+      }
+    };
+    fetchCities();
+  }, []);
+
   return (
     <footer className="bg-white border-t border-slate-200 py-12 px-6 mt-20">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
@@ -28,12 +44,21 @@ export const Footer = () => {
         <div>
           <h4 className="font-bold mb-6 text-sm uppercase tracking-wider text-slate-400">Cities</h4>
           <ul className="space-y-4 text-slate-600 text-sm">
-            <li><Link href="/iv-therapy/new-york/new-york" className="hover:text-wellness-600 transition-colors">New York</Link></li>
-            <li><Link href="/iv-therapy/california/los-angeles" className="hover:text-wellness-600 transition-colors">Los Angeles</Link></li>
-            <li><Link href="/iv-therapy/florida/miami" className="hover:text-wellness-600 transition-colors">Miami</Link></li>
-            <li><Link href="/iv-therapy/ontario/toronto" className="hover:text-wellness-600 transition-colors">Toronto</Link></li>
-            <li><Link href="/iv-therapy/illinois/chicago" className="hover:text-wellness-600 transition-colors">Chicago</Link></li>
-            <li><Link href="/iv-therapy/texas/austin" className="hover:text-wellness-600 transition-colors">Austin</Link></li>
+            {topCities.map((city, idx) => (
+              <li key={idx}>
+                <Link 
+                  href={`/search?city=${encodeURIComponent(city.city)}`} 
+                  className="hover:text-wellness-600 transition-colors"
+                >
+                  {city.city}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <Link href="/search" className="text-wellness-600 font-bold hover:underline">
+                View All Cities
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
@@ -47,9 +72,11 @@ export const Footer = () => {
           </ul>
         </div>
       </div>
-      <MedicalDisclaimer />
-      <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-slate-100 text-center text-slate-400 text-sm">
-        © 2026 TheDripMap. All rights reserved.
+      <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-slate-100 flex flex-col items-center gap-8">
+        <MedicalDisclaimer />
+        <div className="text-slate-400 text-sm">
+          © 2026 TheDripMap. All rights reserved.
+        </div>
       </div>
     </footer>
   );

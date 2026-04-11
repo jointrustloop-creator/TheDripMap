@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { 
   Zap, 
   Search, 
@@ -19,6 +18,8 @@ import { BlogCard } from '../src/components/BlogCard';
 import { ClinicianSection } from '../src/components/ClinicianSection';
 import { HowItWorks } from '../src/components/HowItWorks';
 import { DripBackground } from '../src/components/DripBackground';
+import { QuickMatch } from '../src/components/QuickMatch';
+import { TrustSignals } from '../src/components/TrustSignals';
 import { getAllCities, getListingStats, getBlogPosts } from '../src/lib/data';
 import { isSupabaseConfigured } from '../src/lib/supabase';
 import { Metadata } from 'next';
@@ -89,26 +90,11 @@ export default async function HomePage() {
               You Need.
             </h1>
             
-            <p className="text-2xl md:text-3xl text-slate-600 mb-12 font-bold tracking-tight max-w-3xl mx-auto leading-tight">
+            <p className="text-2xl md:text-3xl text-slate-600 mb-16 font-bold tracking-tight max-w-3xl mx-auto leading-tight">
               We&apos;ve analyzed {stats.totalListings} clinics across {stats.totalCities} cities so you don&apos;t have to. Get matched to your perfect drip in 60 seconds.
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <Link 
-                href="/quiz"
-                className="w-full sm:w-auto bg-wellness-600 text-white px-16 py-8 rounded-2xl font-black text-2xl hover:bg-wellness-700 transition-all shadow-[0_20px_50px_rgba(234,88,12,0.3)] flex items-center justify-center gap-3 uppercase tracking-tighter italic"
-              >
-                <Zap size={28} fill="currentColor" />
-                Find My Match
-              </Link>
-              <Link 
-                href="/search"
-                className="w-full sm:w-auto bg-white text-slate-900 border-[6px] border-slate-900 px-16 py-8 rounded-2xl font-black text-2xl hover:bg-slate-900 hover:text-white transition-all flex items-center justify-center gap-3 uppercase tracking-tighter italic"
-              >
-                <Search size={28} strokeWidth={4} />
-                Browse All
-              </Link>
-            </div>
+            <QuickMatch />
 
             <div className="mt-16 flex flex-col items-center gap-4">
               {isLive ? (
@@ -198,61 +184,8 @@ export default async function HomePage() {
       {/* How It Works */}
       <HowItWorks />
 
-      {/* Human Connection Section */}
-      <section className="py-24 px-6 overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="relative h-[600px] rounded-[3rem] overflow-hidden shadow-2xl">
-              <Image 
-                src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=1200"
-                alt="Modern luxury wellness lounge with comfortable seating for IV therapy patients"
-                fill
-                className="object-cover"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent" />
-              <div className="absolute bottom-10 left-10 right-10">
-                <div className="bg-white/90 backdrop-blur-md p-6 rounded-2xl border border-white/20">
-                  <p className="text-slate-900 font-bold italic">&quot;The best IV experience I&apos;ve ever had. The matching quiz found me a clinic that specialized exactly in what I needed for my marathon recovery.&quot;</p>
-                  <div className="mt-4 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-wellness-100 rounded-full flex items-center justify-center text-wellness-600 font-bold">JD</div>
-                    <div>
-                      <div className="text-sm font-black text-slate-900">Jessica D.</div>
-                      <div className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Verified Patient</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-8 tracking-tight leading-tight">
-                Wellness is Better <br />
-                <span className="text-wellness-600">When It&apos;s Personal.</span>
-              </h2>
-              <p className="text-lg text-slate-500 leading-relaxed mb-10">
-                We believe that IV therapy isn&apos;t just about the vitamins—it&apos;s about the care, the environment, and the results. That&apos;s why we only partner with clinics that prioritize the human experience.
-              </p>
-              <div className="space-y-6">
-                {[
-                  { title: 'Group Friendly', desc: 'Find clinics that offer group drips for bridal parties, corporate events, or friends.' },
-                  { title: 'Luxury Environments', desc: 'Browse lounges designed for relaxation with massage chairs and premium amenities.' },
-                  { title: 'Expert Care', desc: 'Every provider in our network is vetted for medical supervision and licensed administration.' }
-                ].map((item, idx) => (
-                  <div key={idx} className="flex gap-4">
-                    <div className="w-6 h-6 bg-wellness-100 rounded-full flex items-center justify-center text-wellness-600 shrink-0 mt-1">
-                      <Zap size={14} fill="currentColor" />
-                    </div>
-                    <div>
-                      <h4 className="font-black text-slate-900">{item.title}</h4>
-                      <p className="text-sm text-slate-500">{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Trust Signals Section */}
+      <TrustSignals />
 
       {/* For Clinicians Section */}
       <ClinicianSection stats={stats} />

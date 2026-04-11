@@ -17,6 +17,9 @@ export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2
 export interface UserLocation {
   latitude: number;
   longitude: number;
+  city?: string;
+  region?: string;
+  country?: string;
 }
 
 export function getUserLocation(): Promise<UserLocation> {
@@ -33,8 +36,26 @@ export function getUserLocation(): Promise<UserLocation> {
         },
         (error) => {
           reject(error);
-        }
+        },
+        { timeout: 5000 }
       );
     }
   });
+}
+
+export async function getIPLocation(): Promise<UserLocation> {
+  try {
+    const res = await fetch('https://ipapi.co/json/');
+    if (!res.ok) throw new Error('IP geolocation failed');
+    const data = await res.json();
+    return {
+      latitude: data.latitude,
+      longitude: data.longitude,
+      city: data.city,
+      region: data.region,
+      country: data.country_name
+    };
+  } catch (error) {
+    throw error;
+  }
 }

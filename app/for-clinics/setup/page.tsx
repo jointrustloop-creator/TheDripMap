@@ -1,6 +1,6 @@
 'use client';
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   ShieldCheck, 
   Zap, 
@@ -14,19 +14,25 @@ import {
   Clock,
   Users,
   DollarSign,
-  Sparkles
+  Sparkles,
+  Info
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { supabase, isSupabaseConfigured } from '../../../src/lib/supabase';
 
-export default function OperatorSetupPage() {
+function SetupContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const clinicId = searchParams.get('clinicId');
+  const clinicName = searchParams.get('clinicName');
+  const clinicCity = searchParams.get('clinicCity');
+
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    clinicName: '',
+    clinicName: clinicName || '',
     ownerName: '',
     email: '',
     primarySpecialty: '',
@@ -114,6 +120,7 @@ export default function OperatorSetupPage() {
           {
             owner_name: formData.ownerName,
             email: formData.email,
+            clinic_id: clinicId || null,
             profile_data: {
               clinicName: formData.clinicName,
               primarySpecialty: formData.primarySpecialty,
@@ -132,6 +139,22 @@ export default function OperatorSetupPage() {
         ]);
 
       if (error) throw error;
+
+      // Update the listings (providers) table if claiming a specific clinic
+      if (clinicId) {
+        const { error: updateError } = await supabase
+          .from('providers')
+          .update({ 
+            is_claimed: true, 
+            claimed_at: new Date().toISOString() 
+          })
+          .eq('id', clinicId);
+        
+        if (updateError) {
+          console.warn('Error updating provider claim status:', updateError);
+        }
+      }
+
       router.push('/dashboard');
     } catch (err) {
       console.error('Error saving operator profile:', err);
@@ -146,6 +169,19 @@ export default function OperatorSetupPage() {
       <Navbar />
       
       <main className="max-w-3xl mx-auto px-6 py-20">
+        {/* Clinic Claim Banner */}
+        {clinicId && clinicName && (
+          <div className="mb-8 bg-wellness-50 border border-wellness-200 p-4 rounded-2xl flex items-center gap-3">
+            <div className="w-10 h-10 bg-wellness-600 rounded-xl flex items-center justify-center text-white shrink-0">
+              <Info size={20} />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-wellness-900">You are claiming: {clinicName}</p>
+              <p className="text-xs text-wellness-700">in {clinicCity || 'your city'}</p>
+            </div>
+          </div>
+        )}
+
         {/* Progress Header */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-4">
@@ -185,7 +221,10 @@ export default function OperatorSetupPage() {
                     value={formData.clinicName}
                     onChange={e => setFormData({...formData, clinicName: e.target.value})}
                     placeholder="e.g. Wellness Drip NYC"
-                    className="w-full p-4 rounded-2xl border border-slate-200 focus:border-wellness-600 focus:ring-2 focus:ring-wellness-100 outline-none transition-all"
+                    readOnly={!!clinicId}
+                    className={`w-full p-4 rounded-2xl border border-slate-200 focus:border-wellness-600 focus:ring-2 focus:ring-wellness-100 outline-none transition-all ${
+                      clinicId ? 'bg-slate-50 text-slate-500 cursor-not-allowed' : ''
+                    }`}
                   />
                 </div>
                 <div className="space-y-2">
@@ -434,7 +473,7 @@ export default function OperatorSetupPage() {
                     <div className="flex gap-2">
                       {[true, false].map(v => (
                         <button
-                          key={v ? 'yes' : 'no'}
+                           key={v ? 'yes' : 'no'}
                           onClick={() => setFormData({...formData, walkInsWelcome: v})}
                           className={`flex-1 p-4 rounded-2xl border font-bold transition-all ${
                             formData.walkInsWelcome === v 
@@ -549,5 +588,17 @@ export default function OperatorSetupPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function OperatorSetupPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#FDFDFB] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-wellness-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <SetupContent />
+    </Suspense>
   );
 }

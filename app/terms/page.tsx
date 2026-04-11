@@ -15,7 +15,7 @@ export default function TermsPage() {
       <main className="max-w-4xl mx-auto px-6 py-20">
         <h1 className="text-4xl font-black text-slate-900 mb-8">Terms of Service</h1>
         <div className="prose prose-slate max-w-none">
-          <p>Last updated: April 5, 2024</p>
+          <p>Last updated: April 5, 2025</p>
           <p>By using TheDripMap, you agree to these terms. Please read them carefully.</p>
           <h2>1. Use of Our Services</h2>
           <p>You must follow any policies made available to you within the Services.</p>

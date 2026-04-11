@@ -34,8 +34,11 @@ function SearchContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   
-  const [selectedCity, setSelectedCity] = useState<City | 'All'>((searchParams.get('city') as City) || 'All');
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const initialCity = searchParams.get('city') || searchParams.get('location') || 'All';
+  const initialQuery = searchParams.get('q') || searchParams.get('treatment') || '';
+  
+  const [selectedCity, setSelectedCity] = useState<City | 'All'>(initialCity as City || 'All');
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [typeFilter, setTypeFilter] = useState<TreatmentType | 'All'>('All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filteredProviders, setFilteredProviders] = useState<Provider[]>([]);

@@ -16,7 +16,6 @@ interface ProviderCardProps {
 
 export const ProviderCard = ({ provider, operatorProfile, className }: ProviderCardProps) => {
   const slug = provider.slug || slugify(provider.name);
-  const priceAnchor = provider.priceRange === '$' ? '$99' : provider.priceRange === '$$' ? '$149' : provider.priceRange === '$$$' ? '$199' : '$249';
 
   return (
     <div className={cn(
@@ -111,10 +110,14 @@ export const ProviderCard = ({ provider, operatorProfile, className }: ProviderC
         </Link>
 
         <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-          <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Starting From</span>
-            <span className="text-lg font-black text-slate-900">{priceAnchor}+</span>
-          </div>
+          {provider.price_range || provider.priceRange ? (
+            <div className="flex flex-col">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Price Range</span>
+              <span className="text-lg font-black text-slate-900">{provider.price_range || provider.priceRange}</span>
+            </div>
+          ) : (
+            <div />
+          )}
           <div className="flex items-center gap-2">
             {provider.phone && (
               <a 

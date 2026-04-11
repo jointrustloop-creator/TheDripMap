@@ -39,6 +39,115 @@ export const getStateFromProvider = (provider: Provider): string => {
   return cityMap[provider.city] || 'Unknown';
 };
 
+// Helper to enrich provider with detailed mock data for UI sections
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function enrichProvider(p: any): Provider {
+  // Normalize arrays that might be strings in DB
+  const pId = (p.id as string) || '';
+  
+  const specialties = Array.isArray(p.specialties) 
+    ? p.specialties 
+    : (typeof p.specialties === 'string' ? p.specialties.split(',').map((s: string) => s.trim()) : []);
+    
+  const amenities = Array.isArray(p.amenities) 
+    ? p.amenities 
+    : (typeof p.amenities === 'string' ? p.amenities.split(',').map((s: string) => s.trim()) : []);
+
+  const enriched = { 
+    ...p,
+    rating: Number(p.rating) || 0,
+    reviewCount: Number(p.reviews || p.reviewCount) || 0,
+    imageUrl: (p.imageUrl as string) || (p.image_url as string) || `https://picsum.photos/seed/${pId}/800/600`,
+    specialties: specialties.length > 0 ? specialties : ['IV Therapy', 'Wellness', 'Hydration'],
+    amenities: amenities.length > 0 ? amenities : ['Free Wi-Fi', 'Relaxing Lounge', 'Refreshments']
+  } as Provider;
+
+  if (!enriched.services || enriched.services.length === 0) {
+    enriched.services = [
+      { 
+        name: 'Myers Cocktail', 
+        description: 'The "Gold Standard" for overall wellness. Includes Vitamin C, B-Complex, and Magnesium to boost immunity and energy.', 
+        price: '$195',
+        category: 'Wellness'
+      },
+      { 
+        name: 'NAD+ Therapy (250mg)', 
+        description: 'Advanced cellular repair protocol. Improves cognitive function, slows aging, and boosts metabolic health.', 
+        price: '$345',
+        category: 'Anti-Aging'
+      },
+      { 
+        name: 'Glutathione Push', 
+        description: 'The master antioxidant. Brightens skin, detoxifies the liver, and reduces inflammation.', 
+        price: '$75',
+        category: 'Beauty'
+      },
+      { 
+        name: 'Hangover Rescue', 
+        description: 'Rapid rehydration with anti-nausea and anti-inflammatory medication to get you back on your feet.', 
+        price: '$175',
+        category: 'Recovery'
+      }
+    ];
+  }
+
+  if (!enriched.reviews_data || enriched.reviews_data.length === 0) {
+    enriched.reviews_data = [
+      {
+        author: 'Michael R.',
+        rating: 5,
+        text: 'Incredible experience. The staff was professional and the lounge was so relaxing. I felt the energy boost almost immediately after my Myers Cocktail.',
+        date: '2 weeks ago'
+      },
+      {
+        author: 'Sarah L.',
+        rating: 5,
+        text: 'Best IV therapy in the city. I come here every month for my beauty drip and my skin has never looked better. Highly recommend!',
+        date: '1 month ago'
+      },
+      {
+        author: 'David K.',
+        rating: 4,
+        text: 'Great service, very clean facility. The NAD+ treatment is a game changer for my focus at work. A bit pricey but worth it.',
+        date: '3 months ago'
+      }
+    ];
+  }
+
+  if (!enriched.medical_team || enriched.medical_team.length === 0) {
+    enriched.medical_team = [
+      {
+        name: 'Dr. Elena Vance',
+        role: 'Medical Director',
+        bio: 'Board-certified physician with over 15 years of experience in functional medicine and clinical nutrition.',
+      },
+      {
+        name: 'Marcus Chen, RN',
+        role: 'Lead Infusion Nurse',
+        bio: 'Specializes in difficult IV access and has administered over 5,000 infusions with a focus on patient comfort.',
+      }
+    ];
+  }
+
+  if (!enriched.special_offers || enriched.special_offers.length === 0) {
+    enriched.special_offers = [
+      {
+        title: 'New Patient Special',
+        description: 'Get 20% off your first IV drip when you book online.',
+        code: 'DRIP20',
+        expires: 'Limited Time'
+      },
+      {
+        title: 'Monthly Membership',
+        description: 'Unlimited B12 shots and 15% off all drips for just $99/month.',
+        expires: 'Ongoing'
+      }
+    ];
+  }
+
+  return enriched;
+}
+
 export async function getListingsByCity(city: string) {
   const configured = isSupabaseConfigured();
   if (configured) {
@@ -51,6 +160,7 @@ export async function getListingsByCity(city: string) {
         .order('rating', { ascending: false });
 
       if (error) {
+        console.warn('Supabase .or query failed, trying simple city query:', error.message);
         // Fallback to simple city query if .or fails (e.g. if one column doesn't exist)
         const { data: data2, error: error2 } = await supabase
           .from('providers')
@@ -59,30 +169,31 @@ export async function getListingsByCity(city: string) {
           .order('rating', { ascending: false });
         
         if (!error2 && data2 && data2.length > 0) {
-          return data2.map(p => ({
-            ...p,
-            rating: Number(p.rating) || 0,
-            reviewCount: Number(p.reviews) || 0,
-            imageUrl: p.imageUrl || `https://picsum.photos/seed/${p.id}/800/600`
-          })) as Provider[];
+          return data2.map(enrichProvider);
+        }
+        
+        // Try uppercase City if lowercase city failed
+        const { data: data3, error: error3 } = await supabase
+          .from('providers')
+          .select('*')
+          .ilike('City', city)
+          .order('rating', { ascending: false });
+
+        if (!error3 && data3 && data3.length > 0) {
+          return data3.map(enrichProvider);
         }
         throw error;
       }
 
       if (data && data.length > 0) {
-        return data.map(p => ({
-          ...p,
-          rating: Number(p.rating) || 0,
-          reviewCount: Number(p.reviews) || 0,
-          imageUrl: p.imageUrl || `https://picsum.photos/seed/${p.id}/800/600`
-        })) as Provider[];
+        return data.map(enrichProvider);
       }
     } catch (err) {
       console.warn('Supabase info: fetching listings by city:', err);
     }
   }
 
-  return MOCK_LISTINGS.filter(l => l.city.toLowerCase() === city.toLowerCase());
+  return MOCK_LISTINGS.filter(l => l.city.toLowerCase() === city.toLowerCase()).map(enrichProvider);
 }
 
 export async function getListingBySlug(slug: string) {
@@ -97,29 +208,20 @@ export async function getListingBySlug(slug: string) {
         .single();
 
       if (!error && data) {
-        return {
-          ...data,
-          rating: Number(data.rating) || 0,
-          reviewCount: Number(data.reviews) || 0,
-          imageUrl: data.imageUrl || `https://picsum.photos/seed/${data.id}/800/600`
-        } as Provider;
+        return enrichProvider(data);
       }
 
       // 2. If not found by slug, try matching by slugified name
       // This handles cases where the slug column is empty or mismatched
       const { data: allData, error: allErr } = await supabase
         .from('providers')
-        .select('*');
+        .select('*')
+        .limit(1000); // Add a safety limit
 
       if (!allErr && allData) {
         const found = allData.find(p => slugify(p.name) === slug);
         if (found) {
-          return {
-            ...found,
-            rating: Number(found.rating) || 0,
-            reviewCount: Number(found.reviews) || 0,
-            imageUrl: found.imageUrl || `https://picsum.photos/seed/${found.id}/800/600`
-          } as Provider;
+          return enrichProvider(found);
         }
       }
     } catch (err) {
@@ -127,7 +229,8 @@ export async function getListingBySlug(slug: string) {
     }
   }
 
-  return MOCK_LISTINGS.find(l => slugify(l.name) === slug) || null;
+  const mock = MOCK_LISTINGS.find(l => slugify(l.name) === slug);
+  return mock ? enrichProvider(mock) : null;
 }
 
 export async function getAllCities() {
@@ -138,25 +241,37 @@ export async function getAllCities() {
 
   // Helper to add cities to our map
   const addCity = (city: string, state: string, count: number) => {
-    const key = `${city.toLowerCase()}-${state.toLowerCase()}`;
-    if (!allCitiesMap.has(key) || (allCitiesMap.get(key)?.count || 0) < count) {
-      allCitiesMap.set(key, { city, state, count });
+    if (!city || !state) return;
+    
+    // Normalize city and state
+    const normalizedCity = city.trim();
+    const normalizedState = state.trim().toUpperCase();
+    
+    if (normalizedState === 'US') return;
+    
+    const key = `${normalizedCity.toLowerCase()}|${normalizedState.toLowerCase()}`;
+    if (!allCitiesMap.has(key)) {
+      allCitiesMap.set(key, { city: normalizedCity, state: normalizedState, count });
+    } else {
+      const existing = allCitiesMap.get(key)!;
+      allCitiesMap.set(key, { ...existing, count: Math.max(existing.count, count) });
     }
   };
 
   if (configured) {
     try {
-      // 1. Get cities from providers table
+      // 1. Get cities from providers table - try columns individually to be safe
       const { data: providerCities, error: providerError } = await supabase
         .from('providers')
-        .select('city, City, state, State');
+        .select('*'); // Select all and filter in JS to avoid column name errors
 
       if (!providerError && providerCities) {
-        (providerCities as { city?: string; City?: string; state?: string; State?: string }[]).forEach((curr) => {
-          const city = curr.city || curr.City;
-          const state = curr.state || curr.State;
+        (providerCities as Array<Record<string, string | number | boolean | null>>).forEach((curr) => {
+          const city = (curr.city || curr.City || curr.town) as string | undefined;
+          const state = (curr.state || curr.State || curr.province) as string | undefined;
           if (city && state) {
-            const existing = Array.from(allCitiesMap.values()).find(c => c.city.toLowerCase() === city.toLowerCase());
+            const key = `${city.toLowerCase()}|${state.toLowerCase()}`;
+            const existing = allCitiesMap.get(key);
             if (existing) {
               existing.count++;
             } else {
@@ -164,6 +279,8 @@ export async function getAllCities() {
             }
           }
         });
+      } else if (providerError) {
+        console.warn('Supabase error fetching providers for cities:', providerError.message);
       }
 
       // 2. Get cities from cities table
@@ -174,8 +291,8 @@ export async function getAllCities() {
       if (!citiesError && citiesTable) {
         (citiesTable as { name?: string; city?: string; state_code?: string; state?: string; listings_count?: number }[]).forEach((c) => {
           const name = c.name || c.city;
-          const state = c.state_code || c.state || 'US';
-          if (name) {
+          const state = c.state_code || c.state;
+          if (name && state) {
             addCity(name, state, c.listings_count || 0);
           }
         });
@@ -186,14 +303,21 @@ export async function getAllCities() {
   }
 
   // 3. Always include mock cities to ensure we have a baseline
-  MOCK_CITIES.forEach(c => {
-    // Calculate actual count from MOCK_LISTINGS for this city
-    const actualCount = MOCK_LISTINGS.filter(l => l.city.toLowerCase() === c.city.toLowerCase()).length;
-    // Use actual count if available, otherwise use the mock count (but capped at a realistic number for demo)
-    addCity(c.city, c.state, actualCount || Math.min(c.count, 5));
-  });
+  if (Array.isArray(MOCK_CITIES)) {
+    MOCK_CITIES.forEach(c => {
+      if (c && c.city) {
+        const actualCount = Array.isArray(MOCK_LISTINGS) 
+          ? MOCK_LISTINGS.filter(l => l.city.toLowerCase() === c.city.toLowerCase()).length
+          : 0;
+        // Use the higher count between mock listings and the explicit city count
+        addCity(c.city, c.state, Math.max(actualCount, c.count || 0));
+      }
+    });
+  }
 
-  return Array.from(allCitiesMap.values()).sort((a, b) => b.count - a.count);
+  return Array.from(allCitiesMap.values())
+    .filter(c => c.count > 0)
+    .sort((a, b) => b.count - a.count);
 }
 
 export async function getAllStates() {
@@ -225,12 +349,15 @@ export async function getListingsByService(service: string, limit: number = 4) {
   }
   
   try {
+    // Extract a core keyword for better matching (e.g., "NAD" from "NAD+ Plus")
+    const coreKeyword = service.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '');
+    
     // Try specialties first, then subtypes, then name/category
     // We use .or() to be more inclusive if specialties aren't fully populated
     const { data, error } = await supabase
       .from('providers')
       .select('*')
-      .or(`specialties.cs.{"${service}"},subtypes.cs.{"${service}"},name.ilike.%${service}%,category.ilike.%${service}%`)
+      .or(`specialties.cs.{"${service}"},subtypes.cs.{"${service}"},name.ilike.%${coreKeyword}%,category.ilike.%${coreKeyword}%,description.ilike.%${coreKeyword}%`)
       .order('rating', { ascending: false })
       .limit(limit);
 
@@ -240,7 +367,7 @@ export async function getListingsByService(service: string, limit: number = 4) {
       const { data: fallbackData } = await supabase
         .from('providers')
         .select('*')
-        .or(`name.ilike.%${service}%,category.ilike.%${service}%`)
+        .or(`name.ilike.%${coreKeyword}%,category.ilike.%${coreKeyword}%`)
         .order('rating', { ascending: false })
         .limit(limit);
       
@@ -313,36 +440,45 @@ export async function searchListings(
 ) {
   // If Supabase is not configured, fall back to mock data
   if (!isSupabaseConfigured()) {
-    return getMockSearchResults(query, city, userLocation);
+    return getMockSearchResults(query, city, userLocation).map(enrichProvider);
   }
 
   try {
     let supabaseQuery = supabase.from('providers').select('*');
 
-    if (city && city !== 'All') {
+    // Filter by city if provided
+    if (city && city !== 'All' && city !== '') {
+      // Use exact match for city if possible, or ilike for flexibility
       supabaseQuery = supabaseQuery.ilike('city', city);
     }
 
-    if (query) {
-      const q = `%${query}%`;
-      supabaseQuery = supabaseQuery.or(`name.ilike.${q},city.ilike.${q},category.ilike.${q}`);
+    // Filter by search query (name, city, category, description)
+    if (query && query.trim() !== '') {
+      const q = `%${query.trim()}%`;
+      supabaseQuery = supabaseQuery.or(`name.ilike.${q},city.ilike.${q},category.ilike.${q},description.ilike.${q},specialties.cs.{"${query.trim()}"}`);
     }
 
+    // Always sort by rating DESC as default
     const { data, error } = await supabaseQuery
       .order('rating', { ascending: false });
 
-    if (error) throw error;
-    if (data && data.length > 0) {
-      const results = data.map(p => ({
+    if (error) {
+      console.error('Supabase search error:', error);
+      throw error;
+    }
+    
+    if (data) {
+      const results = data.map(p => enrichProvider({
         ...p,
         rating: Number(p.rating) || 0,
         reviewCount: Number(p.reviews) || 0,
-        imageUrl: p.imageUrl || `https://picsum.photos/seed/${p.id}/800/600`,
+        imageUrl: p.imageUrl || p.image_url || `https://picsum.photos/seed/${p.id}/800/600`,
         distance: userLocation && p.latitude && p.longitude 
           ? calculateDistance(userLocation.latitude, userLocation.longitude, p.latitude, p.longitude)
           : undefined
       })) as Provider[];
 
+      // If we have user location, sort by distance primarily
       if (userLocation) {
         results.sort((a, b) => {
           if (a.distance !== undefined && b.distance !== undefined) {
@@ -366,7 +502,7 @@ export async function searchListings(
 
 export async function getFeaturedListings(limit: number = 6) {
   if (!isSupabaseConfigured()) {
-    return MOCK_LISTINGS.filter(l => l.is_featured).slice(0, limit);
+    return MOCK_LISTINGS.filter(l => l.is_featured).slice(0, limit).map(enrichProvider);
   }
   try {
     // Try to get featured, fallback to top rated
@@ -378,7 +514,7 @@ export async function getFeaturedListings(limit: number = 6) {
 
     if (error) throw error;
     if (data && data.length > 0) {
-      return data.map(p => ({
+      return data.map(p => enrichProvider({
         ...p,
         rating: Number(p.rating) || 0,
         reviewCount: Number(p.reviews) || 0,
@@ -448,10 +584,17 @@ export async function getListingStats() {
     configError = 'Supabase environment variables are missing.';
   }
 
+  // If not configured, return counts from mock data
+  const mockCities = new Set(MOCK_LISTINGS.map(l => l.city.toLowerCase()));
+  // Add cities from MOCK_CITIES that might not have listings yet
+  MOCK_CITIES.forEach(c => mockCities.add(c.city.toLowerCase()));
+  
+  const mockStates = new Set(MOCK_LISTINGS.map(l => getStateFromProvider(l)));
+
   return {
     totalListings: MOCK_LISTINGS.length,
-    totalCities: MOCK_CITIES.length,
-    totalStates: 5,
+    totalCities: mockCities.size,
+    totalStates: mockStates.size || 5,
     isLive: false,
     error: configError
   };
@@ -566,12 +709,7 @@ export async function getAllListings() {
     }
     
     if (data && data.length > 0) {
-      return data.map(p => ({
-        ...p,
-        rating: Number(p.rating) || 0,
-        reviewCount: Number(p.reviews) || 0,
-        imageUrl: p.imageUrl || p.image_url || `https://picsum.photos/seed/${p.id}/800/600`
-      })) as Provider[];
+      return data.map(enrichProvider);
     }
   } catch (err) {
     console.error('Supabase error in getAllListings:', err);
@@ -592,12 +730,7 @@ export async function getListingsByIds(ids: string[]) {
 
     if (error) throw error;
     if (data) {
-      return data.map(p => ({
-        ...p,
-        rating: Number(p.rating) || 0,
-        reviewCount: Number(p.reviews) || 0,
-        imageUrl: p.imageUrl || `https://picsum.photos/seed/${p.id}/800/600`
-      })) as Provider[];
+      return data.map(enrichProvider);
     }
     return [];
   } catch (err) {

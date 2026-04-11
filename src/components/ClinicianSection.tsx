@@ -53,7 +53,9 @@ export const ClinicianSection = ({ stats }: ClinicianSectionProps) => {
               </div>
               <div className="w-px h-8 bg-slate-800" />
               <div className="text-center">
-                <div className="text-2xl md:text-3xl font-black text-white">12k+</div>
+                <div className="text-2xl md:text-3xl font-black text-white">
+                  {Math.floor(stats.totalListings * 632 / 100) / 10}k+
+                </div>
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Matches</div>
               </div>
             </div>

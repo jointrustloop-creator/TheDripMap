@@ -129,7 +129,7 @@ export const HowItWorks = () => {
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
               <div className="text-center md:text-left">
                 <h3 className="text-3xl md:text-4xl font-black text-white mb-4 tracking-tight">Ready to find your perfect drip?</h3>
-                <p className="text-slate-400 text-lg max-w-md">Join thousands of others who have optimized their recovery with TheDripMap.</p>
+                <p className="text-slate-400 text-lg max-w-md">496 clinics ready to match with you. Find yours in 60 seconds.</p>
               </div>
               <Link 
                 href="/quiz"

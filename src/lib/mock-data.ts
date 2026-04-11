@@ -1,13 +1,18 @@
 import { Provider, BlogPost } from '../types';
 
 export const MOCK_CITIES: { city: string, state: string, count: number }[] = [
-  { city: 'New York', state: 'NY', count: 3 },
-  { city: 'Los Angeles', state: 'CA', count: 2 },
-  { city: 'Miami', state: 'FL', count: 2 },
-  { city: 'Las Vegas', state: 'NV', count: 1 },
-  { city: 'Austin', state: 'TX', count: 1 },
-  { city: 'Chicago', state: 'IL', count: 1 },
-  { city: 'Toronto', state: 'ON', count: 2 },
+  { city: 'New York', state: 'NY', count: 131 },
+  { city: 'Clearwater', state: 'FL', count: 75 },
+  { city: 'Washington DC', state: 'DC', count: 38 },
+  { city: 'Kansas City', state: 'MO', count: 29 },
+  { city: 'Tampa', state: 'FL', count: 20 },
+  { city: 'Fairfax', state: 'VA', count: 18 },
+  { city: 'San Diego', state: 'CA', count: 17 },
+  { city: 'Houston', state: 'TX', count: 17 },
+  { city: 'Huntsville', state: 'AL', count: 16 },
+  { city: 'Pleasanton', state: 'CA', count: 16 },
+  { city: 'Cypress', state: 'TX', count: 15 },
+  { city: 'Greenville', state: 'SC', count: 15 },
 ];
 
 export const MOCK_LISTINGS: Provider[] = [
@@ -220,6 +225,363 @@ export const MOCK_LISTINGS: Provider[] = [
       speedOfService: 4,
       valueForMoney: 4
     }
+  },
+  {
+    id: '7',
+    name: 'Vegas Vitality',
+    city: 'Las Vegas',
+    address: '3570 S Las Vegas Blvd, Las Vegas, NV 89109',
+    rating: 4.8,
+    reviewCount: 342,
+    priceRange: '$$$',
+    type: 'Both',
+    specialties: ['Hangover', 'Recovery', 'Hydration'],
+    amenities: ['Strip View', 'Mobile Service'],
+    description: 'The ultimate recovery station on the Las Vegas Strip. We bring the cure to your suite or welcome you in our luxury lounge.',
+    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 5,
+      speedOfService: 5,
+      valueForMoney: 3
+    }
+  },
+  {
+    id: '8',
+    name: 'Windy City Wellness',
+    city: 'Chicago',
+    address: '150 N Riverside Plaza, Chicago, IL 60606',
+    rating: 4.7,
+    reviewCount: 124,
+    priceRange: '$$',
+    type: 'In-Clinic',
+    specialties: ['Immune Support', 'NAD+ Plus'],
+    amenities: ['River View', 'Private Rooms'],
+    description: 'Premium IV hydration and wellness in the heart of Chicago\'s Loop.',
+    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 3,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: '9',
+    name: 'Fog City Hydration',
+    city: 'San Francisco',
+    address: '101 California St, San Francisco, CA 94111',
+    rating: 4.9,
+    reviewCount: 98,
+    priceRange: '$$$',
+    type: 'Both',
+    specialties: ['NAD+ Plus', 'Immune Support', 'Recovery'],
+    amenities: ['Tech-Forward Lounge', 'Mobile Service'],
+    description: 'Advanced IV therapy for San Francisco\'s high-performers and wellness enthusiasts.',
+    imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 5,
+      speedOfService: 4,
+      valueForMoney: 3
+    }
+  },
+  {
+    id: '11',
+    name: 'Big D Drip',
+    city: 'Dallas',
+    address: '2200 Victory Ave, Dallas, TX 75219',
+    rating: 4.8,
+    reviewCount: 156,
+    priceRange: '$$',
+    type: 'Both',
+    specialties: ['Hangover', 'Beauty Glow', 'Hydration'],
+    amenities: ['Luxury Lounge', 'Mobile Service'],
+    description: 'Dallas\' premier destination for hydration and vitamin therapy.',
+    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 4,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: '12',
+    name: 'Space City Hydration',
+    city: 'Houston',
+    address: '1200 Main St, Houston, TX 77002',
+    rating: 4.8,
+    reviewCount: 189,
+    priceRange: '$$',
+    type: 'Both',
+    specialties: ['Recovery', 'Immune Support'],
+    amenities: ['Modern Lounge', 'Mobile Service'],
+    description: 'Houston\'s leading IV therapy provider for athletes and busy professionals.',
+    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 4,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: '13',
+    name: 'Desert Drip',
+    city: 'Phoenix',
+    address: '2 N Central Ave, Phoenix, AZ 85004',
+    rating: 4.9,
+    reviewCount: 145,
+    priceRange: '$$',
+    type: 'Both',
+    specialties: ['Hydration', 'Heat Recovery'],
+    amenities: ['Cooling Lounge', 'Mobile Service'],
+    description: 'Stay hydrated in the Valley of the Sun with our specialized IV protocols.',
+    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 5,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: '14',
+    name: 'Peach State Wellness',
+    city: 'Atlanta',
+    address: '191 Peachtree St NE, Atlanta, GA 30303',
+    rating: 4.8,
+    reviewCount: 178,
+    priceRange: '$$',
+    type: 'Both',
+    specialties: ['Immune Support', 'Energy Boost'],
+    amenities: ['Luxury Lounge', 'Mobile Service'],
+    description: 'Atlanta\'s premier IV therapy and wellness destination.',
+    imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 5,
+      speedOfService: 4,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: '15',
+    name: 'Mile High Hydration',
+    city: 'Denver',
+    address: '1701 Wynkoop St, Denver, CO 80202',
+    rating: 4.8,
+    reviewCount: 134,
+    priceRange: '$$',
+    type: 'Both',
+    specialties: ['Altitude Recovery', 'Immune Support'],
+    amenities: ['Mountain Views', 'Mobile Service'],
+    description: 'Denver\'s top choice for altitude sickness relief and wellness drips.',
+    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 4,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: '16',
+    name: 'Emerald City Drip',
+    city: 'Seattle',
+    address: '1000 4th Ave, Seattle, WA 98104',
+    rating: 4.9,
+    reviewCount: 112,
+    priceRange: '$$',
+    type: 'Both',
+    specialties: ['Immune Support', 'Energy Boost'],
+    amenities: ['Modern Lounge', 'Mobile Service'],
+    description: 'Premium IV therapy for Seattle\'s active and professional community.',
+    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 5,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: '17',
+    name: 'Boston Wellness Hub',
+    city: 'Boston',
+    address: '100 Federal St, Boston, MA 02110',
+    rating: 4.8,
+    reviewCount: 167,
+    priceRange: '$$$',
+    type: 'In-Clinic',
+    specialties: ['NAD+ Plus', 'Recovery'],
+    amenities: ['Clinical Excellence', 'Private Suites'],
+    description: 'Advanced clinical IV therapy in the heart of Boston.',
+    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 5,
+      speedOfService: 3,
+      valueForMoney: 3
+    }
+  },
+  {
+    id: '19',
+    name: 'Queen City Drip',
+    city: 'Charlotte',
+    address: '100 N Tryon St, Charlotte, NC 28202',
+    rating: 4.7,
+    reviewCount: 92,
+    priceRange: '$$',
+    type: 'Both',
+    specialties: ['Immune Support', 'Recovery'],
+    amenities: ['Modern Lounge', 'Mobile Service'],
+    description: 'Charlotte\'s premier destination for hydration and wellness optimization.',
+    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 4,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: '20',
+    name: 'Orlando Wellness Drip',
+    city: 'Orlando',
+    address: '400 W Church St, Orlando, FL 32801',
+    rating: 4.8,
+    reviewCount: 156,
+    priceRange: '$$',
+    type: 'Both',
+    specialties: ['Hydration', 'Immune Support'],
+    amenities: ['Family Friendly', 'Mobile Service'],
+    description: 'Expert IV therapy in the heart of Orlando, perfect for theme park recovery and wellness.',
+    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 4,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: '21',
+    name: 'Rocky Mountain IV',
+    city: 'Denver',
+    address: '1200 17th St, Denver, CO 80202',
+    rating: 4.7,
+    reviewCount: 88,
+    priceRange: '$$',
+    type: 'Mobile',
+    specialties: ['Altitude Recovery', 'Hydration'],
+    amenities: ['Mobile Service', 'Oxygen Therapy'],
+    description: 'Specialized altitude sickness relief delivered to your door in Denver and surrounding areas.',
+    imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 3,
+      speedOfService: 5,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: '22',
+    name: 'Rain City Recovery',
+    city: 'Seattle',
+    address: '1201 3rd Ave, Seattle, WA 98101',
+    rating: 4.6,
+    reviewCount: 74,
+    priceRange: '$$',
+    type: 'In-Clinic',
+    specialties: ['Immune Support', 'NAD+ Plus'],
+    amenities: ['Private Pods', 'Coffee Bar'],
+    description: 'Boost your immunity and energy in our cozy downtown Seattle lounge.',
+    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 4,
+      valueForMoney: 3
+    }
+  },
+  {
+    id: '23',
+    name: 'Beacon Hill Wellness',
+    city: 'Boston',
+    address: '1 Beacon St, Boston, MA 02108',
+    rating: 4.9,
+    reviewCount: 110,
+    priceRange: '$$$',
+    type: 'Both',
+    specialties: ['NAD+ Plus', 'Beauty Glow'],
+    amenities: ['Luxury Lounge', 'Mobile Service'],
+    description: 'Elite IV therapy and anti-aging treatments in Boston\'s historic Beacon Hill.',
+    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 5,
+      speedOfService: 4,
+      valueForMoney: 3
+    }
+  },
+  {
+    id: '24',
+    name: 'Broadway Drip Lounge',
+    city: 'Nashville',
+    address: '414 Union St, Nashville, TN 37219',
+    rating: 4.8,
+    reviewCount: 195,
+    priceRange: '$$',
+    type: 'In-Clinic',
+    specialties: ['Hangover', 'Hydration'],
+    amenities: ['Group Seating', 'Music'],
+    description: 'The perfect pre- or post-Broadway recovery spot for groups and individuals.',
+    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 3,
+      speedOfService: 5,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: '25',
+    name: 'Tryon Wellness',
+    city: 'Charlotte',
+    address: '201 S Tryon St, Charlotte, NC 28202',
+    rating: 4.7,
+    reviewCount: 65,
+    priceRange: '$$',
+    type: 'Both',
+    specialties: ['Immune Support', 'Recovery'],
+    amenities: ['Modern Lounge', 'Mobile Service'],
+    description: 'Comprehensive IV therapy solutions for Charlotte\'s growing wellness community.',
+    imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=800',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 4,
+      valueForMoney: 4
+    }
   }
 ];
 
@@ -310,7 +672,7 @@ Whether you are an executive looking for a cognitive edge, an athlete seeking fa
     `,
     date: '2024-03-28',
     author: 'Dr. James Wilson',
-    imageUrl: 'https://images.unsplash.com/photo-1559839734-2b71f1536783?auto=format&fit=crop&q=80&w=1200'
+    imageUrl: 'https://picsum.photos/seed/nad-plus/1200/800'
   },
   {
     slug: 'myers-cocktail-iv-benefits-chronic-fatigue',

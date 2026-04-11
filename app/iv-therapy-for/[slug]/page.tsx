@@ -1,10 +1,9 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getUseCaseBySlug, getListingsByService, getAllUseCases } from '@/src/lib/data';
+import { getUseCaseBySlug, getListingsByService, getAllUseCases, slugify } from '@/src/lib/data';
 import * as Icons from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
-import { MedicalDisclaimer } from '@/src/components/MedicalDisclaimer';
 import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
 import { Navbar } from '@/src/components/Navbar';
 import { Footer } from '@/src/components/Footer';
@@ -18,8 +17,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const useCase = await getUseCaseBySlug(slug);
   if (!useCase) return { title: 'Not Found' };
 
+  let title = `IV Therapy for ${useCase.title} — Find Clinics Near You | TheDripMap`;
+  
+  if (slug === 'stress') {
+    title = "Stress Relief IV Drip — Find Clinics Near You | TheDripMap";
+  } else if (slug === 'fatigue') {
+    title = "IV Drip for Energy and Fatigue — Find Clinics | TheDripMap";
+  }
+
   return {
-    title: `IV Therapy for ${useCase.title} — Find Clinics Near You | TheDripMap`,
+    title,
     description: `Learn about how IV therapy is commonly used for ${useCase.title.toLowerCase()}. Find top-rated clinics and what to expect from your session.`,
     alternates: {
       canonical: `/iv-therapy-for/${slug}`,
@@ -111,30 +118,71 @@ export default async function UseCasePage({ params }: PageProps) {
                 IV Therapy for {useCase.title} — What to Expect
               </h1>
               <div className="prose prose-lg text-gray-600 max-w-none leading-relaxed">
-                <p>{useCase.description}</p>
+                <p className="mb-6">{useCase.description}</p>
+                
+                {useCase.whyItWorks && (
+                  <div className="mt-12">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Why IV therapy works for {useCase.title}</h2>
+                    <div className="whitespace-pre-wrap">{useCase.whyItWorks}</div>
+                  </div>
+                )}
               </div>
             </div>
-            <div className="w-full md:w-1/3 bg-blue-50 p-8 rounded-3xl border border-blue-100">
+            <div className="w-full md:w-1/3 bg-blue-50 p-8 rounded-3xl border border-blue-100 h-fit">
               <h3 className="text-xl font-bold text-blue-900 mb-6 flex items-center">
                 <Icons.FlaskConical className="w-5 h-5 mr-2" /> Common Ingredients
               </h3>
               <ul className="space-y-4">
-                {useCase.ingredients.map((ingredient, idx) => (
-                  <li key={idx} className="flex items-start text-blue-800">
-                    <Icons.CheckCircle2 className="w-5 h-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" />
-                    <span className="font-medium">{ingredient}</span>
-                  </li>
-                ))}
+                {useCase.ingredientsDetailed ? (
+                  useCase.ingredientsDetailed.map((item, idx) => (
+                    <li key={idx} className="flex items-start text-blue-800">
+                      <Icons.CheckCircle2 className="w-5 h-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <span className="font-bold block">{item.name}</span>
+                        <span className="text-sm text-blue-700/80">{item.role}</span>
+                      </div>
+                    </li>
+                  ))
+                ) : (
+                  useCase.ingredients.map((ingredient, idx) => (
+                    <li key={idx} className="flex items-start text-blue-800">
+                      <Icons.CheckCircle2 className="w-5 h-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" />
+                      <span className="font-medium">{ingredient}</span>
+                    </li>
+                  ))
+                )}
               </ul>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Comparisons & Typical Patient Section */}
+      {(useCase.comparisons || useCase.typicalPatient) && (
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              {useCase.comparisons && (
+                <div className="bg-gray-50 p-10 rounded-[2.5rem] border border-gray-100">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">How it compares to other options</h2>
+                  <p className="text-gray-600 leading-relaxed">{useCase.comparisons}</p>
+                </div>
+              )}
+              {useCase.typicalPatient && (
+                <div className="bg-blue-50/50 p-10 rounded-[2.5rem] border border-blue-100/50">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">Who typically uses IV therapy for {useCase.title}</h2>
+                  <p className="text-gray-600 leading-relaxed">{useCase.typicalPatient}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Session Section */}
       <section className="py-16 bg-gray-50 border-y border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">What a session is like</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">What to expect at your session</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             {useCase.sessionExpectation}
           </p>
@@ -148,12 +196,71 @@ export default async function UseCasePage({ params }: PageProps) {
         initialClinics={clinics} 
       />
 
+      {/* Location CTA Section */}
+      <section className="py-20 bg-white border-t border-gray-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-black text-slate-900 mb-4">Find a {useCase.title} IV clinic in your city</h2>
+          <p className="text-slate-500 mb-10">Search our directory of top-rated providers specializing in {useCase.title.toLowerCase()} support.</p>
+          
+          <form action="/search" method="GET" className="relative max-w-xl mx-auto mb-12">
+            <input type="hidden" name="service" value={useCase.serviceTag} />
+            <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+              <Icons.MapPin className="h-5 w-5 text-slate-400" />
+            </div>
+            <input
+              type="text"
+              name="city"
+              placeholder="Enter your city (e.g. Dallas)"
+              className="block w-full pl-12 pr-32 py-5 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm font-medium"
+              required
+            />
+            <button 
+              type="submit"
+              className="absolute right-2 top-2 bottom-2 bg-blue-600 text-white px-6 rounded-xl font-bold hover:bg-blue-700 transition-colors flex items-center gap-2"
+            >
+              <Icons.Search className="w-4 h-4" />
+              <span>Search</span>
+            </button>
+          </form>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[
+              { city: 'New York', state: 'ny' },
+              { city: 'Miami', state: 'fl' },
+              { city: 'Los Angeles', state: 'ca' }
+            ].map((loc) => (
+              <Link 
+                key={loc.city}
+                href={`/iv-therapy/${loc.state}/${slugify(loc.city)}?service=${encodeURIComponent(useCase.serviceTag)}`}
+                className="p-4 rounded-2xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50 transition-all text-sm font-bold text-slate-700"
+              >
+                IV therapy for {useCase.title} in {loc.city}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* FAQ Section */}
       <section className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Common Questions About {useCase.title}</h2>
           <div className="space-y-6">
-            {useCase.faqs.map((faq, idx) => (
+            {[
+              ...useCase.faqs,
+              { 
+                question: `How much does ${useCase.title} IV therapy cost?`, 
+                answer: `The cost of IV therapy for ${useCase.title.toLowerCase()} typically ranges from $175 to $350, depending on the specific ingredients included in the drip and the provider's location. Many clinics offer package deals or memberships that can reduce the per-session cost.` 
+              },
+              { 
+                question: `How soon will I feel better after ${useCase.title} IV therapy?`, 
+                answer: `Many people report feeling a difference within 30 to 60 minutes of starting their session, as the fluids and nutrients are delivered directly into the bloodstream. However, for some conditions, the full benefits may be more noticeable over the following 24 to 48 hours.` 
+              },
+              { 
+                question: `Is ${useCase.title} IV therapy covered by insurance?`, 
+                answer: `In most cases, elective IV therapy for ${useCase.title.toLowerCase()} is considered a wellness treatment and is not covered by standard health insurance. However, some providers accept HSA (Health Savings Account) or FSA (Flexible Spending Account) payments. It's always best to check with both the clinic and your insurance provider.` 
+              }
+            ].map((faq, idx) => (
               <div key={idx} className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">
                 <h3 className="text-lg font-bold text-gray-900 mb-3">{faq.question}</h3>
                 <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
@@ -181,10 +288,6 @@ export default async function UseCasePage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* Medical Disclaimer */}
-      <div className="py-12 border-t border-gray-200">
-        <MedicalDisclaimer />
-      </div>
       </main>
       <Footer />
     </div>

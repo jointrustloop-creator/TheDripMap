@@ -19,6 +19,7 @@ export interface Provider {
   rating: number;
   reviewCount: number;
   priceRange?: '$' | '$$' | '$$$' | '$$$$';
+  price_range?: string;
   type?: TreatmentType;
   specialties: string[];
   amenities: string[];
@@ -26,6 +27,14 @@ export interface Provider {
   imageUrl: string;
   slug?: string;
   is_featured: boolean;
+  is_verified?: boolean;
+  is_claimed?: boolean;
+  claimed_at?: string;
+  subscription_tier?: string;
+  mobile_service?: boolean;
+  walk_ins_welcome?: boolean;
+  photos?: string[];
+  hours?: Record<string, string>;
   distance?: number;
   decisionDrivers?: {
     medicalSupervision: boolean;
@@ -36,6 +45,31 @@ export interface Provider {
   rank_in_city?: number;
   availability?: boolean;
   working_hours?: Record<string, string[]>;
+  services?: {
+    name: string;
+    description: string;
+    price: string;
+    category?: string;
+  }[];
+  reviews_data?: {
+    author: string;
+    rating: number;
+    text: string;
+    date: string;
+    avatar?: string;
+  }[];
+  medical_team?: {
+    name: string;
+    role: string;
+    bio: string;
+    photo?: string;
+  }[];
+  special_offers?: {
+    title: string;
+    description: string;
+    code?: string;
+    expires?: string;
+  }[];
 }
 
 export interface BlogPost {
@@ -71,6 +105,10 @@ export interface SurveyState {
   locationPreference?: TreatmentType;
   budget?: string;
   city?: City;
+  lat?: number;
+  lng?: number;
+  country?: string;
+  state?: string;
   symptoms?: string[];
   lifestyle?: string;
   medicalHistory?: string[];
@@ -80,8 +118,12 @@ export interface SurveyState {
 export interface OperatorProfile {
   id: string;
   clinicId: string;
+  clinic_id?: string;
   ownerName: string;
   email: string;
+  owner_name?: string;
+  one_liner?: string;
+  credentials?: string;
   profile_data: {
     primarySpecialty: string;
     additionalServices: string[];

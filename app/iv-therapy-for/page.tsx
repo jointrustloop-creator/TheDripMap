@@ -5,6 +5,9 @@ import { getAllUseCases } from '@/src/lib/data';
 import * as Icons from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 
+import { Navbar } from '@/src/components/Navbar';
+import { Footer } from '@/src/components/Footer';
+
 export const metadata: Metadata = {
   title: 'IV Therapy for Symptoms & Use Cases | TheDripMap',
   description: 'Explore common reasons people seek IV therapy, from hangover recovery and jet lag to immunity boosts and skin glow. Find the right drip for your needs.',
@@ -14,8 +17,10 @@ export default async function UseCaseHubPage() {
   const useCases = await getAllUseCases();
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <main>
+        {/* Hero Section */}
       <section className="relative py-24 md:py-32 overflow-hidden bg-white">
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#4a7362 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -93,17 +98,8 @@ export default async function UseCaseHubPage() {
         </div>
       </section>
 
-      {/* Medical Disclaimer */}
-      <section className="py-12 border-t border-gray-200 bg-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <p className="text-xs text-gray-400 leading-relaxed uppercase tracking-widest font-semibold mb-4">
-            Medical Disclaimer
-          </p>
-          <p className="text-sm text-gray-500 leading-relaxed italic">
-            The information provided on this website is for informational purposes only and is not intended as medical advice, diagnosis, or treatment. IV therapy is a wellness service and should be discussed with a qualified healthcare professional. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.
-          </p>
-        </div>
-      </section>
-    </main>
+      </main>
+      <Footer />
+    </div>
   );
 }

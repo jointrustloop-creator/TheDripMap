@@ -1,5 +1,16 @@
 import { Provider, SurveyState, OperatorProfile } from '../types';
-import { calculateDistance } from './geo';
+
+function getDistance(lat1: number, lng1: number, lat2: number, lng2: number) {
+  const R = 3959; // Earth radius in miles
+  const dLat = (lat2-lat1) * Math.PI/180;
+  const dLng = (lng2-lng1) * Math.PI/180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1*Math.PI/180) * 
+    Math.cos(lat2*Math.PI/180) *
+    Math.sin(dLng/2) * Math.sin(dLng/2);
+  return R * 2 * Math.atan2(
+    Math.sqrt(a), Math.sqrt(1-a));
+}
 
 export function matchProviders(
   answers: SurveyState, 
@@ -11,101 +22,101 @@ export function matchProviders(
     let score = 0;
     const profile = operatorProfiles.find(op => op.clinicId === p.id);
     
-    // 0. Distance Match (High Priority if location available)
+    // 0. Distance Match (High Priority)
     let distance: number | undefined;
     if (userLocation && p.latitude && p.longitude) {
-      distance = calculateDistance(
+      distance = getDistance(
         userLocation.latitude, 
         userLocation.longitude, 
         p.latitude, 
         p.longitude
       );
       
-      // Bonus for proximity
-      if (distance <= 5) score += 500;
-      else if (distance <= 15) score += 300;
-      else if (distance <= 30) score += 100;
-      
-      // Penalty for very far (if not mobile)
-      if (distance > 50 && p.type !== 'Mobile') score -= 200;
+      // Proximity Scoring (Step 2)
+      if (distance < 5) score += 15;
+      else if (distance < 10) score += 12;
+      else if (distance < 20) score += 8;
+      else if (distance < 50) score += 4;
     }
 
-    // 1. City Match (Highest Priority)
-    if (answers.city && p.city === answers.city) {
-      score += 1000;
+    // Mobile Service Bonus (Step 2)
+    const isMobile = p.type === 'Mobile' || p.mobile_service === true || (profile?.profile_data?.mobileService === true);
+    if (isMobile) {
+      score += 15; // Mobile comes to them, distance irrelevant
     }
 
-    // 2. Rank in City (Inverse weight)
+    // 1. City Match
+    if (answers.city && p.city.toLowerCase() === answers.city.toLowerCase()) {
+      score += 20;
+    }
+
+    // 2. Rank in City
     if (p.rank_in_city) {
-      score += (10 - p.rank_in_city) * 10; // rank 1 gets +90, rank 2 gets +80, etc.
+      score += (10 - p.rank_in_city) * 2;
     }
+
+    // 2.1 Rating Quality Score
+    if (p.rating >= 4.8) score += 25;
+    else if (p.rating >= 4.5) score += 20;
+    else if (p.rating >= 4.0) score += 15;
+    else if (p.rating >= 3.5) score += 10;
+
+    // 2.2 Review Count Bonus
+    if (p.reviewCount >= 100) score += 5;
+    else if (p.reviewCount >= 50) score += 3;
+    else if (p.reviewCount >= 10) score += 1;
+
+    // 2.3 Featured and Verified Bonuses
+    if (p.is_featured) score += 10;
+    if (p.is_verified) score += 8;
 
     // 3. User Goal (Specialties)
     if (answers.goal && p.specialties && Array.isArray(p.specialties)) {
       if (p.specialties.some(s => s && s.toLowerCase().includes(answers.goal?.toLowerCase() || ''))) {
-        score += 50;
+        score += 20;
       }
     }
 
     // 4. Delivery Preference
     if (answers.locationPreference === 'Mobile' && p.type === 'Mobile') {
-      score += 30;
+      score += 15;
     } else if (answers.locationPreference === 'In-Clinic' && p.type === 'In-Clinic') {
-      score += 30;
-    } else if (answers.locationPreference === 'Both') {
-      score += 30;
+      score += 15;
     }
 
-    // 5. Availability (if present)
+    // 5. Availability
     if (p.availability === true) {
-      score += 40;
-    } else if (p.availability === false) {
-      score -= 100; // Penalize if explicitly unavailable
-    }
-
-    // 6. Urgency (ASAP preference)
-    if (answers.urgency === 'ASAP' && p.type === 'Mobile') {
-      score += 20;
+      score += 10;
     }
 
     // THE MATCHING UPGRADE (Operator Profiles)
     if (profile) {
       const data = profile.profile_data;
       
-      // Bonus for profile completion (always rank above identical-scoring clinics)
-      score += 1;
+      // Bonus for profile completion
+      score += 5;
 
-      // clinic primary_specialty matches patient goal (+20 points)
+      // clinic primary_specialty matches patient goal
       if (answers.goal && data.primarySpecialty && typeof data.primarySpecialty === 'string' && data.primarySpecialty.toLowerCase().includes(answers.goal.toLowerCase())) {
         score += 20;
       }
 
-      // clinic environment matches patient preference (+10 points)
-      // Note: We need to map patient preference to environment if applicable
-      // For now, let's assume if patient wants luxury and clinic is spa-like
+      // clinic environment matches patient preference
       if (data.environment && typeof data.environment === 'string' && data.environment === 'Spa-like lounge' && (answers.lifestyle === 'Luxury' || answers.goal === 'Beauty + glow')) {
-        score += 10;
+        score += 5;
       }
 
-      // clinic price_range matches patient budget (+10 points)
+      // clinic price_range matches patient budget
       if (answers.budget && data.priceRange && typeof data.priceRange === 'string' && data.priceRange.includes(answers.budget)) {
-        score += 10;
+        score += 5;
       }
 
-      // clinic walk_ins=true AND patient timing=today (+15 points)
+      // clinic walk_ins=true AND patient timing=today
       if (data.walkInsWelcome && (answers.urgency === 'Today' || answers.urgency === 'ASAP')) {
-        score += 15;
-      }
-
-      // clinic mobile=true AND patient delivery=mobile (+15 points)
-      if (data.mobileService && answers.locationPreference === 'Mobile') {
-        score += 15;
+        score += 5;
       }
     }
 
-    // Randomize slightly for "clinical nuance" simulation
-    // const finalScore = Math.min(100, score + Math.floor(Math.random() * 5));
-
-    return { ...p, matchScore: score, distance }; // Using raw score for sorting
-  }).sort((a, b) => b.matchScore - a.matchScore);
+    return { ...p, matchScore: score, distance };
+  }).sort((a, b) => b.matchScore - a.matchScore).slice(0, 10);
 }

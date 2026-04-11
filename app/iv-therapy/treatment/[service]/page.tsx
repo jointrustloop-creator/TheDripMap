@@ -1,6 +1,6 @@
-import React from 'react';
-import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+'use client';
+import React, { useState, useEffect } from 'react';
+import { notFound, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
   Droplets, 
@@ -11,7 +11,8 @@ import {
   Heart,
   Sparkles,
   Dumbbell,
-  CheckCircle2
+  CheckCircle2,
+  MapPin
 } from 'lucide-react';
 import { Navbar } from '../../../../src/components/Navbar';
 import { Footer } from '../../../../src/components/Footer';
@@ -19,15 +20,8 @@ import { ProviderCard } from '../../../../src/components/ProviderCard';
 import { FAQSection } from '../../../../src/components/FAQSection';
 import { BreadcrumbNav } from '../../../../src/components/BreadcrumbNav';
 import { CityGrid } from '../../../../src/components/CityGrid';
-import { getListingsByService, getAllCities } from '../../../../src/lib/data';
-
-export const revalidate = 86400; // 24 hours
-
-interface ServicePageProps {
-  params: Promise<{
-    service: string;
-  }>;
-}
+import { getListingsByServiceAndCity, getAllCities, getListingsByService } from '../../../../src/lib/data';
+import { Provider } from '../../../../src/types';
 
 const SERVICES = [
   { name: 'NAD+ Plus', slug: 'nad-plus', icon: <Activity size={24} /> },
@@ -40,47 +34,69 @@ const SERVICES = [
   { name: 'Myers Cocktail', slug: 'myers-cocktail', icon: <Zap size={24} /> },
 ];
 
-export async function generateStaticParams() {
-  return SERVICES.map((s) => ({
-    service: s.slug,
-  }));
-}
+export default function ServicePage({ params }: { params: Promise<{ service: string }> }) {
+  const resolvedParams = React.use(params);
+  const serviceSlug = resolvedParams.service;
+  const searchParams = useSearchParams();
+  const cityParam = searchParams.get('city');
 
-export async function generateMetadata({ params }: ServicePageProps): Promise<Metadata> {
-  const { service: serviceSlug } = await params;
-  const service = SERVICES.find(s => s.slug === serviceSlug);
-  
-  if (!service) return { title: 'Service Not Found' };
+  const [service] = useState(SERVICES.find(s => s.slug === serviceSlug));
+  const [listings, setListings] = useState<Provider[]>([]);
+  const [topCities, setTopCities] = useState<{ city: string; state: string; count: number }[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentCity, setCurrentCity] = useState<string | null>(cityParam);
 
-  return {
-    title: `Best ${service.name} IV Therapy Near Me | Top Rated Clinics 2024`,
-    description: `Find and compare the best ${service.name} IV therapy clinics near you. Read reviews, compare prices, and book top-rated ${service.name} hydration and wellness drips.`,
-    alternates: {
-      canonical: `/iv-therapy/treatment/${serviceSlug}`,
-    },
-    openGraph: {
-      title: `Best ${service.name} IV Therapy Near Me`,
-      description: `Find and compare the best ${service.name} IV therapy clinics near you.`,
-      url: `https://thedripmap.com/iv-therapy/treatment/${serviceSlug}`,
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: `Best ${service.name} IV Therapy Near Me`,
-      description: `Find and compare the best ${service.name} IV therapy clinics near you.`,
-    },
-  };
-}
+  useEffect(() => {
+    if (!service) return;
 
-export default async function ServicePage({ params }: ServicePageProps) {
-  const { service: serviceSlug } = await params;
-  const service = SERVICES.find(s => s.slug === serviceSlug);
-  
+    const loadData = async () => {
+      setIsLoading(true);
+      
+      // Check for city in session storage if not in URL
+      let cityToUse = currentCity;
+      if (!cityToUse) {
+        const cached = sessionStorage.getItem('tdm_location');
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached);
+            if (parsed.city) cityToUse = parsed.city;
+          } catch (e) {
+            console.error('Failed to parse cached location', e);
+          }
+        }
+      }
+
+      const [serviceListings, allCities] = await Promise.all([
+        cityToUse && cityToUse !== 'All' 
+          ? getListingsByServiceAndCity(service.name, cityToUse, 9)
+          : getListingsByService(service.name, 9),
+        getAllCities()
+      ]);
+
+      setListings(serviceListings);
+      setTopCities(allCities.slice(0, 8));
+      setCurrentCity(cityToUse);
+      setIsLoading(false);
+    };
+
+    loadData();
+  }, [service, currentCity]);
+
+  // Listen for global location changes
+  useEffect(() => {
+    const handleLocationChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const newLoc = customEvent.detail;
+      if (newLoc && newLoc.city) {
+        setCurrentCity(newLoc.city);
+      }
+    };
+
+    window.addEventListener('tdm_location_change', handleLocationChange);
+    return () => window.removeEventListener('tdm_location_change', handleLocationChange);
+  }, []);
+
   if (!service) notFound();
-
-  const listings = await getListingsByService(service.name);
-  const cities = await getAllCities();
-  const topCities = cities.slice(0, 8);
 
   const faqs = [
     {
@@ -97,59 +113,10 @@ export default async function ServicePage({ params }: ServicePageProps) {
     }
   ];
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    "name": `${service.name} IV Therapy`,
-    "description": `Top rated ${service.name} IV hydration and wellness treatments.`,
-    "provider": {
-      "@type": "Organization",
-      "name": "TheDripMap"
-    },
-    "areaServed": {
-      "@type": "Country",
-      "name": "US"
-    }
-  };
-
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "https://thedripmap.com"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Treatments",
-        "item": "https://thedripmap.com/search"
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": service.name,
-        "item": `https://thedripmap.com/iv-therapy/treatment/${serviceSlug}`
-      }
-    ]
-  };
-
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
       
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-
       <main className="max-w-7xl mx-auto px-6 py-12">
         <BreadcrumbNav 
           items={[
@@ -166,7 +133,7 @@ export default async function ServicePage({ params }: ServicePageProps) {
               <span>Specialized {service.name} Protocols</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
-              Best <span className="text-wellness-600">{service.name} IV Therapy</span> Near Me
+              Best <span className="text-wellness-600">{service.name} IV Therapy</span> {currentCity && currentCity !== 'All' ? `in ${currentCity}` : 'Near Me'}
             </h1>
             <p className="text-xl text-slate-500 leading-relaxed mb-10">
               Compare {listings.length} top-rated clinics and mobile services specializing in {service.name} IV therapy. Find the perfect treatment for your wellness goals today.
@@ -192,20 +159,41 @@ export default async function ServicePage({ params }: ServicePageProps) {
         {/* Featured Listings Grid */}
         <section className="mb-24">
           <div className="flex items-center justify-between gap-6 mb-12">
-            <h2 className="text-3xl font-black text-slate-900 tracking-tight">Top {service.name} Providers</h2>
+            <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+              {currentCity && currentCity !== 'All' ? `Top ${service.name} Providers in ${currentCity}` : `Top ${service.name} Providers`}
+            </h2>
             <Link 
-              href="/search"
+              href={`/search?q=${encodeURIComponent(service.name)}&city=${encodeURIComponent(currentCity || 'All')}`}
               className="hidden md:flex items-center gap-2 text-sm font-bold text-wellness-600 hover:text-wellness-700 transition-colors"
             >
               View All Clinics <ArrowRight size={16} />
             </Link>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {listings.slice(0, 9).map((provider) => (
-              <ProviderCard key={provider.id} provider={provider} />
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="text-center py-20">
+              <div className="w-12 h-12 border-4 border-wellness-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-slate-500 font-bold">Finding specialized providers...</p>
+            </div>
+          ) : listings.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {listings.map((provider) => (
+                <ProviderCard key={provider.id} provider={provider} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20 bg-white rounded-[3rem] border border-slate-100 shadow-sm">
+              <MapPin size={48} className="mx-auto text-slate-200 mb-4" />
+              <h3 className="text-xl font-bold text-slate-900 mb-2">No {service.name} providers found in {currentCity}</h3>
+              <p className="text-slate-500 mb-6">Try searching in a nearby city or browse all providers.</p>
+              <button 
+                onClick={() => setCurrentCity('All')}
+                className="text-wellness-600 font-bold hover:underline"
+              >
+                Show all {service.name} providers
+              </button>
+            </div>
+          )}
         </section>
 
         {/* Service Info Section */}

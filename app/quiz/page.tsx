@@ -12,20 +12,20 @@ import {
   Dumbbell,
   Sun,
   CheckCircle2,
-  ChevronLeft
+  ChevronLeft,
+  DollarSign,
+  Navigation,
+  Lock,
+  Calendar
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { SurveyState, City } from '../../src/types';
+import { SurveyState } from '../../src/types';
 import { cn } from '../../src/lib/utils';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 
-const TOP_CITIES: City[] = [
-  'New York', 'Los Angeles', 'Miami', 'Las Vegas', 'Austin', 
-  'Chicago', 'Washington', 'Portland', 'San Francisco', 'San Diego',
-  'Dallas' as City, 'Houston' as City, 'Phoenix' as City, 'Atlanta' as City, 'Denver' as City,
-  'Seattle' as City, 'Boston' as City, 'Nashville' as City, 'Charlotte' as City, 'Orlando' as City
-];
+import { getUserLocation, getIPLocation } from '../../src/lib/geo';
+import { getAllCities } from '../../src/lib/data';
 
 const STEPS = [
   {
@@ -52,12 +52,6 @@ const STEPS = [
     ]
   },
   {
-    id: 'city',
-    question: "Where are you located?",
-    description: "We'll find the best-rated providers in your immediate area.",
-    type: 'city-select'
-  },
-  {
     id: 'urgency',
     question: "When do you need your treatment?",
     description: "Some providers offer rapid 60-minute dispatch for mobile services.",
@@ -66,18 +60,96 @@ const STEPS = [
       { id: 'Today', label: 'Later Today', icon: <Sun size={24} />, desc: 'Planning for a session today' },
       { id: 'This Week', label: 'Sometime This Week', icon: <Calendar size={24} />, desc: 'Regular wellness maintenance' },
     ]
+  },
+  {
+    id: 'budget',
+    question: "What's your budget for this session?",
+    description: "We'll find clinics that match your price range.",
+    options: [
+      { id: 'Under $100', label: 'Under $100', icon: <DollarSign size={24} />, desc: 'Basic hydration and recovery' },
+      { id: '$100 – $200', label: '$100 – $200', icon: <DollarSign size={24} />, desc: 'Standard IV drip packages' },
+      { id: '$200 – $400', label: '$200 – $400', icon: <DollarSign size={24} />, desc: 'Premium formulas and add-ons' },
+      { id: '$400+', label: '$400+', icon: <DollarSign size={24} />, desc: 'Concierge and NAD+ protocols' },
+    ]
+  },
+  {
+    id: 'city',
+    question: "Where are you located?",
+    description: "We'll find clinics near you",
+    type: 'location'
   }
 ];
 
 function Building2({ size }: { size: number }) { return <Droplets size={size} />; }
 function Home({ size }: { size: number }) { return <Droplets size={size} />; }
-function Calendar({ size }: { size: number }) { return <Droplets size={size} />; }
 
 export default function QuizPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [data, setData] = useState<SurveyState>({});
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isLocating, setIsLocating] = useState(true);
+  const [showManualLocation, setShowManualLocation] = useState(false);
+  const [allCities, setAllCities] = useState<{ city: string, state: string }[]>([]);
+  const [citySearch, setCitySearch] = useState('');
+
+  useEffect(() => {
+    async function init() {
+      // Load cities for autocomplete fallback
+      const cities = await getAllCities();
+      setAllCities(cities);
+
+      // Check for cached location first
+      const cached = sessionStorage.getItem('tdm_location');
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          setData(prev => ({
+            ...prev,
+            city: parsed.city,
+            state: parsed.state,
+            lat: parsed.latitude,
+            lng: parsed.longitude,
+            country: parsed.country
+          }));
+          setIsLocating(false);
+          return;
+        } catch {
+          // Ignore parse errors
+        }
+      }
+
+      try {
+        // 1. Silent browser geolocation
+        const pos = await getUserLocation();
+        setData(prev => ({
+          ...prev,
+          lat: pos.latitude,
+          lng: pos.longitude
+        }));
+        setIsLocating(false);
+      } catch {
+        // 2. IP geolocation fallback
+        try {
+          const ipPos = await getIPLocation();
+          setData(prev => ({
+            ...prev,
+            city: ipPos.city,
+            state: ipPos.region,
+            lat: ipPos.latitude,
+            lng: ipPos.longitude,
+            country: ipPos.country
+          }));
+          setIsLocating(false);
+        } catch {
+          // 3. Both failed, show manual input
+          setShowManualLocation(true);
+          setIsLocating(false);
+        }
+      }
+    }
+    init();
+  }, []);
 
   const handleOptionSelect = (id: string, value: string) => {
     const newData = { ...data, [id]: value };
@@ -90,6 +162,58 @@ export default function QuizPage() {
     }
   };
 
+  const handleLocationDetect = async () => {
+    setIsLocating(true);
+    try {
+      // Try precise location first
+      const pos = await getUserLocation();
+      setData(prev => ({
+        ...prev,
+        lat: pos.latitude,
+        lng: pos.longitude
+      }));
+      
+      // Try to get city name from IP fallback
+      try {
+        const ipPos = await getIPLocation();
+        setData(prev => ({
+          ...prev,
+          city: ipPos.city,
+          state: ipPos.region
+        }));
+        if (ipPos.city) setCitySearch(ipPos.city);
+      } catch {
+        // Ignore IP failure if we at least have lat/lng
+      }
+    } catch {
+      // Fallback to IP location entirely
+      try {
+        const ipPos = await getIPLocation();
+        setData(prev => ({
+          ...prev,
+          lat: ipPos.latitude,
+          lng: ipPos.longitude,
+          city: ipPos.city,
+          state: ipPos.region
+        }));
+        if (ipPos.city) setCitySearch(ipPos.city);
+      } catch (innerErr) {
+        console.error("Location detection failed", innerErr);
+      }
+    } finally {
+      setIsLocating(false);
+    }
+  };
+
+  const handleManualLocation = (city: string, state: string) => {
+    setData(prev => ({ ...prev, city, state }));
+    setShowManualLocation(false);
+  };
+
+  const skipLocation = () => {
+    setShowManualLocation(false);
+  };
+
   const handleComplete = (finalData: SurveyState) => {
     setIsAnalyzing(true);
     // Simulate analysis time
@@ -97,6 +221,10 @@ export default function QuizPage() {
       const query = new URLSearchParams();
       if (finalData.goal) query.set('goal', finalData.goal);
       if (finalData.city) query.set('city', finalData.city);
+      if (finalData.state) query.set('state', finalData.state);
+      if (finalData.lat) query.set('lat', finalData.lat.toString());
+      if (finalData.lng) query.set('lng', finalData.lng.toString());
+      if (finalData.country) query.set('country', finalData.country);
       if (finalData.locationPreference) query.set('type', finalData.locationPreference);
       if (finalData.urgency) query.set('urgency', finalData.urgency);
       
@@ -105,6 +233,94 @@ export default function QuizPage() {
   };
 
   const progress = ((step + 1) / STEPS.length) * 100;
+
+  if (isLocating) {
+    return (
+      <div className="min-h-screen bg-[#FDFDFB] flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-16 h-16 border-4 border-wellness-600 border-t-transparent rounded-full animate-spin mb-6"></div>
+        <h2 className="text-2xl font-black text-slate-900 mb-2">Finding Your Location</h2>
+        <p className="text-slate-500 font-medium">We&apos;re locating nearby clinics for you...</p>
+      </div>
+    );
+  }
+
+  if (showManualLocation) {
+    const filteredCities = allCities.filter(c => 
+      c.city.toLowerCase().includes(citySearch.toLowerCase()) || 
+      c.state.toLowerCase().includes(citySearch.toLowerCase())
+    ).slice(0, 8);
+
+    return (
+      <div className="min-h-screen bg-[#FDFDFB]">
+        <Navbar />
+        <div className="max-w-4xl mx-auto px-6 py-20">
+          <div className="max-w-2xl mb-12">
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">
+              Where are you located?
+            </h2>
+            <p className="text-lg text-slate-500">
+              We couldn&apos;t detect your location automatically. Please enter your city to find clinics near you.
+            </p>
+          </div>
+
+          <div className="relative max-w-xl">
+            <div className="relative">
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+              <input 
+                type="text"
+                placeholder="Search your city..."
+                value={citySearch}
+                onChange={(e) => setCitySearch(e.target.value)}
+                className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-slate-100 focus:border-wellness-600 focus:outline-none font-bold text-slate-900 transition-all"
+                autoFocus
+              />
+            </div>
+
+            {citySearch.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border-2 border-slate-100 shadow-xl z-50 overflow-hidden">
+                {filteredCities.length > 0 ? (
+                  filteredCities.map((c, idx) => (
+                    <button
+                      key={`${c.city}-${c.state}-${idx}`}
+                      onClick={() => handleManualLocation(c.city, c.state)}
+                      className="w-full flex items-center gap-3 px-6 py-4 hover:bg-wellness-50 text-left transition-colors border-b border-slate-50 last:border-0"
+                    >
+                      <MapPin size={16} className="text-slate-400" />
+                      <div>
+                        <span className="font-bold text-slate-900">{c.city}</span>
+                        <span className="text-slate-400 ml-2">{c.state}</span>
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <div className="px-6 py-4 text-slate-400 italic">No cities found matching &quot;{citySearch}&quot;</div>
+                )}
+              </div>
+            )}
+
+            <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {allCities.slice(0, 5).map((c, idx) => (
+                <button
+                  key={`top-${c.city}-${idx}`}
+                  onClick={() => handleManualLocation(c.city, c.state)}
+                  className="px-4 py-3 rounded-xl border border-slate-100 hover:border-wellness-600 hover:bg-wellness-50 font-bold text-slate-600 hover:text-wellness-600 transition-all text-sm"
+                >
+                  {c.city}
+                </button>
+              ))}
+              <button
+                onClick={skipLocation}
+                className="px-4 py-3 rounded-xl border-2 border-dashed border-slate-200 hover:border-wellness-600 hover:bg-wellness-50 font-bold text-slate-400 hover:text-wellness-600 transition-all text-sm"
+              >
+                Skip for now
+              </button>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (isAnalyzing) {
     return (
@@ -175,35 +391,9 @@ export default function QuizPage() {
               </p>
             </div>
 
-            {currentStep.type === 'city-select' ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-4 custom-scrollbar">
-                {TOP_CITIES.map((city) => (
-                  <button
-                    key={city}
-                    onClick={() => handleOptionSelect('city', city)}
-                    className={cn(
-                      "flex items-center justify-between p-5 rounded-2xl border-2 text-left transition-all group",
-                      data.city === city 
-                        ? "border-wellness-600 bg-wellness-50 shadow-lg shadow-wellness-100" 
-                        : "border-slate-100 bg-white hover:border-wellness-200 hover:shadow-md"
-                    )}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={cn(
-                        "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
-                        data.city === city ? "bg-wellness-600 text-white" : "bg-slate-50 text-slate-400 group-hover:bg-wellness-50 group-hover:text-wellness-600"
-                      )}>
-                        <MapPin size={20} />
-                      </div>
-                      <span className="font-bold text-slate-900">{city}</span>
-                    </div>
-                    {data.city === city && <CheckCircle2 size={20} className="text-wellness-600" />}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {currentStep.options?.map((option) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {currentStep.options ? (
+                currentStep.options.map((option) => (
                   <button
                     key={option.id}
                     onClick={() => handleOptionSelect(currentStep.id, option.id)}
@@ -227,9 +417,43 @@ export default function QuizPage() {
                       <p className="text-sm text-slate-500 leading-relaxed">{option.desc}</p>
                     </div>
                   </button>
-                ))}
-              </div>
-            )}
+                ))
+              ) : currentStep.type === 'location' ? (
+                <div className="col-span-1 md:col-span-2 space-y-6">
+                  <div className="relative">
+                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                    <input 
+                      type="text"
+                      placeholder="City, State or Zip"
+                      value={citySearch || data.city || ''}
+                      onChange={(e) => {
+                        setCitySearch(e.target.value);
+                        setData(prev => ({ ...prev, city: e.target.value }));
+                      }}
+                      className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-slate-100 focus:border-wellness-600 focus:outline-none font-bold text-slate-900 transition-all"
+                      autoFocus
+                    />
+                  </div>
+                  
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button 
+                      onClick={handleLocationDetect}
+                      className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-slate-50 border-2 border-slate-100 hover:border-wellness-600 hover:bg-wellness-50 text-slate-600 font-bold transition-all"
+                    >
+                      <Navigation size={18} />
+                      Use my current location
+                    </button>
+                    <button 
+                      onClick={() => handleComplete(data)}
+                      disabled={!data.city && !citySearch}
+                      className="flex-1 bg-wellness-600 text-white px-8 py-4 rounded-2xl font-black hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Find Matches
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+            </div>
 
             <div className="flex items-center justify-between pt-10 border-t border-slate-100">
               <button 
@@ -240,7 +464,7 @@ export default function QuizPage() {
                 <ChevronLeft size={20} /> Back
               </button>
               <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-300">
-                <ShieldCheck size={14} /> HIPAA Compliant Matching
+                <Lock size={14} /> Your answers are private and never shared
               </div>
             </div>
           </motion.div>

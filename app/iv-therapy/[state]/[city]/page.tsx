@@ -1,6 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { 
   MapPin, 
   ShieldCheck, 
@@ -23,6 +23,9 @@ interface CityPageProps {
     state: string;
     city: string;
   }>;
+  searchParams: Promise<{
+    service?: string;
+  }>;
 }
 
 export async function generateStaticParams() {
@@ -35,8 +38,9 @@ export async function generateStaticParams() {
     }));
 }
 
-export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: CityPageProps): Promise<Metadata> {
   const { state, city } = await params;
+  const { service } = await searchParams;
   const cities = await getAllCities();
   const cityInfo = cities.find(c => slugify(c.city) === city);
   
@@ -45,9 +49,13 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   const cityName = cityInfo.city;
   const stateName = cityInfo.state;
 
+  const baseTitle = service 
+    ? `Best ${service} IV Therapy in ${cityName}, ${stateName} | Top Rated 2025`
+    : `Best IV Therapy in ${cityName}, ${stateName} | Top Rated Clinics 2025`;
+
   return {
-    title: `Best IV Therapy in ${cityName}, ${stateName} | Top Rated Clinics 2024`,
-    description: `Find and compare the best IV therapy clinics in ${cityName}, ${stateName}. Read reviews, compare prices, and book top-rated hydration and wellness drips.`,
+    title: baseTitle,
+    description: `Find and compare the best ${service ? service + ' ' : ''}IV therapy clinics in ${cityName}, ${stateName}. Read reviews, compare prices, and book top-rated hydration and wellness drips.`,
     alternates: {
       canonical: `/iv-therapy/${state}/${city}`,
     },
@@ -65,16 +73,31 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   };
 }
 
-export default async function CityPage({ params }: CityPageProps) {
+export default async function CityPage({ params, searchParams }: CityPageProps) {
   const { state, city } = await params;
+  const { service } = await searchParams;
+  
   const cities = await getAllCities();
   const cityInfo = cities.find(c => slugify(c.city) === city);
   
   if (!cityInfo) notFound();
 
+  // Redirect /us/ to correct state code if possible
+  if (state.toLowerCase() === 'us' && cityInfo.state && cityInfo.state.toLowerCase() !== 'us') {
+    redirect(`/iv-therapy/${slugify(cityInfo.state)}/${city}`);
+  }
+
   const cityName = cityInfo.city;
   const stateName = cityInfo.state;
-  const listings = await getListingsByCity(cityName);
+  let listings = await getListingsByCity(cityName);
+
+  if (service) {
+    listings = listings.filter(l => 
+      l.specialties.some(s => s.toLowerCase().includes(service.toLowerCase())) ||
+      l.name.toLowerCase().includes(service.toLowerCase()) ||
+      l.description.toLowerCase().includes(service.toLowerCase())
+    );
+  }
   
   const nearbyCities = cities
     .filter(c => c.state === cityInfo.state && c.city !== cityName)
@@ -110,7 +133,9 @@ export default async function CityPage({ params }: CityPageProps) {
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "4.9",
-      "reviewCount": ((cityInfo.count || listings.length) * 15 + 7).toString()
+      "reviewCount": listings.length > 0 
+        ? listings.reduce((acc, curr) => acc + (curr.reviewCount || 0), 0).toString()
+        : "12"
     }
   };
 
@@ -169,10 +194,10 @@ export default async function CityPage({ params }: CityPageProps) {
               <span>Verified Providers in {cityName}</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
-              Best IV Therapy in <span className="text-wellness-600">{cityName}, {stateName}</span>
+              Best {service ? <span className="text-wellness-600">{service} </span> : ''}IV Therapy in <span className="text-wellness-600">{cityName}, {stateName}</span>
             </h1>
             <p className="text-xl text-slate-500 leading-relaxed mb-10">
-              Compare {cityInfo.count || listings.length} top-rated IV therapy clinics and mobile services in {cityName}. Find the perfect hydration, energy, or recovery drip today.
+              Compare {service ? listings.length : (cityInfo.count || listings.length)} top-rated {service ? service + ' ' : ''}IV therapy clinics and mobile services in {cityName}. Find the perfect hydration, energy, or recovery drip today.
             </p>
             
             <div className="flex flex-wrap gap-4">
@@ -197,7 +222,7 @@ export default async function CityPage({ params }: CityPageProps) {
           <div className="flex items-center justify-between gap-6 mb-12">
             <h2 className="text-3xl font-black text-slate-900 tracking-tight">Top Rated Clinics</h2>
             <div className="hidden md:flex items-center gap-2 text-sm font-bold text-slate-400">
-              <Clock size={16} /> Updated: April 2024
+              <Clock size={16} /> Updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
             </div>
           </div>
           
