@@ -44,7 +44,37 @@ export function QuickMatch() {
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+
+    // Listen for location changes from LocationIndicator
+    const handleLocationChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const { city, state } = customEvent.detail;
+      if (city && state) {
+        setLocation(`${city}, ${state}`);
+      } else if (city) {
+        setLocation(city);
+      }
+    };
+
+    window.addEventListener('tdm_location_change', handleLocationChange);
+    
+    // Check if location is already in session storage
+    const cached = sessionStorage.getItem('tdm_location');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (parsed.city) {
+          setLocation(parsed.state ? `${parsed.city}, ${parsed.state}` : parsed.city);
+        }
+      } catch {
+        // Ignore errors
+      }
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('tdm_location_change', handleLocationChange);
+    };
   }, []);
 
   const handleDetectLocation = () => {
@@ -81,10 +111,24 @@ export function QuickMatch() {
   const handleMatch = () => {
     const params = new URLSearchParams();
     if (goal) params.set('treatment', goal.id);
-    if (location) params.set('location', location);
     
-    // If we have a goal, we might want to go to the quiz or a filtered search
-    // For "Quick Match", let's go to search with these filters
+    if (location) {
+      params.set('city', location);
+      
+      // Update global location state so the entire app stays in sync
+      const [cityName, stateName] = location.split(',').map(s => s.trim());
+      const newLoc = {
+        city: cityName,
+        state: stateName || '',
+        country: 'US',
+        isPrecise: false,
+        detectedAt: Date.now()
+      };
+      sessionStorage.setItem('tdm_location', JSON.stringify(newLoc));
+      window.dispatchEvent(new CustomEvent('tdm_location_change', { detail: newLoc }));
+    }
+    
+    // Navigate to search page
     router.push(`/search?${params.toString()}`);
   };
 
@@ -163,6 +207,7 @@ export function QuickMatch() {
               type="text"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleMatch()}
               placeholder="City, State or Zip"
               className="w-full bg-transparent font-bold text-slate-900 placeholder:text-slate-400 outline-none"
             />

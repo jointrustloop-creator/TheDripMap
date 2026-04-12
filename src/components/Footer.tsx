@@ -1,24 +1,18 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { Logo } from './Logo';
 import { MedicalDisclaimer } from './MedicalDisclaimer';
-import { getAllCities } from '../lib/data';
 
 export const Footer = () => {
-  const [topCities, setTopCities] = useState<{ city: string; state: string }[]>([]);
-
-  useEffect(() => {
-    const fetchCities = async () => {
-      try {
-        const cities = await getAllCities();
-        setTopCities(cities.slice(0, 20));
-      } catch (err) {
-        console.error('Failed to fetch cities for footer:', err);
-      }
-    };
-    fetchCities();
-  }, []);
+  const POPULAR_CITIES = [
+    { city: 'New York', state: 'NY' },
+    { city: 'Miami', state: 'FL' },
+    { city: 'Los Angeles', state: 'CA' },
+    { city: 'Chicago', state: 'IL' },
+    { city: 'Houston', state: 'TX' },
+    { city: 'Las Vegas', state: 'NV' },
+  ];
 
   return (
     <footer className="bg-white border-t border-slate-200 py-12 px-6 mt-20">
@@ -42,15 +36,26 @@ export const Footer = () => {
           </ul>
         </div>
         <div>
-          <h4 className="font-bold mb-6 text-sm uppercase tracking-wider text-slate-400">Cities</h4>
+          <h4 className="font-bold mb-6 text-sm uppercase tracking-wider text-slate-400">Popular Hubs</h4>
           <ul className="space-y-4 text-slate-600 text-sm">
-            {topCities.map((city, idx) => (
+            {POPULAR_CITIES.map((city, idx) => (
               <li key={idx}>
                 <Link 
                   href={`/search?city=${encodeURIComponent(city.city)}`} 
                   className="hover:text-wellness-600 transition-colors"
+                  onClick={() => {
+                    const newLoc = {
+                      city: city.city,
+                      state: city.state,
+                      country: 'US',
+                      isPrecise: false,
+                      detectedAt: Date.now()
+                    };
+                    sessionStorage.setItem('tdm_location', JSON.stringify(newLoc));
+                    window.dispatchEvent(new CustomEvent('tdm_location_change', { detail: newLoc }));
+                  }}
                 >
-                  {city.city}
+                  {city.city}, {city.state}
                 </Link>
               </li>
             ))}

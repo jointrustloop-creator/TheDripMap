@@ -1,18 +1,19 @@
 import { Provider, BlogPost } from '../types';
 
-export const MOCK_CITIES: { city: string, state: string, count: number }[] = [
-  { city: 'New York', state: 'NY', count: 131 },
-  { city: 'Clearwater', state: 'FL', count: 75 },
-  { city: 'Washington DC', state: 'DC', count: 38 },
-  { city: 'Kansas City', state: 'MO', count: 29 },
-  { city: 'Tampa', state: 'FL', count: 20 },
-  { city: 'Fairfax', state: 'VA', count: 18 },
-  { city: 'San Diego', state: 'CA', count: 17 },
-  { city: 'Houston', state: 'TX', count: 17 },
-  { city: 'Huntsville', state: 'AL', count: 16 },
-  { city: 'Pleasanton', state: 'CA', count: 16 },
-  { city: 'Cypress', state: 'TX', count: 15 },
-  { city: 'Greenville', state: 'SC', count: 15 },
+export const MOCK_CITIES: { city: string, state: string }[] = [
+  { city: 'New York', state: 'NY' },
+  { city: 'San Francisco', state: 'CA' },
+  { city: 'Clearwater', state: 'FL' },
+  { city: 'Washington DC', state: 'DC' },
+  { city: 'Kansas City', state: 'MO' },
+  { city: 'Tampa', state: 'FL' },
+  { city: 'Fairfax', state: 'VA' },
+  { city: 'San Diego', state: 'CA' },
+  { city: 'Houston', state: 'TX' },
+  { city: 'Huntsville', state: 'AL' },
+  { city: 'Pleasanton', state: 'CA' },
+  { city: 'Cypress', state: 'TX' },
+  { city: 'Greenville', state: 'SC' },
 ];
 
 export const MOCK_LISTINGS: Provider[] = [
@@ -28,7 +29,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['NAD+ Plus', 'Immune Support', 'Beauty Glow'],
     amenities: ['Private Rooms', 'Free WiFi', 'Beverages'],
     description: 'Premier IV therapy clinic in the heart of Manhattan offering customized wellness solutions.',
-    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-1/800/600',
     is_featured: true,
     decisionDrivers: {
       medicalSupervision: true,
@@ -49,7 +50,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Hangover', 'Recovery', 'NAD+ Plus'],
     amenities: ['Luxury Lounge', 'Valet'],
     description: 'Upscale IV hydration lounge catering to Manhattan\'s elite professionals.',
-    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-1-2/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -70,7 +71,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Immune Support', 'Hydration'],
     amenities: ['Mobile Service', 'Group Discounts'],
     description: 'Fast, affordable mobile IV therapy serving all of Brooklyn and Queens.',
-    imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-1-3/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -91,7 +92,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Hangover', 'Recovery', 'Hydration'],
     amenities: ['Valet Parking', 'Luxury Lounge'],
     description: 'Hollywood\'s favorite hydration spot for quick recovery and performance boosts.',
-    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-2/800/600',
     is_featured: true,
     decisionDrivers: {
       medicalSupervision: true,
@@ -112,7 +113,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Beauty Glow', 'NAD+ Plus', 'Immune Support'],
     amenities: ['Ocean View', 'Private Suites'],
     description: 'Clinical excellence meets coastal luxury. The premier destination for NAD+ and beauty drips.',
-    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-2-2/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -133,7 +134,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Beauty Glow', 'Weight Loss', 'Hydration'],
     amenities: ['Mobile Service', 'Group Discounts'],
     description: 'Expert mobile IV therapy bringing the glow directly to your home or hotel.',
-    imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-3/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -154,7 +155,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Hangover', 'NAD+ Plus'],
     amenities: ['Private Pods', 'Refreshments'],
     description: 'High-tech recovery in the heart of the financial district.',
-    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-3-2/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -175,7 +176,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Immune Support', 'NAD+ Plus', 'Chronic Fatigue'],
     amenities: ['Clinical Environment', 'Expert Consultations'],
     description: 'Toronto\'s premier clinical IV therapy centre specializing in functional medicine and personalized wellness.',
-    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-4/800/600',
     is_featured: true,
     decisionDrivers: {
       medicalSupervision: true,
@@ -196,7 +197,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Beauty Glow', 'Hangover', 'Hydration'],
     amenities: ['Luxury Lounge', 'Yorkville Location'],
     description: 'Global leader in IV wellness located in the heart of Yorkville, offering premium hydration and vitamin therapies.',
-    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-5/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -217,7 +218,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['NAD+ Plus', 'Hangover', 'Immune Support'],
     amenities: ['Modern Lounge', 'Complimentary Snacks'],
     description: 'Austin\'s premier destination for clinical-grade IV therapy and wellness optimization.',
-    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-6/800/600',
     is_featured: true,
     decisionDrivers: {
       medicalSupervision: true,
@@ -238,7 +239,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Hangover', 'Recovery', 'Hydration'],
     amenities: ['Strip View', 'Mobile Service'],
     description: 'The ultimate recovery station on the Las Vegas Strip. We bring the cure to your suite or welcome you in our luxury lounge.',
-    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-7/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -259,7 +260,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Immune Support', 'NAD+ Plus'],
     amenities: ['River View', 'Private Rooms'],
     description: 'Premium IV hydration and wellness in the heart of Chicago\'s Loop.',
-    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-8/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -277,16 +278,38 @@ export const MOCK_LISTINGS: Provider[] = [
     reviewCount: 98,
     priceRange: '$$$',
     type: 'Both',
-    specialties: ['NAD+ Plus', 'Immune Support', 'Recovery'],
+    specialties: ['NAD+ Plus', 'Immune Support', 'Recovery', 'Hangover'],
     amenities: ['Tech-Forward Lounge', 'Mobile Service'],
     description: 'Advanced IV therapy for San Francisco\'s high-performers and wellness enthusiasts.',
-    imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-9/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
       luxuryExperience: 5,
       speedOfService: 4,
       valueForMoney: 3
+    }
+  },
+  {
+    id: 'sf-2',
+    name: 'Golden Gate IV & Wellness',
+    city: 'San Francisco',
+    state: 'CA',
+    address: '2200 Fillmore St, San Francisco, CA 94115',
+    rating: 4.8,
+    reviewCount: 45,
+    priceRange: '$$',
+    type: 'In-Clinic',
+    specialties: ['Hangover', 'Beauty Glow', 'Immune Support'],
+    amenities: ['Boutique Setting', 'Organic Refreshments'],
+    description: 'Personalized IV hydration and vitamin therapy in the heart of Pacific Heights.',
+    imageUrl: 'https://picsum.photos/seed/sf-2/800/600',
+    is_featured: true,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 4,
+      valueForMoney: 4
     }
   },
   {
@@ -301,7 +324,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Hangover', 'Beauty Glow', 'Hydration'],
     amenities: ['Luxury Lounge', 'Mobile Service'],
     description: 'Dallas\' premier destination for hydration and vitamin therapy.',
-    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-11/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -322,7 +345,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Recovery', 'Immune Support'],
     amenities: ['Modern Lounge', 'Mobile Service'],
     description: 'Houston\'s leading IV therapy provider for athletes and busy professionals.',
-    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-12/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -343,7 +366,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Hydration', 'Heat Recovery'],
     amenities: ['Cooling Lounge', 'Mobile Service'],
     description: 'Stay hydrated in the Valley of the Sun with our specialized IV protocols.',
-    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-13/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -364,7 +387,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Immune Support', 'Energy Boost'],
     amenities: ['Luxury Lounge', 'Mobile Service'],
     description: 'Atlanta\'s premier IV therapy and wellness destination.',
-    imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-14/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -385,7 +408,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Altitude Recovery', 'Immune Support'],
     amenities: ['Mountain Views', 'Mobile Service'],
     description: 'Denver\'s top choice for altitude sickness relief and wellness drips.',
-    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-15/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -406,7 +429,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Immune Support', 'Energy Boost'],
     amenities: ['Modern Lounge', 'Mobile Service'],
     description: 'Premium IV therapy for Seattle\'s active and professional community.',
-    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-16/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -427,7 +450,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['NAD+ Plus', 'Recovery'],
     amenities: ['Clinical Excellence', 'Private Suites'],
     description: 'Advanced clinical IV therapy in the heart of Boston.',
-    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-17/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -448,7 +471,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Immune Support', 'Recovery'],
     amenities: ['Modern Lounge', 'Mobile Service'],
     description: 'Charlotte\'s premier destination for hydration and wellness optimization.',
-    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-19/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -469,7 +492,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Hydration', 'Immune Support'],
     amenities: ['Family Friendly', 'Mobile Service'],
     description: 'Expert IV therapy in the heart of Orlando, perfect for theme park recovery and wellness.',
-    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-20/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -490,7 +513,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Altitude Recovery', 'Hydration'],
     amenities: ['Mobile Service', 'Oxygen Therapy'],
     description: 'Specialized altitude sickness relief delivered to your door in Denver and surrounding areas.',
-    imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-21/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -511,7 +534,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Immune Support', 'NAD+ Plus'],
     amenities: ['Private Pods', 'Coffee Bar'],
     description: 'Boost your immunity and energy in our cozy downtown Seattle lounge.',
-    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-22/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -532,7 +555,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['NAD+ Plus', 'Beauty Glow'],
     amenities: ['Luxury Lounge', 'Mobile Service'],
     description: 'Elite IV therapy and anti-aging treatments in Boston\'s historic Beacon Hill.',
-    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-23/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -553,7 +576,7 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Hangover', 'Hydration'],
     amenities: ['Group Seating', 'Music'],
     description: 'The perfect pre- or post-Broadway recovery spot for groups and individuals.',
-    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-24/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
@@ -574,13 +597,277 @@ export const MOCK_LISTINGS: Provider[] = [
     specialties: ['Immune Support', 'Recovery'],
     amenities: ['Modern Lounge', 'Mobile Service'],
     description: 'Comprehensive IV therapy solutions for Charlotte\'s growing wellness community.',
-    imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://picsum.photos/seed/provider-25/800/600',
     is_featured: false,
     decisionDrivers: {
       medicalSupervision: true,
       luxuryExperience: 4,
       speedOfService: 4,
       valueForMoney: 4
+    }
+  },
+  {
+    id: 'tampa-1',
+    name: 'Tampa Bay IV Hydration',
+    city: 'Tampa',
+    state: 'FL',
+    address: '401 E Jackson St, Tampa, FL 33602',
+    rating: 4.9,
+    reviewCount: 87,
+    priceRange: '$$',
+    type: 'Both',
+    specialties: ['Immune Support', 'Recovery', 'Beauty Glow'],
+    amenities: ['Private Suites', 'Free WiFi', 'Refreshments'],
+    description: 'Tampa\'s premier IV therapy destination for rapid recovery and wellness optimization.',
+    imageUrl: 'https://picsum.photos/seed/tampa-1/800/600',
+    is_featured: true,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 5,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: 'tampa-2',
+    name: 'Ybor City Drip Lounge',
+    city: 'Tampa',
+    state: 'FL',
+    address: '1600 E 7th Ave, Tampa, FL 33605',
+    rating: 4.8,
+    reviewCount: 54,
+    priceRange: '$$',
+    type: 'In-Clinic',
+    specialties: ['Hangover', 'Energy Boost'],
+    amenities: ['Historic Building', 'Lounge Area'],
+    description: 'Located in the heart of Ybor City, offering fast hydration for locals and visitors alike.',
+    imageUrl: 'https://picsum.photos/seed/tampa-2/800/600',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 3,
+      speedOfService: 4,
+      valueForMoney: 5
+    }
+  },
+  {
+    id: 'clearwater-1',
+    name: 'Clearwater Beach IV',
+    city: 'Clearwater',
+    state: 'FL',
+    address: '25 Causeway Blvd, Clearwater, FL 33767',
+    rating: 4.9,
+    reviewCount: 112,
+    priceRange: '$$',
+    type: 'Both',
+    specialties: ['Sunburn Recovery', 'Hydration', 'Immune Support'],
+    amenities: ['Beach View', 'Mobile Service'],
+    description: 'Specialized IV protocols for beachgoers and vacationers in Clearwater Beach.',
+    imageUrl: 'https://picsum.photos/seed/clearwater-1/800/600',
+    is_featured: true,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 5,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: 'clearwater-2',
+    name: 'Gulf Coast Wellness',
+    city: 'Clearwater',
+    state: 'FL',
+    address: '1234 Gulf to Bay Blvd, Clearwater, FL 33755',
+    rating: 4.7,
+    reviewCount: 43,
+    priceRange: '$',
+    type: 'In-Clinic',
+    specialties: ['Wellness', 'Vitamin C'],
+    amenities: ['Easy Parking', 'Fast Service'],
+    description: 'Affordable and effective IV therapy for the Clearwater community.',
+    imageUrl: 'https://picsum.photos/seed/clearwater-2/800/600',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 2,
+      speedOfService: 4,
+      valueForMoney: 5
+    }
+  },
+  {
+    id: 'dc-1',
+    name: 'Capital Drip & Wellness',
+    city: 'Washington DC',
+    state: 'DC',
+    address: '1200 17th St NW, Washington, DC 20036',
+    rating: 4.9,
+    reviewCount: 156,
+    priceRange: '$$$',
+    type: 'Both',
+    specialties: ['NAD+ Plus', 'Immune Support', 'Executive Recovery'],
+    amenities: ['Private Suites', 'Concierge Service'],
+    description: 'Premier IV therapy for DC\'s professionals and residents.',
+    imageUrl: 'https://picsum.photos/seed/dc-1/800/600',
+    is_featured: true,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 5,
+      speedOfService: 4,
+      valueForMoney: 3
+    }
+  },
+  {
+    id: 'kc-1',
+    name: 'Kansas City Hydration Lounge',
+    city: 'Kansas City',
+    state: 'MO',
+    address: '4740 Grand Ave, Kansas City, MO 64112',
+    rating: 4.8,
+    reviewCount: 92,
+    priceRange: '$$',
+    type: 'In-Clinic',
+    specialties: ['Athletic Recovery', 'Immune Support'],
+    amenities: ['Relaxing Environment', 'Free WiFi'],
+    description: 'The Plaza\'s top destination for IV wellness and hydration.',
+    imageUrl: 'https://picsum.photos/seed/kc-1/800/600',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 4,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: 'sd-1',
+    name: 'San Diego Glow IV',
+    city: 'San Diego',
+    state: 'CA',
+    address: '1230 Prospect St, La Jolla, CA 92037',
+    rating: 4.9,
+    reviewCount: 134,
+    priceRange: '$$',
+    type: 'Both',
+    specialties: ['Beauty Glow', 'Hydration', 'NAD+ Plus'],
+    amenities: ['Ocean View', 'Mobile Service'],
+    description: 'Coastal wellness and hydration in the heart of La Jolla.',
+    imageUrl: 'https://picsum.photos/seed/sd-1/800/600',
+    is_featured: true,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 5,
+      speedOfService: 4,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: 'fairfax-1',
+    name: 'Fairfax Wellness Drip',
+    city: 'Fairfax',
+    state: 'VA',
+    address: '2905 District Ave, Fairfax, VA 22031',
+    rating: 4.8,
+    reviewCount: 67,
+    priceRange: '$$',
+    type: 'In-Clinic',
+    specialties: ['Immune Support', 'Wellness'],
+    amenities: ['Modern Facility', 'Expert Staff'],
+    description: 'Professional IV therapy services in the Mosaic District.',
+    imageUrl: 'https://picsum.photos/seed/fairfax-1/800/600',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 4,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: 'tampa-3',
+    name: 'Hydrate Tampa Mobile',
+    city: 'Tampa',
+    state: 'FL',
+    address: 'Mobile Service, Tampa, FL 33602',
+    rating: 4.7,
+    reviewCount: 31,
+    priceRange: '$$',
+    type: 'Mobile',
+    specialties: ['Hydration', 'Flu Recovery'],
+    amenities: ['Mobile Service', 'Fast Response'],
+    description: 'On-demand mobile IV therapy serving the greater Tampa Bay area.',
+    imageUrl: 'https://picsum.photos/seed/tampa-3/800/600',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 3,
+      speedOfService: 5,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: 'tampa-4',
+    name: 'South Tampa Wellness',
+    city: 'Tampa',
+    state: 'FL',
+    address: '2502 S MacDill Ave, Tampa, FL 33629',
+    rating: 4.9,
+    reviewCount: 104,
+    priceRange: '$$$',
+    type: 'In-Clinic',
+    specialties: ['NAD+ Plus', 'Anti-Aging', 'Weight Loss'],
+    amenities: ['Luxury Lounge', 'Private Rooms'],
+    description: 'Premium wellness and longevity treatments in South Tampa.',
+    imageUrl: 'https://picsum.photos/seed/tampa-4/800/600',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 5,
+      speedOfService: 4,
+      valueForMoney: 3
+    }
+  },
+  {
+    id: 'clearwater-3',
+    name: 'Clearwater Mobile Drip',
+    city: 'Clearwater',
+    state: 'FL',
+    address: 'Mobile Service, Clearwater, FL 33756',
+    rating: 4.8,
+    reviewCount: 28,
+    priceRange: '$$',
+    type: 'Mobile',
+    specialties: ['Hydration', 'Recovery'],
+    amenities: ['Mobile Service', 'Group Discounts'],
+    description: 'We bring the wellness to you in Clearwater and surrounding beaches.',
+    imageUrl: 'https://picsum.photos/seed/clearwater-3/800/600',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 3,
+      speedOfService: 4,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: 'clearwater-4',
+    name: 'Sand Key Wellness',
+    city: 'Clearwater',
+    state: 'FL',
+    address: '1160 Gulf Blvd, Clearwater, FL 33767',
+    rating: 4.9,
+    reviewCount: 76,
+    priceRange: '$$$',
+    type: 'In-Clinic',
+    specialties: ['Beauty Glow', 'NAD+ Plus'],
+    amenities: ['Resort Location', 'Valet Parking'],
+    description: 'High-end IV therapy located within the Sand Key resort area.',
+    imageUrl: 'https://picsum.photos/seed/clearwater-4/800/600',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 5,
+      speedOfService: 4,
+      valueForMoney: 3
     }
   }
 ];
@@ -630,7 +917,7 @@ While time is the only absolute cure for a hangover, IV therapy can compress a 2
     `,
     date: '2024-04-01',
     author: 'Dr. Sarah Chen',
-    imageUrl: 'https://images.unsplash.com/photo-1527613426441-4da17471b66d?auto=format&fit=crop&q=80&w=1200'
+    imageUrl: 'https://picsum.photos/seed/blog-1/1200/800'
   },
   {
     slug: 'nad-plus-iv-therapy-cellular-longevity-guide',
@@ -710,7 +997,7 @@ The Myers’ Cocktail is exceptionally safe for most adults. For chronic conditi
     `,
     date: '2024-03-25',
     author: 'Dr. Sarah Chen',
-    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=1200'
+    imageUrl: 'https://picsum.photos/seed/blog-3/1200/800'
   },
   {
     slug: 'iv-hydration-for-athletic-performance-recovery',
@@ -747,7 +1034,7 @@ For competitive athletes, it is important to note that WADA (World Anti-Doping A
     `,
     date: '2024-03-20',
     author: 'Coach Alex Rivera',
-    imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=1200'
+    imageUrl: 'https://picsum.photos/seed/blog-4/1200/800'
   },
   {
     slug: 'iv-therapy-safety-side-effects-guide',
@@ -825,7 +1112,7 @@ IV therapy is a powerful tool in the modern wellness arsenal. It can bridge the 
     `,
     date: '2024-03-15',
     author: 'Dr. Sarah Chen',
-    imageUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1200',
+    imageUrl: 'https://picsum.photos/seed/blog-5/1200/800',
     reviewedBy: 'Dr. Michael Roberts, MD'
   },
   {
@@ -896,7 +1183,7 @@ If you are feeling 2/10 and just want to get to 5/10 so you can function, **call
     `,
     date: '2024-03-10',
     author: 'Mark Johnson',
-    imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=1200',
+    imageUrl: 'https://picsum.photos/seed/blog-6/1200/800',
     reviewedBy: 'Nurse Jennifer Adams, RN'
   }
 ];

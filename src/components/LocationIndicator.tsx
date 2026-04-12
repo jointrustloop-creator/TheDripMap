@@ -93,6 +93,8 @@ export const LocationIndicator = () => {
           if (Date.now() - parsed.detectedAt < 86400000) {
             setLocation(parsed);
             setIsDetecting(false);
+            // Dispatch to sync other components on mount
+            window.dispatchEvent(new CustomEvent('tdm_location_change', { detail: parsed }));
             return;
           }
         } catch {

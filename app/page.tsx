@@ -9,7 +9,9 @@ import {
   Activity,
   Heart,
   Sparkles,
-  Dumbbell
+  Dumbbell,
+  Target,
+  Clock
 } from 'lucide-react';
 import { Navbar } from '../src/components/Navbar';
 import { Footer } from '../src/components/Footer';
@@ -81,20 +83,57 @@ export default async function HomePage() {
         <DripBackground />
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center max-w-5xl mx-auto mb-20">
-            <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-8 tracking-tight leading-[1.1] drop-shadow-sm">
-              Stop <span className="text-wellness-600 relative">
-                Guessing.
+            <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight leading-[1.1] drop-shadow-sm">
+              Find Your Perfect <br />
+              <span className="text-wellness-600 relative">
+                IV Therapy Match.
                 <span className="absolute -inset-1 bg-wellness-100/30 blur-2xl -z-10 rounded-full" />
-              </span> <br />
-              Get The <span className="underline decoration-wellness-500 decoration-4 underline-offset-4">Exact</span> IV <br />
-              You Need.
+              </span>
             </h1>
             
-            <p className="text-2xl md:text-3xl text-slate-600 mb-16 font-bold tracking-tight max-w-3xl mx-auto leading-tight">
-              We&apos;ve analyzed {stats.totalListings} clinics across {stats.totalCities} cities so you don&apos;t have to. Get matched to your perfect drip in 60 seconds.
+            <p className="text-xl md:text-2xl text-slate-500 mb-8 font-medium tracking-tight max-w-3xl mx-auto leading-relaxed">
+              Answer 3 quick questions. We&apos;ll find the right clinic for your exact goal, location, and budget — from {stats.totalListings} verified providers.
             </p>
+
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] font-bold text-slate-500 mb-12">
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalListings} Clinics</span>
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalCities} Cities</span>
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> Free Matching</span>
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> Results in 60 Seconds</span>
+            </div>
             
             <QuickMatch />
+
+            {/* Trust Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-16 max-w-5xl mx-auto">
+              <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm">
+                <div className="w-10 h-10 bg-wellness-50 rounded-xl flex items-center justify-center text-wellness-600 shrink-0">
+                  <Target size={20} />
+                </div>
+                <div className="text-left">
+                  <h4 className="font-bold text-slate-900 text-sm">Goal-Based Matching</h4>
+                  <p className="text-slate-500 text-xs leading-relaxed">We match on what you need, not just who&apos;s closest</p>
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm">
+                <div className="w-10 h-10 bg-wellness-50 rounded-xl flex items-center justify-center text-wellness-600 shrink-0">
+                  <ShieldCheck size={20} />
+                </div>
+                <div className="text-left">
+                  <h4 className="font-bold text-slate-900 text-sm">{stats.totalListings} Verified Clinics</h4>
+                  <p className="text-slate-500 text-xs leading-relaxed">Real businesses with real Google reviews</p>
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm">
+                <div className="w-10 h-10 bg-wellness-50 rounded-xl flex items-center justify-center text-wellness-600 shrink-0">
+                  <Clock size={20} />
+                </div>
+                <div className="text-left">
+                  <h4 className="font-bold text-slate-900 text-sm">Results in 60 Seconds</h4>
+                  <p className="text-slate-500 text-xs leading-relaxed">No browsing. No guessing. Just your best match.</p>
+                </div>
+              </div>
+            </div>
 
             <div className="mt-16 flex flex-col items-center gap-4">
               {isLive ? (
@@ -105,7 +144,7 @@ export default async function HomePage() {
               ) : (
                 <div className="inline-flex items-center gap-3 text-amber-500 font-black text-xs uppercase tracking-[0.3em]">
                   <div className="w-3 h-3 bg-amber-500 rounded-full" />
-                  Demo Mode (Mock Data)
+                  Database Not Connected
                 </div>
               )}
               
@@ -116,6 +155,8 @@ export default async function HomePage() {
               )}
             </div>
           </div>
+
+          <h2 className="text-2xl font-bold text-slate-900 text-center mb-12">The Smarter Way to Find IV Therapy Clinics Near You</h2>
 
           {/* Path Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">

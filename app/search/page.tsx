@@ -39,46 +39,70 @@ function SearchContent() {
   
   const [selectedCity, setSelectedCity] = useState<City | 'All'>(initialCity as City || 'All');
   const [searchQuery, setSearchQuery] = useState(initialQuery);
+
+  // Sync with URL parameters
+  useEffect(() => {
+    const city = searchParams.get('city') || searchParams.get('location') || 'All';
+    const q = searchParams.get('q') || searchParams.get('treatment') || '';
+    setSelectedCity(city as City || 'All');
+    setSearchQuery(q);
+  }, [searchParams]);
   const [typeFilter, setTypeFilter] = useState<TreatmentType | 'All'>('All');
+  const [sortBy, setSortBy] = useState<'best' | 'rating' | 'reviews' | 'distance'>('best');
+  const [activeChips, setActiveChips] = useState<string[]>(['All']);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filteredProviders, setFilteredProviders] = useState<Provider[]>([]);
   const [topCities, setTopCities] = useState<{city: string, state: string, count: number}[]>([]);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // Sync with session storage if no city in URL
-    if (!searchParams.get('city')) {
-      const cached = sessionStorage.getItem('tdm_location');
-      if (cached) {
-        try {
-          const parsed = JSON.parse(cached);
-          if (parsed.city) {
-            setSelectedCity(parsed.city as City);
-          }
-        } catch (e) {
-          console.error('Failed to parse cached location', e);
-        }
-      }
+  const filterChips = [
+    { id: 'All', label: 'All' },
+    { id: 'Mobile', label: 'Mobile IV' },
+    { id: 'Walk-ins', label: 'Walk-ins' },
+    { id: 'Open', label: 'Open Now' },
+    { id: 'Verified', label: 'Verified' },
+    { id: 'Featured', label: 'Featured' },
+  ];
+
+  const toggleChip = (id: string) => {
+    if (id === 'All') {
+      setActiveChips(['All']);
+      setTypeFilter('All');
+      return;
     }
-  }, [searchParams]);
+    
+    setActiveChips(prev => {
+      const next = prev.includes(id) ? prev.filter(c => c !== id) : [...prev.filter(c => c !== 'All'), id];
+      return next.length === 0 ? ['All'] : next;
+    });
 
-  useEffect(() => {
-    const handleLocationChange = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      const newLoc = customEvent.detail;
-      if (newLoc && newLoc.city) {
-        setSelectedCity(newLoc.city as City);
-        // Update URL to reflect the change
-        const params = new URLSearchParams(searchParams.toString());
-        params.set('city', newLoc.city);
-        router.push(`/search?${params.toString()}`, { scroll: false });
-      }
-    };
+    if (id === 'Mobile') {
+      setTypeFilter(prev => prev === 'Mobile' ? 'All' : 'Mobile');
+    }
+  };
 
-    window.addEventListener('tdm_location_change', handleLocationChange);
-    return () => window.removeEventListener('tdm_location_change', handleLocationChange);
-  }, [searchParams, router]);
+  const isOpenNow = (hours?: Record<string, string>) => {
+    if (!hours) return false;
+    const now = new Date();
+    const day = now.toLocaleDateString('en-US', { weekday: 'long' });
+    const timeRange = hours[day];
+    if (!timeRange || timeRange.toLowerCase().includes('closed')) return false;
+    try {
+      const [start, end] = timeRange.split('-').map(t => t.trim());
+      const parseTime = (t: string) => {
+        const [time, modifier] = t.split(' ');
+        let h = time.split(':').map(Number)[0];
+        const m = time.split(':').map(Number)[1];
+        if (modifier === 'PM' && h < 12) h += 12;
+        if (modifier === 'AM' && h === 12) h = 0;
+        const d = new Date();
+        d.setHours(h, m || 0, 0, 0);
+        return d;
+      };
+      return now >= parseTime(start) && now <= parseTime(end);
+    } catch (e) { return false; }
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -98,20 +122,50 @@ function SearchContent() {
   useEffect(() => {
     const fetchListings = async () => {
       setIsLoading(true);
-      const results = await searchListings(searchQuery, selectedCity, userLocation || undefined);
+      let results = await searchListings(searchQuery, selectedCity, userLocation || undefined);
       
-      // Secondary filter for type
-      let filtered = results;
-      if (typeFilter !== 'All') {
-        filtered = results.filter(p => p.type === typeFilter);
+      // Apply Chips Filters
+      if (!activeChips.includes('All')) {
+        if (activeChips.includes('Mobile')) {
+          results = results.filter(p => p.mobile_service || p.type === 'Mobile');
+        }
+        if (activeChips.includes('Walk-ins')) {
+          results = results.filter(p => p.walk_ins_welcome);
+        }
+        if (activeChips.includes('Open')) {
+          results = results.filter(p => isOpenNow(p.hours));
+        }
+        if (activeChips.includes('Verified')) {
+          results = results.filter(p => p.is_verified);
+        }
+        if (activeChips.includes('Featured')) {
+          results = results.filter(p => p.is_featured);
+        }
+      }
+
+      // Apply Sorting
+      const sorted = [...results];
+      if (sortBy === 'rating') {
+        sorted.sort((a, b) => b.rating - a.rating);
+      } else if (sortBy === 'reviews') {
+        sorted.sort((a, b) => b.reviewCount - a.reviewCount);
+      } else if (sortBy === 'distance' && userLocation) {
+        sorted.sort((a, b) => (a.distance || 999) - (b.distance || 999));
+      } else {
+        // Best Match: Featured first, then rating
+        sorted.sort((a, b) => {
+          if (a.is_featured && !b.is_featured) return -1;
+          if (!a.is_featured && b.is_featured) return 1;
+          return b.rating - a.rating;
+        });
       }
       
-      setFilteredProviders(filtered);
+      setFilteredProviders(sorted);
       setIsLoading(false);
     };
 
     fetchListings();
-  }, [selectedCity, searchQuery, typeFilter, userLocation]);
+  }, [selectedCity, searchQuery, activeChips, sortBy, userLocation]);
 
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
@@ -137,6 +191,18 @@ function SearchContent() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
+              
+              <select 
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'best' | 'rating' | 'reviews' | 'distance')}
+                className="bg-white border border-slate-100 rounded-2xl px-4 py-3 text-sm font-bold text-slate-600 focus:outline-none focus:ring-2 focus:ring-wellness-600/20 transition-all cursor-pointer"
+              >
+                <option value="best">Best Match</option>
+                <option value="rating">Highest Rated</option>
+                <option value="reviews">Most Reviewed</option>
+                <option value="distance">Nearest First</option>
+              </select>
+
               <button 
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
                 className={cn(
@@ -147,6 +213,28 @@ function SearchContent() {
                 <Filter size={18} /> Filters
               </button>
             </div>
+          </div>
+
+          {/* Filter Chips */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {filterChips.map(chip => (
+              <button
+                key={chip.id}
+                onClick={() => toggleChip(chip.id)}
+                className={cn(
+                  "px-4 py-1.5 rounded-full text-xs font-bold border transition-all",
+                  activeChips.includes(chip.id) 
+                    ? "bg-wellness-600 border-wellness-600 text-white" 
+                    : "bg-white border-slate-200 text-slate-600 hover:border-wellness-300"
+                )}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+            Showing {filteredProviders.length} {activeChips.includes('Mobile') ? 'mobile IV ' : ''}clinics in {selectedCity}
           </div>
 
           <AnimatePresence>

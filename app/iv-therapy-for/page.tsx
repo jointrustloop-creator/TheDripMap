@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
 import { getAllUseCases } from '@/src/lib/data';
 import * as Icons from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
@@ -35,14 +34,8 @@ export default async function UseCaseHubPage() {
                 Whether you&apos;re recovering from a long night, preparing for a big event, or just looking for a wellness boost, discover how IV therapy is commonly used to support your goals.
               </p>
             </div>
-            <div className="relative h-[400px] md:h-[500px] rounded-[3rem] overflow-hidden shadow-2xl">
-              <Image 
-                src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=1200"
-                alt="Professional medical environment showing clinical IV therapy preparation"
-                fill
-                className="object-cover"
-                referrerPolicy="no-referrer"
-              />
+            <div className="relative h-[400px] md:h-[500px] rounded-[3rem] overflow-hidden shadow-2xl bg-wellness-700 flex items-center justify-center">
+              <div className="text-white text-9xl font-black opacity-10">IV</div>
             </div>
           </div>
         </div>

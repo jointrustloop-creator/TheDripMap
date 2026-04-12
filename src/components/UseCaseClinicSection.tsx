@@ -24,19 +24,34 @@ export const UseCaseClinicSection = ({
   const [searchStatus, setSearchStatus] = useState<'initial' | 'searching' | 'results' | 'no-results'>('initial');
 
   useEffect(() => {
-    // Check for cached location
+    const handleLocationChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const newLoc = customEvent.detail;
+      if (newLoc && newLoc.city) {
+        setDetectedCity(newLoc.city);
+        setCity(newLoc.city);
+        handleSearch(newLoc.city);
+      }
+    };
+
+    window.addEventListener('tdm_location_change', handleLocationChange);
+
+    // Initial check
     const cached = sessionStorage.getItem('tdm_location');
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
         if (parsed.city) {
           setDetectedCity(parsed.city);
+          setCity(parsed.city);
           handleSearch(parsed.city);
         }
       } catch (e) {
         console.error('Error parsing cached location', e);
       }
     }
+
+    return () => window.removeEventListener('tdm_location_change', handleLocationChange);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

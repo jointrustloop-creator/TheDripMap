@@ -14,21 +14,21 @@ export const TrustSignals = () => {
   const stats = [
     { 
       label: 'Clinics listed', 
-      value: '496', 
+      value: '40', 
       icon: <Building2 className="text-wellness-600" size={24} />,
-      suffix: ''
+      suffix: '+'
     },
     { 
       label: 'Cities covered', 
-      value: '276', 
+      value: '12', 
       icon: <Map className="text-wellness-600" size={24} />,
-      suffix: ''
+      suffix: '+'
     },
     { 
       label: 'States represented', 
-      value: '50', 
+      value: '8', 
       icon: <Globe className="text-wellness-600" size={24} />,
-      suffix: ''
+      suffix: '+'
     },
     { 
       label: 'Average clinic rating', 

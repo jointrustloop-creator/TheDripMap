@@ -21,7 +21,7 @@ export default function ForClinicsPage() {
             Your clinic is already on <span className="text-wellness-600">TheDripMap</span>. Make it work for you.
           </h1>
           <p className="text-xl text-slate-500 leading-relaxed">
-            496 clinics listed across the US. Patients are actively searching. Claim your free listing in 2 minutes.
+            40+ clinics listed across the US. Patients are actively searching. Claim your free listing in 2 minutes.
           </p>
         </div>
 

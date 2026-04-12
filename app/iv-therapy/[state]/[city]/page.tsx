@@ -1,12 +1,14 @@
 import React from 'react';
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { 
   MapPin, 
   ShieldCheck, 
   Zap, 
   CheckCircle2,
-  Clock
+  Clock,
+  ArrowRight
 } from 'lucide-react';
 import { Navbar } from '../../../../src/components/Navbar';
 import { Footer } from '../../../../src/components/Footer';
@@ -227,9 +229,27 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {listings.map((provider) => (
-              <ProviderCard key={provider.id} provider={provider} />
-            ))}
+            {listings.length > 0 ? (
+              listings.map((provider) => (
+                <ProviderCard key={provider.id} provider={provider} />
+              ))
+            ) : (
+              <div className="col-span-full py-20 text-center bg-white rounded-3xl border border-slate-100 shadow-sm">
+                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
+                  <MapPin size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">No clinics found in {cityName} yet</h3>
+                <p className="text-slate-500 max-w-md mx-auto mb-8">
+                  We&apos;re currently expanding our network in {stateName}. Check out nearby cities or try a different search.
+                </p>
+                <Link 
+                  href="/search"
+                  className="inline-flex items-center gap-2 bg-wellness-600 text-white px-8 py-4 rounded-2xl font-black text-sm hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-200"
+                >
+                  Browse All Locations <ArrowRight size={18} />
+                </Link>
+              </div>
+            )}
           </div>
         </section>
 

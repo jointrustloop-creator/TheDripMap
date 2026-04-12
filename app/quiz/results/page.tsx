@@ -18,7 +18,7 @@ import { Footer } from '../../../src/components/Footer';
 import { SurveyState, OperatorProfile, Provider, City, TreatmentType } from '../../../src/types';
 import { getOperatorProfiles, getAllListings } from '../../../src/lib/data';
 import { cn } from '../../../src/lib/utils';
-import Image from 'next/image';
+import { ClinicImage } from '../../../src/components/ClinicImage';
 
 export default function ResultsPage() {
   return (
@@ -217,23 +217,6 @@ function ResultsContent() {
     return `${provider.city}${provider.state ? `, ${provider.state}` : ''}`;
   };
 
-  const InitialsPlaceholder = ({ name, size = "md" }: { name: string, size?: "sm" | "md" | "lg" }) => {
-    const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-    const sizeClasses = {
-      sm: "w-10 h-10 text-xs",
-      md: "w-16 h-16 text-xl",
-      lg: "w-full h-full text-4xl"
-    };
-    return (
-      <div className={cn(
-        "bg-wellness-600 flex items-center justify-center text-white font-black rounded-xl",
-        sizeClasses[size]
-      )}>
-        {initials}
-      </div>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
@@ -295,12 +278,10 @@ function ResultsContent() {
             <div className="bg-white rounded-[2.5rem] border-2 border-wellness-100 overflow-hidden shadow-2xl shadow-wellness-100/50 group">
               <div className="grid grid-cols-1 lg:grid-cols-2">
                 <div className="relative h-72 lg:h-auto overflow-hidden">
-                  <Image 
-                    src={topMatch.imageUrl} 
-                    alt={topMatch.name}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    referrerPolicy="no-referrer"
+                  <ClinicImage 
+                    name={topMatch.name}
+                    imageUrl={topMatch.imageUrl}
+                    className="group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute top-6 left-6 flex flex-wrap gap-2">
                     {topMatch.availability && (
@@ -378,17 +359,10 @@ function ResultsContent() {
                 {otherMatches.map((provider) => (
                   <div key={provider.id} className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden shadow-xl shadow-slate-200/50 flex flex-col">
                     <div className="relative h-48">
-                      {provider.imageUrl && !provider.imageUrl.includes('picsum.photos/seed') ? (
-                        <Image 
-                          src={provider.imageUrl} 
-                          alt={provider.name}
-                          fill
-                          className="object-cover"
-                          referrerPolicy="no-referrer"
-                        />
-                      ) : (
-                        <InitialsPlaceholder name={provider.name} size="lg" />
-                      )}
+                      <ClinicImage 
+                        name={provider.name}
+                        imageUrl={provider.imageUrl}
+                      />
                       <div className="absolute top-4 left-4">
                         <span className="bg-white/90 backdrop-blur-md text-slate-900 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm">
                           {formatDistance(provider)}
@@ -463,11 +437,10 @@ function ResultsContent() {
                       {moreMatches.map((provider) => (
                         <div key={provider.id} className="bg-white p-4 rounded-2xl border border-slate-100 flex items-center gap-4">
                           <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0">
-                            {provider.imageUrl && !provider.imageUrl.includes('picsum.photos/seed') ? (
-                              <Image src={provider.imageUrl} alt={provider.name} fill className="object-cover" referrerPolicy="no-referrer" />
-                            ) : (
-                              <InitialsPlaceholder name={provider.name} size="lg" />
-                            )}
+                            <ClinicImage 
+                              name={provider.name}
+                              imageUrl={provider.imageUrl}
+                            />
                           </div>
                           <div className="flex-1 min-w-0">
                             <h4 className="font-bold text-slate-900 text-sm truncate">{provider.name}</h4>
@@ -515,11 +488,10 @@ function ResultsContent() {
                 {fallbackResults.map((provider) => (
                   <div key={provider.id} className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-lg flex flex-col">
                     <div className="relative h-40">
-                      {provider.imageUrl && !provider.imageUrl.includes('picsum.photos/seed') ? (
-                        <Image src={provider.imageUrl} alt={provider.name} fill className="object-cover" referrerPolicy="no-referrer" />
-                      ) : (
-                        <InitialsPlaceholder name={provider.name} size="lg" />
-                      )}
+                      <ClinicImage 
+                        name={provider.name}
+                        imageUrl={provider.imageUrl}
+                      />
                       <div className="absolute top-3 left-3">
                         <span className="bg-black/60 backdrop-blur-md text-white px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">
                           {formatDistance(provider)}
