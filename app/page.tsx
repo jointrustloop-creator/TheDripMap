@@ -27,10 +27,32 @@ import { isSupabaseConfigured } from '../src/lib/supabase';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "IV Therapy Near Me — Find Top Rated Clinics | TheDripMap",
-  description: "Find and compare the best IV therapy clinics near you. Browse providers across the US or get matched to your perfect drip in 60 seconds.",
+  title: "Find IV Therapy Near You — Get Matched in 60 Seconds | TheDripMap",
+  description: "TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse 496 verified clinics across 276 US cities or take our free 60-second matching quiz.",
   alternates: {
     canonical: '/',
+  },
+  openGraph: {
+    title: "Find IV Therapy Near You — Get Matched in 60 Seconds | TheDripMap",
+    description: "TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse 496 verified clinics across 276 US cities or take our free 60-second matching quiz.",
+    url: 'https://thedripmap.com',
+    siteName: 'TheDripMap',
+    images: [
+      {
+        url: 'https://thedripmap.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'TheDripMap - Find Your Perfect IV Therapy Match',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Find IV Therapy Near You — Get Matched in 60 Seconds | TheDripMap",
+    description: "TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse 496 verified clinics across 276 US cities or take our free 60-second matching quiz.",
+    images: ['https://thedripmap.com/og-image.png'],
   },
 };
 
@@ -41,7 +63,6 @@ export default async function HomePage() {
   const cities = await getAllCities();
   const stats = await getListingStats();
   const blogPosts = await getBlogPosts();
-  const isLive = isSupabaseConfigured();
   const latestPosts = blogPosts.slice(0, 3);
   const topCities = cities.slice(0, 12);
 
@@ -55,6 +76,31 @@ export default async function HomePage() {
         "name": "Home",
         "item": "https://thedripmap.com"
       }
+    ]
+  };
+
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "TheDripMap",
+    "url": "https://thedripmap.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://thedripmap.com/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "TheDripMap",
+    "url": "https://thedripmap.com",
+    "logo": "https://thedripmap.com/logo.png",
+    "sameAs": [
+      "https://www.facebook.com/thedripmap",
+      "https://www.instagram.com/thedripmap",
+      "https://twitter.com/thedripmap"
     ]
   };
 
@@ -77,6 +123,14 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-40 px-6 overflow-hidden bg-white">
@@ -92,17 +146,17 @@ export default async function HomePage() {
             </h1>
             
             <p className="text-xl md:text-2xl text-slate-500 mb-8 font-medium tracking-tight max-w-3xl mx-auto leading-relaxed">
-              Answer 3 quick questions. We&apos;ll find the right clinic for your exact goal, location, and budget — from {stats.totalListings} verified providers.
+              Answer 5 quick questions. We&apos;ll find the right clinic for your exact goal, location, and budget — from {stats.totalListings || 496} verified providers.
             </p>
 
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] font-bold text-slate-500 mb-12">
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalListings} Clinics</span>
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalCities} Cities</span>
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> Free Matching</span>
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> Results in 60 Seconds</span>
-            </div>
-            
             <QuickMatch />
+            
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] font-bold text-slate-500 mt-8">
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalListings || 496} Clinics</span>
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalCities || 276} Cities</span>
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalStates || 30} States</span>
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> 4.8★ Avg Rating</span>
+            </div>
 
             {/* Trust Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-16 max-w-5xl mx-auto">
@@ -120,7 +174,7 @@ export default async function HomePage() {
                   <ShieldCheck size={20} />
                 </div>
                 <div className="text-left">
-                  <h4 className="font-bold text-slate-900 text-sm">{stats.totalListings} Verified Clinics</h4>
+                  <h4 className="font-bold text-slate-900 text-sm">{stats.totalListings || 496} Verified Clinics</h4>
                   <p className="text-slate-500 text-xs leading-relaxed">Real businesses with real Google reviews</p>
                 </div>
               </div>
@@ -135,28 +189,9 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div className="mt-16 flex flex-col items-center gap-4">
-              {isLive ? (
-                <div className="inline-flex items-center gap-3 text-slate-400 font-black text-xs uppercase tracking-[0.3em]">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-ping" />
-                  {stats.totalListings > 0 ? `${stats.totalListings} Clinics Verified` : 'Live Database Connected'}
-                </div>
-              ) : (
-                <div className="inline-flex items-center gap-3 text-amber-500 font-black text-xs uppercase tracking-[0.3em]">
-                  <div className="w-3 h-3 bg-amber-500 rounded-full" />
-                  Database Not Connected
-                </div>
-              )}
-              
-              {stats.error && (
-                <div className="bg-red-50 text-red-600 px-6 py-3 rounded-xl text-sm font-bold border border-red-100 max-w-lg">
-                  Connection Issue: {stats.error}
-                </div>
-              )}
             </div>
-          </div>
 
-          <h2 className="text-2xl font-bold text-slate-900 text-center mb-12">The Smarter Way to Find IV Therapy Clinics Near You</h2>
+          <h2 className="text-4xl md:text-5xl font-black text-slate-900 text-center mb-16 tracking-tight">The Smarter Way to Find IV Therapy Clinics Near You</h2>
 
           {/* Path Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
@@ -184,7 +219,7 @@ export default async function HomePage() {
                 </div>
                 <h3 className="text-3xl font-black text-white mb-4">Browse Directory</h3>
                 <p className="text-slate-400 leading-relaxed mb-8">
-                  Already know what you need? Filter through {stats.totalListings} top-rated clinics by city, service, or price.
+                  Already know what you need? Filter through {stats.totalListings || 496} top-rated clinics by city, service, or price.
                 </p>
                 <div className="flex items-center gap-2 text-white font-bold">
                   Explore Now <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -199,8 +234,8 @@ export default async function HomePage() {
       <section className="py-24 px-6 bg-slate-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Browse By Drip Type</h2>
-            <p className="text-lg text-slate-500">Select a service to find specialized providers near you.</p>
+            <h2 className="text-5xl md:text-6xl font-black text-slate-900 mb-4 tracking-tight">Browse By Drip Type</h2>
+            <p className="text-xl text-slate-500">Select a service to find specialized providers near you.</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {services.map((service, idx) => (
@@ -223,7 +258,7 @@ export default async function HomePage() {
       <CityGrid cities={topCities} />
 
       {/* How It Works */}
-      <HowItWorks />
+      <HowItWorks totalListings={stats.totalListings} />
 
       {/* Trust Signals Section */}
       <TrustSignals />
@@ -236,8 +271,8 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
             <div className="max-w-2xl">
-              <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">Latest from the Blog</h2>
-              <p className="text-lg text-slate-500 leading-relaxed">
+              <h2 className="text-5xl md:text-6xl font-black text-slate-900 mb-4 tracking-tight">Latest from the Blog</h2>
+              <p className="text-xl text-slate-500 leading-relaxed">
                 Expert guides on IV therapy, wellness protocols, and local health insights.
               </p>
             </div>

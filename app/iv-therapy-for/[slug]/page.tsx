@@ -17,25 +17,34 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const useCase = await getUseCaseBySlug(slug);
   if (!useCase) return { title: 'Not Found' };
 
-  let title = `IV Therapy for ${useCase.title} — Find Clinics Near You | TheDripMap`;
-  
-  if (slug === 'stress') {
-    title = "Stress Relief IV Drip — Find Clinics Near You | TheDripMap";
-  } else if (slug === 'fatigue') {
-    title = "IV Drip for Energy and Fatigue — Find Clinics | TheDripMap";
-  }
+  const title = `IV Therapy for ${useCase.title} — Find Clinics Near You | TheDripMap`;
+  const description = `Learn about how IV therapy is commonly used for ${useCase.title.toLowerCase()}. Find top-rated clinics and what to expect from your session.`;
 
   return {
     title,
-    description: `Learn about how IV therapy is commonly used for ${useCase.title.toLowerCase()}. Find top-rated clinics and what to expect from your session.`,
+    description,
     alternates: {
       canonical: `/iv-therapy-for/${slug}`,
     },
     openGraph: {
-      title: `IV Therapy for ${useCase.title}`,
-      description: `Learn about how IV therapy is commonly used for ${useCase.title.toLowerCase()}.`,
+      title,
+      description,
       url: `https://thedripmap.com/iv-therapy-for/${slug}`,
       type: 'website',
+      images: [
+        {
+          url: 'https://thedripmap.com/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: `IV Therapy for ${useCase.title}`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['https://thedripmap.com/og-image.png'],
     },
   };
 }
@@ -85,6 +94,18 @@ export default async function UseCasePage({ params }: PageProps) {
     })),
   };
 
+  const medicalProcedureSchema = {
+    "@context": "https://schema.org",
+    "@type": "MedicalProcedure",
+    "name": `IV Therapy for ${useCase.title}`,
+    "description": useCase.description,
+    "procedureType": "Intravenous Therapy",
+    "relevantSpecialty": {
+      "@type": "MedicalSpecialty",
+      "name": "Wellness and Preventive Medicine"
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
@@ -95,6 +116,10 @@ export default async function UseCasePage({ params }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(medicalProcedureSchema) }}
       />
 
       <main>

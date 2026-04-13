@@ -6,12 +6,12 @@ import { MedicalDisclaimer } from './MedicalDisclaimer';
 
 export const Footer = () => {
   const POPULAR_CITIES = [
-    { city: 'New York', state: 'NY' },
-    { city: 'Miami', state: 'FL' },
-    { city: 'Los Angeles', state: 'CA' },
-    { city: 'Chicago', state: 'IL' },
-    { city: 'Houston', state: 'TX' },
+    { city: 'San Francisco', state: 'CA' },
     { city: 'Las Vegas', state: 'NV' },
+    { city: 'San Diego', state: 'CA' },
+    { city: 'Chicago', state: 'IL' },
+    { city: 'New York', state: 'NY' },
+    { city: 'Los Angeles', state: 'CA' },
   ];
 
   return (

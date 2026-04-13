@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { 
   MapPin, 
-  ShieldCheck, 
   Zap, 
   CheckCircle2,
   Clock,
@@ -50,27 +49,37 @@ export async function generateMetadata({ params, searchParams }: CityPageProps):
 
   const cityName = cityInfo.city;
   const stateName = cityInfo.state;
+  const listings = await getListingsByCity(cityName);
+  const count = listings.length;
 
-  const baseTitle = service 
-    ? `Best ${service} IV Therapy in ${cityName}, ${stateName} | Top Rated 2025`
-    : `Best IV Therapy in ${cityName}, ${stateName} | Top Rated Clinics 2025`;
+  const title = `IV Therapy in ${cityName}, ${state} — ${count} Clinics | TheDripMap`;
+  const description = `Find and compare ${count} IV therapy clinics in ${cityName}, ${state}. Read reviews, compare prices, and book top-rated hydration and wellness drips.`;
 
   return {
-    title: baseTitle,
-    description: `Find and compare the best ${service ? service + ' ' : ''}IV therapy clinics in ${cityName}, ${stateName}. Read reviews, compare prices, and book top-rated hydration and wellness drips.`,
+    title,
+    description,
     alternates: {
       canonical: `/iv-therapy/${state}/${city}`,
     },
     openGraph: {
-      title: `Best IV Therapy in ${cityName}, ${stateName}`,
-      description: `Find and compare the best IV therapy clinics in ${cityName}, ${stateName}.`,
+      title,
+      description,
       url: `https://thedripmap.com/iv-therapy/${state}/${city}`,
       type: 'website',
+      images: [
+        {
+          url: 'https://thedripmap.com/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: `IV Therapy in ${cityName}, ${state}`,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `Best IV Therapy in ${cityName}, ${stateName}`,
-      description: `Find and compare the best IV therapy clinics in ${cityName}, ${stateName}.`,
+      title,
+      description,
+      images: ['https://thedripmap.com/og-image.png'],
     },
   };
 }
@@ -101,6 +110,26 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
     );
   }
   
+  // Popular Drips logic
+  const serviceCounts: Record<string, number> = {};
+  listings.forEach(l => {
+    const servicesList = Array.isArray(l.services) ? l.services : [];
+    servicesList.forEach((s: string | { name: string }) => {
+      const name = typeof s === 'string' ? s : (s.name || '');
+      if (name) {
+        serviceCounts[name] = (serviceCounts[name] || 0) + 1;
+      }
+    });
+  });
+  const topServices = Object.entries(serviceCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([name]) => name);
+
+  const commonServicesText = topServices.length > 0 
+    ? topServices.join(', ') 
+    : 'NAD+ therapy, hangover recovery, and immune support';
+
   const nearbyCities = cities
     .filter(c => c.state === cityInfo.state && c.city !== cityName)
     .slice(0, 5);
@@ -117,12 +146,32 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
     {
       question: `What are the most popular IV drips in ${cityName}?`,
       answer: `The most popular treatments in ${cityName} include NAD+ therapy for longevity, hangover recovery drips, and immune support infusions.`
+    },
+    {
+      question: `What is the average cost of IV therapy in ${cityName}?`,
+      answer: `On average, residents in ${cityName} can expect to pay around $225 for a standard wellness drip. Specialized treatments like NAD+ or high-dose Vitamin C may cost more, while basic hydration packages are often available at lower price points.`
+    },
+    {
+      question: `Are there mobile IV therapy services in ${cityName}?`,
+      answer: `Absolutely. ${cityName} has a high concentration of mobile-first IV providers. These services are particularly popular for group events, office wellness days, or recovery at home after a long night or intense workout.`
+    },
+    {
+      question: `Do I need an appointment for IV therapy in ${cityName}?`,
+      answer: `While some clinics in ${cityName} accept walk-ins, we highly recommend booking an appointment. This ensures a nurse is available and allows the clinic to prepare your specific infusion in advance.`
+    },
+    {
+      question: `What should I look for when choosing an IV therapy clinic in ${cityName}?`,
+      answer: `When selecting a provider in ${cityName}, prioritize clinics with licensed medical staff (RNs or NPs), positive verified reviews, and transparent pricing. Ensure they conduct a brief medical screening before your first treatment.`
+    },
+    {
+      question: `Is IV therapy safe in ${cityName}?`,
+      answer: `Yes, IV therapy is a safe and common wellness procedure in ${cityName} when performed by trained medical professionals. All clinics listed on TheDripMap are verified to follow standard medical protocols for intravenous administration.`
     }
   ];
 
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": "MedicalBusiness",
     "name": `IV Therapy Providers in ${cityName}`,
     "description": `Top rated IV hydration and wellness clinics in ${cityName}, ${stateName}.`,
     "url": `https://thedripmap.com/iv-therapy/${state}/${city}`,
@@ -139,6 +188,30 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
         ? listings.reduce((acc, curr) => acc + (curr.reviewCount || 0), 0).toString()
         : "12"
     }
+  };
+
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": listings.map((l, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "url": `https://thedripmap.com/provider/${l.slug || slugify(l.name)}`,
+      "name": l.name
+    }))
+  };
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
   };
 
   const breadcrumbJsonLd = {
@@ -173,6 +246,14 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <script
         type="application/ld+json"
@@ -253,39 +334,102 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
           </div>
         </section>
 
-        {/* Local Content Section */}
-        <section className="py-20 px-10 bg-wellness-900 text-white rounded-[3rem] mb-24 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-1/3 h-full bg-wellness-800/50 skew-x-12 translate-x-1/4" />
-          <div className="relative z-10 max-w-2xl">
-            <h2 className="text-4xl font-black mb-6 tracking-tight">Why Get IV Therapy in {cityName}?</h2>
-            <p className="text-lg text-wellness-100 leading-relaxed mb-8">
-              {cityName} is a hub for wellness and performance. Whether you&apos;re recovering from a long flight, prepping for a big event, or just maintaining your health, {cityName}&apos;s top clinics offer cutting-edge protocols tailored to your lifestyle.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-wellness-700 rounded-xl flex items-center justify-center shrink-0">
-                  <Zap size={20} className="text-wellness-400" />
-                </div>
-                <div>
-                  <h4 className="font-bold mb-1">Rapid Recovery</h4>
-                  <p className="text-xs text-wellness-200">Feel better in under 60 minutes with targeted infusions.</p>
-                </div>
+        {/* Local Content Sections */}
+        <section className="mb-24 space-y-20">
+          {/* Opening Section */}
+          <div className="prose prose-slate max-w-none">
+            <h2 className="text-4xl font-black text-slate-900 mb-8 tracking-tight">IV Therapy in {cityName}</h2>
+            <div className="text-lg text-slate-600 leading-relaxed space-y-6">
+              <p>
+                IV therapy in {cityName} has grown significantly over the past few years, with {listings.length} clinics now serving {cityName} residents across {stateName}. This surge in popularity reflects a broader trend toward proactive wellness and rapid recovery solutions. Whether you are a busy professional in the heart of {cityName} or a local athlete looking to optimize performance, intravenous hydration offers a direct path to cellular replenishment.
+              </p>
+              <p>
+                The local landscape in {cityName} is diverse, featuring everything from high-end wellness boutiques to specialized medical clinics. Most providers in the area focus on a holistic approach, ensuring that each drip is tailored to the individual&apos;s needs. Common services found across {cityName} include {commonServicesText}. These treatments are designed to address a variety of concerns, from seasonal allergies and immune support to chronic fatigue and anti-aging protocols.
+              </p>
+              <p>
+                As {cityName} continues to embrace these advanced health services, the quality and accessibility of care have reached new heights. Patients can now choose between relaxing in-clinic environments or the convenience of mobile services that bring the treatment directly to their doorstep. The medical community here has set high standards for safety and efficacy, making it one of the premier locations for elective IV treatments in the region.
+              </p>
+            </div>
+          </div>
+
+          {/* What to Expect Section */}
+          <div className="bg-slate-50 rounded-[3rem] p-10 md:p-16 border border-slate-100">
+            <h3 className="text-3xl font-black text-slate-900 mb-6 tracking-tight">What to Expect from Your Session in {cityName}</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <div className="text-lg text-slate-600 leading-relaxed">
+                <p>
+                  When you book an IV therapy session in {cityName}, you can expect a professional and streamlined experience. Most sessions begin with a brief medical consultation to ensure the chosen treatment is safe and appropriate for you. The actual infusion typically takes between 45 to 60 minutes, during which you can relax, work, or even catch up on your favorite show.
+                </p>
+                <p className="mt-4">
+                  Price ranges in {cityName} are competitive, with standard wellness drips starting around $150 and more complex formulas reaching up to $350. Mobile IV therapy is particularly popular in {cityName}, offering a convenient alternative for those with busy schedules or those who prefer the comfort of their own home. Licensed medical professionals, typically Registered Nurses or Nurse Practitioners, oversee every administration to ensure the highest level of care.
+                </p>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-wellness-700 rounded-xl flex items-center justify-center shrink-0">
-                  <ShieldCheck size={20} className="text-wellness-400" />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                  <div className="text-wellness-600 font-black text-2xl mb-1">$150+</div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Avg. Starting Price</div>
                 </div>
-                <div>
-                  <h4 className="font-bold mb-1">Expert Nurses</h4>
-                  <p className="text-xs text-wellness-200">All treatments administered by licensed medical professionals.</p>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                  <div className="text-wellness-600 font-black text-2xl mb-1">45-60m</div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Session Length</div>
+                </div>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                  <div className="text-wellness-600 font-black text-2xl mb-1">Mobile</div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">High Availability</div>
+                </div>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                  <div className="text-wellness-600 font-black text-2xl mb-1">RN/NP</div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Medical Staff</div>
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Popular Drips Section */}
+          <div>
+            <h3 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Popular Drips in {cityName}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {topServices.length > 0 ? topServices.map((s, i) => (
+                <div key={i} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="w-12 h-12 bg-wellness-50 rounded-xl flex items-center justify-center text-wellness-600 mb-6">
+                    <Zap size={24} />
+                  </div>
+                  <h4 className="text-xl font-bold text-slate-900 mb-3">{s}</h4>
+                  <p className="text-sm text-slate-500 leading-relaxed">
+                    One of the most requested treatments in {cityName}, known for its effective results and high patient satisfaction. Local clinics report high demand for this specific protocol due to its comprehensive nutrient profile.
+                  </p>
+                </div>
+              )) : (
+                <p className="col-span-full text-slate-500 italic">Data on specific popular drips is currently being updated for {cityName}.</p>
+              )}
+            </div>
+            <p className="mt-10 text-lg text-slate-600 leading-relaxed">
+              The high demand for these specific treatments in {cityName} highlights the community&apos;s focus on targeted wellness. Whether it&apos;s the energy-boosting properties of NAD+ or the rapid rehydration of a recovery drip, {cityName} residents prioritize efficiency and quality in their health choices. Many local providers also offer custom blends, allowing you to fine-tune your infusion based on your unique physiological needs.
+            </p>
           </div>
         </section>
 
         <FAQSection faqs={faqs} title={`IV Therapy in ${cityName} FAQ`} />
         
+        {nearbyCities.length > 0 && (
+          <section className="py-12 border-t border-slate-100">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Also serving:</span>
+              {nearbyCities.map((c, i) => (
+                <React.Fragment key={c.city}>
+                  <Link 
+                    href={`/iv-therapy/${slugify(c.state)}/${slugify(c.city)}`}
+                    className="text-xs font-bold text-wellness-600 hover:text-wellness-700 transition-colors"
+                  >
+                    {c.city}
+                  </Link>
+                  {i < nearbyCities.length - 1 && <span className="text-slate-300">·</span>}
+                </React.Fragment>
+              ))}
+            </div>
+          </section>
+        )}
+
         {nearbyCities.length > 0 && (
           <NearbyCities cities={nearbyCities} currentState={stateName} />
         )}

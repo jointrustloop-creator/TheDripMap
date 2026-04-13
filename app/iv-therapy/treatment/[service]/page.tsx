@@ -73,7 +73,15 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
         getAllCities()
       ]);
 
-      setListings(serviceListings);
+      // Fallback logic: if no service-specific listings found, get general top-rated listings
+      if (serviceListings.length === 0) {
+        const { getFeaturedListings } = await import('../../../../src/lib/data');
+        const fallbackListings = await getFeaturedListings(9);
+        setListings(fallbackListings);
+      } else {
+        setListings(serviceListings);
+      }
+      
       setTopCities(allCities.slice(0, 8));
       setCurrentCity(cityToUse);
       setIsLoading(false);
@@ -98,6 +106,45 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
 
   if (!service) notFound();
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://thedripmap.com';
+  
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": siteUrl
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "IV Therapy",
+        "item": `${siteUrl}/search`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": service.name,
+        "item": `${siteUrl}/iv-therapy/treatment/${service.slug}`
+      }
+    ]
+  };
+
+  const procedureJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "MedicalProcedure",
+    "name": `${service.name} IV Therapy`,
+    "description": `Specialized intravenous treatment for ${service.name}.`,
+    "procedureType": "Intravenous Therapy",
+    "relevantSpecialty": {
+      "@type": "MedicalSpecialty",
+      "name": "Preventive Medicine"
+    }
+  };
+
   const faqs = [
     {
       question: `What is ${service.name} IV therapy?`,
@@ -113,9 +160,35 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
     }
   ];
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  };
+
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
+      
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(procedureJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       
       <main className="max-w-7xl mx-auto px-6 py-12">
         <BreadcrumbNav 

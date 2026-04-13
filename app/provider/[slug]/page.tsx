@@ -69,11 +69,36 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   
   if (!provider) return { title: 'Provider Not Found' };
 
+  const title = `${provider.name} — IV Therapy in ${provider.city}, ${provider.state} | TheDripMap`;
+  const description = provider.reviewCount > 0
+    ? `Read ${provider.reviewCount} reviews for ${provider.name} in ${provider.city}, ${provider.state}. Top-rated IV therapy clinic offering hydration, NAD+, and wellness drips.`
+    : `Find details for ${provider.name} in ${provider.city}, ${provider.state}. Top-rated IV therapy clinic offering hydration, NAD+, and wellness drips.`;
+
   return {
-    title: `${provider.name} | Best IV Therapy in ${provider.city} | TheDripMap`,
-    description: `${provider.name} offers top-rated IV therapy in ${provider.city}. Read reviews and book your drip today.`,
+    title,
+    description,
     alternates: {
       canonical: `/provider/${slug}`,
+    },
+    openGraph: {
+      title,
+      description,
+      url: `https://thedripmap.com/provider/${slug}`,
+      type: 'website',
+      images: [
+        {
+          url: provider.imageUrl || 'https://thedripmap.com/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: provider.name,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [provider.imageUrl || 'https://thedripmap.com/og-image.png'],
     },
   };
 }
@@ -131,6 +156,65 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
   const allListings = await getAllListings();
   const initials = getInitials(provider.name, provider.city, allListings);
 
+  const medicalBusinessJsonLd = {
+    "@context": "https://schema.org",
+    "@type": ["LocalBusiness", "MedicalBusiness"],
+    "name": provider.name,
+    "description": provider.description,
+    "image": provider.imageUrl,
+    "telePhone": provider.phone,
+    "url": `https://thedripmap.com/provider/${slug}`,
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": provider.address,
+      "addressLocality": provider.city,
+      "addressRegion": stateCode,
+      "postalCode": provider.postal_code,
+      "addressCountry": "US"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": provider.latitude,
+      "longitude": provider.longitude
+    },
+    "aggregateRating": provider.reviewCount > 0 ? {
+      "@type": "AggregateRating",
+      "ratingValue": provider.rating,
+      "reviewCount": provider.reviewCount
+    } : undefined
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://thedripmap.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": stateLabel,
+        "item": `https://thedripmap.com/iv-therapy/${stateSlug}`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": cityLabel,
+        "item": `https://thedripmap.com/iv-therapy/${stateSlug}/${citySlug}`
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": provider.name,
+        "item": `https://thedripmap.com/provider/${slug}`
+      }
+    ]
+  };
+
   let similarClinics = allListings.filter(p => p.id !== provider.id && p.city === provider.city);
   let similarTitle = `Other IV therapy clinics in ${provider.city}`;
   
@@ -150,6 +234,15 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
+      
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(medicalBusinessJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       
       <main className="max-w-7xl mx-auto px-6 py-12">
         {/* BREADCRUMB */}

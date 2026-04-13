@@ -1,8 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { MapPin, Zap, Phone, Globe, ShieldCheck, Clock } from 'lucide-react';
+import { Phone } from 'lucide-react';
 import { Provider } from '../types';
-import { RatingStars } from './RatingStars';
 import { slugify } from '../lib/data';
 import { cn } from '../lib/utils';
 import { ClinicImage } from './ClinicImage';
@@ -131,33 +130,19 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
 
       {/* Card Footer */}
       <div className="px-3 py-3 border-t border-slate-50 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          {provider.phone && (
-            <a 
-              href={`tel:${provider.phone}`}
-              className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-wellness-50 hover:text-wellness-600 transition-all border border-slate-100"
-              title="Call Clinic"
-            >
-              <Phone size={16} />
-            </a>
-          )}
-          {provider.website && (
-            <a 
-              href={provider.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-wellness-50 hover:text-wellness-600 transition-all border border-slate-100"
-              title="Visit Website"
-            >
-              <Globe size={16} />
-            </a>
-          )}
-        </div>
+        {provider.phone && (
+          <a 
+            href={`tel:${provider.phone}`}
+            className="flex-1 bg-slate-900 text-white px-3 py-2 rounded-lg font-bold text-[11px] hover:bg-slate-800 transition-all flex items-center justify-center gap-1.5 shadow-sm"
+          >
+            <Phone size={14} /> Call Now
+          </a>
+        )}
         <Link 
-          href={`/quiz?clinic=${provider.id}`}
+          href={`/provider/${slug}`}
           className="flex-1 bg-wellness-600 text-white px-3 py-2 rounded-lg font-bold text-[11px] hover:bg-wellness-700 transition-all flex items-center justify-center gap-1.5 shadow-sm"
         >
-          <Zap size={14} /> Get Matched
+          View Profile
         </Link>
       </div>
     </div>

@@ -59,10 +59,8 @@ function SearchContent() {
   const filterChips = [
     { id: 'All', label: 'All' },
     { id: 'Mobile', label: 'Mobile IV' },
-    { id: 'Walk-ins', label: 'Walk-ins' },
     { id: 'Open', label: 'Open Now' },
     { id: 'Verified', label: 'Verified' },
-    { id: 'Featured', label: 'Featured' },
   ];
 
   const toggleChip = (id: string) => {
@@ -85,23 +83,49 @@ function SearchContent() {
   const isOpenNow = (hours?: Record<string, string>) => {
     if (!hours) return false;
     const now = new Date();
-    const day = now.toLocaleDateString('en-US', { weekday: 'long' });
+    // Use lowercase day for matching our normalized keys
+    const day = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
     const timeRange = hours[day];
     if (!timeRange || timeRange.toLowerCase().includes('closed')) return false;
     try {
-      const [start, end] = timeRange.split('-').map(t => t.trim());
+      // Handle "9AM-5PM" or "9:00 AM - 5:00 PM" formats
+      const cleanRange = timeRange.replace(/\s+/g, '');
+      const parts = cleanRange.split(/[-–—]/);
+      if (parts.length !== 2) return false;
+      
+      const [startStr, endStr] = parts;
+      
       const parseTime = (t: string) => {
-        const [time, modifier] = t.split(' ');
-        let h = time.split(':').map(Number)[0];
-        const m = time.split(':').map(Number)[1];
+        const match = t.match(/(\d+)(?::(\d+))?\s*(AM|PM)/i);
+        if (!match) return null;
+        
+        let h = parseInt(match[1], 10);
+        const m = match[2] ? parseInt(match[2], 10) : 0;
+        const modifier = match[3].toUpperCase();
+        
         if (modifier === 'PM' && h < 12) h += 12;
         if (modifier === 'AM' && h === 12) h = 0;
-        const d = new Date();
-        d.setHours(h, m || 0, 0, 0);
+        
+        const d = new Date(now);
+        d.setHours(h, m, 0, 0);
         return d;
       };
-      return now >= parseTime(start) && now <= parseTime(end);
-    } catch (e) { return false; }
+      
+      const startTime = parseTime(startStr);
+      const endTime = parseTime(endStr);
+      
+      if (!startTime || !endTime) return false;
+      
+      // Handle overnight hours (e.g., 10PM-2AM)
+      if (endTime < startTime) {
+        endTime.setDate(endTime.getDate() + 1);
+      }
+      
+      return now >= startTime && now <= endTime;
+    } catch (e) { 
+      console.warn('Error parsing hours:', timeRange, e);
+      return false; 
+    }
   };
 
   useEffect(() => {
@@ -137,9 +161,6 @@ function SearchContent() {
         }
         if (activeChips.includes('Verified')) {
           results = results.filter(p => p.is_verified);
-        }
-        if (activeChips.includes('Featured')) {
-          results = results.filter(p => p.is_featured);
         }
       }
 

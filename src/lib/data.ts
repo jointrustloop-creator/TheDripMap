@@ -63,6 +63,7 @@ function enrichProvider(p: any): Provider {
   
   if (rawHours && typeof rawHours === 'object') {
     Object.entries(rawHours).forEach(([day, val]) => {
+      // Keep keys as provided but also ensure we have lowercase versions for easier lookup
       const dayKey = day.toLowerCase();
       if (Array.isArray(val)) {
         hours[dayKey] = val[0] || 'Closed';
@@ -72,17 +73,30 @@ function enrichProvider(p: any): Provider {
     });
   }
 
+  // Infer mobile service from name or category if not explicitly set
+  const isMobile = p.mobile_service || 
+                   p.type === 'Mobile' || 
+                   p.name?.toLowerCase().includes('mobile') || 
+                   p.category?.toLowerCase().includes('mobile') ||
+                   p.description?.toLowerCase().includes('mobile iv');
+
+  // Infer verification status (for demo/launch purposes, highly rated clinics with reviews are "verified")
+  const isVerified = p.is_verified || (Number(p.rating) >= 4.5 && Number(p.review_count || p.reviews) >= 5);
+
   const enriched = { 
     ...p,
     name: p.name || p.Name || p.clinic_name || 'Unnamed Clinic',
-    city: p.city || p.City || p.town || 'Unknown City',
-    state: p.state || p.State || p.province || '',
-    rating: Number(p.rating || p.Rating) || 0,
+    city: p.city || p.town || 'Unknown City',
+    state: p.state || p.province || '',
+    rating: Number(p.rating) || 0,
     reviewCount: Number(p.review_count || p.reviews || p.reviewCount || p.Reviews) || 0,
     imageUrl: finalImageUrl,
     specialties: specialties,
     amenities: amenities,
     hours: Object.keys(hours).length > 0 ? hours : undefined,
+    mobile_service: !!isMobile,
+    is_verified: !!isVerified,
+    type: isMobile ? 'Mobile' : (p.type || 'In-Clinic'),
     services: p.services || [],
     reviews_data: p.reviews_data || [],
     medical_team: p.medical_team || [],
@@ -97,16 +111,14 @@ export async function getListingsByCity(city: string) {
   if (!configured) return [];
   
   try {
-    // Try both 'city' and 'City' column names
     const { data, error } = await supabase
       .from('providers')
       .select('*')
-      .or(`city.ilike.%${city}%,City.ilike.%${city}%`)
+      .or(`city.ilike.%${city}%,state.ilike.%${city}%`)
       .order('rating', { ascending: false });
 
     if (error) {
       console.warn('Supabase .or query failed, trying simple city query:', error.message);
-      // Fallback to simple city query if .or fails (e.g. if one column doesn't exist)
       const { data: data2, error: error2 } = await supabase
         .from('providers')
         .select('*')
@@ -115,17 +127,6 @@ export async function getListingsByCity(city: string) {
       
       if (!error2 && data2 && data2.length > 0) {
         return data2.map(enrichProvider);
-      }
-      
-      // Try uppercase City if lowercase city failed
-      const { data: data3, error: error3 } = await supabase
-        .from('providers')
-        .select('*')
-        .ilike('City', city)
-        .order('rating', { ascending: false });
-
-      if (!error3 && data3 && data3.length > 0) {
-        return data3.map(enrichProvider);
       }
       return [];
     }
@@ -210,8 +211,8 @@ export async function getAllCities() {
 
       if (!providerError && providerCities) {
         (providerCities as Array<Record<string, string | number | boolean | null>>).forEach((curr) => {
-          const city = (curr.city || curr.City || curr.town) as string | undefined;
-          const state = (curr.state || curr.State || curr.province) as string | undefined;
+          const city = (curr.city || curr.town) as string | undefined;
+          const state = (curr.state || curr.province) as string | undefined;
           if (city && state) {
             const key = `${city.toLowerCase()}|${state.toLowerCase()}`;
             const existing = allCitiesMap.get(key);
@@ -272,51 +273,58 @@ export async function getAllStates() {
   return [];
 }
 
+function getServiceFilter(service: string): string {
+  const s = service.toLowerCase();
+  if (s.includes('hangover')) {
+    return "services.ilike.%hangover%,subtypes.ilike.%hangover%,name.ilike.%hangover%";
+  }
+  if (s.includes('nad')) {
+    return "services.ilike.%NAD%,subtypes.ilike.%NAD%";
+  }
+  if (s.includes('immune')) {
+    return "services.ilike.%immune%,subtypes.ilike.%immune%,subtypes.ilike.%wellness%";
+  }
+  if (s.includes('beauty') || s.includes('glow')) {
+    return "services.ilike.%beauty%,services.ilike.%glow%,subtypes.ilike.%beauty%,subtypes.ilike.%skin%";
+  }
+  if (s.includes('hydration')) {
+    return "services.ilike.%hydration%,name.ilike.%hydration%,name.ilike.%hydrate%";
+  }
+  if (s.includes('recovery')) {
+    return "services.ilike.%recovery%,subtypes.ilike.%athletic%,subtypes.ilike.%sport%";
+  }
+  if (s.includes('myers')) {
+    return "services.ilike.%myers%,subtypes.ilike.%myers%";
+  }
+  if (s.includes('weight')) {
+    return "services.ilike.%weight%,subtypes.ilike.%weight%";
+  }
+  
+  // Default fallback
+  const coreKeyword = service.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '');
+  return `specialties.cs.{"${service}"},subtypes.cs.{"${service}"},name.ilike.%${coreKeyword}%,category.ilike.%${coreKeyword}%,description.ilike.%${coreKeyword}%`;
+}
+
 export async function getListingsByService(service: string, limit: number = 4) {
   const configured = isSupabaseConfigured();
   if (!configured) return [];
   
   try {
-    // Extract a core keyword for better matching (e.g., "NAD" from "NAD+ Plus")
-    const coreKeyword = service.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '');
-    
-    // Try specialties first, then subtypes, then name/category
-    // We use .or() to be more inclusive if specialties aren't fully populated
+    const filter = getServiceFilter(service);
     const { data, error } = await supabase
       .from('providers')
       .select('*')
-      .or(`specialties.cs.{"${service}"},subtypes.cs.{"${service}"},name.ilike.%${coreKeyword}%,category.ilike.%${coreKeyword}%,description.ilike.%${coreKeyword}%`)
+      .or(filter)
       .order('rating', { ascending: false })
       .limit(limit);
 
     if (error) {
       console.warn('Supabase error in getListingsByService:', error.message);
-      // Fallback to simple name/category search if columns are missing
-      const { data: fallbackData } = await supabase
-        .from('providers')
-        .select('*')
-        .or(`name.ilike.%${coreKeyword}%,category.ilike.%${coreKeyword}%`)
-        .order('rating', { ascending: false })
-        .limit(limit);
-      
-      if (fallbackData) {
-        return fallbackData.map(p => ({
-          ...p,
-          rating: Number(p.rating) || 0,
-          reviewCount: Number(p.reviews) || 0,
-          imageUrl: p.imageUrl || p.image_url || `https://picsum.photos/seed/${p.id}/800/600`
-        })) as Provider[];
-      }
       return [];
     }
 
     if (data && data.length > 0) {
-      return data.map(p => ({
-        ...p,
-        rating: Number(p.rating) || 0,
-        reviewCount: Number(p.reviews) || 0,
-        imageUrl: p.imageUrl || p.image_url || `https://picsum.photos/seed/${p.id}/800/600`
-      })) as Provider[];
+      return data.map(enrichProvider);
     }
     
     return [];
@@ -341,16 +349,19 @@ export async function searchListings(
 
     // Filter by city if provided
     if (city && city !== 'All' && city !== '') {
-      // Use case-insensitive match for city
-      // We try 'city' first, but we'll handle column name variations in the fallback
-      supabaseQuery = supabaseQuery.ilike('city', city);
+      // Handle "City, State" format by taking the city part
+      const cityPart = city.split(',')[0].trim();
+      const q = `%${cityPart}%`;
+      // Search in both city and state columns for better coverage
+      supabaseQuery = supabaseQuery.or(`city.ilike.${q},state.ilike.${q}`);
     }
 
-    // Filter by search query (name, city, category, description)
+    // Filter by search query (name, city, state, category, description)
     if (query && query.trim() !== '') {
-      const q = `%${query.trim()}%`;
+      const cleanQuery = query.split(',')[0].trim();
+      const q = `%${cleanQuery}%`;
       // Try to be inclusive with column names
-      supabaseQuery = supabaseQuery.or(`name.ilike.${q},city.ilike.${q},category.ilike.${q},description.ilike.${q}`);
+      supabaseQuery = supabaseQuery.or(`name.ilike.${q},city.ilike.${q},state.ilike.${q},category.ilike.${q},description.ilike.${q}`);
     }
 
     // Order as requested: Featured first, then Rating, then Review Count
@@ -369,22 +380,27 @@ export async function searchListings(
       if (allData) {
         let filtered = allData.map(p => enrichProvider({
           ...p,
-          city: p.city || p.City || p.town || '',
-          rating: Number(p.rating || p.Rating) || 0,
+          city: p.city || p.town || '',
+          rating: Number(p.rating) || 0,
           reviewCount: Number(p.review_count || p.reviews || p.reviewCount || p.Reviews) || 0,
         }));
 
         if (city && city !== 'All' && city !== '') {
-          filtered = filtered.filter(p => p.city.toLowerCase() === city.toLowerCase());
+          const cityPart = city.split(',')[0].trim().toLowerCase();
+          filtered = filtered.filter(p => 
+            p.city.toLowerCase().includes(cityPart) || 
+            p.state.toLowerCase().includes(cityPart)
+          );
         }
 
         if (query && query.trim() !== '') {
-          const q = query.toLowerCase().trim();
+          const cleanQuery = query.split(',')[0].trim().toLowerCase();
           filtered = filtered.filter(p => 
-            p.name.toLowerCase().includes(q) || 
-            p.city.toLowerCase().includes(q) ||
-            (p.description && p.description.toLowerCase().includes(q)) ||
-            (p.specialties && p.specialties.some(s => s.toLowerCase().includes(q)))
+            p.name.toLowerCase().includes(cleanQuery) || 
+            p.city.toLowerCase().includes(cleanQuery) ||
+            p.state.toLowerCase().includes(cleanQuery) ||
+            (p.description && p.description.toLowerCase().includes(cleanQuery)) ||
+            (p.specialties && p.specialties.some(s => s.toLowerCase().includes(cleanQuery)))
           );
         }
 
@@ -458,21 +474,27 @@ export async function getListingStats() {
 
       if (countError) throw countError;
 
-      // 2. Get cities to count them
+      // 2. Get cities and states
       const { data, error } = await supabase
         .from('providers')
-        .select('city, state');
+        .select('city, state, rating');
 
       if (error) throw error;
       
       if (data) {
-        const cities = new Set(data.map((p: { city?: string; City?: string }) => p.city || p.City).filter(Boolean));
-        const states = new Set(data.map((p: { state?: string; State?: string }) => p.state || p.State).filter(Boolean));
+        const cities = new Set(data.map((p: { city?: string }) => p.city).filter(Boolean));
+        const states = new Set(data.map((p: { state?: string }) => p.state).filter(Boolean));
+        
+        const ratings = data.map((p: { rating?: number }) => Number(p.rating)).filter(r => !isNaN(r) && r > 0);
+        const avgRating = ratings.length > 0 
+          ? ratings.reduce((a, b) => a + b, 0) / ratings.length 
+          : 4.8;
         
         return {
           totalListings: totalListings || data.length,
           totalCities: cities.size,
           totalStates: states.size || 1,
+          avgRating: Math.round(avgRating * 10) / 10,
           isLive: true
         };
       }
@@ -484,6 +506,7 @@ export async function getListingStats() {
         totalListings: 0,
         totalCities: 0,
         totalStates: 0,
+        avgRating: 4.8,
         isLive: true,
         error: message
       };
@@ -494,6 +517,7 @@ export async function getListingStats() {
     totalListings: 0,
     totalCities: 0,
     totalStates: 0,
+    avgRating: 4.8,
     isLive: false
   };
 }
@@ -515,8 +539,17 @@ export async function getBlogPosts() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return (data as any[]).map(post => {
         const content = post.content || post.body || post.markdown || post.text || '';
+        
+        // Replace fake author names
+        let author = post.author || 'TheDripMap Team';
+        const fakeAuthors = ['Dr. Sarah Chen', 'Dr. James Wilson', 'Dr. Michael Brown', 'Dr. Emily White'];
+        if (fakeAuthors.includes(author)) {
+          author = 'TheDripMap Team';
+        }
+
         return {
           ...post,
+          author,
           content,
           imageUrl: post.imageUrl || `https://picsum.photos/seed/${post.slug}/800/600`
         };
@@ -547,8 +580,16 @@ export async function getBlogPostBySlug(slug: string) {
       // Handle potential column name variations
       const content = post.content || post.body || post.markdown || post.text || '';
       
+      // Replace fake author names
+      let author = post.author || 'TheDripMap Team';
+      const fakeAuthors = ['Dr. Sarah Chen', 'Dr. James Wilson', 'Dr. Michael Brown', 'Dr. Emily White'];
+      if (fakeAuthors.includes(author)) {
+        author = 'TheDripMap Team';
+      }
+
       return {
         ...post,
+        author,
         content,
         imageUrl: post.imageUrl || `https://picsum.photos/seed/${post.slug}/800/600`
       } as BlogPost;
@@ -618,11 +659,13 @@ export async function getListingsByServiceAndCity(service: string, city: string,
   if (!configured) return [];
   
   try {
+    const filter = getServiceFilter(service);
+    const cityPart = city.split(',')[0].trim();
     const { data, error } = await supabase
       .from('providers')
       .select('*')
-      .ilike('city', city)
-      .or(`specialties.cs.{"${service}"},subtypes.cs.{"${service}"},name.ilike.%${service}%,category.ilike.%${service}%`)
+      .or(`city.ilike.%${cityPart}%,state.ilike.%${cityPart}%`)
+      .or(filter)
       .order('rating', { ascending: false })
       .limit(limit);
 

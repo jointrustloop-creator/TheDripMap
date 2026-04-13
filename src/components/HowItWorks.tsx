@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion, Variants } from 'motion/react';
 import { Zap, Search, Droplets, ArrowRight } from 'lucide-react';
 
-export const HowItWorks = () => {
+export const HowItWorks = ({ totalListings = 496 }: { totalListings?: number }) => {
   const steps = [
     { 
       step: '01', 
@@ -129,7 +129,7 @@ export const HowItWorks = () => {
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
               <div className="text-center md:text-left">
                 <h3 className="text-3xl md:text-4xl font-black text-white mb-4 tracking-tight">Ready to find your perfect drip?</h3>
-                <p className="text-slate-400 text-lg max-w-md">40+ clinics ready to match with you. Find yours in 60 seconds.</p>
+                <p className="text-slate-400 text-lg max-w-md">{totalListings}+ clinics ready to match with you. Find yours in 60 seconds.</p>
               </div>
               <Link 
                 href="/quiz"

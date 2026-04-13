@@ -6,8 +6,28 @@ import { Footer } from '../../src/components/Footer';
 import { ShieldCheck, ArrowRight, BarChart, Users, Globe } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: "For Clinics | Grow Your IV Therapy Practice | TheDripMap",
-  description: "Join the nation's #1 IV therapy directory. Reach thousands of patients searching for wellness drips in your city every month.",
+  title: "List Your IV Therapy Clinic — Reach More Patients | TheDripMap",
+  description: "Join the nation's #1 IV therapy directory. Claim your free listing to reach thousands of patients searching for wellness drips in your city every month.",
+  openGraph: {
+    title: "List Your IV Therapy Clinic — Reach More Patients | TheDripMap",
+    description: "Join the nation's #1 IV therapy directory. Claim your free listing to reach thousands of patients searching for wellness drips in your city every month.",
+    url: 'https://thedripmap.com/for-clinics',
+    type: 'website',
+    images: [
+      {
+        url: 'https://thedripmap.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'TheDripMap for Clinics',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "List Your IV Therapy Clinic — Reach More Patients | TheDripMap",
+    description: "Join the nation's #1 IV therapy directory. Claim your free listing to reach thousands of patients searching for wellness drips in your city every month.",
+    images: ['https://thedripmap.com/og-image.png'],
+  },
 };
 
 export default function ForClinicsPage() {
@@ -21,7 +41,7 @@ export default function ForClinicsPage() {
             Your clinic is already on <span className="text-wellness-600">TheDripMap</span>. Make it work for you.
           </h1>
           <p className="text-xl text-slate-500 leading-relaxed">
-            40+ clinics listed across the US. Patients are actively searching. Claim your free listing in 2 minutes.
+            490+ clinics listed across the US. Patients are actively searching. Claim your free listing in 2 minutes.
           </p>
         </div>
 

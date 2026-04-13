@@ -81,11 +81,11 @@ export default function AboutPage() {
             </div>
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <div className="text-4xl font-black text-wellness-400 mb-2">140+</div>
+                <div className="text-4xl font-black text-wellness-400 mb-2">490+</div>
                 <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">Verified Clinics</div>
               </div>
               <div>
-                <div className="text-4xl font-black text-wellness-400 mb-2">80+</div>
+                <div className="text-4xl font-black text-wellness-400 mb-2">270+</div>
                 <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">Cities Covered</div>
               </div>
               <div>

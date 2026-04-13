@@ -37,8 +37,8 @@ export const CityGrid = ({ cities, title = "Browse Top Cities" }: CityGridProps)
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
           <div className="max-w-2xl">
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">{title}</h2>
-            <p className="text-lg text-slate-500 leading-relaxed">
+            <h2 className="text-5xl md:text-6xl font-black text-slate-900 mb-4 tracking-tight">{title}</h2>
+            <p className="text-xl text-slate-500 leading-relaxed">
               Find top-rated IV therapy providers in these major wellness hubs.
             </p>
           </div>

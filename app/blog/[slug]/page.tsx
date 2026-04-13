@@ -45,27 +45,30 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   
   if (!post) return { title: 'Post Not Found' };
 
+  const title = `${post.title} | TheDripMap Wellness Blog`;
+  const description = post.metaDescription || post.excerpt || `Read our latest guide on ${post.title.toLowerCase()}. Expert insights from TheDripMap Team.`;
+
   return {
-    title: post.metaTitle,
-    description: post.metaDescription,
+    title,
+    description,
     alternates: {
       canonical: `/blog/${slug}`,
     },
     openGraph: {
-      title: post.title,
-      description: post.metaDescription,
+      title,
+      description,
       url: `https://thedripmap.com/blog/${slug}`,
-      images: [{ url: post.imageUrl }],
+      images: [{ url: post.imageUrl || 'https://thedripmap.com/og-image.png' }],
       type: 'article',
       publishedTime: post.date,
       modifiedTime: post.lastUpdated || post.date,
-      authors: [post.author],
+      authors: [post.author || 'TheDripMap Team'],
     },
     twitter: {
       card: 'summary_large_image',
-      title: post.title,
-      description: post.metaDescription,
-      images: [post.imageUrl],
+      title,
+      description,
+      images: [post.imageUrl || 'https://thedripmap.com/og-image.png'],
     },
   };
 }
@@ -87,14 +90,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "BlogPosting",
+    "@type": "Article",
     "headline": post.title,
     "image": post.imageUrl,
     "datePublished": post.date,
     "dateModified": post.lastUpdated || post.date,
     "author": {
       "@type": "Person",
-      "name": post.author,
+      "name": post.author || "TheDripMap Team",
       "jobTitle": "Medical Contributor"
     },
     "publisher": {
@@ -105,7 +108,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         "url": "https://thedripmap.com/logo.png"
       }
     },
-    "description": post.metaDescription,
+    "description": post.metaDescription || post.excerpt,
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": `https://thedripmap.com/blog/${slug}`

@@ -13,6 +13,7 @@ interface ClinicianSectionProps {
     totalListings: number;
     totalCities: number;
     totalStates: number;
+    avgRating?: number;
     isLive: boolean;
     error?: string;
   };
@@ -36,11 +37,11 @@ export const ClinicianSection = ({ stats }: ClinicianSectionProps) => {
               <TrendingUp size={12} />
               <span>For Business Owners</span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-4 tracking-tight leading-tight">
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight leading-tight">
               Own an IV Clinic? <br />
               <span className="text-slate-400">Grow with TheDripMap.</span>
             </h2>
-            <p className="text-slate-400 text-sm font-medium leading-relaxed max-w-md">
+            <p className="text-slate-400 text-lg font-medium leading-relaxed max-w-md">
               Join {stats.totalListings}+ elite providers across {stats.totalCities} cities and start receiving high-intent patient referrals today.
             </p>
           </div>
@@ -54,9 +55,9 @@ export const ClinicianSection = ({ stats }: ClinicianSectionProps) => {
               <div className="w-px h-8 bg-slate-800" />
               <div className="text-center">
                 <div className="text-2xl md:text-3xl font-black text-white">
-                  {Math.floor(stats.totalListings * 632 / 100) / 10}k+
+                  {stats.avgRating || 4.8}★
                 </div>
-                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Matches</div>
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Avg Rating</div>
               </div>
             </div>
 

@@ -9,7 +9,8 @@ import {
   Star,
   ChevronDown,
   ChevronUp,
-  Info
+  Info,
+  Calendar
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { matchProviders } from '../../../src/lib/matching';
@@ -275,13 +276,22 @@ function ResultsContent() {
               <div className="h-px flex-1 bg-slate-100" />
             </div>
 
-            <div className="bg-white rounded-[2.5rem] border-2 border-wellness-100 overflow-hidden shadow-2xl shadow-wellness-100/50 group">
-              <div className="grid grid-cols-1 lg:grid-cols-2">
-                <div className="relative h-72 lg:h-auto overflow-hidden">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-[2.5rem] border-2 border-wellness-100 overflow-hidden shadow-2xl shadow-wellness-100/50 group relative"
+            >
+              <div className="absolute -top-4 -right-4 bg-amber-400 text-white p-4 rounded-full shadow-xl z-10 rotate-12 group-hover:rotate-0 transition-transform duration-500 hidden lg:block">
+                <Sparkles size={24} />
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr]">
+                <div className="relative h-64 lg:h-full overflow-hidden bg-slate-50">
                   <ClinicImage 
                     name={topMatch.name}
                     imageUrl={topMatch.imageUrl}
-                    className="group-hover:scale-105 transition-transform duration-700"
+                    className="group-hover:scale-105 transition-transform duration-700 h-full w-full object-cover"
                   />
                   <div className="absolute top-6 left-6 flex flex-wrap gap-2">
                     {topMatch.availability && (
@@ -292,18 +302,23 @@ function ResultsContent() {
                     )}
                   </div>
                 </div>
-                <div className="p-8 lg:p-12 flex flex-col justify-center">
-                  <div className="flex items-center gap-2 text-wellness-600 mb-4">
+                <div className="p-8 lg:p-10 flex flex-col justify-center">
+                  <div className="flex items-center gap-2 mb-4">
                     <div className="flex">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={16} fill={i < Math.floor(topMatch.rating) ? "currentColor" : "none"} className={i < Math.floor(topMatch.rating) ? "text-wellness-600" : "text-slate-200"} />
+                        <Star 
+                          key={i} 
+                          size={16} 
+                          fill={i < Math.floor(topMatch.rating) ? "currentColor" : "none"} 
+                          className={i < Math.floor(topMatch.rating) ? "text-amber-400" : "text-slate-200"} 
+                        />
                       ))}
                     </div>
                     <span className="text-sm font-bold text-slate-400">({topMatch.reviewCount} reviews)</span>
                   </div>
-                  <h1 className="text-3xl lg:text-4xl font-black text-slate-900 mb-2 tracking-tight leading-tight">
+                  <h2 className="text-3xl lg:text-4xl font-black text-slate-900 mb-2 tracking-tight leading-tight">
                     {topMatch.name}
-                  </h1>
+                  </h2>
                   <div className="flex items-center gap-2 text-slate-500 font-bold mb-6">
                     <MapPin size={16} className="text-wellness-600" />
                     <span>{topMatch.city}{topMatch.state ? `, ${topMatch.state}` : ''} · {formatDistance(topMatch)}</span>
@@ -331,8 +346,9 @@ function ResultsContent() {
                       href={topMatch.website || '#'} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="flex-1 bg-wellness-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-wellness-700 transition-all text-center shadow-lg shadow-wellness-200"
+                      className="flex-1 bg-wellness-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-wellness-700 transition-all text-center shadow-lg shadow-wellness-200 flex items-center justify-center gap-2"
                     >
+                      <Calendar size={18} />
                       Book Appointment
                     </a>
                     <Link 
@@ -344,7 +360,7 @@ function ResultsContent() {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </section>
 
           {/* SECTION 2 — "OTHER STRONG OPTIONS" */}

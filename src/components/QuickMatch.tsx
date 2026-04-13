@@ -234,20 +234,6 @@ export function QuickMatch() {
           <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
         </button>
       </div>
-
-      {/* Quick Suggestions */}
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Popular:</span>
-        {['New York', 'Los Angeles', 'Miami', 'Las Vegas'].map((city) => (
-          <button 
-            key={city}
-            onClick={() => setLocation(city)}
-            className="text-xs font-bold text-slate-500 hover:text-wellness-600 transition-colors"
-          >
-            {city}
-          </button>
-        ))}
-      </div>
     </div>
   );
 }
