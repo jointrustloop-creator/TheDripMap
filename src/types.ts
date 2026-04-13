@@ -77,6 +77,7 @@ export interface BlogPost {
   title: string;
   metaTitle: string;
   metaDescription: string;
+  excerpt?: string;
   category: 'Educational' | 'Local' | 'Use-Case';
   content: string;
   date: string;
