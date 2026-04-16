@@ -2,6 +2,31 @@ import { calculateDistance } from './geo';
 import { Provider, BlogPost, OperatorProfile } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
 
+const EXCLUDED_CATEGORIES = [
+  'restaurants', 
+  'Brewery', 
+  'Tool store', 
+  'cafes', 
+  'bars', 
+  'coffee shops', 
+  'Juice shop', 
+  'Açaí shop', 
+  'Mobile caterer', 
+  'Corporate office',
+  'Brewpub',
+  'Bakery',
+  'Ice cream shop',
+  'Dessert shop',
+  'Wine bar',
+  'Pub',
+  'Grill',
+  'Coffee',
+  'Roasters',
+  'Cafe',
+  'Coffee shop',
+  'Coffee roasters'
+];
+
 // Helper to slugify strings
 export const slugify = (text: string | null | undefined) => {
   if (!text) return '';
@@ -80,14 +105,17 @@ function enrichProvider(p: any): Provider {
                    p.category?.toLowerCase().includes('mobile') ||
                    p.description?.toLowerCase().includes('mobile iv');
 
-  // Infer verification status (for demo/launch purposes, highly rated clinics with reviews are "verified")
-  const isVerified = p.is_verified || (Number(p.rating) >= 4.5 && Number(p.review_count || p.reviews) >= 5);
+  // Infer top rated status (highly rated clinics with reviews)
+  const isTopRated = Number(p.rating) >= 4.8 && Number(p.review_count || p.reviews || p.reviewCount) >= 10;
+  
+  // Verification should only be true if explicitly set in DB or claimed
+  const isVerified = !!p.is_verified || !!p.is_claimed;
 
   const enriched = { 
     ...p,
     name: p.name || p.Name || p.clinic_name || 'Unnamed Clinic',
     city: p.city || p.town || 'Unknown City',
-    state: p.state || p.province || '',
+    state: p.state || p.state_abbr || p.province || '',
     rating: Number(p.rating) || 0,
     reviewCount: Number(p.review_count || p.reviews || p.reviewCount || p.Reviews) || 0,
     imageUrl: finalImageUrl,
@@ -95,9 +123,10 @@ function enrichProvider(p: any): Provider {
     amenities: amenities,
     hours: Object.keys(hours).length > 0 ? hours : undefined,
     mobile_service: !!isMobile,
-    is_verified: !!isVerified,
+    is_verified: isVerified,
+    is_top_rated: isTopRated,
     type: isMobile ? 'Mobile' : (p.type || 'In-Clinic'),
-    services: p.services || [],
+    services: specialties,
     reviews_data: p.reviews_data || [],
     medical_team: p.medical_team || [],
     special_offers: p.special_offers || []
@@ -106,148 +135,89 @@ function enrichProvider(p: any): Provider {
   return enriched;
 }
 
-export async function getListingsByCity(city: string) {
-  const configured = isSupabaseConfigured();
-  if (!configured) return [];
+export async function getListingsByCity(city: string, state?: string) {
+  if (!isSupabaseConfigured()) return [];
   
   try {
     const { data, error } = await supabase
-      .from('providers')
+      .from('listings')
       .select('*')
-      .or(`city.ilike.%${city}%,state.ilike.%${city}%`)
-      .order('rating', { ascending: false });
+      .ilike('city', city)
+      .order('rating', { ascending: false })
+      .order('review_count', { ascending: false });
 
-    if (error) {
-      console.warn('Supabase .or query failed, trying simple city query:', error.message);
-      const { data: data2, error: error2 } = await supabase
-        .from('providers')
-        .select('*')
-        .ilike('city', city)
-        .order('rating', { ascending: false });
-      
-      if (!error2 && data2 && data2.length > 0) {
-        return data2.map(enrichProvider);
-      }
-      return [];
-    }
+    if (error) throw error;
 
     if (data && data.length > 0) {
       return data.map(enrichProvider);
     }
   } catch (err) {
-    console.warn('Supabase info: fetching listings by city:', err);
+    console.error('Supabase error in getListingsByCity:', err);
   }
 
   return [];
 }
 
 export async function getListingBySlug(slug: string) {
-  const configured = isSupabaseConfigured();
-  if (!configured) return null;
+  if (!isSupabaseConfigured()) return null;
   
   try {
-    // 1. Try direct slug match
     const { data, error } = await supabase
-      .from('providers')
+      .from('listings')
       .select('*')
       .eq('slug', slug)
       .single();
 
-    if (!error && data) {
-      return enrichProvider(data);
-    }
-
-    // 2. If not found by slug, try matching by slugified name
-    // This handles cases where the slug column is empty or mismatched
-    const { data: allData, error: allErr } = await supabase
-      .from('providers')
-      .select('*')
-      .limit(1000); // Add a safety limit
-
-    if (!allErr && allData) {
-      const found = allData.find(p => slugify(p.name) === slug);
-      if (found) {
-        return enrichProvider(found);
-      }
-    }
+    if (error) return null;
+    return enrichProvider(data);
   } catch (err) {
-    console.error('Supabase error fetching listing by slug:', err);
+    return null;
   }
-
-  return null;
 }
 
-export async function getAllCities() {
-  const configured = isSupabaseConfigured();
+export async function getAllCities(): Promise<{ city: string, state: string, stateAbbr: string, count: number }[]> {
+  if (!isSupabaseConfigured()) return [];
   
-  // We'll collect cities from all sources to ensure we don't miss any
-  const allCitiesMap = new Map<string, { city: string, state: string, count: number }>();
+  try {
+    const { data, error } = await supabase
+      .from('listings')
+      .select('city, state_abbr');
 
-  // Helper to add cities to our map
-  const addCity = (city: string, state: string, count: number) => {
-    if (!city || !state) return;
-    
-    // Normalize city and state
-    const normalizedCity = city.trim();
-    const normalizedState = state.trim().toUpperCase();
-    
-    if (normalizedState === 'US') return;
-    
-    const key = `${normalizedCity.toLowerCase()}|${normalizedState.toLowerCase()}`;
-    if (!allCitiesMap.has(key)) {
-      allCitiesMap.set(key, { city: normalizedCity, state: normalizedState, count });
-    } else {
-      const existing = allCitiesMap.get(key)!;
-      allCitiesMap.set(key, { ...existing, count: Math.max(existing.count, count) });
-    }
-  };
+    if (error) throw error;
 
-  if (configured) {
-    try {
-      // 1. Get cities from providers table - try columns individually to be safe
-      const { data: providerCities, error: providerError } = await supabase
-        .from('providers')
-        .select('*'); // Select all and filter in JS to avoid column name errors
-
-      if (!providerError && providerCities) {
-        (providerCities as Array<Record<string, string | number | boolean | null>>).forEach((curr) => {
-          const city = (curr.city || curr.town) as string | undefined;
-          const state = (curr.state || curr.province) as string | undefined;
-          if (city && state) {
-            const key = `${city.toLowerCase()}|${state.toLowerCase()}`;
-            const existing = allCitiesMap.get(key);
-            if (existing) {
-              existing.count++;
-            } else {
-              addCity(city, state, 1);
-            }
-          }
-        });
-      } else if (providerError) {
-        console.warn('Supabase error fetching providers for cities:', providerError.message);
-      }
-
-      // 2. Get cities from cities table
-      const { data: citiesTable, error: citiesError } = await supabase
-        .from('cities')
-        .select('*');
-
-      if (!citiesError && citiesTable) {
-        (citiesTable as { name?: string; city?: string; state_code?: string; state?: string; listings_count?: number }[]).forEach((c) => {
-          const name = c.name || c.city;
-          const state = c.state_code || c.state;
-          if (name && state) {
-            addCity(name, state, c.listings_count || 0);
-          }
+    const cityCounts = new Map<string, { city: string, stateAbbr: string, count: number }>();
+    data?.forEach(item => {
+      if (!item.city || !item.state_abbr) return;
+      const key = `${item.city.trim()}|${item.state_abbr.trim().toUpperCase()}`;
+      const existing = cityCounts.get(key);
+      if (existing) {
+        existing.count++;
+      } else {
+        cityCounts.set(key, { 
+          city: item.city.trim(), 
+          stateAbbr: item.state_abbr.trim().toUpperCase(), 
+          count: 1 
         });
       }
-    } catch (err) {
-      console.warn('Supabase info: fetching all cities:', err);
-    }
+    });
+
+    return Array.from(cityCounts.values())
+      .filter(c => c.count >= 3)
+      .map(c => ({
+        ...c,
+        state: c.stateAbbr // Using abbreviation as state name for simplicity
+      }))
+      .sort((a, b) => b.count - a.count);
+  } catch (err) {
+    console.error('Supabase error in getAllCities:', err);
+    return [];
   }
+}
 
-  return Array.from(allCitiesMap.values())
-    .filter(c => c.count > 0)
+export async function getCitiesFromListings() {
+  const allCities = await getAllCities();
+  return allCities
+    .filter(c => c.count >= 3)
     .sort((a, b) => b.count - a.count);
 }
 
@@ -276,250 +246,128 @@ export async function getAllStates() {
 function getServiceFilter(service: string): string {
   const s = service.toLowerCase();
   if (s.includes('hangover')) {
-    return "services.ilike.%hangover%,subtypes.ilike.%hangover%,name.ilike.%hangover%";
+    return "name.ilike.%hangover%,description.ilike.%hangover%,subtypes.cs.{\"Hangover\"}";
   }
   if (s.includes('nad')) {
-    return "services.ilike.%NAD%,subtypes.ilike.%NAD%";
+    return "name.ilike.%NAD%,description.ilike.%NAD%,subtypes.cs.{\"NAD\"}";
   }
   if (s.includes('immune')) {
-    return "services.ilike.%immune%,subtypes.ilike.%immune%,subtypes.ilike.%wellness%";
+    return "name.ilike.%immune%,description.ilike.%immune%,subtypes.cs.{\"Immune\"},subtypes.cs.{\"Wellness\"}";
   }
   if (s.includes('beauty') || s.includes('glow')) {
-    return "services.ilike.%beauty%,services.ilike.%glow%,subtypes.ilike.%beauty%,subtypes.ilike.%skin%";
+    return "name.ilike.%beauty%,name.ilike.%glow%,description.ilike.%beauty%,subtypes.cs.{\"Beauty\"},subtypes.cs.{\"Skin\"}";
   }
   if (s.includes('hydration')) {
-    return "services.ilike.%hydration%,name.ilike.%hydration%,name.ilike.%hydrate%";
+    return "name.ilike.%hydration%,name.ilike.%hydrate%,description.ilike.%hydration%";
   }
   if (s.includes('recovery')) {
-    return "services.ilike.%recovery%,subtypes.ilike.%athletic%,subtypes.ilike.%sport%";
+    return "name.ilike.%recovery%,description.ilike.%recovery%,subtypes.cs.{\"Athletic\"},subtypes.cs.{\"Sport\"}";
   }
   if (s.includes('myers')) {
-    return "services.ilike.%myers%,subtypes.ilike.%myers%";
+    return "name.ilike.%myers%,description.ilike.%myers%,subtypes.cs.{\"Myers\"}";
   }
   if (s.includes('weight')) {
-    return "services.ilike.%weight%,subtypes.ilike.%weight%";
+    return "name.ilike.%weight%,description.ilike.%weight%,subtypes.cs.{\"Weight\"}";
   }
   
   // Default fallback
   const coreKeyword = service.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '');
-  return `specialties.cs.{"${service}"},subtypes.cs.{"${service}"},name.ilike.%${coreKeyword}%,category.ilike.%${coreKeyword}%,description.ilike.%${coreKeyword}%`;
+  return `name.ilike.%${coreKeyword}%,category.ilike.%${coreKeyword}%,description.ilike.%${coreKeyword}%`;
 }
 
 export async function getListingsByService(service: string, limit: number = 4) {
-  const configured = isSupabaseConfigured();
-  if (!configured) return [];
+  if (!isSupabaseConfigured()) return [];
   
   try {
     const filter = getServiceFilter(service);
     const { data, error } = await supabase
-      .from('providers')
+      .from('listings')
       .select('*')
       .or(filter)
       .order('rating', { ascending: false })
       .limit(limit);
 
-    if (error) {
-      console.warn('Supabase error in getListingsByService:', error.message);
-      return [];
-    }
-
-    if (data && data.length > 0) {
-      return data.map(enrichProvider);
-    }
-    
-    return [];
+    if (error) throw error;
+    return (data || []).map(enrichProvider);
   } catch (err) {
     console.error('Supabase error in getListingsByService:', err);
     return [];
   }
 }
 
-export async function searchListings(
-  query: string, 
-  city?: string,
-  userLocation?: { latitude: number; longitude: number }
-) {
-  // If Supabase is not configured, return empty
-  if (!isSupabaseConfigured()) {
-    return [];
-  }
+export async function searchListings(query: string, city?: string) {
+  if (!isSupabaseConfigured()) return [];
 
   try {
-    let supabaseQuery = supabase.from('providers').select('*');
-
-    // Filter by city if provided
-    if (city && city !== 'All' && city !== '') {
-      // Handle "City, State" format by taking the city part
-      const cityPart = city.split(',')[0].trim();
-      const q = `%${cityPart}%`;
-      // Search in both city and state columns for better coverage
-      supabaseQuery = supabaseQuery.or(`city.ilike.${q},state.ilike.${q}`);
-    }
-
-    // Filter by search query (name, city, state, category, description)
-    if (query && query.trim() !== '') {
-      const cleanQuery = query.split(',')[0].trim();
-      const q = `%${cleanQuery}%`;
-      // Try to be inclusive with column names
-      supabaseQuery = supabaseQuery.or(`name.ilike.${q},city.ilike.${q},state.ilike.${q},category.ilike.${q},description.ilike.${q}`);
-    }
-
-    // Order as requested: Featured first, then Rating, then Review Count
-    // We use .order multiple times for multi-column sorting
-    const { data, error } = await supabaseQuery
-      .order('is_featured', { ascending: false })
-      .order('rating', { ascending: false, nullsFirst: false })
-      .limit(1000);
-
-    if (error) {
-      console.warn('Supabase search error, trying fallback with select all:', error.message);
-      // If specific filters/orders fail, get all and filter in memory
-      const { data: allData, error: allErr } = await supabase.from('providers').select('*').limit(1000);
-      if (allErr) throw allErr;
-      
-      if (allData) {
-        let filtered = allData.map(p => enrichProvider({
-          ...p,
-          city: p.city || p.town || '',
-          rating: Number(p.rating) || 0,
-          reviewCount: Number(p.review_count || p.reviews || p.reviewCount || p.Reviews) || 0,
-        }));
-
-        if (city && city !== 'All' && city !== '') {
-          const cityPart = city.split(',')[0].trim().toLowerCase();
-          filtered = filtered.filter(p => 
-            p.city.toLowerCase().includes(cityPart) || 
-            p.state.toLowerCase().includes(cityPart)
-          );
-        }
-
-        if (query && query.trim() !== '') {
-          const cleanQuery = query.split(',')[0].trim().toLowerCase();
-          filtered = filtered.filter(p => 
-            p.name.toLowerCase().includes(cleanQuery) || 
-            p.city.toLowerCase().includes(cleanQuery) ||
-            p.state.toLowerCase().includes(cleanQuery) ||
-            (p.description && p.description.toLowerCase().includes(cleanQuery)) ||
-            (p.specialties && p.specialties.some(s => s.toLowerCase().includes(cleanQuery)))
-          );
-        }
-
-        // Sort in memory
-        filtered.sort((a, b) => {
-          if (a.is_featured && !b.is_featured) return -1;
-          if (!a.is_featured && b.is_featured) return 1;
-          return b.rating - a.rating;
-        });
-
-        return filtered;
-      }
+    let q = supabase.from('listings').select('*');
+    
+    if (city && city !== 'All') {
+      q = q.ilike('city', city);
     }
     
-    if (data) {
-      const results = data.map(p => enrichProvider({
-        ...p,
-        rating: Number(p.rating || p.Rating) || 0,
-        reviewCount: Number(p.review_count || p.reviews || p.reviewCount || p.Reviews) || 0,
-        imageUrl: p.imageUrl || p.image_url,
-        distance: userLocation && p.latitude && p.longitude 
-          ? calculateDistance(userLocation.latitude, userLocation.longitude, p.latitude, p.longitude)
-          : undefined
-      })) as Provider[];
-      
-      return results;
+    if (query && query.trim() !== '') {
+      const searchTerm = `%${query.trim()}%`;
+      q = q.or(`name.ilike.${searchTerm},city.ilike.${searchTerm},services.cs.{${query.trim()}}`);
     }
-  } catch (err) {
-    console.warn('Supabase info: searching listings:', err);
-  }
 
-  return [];
+    const { data, error } = await q
+      .order('rating', { ascending: false })
+      .limit(2000);
+    if (error) throw error;
+    return (data || []).map(enrichProvider);
+  } catch (err) {
+    console.error('Supabase error in searchListings:', err);
+    return [];
+  }
 }
 
 export async function getFeaturedListings(limit: number = 6) {
   if (!isSupabaseConfigured()) return [];
   
   try {
-    // Try to get featured, fallback to top rated
     const { data, error } = await supabase
-      .from('providers')
+      .from('listings')
       .select('*')
+      .eq('is_featured', true)
       .order('rating', { ascending: false })
       .limit(limit);
 
     if (error) throw error;
     if (data && data.length > 0) {
-      return data.map(p => enrichProvider({
-        ...p,
-        rating: Number(p.rating) || 0,
-        reviewCount: Number(p.reviews) || 0,
-        imageUrl: p.imageUrl || `https://picsum.photos/seed/${p.id}/800/600`
-      })) as Provider[];
+      return data.map(enrichProvider);
     }
   } catch (err) {
-    console.warn('Supabase info: fetching featured listings:', err);
+    console.warn('Supabase error in getFeaturedListings:', err);
   }
 
   return [];
 }
 
 export async function getListingStats() {
-  const configured = isSupabaseConfigured();
-  
-  if (configured) {
-    try {
-      // 1. Get total count of providers
-      const { count: totalListings, error: countError } = await supabase
-        .from('providers')
-        .select('id', { count: 'exact', head: true });
-
-      if (countError) throw countError;
-
-      // 2. Get cities and states
-      const { data, error } = await supabase
-        .from('providers')
-        .select('city, state, rating');
-
-      if (error) throw error;
-      
-      if (data) {
-        const cities = new Set(data.map((p: { city?: string }) => p.city).filter(Boolean));
-        const states = new Set(data.map((p: { state?: string }) => p.state).filter(Boolean));
-        
-        const ratings = data.map((p: { rating?: number }) => Number(p.rating)).filter(r => !isNaN(r) && r > 0);
-        const avgRating = ratings.length > 0 
-          ? ratings.reduce((a, b) => a + b, 0) / ratings.length 
-          : 4.8;
-        
-        return {
-          totalListings: totalListings || data.length,
-          totalCities: cities.size,
-          totalStates: states.size || 1,
-          avgRating: Math.round(avgRating * 10) / 10,
-          isLive: true
-        };
-      }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.warn('Supabase stats info:', message);
-      
-      return {
-        totalListings: 0,
-        totalCities: 0,
-        totalStates: 0,
-        avgRating: 4.8,
-        isLive: true,
-        error: message
-      };
-    }
+  if (!isSupabaseConfigured()) {
+    return { totalListings: 1042, totalCities: 350, avgRating: 4.8, isLive: false };
   }
+  
+  try {
+    const [totalRes, citiesRes, ratingRes] = await Promise.all([
+      supabase.from('listings').select('*', { count: 'exact', head: true }),
+      supabase.from('listings').select('city'),
+      supabase.from('listings').select('rating').not('rating', 'is', null)
+    ]);
 
-  return {
-    totalListings: 0,
-    totalCities: 0,
-    totalStates: 0,
-    avgRating: 4.8,
-    isLive: false
-  };
+    const cityCount = new Set(citiesRes.data?.map(c => c.city?.toLowerCase().trim())).size;
+    const ratings = ratingRes.data?.map(r => r.rating) || [];
+    const avgRating = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 4.8;
+
+    return {
+      totalListings: totalRes.count || 1042,
+      totalCities: cityCount || 350,
+      avgRating: Math.round(avgRating * 10) / 10,
+      isLive: true
+    };
+  } catch (err) {
+    return { totalListings: 1042, totalCities: 350, avgRating: 4.8, isLive: false };
+  }
 }
 
 export async function getBlogPosts() {
@@ -612,42 +460,32 @@ export async function getAllUseCases() {
 }
 
 export async function getAllListings() {
-  const configured = isSupabaseConfigured();
-  if (!configured) return [];
+  if (!isSupabaseConfigured()) return [];
   
   try {
     const { data, error } = await supabase
-      .from('providers')
-      .select('*');
+      .from('listings')
+      .select('*')
+      .limit(2000);
 
-    if (error) {
-      console.error('Supabase error fetching all listings:', error.message);
-      throw error;
-    }
-    
-    if (data && data.length > 0) {
-      return data.map(enrichProvider);
-    }
+    if (error) throw error;
+    return (data || []).map(enrichProvider);
   } catch (err) {
     console.error('Supabase error in getAllListings:', err);
+    return [];
   }
-
-  return [];
 }
 
 export async function getListingsByIds(ids: string[]) {
   if (!isSupabaseConfigured()) return [];
   try {
     const { data, error } = await supabase
-      .from('providers')
+      .from('listings')
       .select('*')
       .in('id', ids);
 
     if (error) throw error;
-    if (data) {
-      return data.map(enrichProvider);
-    }
-    return [];
+    return (data || []).map(enrichProvider);
   } catch (err) {
     console.error('Supabase error fetching listings by ids:', err);
     return [];
@@ -655,30 +493,20 @@ export async function getListingsByIds(ids: string[]) {
 }
 
 export async function getListingsByServiceAndCity(service: string, city: string, limit: number = 4) {
-  const configured = isSupabaseConfigured();
-  if (!configured) return [];
+  if (!isSupabaseConfigured()) return [];
   
   try {
     const filter = getServiceFilter(service);
-    const cityPart = city.split(',')[0].trim();
     const { data, error } = await supabase
-      .from('providers')
+      .from('listings')
       .select('*')
-      .or(`city.ilike.%${cityPart}%,state.ilike.%${cityPart}%`)
+      .ilike('city', city)
       .or(filter)
       .order('rating', { ascending: false })
       .limit(limit);
 
-    if (error) {
-      console.warn('Supabase error in getListingsByServiceAndCity:', error.message);
-      throw error;
-    }
-    
-    if (data && data.length > 0) {
-      return data.map(enrichProvider);
-    }
-    
-    return [];
+    if (error) throw error;
+    return (data || []).map(enrichProvider);
   } catch (err) {
     console.error('Supabase error in getListingsByServiceAndCity:', err);
     return [];

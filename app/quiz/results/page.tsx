@@ -9,7 +9,6 @@ import {
   Star,
   ChevronDown,
   ChevronUp,
-  Info,
   Calendar
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -17,8 +16,7 @@ import { matchProviders } from '../../../src/lib/matching';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { SurveyState, OperatorProfile, Provider, City, TreatmentType } from '../../../src/types';
-import { getOperatorProfiles, getAllListings } from '../../../src/lib/data';
-import { cn } from '../../../src/lib/utils';
+import { getOperatorProfiles, getAllListings, getListingsByCity } from '../../../src/lib/data';
 import { ClinicImage } from '../../../src/components/ClinicImage';
 
 export default function ResultsPage() {
@@ -36,6 +34,17 @@ export default function ResultsPage() {
   );
 }
 
+const GOALS = [
+  { id: 'hangover', label: 'Hangover Recovery' },
+  { id: 'nad-plus', label: 'Energy & NAD+' },
+  { id: 'immune-support', label: 'Immune Support' },
+  { id: 'beauty-glow', label: 'Beauty & Glow' },
+  { id: 'weight-loss', label: 'Weight Loss' },
+  { id: 'hydration', label: 'Rapid Hydration' },
+  { id: 'recovery', label: 'Athletic Recovery' },
+  { id: 'myers-cocktail', label: 'Myers Cocktail' },
+];
+
 function ResultsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -48,13 +57,17 @@ function ResultsContent() {
     async function loadData() {
       setIsLoading(true);
       try {
-        const [profiles, allListings] = await Promise.allSettled([
+        const city = searchParams.get('city');
+        const state = searchParams.get('state');
+        
+        // Step 1: Fetch by location
+        const [profiles, locationListings] = await Promise.allSettled([
           getOperatorProfiles(),
-          getAllListings()
+          city ? getListingsByCity(city, state || undefined) : getAllListings()
         ]);
 
         if (profiles.status === 'fulfilled') setOperatorProfiles(profiles.value);
-        if (allListings.status === 'fulfilled') setListings(allListings.value);
+        if (locationListings.status === 'fulfilled') setListings(locationListings.value);
       } catch (err) {
         console.error('Error loading results data:', err);
       } finally {
@@ -62,7 +75,7 @@ function ResultsContent() {
       }
     }
     loadData();
-  }, []);
+  }, [searchParams]);
 
   const surveyData: SurveyState = useMemo(() => ({
     goal: searchParams.get('goal') || undefined,
@@ -73,6 +86,8 @@ function ResultsContent() {
     country: searchParams.get('country') || undefined,
     locationPreference: (searchParams.get('type') as TreatmentType) || undefined,
     urgency: (searchParams.get('urgency') as 'ASAP' | 'Today' | 'This Week') || undefined,
+    budget: searchParams.get('budget') || undefined,
+    symptoms: searchParams.get('symptoms')?.split(',') || undefined,
   }), [searchParams]);
 
   const userLocation = useMemo(() => {
@@ -84,12 +99,16 @@ function ResultsContent() {
 
   const scoredProviders = useMemo(() => {
     if (listings.length === 0) return [];
+    // Step 2: Score and Sort
     return matchProviders(surveyData, listings, operatorProfiles, userLocation);
   }, [surveyData, operatorProfiles, listings, userLocation]);
 
-  // Step 5: Empty State - zero results within 100 miles
-  const resultsWithin100 = scoredProviders.filter(p => p.distance === undefined || p.distance <= 100);
+  // Step 3: Display
+  const topMatch = scoredProviders[0];
+  const otherMatches = scoredProviders.slice(1, 3);
+  const moreMatches = scoredProviders.slice(3, 10);
   
+  // Empty State - zero results
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#FDFDFB] flex items-center justify-center">
@@ -102,7 +121,7 @@ function ResultsContent() {
     );
   }
 
-  if (scoredProviders.length === 0 || resultsWithin100.length === 0) {
+  if (scoredProviders.length === 0) {
     return (
       <div className="min-h-screen bg-[#FDFDFB]">
         <Navbar />
@@ -111,10 +130,10 @@ function ResultsContent() {
             <MapPin size={40} />
           </div>
           <h1 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">
-            No IV therapy clinics found near {surveyData.city || 'you'} yet.
+            No IV therapy clinics found in {surveyData.city || 'your area'} yet.
           </h1>
           <p className="text-lg text-slate-500 mb-12 max-w-lg mx-auto">
-            Browse our national directory or take the quiz again with a wider area.
+            Browse our national directory or take the quiz again with a different location.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link 
@@ -136,20 +155,6 @@ function ResultsContent() {
     );
   }
 
-  const topMatch = scoredProviders[0];
-  const otherMatches = scoredProviders.slice(1, 3);
-  const moreMatches = scoredProviders.slice(3, 10);
-  
-  // Step 3 Section 4: Fallback (conditional)
-  // Only show if zero results in the matched city AND fewer than 3 results within 50 miles
-  const resultsInCity = scoredProviders.filter(p => 
-    surveyData.city && p.city.toLowerCase() === surveyData.city.toLowerCase()
-  );
-  const resultsWithin50 = scoredProviders.filter(p => p.distance !== undefined && p.distance <= 50);
-  
-  const showFallback = resultsInCity.length === 0 && resultsWithin50.length < 3;
-  const fallbackResults = showFallback ? scoredProviders.slice(0, 3) : [];
-
   const getMatchReason = (provider: Provider) => {
     const goal = surveyData.goal || '';
     const city = surveyData.city || '';
@@ -158,9 +163,35 @@ function ResultsContent() {
     
     const clauses: string[] = [];
     
-    // 1. Specialty Match
-    if (goal && provider.specialties?.some(s => s.toLowerCase().includes(goal.toLowerCase()))) {
-      clauses.push(`specializes in ${goal}`);
+    // 1. Goal/Keyword Match
+    if (goal) {
+      const goalLower = goal.toLowerCase();
+      const goalKeywords: Record<string, string[]> = {
+        'hangover': ['hangover', 'hydration', 'recovery'],
+        'nad-plus': ['nad', 'energy', 'anti-aging'],
+        'immune-support': ['immune', 'wellness', 'immunity'],
+        'beauty-glow': ['beauty', 'glow', 'skin'],
+        'weight-loss': ['weight', 'metabolism', 'fat'],
+        'hydration': ['hydration', 'fluids'],
+        'recovery': ['recovery', 'athletic', 'sport'],
+        'myers-cocktail': ['myers', 'cocktail']
+      };
+      
+      const keywords = goalKeywords[goalLower] || [goalLower];
+      const pSpecialties = (provider.specialties || []).map(s => s.toLowerCase());
+      const pSubtypes = (provider.subtypes || []).map(s => s.toLowerCase());
+      const pName = provider.name.toLowerCase();
+      
+      const hasKeyword = keywords.some(kw => 
+        pSpecialties.some(s => s.includes(kw)) || 
+        pSubtypes.some(s => s.includes(kw)) ||
+        pName.includes(kw)
+      );
+
+      if (hasKeyword) {
+        const goalLabel = GOALS.find(g => g.id === goalLower)?.label || goal;
+        clauses.push(`offers specialized treatments for ${goalLabel}`);
+      }
     }
     
     // 2. City Match
@@ -299,6 +330,12 @@ function ResultsContent() {
                     )}
                     {(topMatch.type === 'Mobile' || operatorProfiles.find(op => op.clinicId === topMatch.id)?.profile_data?.mobileService) && (
                       <span className="bg-wellness-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg">Mobile IV</span>
+                    )}
+                    {topMatch.is_top_rated && (
+                      <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg">⭐ Top Rated</span>
+                    )}
+                    {topMatch.is_verified && (
+                      <span className="bg-[#10B981] text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg">✓ Verified</span>
                     )}
                   </div>
                 </div>
@@ -482,65 +519,6 @@ function ResultsContent() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </section>
-          )}
-
-          {/* SECTION 4 — FALLBACK (conditional) */}
-          {showFallback && (
-            <section className="space-y-8">
-              <div className="bg-amber-50 border border-amber-100 rounded-3xl p-8 text-center">
-                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-600">
-                  <Info size={24} />
-                </div>
-                <h3 className="text-xl font-black text-slate-900 mb-2">
-                  We found 0 clinics near {surveyData.city || 'you'}.
-                </h3>
-                <p className="text-slate-600 font-medium">
-                  Here are top-rated options further away:
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {fallbackResults.map((provider) => (
-                  <div key={provider.id} className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-lg flex flex-col">
-                    <div className="relative h-40">
-                      <ClinicImage 
-                        name={provider.name}
-                        imageUrl={provider.imageUrl}
-                      />
-                      <div className="absolute top-3 left-3">
-                        <span className="bg-black/60 backdrop-blur-md text-white px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">
-                          {formatDistance(provider)}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="p-4 flex-1 flex flex-col">
-                      <div className="flex items-center gap-1 text-wellness-600 mb-1">
-                        <Star size={10} fill="currentColor" />
-                        <span className="text-[10px] font-bold">{provider.rating}</span>
-                        <span className="text-[8px] text-slate-400 font-bold ml-1">({provider.reviewCount})</span>
-                      </div>
-                      <h4 className="font-bold text-slate-900 text-sm mb-1 line-clamp-1">{provider.name}</h4>
-                      <p className="text-[10px] text-slate-500 font-bold mb-3">{provider.city}{provider.state ? `, ${provider.state}` : ''}</p>
-                      
-                      <div className="flex flex-wrap gap-1 mb-4">
-                        {provider.specialties.slice(0, 2).map(s => (
-                          <span key={s} className="bg-slate-50 text-slate-500 px-1.5 py-0.5 rounded text-[8px] font-bold border border-slate-100">
-                            {s}
-                          </span>
-                        ))}
-                      </div>
-
-                      <Link 
-                        href={`/provider/${provider.slug || provider.id}`}
-                        className="mt-auto w-full bg-slate-50 text-slate-900 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-slate-100 transition-all text-center"
-                      >
-                        View Profile
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </section>
           )}
         </div>

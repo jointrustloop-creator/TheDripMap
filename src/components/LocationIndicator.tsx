@@ -103,14 +103,14 @@ export const LocationIndicator = () => {
       }
 
       try {
-        const res = await fetch('https://ipapi.co/json/');
+        const res = await fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?localityLanguage=en');
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
-        if (data.city) {
+        if (data.city || data.locality) {
           const detected = {
-            city: data.city,
-            state: data.region_code,
-            country: data.country_name,
+            city: data.city || data.locality,
+            state: data.principalSubdivisionCode?.split('-')[1] || data.principalSubdivision || '',
+            country: data.countryName,
             latitude: data.latitude,
             longitude: data.longitude,
             isPrecise: false,

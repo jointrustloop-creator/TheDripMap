@@ -7,7 +7,11 @@ import {
   Zap, 
   CheckCircle2,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Star,
+  Users,
+  Truck,
+  ShieldCheck
 } from 'lucide-react';
 import { Navbar } from '../../../../src/components/Navbar';
 import { Footer } from '../../../../src/components/Footer';
@@ -43,7 +47,7 @@ export async function generateMetadata({ params, searchParams }: CityPageProps):
   const { state, city } = await params;
   const { service } = await searchParams;
   const cities = await getAllCities();
-  const cityInfo = cities.find(c => slugify(c.city) === city);
+  const cityInfo = cities.find(c => slugify(c.city) === city && slugify(c.state) === state);
   
   if (!cityInfo) return { title: 'City Not Found' };
 
@@ -89,7 +93,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
   const { service } = await searchParams;
   
   const cities = await getAllCities();
-  const cityInfo = cities.find(c => slugify(c.city) === city);
+  const cityInfo = cities.find(c => slugify(c.city) === city && slugify(c.state) === state);
   
   if (!cityInfo) notFound();
 
@@ -161,11 +165,11 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
     },
     {
       question: `What should I look for when choosing an IV therapy clinic in ${cityName}?`,
-      answer: `When selecting a provider in ${cityName}, prioritize clinics with licensed medical staff (RNs or NPs), positive verified reviews, and transparent pricing. Ensure they conduct a brief medical screening before your first treatment.`
+      answer: `When selecting a provider in ${cityName}, prioritize clinics with licensed medical staff (RNs or NPs), positive patient reviews, and transparent pricing. Ensure they conduct a brief medical screening before your first treatment.`
     },
     {
       question: `Is IV therapy safe in ${cityName}?`,
-      answer: `Yes, IV therapy is a safe and common wellness procedure in ${cityName} when performed by trained medical professionals. All clinics listed on TheDripMap are verified to follow standard medical protocols for intravenous administration.`
+      answer: `Yes, IV therapy is a safe and common wellness procedure in ${cityName} when performed by trained medical professionals. All clinics listed on TheDripMap follow standard medical protocols for intravenous administration.`
     }
   ];
 
@@ -239,6 +243,24 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
     ]
   };
 
+  // Calculate real stats for the city
+  const avgRating = listings.length > 0 
+    ? (listings.reduce((acc, l) => acc + (l.rating || 0), 0) / listings.length).toFixed(1)
+    : "4.8";
+  
+  const totalReviews = listings.reduce((acc, l) => acc + (l.reviewCount || 0), 0);
+  
+  const mobileProviders = listings.filter(l => 
+    l.mobile_service === true || 
+    l.type === 'Mobile' || 
+    l.type === 'Both'
+  ).length;
+  
+  const priceMap: Record<string, number> = { '$': 149, '$$': 199, '$$$': 249, '$$$$': 299 };
+  const avgPrice = listings.length > 0
+    ? Math.round(listings.reduce((acc, l) => acc + (priceMap[l.priceRange || l.price_range || '$$'] || 199), 0) / listings.length)
+    : 175;
+
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
@@ -274,7 +296,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 bg-wellness-50 text-wellness-700 px-4 py-1.5 rounded-full text-sm font-bold mb-6 border border-wellness-100">
               <MapPin size={16} />
-              <span>Verified Providers in {cityName}</span>
+              <span>Top Rated Providers in {cityName}</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
               Best {service ? <span className="text-wellness-600">{service} </span> : ''}IV Therapy in <span className="text-wellness-600">{cityName}, {stateName}</span>
@@ -290,7 +312,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
               </div>
               <div className="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm">
                 <CheckCircle2 size={18} className="text-wellness-600" />
-                <span className="text-sm font-bold text-slate-700">Verified Reviews</span>
+                <span className="text-sm font-bold text-slate-700">Patient Reviews</span>
               </div>
               <div className="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm">
                 <CheckCircle2 size={18} className="text-wellness-600" />
@@ -353,33 +375,48 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
           </div>
 
           {/* What to Expect Section */}
-          <div className="bg-slate-50 rounded-[3rem] p-10 md:p-16 border border-slate-100">
-            <h3 className="text-3xl font-black text-slate-900 mb-6 tracking-tight">What to Expect from Your Session in {cityName}</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              <div className="text-lg text-slate-600 leading-relaxed">
-                <p>
-                  When you book an IV therapy session in {cityName}, you can expect a professional and streamlined experience. Most sessions begin with a brief medical consultation to ensure the chosen treatment is safe and appropriate for you. The actual infusion typically takes between 45 to 60 minutes, during which you can relax, work, or even catch up on your favorite show.
-                </p>
-                <p className="mt-4">
-                  Price ranges in {cityName} are competitive, with standard wellness drips starting around $150 and more complex formulas reaching up to $350. Mobile IV therapy is particularly popular in {cityName}, offering a convenient alternative for those with busy schedules or those who prefer the comfort of their own home. Licensed medical professionals, typically Registered Nurses or Nurse Practitioners, oversee every administration to ensure the highest level of care.
-                </p>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                  <div className="text-wellness-600 font-black text-2xl mb-1">$150+</div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Avg. Starting Price</div>
+          <div className="bg-slate-900 rounded-[3rem] p-10 md:p-16 text-white overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-wellness-500/10 rounded-full -mr-32 -mt-32 blur-3xl" />
+            <div className="relative z-10">
+              <h3 className="text-3xl font-black mb-10 tracking-tight">What to Expect from Your Session in {cityName}</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                <div className="text-lg text-slate-300 leading-relaxed space-y-6">
+                  <p>
+                    When you book an IV therapy session in {cityName}, you can expect a professional and streamlined experience. Most sessions begin with a brief medical consultation to ensure the chosen treatment is safe and appropriate for you. The actual infusion typically takes between 45 to 60 minutes, during which you can relax, work, or even catch up on your favorite show.
+                  </p>
+                  <p>
+                    Price ranges in {cityName} are competitive, with standard wellness drips starting around ${avgPrice} and more complex formulas reaching up to $350. Mobile IV therapy is particularly popular in {cityName}, with {mobileProviders} providers offering convenient alternatives for those with busy schedules.
+                  </p>
                 </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                  <div className="text-wellness-600 font-black text-2xl mb-1">45-60m</div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Session Length</div>
-                </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                  <div className="text-wellness-600 font-black text-2xl mb-1">Mobile</div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">High Availability</div>
-                </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                  <div className="text-wellness-600 font-black text-2xl mb-1">RN/NP</div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Medical Staff</div>
+                <div className="grid grid-cols-2 gap-4 md:gap-6">
+                  <div className="bg-white/5 backdrop-blur-sm p-6 md:p-8 rounded-[2rem] border border-white/10 hover:bg-white/10 transition-colors">
+                    <div className="w-10 h-10 bg-wellness-500/20 rounded-xl flex items-center justify-center text-wellness-400 mb-4">
+                      <Star size={20} fill="currentColor" />
+                    </div>
+                    <div className="text-white font-black text-2xl md:text-3xl mb-1">{avgRating}</div>
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Avg. Rating</div>
+                  </div>
+                  <div className="bg-white/5 backdrop-blur-sm p-6 md:p-8 rounded-[2rem] border border-white/10 hover:bg-white/10 transition-colors">
+                    <div className="w-10 h-10 bg-wellness-500/20 rounded-xl flex items-center justify-center text-wellness-400 mb-4">
+                      <Users size={20} />
+                    </div>
+                    <div className="text-white font-black text-2xl md:text-3xl mb-1">{totalReviews.toLocaleString()}+</div>
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Total Reviews</div>
+                  </div>
+                  <div className="bg-white/5 backdrop-blur-sm p-6 md:p-8 rounded-[2rem] border border-white/10 hover:bg-white/10 transition-colors">
+                    <div className="w-10 h-10 bg-wellness-500/20 rounded-xl flex items-center justify-center text-wellness-400 mb-4">
+                      <Truck size={20} />
+                    </div>
+                    <div className="text-white font-black text-2xl md:text-3xl mb-1">{mobileProviders}</div>
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Mobile Clinics</div>
+                  </div>
+                  <div className="bg-white/5 backdrop-blur-sm p-6 md:p-8 rounded-[2rem] border border-white/10 hover:bg-white/10 transition-colors">
+                    <div className="w-10 h-10 bg-wellness-500/20 rounded-xl flex items-center justify-center text-wellness-400 mb-4">
+                      <ShieldCheck size={20} />
+                    </div>
+                    <div className="text-white font-black text-2xl md:text-3xl mb-1">${avgPrice}+</div>
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Starting Price</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -416,7 +453,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Also serving:</span>
               {nearbyCities.map((c, i) => (
-                <React.Fragment key={c.city}>
+                <React.Fragment key={`${c.city}-${c.state}`}>
                   <Link 
                     href={`/iv-therapy/${slugify(c.state)}/${slugify(c.city)}`}
                     className="text-xs font-bold text-wellness-600 hover:text-wellness-700 transition-colors"

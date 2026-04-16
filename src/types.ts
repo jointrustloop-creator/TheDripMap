@@ -28,6 +28,7 @@ export interface Provider {
   slug?: string;
   is_featured: boolean;
   is_verified?: boolean;
+  is_top_rated?: boolean;
   is_claimed?: boolean;
   claimed_at?: string;
   subscription_tier?: string;

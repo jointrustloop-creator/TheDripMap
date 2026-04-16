@@ -367,6 +367,11 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
                       <User size={14} /> Walk-ins
                     </span>
                   )}
+                  {provider.is_top_rated && (
+                    <span className="bg-amber-500 text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-lg">
+                      <Star size={14} fill="white" /> Top Rated
+                    </span>
+                  )}
                   {provider.is_verified && (
                     <span className="bg-emerald-600 text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-lg">
                       <ShieldCheck size={14} /> Verified

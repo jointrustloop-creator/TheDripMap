@@ -45,9 +45,9 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
               ⭐ Featured
             </span>
           )}
-          {provider.is_verified && (
-            <span className="bg-[#10B981] text-white px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
-              ✓ Verified
+          {provider.is_top_rated && (
+            <span className="bg-amber-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
+              ⭐ Top Rated
             </span>
           )}
         </div>

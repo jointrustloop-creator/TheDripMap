@@ -4,7 +4,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { 
   Search, 
   Filter, 
-  Zap
+  Zap,
+  CheckCircle2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Provider, City, TreatmentType } from '../../src/types';
@@ -39,6 +40,7 @@ function SearchContent() {
   
   const [selectedCity, setSelectedCity] = useState<City | 'All'>(initialCity as City || 'All');
   const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const [citySearchQuery, setCitySearchQuery] = useState('');
 
   // Sync with URL parameters
   useEffect(() => {
@@ -60,7 +62,7 @@ function SearchContent() {
     { id: 'All', label: 'All' },
     { id: 'Mobile', label: 'Mobile IV' },
     { id: 'Open', label: 'Open Now' },
-    { id: 'Verified', label: 'Verified' },
+    { id: 'TopRated', label: 'Top Rated' },
   ];
 
   const toggleChip = (id: string) => {
@@ -131,7 +133,7 @@ function SearchContent() {
   useEffect(() => {
     const loadData = async () => {
       const cities = await getAllCities();
-      setTopCities(cities.slice(0, 12));
+      setTopCities(cities);
       
       try {
         const location = await getUserLocation();
@@ -159,8 +161,8 @@ function SearchContent() {
         if (activeChips.includes('Open')) {
           results = results.filter(p => isOpenNow(p.hours));
         }
-        if (activeChips.includes('Verified')) {
-          results = results.filter(p => p.is_verified);
+        if (activeChips.includes('TopRated')) {
+          results = results.filter(p => p.is_top_rated);
         }
       }
 
@@ -267,30 +269,51 @@ function SearchContent() {
                 className="overflow-hidden"
               >
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-8 border-t border-slate-50">
-                  <div>
+                  <div className="md:col-span-1">
                     <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Select City</h4>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="mb-4 relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                      <input 
+                        type="text"
+                        placeholder="Search cities..."
+                        className="w-full pl-9 pr-4 py-2 bg-white border border-slate-100 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-wellness-600/20 focus:border-wellness-600 transition-all"
+                        value={citySearchQuery}
+                        onChange={(e) => setCitySearchQuery(e.target.value)}
+                      />
+                    </div>
+                    <div className="max-h-[300px] overflow-y-auto pr-2 custom-scrollbar space-y-1">
                       <button 
                         onClick={() => setSelectedCity('All')}
                         className={cn(
-                          "px-4 py-2 rounded-xl text-xs font-bold border transition-all",
+                          "w-full text-left px-4 py-2 rounded-xl text-xs font-bold border transition-all flex items-center justify-between",
                           selectedCity === 'All' ? "bg-wellness-50 border-wellness-600 text-wellness-700" : "bg-white border-slate-100 text-slate-600 hover:border-wellness-200"
                         )}
                       >
                         All Cities
+                        {selectedCity === 'All' && <CheckCircle2 size={14} />}
                       </button>
-                      {topCities.map(c => (
+                      
+                      {topCities
+                        .filter(c => c.city.toLowerCase().includes(citySearchQuery.toLowerCase()))
+                        .map(c => (
                         <button 
-                          key={c.city}
+                          key={`${c.city}-${c.state}`}
                           onClick={() => setSelectedCity(c.city as City)}
                           className={cn(
-                            "px-4 py-2 rounded-xl text-xs font-bold border transition-all",
+                            "w-full text-left px-4 py-2 rounded-xl text-xs font-bold border transition-all flex items-center justify-between",
                             selectedCity === c.city ? "bg-wellness-50 border-wellness-600 text-wellness-700" : "bg-white border-slate-100 text-slate-600 hover:border-wellness-200"
                           )}
                         >
-                          {c.city}
+                          <span>{c.city} <span className="text-[10px] opacity-50 ml-1">{c.state}</span></span>
+                          {selectedCity === c.city && <CheckCircle2 size={14} />}
                         </button>
                       ))}
+                      
+                      {topCities.filter(c => c.city.toLowerCase().includes(citySearchQuery.toLowerCase())).length === 0 && (
+                        <div className="text-center py-8 text-slate-400 text-xs font-medium">
+                          No cities found
+                        </div>
+                      )}
                     </div>
                   </div>
 

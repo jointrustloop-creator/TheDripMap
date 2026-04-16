@@ -45,15 +45,15 @@ export function getUserLocation(): Promise<UserLocation> {
 
 export async function getIPLocation(): Promise<UserLocation> {
   try {
-    const res = await fetch('https://ipapi.co/json/');
+    const res = await fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?localityLanguage=en');
     if (!res.ok) throw new Error('IP geolocation failed');
     const data = await res.json();
     return {
       latitude: data.latitude,
       longitude: data.longitude,
-      city: data.city,
-      region: data.region,
-      country: data.country_name
+      city: data.city || data.locality,
+      region: data.principalSubdivision,
+      country: data.countryName
     };
   } catch (error) {
     throw error;

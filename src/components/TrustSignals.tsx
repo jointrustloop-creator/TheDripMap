@@ -10,29 +10,38 @@ import {
   CheckCircle2
 } from 'lucide-react';
 
-export const TrustSignals = () => {
+interface TrustSignalsProps {
+  stats?: {
+    totalListings: number;
+    totalCities: number;
+    totalStates: number;
+    avgRating: number;
+  };
+}
+
+export const TrustSignals = ({ stats: dynamicStats }: TrustSignalsProps) => {
   const stats = [
     { 
       label: 'Clinics listed', 
-      value: '40', 
+      value: dynamicStats?.totalListings?.toString() || '1,518', 
       icon: <Building2 className="text-wellness-600" size={24} />,
       suffix: '+'
     },
     { 
       label: 'Cities covered', 
-      value: '12', 
+      value: dynamicStats?.totalCities?.toString() || '350', 
       icon: <Map className="text-wellness-600" size={24} />,
       suffix: '+'
     },
     { 
       label: 'States represented', 
-      value: '8', 
+      value: dynamicStats?.totalStates?.toString() || '50', 
       icon: <Globe className="text-wellness-600" size={24} />,
       suffix: '+'
     },
     { 
       label: 'Average clinic rating', 
-      value: '4.8', 
+      value: dynamicStats?.avgRating?.toFixed(1) || '4.8', 
       icon: <Star className="text-amber-500 fill-amber-500" size={24} />,
       suffix: '★'
     },

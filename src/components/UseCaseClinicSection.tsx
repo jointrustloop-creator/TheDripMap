@@ -83,17 +83,18 @@ export const UseCaseClinicSection = ({
   const detectLocation = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('https://ipapi.co/json/');
+      const res = await fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?localityLanguage=en');
       const data = await res.json();
-      if (data.city) {
-        setCity(data.city);
-        setDetectedCity(data.city);
-        handleSearch(data.city);
+      const detectedCityName = data.city || data.locality;
+      if (detectedCityName) {
+        setCity(detectedCityName);
+        setDetectedCity(detectedCityName);
+        handleSearch(detectedCityName);
         
         // Cache it
         sessionStorage.setItem('tdm_location', JSON.stringify({
-          city: data.city,
-          state: data.region_code,
+          city: detectedCityName,
+          state: data.principalSubdivisionCode?.split('-')[1] || data.principalSubdivision || '',
           detectedAt: Date.now()
         }));
       }

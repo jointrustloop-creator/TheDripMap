@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { ShieldCheck, ArrowRight, BarChart, Users, Globe } from 'lucide-react';
+import { getListingStats } from '../../src/lib/data';
 
 export const metadata: Metadata = {
   title: "List Your IV Therapy Clinic — Reach More Patients | TheDripMap",
@@ -30,7 +31,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ForClinicsPage() {
+export default async function ForClinicsPage() {
+  const stats = await getListingStats();
+  
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
@@ -41,7 +44,7 @@ export default function ForClinicsPage() {
             Your clinic is already on <span className="text-wellness-600">TheDripMap</span>. Make it work for you.
           </h1>
           <p className="text-xl text-slate-500 leading-relaxed">
-            490+ clinics listed across the US. Patients are actively searching. Claim your free listing in 2 minutes.
+            {stats.totalListings.toLocaleString()}+ clinics listed across the US. Patients are actively searching. Claim your free listing in 2 minutes.
           </p>
         </div>
 
@@ -71,23 +74,33 @@ export default function ForClinicsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Unclaimed */}
             <div className="space-y-6">
-              <div className="flex items-center gap-2 text-slate-400 font-bold uppercase tracking-widest text-xs">
-                <span className="w-2 h-2 bg-slate-200 rounded-full" /> Basic Listing (Unclaimed)
+              <div className="flex items-center gap-2 text-slate-400 font-bold uppercase tracking-widest text-[10px]">
+                <span className="w-2 h-2 bg-slate-300 rounded-full" /> Basic Listing (Unclaimed)
               </div>
-              <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 opacity-60 grayscale-[0.5] pointer-events-none">
+              <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 opacity-80 grayscale-[0.2] pointer-events-none">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-slate-100 rounded-2xl" />
-                  <div className="space-y-2 flex-1">
-                    <div className="h-4 bg-slate-100 rounded w-3/4" />
-                    <div className="h-3 bg-slate-50 rounded w-1/2" />
+                  <div className="w-16 h-16 bg-[#0F6E56]/10 rounded-2xl flex items-center justify-center text-[#0F6E56] font-black text-xl">
+                    WD
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-slate-900 mb-1">Wellness Drip NYC</h4>
+                    <div className="flex items-center gap-1 text-slate-400 text-xs font-bold">
+                      <span className="text-wellness-600">★★★★★</span> 4.9 (127 reviews)
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-3">
-                  <div className="h-3 bg-slate-50 rounded w-full" />
-                  <div className="h-3 bg-slate-50 rounded w-full" />
-                  <div className="h-3 bg-slate-50 rounded w-2/3" />
+                <div className="mb-4">
+                  <div className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Location</div>
+                  <div className="text-slate-600 text-sm font-medium">New York, NY</div>
                 </div>
-                <div className="mt-8 h-12 bg-slate-100 rounded-xl w-full" />
+                <div className="flex gap-2 mb-8">
+                  {['IV Therapy', 'Wellness'].map(s => (
+                    <span key={s} className="bg-slate-50 text-slate-400 px-2 py-1 rounded-md text-[10px] font-bold border border-slate-100">{s}</span>
+                  ))}
+                </div>
+                <div className="w-full py-3 text-center text-slate-300 font-bold text-sm border-2 border-slate-50 rounded-xl">
+                  Claim this listing
+                </div>
               </div>
               <p className="text-sm text-slate-400 font-medium italic text-center">
                 Missing clinical details, verified badges, and direct booking links.
@@ -136,31 +149,53 @@ export default function ForClinicsPage() {
           </div>
         </div>
 
-        <div className="bg-wellness-900 text-white rounded-[4rem] p-12 md:p-20 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-wellness-800/50 skew-x-12 translate-x-1/4" />
+        {/* Social Proof Row */}
+        <div className="py-12 border-y border-slate-100 mb-20">
+          <div className="flex flex-wrap justify-center gap-x-12 gap-y-6 text-center">
+            <div className="space-y-1">
+              <div className="text-2xl font-black text-slate-900">{stats.totalListings.toLocaleString()}</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">clinics listed</div>
+            </div>
+            <div className="space-y-1 text-slate-200 text-2xl font-light">·</div>
+            <div className="space-y-1">
+              <div className="text-2xl font-black text-slate-900">{stats.totalCities.toLocaleString()}</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">cities covered</div>
+            </div>
+            <div className="space-y-1 text-slate-200 text-2xl font-light">·</div>
+            <div className="space-y-1 text-wellness-600">
+              <div className="text-2xl font-black">Free</div>
+              <div className="text-[10px] font-bold uppercase tracking-widest">forever for basic listings</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-[#0F6E56] text-white rounded-[4rem] p-12 md:p-20 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-black/5 skew-x-12 translate-x-1/4" />
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-4xl md:text-5xl font-black mb-8 tracking-tight">Ready to claim your listing?</h2>
-              <p className="text-lg text-wellness-100 mb-10 leading-relaxed">
-                Our team will verify your clinical protocols and medical supervision before adding you to the map. Join the most trusted resource in IV wellness.
+              <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">Ready to claim your listing?</h2>
+              <p className="text-lg text-emerald-50 mb-10 leading-relaxed font-medium">
+                It&apos;s free. Takes 2 minutes. Patients in your city are searching right now.
               </p>
               <Link 
                 href="/for-clinics/setup"
-                className="bg-white text-wellness-900 px-10 py-5 rounded-2xl font-bold text-lg hover:bg-wellness-50 transition-all flex items-center gap-2"
+                className="inline-flex bg-white text-[#0F6E56] px-10 py-5 rounded-2xl font-black text-lg hover:bg-emerald-50 transition-all items-center gap-2 group shadow-xl shadow-black/20"
               >
-                Claim My Free Listing <ArrowRight size={20} />
+                Claim My Free Listing <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
             <div className="space-y-6">
               {[
-                'Verified Medical Director Required',
-                'Licensed RN Administration Only',
-                'Transparent Pricing Protocols',
-                'High Clinical Safety Standards'
+                'Free to claim and manage',
+                'Add your photos and specialties',
+                'Rank higher in match results',
+                'See how many patients view your listing'
               ].map((item, idx) => (
-                <div key={idx} className="flex items-center gap-4 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
-                  <ShieldCheck className="text-wellness-400" />
-                  <span className="font-bold">{item}</span>
+                <div key={idx} className="flex items-center gap-4 bg-white/10 backdrop-blur-md p-5 rounded-3xl border border-white/10 group hover:border-white/20 transition-colors">
+                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0">
+                    ✓
+                  </div>
+                  <span className="font-bold text-lg">{item}</span>
                 </div>
               ))}
             </div>

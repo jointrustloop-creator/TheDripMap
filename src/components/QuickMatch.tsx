@@ -110,13 +110,14 @@ export function QuickMatch() {
 
   const handleMatch = () => {
     const params = new URLSearchParams();
-    if (goal) params.set('treatment', goal.id);
+    if (goal) params.set('goal', goal.id);
     
     if (location) {
-      params.set('city', location);
+      const [cityName, stateName] = location.split(',').map(s => s.trim());
+      params.set('city', cityName);
+      if (stateName) params.set('state', stateName);
       
       // Update global location state so the entire app stays in sync
-      const [cityName, stateName] = location.split(',').map(s => s.trim());
       const newLoc = {
         city: cityName,
         state: stateName || '',
@@ -128,8 +129,13 @@ export function QuickMatch() {
       window.dispatchEvent(new CustomEvent('tdm_location_change', { detail: newLoc }));
     }
     
-    // Navigate to search page
-    router.push(`/search?${params.toString()}`);
+    // Default quiz params for shortcut
+    params.set('urgency', 'Today');
+    params.set('type', 'Any');
+    params.set('budget', 'Any');
+    
+    // Navigate to results page directly
+    router.push(`/quiz/results?${params.toString()}`);
   };
 
   return (

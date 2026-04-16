@@ -114,6 +114,27 @@ export default function RootLayout({
             </Script>
           </>
         )}
+        <Script id="fetch-fix" strategy="beforeInteractive">
+          {`
+            (function() {
+              if (typeof window !== 'undefined') {
+                try {
+                  var originalFetch = window.fetch;
+                  Object.defineProperty(window, 'fetch', {
+                    get: function() { return originalFetch; },
+                    set: function(v) { 
+                      console.warn('Blocked attempt to overwrite window.fetch');
+                    },
+                    configurable: true
+                  });
+                } catch (e) {
+                  // If we can't redefine it, it might already be a getter-only property
+                  // which is what's causing the error when someone tries to set it.
+                }
+              }
+            })();
+          `}
+        </Script>
         <ErrorBoundary>
           {children}
         </ErrorBoundary>

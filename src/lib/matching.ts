@@ -70,10 +70,43 @@ export function matchProviders(
     if (p.is_featured) score += 10;
     if (p.is_verified) score += 8;
 
-    // 3. User Goal (Specialties)
-    if (answers.goal && p.specialties && Array.isArray(p.specialties)) {
-      if (p.specialties.some(s => s && s.toLowerCase().includes(answers.goal?.toLowerCase() || ''))) {
-        score += 20;
+    // 3. User Goal (Specialties & Keywords)
+    if (answers.goal) {
+      const goal = answers.goal.toLowerCase();
+      const pSpecialties = (p.specialties || []).map(s => s.toLowerCase());
+      const pSubtypes = (p.subtypes || []).map(s => s.toLowerCase());
+      const pName = p.name.toLowerCase();
+      const pDesc = (p.description || '').toLowerCase();
+
+      // Define keyword mappings for goals
+      const goalKeywords: Record<string, string[]> = {
+        'hangover': ['hangover', 'hydration', 'recovery', 'rehydrate'],
+        'nad-plus': ['nad', 'nicotinamide', 'anti-aging', 'energy'],
+        'immune-support': ['immune', 'wellness', 'vitamin c', 'zinc', 'immunity'],
+        'beauty-glow': ['beauty', 'glow', 'skin', 'hair', 'nails', 'collagen', 'glutathione'],
+        'weight-loss': ['weight', 'metabolism', 'fat', 'slim', 'semaglutide', 'tirzepatide'],
+        'hydration': ['hydration', 'rehydrate', 'fluids', 'saline'],
+        'recovery': ['recovery', 'athletic', 'sport', 'muscle', 'performance'],
+        'myers-cocktail': ['myers', 'cocktail', 'multivitamin']
+      };
+
+      const keywords = goalKeywords[goal] || [goal];
+      
+      // Check specialties, subtypes, name, and description for keywords
+      const hasKeyword = keywords.some(kw => 
+        pSpecialties.some(s => s.includes(kw)) || 
+        pSubtypes.some(s => s.includes(kw)) ||
+        pName.includes(kw) ||
+        pDesc.includes(kw)
+      );
+
+      if (hasKeyword) {
+        score += 30; // Significant boost for goal match
+      }
+      
+      // Also check for exact goal match in specialties
+      if (pSpecialties.some(s => s.includes(goal))) {
+        score += 10;
       }
     }
 

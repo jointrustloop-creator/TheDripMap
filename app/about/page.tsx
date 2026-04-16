@@ -3,7 +3,8 @@ import { Metadata } from 'next';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import Link from 'next/link';
-import { ShieldCheck, Zap } from 'lucide-react';
+import { ShieldCheck, Zap, Heart, Clock, Star, MapPin, CheckCircle2 } from 'lucide-react';
+import { IVAnimation } from '../../src/components/IVAnimation';
 
 export const metadata: Metadata = {
   title: "About TheDripMap | Our Mission & Clinical Standards | TheDripMap",
@@ -25,9 +26,9 @@ export default function AboutPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-20 items-center mb-32">
-          <div className="relative h-[500px] rounded-[3rem] overflow-hidden shadow-2xl bg-wellness-700 flex items-center justify-center">
-            <div className="text-white text-9xl font-black opacity-10">TDM</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-20 items-center mb-20">
+          <div className="h-[500px] w-full">
+            <IVAnimation />
           </div>
           <div>
             <h2 className="text-4xl font-black text-slate-900 mb-8 tracking-tight">The Problem We&apos;re Solving</h2>
@@ -38,6 +39,9 @@ export default function AboutPage() {
               TheDripMap was created to bring transparency and trust to the IV therapy industry. We&apos;ve analyzed hundreds of clinics across the country to provide you with the most accurate and up-to-date information.
             </p>
           </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-32">
           <div className="bg-wellness-50 rounded-[3rem] p-12 border border-wellness-100 shadow-xl shadow-wellness-100/50">
             <div className="flex items-center gap-4 mb-8">
               <div className="w-12 h-12 bg-wellness-600 rounded-2xl flex items-center justify-center text-white">
@@ -61,6 +65,29 @@ export default function AboutPage() {
                 </li>
               ))}
             </ul>
+          </div>
+
+          <div className="bg-white rounded-[3rem] p-12 border border-slate-100 shadow-xl shadow-slate-100/50">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white">
+                <Heart size={24} />
+              </div>
+              <h3 className="text-2xl font-black text-slate-900 tracking-tight">Why Choose Us</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {[
+                { icon: <Clock size={16} />, title: 'Real-time Booking', desc: 'Instant access to clinic schedules' },
+                { icon: <MapPin size={16} />, title: 'Mobile Options', desc: 'IV therapy delivered to your door' },
+                { icon: <Star size={16} />, title: 'Expert Guidance', desc: 'Clinically-backed matching quiz' },
+                { icon: <CheckCircle2 size={16} />, title: '100% Free', desc: 'No hidden fees for patients' }
+              ].map((benefit, idx) => (
+                <div key={idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                  <div className="text-wellness-600 mb-2">{benefit.icon}</div>
+                  <div className="font-bold text-slate-900 text-sm mb-1">{benefit.title}</div>
+                  <div className="text-slate-500 text-xs leading-relaxed">{benefit.desc}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 

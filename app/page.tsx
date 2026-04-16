@@ -15,26 +15,25 @@ import {
 } from 'lucide-react';
 import { Navbar } from '../src/components/Navbar';
 import { Footer } from '../src/components/Footer';
-import { CityGrid } from '../src/components/CityGrid';
+import { CompactCityGrid } from '../src/components/CompactCityGrid';
 import { BlogCard } from '../src/components/BlogCard';
 import { ClinicianSection } from '../src/components/ClinicianSection';
 import { HowItWorks } from '../src/components/HowItWorks';
 import { DripBackground } from '../src/components/DripBackground';
 import { QuickMatch } from '../src/components/QuickMatch';
 import { TrustSignals } from '../src/components/TrustSignals';
-import { getAllCities, getListingStats, getBlogPosts } from '../src/lib/data';
-import { isSupabaseConfigured } from '../src/lib/supabase';
+import { getListingStats, getBlogPosts, getCitiesFromListings } from '../src/lib/data';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: "Find IV Therapy Near You — Get Matched in 60 Seconds | TheDripMap",
-  description: "TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse 496 verified clinics across 276 US cities or take our free 60-second matching quiz.",
+  description: "TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse 1,042 clinics across 200+ US cities or take our free 60-second matching quiz.",
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: "Find IV Therapy Near You — Get Matched in 60 Seconds | TheDripMap",
-    description: "TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse 496 verified clinics across 276 US cities or take our free 60-second matching quiz.",
+    description: "TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse 1,042 clinics across 200+ US cities or take our free 60-second matching quiz.",
     url: 'https://thedripmap.com',
     siteName: 'TheDripMap',
     images: [
@@ -51,7 +50,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: "Find IV Therapy Near You — Get Matched in 60 Seconds | TheDripMap",
-    description: "TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse 496 verified clinics across 276 US cities or take our free 60-second matching quiz.",
+    description: "TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse 1,042 clinics across 200+ US cities or take our free 60-second matching quiz.",
     images: ['https://thedripmap.com/og-image.png'],
   },
 };
@@ -60,11 +59,12 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function HomePage() {
-  const cities = await getAllCities();
   const stats = await getListingStats();
   const blogPosts = await getBlogPosts();
   const latestPosts = blogPosts.slice(0, 3);
-  const topCities = cities.slice(0, 12);
+  
+  // Fetch cities from the listings table for the compact grid
+  const listingCities = await getCitiesFromListings();
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -146,47 +146,16 @@ export default async function HomePage() {
             </h1>
             
             <p className="text-xl md:text-2xl text-slate-500 mb-8 font-medium tracking-tight max-w-3xl mx-auto leading-relaxed">
-              Answer 5 quick questions. We&apos;ll find the right clinic for your exact goal, location, and budget — from {stats.totalListings || 496} verified providers.
+              Answer 5 quick questions. We&apos;ll find the right clinic for your exact goal, location, and budget — from {stats.totalListings || 1042} verified providers.
             </p>
 
             <QuickMatch />
             
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] font-bold text-slate-500 mt-8">
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalListings || 496} Clinics</span>
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalCities || 276} Cities</span>
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalStates || 30} States</span>
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> 4.8★ Avg Rating</span>
-            </div>
-
-            {/* Trust Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-16 max-w-5xl mx-auto">
-              <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm">
-                <div className="w-10 h-10 bg-wellness-50 rounded-xl flex items-center justify-center text-wellness-600 shrink-0">
-                  <Target size={20} />
-                </div>
-                <div className="text-left">
-                  <h4 className="font-bold text-slate-900 text-sm">Goal-Based Matching</h4>
-                  <p className="text-slate-500 text-xs leading-relaxed">We match on what you need, not just who&apos;s closest</p>
-                </div>
-              </div>
-              <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm">
-                <div className="w-10 h-10 bg-wellness-50 rounded-xl flex items-center justify-center text-wellness-600 shrink-0">
-                  <ShieldCheck size={20} />
-                </div>
-                <div className="text-left">
-                  <h4 className="font-bold text-slate-900 text-sm">{stats.totalListings || 496} Verified Clinics</h4>
-                  <p className="text-slate-500 text-xs leading-relaxed">Real businesses with real Google reviews</p>
-                </div>
-              </div>
-              <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm">
-                <div className="w-10 h-10 bg-wellness-50 rounded-xl flex items-center justify-center text-wellness-600 shrink-0">
-                  <Clock size={20} />
-                </div>
-                <div className="text-left">
-                  <h4 className="font-bold text-slate-900 text-sm">Results in 60 Seconds</h4>
-                  <p className="text-slate-500 text-xs leading-relaxed">No browsing. No guessing. Just your best match.</p>
-                </div>
-              </div>
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalListings || 1042} Clinics</span>
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalCities || 208} Cities</span>
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalStates || 25} States</span>
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> 4.9★ Avg Rating</span>
             </div>
 
             </div>
@@ -194,7 +163,7 @@ export default async function HomePage() {
           <h2 className="text-4xl md:text-5xl font-black text-slate-900 text-center mb-16 tracking-tight">The Smarter Way to Find IV Therapy Clinics Near You</h2>
 
           {/* Path Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
             <Link href="/quiz" className="group relative bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl hover:shadow-2xl hover:border-wellness-200 transition-all duration-500 overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-wellness-50 rounded-bl-[5rem] -mr-8 -mt-8 group-hover:scale-110 transition-transform" />
               <div className="relative z-10">
@@ -219,13 +188,44 @@ export default async function HomePage() {
                 </div>
                 <h3 className="text-3xl font-black text-white mb-4">Browse Directory</h3>
                 <p className="text-slate-400 leading-relaxed mb-8">
-                  Already know what you need? Filter through {stats.totalListings || 496} top-rated clinics by city, service, or price.
+                  Already know what you need? Filter through {stats.totalListings || 1042} top-rated clinics by city, service, or price.
                 </p>
                 <div className="flex items-center gap-2 text-white font-bold">
                   Explore Now <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
             </Link>
+          </div>
+
+          {/* Trust Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto">
+            <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm">
+              <div className="w-10 h-10 bg-wellness-50 rounded-xl flex items-center justify-center text-wellness-600 shrink-0">
+                <Target size={20} />
+              </div>
+              <div className="text-left">
+                <h4 className="font-bold text-slate-900 text-sm">Goal-Based Matching</h4>
+                <p className="text-slate-500 text-xs leading-relaxed">We match on what you need, not just who&apos;s closest</p>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm">
+              <div className="w-10 h-10 bg-wellness-50 rounded-xl flex items-center justify-center text-wellness-600 shrink-0">
+                <ShieldCheck size={20} />
+              </div>
+              <div className="text-left">
+                <h4 className="font-bold text-slate-900 text-sm">{stats.totalListings || 1042} Top-Rated Clinics</h4>
+                <p className="text-slate-500 text-xs leading-relaxed">Real businesses with real patient reviews</p>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm">
+              <div className="w-10 h-10 bg-wellness-50 rounded-xl flex items-center justify-center text-wellness-600 shrink-0">
+                <Clock size={20} />
+              </div>
+              <div className="text-left">
+                <h4 className="font-bold text-slate-900 text-sm">Results in 60 Seconds</h4>
+                <p className="text-slate-500 text-xs leading-relaxed">No browsing. No guessing. Just your best match.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -254,17 +254,14 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Top Cities Grid */}
-      <CityGrid cities={topCities} />
-
       {/* How It Works */}
       <HowItWorks totalListings={stats.totalListings} />
 
-      {/* Trust Signals Section */}
-      <TrustSignals />
+      {/* Compact City Grid */}
+      <CompactCityGrid cities={listingCities} />
 
-      {/* For Clinicians Section */}
-      <ClinicianSection stats={stats} />
+      {/* Trust Signals Section */}
+      <TrustSignals stats={stats} />
 
       {/* Blog Preview */}
       <section className="py-24 px-6">
@@ -290,6 +287,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* For Clinicians Section */}
+      <ClinicianSection stats={stats} />
 
       <Footer />
     </div>
