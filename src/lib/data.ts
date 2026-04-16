@@ -1,5 +1,5 @@
 import { calculateDistance } from './geo';
-import { Provider, BlogPost, OperatorProfile } from '../types';
+import { Provider, BlogPost, OperatorProfile, ListingStats } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
 
 const EXCLUDED_CATEGORIES = [
@@ -343,30 +343,33 @@ export async function getFeaturedListings(limit: number = 6) {
   return [];
 }
 
-export async function getListingStats() {
+export async function getListingStats(): Promise<ListingStats> {
   if (!isSupabaseConfigured()) {
-    return { totalListings: 1042, totalCities: 350, avgRating: 4.8, isLive: false };
+    return { totalListings: 1042, totalCities: 208, totalStates: 25, avgRating: 4.9, isLive: false };
   }
   
   try {
-    const [totalRes, citiesRes, ratingRes] = await Promise.all([
+    const [totalRes, citiesRes, ratingRes, statesRes] = await Promise.all([
       supabase.from('listings').select('*', { count: 'exact', head: true }),
       supabase.from('listings').select('city'),
-      supabase.from('listings').select('rating').not('rating', 'is', null)
+      supabase.from('listings').select('rating').not('rating', 'is', null),
+      supabase.from('listings').select('state_abbr')
     ]);
 
     const cityCount = new Set(citiesRes.data?.map(c => c.city?.toLowerCase().trim())).size;
+    const stateCount = new Set(statesRes.data?.map(s => s.state_abbr?.toUpperCase().trim()).filter(Boolean)).size;
     const ratings = ratingRes.data?.map(r => r.rating) || [];
-    const avgRating = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 4.8;
+    const avgRating = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 4.9;
 
     return {
       totalListings: totalRes.count || 1042,
-      totalCities: cityCount || 350,
+      totalCities: cityCount || 208,
+      totalStates: stateCount || 25,
       avgRating: Math.round(avgRating * 10) / 10,
       isLive: true
     };
   } catch (err) {
-    return { totalListings: 1042, totalCities: 350, avgRating: 4.8, isLive: false };
+    return { totalListings: 1042, totalCities: 208, totalStates: 25, avgRating: 4.9, isLive: false };
   }
 }
 

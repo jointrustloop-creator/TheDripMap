@@ -2,6 +2,15 @@ export type City = string;
 
 export type TreatmentType = 'In-Clinic' | 'Mobile' | 'Both';
 
+export interface ListingStats {
+  totalListings: number;
+  totalCities: number;
+  totalStates: number;
+  avgRating: number;
+  isLive: boolean;
+  error?: string;
+}
+
 export interface Provider {
   id: string;
   name: string;

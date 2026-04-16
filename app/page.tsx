@@ -155,7 +155,7 @@ export default async function HomePage() {
               <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalListings || 1042} Clinics</span>
               <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalCities || 208} Cities</span>
               <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalStates || 25} States</span>
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> 4.9★ Avg Rating</span>
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.avgRating || 4.9}★ Avg Rating</span>
             </div>
 
             </div>

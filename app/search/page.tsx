@@ -148,7 +148,7 @@ function SearchContent() {
   useEffect(() => {
     const fetchListings = async () => {
       setIsLoading(true);
-      let results = await searchListings(searchQuery, selectedCity, userLocation || undefined);
+      let results = await searchListings(searchQuery, selectedCity);
       
       // Apply Chips Filters
       if (!activeChips.includes('All')) {
