@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { ShieldCheck, ArrowRight, BarChart, Users, Globe } from 'lucide-react';
-import { getListingStats } from '../../src/lib/data';
+import { getSiteStats } from '../../src/lib/data';
 
 export const metadata: Metadata = {
   title: "List Your IV Therapy Clinic — Reach More Patients | TheDripMap",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ForClinicsPage() {
-  const stats = await getListingStats();
+  const stats = await getSiteStats();
   
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
@@ -44,7 +44,7 @@ export default async function ForClinicsPage() {
             Your clinic is already on <span className="text-wellness-600">TheDripMap</span>. Make it work for you.
           </h1>
           <p className="text-xl text-slate-500 leading-relaxed">
-            {stats.totalListings.toLocaleString()}+ clinics listed across the US. Patients are actively searching. Claim your free listing in 2 minutes.
+            {stats.total.toLocaleString()}+ clinics listed across the US. Patients are actively searching. Claim your free listing in 2 minutes.
           </p>
         </div>
 
@@ -153,18 +153,18 @@ export default async function ForClinicsPage() {
         <div className="py-12 border-y border-slate-100 mb-20">
           <div className="flex flex-wrap justify-center gap-x-12 gap-y-6 text-center">
             <div className="space-y-1">
-              <div className="text-2xl font-black text-slate-900">{stats.totalListings.toLocaleString()}</div>
+              <div className="text-2xl font-black text-slate-900">{stats.total.toLocaleString()}</div>
               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">clinics listed</div>
             </div>
             <div className="space-y-1 text-slate-200 text-2xl font-light">·</div>
             <div className="space-y-1">
-              <div className="text-2xl font-black text-slate-900">{stats.totalCities.toLocaleString()}</div>
+              <div className="text-2xl font-black text-slate-900">{stats.cities.toLocaleString()}</div>
               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">cities covered</div>
             </div>
             <div className="space-y-1 text-slate-200 text-2xl font-light">·</div>
-            <div className="space-y-1 text-wellness-600">
-              <div className="text-2xl font-black">Free</div>
-              <div className="text-[10px] font-bold uppercase tracking-widest">forever for basic listings</div>
+            <div className="space-y-1">
+              <div className="text-2xl font-black text-slate-900">{stats.states.toLocaleString()}</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">states</div>
             </div>
           </div>
         </div>

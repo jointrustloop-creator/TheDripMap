@@ -55,7 +55,7 @@ export const ClinicianSection = ({ stats }: ClinicianSectionProps) => {
               <div className="w-px h-8 bg-slate-800" />
               <div className="text-center">
                 <div className="text-2xl md:text-3xl font-black text-white">
-                  {stats.avgRating || 4.8}★
+                  {stats.avgRating || '4.9'}★
                 </div>
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Avg Rating</div>
               </div>

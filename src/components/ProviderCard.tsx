@@ -1,11 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
-import { Phone } from 'lucide-react';
+import { Phone, ArrowRight } from 'lucide-react';
 import { Provider } from '../types';
 import { slugify } from '../lib/data';
 import { cn } from '../lib/utils';
 import { ClinicImage } from './ClinicImage';
-
+import { calculateValueMetrics } from '../lib/price-utils';
 import { getStatus } from '../lib/hours';
 
 interface ProviderCardProps {
@@ -15,6 +15,7 @@ interface ProviderCardProps {
 
 export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
   const slug = provider.slug || slugify(provider.name);
+  const valueMetrics = calculateValueMetrics(provider);
 
   const status = getStatus(provider.hours);
   const isOpenNow = status.isOpen;
@@ -50,6 +51,12 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
               ⭐ Top Rated
             </span>
           )}
+          <span className={cn(
+            "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1 border",
+            valueMetrics.color
+          )}>
+            💎 {valueMetrics.label}
+          </span>
         </div>
 
         {/* Top Right Badge */}
@@ -65,6 +72,17 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
             </span>
           )}
         </div>
+
+        {/* Claim Listing Overlay */}
+        {!provider.is_claimed && (
+          <Link 
+            href={`/for-clinics?clinicId=${provider.id}&clinicName=${encodeURIComponent(provider.name)}`}
+            className="absolute bottom-0 left-0 right-0 bg-wellness-600/90 backdrop-blur-sm py-2 px-3 flex items-center justify-center gap-2 hover:bg-wellness-700 transition-colors z-10"
+          >
+            <span className="text-[10px] font-black text-white uppercase tracking-widest">CLAIM MY LISTING</span>
+            <ArrowRight size={12} className="text-white" />
+          </Link>
+        )}
       </div>
 
       {/* Card Body */}

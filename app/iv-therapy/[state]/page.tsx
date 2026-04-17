@@ -26,14 +26,14 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: StatePageProps): Promise<Metadata> {
   const { state } = await params;
   const cities = await getAllCities();
-  const cityInState = cities.find(c => slugify(c.state) === state);
+  const cityInState = cities.find(c => slugify(c.state) === state || c.stateAbbr.toLowerCase() === state);
   
   if (!cityInState) return { title: 'State Not Found' };
 
   const stateName = cityInState.state;
 
   return {
-    title: `Best IV Therapy in ${stateName} | Top Rated Clinics by City`,
+    title: `Best IV Therapy in ${stateName} | Top Rated Clinics by City | TheDripMap`,
     description: `Find the best IV therapy clinics across ${stateName}. Compare top-rated providers in major cities and book your hydration treatment today.`,
   };
 }
@@ -42,7 +42,7 @@ export default async function StatePage({ params }: StatePageProps) {
   const { state } = await params;
   const allCities = await getAllCities();
   
-  const stateCities = allCities.filter(c => slugify(c.state) === state);
+  const stateCities = allCities.filter(c => slugify(c.state) === state || c.stateAbbr.toLowerCase() === state);
   
   if (stateCities.length === 0) notFound();
 

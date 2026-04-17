@@ -45,18 +45,19 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params, searchParams }: CityPageProps): Promise<Metadata> {
   const { state, city } = await params;
-  const { service } = await searchParams;
   const cities = await getAllCities();
-  const cityInfo = cities.find(c => slugify(c.city) === city && slugify(c.state) === state);
+  const cityInfo = cities.find(c => 
+    slugify(c.city) === city && 
+    (slugify(c.state) === state || c.stateAbbr.toLowerCase() === state)
+  );
   
   if (!cityInfo) return { title: 'City Not Found' };
 
   const cityName = cityInfo.city;
-  const stateName = cityInfo.state;
   const listings = await getListingsByCity(cityName);
   const count = listings.length;
 
-  const title = `IV Therapy in ${cityName}, ${state} — ${count} Clinics | TheDripMap`;
+  const title = `IV Therapy in ${cityName}, ${cityInfo.stateAbbr} — ${count} Clinics | TheDripMap`;
   const description = `Find and compare ${count} IV therapy clinics in ${cityName}, ${state}. Read reviews, compare prices, and book top-rated hydration and wellness drips.`;
 
   return {
@@ -93,7 +94,10 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
   const { service } = await searchParams;
   
   const cities = await getAllCities();
-  const cityInfo = cities.find(c => slugify(c.city) === city && slugify(c.state) === state);
+  const cityInfo = cities.find(c => 
+    slugify(c.city) === city && 
+    (slugify(c.state) === state || c.stateAbbr.toLowerCase() === state)
+  );
   
   if (!cityInfo) notFound();
 

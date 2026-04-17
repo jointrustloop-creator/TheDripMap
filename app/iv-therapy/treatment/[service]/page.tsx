@@ -68,19 +68,41 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
 
       const [serviceListings, allCities] = await Promise.all([
         cityToUse && cityToUse !== 'All' 
-          ? getListingsByServiceAndCity(service.name, cityToUse, 9)
-          : getListingsByService(service.name, 9),
+          ? getListingsByServiceAndCity(service.name, cityToUse, 60)
+          : getListingsByService(service.name, 60),
         getAllCities()
       ]);
 
-      // Fallback logic: if no service-specific listings found, get general top-rated listings
-      if (serviceListings.length === 0) {
-        const { getFeaturedListings } = await import('../../../../src/lib/data');
-        const fallbackListings = await getFeaturedListings(9);
-        setListings(fallbackListings);
-      } else {
-        setListings(serviceListings);
+      const finalResults = [...serviceListings];
+      
+      // Minimum results logic: If we have fewer than 3 specific matches, backfill with top clinics in the city
+      if (finalResults.length < 3) {
+        const { getFeaturedListings, getListingsByCity } = await import('../../../../src/lib/data');
+        
+        // Try featured first
+        let fallbackListings = await getFeaturedListings(60, cityToUse || undefined);
+        
+        // If featured didn't give us enough, try all top rated in city
+        if (fallbackListings.length < 3 && cityToUse) {
+          const cityListings = await getListingsByCity(cityToUse);
+          fallbackListings = [...fallbackListings, ...cityListings];
+        }
+        
+        // Add fallbacks that aren't already in results (avoid doubles)
+        const existingIds = new Set(finalResults.map(p => p.id));
+        const existingBrands = new Set(finalResults.map(p => p.name.toLowerCase().split(' - ')[0].split(' (')[0].trim()));
+        
+        fallbackListings.forEach(p => {
+          const brand = p.name.toLowerCase().split(' - ')[0].split(' (')[0].trim();
+          if (!existingIds.has(p.id) && !existingBrands.has(brand) && finalResults.length < 60) {
+            finalResults.push(p);
+            existingIds.add(p.id);
+            existingBrands.add(brand);
+          }
+        });
       }
+
+      setListings(finalResults);
       
       setTopCities(allCities.slice(0, 8));
       setCurrentCity(cityToUse);

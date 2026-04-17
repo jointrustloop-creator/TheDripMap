@@ -20,10 +20,10 @@ const siteName = process.env.NEXT_PUBLIC_SITE_NAME || 'TheDripMap';
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `IV Therapy Near Me — Find Top Rated Clinics | ${siteName}`,
-    template: `%s | ${siteName}`,
+    template: '%s',
+    default: 'TheDripMap | Find Your Perfect IV Therapy Match',
   },
-  description: `Find and compare the best IV therapy clinics near you. Browse providers across the US or get matched to your perfect drip in 60 seconds.`,
+  description: 'Find and compare the best IV therapy clinics near you. Browse 1,042 verified providers across 208 US cities or get matched in 60 seconds.',
   alternates: {
     canonical: '/',
   },

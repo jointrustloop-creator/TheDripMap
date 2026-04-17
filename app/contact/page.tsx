@@ -5,7 +5,7 @@ import { Footer } from '../../src/components/Footer';
 import { Mail, MapPin, MessageSquare } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: "Contact Us | Get in Touch with TheDripMap | TheDripMap",
+  title: "Contact Us | TheDripMap",
   description: "Have questions about IV therapy or want to list your clinic? Contact the TheDripMap team today.",
 };
 

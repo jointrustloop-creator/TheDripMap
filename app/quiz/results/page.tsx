@@ -334,9 +334,6 @@ function ResultsContent() {
                     {topMatch.is_top_rated && (
                       <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg">⭐ Top Rated</span>
                     )}
-                    {topMatch.is_verified && (
-                      <span className="bg-[#10B981] text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg">✓ Verified</span>
-                    )}
                   </div>
                 </div>
                 <div className="p-8 lg:p-10 flex flex-col justify-center">

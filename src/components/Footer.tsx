@@ -6,12 +6,12 @@ import { MedicalDisclaimer } from './MedicalDisclaimer';
 
 export const Footer = () => {
   const POPULAR_CITIES = [
-    { city: 'San Francisco', state: 'CA' },
-    { city: 'Las Vegas', state: 'NV' },
-    { city: 'San Diego', state: 'CA' },
-    { city: 'Chicago', state: 'IL' },
-    { city: 'New York', state: 'NY' },
-    { city: 'Los Angeles', state: 'CA' },
+    { city: 'San Francisco', state: 'CA', href: '/iv-therapy/california/san-francisco' },
+    { city: 'Las Vegas', state: 'NV', href: '/iv-therapy/nevada/las-vegas' },
+    { city: 'San Diego', state: 'CA', href: '/iv-therapy/california/san-diego' },
+    { city: 'Chicago', state: 'IL', href: '/iv-therapy/illinois/chicago' },
+    { city: 'New York', state: 'NY', href: '/iv-therapy/ny/new-york' },
+    { city: 'Los Angeles', state: 'CA', href: '/iv-therapy/california/los-angeles' },
   ];
 
   return (
@@ -41,7 +41,7 @@ export const Footer = () => {
             {POPULAR_CITIES.map((city, idx) => (
               <li key={idx}>
                 <Link 
-                  href={`/search?city=${encodeURIComponent(city.city)}`} 
+                  href={city.href} 
                   className="hover:text-wellness-600 transition-colors"
                   onClick={() => {
                     const newLoc = {

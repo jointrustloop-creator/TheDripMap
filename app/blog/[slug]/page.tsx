@@ -15,6 +15,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import DOMPurify from 'isomorphic-dompurify';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
@@ -45,7 +46,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   
   if (!post) return { title: 'Post Not Found' };
 
-  const title = `${post.title} | TheDripMap Wellness Blog`;
+  const title = `${post.title} | TheDripMap`;
   const description = post.metaDescription || post.excerpt || `Read our latest guide on ${post.title.toLowerCase()}. Expert insights from TheDripMap Team.`;
 
   return {
@@ -98,7 +99,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     "author": {
       "@type": "Person",
       "name": post.author || "TheDripMap Team",
-      "jobTitle": "Medical Contributor"
+      "jobTitle": post.authorRole || "TheDripMap Editorial"
     },
     "publisher": {
       "@type": "Organization",
@@ -199,7 +200,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   </div>
                   <div>
                     <div className="text-sm font-black text-slate-900">{post.author}</div>
-                    <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Medical Contributor</div>
+                    <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">{post.authorRole || "TheDripMap Editorial"}</div>
                   </div>
                 </div>
 
@@ -234,7 +235,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
             <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline">
               {post.content ? (
-                <ReactMarkdown>{post.content}</ReactMarkdown>
+                <div 
+                  dangerouslySetInnerHTML={{ 
+                    __html: DOMPurify.sanitize(post.content) 
+                  }} 
+                />
               ) : (
                 <div className="bg-slate-50 border border-slate-100 rounded-3xl p-12 text-center">
                   <Zap size={40} className="mx-auto mb-6 text-slate-300" />

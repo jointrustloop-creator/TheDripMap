@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion, Variants } from 'motion/react';
 import { Zap, Search, Droplets, ArrowRight } from 'lucide-react';
 
-export const HowItWorks = ({ totalListings = 1518 }: { totalListings?: number }) => {
+export const HowItWorks = ({ totalListings = 1042 }: { totalListings?: number }) => {
   const steps = [
     { 
       step: '01', 

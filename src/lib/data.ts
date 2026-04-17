@@ -1,6 +1,7 @@
 import { calculateDistance } from './geo';
 import { Provider, BlogPost, OperatorProfile, ListingStats } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
+import { unstable_cache } from 'next/cache';
 
 const EXCLUDED_CATEGORIES = [
   'restaurants', 
@@ -66,7 +67,7 @@ export const getStateFromProvider = (provider: Provider): string => {
 
 // Helper to enrich provider with detailed mock data for UI sections
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function enrichProvider(p: any): Provider {
+export function enrichProvider(p: any): Provider {
   // Normalize arrays that might be strings in DB
   const specialties = Array.isArray(p.specialties) 
     ? p.specialties 
@@ -111,11 +112,20 @@ function enrichProvider(p: any): Provider {
   // Verification should only be true if explicitly set in DB or claimed
   const isVerified = !!p.is_verified || !!p.is_claimed;
 
+  // Sanitize website - filter out common placeholders
+  const rawWebsite = p.website || p.Website || p.website_url || '';
+  const website = (rawWebsite.toLowerCase().includes('example.com') || 
+                  rawWebsite.toLowerCase().includes('placeholder.com') ||
+                  rawWebsite.length < 5) 
+                  ? null 
+                  : rawWebsite;
+
   const enriched = { 
     ...p,
     name: p.name || p.Name || p.clinic_name || 'Unnamed Clinic',
     city: p.city || p.town || 'Unknown City',
     state: p.state || p.state_abbr || p.province || '',
+    website: website,
     rating: Number(p.rating) || 0,
     reviewCount: Number(p.review_count || p.reviews || p.reviewCount || p.Reviews) || 0,
     imageUrl: finalImageUrl,
@@ -142,13 +152,15 @@ export async function getListingsByCity(city: string, state?: string) {
     const { data, error } = await supabase
       .from('listings')
       .select('*')
-      .ilike('city', city)
+      .ilike('city', `%${city}%`)
       .order('rating', { ascending: false })
       .order('review_count', { ascending: false });
 
     if (error) throw error;
 
     if (data && data.length > 0) {
+      // For city-specific pages, we show all locations to provide accurate coverage
+      // Deduplication is handled mainly on service-specific top-lists
       return data.map(enrichProvider);
     }
   } catch (err) {
@@ -246,13 +258,13 @@ export async function getAllStates() {
 function getServiceFilter(service: string): string {
   const s = service.toLowerCase();
   if (s.includes('hangover')) {
-    return "name.ilike.%hangover%,description.ilike.%hangover%,subtypes.cs.{\"Hangover\"}";
+    return "name.ilike.%hangover%,description.ilike.%hangover%,name.ilike.%rehydrate%,description.ilike.%rehydrate%,name.ilike.%detox%,description.ilike.%detox%,subtypes.cs.{\"Hangover\"},subtypes.cs.{\"Hydration\"},subtypes.cs.{\"Wellness\"},description.ilike.%hydration%,description.ilike.%fluids%,description.ilike.%saline%,name.ilike.%wellness%,name.ilike.%drip%,description.ilike.%drip%";
   }
   if (s.includes('nad')) {
-    return "name.ilike.%NAD%,description.ilike.%NAD%,subtypes.cs.{\"NAD\"}";
+    return "name.ilike.%NAD%,description.ilike.%NAD%,subtypes.cs.{\"NAD\"},description.ilike.%nicotinamide%,description.ilike.%anti-aging%,description.ilike.%longevity%";
   }
   if (s.includes('immune')) {
-    return "name.ilike.%immune%,description.ilike.%immune%,subtypes.cs.{\"Immune\"},subtypes.cs.{\"Wellness\"}";
+    return "name.ilike.%immune%,description.ilike.%immune%,name.ilike.%immunity%,description.ilike.%immunity%,name.ilike.%shield%,description.ilike.%shield%,name.ilike.%defense%,name.ilike.%defender%,description.ilike.%defense%,subtypes.cs.{\"Immune\"},subtypes.cs.{\"Wellness\"},subtypes.cs.{\"Vitamin C\"},subtypes.cs.{\"Zinc\"},subtypes.cs.{\"Glutathione\"},name.ilike.%vitamin c%";
   }
   if (s.includes('beauty') || s.includes('glow')) {
     return "name.ilike.%beauty%,name.ilike.%glow%,description.ilike.%beauty%,subtypes.cs.{\"Beauty\"},subtypes.cs.{\"Skin\"}";
@@ -261,13 +273,13 @@ function getServiceFilter(service: string): string {
     return "name.ilike.%hydration%,name.ilike.%hydrate%,description.ilike.%hydration%";
   }
   if (s.includes('recovery')) {
-    return "name.ilike.%recovery%,description.ilike.%recovery%,subtypes.cs.{\"Athletic\"},subtypes.cs.{\"Sport\"}";
+    return "name.ilike.%recovery%,description.ilike.%recovery%,subtypes.cs.{\"Athletic\"},subtypes.cs.{\"Sport\"},subtypes.cs.{\"Performance\"},subtypes.cs.{\"Muscle\"}";
   }
   if (s.includes('myers')) {
     return "name.ilike.%myers%,description.ilike.%myers%,subtypes.cs.{\"Myers\"}";
   }
   if (s.includes('weight')) {
-    return "name.ilike.%weight%,description.ilike.%weight%,subtypes.cs.{\"Weight\"}";
+    return "name.ilike.%weight%,description.ilike.%weight%,subtypes.cs.{\"Weight\"},subtypes.cs.{\"Metabolism\"},description.ilike.%metabolism%,description.ilike.%slim%,description.ilike.%fat burn%,name.ilike.%lipo%,description.ilike.%MIC%,name.ilike.%MIC%";
   }
   
   // Default fallback
@@ -280,15 +292,30 @@ export async function getListingsByService(service: string, limit: number = 4) {
   
   try {
     const filter = getServiceFilter(service);
+    // Increase internal limit to allow for brand-level deduplication
     const { data, error } = await supabase
       .from('listings')
       .select('*')
       .or(filter)
       .order('rating', { ascending: false })
-      .limit(limit);
+      .limit(2000);
 
     if (error) throw error;
-    return (data || []).map(enrichProvider);
+    
+    // Deduplicate by name to ensure brand diversity (No doubles)
+    const seenNames = new Set<string>();
+    const uniqueListings: Provider[] = [];
+    
+    (data || []).forEach(p => {
+      const enriched = enrichProvider(p);
+      const nameKey = enriched.name.toLowerCase().split(' - ')[0].split(' (')[0].trim();
+      if (!seenNames.has(nameKey)) {
+        uniqueListings.push(enriched);
+        seenNames.add(nameKey);
+      }
+    });
+
+    return uniqueListings.slice(0, limit);
   } catch (err) {
     console.error('Supabase error in getListingsByService:', err);
     return [];
@@ -314,21 +341,30 @@ export async function searchListings(query: string, city?: string) {
       .order('rating', { ascending: false })
       .limit(2000);
     if (error) throw error;
-    return (data || []).map(enrichProvider);
+    
+    // Deduplicate by ID
+    const uniqueData = Array.from(new Map((data || []).map(item => [item.id, item])).values());
+    return uniqueData.map(enrichProvider);
   } catch (err) {
     console.error('Supabase error in searchListings:', err);
     return [];
   }
 }
 
-export async function getFeaturedListings(limit: number = 6) {
+export async function getFeaturedListings(limit: number = 6, city?: string) {
   if (!isSupabaseConfigured()) return [];
   
   try {
-    const { data, error } = await supabase
+    let q = supabase
       .from('listings')
       .select('*')
-      .eq('is_featured', true)
+      .eq('is_featured', true);
+      
+    if (city && city !== 'All') {
+      q = q.ilike('city', `%${city}%`);
+    }
+
+    const { data, error } = await q
       .order('rating', { ascending: false })
       .limit(limit);
 
@@ -343,34 +379,112 @@ export async function getFeaturedListings(limit: number = 6) {
   return [];
 }
 
-export async function getListingStats(): Promise<ListingStats> {
-  if (!isSupabaseConfigured()) {
-    return { totalListings: 1042, totalCities: 208, totalStates: 25, avgRating: 4.9, isLive: false };
-  }
-  
-  try {
-    const [totalRes, citiesRes, ratingRes, statesRes] = await Promise.all([
-      supabase.from('listings').select('*', { count: 'exact', head: true }),
-      supabase.from('listings').select('city'),
-      supabase.from('listings').select('rating').not('rating', 'is', null),
-      supabase.from('listings').select('state_abbr')
-    ]);
+export const getSiteStats = unstable_cache(
+  async () => {
+    if (!isSupabaseConfigured()) {
+      return { 
+        total: 1042, 
+        cities: 208, 
+        states: 26, 
+        avgRating: '4.9',
+        totalReviews: 12540,
+        topStates: [],
+        topCities: []
+      };
+    }
 
-    const cityCount = new Set(citiesRes.data?.map(c => c.city?.toLowerCase().trim())).size;
-    const stateCount = new Set(statesRes.data?.map(s => s.state_abbr?.toUpperCase().trim()).filter(Boolean)).size;
-    const ratings = ratingRes.data?.map(r => r.rating) || [];
-    const avgRating = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 4.9;
+    const { data: allListings, error } = await supabase
+      .from('listings')
+      .select('city, state_abbr, rating, reviewCount');
+
+    const { count: exactTotal, error: countError } = await supabase
+      .from('listings')
+      .select('*', { count: 'exact', head: true });
+
+    if (error || !allListings) {
+      return { total: exactTotal || 1042, cities: 208, states: 26, avgRating: '4.9', totalReviews: 12540, topStates: [], topCities: [] };
+    }
+
+    const total = exactTotal || allListings.length;
+    
+    const citiesSet = new Set(
+      allListings.map(r => 
+        (r.city?.toLowerCase() || '') + '-' + 
+        (r.state_abbr?.toLowerCase() || '')
+      ).filter(id => id.length > 1)
+    );
+    const cities = citiesSet.size || 208;
+
+    const statesSet = new Set(
+      allListings.map(r => r.state_abbr).filter(Boolean)
+    );
+    const states = statesSet.size || 26;
+
+    const ratingData = allListings.filter(r => r.rating > 0);
+    const avgRating = ratingData.length > 0
+      ? (ratingData.reduce((sum, r) => sum + (r.rating || 0), 0) / ratingData.length).toFixed(1)
+      : '4.9';
+
+    const totalReviews = allListings.reduce((sum, r) => sum + (r.reviewCount || 0), 0) || 12540;
+
+    // State Breakdown
+    const stateCounts: Record<string, number> = {};
+    allListings.forEach(l => {
+      if (l.state_abbr) {
+        stateCounts[l.state_abbr] = (stateCounts[l.state_abbr] || 0) + 1;
+      }
+    });
+    const topStates = Object.entries(stateCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, count]) => ({
+        name,
+        count,
+        share: `${((count / total) * 100).toFixed(1)}%`
+      }));
+
+    // City Breakdown
+    const cityCounts: Record<string, { count: number, state: string }> = {};
+    allListings.forEach(l => {
+      if (l.city && l.state_abbr) {
+        const key = `${l.city}, ${l.state_abbr}`;
+        if (!cityCounts[key]) {
+          cityCounts[key] = { count: 0, state: l.state_abbr };
+        }
+        cityCounts[key].count++;
+      }
+    });
+    const topCities = Object.entries(cityCounts)
+      .sort((a, b) => b[1].count - a[1].count)
+      .slice(0, 20)
+      .map(([cityWithState, info]) => ({
+        city: cityWithState.split(', ')[0],
+        state: info.state,
+        count: info.count
+      }));
 
     return {
-      totalListings: totalRes.count || 1042,
-      totalCities: cityCount || 208,
-      totalStates: stateCount || 25,
-      avgRating: Math.round(avgRating * 10) / 10,
-      isLive: true
+      total,
+      cities,
+      states,
+      avgRating,
+      totalReviews,
+      topStates,
+      topCities
     };
-  } catch (err) {
-    return { totalListings: 1042, totalCities: 208, totalStates: 25, avgRating: 4.9, isLive: false };
-  }
+  },
+  ['site-stats'],
+  { revalidate: 3600 }
+);
+
+export async function getListingStats(): Promise<ListingStats> {
+  const stats = await getSiteStats();
+  return {
+    totalListings: stats.total,
+    totalCities: stats.cities,
+    totalStates: stats.states,
+    avgRating: parseFloat(stats.avgRating),
+    isLive: true
+  };
 }
 
 export async function getBlogPosts() {
@@ -500,16 +614,34 @@ export async function getListingsByServiceAndCity(service: string, city: string,
   
   try {
     const filter = getServiceFilter(service);
+    // Use a broader city match (ilike %city%) to handle "New York" vs "New York City"
+    const cityPattern = `%${city}%`;
+    
     const { data, error } = await supabase
       .from('listings')
       .select('*')
-      .ilike('city', city)
+      .ilike('city', cityPattern)
       .or(filter)
       .order('rating', { ascending: false })
-      .limit(limit);
+      .limit(2000); // Fetch a large sample to ensure variety after deduplication
 
     if (error) throw error;
-    return (data || []).map(enrichProvider);
+    
+    // Deduplicate by name to ensure brand diversity (No doubles)
+    const seenNames = new Set<string>();
+    const uniqueListings: Provider[] = [];
+    
+    (data || []).forEach(p => {
+      const enriched = enrichProvider(p);
+      const nameKey = enriched.name.toLowerCase().split(' - ')[0].split(' (')[0].trim();
+      if (!seenNames.has(nameKey)) {
+        uniqueListings.push(enriched);
+        seenNames.add(nameKey);
+      }
+    });
+
+    // Clamp to the requested limit
+    return uniqueListings.slice(0, limit);
   } catch (err) {
     console.error('Supabase error in getListingsByServiceAndCity:', err);
     return [];
@@ -527,6 +659,46 @@ export async function getOperatorProfiles() {
     return data as OperatorProfile[];
   } catch (err) {
     console.error('Supabase error fetching operator profiles:', err);
+    return [];
+  }
+}
+
+export async function getSimilarClinics(currentSlug: string, city: string, state: string, limit: number = 3) {
+  if (!isSupabaseConfigured()) return [];
+  
+  try {
+    // 1. Try to find other clinics in the same city
+    const { data: cityData, error: cityError } = await supabase
+      .from('listings')
+      .select('*')
+      .eq('city', city)
+      .neq('slug', currentSlug)
+      .order('rating', { ascending: false })
+      .limit(limit);
+
+    if (cityError) throw cityError;
+    
+    let results = (cityData || []).map(enrichProvider);
+
+    // 2. If not enough in the city, find some in the same state
+    if (results.length < limit) {
+      const remaining = limit - results.length;
+      const { data: stateData, error: stateError } = await supabase
+        .from('listings')
+        .select('*')
+        .eq('state_abbr', state)
+        .neq('city', city) // Don't pick up city clinics again
+        .neq('slug', currentSlug)
+        .order('rating', { ascending: false })
+        .limit(remaining);
+
+      if (stateError) throw stateError;
+      results = [...results, ...(stateData || []).map(enrichProvider)];
+    }
+
+    return results;
+  } catch (err) {
+    console.error('Supabase error in getSimilarClinics:', err);
     return [];
   }
 }

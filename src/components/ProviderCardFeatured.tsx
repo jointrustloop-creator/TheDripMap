@@ -7,6 +7,7 @@ import { RatingStars } from './RatingStars';
 import { ServicePill } from './ServicePill';
 import { slugify } from '../lib/data';
 import { cn } from '../lib/utils';
+import { calculateValueMetrics } from '../lib/price-utils';
 
 interface ProviderCardFeaturedProps {
   provider: Provider & { matchScore?: number };
@@ -17,6 +18,7 @@ interface ProviderCardFeaturedProps {
 
 export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = true }: ProviderCardFeaturedProps) => {
   const slug = provider.slug || slugify(provider.name);
+  const valueMetrics = calculateValueMetrics(provider);
   const priceAnchor = provider.priceRange === '$' ? '$99' : provider.priceRange === '$$' ? '$149' : provider.priceRange === '$$$' ? '$199' : '$249';
 
   return (
@@ -48,8 +50,16 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
           </Link>
           
           {isPrimary && (
-            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-wellness-700 px-4 py-2 rounded-2xl text-xs font-black shadow-xl flex items-center gap-2">
-              <Sparkles size={14} /> YOUR BEST MATCH
+            <div className="flex flex-col gap-2 absolute top-4 left-4">
+              <div className="bg-white/90 backdrop-blur-sm text-wellness-700 px-4 py-2 rounded-2xl text-xs font-black shadow-xl flex items-center gap-2">
+                <Sparkles size={14} /> YOUR BEST MATCH
+              </div>
+              <div className={cn(
+                "px-4 py-2 rounded-2xl text-[10px] font-black shadow-xl flex items-center gap-2 border",
+                valueMetrics.color
+              )}>
+                💎 {valueMetrics.label}
+              </div>
             </div>
           )}
 
@@ -57,6 +67,17 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
             <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-slate-900 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg">
               {provider.distance} miles away
             </div>
+          )}
+
+          {/* Claim Listing Overlay */}
+          {!provider.is_claimed && (
+            <Link 
+              href={`/for-clinics?clinicId=${provider.id}&clinicName=${encodeURIComponent(provider.name)}`}
+              className="absolute bottom-4 left-4 right-4 bg-wellness-600/90 backdrop-blur-md py-3 px-5 rounded-2xl flex items-center justify-center gap-3 hover:bg-wellness-700 transition-all border border-white/20 shadow-xl z-10"
+            >
+              <span className="text-xs font-black text-white uppercase tracking-[0.15em]">CLAIM MY LISTING</span>
+              <ArrowRight size={18} className="text-white" />
+            </Link>
           )}
         </div>
 

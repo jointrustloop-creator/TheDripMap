@@ -18,7 +18,7 @@ export function matchProviders(
   operatorProfiles: OperatorProfile[] = [],
   userLocation?: { latitude: number; longitude: number }
 ) {
-  return providers.map(p => {
+  const matched = providers.map(p => {
     let score = 0;
     const profile = operatorProfiles.find(op => op.clinicId === p.id);
     
@@ -82,9 +82,9 @@ export function matchProviders(
       const goalKeywords: Record<string, string[]> = {
         'hangover': ['hangover', 'hydration', 'recovery', 'rehydrate'],
         'nad-plus': ['nad', 'nicotinamide', 'anti-aging', 'energy'],
-        'immune-support': ['immune', 'wellness', 'vitamin c', 'zinc', 'immunity'],
-        'beauty-glow': ['beauty', 'glow', 'skin', 'hair', 'nails', 'collagen', 'glutathione'],
-        'weight-loss': ['weight', 'metabolism', 'fat', 'slim', 'semaglutide', 'tirzepatide'],
+        'immune-support': ['immune', 'wellness', 'vitamin c', 'zinc', 'immunity', 'shield', 'defense', 'defender', 'glutathione'],
+        'beauty-glow': ['beauty', 'glow', 'skin', 'hair', 'nails', 'collagen', 'glutathione', 'skin glow'],
+        'weight-loss': ['weight', 'metabolism', 'fat', 'slim', 'semaglutide', 'tirzepatide', 'mic', 'lipo'],
         'hydration': ['hydration', 'rehydrate', 'fluids', 'saline'],
         'recovery': ['recovery', 'athletic', 'sport', 'muscle', 'performance'],
         'myers-cocktail': ['myers', 'cocktail', 'multivitamin']
@@ -151,5 +151,28 @@ export function matchProviders(
     }
 
     return { ...p, matchScore: score, distance };
-  }).sort((a, b) => b.matchScore - a.matchScore).slice(0, 10);
+  });
+
+  // Deduplication Logic - 100% Unique result set
+  const uniqueMatches: (Provider & { matchScore: number; distance?: number })[] = [];
+  const seenNames = new Set<string>();
+  const seenIds = new Set<string>();
+
+  // Sort by score first to keep the best versions of each clinic
+  const sorted = matched.sort((a, b) => b.matchScore - a.matchScore);
+
+  for (const item of sorted) {
+    const nameKey = item.name.toLowerCase().split(' - ')[0].split(' (')[0].trim();
+    // Prevent same clinic brand from appearing multiple times in top matches
+    if (!seenIds.has(item.id) && !seenNames.has(nameKey)) {
+      uniqueMatches.push(item);
+      seenIds.add(item.id);
+      seenNames.add(nameKey);
+    }
+    
+    // Safety exit
+    if (uniqueMatches.length >= 12) break;
+  }
+
+  return uniqueMatches;
 }

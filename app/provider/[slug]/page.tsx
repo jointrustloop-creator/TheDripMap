@@ -12,6 +12,7 @@ import {
   Star,
   ArrowRight,
   User,
+  CheckCircle2,
   ExternalLink,
   Phone,
   Lock,
@@ -26,11 +27,14 @@ import {
   slugify, 
   getAllListings, 
   getStateFromProvider, 
-  getOperatorProfiles
+  getOperatorProfiles,
+  getSimilarClinics
 } from '../../../src/lib/data';
 import { Provider } from '../../../src/types';
 import { cn } from '../../../src/lib/utils';
 import { getStatus } from '../../../src/lib/hours';
+import SmartSummary from '../../../src/components/SmartSummary';
+import { calculateValueMetrics } from '../../../src/lib/price-utils';
 
 export const revalidate = 86400; // 24 hours
 
@@ -69,7 +73,13 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   
   if (!provider) return { title: 'Provider Not Found' };
 
-  const title = `${provider.name} — IV Therapy in ${provider.city}, ${provider.state} | TheDripMap`;
+  const displayName = provider.name
+    .split(' | ')[0]
+    .split(' - IV')[0]
+    .split(' - Drip')[0]
+    .trim();
+
+  const title = `${displayName} — IV Therapy in ${provider.city}, ${provider.state} | TheDripMap`;
   const description = provider.reviewCount > 0
     ? `Read ${provider.reviewCount} reviews for ${provider.name} in ${provider.city}, ${provider.state}. Top-rated IV therapy clinic offering hydration, NAD+, and wellness drips.`
     : `Find details for ${provider.name} in ${provider.city}, ${provider.state}. Top-rated IV therapy clinic offering hydration, NAD+, and wellness drips.`;
@@ -155,6 +165,13 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
 
   const allListings = await getAllListings();
   const initials = getInitials(provider.name, provider.city, allListings);
+  const valueMetrics = calculateValueMetrics(provider);
+  
+  const similarClinics = await getSimilarClinics(slug, provider.city, stateCode);
+  const isCityMatch = similarClinics.every(c => c.city === provider.city);
+  const similarTitle = isCityMatch && similarClinics.length >= 3 
+    ? `Other IV therapy clinics in ${provider.city}` 
+    : `Other IV therapy clinics in ${stateName}`;
 
   const medicalBusinessJsonLd = {
     "@context": "https://schema.org",
@@ -215,21 +232,38 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
     ]
   };
 
-  let similarClinics = allListings.filter(p => p.id !== provider.id && p.city === provider.city);
-  let similarTitle = `Other IV therapy clinics in ${provider.city}`;
-  
-  if (similarClinics.length < 3) {
-    const stateSimilar = allListings.filter(p => 
-      p.id !== provider.id && 
-      p.city !== provider.city && 
-      (p.state === stateCode || getStateFromProvider(p) === stateCode)
-    );
-    similarClinics = [...similarClinics, ...stateSimilar].slice(0, 3);
-    similarTitle = `Other IV therapy clinics in ${stateName}`;
-  } else {
-    similarClinics = similarClinics.slice(0, 3);
-  }
-  similarClinics.sort((a, b) => b.rating - a.rating);
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `What services does ${provider.name} offer?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${provider.name} in ${provider.city} specializes in ${provider.specialties?.slice(0, 3).join(', ')} and other IV wellness treatments.`
+        }
+      },
+      {
+        "@type": "Question",
+        "name": `Is mobile IV therapy available from ${provider.name}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": isMobile 
+            ? `Yes, ${provider.name} offers mobile IV therapy services in the ${provider.city} area.`
+            : `Currently, ${provider.name} primarily offers in-clinic treatments at their location in ${provider.city}.`
+        }
+      },
+      {
+        "@type": "Question",
+        "name": `How much does IV therapy cost at ${provider.name}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `Pricing at ${provider.name} is classified as ${provider.price_range || 'competitive'}. For exact pricing on specific drips like NAD+ or Myers' Cocktail, it is best to visit their website or call the clinic directly.`
+        }
+      }
+    ]
+  };
 
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
@@ -242,6 +276,10 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       
       <main className="max-w-7xl mx-auto px-6 py-12">
@@ -301,25 +339,16 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
                     </div>
                   )}
                   {provider.price_range && (
-                    <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
-                      <span>💰</span> {provider.price_range}
+                    <div className={cn(
+                      "px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 border",
+                      valueMetrics.color
+                    )}>
+                      <span>💎</span> {valueMetrics.label} ({provider.price_range})
                     </div>
                   )}
                 </div>
 
                 <div className="flex flex-wrap items-center gap-x-8 gap-y-4 text-base font-bold text-slate-500 mb-8">
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center text-wellness-600">
-                      {[...Array(5)].map((_, i) => {
-                        const val = i + 1;
-                        if (provider.rating >= val) return <Star key={i} size={20} fill="currentColor" />;
-                        if (provider.rating >= val - 0.5) return <StarHalf key={i} size={20} fill="currentColor" />;
-                        return <Star key={i} size={20} />;
-                      })}
-                    </div>
-                    <span className="text-slate-900">{provider.rating}</span>
-                    <span className="text-slate-400">· {provider.reviewCount} reviews</span>
-                  </div>
                   <div className="flex items-center gap-2">
                     <MapPin size={20} className="text-wellness-600" />
                     {provider.city}, {stateCode}
@@ -372,11 +401,6 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
                       <Star size={14} fill="white" /> Top Rated
                     </span>
                   )}
-                  {provider.is_verified && (
-                    <span className="bg-emerald-600 text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-lg">
-                      <ShieldCheck size={14} /> Verified
-                    </span>
-                  )}
                   {provider.is_featured && (
                     <span className="bg-wellness-600 text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-lg">
                       <Star size={14} fill="white" /> Featured
@@ -387,6 +411,8 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
             </section>
 
             {/* ABOUT SECTION */}
+            <SmartSummary reviews={provider.reviews_data || []} clinicName={displayName} />
+
             {provider.description && provider.description.length > 30 && (
               <section className="pt-8 border-t border-slate-100">
                 <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">About {provider.name}</h2>
@@ -443,15 +469,26 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
 
             {/* QUICK FACTS GRID */}
             {(() => {
-              const hasFacts = provider.price_range || isMobile || provider.walk_ins_welcome || provider.rating;
+              const hasFacts = (provider.price_range || provider.priceRange) || 
+                               isMobile || 
+                               provider.walk_ins_welcome || 
+                               (provider.amenities && provider.amenities.length > 0) ||
+                               (provider.subtypes && provider.subtypes.length > 0);
+              
               if (!hasFacts) return null;
+              
+              const priceDisplay = provider.price_range || provider.priceRange || '$$';
               
               return (
                 <section className="pt-8 border-t border-slate-100">
                   <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Clinic details</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {provider.price_range && (
-                      <DetailCard label="Price Range" value={provider.price_range} icon={<Zap size={24} />} />
+                    {priceDisplay && (
+                      <DetailCard 
+                        label="Price Range" 
+                        value={`${priceDisplay} (${valueMetrics.label})`} 
+                        icon={<Zap size={24} />} 
+                      />
                     )}
                     {isMobile && (
                       <DetailCard label="Mobile Service" value="Comes to your location" icon={<Home size={24} />} />
@@ -459,8 +496,19 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
                     {provider.walk_ins_welcome && (
                       <DetailCard label="Walk-ins Welcome" value="No appointment needed" icon={<User size={24} />} />
                     )}
-                    {provider.rating && (
-                      <DetailCard label="Rating" value={`${provider.rating} (${provider.reviewCount} reviews)`} icon={<Star size={24} />} />
+                    {provider.amenities && provider.amenities.length > 0 && (
+                      <DetailCard 
+                        label="Amenities" 
+                        value={provider.amenities.slice(0, 2).join(', ')} 
+                        icon={<Building2 size={24} />} 
+                      />
+                    )}
+                    {provider.subtypes && provider.subtypes.length > 0 && (
+                      <DetailCard 
+                        label="Focus" 
+                        value={provider.subtypes.slice(0, 2).join(', ')} 
+                        icon={<Activity size={24} />} 
+                      />
                     )}
                   </div>
                 </section>
@@ -469,7 +517,7 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
 
             {/* HOURS SECTION */}
             {provider.hours && Object.keys(provider.hours).length > 0 && (
-              <section className="pt-8 border-t border-slate-100">
+              <section id="hours" className="pt-8 border-t border-slate-100">
                 <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Hours</h2>
                 <div className="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm">
                   <table className="w-full text-left border-collapse">
@@ -498,6 +546,74 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
                 </div>
               </section>
             )}
+
+            {/* REVIEWS SECTION */}
+            {provider.reviews_data && provider.reviews_data.length > 0 && (
+              <section id="reviews" className="pt-8 border-t border-slate-100">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+                    Patient Reviews 
+                    <span className="text-wellness-600 text-lg">({provider.reviewCount})</span>
+                  </h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {provider.reviews_data.slice(0, 4).map((review, idx) => (
+                    <div key={idx} className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="w-12 h-12 rounded-full bg-wellness-50 flex items-center justify-center font-bold text-wellness-600">
+                          {review.author[0]}
+                        </div>
+                        <div>
+                          <div className="font-bold text-slate-900">{review.author}</div>
+                          <div className="flex items-center gap-1 text-amber-500 text-xs">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} size={10} fill={i < review.rating ? "currentColor" : "none"} />
+                            ))}
+                            <span className="text-slate-400 ml-1">{review.date}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-slate-600 text-sm leading-relaxed italic">
+                        &quot;{review.text}&quot;
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                {provider.reviews_data.length > 4 && (
+                  <div className="mt-8 text-center">
+                    <p className="text-sm text-slate-400 font-bold italic mb-4">Viewing recent patient feedback</p>
+                  </div>
+                )}
+              </section>
+            )}
+
+            {/* FAQ SECTION */}
+            <section id="faq" className="pt-8 border-t border-slate-100">
+              <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Frequently Asked Questions</h2>
+              <div className="space-y-4">
+                {[
+                  {
+                    q: `What services does ${provider.name} offer?`,
+                    a: `${provider.name} in ${provider.city} specializes in ${provider.specialties?.slice(0, 3).join(', ')} and other IV wellness treatments designed for rapid recovery and cellular health.`
+                  },
+                  {
+                    q: `How long does an appointment take?`,
+                    a: `Most IV treatments take between 45 to 60 minutes depending on the protocol. Specialized infusions like NAD+ may require up to 2-4 hours for cellular absorption.`
+                  },
+                  {
+                    q: `Is mobile IV therapy available?`,
+                    a: isMobile 
+                      ? `Yes! ${provider.name} is a mobile provider and will come directly to your home, office, or hotel in the ${provider.city} area.`
+                      : `Currently, ${provider.name} provides clinical treatments at their facility in ${provider.city}. For mobile options, check our "Mobile IV" filter on the search page.`
+                  }
+                ].map((item, idx) => (
+                  <div key={idx} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                    <h3 className="text-lg font-black text-slate-900 mb-4">{item.q}</h3>
+                    <p className="text-slate-600 leading-relaxed font-medium">{item.a}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
 
             {/* WHO THIS CLINIC IS BEST FOR */}
             {profile?.profile_data && (
@@ -672,7 +788,7 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
                 <div className="pt-8 border-t border-slate-50">
                   {!provider.is_claimed ? (
                     <Link 
-                      href="/for-clinics" 
+                      href={`/for-clinics?clinicId=${provider.id}&clinicName=${encodeURIComponent(provider.name)}`}
                       className="text-sm font-black text-wellness-600 hover:underline flex items-center gap-2"
                     >
                       Own this clinic? Claim your free listing
@@ -680,13 +796,8 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
                   ) : (
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-emerald-600 font-black text-sm">
-                        <ShieldCheck size={18} /> {provider.is_verified ? 'Verified Provider' : 'Claimed by owner'}
+                        <CheckCircle2 size={18} /> Official Clinic Profile
                       </div>
-                      {provider.is_verified && (
-                        <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider pl-6">
-                          Identity and credentials confirmed
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>

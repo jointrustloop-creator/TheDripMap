@@ -11,10 +11,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/about',
     '/blog',
     '/quiz',
+    '/iv-therapy-statistics',
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
-    changeFrequency: 'daily' as const,
+    changeFrequency: route === '/iv-therapy-statistics' ? ('monthly' as const) : ('daily' as const),
     priority: route === '' ? 1 : 0.8,
   }));
 

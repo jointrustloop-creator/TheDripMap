@@ -5,13 +5,16 @@ import { Footer } from '../../src/components/Footer';
 import Link from 'next/link';
 import { ShieldCheck, Zap, Heart, Clock, Star, MapPin, CheckCircle2 } from 'lucide-react';
 import { IVAnimation } from '../../src/components/IVAnimation';
+import { getSiteStats } from '../../src/lib/data';
 
 export const metadata: Metadata = {
-  title: "About TheDripMap | Our Mission & Clinical Standards | TheDripMap",
+  title: "Our Mission & Clinical Standards | TheDripMap",
   description: "Learn about the mission behind TheDripMap. We're building the most trusted resource for IV therapy and clinical wellness in the United States.",
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const stats = await getSiteStats();
+  
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
@@ -22,7 +25,7 @@ export default function AboutPage() {
             Our <span className="text-wellness-600">Mission</span>
           </h1>
           <p className="text-xl text-slate-500 leading-relaxed">
-            We&apos;re building the most trusted resource for IV therapy and clinical wellness in the United States. Our goal is to help you find the perfect provider based on your specific health goals and lifestyle needs.
+            We&apos;re building the most trusted resource for IV therapy and clinical wellness in the United States. Our goal is to help you find the perfect provider based on your specific health goals and lifestyle needs across {stats.total} clinics and {stats.cities} cities.
           </p>
         </div>
 
@@ -108,20 +111,20 @@ export default function AboutPage() {
             </div>
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <div className="text-4xl font-black text-wellness-400 mb-2">490+</div>
+                <div className="text-4xl font-black text-wellness-400 mb-2">{stats.total}+</div>
                 <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">Verified Clinics</div>
               </div>
               <div>
-                <div className="text-4xl font-black text-wellness-400 mb-2">270+</div>
+                <div className="text-4xl font-black text-wellness-400 mb-2">{stats.cities}+</div>
                 <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">Cities Covered</div>
               </div>
               <div>
-                <div className="text-4xl font-black text-wellness-400 mb-2">100%</div>
-                <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">Clinical Focus</div>
+                <div className="text-4xl font-black text-wellness-400 mb-2">{stats.states}</div>
+                <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">States</div>
               </div>
               <div>
-                <div className="text-4xl font-black text-wellness-400 mb-2">24/7</div>
-                <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">Support Access</div>
+                <div className="text-4xl font-black text-wellness-400 mb-2">{stats.avgRating}★</div>
+                <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">Avg Rating</div>
               </div>
             </div>
           </div>

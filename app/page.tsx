@@ -22,44 +22,46 @@ import { HowItWorks } from '../src/components/HowItWorks';
 import { DripBackground } from '../src/components/DripBackground';
 import { QuickMatch } from '../src/components/QuickMatch';
 import { TrustSignals } from '../src/components/TrustSignals';
-import { getListingStats, getBlogPosts, getCitiesFromListings } from '../src/lib/data';
+import { getListingStats, getBlogPosts, getCitiesFromListings, getSiteStats } from '../src/lib/data';
 import { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: "Find IV Therapy Near You — Get Matched in 60 Seconds | TheDripMap",
-  description: "TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse 1,042 clinics across 200+ US cities or take our free 60-second matching quiz.",
-  alternates: {
-    canonical: '/',
-  },
-  openGraph: {
-    title: "Find IV Therapy Near You — Get Matched in 60 Seconds | TheDripMap",
-    description: "TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse 1,042 clinics across 200+ US cities or take our free 60-second matching quiz.",
-    url: 'https://thedripmap.com',
-    siteName: 'TheDripMap',
-    images: [
-      {
-        url: 'https://thedripmap.com/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'TheDripMap - Find Your Perfect IV Therapy Match',
-      },
-    ],
-    locale: 'en_US',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: "Find IV Therapy Near You — Get Matched in 60 Seconds | TheDripMap",
-    description: "TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse 1,042 clinics across 200+ US cities or take our free 60-second matching quiz.",
-    images: ['https://thedripmap.com/og-image.png'],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const stats = await getSiteStats();
+  const description = `TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse ${stats.total} clinics across ${stats.cities} US cities or take our free 60-second matching quiz.`;
+  
+  return {
+    description,
+    alternates: {
+      canonical: '/',
+    },
+    openGraph: {
+      description,
+      url: 'https://thedripmap.com',
+      siteName: 'TheDripMap',
+      images: [
+        {
+          url: 'https://thedripmap.com/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: 'TheDripMap - Find Your Perfect IV Therapy Match',
+        },
+      ],
+      locale: 'en_US',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      description,
+      images: ['https://thedripmap.com/og-image.png'],
+    },
+  };
+}
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function HomePage() {
-  const stats = await getListingStats();
+  const stats = await getSiteStats();
   const blogPosts = await getBlogPosts();
   const latestPosts = blogPosts.slice(0, 3);
   
@@ -146,16 +148,16 @@ export default async function HomePage() {
             </h1>
             
             <p className="text-xl md:text-2xl text-slate-500 mb-8 font-medium tracking-tight max-w-3xl mx-auto leading-relaxed">
-              Answer 5 quick questions. We&apos;ll find the right clinic for your exact goal, location, and budget — from {stats.totalListings || 1042} verified providers.
+              Answer 5 quick questions. We&apos;ll find the right clinic for your exact goal, location, and budget — from {stats.total} verified providers.
             </p>
 
             <QuickMatch />
             
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] font-bold text-slate-500 mt-8">
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalListings || 1042} Clinics</span>
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalCities || 208} Cities</span>
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.totalStates || 25} States</span>
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.avgRating || 4.9}★ Avg Rating</span>
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.total} Clinics</span>
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.cities} Cities</span>
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.states} States</span>
+              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.avgRating}★ Avg Rating</span>
             </div>
 
             </div>
@@ -188,7 +190,7 @@ export default async function HomePage() {
                 </div>
                 <h3 className="text-3xl font-black text-white mb-4">Browse Directory</h3>
                 <p className="text-slate-400 leading-relaxed mb-8">
-                  Already know what you need? Filter through {stats.totalListings || 1042} top-rated clinics by city, service, or price.
+                  Already know what you need? Filter through {stats.total} top-rated clinics by city, service, or price.
                 </p>
                 <div className="flex items-center gap-2 text-white font-bold">
                   Explore Now <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -213,7 +215,7 @@ export default async function HomePage() {
                 <ShieldCheck size={20} />
               </div>
               <div className="text-left">
-                <h4 className="font-bold text-slate-900 text-sm">{stats.totalListings || 1042} Top-Rated Clinics</h4>
+                <h4 className="font-bold text-slate-900 text-sm">{stats.total} Top-Rated Clinics</h4>
                 <p className="text-slate-500 text-xs leading-relaxed">Real businesses with real patient reviews</p>
               </div>
             </div>
@@ -255,13 +257,18 @@ export default async function HomePage() {
       </section>
 
       {/* How It Works */}
-      <HowItWorks totalListings={stats.totalListings} />
+      <HowItWorks totalListings={stats.total} />
 
       {/* Compact City Grid */}
       <CompactCityGrid cities={listingCities} />
 
       {/* Trust Signals Section */}
-      <TrustSignals stats={stats} />
+      <TrustSignals stats={{
+        totalListings: stats.total,
+        totalCities: stats.cities,
+        totalStates: stats.states,
+        avgRating: parseFloat(stats.avgRating)
+      }} />
 
       {/* Blog Preview */}
       <section className="py-24 px-6">
