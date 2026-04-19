@@ -39,7 +39,9 @@ export const CompactCityGrid = ({ cities }: CompactCityGridProps) => {
                     {city.city}
                   </span>
                   <span className="text-[12px] text-slate-400 font-medium">
-                    {city.stateAbbr}
+                    {city.state.split(' ')
+                      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+                      .join(' ')}
                   </span>
                 </div>
                 <span className="text-[12px] text-wellness-600 font-semibold">

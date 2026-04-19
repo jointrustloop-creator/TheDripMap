@@ -93,6 +93,7 @@ export interface BlogPost {
   date: string;
   lastUpdated?: string;
   author: string;
+  authorRole?: string;
   authorImageUrl?: string;
   reviewedBy?: string;
   imageUrl: string;

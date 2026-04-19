@@ -10,7 +10,7 @@ export const Footer = () => {
     { city: 'Las Vegas', state: 'NV', href: '/iv-therapy/nevada/las-vegas' },
     { city: 'San Diego', state: 'CA', href: '/iv-therapy/california/san-diego' },
     { city: 'Chicago', state: 'IL', href: '/iv-therapy/illinois/chicago' },
-    { city: 'New York', state: 'NY', href: '/iv-therapy/ny/new-york' },
+    { city: 'New York', state: 'NY', href: '/iv-therapy/new-york/new-york' },
     { city: 'Los Angeles', state: 'CA', href: '/iv-therapy/california/los-angeles' },
   ];
 

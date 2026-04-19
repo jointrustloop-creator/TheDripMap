@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: '%s',
     default: 'TheDripMap | Find Your Perfect IV Therapy Match',
   },
-  description: 'Find and compare the best IV therapy clinics near you. Browse 1,042 verified providers across 208 US cities or get matched in 60 seconds.',
+  description: 'Find and compare the best IV therapy clinics near you. Browse verified providers across hundreds of US cities or get matched in 60 seconds.',
   alternates: {
     canonical: '/',
   },
@@ -114,27 +114,6 @@ export default function RootLayout({
             </Script>
           </>
         )}
-        <Script id="fetch-fix" strategy="beforeInteractive">
-          {`
-            (function() {
-              if (typeof window !== 'undefined') {
-                try {
-                  var originalFetch = window.fetch;
-                  Object.defineProperty(window, 'fetch', {
-                    get: function() { return originalFetch; },
-                    set: function(v) { 
-                      console.warn('Blocked attempt to overwrite window.fetch');
-                    },
-                    configurable: true
-                  });
-                } catch (e) {
-                  // If we can't redefine it, it might already be a getter-only property
-                  // which is what's causing the error when someone tries to set it.
-                }
-              }
-            })();
-          `}
-        </Script>
         <ErrorBoundary>
           {children}
         </ErrorBoundary>

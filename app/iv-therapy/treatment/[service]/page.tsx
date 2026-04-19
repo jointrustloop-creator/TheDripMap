@@ -32,6 +32,7 @@ const SERVICES = [
   { name: 'Hydration', slug: 'hydration', icon: <Droplets size={24} /> },
   { name: 'Recovery', slug: 'recovery', icon: <Dumbbell size={24} /> },
   { name: 'Myers Cocktail', slug: 'myers-cocktail', icon: <Zap size={24} /> },
+  { name: 'Jet Lag', slug: 'jet-lag', icon: <Droplets size={24} /> },
 ];
 
 export default function ServicePage({ params }: { params: Promise<{ service: string }> }) {

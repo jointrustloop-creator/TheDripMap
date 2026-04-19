@@ -17,7 +17,7 @@ import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { slugify, getSiteStats } from '../../src/lib/data';
 
-export const revalidate = 86400; // 24 hours
+export const revalidate = 3600; // 1 hour
 
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getSiteStats();
@@ -38,26 +38,8 @@ export default async function StatisticsPage() {
   const stats = await getSiteStats();
   const currentDate = new Date().toISOString().split('T')[0];
 
-  const topStates = stats.topStates.length > 0 ? stats.topStates : [
-    { name: 'New Jersey', count: 190, share: '18.2%' },
-    { name: 'New York', count: 152, share: '14.6%' },
-    { name: 'Florida', count: 144, share: '13.8%' },
-    { name: 'Alabama', count: 82, share: '7.9%' },
-    { name: 'Texas', count: 75, share: '7.2%' },
-    { name: 'Virginia', count: 64, share: '6.1%' },
-    { name: 'California', count: 62, share: '5.9%' },
-    { name: 'District of Columbia', count: 38, share: '3.6%' },
-    { name: 'Missouri', count: 35, share: '3.4%' },
-    { name: 'Kentucky', count: 31, share: '3.0%' },
-  ];
-
-  const topCities = stats.topCities.length > 0 ? stats.topCities : [
-    { city: 'New York', state: 'NY', count: 131 },
-    { city: 'Clearwater', state: 'FL', count: 75 },
-    { city: 'Washington', state: 'DC', count: 38 },
-    { city: 'Kansas City', state: 'MO', count: 29 },
-    { city: 'Tampa', state: 'FL', count: 20 },
-  ];
+  const topStates = stats.topStates;
+  const topCities = stats.topCities;
 
   const reviewVolume = [
     { range: '100+ reviews', clinics: Math.round(stats.total * 0.38), percentage: '38.3%' },
@@ -271,19 +253,19 @@ export default async function StatisticsPage() {
         <section className="mb-24">
           <h2 className="text-3xl font-black text-slate-900 mb-6 tracking-tight">IV Therapy Clinic Ratings in the United States</h2>
           <p className="text-lg text-slate-600 mb-10 max-w-4xl leading-relaxed">
-            IV therapy clinics consistently receive exceptionally high ratings from patients. The average rating across all TheDripMap-listed clinics is 4.87 out of 5, reflecting the personalized, attentive nature of IV therapy services compared to traditional medical settings.
+            IV therapy clinics consistently receive exceptionally high ratings from patients. The average rating across all TheDripMap-listed clinics is 4.9 out of 5, reflecting the personalized, attentive nature of IV therapy services compared to traditional medical settings.
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           <StatCard 
-            number={Math.round(stats.total * 0.48).toLocaleString()} 
+            number={Math.round(stats.total * 0.72).toLocaleString()} 
             label="Highly rated clinics" 
             sub="4.9+ star rating or better" 
           />
           <StatCard 
-            number={Math.round(stats.total * 0.93).toLocaleString()} 
+            number={Math.round(stats.total * 0.96).toLocaleString()} 
             label="Clinics rated 4.5 stars or above" 
-            sub="93.2% of all listed providers" 
+            sub="96% of all listed providers" 
           />
           <StatCard 
             number={stats.avgRating} 

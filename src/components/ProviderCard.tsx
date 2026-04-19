@@ -22,7 +22,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
   const openStatus = provider.hours ? isOpenNow : null;
   const isMobile = provider.mobile_service || 
                    provider.type === 'Mobile' || 
-                   provider.specialties?.some(s => s.toLowerCase().includes('mobile'));
+                   provider.specialties?.some(s => (s?.toString() || '').toLowerCase().includes('mobile'));
 
   return (
     <div className={cn(
@@ -131,11 +131,15 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
         {/* Row 4: Service Pills */}
         <div className="flex flex-wrap gap-1.5 mt-auto">
           {(provider.services || []).length > 0 ? (
-            provider.services?.slice(0, 3).map((s, idx) => (
-              <span key={idx} className="bg-slate-50 text-slate-500 px-2 py-0.5 rounded text-[10px] font-medium border border-slate-100">
-                {s.name}
-              </span>
-            ))
+            provider.services?.slice(0, 3).map((s, idx) => {
+              const name = typeof s === 'string' ? s : (s?.name || '');
+              if (!name) return null;
+              return (
+                <span key={idx} className="bg-slate-50 text-slate-500 px-2 py-0.5 rounded text-[10px] font-medium border border-slate-100">
+                  {name}
+                </span>
+              );
+            })
           ) : (
             (provider.specialties || []).slice(0, 3).map((s, idx) => (
               <span key={idx} className="bg-slate-50 text-slate-500 px-2 py-0.5 rounded text-[10px] font-medium border border-slate-100">

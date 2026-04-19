@@ -25,9 +25,20 @@ interface SearchClientProps {
   initialProviders: Provider[];
   topCities: {city: string, state: string, count: number}[];
   initialStats: ListingStats | null;
+  totalCount: number;
 }
 
-export default function SearchClient({ initialProviders, topCities: initialTopCities, initialStats }: SearchClientProps) {
+const GOAL_KEYWORDS: Record<string, string[]> = {
+  'SkinGlow': ['beauty', 'glow', 'skin', 'hair', 'nails', 'collagen', 'glutathione', 'skin glow', 'brightening', 'complexion'],
+  'WeightLoss': ['weight', 'metabolism', 'fat', 'slim', 'semaglutide', 'tirzepatide', 'mic', 'lipo', 'fat burn', 'metabolic'],
+  'NAD': ['nad', 'nicotinamide', 'anti-aging', 'energy', 'longevity', 'cellular', 'rejuvenation'],
+  'Immune': ['immune', 'wellness', 'vitamin c', 'zinc', 'immunity', 'shield', 'defense', 'defender', 'glutathione', 'tri-immune'],
+  'Hangover': ['hangover', 'hydration', 'recovery', 'rehydrate', 'detox', 'cleanse', 'saline', 'fluids'],
+  'Hydration': ['hydration', 'rehydrate', 'fluids', 'saline', 'electrolyte', 'quench'],
+  'JetLag': ['jet', 'lag', 'travel', 'fatigue', 'energy', 'recovery', 'timezone', 'flight', 'international'],
+};
+
+export default function SearchClient({ initialProviders, topCities: initialTopCities, initialStats, totalCount }: SearchClientProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   
@@ -66,18 +77,10 @@ export default function SearchClient({ initialProviders, topCities: initialTopCi
     { id: 'Immune', label: 'Immune Support' },
     { id: 'Hangover', label: 'Hangover' },
     { id: 'Hydration', label: 'Hydration' },
+    { id: 'JetLag', label: 'Jet Lag' },
     { id: 'Open', label: 'Open Now' },
     { id: 'TopRated', label: 'Top Rated' },
   ];
-
-  const GOAL_KEYWORDS: Record<string, string[]> = {
-    'SkinGlow': ['beauty', 'glow', 'skin', 'hair', 'nails', 'collagen', 'glutathione', 'skin glow', 'brightening', 'complexion'],
-    'WeightLoss': ['weight', 'metabolism', 'fat', 'slim', 'semaglutide', 'tirzepatide', 'mic', 'lipo', 'fat burn', 'metabolic'],
-    'NAD': ['nad', 'nicotinamide', 'anti-aging', 'energy', 'longevity', 'cellular', 'rejuvenation'],
-    'Immune': ['immune', 'wellness', 'vitamin c', 'zinc', 'immunity', 'shield', 'defense', 'defender', 'glutathione', 'tri-immune'],
-    'Hangover': ['hangover', 'hydration', 'recovery', 'rehydrate', 'detox', 'cleanse', 'saline', 'fluids'],
-    'Hydration': ['hydration', 'rehydrate', 'fluids', 'saline', 'electrolyte', 'quench'],
-  };
 
   const toggleChip = (id: string) => {
     if (id === 'All') {
@@ -190,9 +193,9 @@ export default function SearchClient({ initialProviders, topCities: initialTopCi
         const activeGoalChips = Object.keys(GOAL_KEYWORDS).filter(id => activeChips.includes(id));
         if (activeGoalChips.length > 0) {
           results = results.filter(p => {
-            const pSpecialties = (p.specialties || []).map(s => s.toLowerCase());
-            const pSubtypes = (p.subtypes || []).map(s => s.toLowerCase());
-            const pName = p.name.toLowerCase();
+            const pSpecialties = (p.specialties || []).map(s => (s || '').toLowerCase());
+            const pSubtypes = (p.subtypes || []).map(s => (s || '').toLowerCase());
+            const pName = (p.name || '').toLowerCase();
             const pDesc = (p.description || '').toLowerCase();
             return activeGoalChips.some(chipId => {
               const keywords = GOAL_KEYWORDS[chipId];
@@ -249,16 +252,18 @@ export default function SearchClient({ initialProviders, topCities: initialTopCi
               IV Therapy Clinics Near You
             </h1>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto md:mx-0 font-medium leading-relaxed">
-              Browse 1,042 verified IV therapy clinics across 208 US cities. Filter by city, service, or delivery preference — or take the quiz to get matched in 60 seconds.
+              Browse {siteStats?.totalListings?.toLocaleString() || '...'} verified IV therapy clinics across {siteStats?.totalCities || '...'} US cities. Filter by city, service, or delivery preference — or take the quiz to get matched in 60 seconds.
             </p>
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pt-8 border-t border-slate-50">
             <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-              {selectedCity === 'All' ? 'All Clinics' : `IV Therapy in ${selectedCity}`}
-              <span className="text-wellness-600 ml-2">
-                ({filteredProviders.length})
-              </span>
+              {selectedCity === 'All' ? `All Clinics (${totalCount})` : `IV Therapy in ${selectedCity}`}
+              {selectedCity !== 'All' && (
+                <span className="text-wellness-600 ml-2">
+                  ({filteredProviders.length})
+                </span>
+              )}
             </h2>
             
             <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -316,7 +321,7 @@ export default function SearchClient({ initialProviders, topCities: initialTopCi
           </div>
 
           <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 text-left">
-            Showing {filteredProviders.length} {activeChips.includes('Mobile') ? 'mobile IV ' : ''}clinics in {selectedCity}
+            Showing {selectedCity === 'All' ? totalCount : filteredProviders.length} {activeChips.includes('Mobile') ? 'mobile IV ' : ''}clinics {selectedCity === 'All' ? 'nationwide' : `in ${selectedCity}`}
           </div>
 
           <AnimatePresence>

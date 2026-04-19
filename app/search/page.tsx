@@ -1,38 +1,54 @@
 import { Metadata } from 'next';
 import { supabase } from '../../src/lib/supabase';
-import { enrichProvider, getAllCities, getListingStats } from '../../src/lib/data';
+import { enrichProvider, getAllCities, getListingStats, deduplicateListings } from '../../src/lib/data';
+import { Suspense } from 'react';
 import SearchClient from './SearchClient';
 
-export const metadata: Metadata = {
-  title: 'Find IV Therapy Clinics Near You — Browse All | TheDripMap',
-  description: 'Browse 1,042 verified IV therapy clinics across 208 US cities. Filter by city, service type, delivery preference and rating. Find your perfect IV therapy match.',
-  openGraph: {
-    title: 'Find IV Therapy Clinics Near You | TheDripMap',
-    description: 'Browse 1,042 verified IV therapy clinics across 208 US cities.',
-    url: 'https://www.thedripmap.com/search',
-    type: 'website',
-    siteName: 'TheDripMap',
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const stats = await getListingStats();
+  const title = `Find IV Therapy Clinics Near You — Browse ${stats.totalListings.toLocaleString()} | TheDripMap`;
+  const description = `Browse ${stats.totalListings.toLocaleString()} verified IV therapy clinics across ${stats.totalCities} US cities. Filter by city, service type, delivery preference and rating.`;
+  
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: 'https://www.thedripmap.com/search',
+      type: 'website',
+      siteName: 'TheDripMap',
+    },
+  };
+}
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function SearchPage() {
-  // SSR the default list of top 50 clinics for SEO
+  // SSR the default list of clinics for SEO and initial view
   const { data } = await supabase
-    .from('listings')
+    .from('providers')
     .select('*')
     .order('rating', { ascending: false })
-    .order('review_count', { ascending: false })
-    .limit(50);
+    .order('reviews', { ascending: false });
 
-  const initialProviders = (data || []).map(enrichProvider);
+  const { count: totalCount } = await supabase
+    .from('providers')
+    .select('*', { count: 'exact', head: true });
+
+  const initialProviders = deduplicateListings(data || []).map(enrichProvider);
   const topCities = await getAllCities();
   const initialStats = await getListingStats();
 
   return (
-    <SearchClient 
-      initialProviders={initialProviders} 
-      topCities={topCities}
-      initialStats={initialStats}
-    />
+    <Suspense fallback={null}>
+      <SearchClient 
+        initialProviders={initialProviders} 
+        topCities={topCities}
+        initialStats={initialStats}
+        totalCount={totalCount || initialProviders.length}
+      />
+    </Suspense>
   );
 }

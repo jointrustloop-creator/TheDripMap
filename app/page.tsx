@@ -22,7 +22,7 @@ import { HowItWorks } from '../src/components/HowItWorks';
 import { DripBackground } from '../src/components/DripBackground';
 import { QuickMatch } from '../src/components/QuickMatch';
 import { TrustSignals } from '../src/components/TrustSignals';
-import { getListingStats, getBlogPosts, getCitiesFromListings, getSiteStats } from '../src/lib/data';
+import { getBlogPosts, getCitiesFromListings, getSiteStats } from '../src/lib/data';
 import { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -296,7 +296,13 @@ export default async function HomePage() {
       </section>
 
       {/* For Clinicians Section */}
-      <ClinicianSection stats={stats} />
+      <ClinicianSection stats={{
+        totalListings: stats.total,
+        totalCities: stats.cities,
+        totalStates: stats.states,
+        avgRating: parseFloat(stats.avgRating),
+        isLive: true
+      }} />
 
       <Footer />
     </div>

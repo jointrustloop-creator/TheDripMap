@@ -25,7 +25,7 @@ export const Logo = ({ className, iconOnly = false }: LogoProps) => {
             TheDrip<span className="text-wellness-600">Map</span>
           </span>
           <span className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-0.5">
-            Premium Wellness Directory
+            IV Therapy Matching Platform
           </span>
         </div>
       )}

@@ -19,9 +19,11 @@ import { ProviderCard } from '../../../../src/components/ProviderCard';
 import { FAQSection } from '../../../../src/components/FAQSection';
 import { BreadcrumbNav } from '../../../../src/components/BreadcrumbNav';
 import { NearbyCities } from '../../../../src/components/NearbyCities';
-import { getListingsByCity, getAllCities, slugify } from '../../../../src/lib/data';
+import { getListingsByCity, getAllCities, slugify, STATE_MAP, REVERSE_STATE_MAP } from '../../../../src/lib/data';
+import { isSupabaseConfigured } from '../../../../src/lib/supabase';
+import { Provider } from '../../../../src/types';
 
-export const revalidate = 86400; // 24 hours
+export const revalidate = 0; // Disable cache for now to fix 404s and stale data
 
 interface CityPageProps {
   params: Promise<{
@@ -31,6 +33,55 @@ interface CityPageProps {
   searchParams: Promise<{
     service?: string;
   }>;
+}
+
+// Defensive city lookup that doesn't rely solely on getAllCities
+async function getCityInfo(state: string, city: string) {
+  const cities = await getAllCities();
+  const s = state.toLowerCase();
+  
+  // Try to find in known list first
+  let cityInfo = cities.find(c => {
+    const isCityMatch = slugify(c.city) === city.toLowerCase();
+    const isStateMatch = slugify(c.state) === s || c.stateAbbr.toLowerCase() === s;
+    const isGenericUSA = s === 'usa' || s === 'us';
+    
+    return isCityMatch && (isStateMatch || isGenericUSA);
+  });
+
+  // Fallback: If not in list, try to lookup directly from DB to see if it's just missing from the summary
+  if (!cityInfo && isSupabaseConfigured()) {
+    console.log(`City ${city} not found in summary, trying direct lookup...`);
+    // If state is 'usa' or 'us', pass undefined for state to getListingByCity to search broadly
+    const stateFilter = (s === 'usa' || s === 'us') ? undefined : state;
+    const listings = await getListingsByCity(city, stateFilter);
+    if (listings.length > 0) {
+      const first = listings[0];
+      cityInfo = {
+        city: first.city,
+        state: first.state || '',
+        stateAbbr: first.state || '',
+        count: listings.length
+      };
+    }
+  }
+
+  // Final Resilience: If still no city info, infer from URL slugs instead of 404ing
+  // This allows the page to render with a "no results found" state rather than a broken 404
+  if (!cityInfo) {
+    const cityName = city.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    const stateAbbr = STATE_MAP[state] || state.toUpperCase();
+    const stateName = REVERSE_STATE_MAP[stateAbbr] || state.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    
+    cityInfo = {
+      city: cityName,
+      state: stateName,
+      stateAbbr: stateAbbr,
+      count: 0
+    };
+  }
+
+  return cityInfo;
 }
 
 export async function generateStaticParams() {
@@ -45,16 +96,12 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params, searchParams }: CityPageProps): Promise<Metadata> {
   const { state, city } = await params;
-  const cities = await getAllCities();
-  const cityInfo = cities.find(c => 
-    slugify(c.city) === city && 
-    (slugify(c.state) === state || c.stateAbbr.toLowerCase() === state)
-  );
+  const cityInfo = await getCityInfo(state, city);
   
   if (!cityInfo) return { title: 'City Not Found' };
 
   const cityName = cityInfo.city;
-  const listings = await getListingsByCity(cityName);
+  const listings = await getListingsByCity(cityName, state);
   const count = listings.length;
 
   const title = `IV Therapy in ${cityName}, ${cityInfo.stateAbbr} — ${count} Clinics | TheDripMap`;
@@ -94,27 +141,32 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
   const { service } = await searchParams;
   
   const cities = await getAllCities();
-  const cityInfo = cities.find(c => 
-    slugify(c.city) === city && 
-    (slugify(c.state) === state || c.stateAbbr.toLowerCase() === state)
-  );
+  const cityInfo = await getCityInfo(state, city);
   
   if (!cityInfo) notFound();
 
-  // Redirect /us/ to correct state code if possible
-  if (state.toLowerCase() === 'us' && cityInfo.state && cityInfo.state.toLowerCase() !== 'us') {
+  const s = state.toLowerCase();
+  // Redirect /us/ or /usa/ to correct state code if possible
+  if ((s === 'us' || s === 'usa') && cityInfo.state && cityInfo.state.toLowerCase() !== s) {
     redirect(`/iv-therapy/${slugify(cityInfo.state)}/${city}`);
   }
 
   const cityName = cityInfo.city;
   const stateName = cityInfo.state;
-  let listings = await getListingsByCity(cityName);
+  // Pass both city and state for more precise matching
+  let listings: Provider[] = [];
+  try {
+    listings = await getListingsByCity(cityName, stateName || state);
+  } catch (error) {
+    console.error('Error fetching listings for city page:', error);
+  }
 
   if (service) {
+    const s = service.toLowerCase();
     listings = listings.filter(l => 
-      l.specialties.some(s => s.toLowerCase().includes(service.toLowerCase())) ||
-      l.name.toLowerCase().includes(service.toLowerCase()) ||
-      l.description.toLowerCase().includes(service.toLowerCase())
+      (l.specialties || []).some((specialty) => (specialty?.toString() || '').toLowerCase().includes(s)) ||
+      (l.name?.toLowerCase() || '').includes(s) ||
+      (l.description?.toLowerCase() || '').includes(s)
     );
   }
   
@@ -123,7 +175,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
   listings.forEach(l => {
     const servicesList = Array.isArray(l.services) ? l.services : [];
     servicesList.forEach((s: string | { name: string }) => {
-      const name = typeof s === 'string' ? s : (s.name || '');
+      const name = typeof s === 'string' ? s : (s?.name || '');
       if (name) {
         serviceCounts[name] = (serviceCounts[name] || 0) + 1;
       }
@@ -306,7 +358,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
               Best {service ? <span className="text-wellness-600">{service} </span> : ''}IV Therapy in <span className="text-wellness-600">{cityName}, {stateName}</span>
             </h1>
             <p className="text-xl text-slate-500 leading-relaxed mb-10">
-              Compare {service ? listings.length : (cityInfo.count || listings.length)} top-rated {service ? service + ' ' : ''}IV therapy clinics and mobile services in {cityName}. Find the perfect hydration, energy, or recovery drip today.
+              Compare {listings.length} top-rated {service ? service + ' ' : ''}IV therapy clinics and mobile services in {cityName}. Find the perfect hydration, energy, or recovery drip today.
             </p>
             
             <div className="flex flex-wrap gap-4">

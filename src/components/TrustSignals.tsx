@@ -23,25 +23,25 @@ export const TrustSignals = ({ stats: dynamicStats }: TrustSignalsProps) => {
   const stats = [
     { 
       label: 'Clinics listed', 
-      value: dynamicStats?.totalListings?.toString() || '1,042', 
+      value: dynamicStats?.totalListings?.toString() || '...', 
       icon: <Building2 className="text-wellness-600" size={24} />,
       suffix: '+'
     },
     { 
       label: 'Cities covered', 
-      value: dynamicStats?.totalCities?.toString() || '208', 
+      value: dynamicStats?.totalCities?.toString() || '...', 
       icon: <Map className="text-wellness-600" size={24} />,
       suffix: '+'
     },
     { 
       label: 'States represented', 
-      value: dynamicStats?.totalStates?.toString() || '26', 
+      value: dynamicStats?.totalStates?.toString() || '...', 
       icon: <Globe className="text-wellness-600" size={24} />,
       suffix: '+'
     },
     { 
       label: 'Average clinic rating', 
-      value: dynamicStats?.avgRating?.toFixed(1) || '4.9', 
+      value: dynamicStats?.avgRating?.toFixed(1) || '...', 
       icon: <Star className="text-amber-500 fill-amber-500" size={24} />,
       suffix: '★'
     },
