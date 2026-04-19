@@ -2,7 +2,6 @@ import { calculateDistance } from './geo';
 import { Provider, BlogPost, OperatorProfile, ListingStats } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
 import { MOCK_BLOG_POSTS } from './mock-data';
-import { unstable_cache } from 'next/cache';
 
 const EXCLUDED_CATEGORIES = [
   'restaurants', 
@@ -163,7 +162,7 @@ export function enrichProvider(p: any): Provider {
   const enriched = { 
     ...p,
     name: p.name || p.Name || p.clinic_name || 'Unnamed Clinic',
-    city: p.city || p.town || 'Unknown City',
+    city: p.city || 'Unknown City',
     state: p.state || p.state_abbr || p.province || '',
     website: website,
     rating: Number(p.rating) || 0,
@@ -351,7 +350,7 @@ export async function getAllCities(): Promise<{ city: string, state: string, sta
     const cityCounts = new Map<string, { city: string, stateAbbr: string, count: number }>();
     
     data?.forEach(item => {
-      const cityVal = item.city || item.town;
+      const cityVal = item.city;
       const stateVal = item.state; // Use 'state' since 'state_abbr' doesn't exist
       if (!cityVal || !stateVal || !item.id) return;
       
