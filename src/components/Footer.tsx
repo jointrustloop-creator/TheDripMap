@@ -6,12 +6,12 @@ import { MedicalDisclaimer } from './MedicalDisclaimer';
 
 export const Footer = () => {
   const POPULAR_CITIES = [
-    { city: 'San Francisco', state: 'CA', href: '/iv-therapy/california/san-francisco' },
-    { city: 'Las Vegas', state: 'NV', href: '/iv-therapy/nevada/las-vegas' },
-    { city: 'San Diego', state: 'CA', href: '/iv-therapy/california/san-diego' },
-    { city: 'Chicago', state: 'IL', href: '/iv-therapy/illinois/chicago' },
-    { city: 'New York', state: 'NY', href: '/iv-therapy/new-york/new-york' },
-    { city: 'Los Angeles', state: 'CA', href: '/iv-therapy/california/los-angeles' },
+    { city: 'San Diego', state: 'CA', slug: 'san-diego' },
+    { city: 'Miami', state: 'FL', slug: 'miami' },
+    { city: 'Houston', state: 'TX', slug: 'houston' },
+    { city: 'Tampa', state: 'FL', slug: 'tampa' },
+    { city: 'New York', state: 'NY', slug: 'new-york' },
+    { city: 'Atlanta', state: 'GA', slug: 'atlanta' },
   ];
 
   return (
@@ -41,7 +41,7 @@ export const Footer = () => {
             {POPULAR_CITIES.map((city, idx) => (
               <li key={idx}>
                 <Link 
-                  href={city.href} 
+                  href={`/cities/${city.slug}`} 
                   className="hover:text-wellness-600 transition-colors"
                   onClick={() => {
                     const newLoc = {
@@ -60,7 +60,7 @@ export const Footer = () => {
               </li>
             ))}
             <li>
-              <Link href="/search" className="text-wellness-600 font-bold hover:underline">
+              <Link href="/cities" className="text-wellness-600 font-bold hover:underline">
                 View All Cities
               </Link>
             </li>

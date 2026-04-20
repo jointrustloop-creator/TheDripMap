@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { LocationInfo } from '../types';
 import { cn } from '../lib/utils';
 import { usePathname, useRouter } from 'next/navigation';
-import { getAllCities } from '../lib/data';
+import { getAllCities, slugify } from '../lib/data';
 
 export const LocationIndicator = () => {
   const pathname = usePathname();
@@ -166,7 +166,7 @@ export const LocationIndicator = () => {
                           pathname.startsWith('/provider/');
     
     if (!isDirectoryPage) {
-      router.push(`/search?city=${encodeURIComponent(city)}`);
+      router.push(`/iv-therapy/${slugify(city)}`);
     }
     
     setIsEditing(false);

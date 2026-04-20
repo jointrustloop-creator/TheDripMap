@@ -11,19 +11,20 @@ import {
   Sparkles,
   Dumbbell,
   Target,
-  Clock
+  Clock,
+  MapPin
 } from 'lucide-react';
 import { Navbar } from '../src/components/Navbar';
 import { Footer } from '../src/components/Footer';
-import { CompactCityGrid } from '../src/components/CompactCityGrid';
 import { BlogCard } from '../src/components/BlogCard';
 import { ClinicianSection } from '../src/components/ClinicianSection';
 import { HowItWorks } from '../src/components/HowItWorks';
 import { DripBackground } from '../src/components/DripBackground';
 import { QuickMatch } from '../src/components/QuickMatch';
 import { TrustSignals } from '../src/components/TrustSignals';
-import { getBlogPosts, getCitiesFromListings, getSiteStats } from '../src/lib/data';
+import { getBlogPosts, getSiteStats, getTopHubs } from '../src/lib/data';
 import { Metadata } from 'next';
+import { cn } from '../src/lib/utils';
 
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getSiteStats();
@@ -63,10 +64,8 @@ export const revalidate = 0;
 export default async function HomePage() {
   const stats = await getSiteStats();
   const blogPosts = await getBlogPosts();
+  const topHubs = await getTopHubs(7);
   const latestPosts = blogPosts.slice(0, 3);
-  
-  // Fetch cities from the listings table for the compact grid
-  const listingCities = await getCitiesFromListings();
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -259,8 +258,47 @@ export default async function HomePage() {
       {/* How It Works */}
       <HowItWorks totalListings={stats.total} />
 
-      {/* Compact City Grid */}
-      <CompactCityGrid cities={listingCities} />
+      {/* Popular Cities Section */}
+      <section className="py-24 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-6xl font-black text-slate-900 mb-4 tracking-tight">Popular Cities</h2>
+            <p className="text-xl text-slate-500">Find the best local IV therapy providers and mobile services in your area.</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              ...topHubs.map(hub => ({ name: hub.city, slug: hub.slug, isAll: false })),
+              { name: 'Browse All Cities', slug: '', isAll: true }
+            ].map((city, idx) => (
+              <Link 
+                key={idx}
+                href={city.isAll ? '/cities' : `/cities/${city.slug}`}
+                className={cn(
+                  "p-8 rounded-[2rem] border transition-all text-center group flex flex-col items-center justify-center min-h-[160px]",
+                  city.isAll 
+                    ? "bg-slate-900 border-slate-900 text-white hover:bg-slate-800" 
+                    : "bg-white border-slate-100 hover:border-wellness-200 hover:shadow-xl"
+                )}
+              >
+                {!city.isAll && (
+                  <div className="w-10 h-10 bg-wellness-50 rounded-xl flex items-center justify-center text-wellness-600 mb-4 group-hover:scale-110 transition-transform">
+                    <MapPin size={20} />
+                  </div>
+                )}
+                <span className={cn(
+                  "font-black tracking-tight",
+                  city.isAll ? "text-lg" : "text-slate-900 group-hover:text-wellness-600 transition-colors"
+                )}>
+                  {city.name}
+                </span>
+                {!city.isAll && (
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">View Clinics</span>
+                )}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Trust Signals Section */}
       <TrustSignals stats={{

@@ -17,7 +17,7 @@ export const NearbyCities = ({ cities }: NearbyCitiesProps) => {
           {cities.map((city, idx) => (
             <Link 
               key={idx}
-              href={`/iv-therapy/${slugify(city.state)}/${slugify(city.city)}`}
+              href={`/iv-therapy/${slugify(city.city)}`}
               className="group bg-white rounded-2xl p-6 border border-slate-100 hover:border-wellness-100 hover:shadow-lg transition-all"
             >
               <div className="flex items-center gap-3 mb-4">

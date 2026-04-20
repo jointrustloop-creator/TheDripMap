@@ -221,7 +221,7 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
         "@type": "ListItem",
         "position": 3,
         "name": cityLabel,
-        "item": `https://thedripmap.com/iv-therapy/${stateSlug}/${citySlug}`
+        "item": `https://thedripmap.com/iv-therapy/${citySlug}`
       },
       {
         "@type": "ListItem",
@@ -289,7 +289,7 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
             items={[
               { label: 'IV Therapy', href: '/search' },
               { label: stateLabel, href: `/iv-therapy/${stateSlug}` },
-              { label: cityLabel, href: `/iv-therapy/${stateSlug}/${citySlug}` },
+              { label: cityLabel, href: `/iv-therapy/${citySlug}` },
               { label: provider.name }
             ]} 
           />

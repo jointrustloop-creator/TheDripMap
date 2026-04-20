@@ -20,7 +20,7 @@ import { ProviderCard } from '../../../../src/components/ProviderCard';
 import { FAQSection } from '../../../../src/components/FAQSection';
 import { BreadcrumbNav } from '../../../../src/components/BreadcrumbNav';
 import { CityGrid } from '../../../../src/components/CityGrid';
-import { getListingsByServiceAndCity, getAllCities, getListingsByService } from '../../../../src/lib/data';
+import { getListingsByServiceAndCity, getListingsByService, getTopHubs } from '../../../../src/lib/data';
 import { Provider } from '../../../../src/types';
 
 const SERVICES = [
@@ -67,11 +67,11 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
         }
       }
 
-      const [serviceListings, allCities] = await Promise.all([
+      const [serviceListings, hubs] = await Promise.all([
         cityToUse && cityToUse !== 'All' 
           ? getListingsByServiceAndCity(service.name, cityToUse, 60)
           : getListingsByService(service.name, 60),
-        getAllCities()
+        getTopHubs(8)
       ]);
 
       const finalResults = [...serviceListings];
@@ -105,7 +105,7 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
 
       setListings(finalResults);
       
-      setTopCities(allCities.slice(0, 8));
+      setTopCities(hubs);
       setCurrentCity(cityToUse);
       setIsLoading(false);
     };

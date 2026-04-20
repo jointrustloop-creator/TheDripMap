@@ -443,6 +443,33 @@ export default function SearchClient({ initialProviders, topCities: initialTopCi
         </div>
       </section>
 
+      {/* Browse by City Section */}
+      <section className="py-16 px-6 border-t border-slate-100">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-2xl font-black text-slate-900 mb-10 tracking-tight">Browse by City</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+            {[
+              { name: 'New York', slug: 'new-york' },
+              { name: 'Clearwater', slug: 'clearwater' },
+              { name: 'Washington', slug: 'washington' },
+              { name: 'Houston', slug: 'houston' },
+              { name: 'San Diego', slug: 'san-diego' },
+              { name: 'Tampa', slug: 'tampa' },
+              { name: 'Kansas City', slug: 'kansas-city' }
+            ].map((city) => (
+              <button
+                key={city.slug}
+                onClick={() => router.push(`/iv-therapy/${city.slug}`)}
+                className="p-6 bg-white border border-slate-100 rounded-2xl text-center hover:border-wellness-200 hover:shadow-md transition-all group"
+              >
+                <div className="text-sm font-bold text-slate-900 group-hover:text-wellness-600 transition-colors">{city.name}</div>
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">View City Info</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Dynamic Trust Signals */}
       {siteStats && <TrustSignals stats={siteStats} />}
 

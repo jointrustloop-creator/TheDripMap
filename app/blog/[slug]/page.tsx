@@ -15,7 +15,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import DOMPurify from 'isomorphic-dompurify';
+import remarkGfm from 'remark-gfm';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
@@ -80,6 +80,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const allPosts = await getBlogPosts();
   
   if (!post) notFound();
+
+  // DEBUG LOGGING AS REQUESTED
+  console.log('RAW CONTENT:', post.content);
 
   const relatedPosts = allPosts
     .filter(p => p.slug !== post.slug && p.category === post.category)
@@ -222,24 +225,27 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </div>
             </div>
 
-            <div className="relative h-[300px] md:h-[500px] rounded-[3rem] overflow-hidden mb-16 shadow-2xl">
-              <Image 
-                src={post.imageUrl || `https://picsum.photos/seed/${post.slug}/1200/800`} 
-                alt={`Illustration for ${post.title} - Clinical IV Therapy and Wellness`}
-                fill
-                className="object-cover"
-                priority
-                referrerPolicy="no-referrer"
-              />
+            <div className="relative h-[250px] md:h-[350px] rounded-[3rem] overflow-hidden mb-16 shadow-2xl bg-[#1a3a2a] flex flex-col items-center justify-center p-8 text-center uppercase tracking-widest border border-[#2a4a3a]">
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 left-0 w-64 h-64 bg-wellness-400 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+                <div className="absolute bottom-0 right-0 w-96 h-96 bg-wellness-500 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+              </div>
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="text-white/40 font-black text-sm mb-4 uppercase tracking-[0.4em]">TheDripMap</div>
+                <div className="w-16 h-px bg-white/20 mb-6" />
+                <div className="px-5 py-2 rounded-full border border-white/10 bg-white/5 text-white/60 text-[10px] font-black tracking-[0.2em]">
+                  {post.category}
+                </div>
+              </div>
             </div>
 
             <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline">
               {post.content ? (
-                <div 
-                  dangerouslySetInnerHTML={{ 
-                    __html: DOMPurify.sanitize(post.content) 
-                  }} 
-                />
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {String(post.content)
+                    .replace(/\\n/g, '\n')
+                    .replace(/\[Full content is now in your app code!\]/g, '')}
+                </ReactMarkdown>
               ) : (
                 <div className="bg-slate-50 border border-slate-100 rounded-3xl p-12 text-center">
                   <Zap size={40} className="mx-auto mb-6 text-slate-300" />
@@ -257,7 +263,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   {post.relatedCities.map((city, idx) => (
                     <Link 
                       key={idx}
-                      href={`/search?city=${city}`}
+                      href={`/iv-therapy/${slugify(city)}`}
                       className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-100 rounded-2xl text-sm font-bold text-slate-600 hover:border-wellness-600 hover:text-wellness-600 transition-all"
                     >
                       <MapPin size={14} /> {city}

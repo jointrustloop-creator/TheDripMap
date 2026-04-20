@@ -17,16 +17,26 @@ export const BlogCard = ({ post, className }: BlogCardProps) => {
       className
     )}>
       <Link href={`/blog/${post.slug}`} className="block">
-        <div className="relative h-56 overflow-hidden">
-          <Image 
-            src={post.imageUrl || `https://picsum.photos/seed/${post.slug}/800/600`} 
-            alt={post.title}
-            fill
-            referrerPolicy="no-referrer"
-            className="object-cover group-hover:scale-110 transition-transform duration-700"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-          <div className="absolute top-4 left-4">
+        <div className="relative h-56 overflow-hidden bg-[#1a3a2a] flex flex-col items-center justify-center p-6 text-center uppercase tracking-widest border-b border-[#2a4a3a]">
+          {post.imageUrl && !post.imageUrl.includes('picsum.photos') ? (
+            <Image 
+              src={post.imageUrl} 
+              alt={post.title}
+              fill
+              referrerPolicy="no-referrer"
+              className="object-cover group-hover:scale-110 transition-transform duration-700"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          ) : (
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="text-white/30 font-black text-[9px] mb-2 tracking-[0.4em]">TheDripMap</div>
+              <div className="w-10 h-px bg-white/10 mb-3" />
+              <div className="text-[10px] font-black text-white/70 line-clamp-2 normal-case tracking-tight px-4 leading-snug">
+                {post.title}
+              </div>
+            </div>
+          )}
+          <div className="absolute top-4 left-4 z-20">
             <span className={cn(
               "px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg",
               post.category === 'Educational' ? "bg-blue-600 text-white" :

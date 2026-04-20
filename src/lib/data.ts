@@ -390,6 +390,48 @@ export async function getAllCities(): Promise<{ city: string, state: string, sta
   }
 }
 
+export async function getTopHubs(limit: number = 8) {
+  if (!isSupabaseConfigured()) return [];
+  
+  try {
+    // 1. Get explicitly defined hubs from the cities table
+    const { data: hubData } = await supabase
+      .from('cities')
+      .select('name, state, slug');
+
+    if (!hubData) return [];
+
+    // 2. Get counts from providers table
+    const { data: providers } = await supabase
+      .from('providers')
+      .select('city');
+
+    const counts: Record<string, number> = {};
+    providers?.forEach(p => {
+      const cityName = p.city?.trim();
+      if (cityName) {
+        counts[cityName] = (counts[cityName] || 0) + 1;
+      }
+    });
+
+    // 3. Merge and filter
+    return hubData
+      .map(hub => ({
+        city: hub.name,
+        state: hub.state || '',
+        slug: hub.slug,
+        count: counts[hub.name] || 0
+      }))
+      .filter(hub => hub.count > 0)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, limit);
+
+  } catch (err) {
+    console.warn('Error in getTopHubs:', err);
+    return [];
+  }
+}
+
 export async function getCitiesFromListings() {
   const allCities = await getAllCities();
   return allCities
@@ -680,20 +722,19 @@ export async function getBlogPosts() {
       if (!error && data && data.length > 0) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return (data as any[]).map(post => {
-          const content = post.content || post.body || post.markdown || post.text || '';
-          
-          // Replace fake author names
-          let author = post.author || 'TheDripMap Team';
-          const fakeAuthors = ['Dr. Sarah Chen', 'Dr. James Wilson', 'Dr. Michael Brown', 'Dr. Emily White'];
-          if (fakeAuthors.includes(author)) {
-            author = 'TheDripMap Team';
-          }
+          const content = post.content || post.body || post.markdown || '';
+          const author = post.author || post.author_name || 'TheDripMap Team';
 
           return {
             ...post,
             author,
             content,
-            imageUrl: post.imageUrl || `https://picsum.photos/seed/${post.slug}/800/600`
+            metaTitle: post.metaTitle || post.meta_title || post.title || '',
+            metaDescription: post.metaDescription || post.meta_description || post.excerpt || post.description || '',
+            excerpt: post.excerpt || post.meta_description || '',
+            imageUrl: post.imageUrl || post.image_url || post.ImageURL || null,
+            relatedCities: post.relatedCities || post.related_cities || [],
+            relatedClinics: post.relatedClinics || post.related_clinics || []
           };
         }) as BlogPost[];
       }
@@ -716,30 +757,47 @@ export async function getBlogPostBySlug(slug: string) {
         .eq('slug', slug)
         .single();
 
-      if (!error && data) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const post = data as any;
-        const content = post.content || post.body || post.markdown || post.text || '';
-        
-        let author = post.author || 'TheDripMap Team';
-        const fakeAuthors = ['Dr. Sarah Chen', 'Dr. James Wilson', 'Dr. Michael Brown', 'Dr. Emily White'];
-        if (fakeAuthors.includes(author)) {
-          author = 'TheDripMap Team';
-        }
+        if (!error && data) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const post = data as any;
+          const content = post.content || post.body || post.markdown || '';
+          
+          // Diagnosis log as requested
+          if (content) {
+            console.warn(`[BLOG_DIAGNOSIS] slug: ${slug}, content length: ${content.length}`);
+          }
+          
+          const author = post.author || post.author_name || 'TheDripMap Team';
 
-        return {
-          ...post,
-          author,
-          content,
-          imageUrl: post.imageUrl || `https://picsum.photos/seed/${post.slug}/800/600`
-        } as BlogPost;
-      }
+          return {
+            ...post,
+            author,
+            content: String(content),
+            metaTitle: post.metaTitle || post.meta_title || post.title || '',
+            metaDescription: post.metaDescription || post.meta_description || post.excerpt || post.description || '',
+            excerpt: post.excerpt || post.meta_description || '',
+            imageUrl: post.imageUrl || post.ImageURL || null,
+            relatedCities: post.relatedCities || post.related_cities || [],
+            relatedClinics: post.relatedClinics || post.related_clinics || []
+          } as BlogPost;
+        }
     } catch (_err) {
       console.error('Supabase error fetching blog post by slug:', _err);
     }
   }
 
   return MOCK_BLOG_POSTS.find(p => p.slug === slug) || null;
+}
+
+export async function getCityBySlug(slug: string) {
+  const { data, error } = await supabase
+    .from('cities')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (error || !data) return null;
+  return data;
 }
 
 import { USE_CASES } from './use-cases';
@@ -886,5 +944,29 @@ export async function getSimilarClinics(currentSlug: string, city: string, state
   } catch (err) {
     console.error('Supabase error in getSimilarClinics:', err);
     return [];
+  }
+}
+
+export async function getCityData(citySlug: string) {
+  if (!isSupabaseConfigured()) return null;
+  
+  try {
+    const { data, error } = await supabase
+      .from('cities')
+      .select('id, name, slug, state, content, meta_title, meta_description, listings_count')
+      .ilike('slug', citySlug)
+      .single();
+
+    if (error) {
+      if (error.code !== 'PGRST116') { // Ignore "no rows found" error
+        console.error('Supabase error in getCityData:', error);
+      }
+      return null;
+    }
+    
+    return data;
+  } catch (err) {
+    console.error('Network error in getCityData:', err);
+    return null;
   }
 }
