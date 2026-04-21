@@ -1,18 +1,17 @@
 import React from 'react';
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { 
-  MapPin
+  MapPin,
+  ArrowRight
 } from 'lucide-react';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { ProviderCard } from '../../../src/components/ProviderCard';
-import { FAQSection } from '../../../src/components/FAQSection';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { CityGrid } from '../../../src/components/CityGrid';
 import { getListingsByCity, getAllCities, slugify, getCityData } from '../../../src/lib/data';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { City as CityType, Provider } from '../../../src/types';
 
 export const revalidate = 0;
@@ -127,24 +126,6 @@ export default async function LocationPage({ params, searchParams }: LocationPag
     );
   }
 
-  const avgRating = listings.length > 0 
-    ? (listings.reduce((acc, l) => acc + (l.rating || 0), 0) / listings.length).toFixed(1)
-    : "4.8";
-  
-  const totalReviews = listings.reduce((acc, l) => acc + (l.reviewCount || 0), 0);
-  const mobileProviders = listings.filter(l => l.mobile_service || l.type === 'Mobile' || l.type === 'Both').length;
-  
-  const faqs = [
-    {
-      question: `How much does IV therapy cost in ${cityName}?`,
-      answer: `IV therapy prices in ${cityName} typically range from $150 to $350 per session, depending on the ingredients and whether you choose in-clinic or mobile service.`
-    },
-    {
-      question: `Is mobile IV therapy available in ${cityName}?`,
-      answer: `Yes, many providers in ${cityName} offer mobile IV services that can come to your home, office, or hotel within 60-90 minutes.`
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
@@ -180,39 +161,16 @@ export default async function LocationPage({ params, searchParams }: LocationPag
           </div>
         </section>
 
-        <section className="mb-24 space-y-20">
-          {cityData?.content && (
-            <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline bg-white p-12 rounded-[3rem] border border-slate-100 shadow-sm">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {cityData.content}
-              </ReactMarkdown>
-            </div>
-          )}
-
-          <div className="bg-slate-900 rounded-[3rem] p-10 md:p-16 text-white overflow-hidden relative">
-            <div className="relative z-10">
-              <h3 className="text-3xl font-black mb-10 tracking-tight">Market Stats for {cityName}</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div className="bg-white/5 backdrop-blur-sm p-8 rounded-[2rem] border border-white/10">
-                  <div className="text-white font-black text-3xl mb-1">{avgRating}</div>
-                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Avg. Rating</div>
-                </div>
-                <div className="bg-white/5 backdrop-blur-sm p-8 rounded-[2rem] border border-white/10">
-                  <div className="text-white font-black text-3xl mb-1">{totalReviews.toLocaleString()}</div>
-                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Patient Reviews</div>
-                </div>
-                <div className="bg-white/5 backdrop-blur-sm p-8 rounded-[2rem] border border-white/10">
-                  <div className="text-white font-black text-3xl mb-1">{mobileProviders}</div>
-                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Mobile Services</div>
-                </div>
-                <div className="bg-white/5 backdrop-blur-sm p-8 rounded-[2rem] border border-white/10">
-                  <div className="text-white font-black text-3xl mb-1">{listings.length}</div>
-                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Total Clinics</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* 3. Hub CTA */}
+        <div className="flex justify-center mt-12 mb-20">
+          <Link 
+            href={`/cities/${slug}`}
+            className="inline-flex items-center gap-3 bg-wellness-50 text-wellness-700 px-10 py-5 rounded-[2rem] text-lg font-black hover:bg-wellness-100 transition-all border border-wellness-100 shadow-sm hover:scale-[1.02] active:scale-[0.98]"
+          >
+            Learn more about IV therapy in {cityName}
+            <ArrowRight size={24} className="text-wellness-600" />
+          </Link>
+        </div>
       </main>
       <Footer />
     </div>
