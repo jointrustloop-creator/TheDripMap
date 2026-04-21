@@ -55,9 +55,8 @@ function RenderNode({ node }: { node: JsonNode }) {
   switch (type) {
     case 'heading':
       const level = (node.attrs?.level as number) || 1;
-      const Level = (`h${level}`) as keyof JSX.IntrinsicElements;
+      const Level = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
       return (
-        // @ts-expect-error - Dynamic heading level
         <Level className="font-bold my-4">
           <RenderChildren nodes={children} />
         </Level>

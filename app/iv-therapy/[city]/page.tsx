@@ -12,7 +12,14 @@ import { ProviderCard } from '../../../src/components/ProviderCard';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { CityGrid } from '../../../src/components/CityGrid';
 import { getListingsByCity, getAllCities, slugify, getCityData } from '../../../src/lib/data';
-import { City as CityType, Provider } from '../../../src/types';
+import { Provider } from '../../../src/types';
+
+interface CityDataSub {
+  city: string;
+  state: string;
+  stateAbbr: string;
+  count: number;
+}
 
 export const revalidate = 0;
 
@@ -66,7 +73,7 @@ export async function generateMetadata({ params }: LocationPageProps): Promise<M
     };
   }
 
-  const cityInfo = location.data as CityType;
+  const cityInfo = location.data as CityDataSub;
   const cityData = await getCityData(city);
   const cityName = cityInfo.city;
   const count = cityData?.listings_count || cityInfo.count;
@@ -112,7 +119,7 @@ export default async function LocationPage({ params, searchParams }: LocationPag
     );
   }
 
-  const cityInfo = location.data as CityType;
+  const cityInfo = location.data as CityDataSub;
   const cityData = await getCityData(slug);
   const cityName = cityInfo.city;
   const stateName = (cityData?.state as string) || (cityInfo.state as string);
