@@ -1,11 +1,12 @@
 import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { MapPin, ArrowRight, ChevronRight } from 'lucide-react';
+import { MapPin, ChevronRight } from 'lucide-react';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { BreadcrumbNav } from '../../src/components/BreadcrumbNav';
 import { supabase, isSupabaseConfigured } from '../../src/lib/supabase';
+import { getAllCities, slugify } from '../../src/lib/data';
 
 export const metadata: Metadata = {
   title: 'Cities Archive - Browse IV Therapy Locations | TheDripMap',
@@ -16,33 +17,30 @@ export default async function CitiesHubPage() {
   let cities = [];
   
   if (isSupabaseConfigured()) {
-    // 1. Fetch cities metadata (content, names, etc)
+    // 1. Fetch cities metadata from the dedicated table
     const { data: dbCities } = await supabase
       .from('cities')
       .select('name, slug, state, listings_count');
       
-    // 2. Fetch all providers to get ACTUAL real-time counts
-    // This solves the bug where the listings_count column might be out of sync
-    const { data: providers } = await supabase
-      .from('providers')
-      .select('city');
+    // 2. Fetch ALL cities that have providers from the providers table
+    const providerCities = await getAllCities();
 
-    const actualCounts: Record<string, number> = {};
-    providers?.forEach(p => {
-      const cityName = p.city?.trim();
-      if (cityName) {
-        actualCounts[cityName] = (actualCounts[cityName] || 0) + 1;
-      }
+    // 3. Create a map for quick lookup of DB cities by name
+    const dbCityMap = new Map();
+    dbCities?.forEach(c => {
+      dbCityMap.set(c.name.toLowerCase(), c);
     });
 
-    // 3. Merge and filter to only show cities with actual listings
-    cities = (dbCities || [])
-      .map(city => ({
-        ...city,
-        displayCount: actualCounts[city.name] || 0
-      }))
-      .filter(city => city.displayCount > 0)
-      .sort((a, b) => b.displayCount - a.displayCount);
+    // 4. Merge providerCities with dbCities metadata
+    cities = providerCities.map(pc => {
+      const dbCity = dbCityMap.get(pc.city.toLowerCase());
+      return {
+        name: pc.city,
+        slug: dbCity?.slug || slugify(pc.city),
+        state: dbCity?.state || pc.state,
+        displayCount: pc.count
+      };
+    }).sort((a, b) => b.displayCount - a.displayCount);
   }
 
   return (

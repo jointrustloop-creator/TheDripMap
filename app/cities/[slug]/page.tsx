@@ -19,32 +19,61 @@ interface CityPageProps {
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const { slug } = await params;
   const cityData = await getCityBySlug(slug);
-
-  if (!cityData) {
-    return { title: 'City Not Found' };
+  
+  let name = '';
+  let state = '';
+  
+  if (cityData) {
+    name = cityData.name;
+    state = cityData.state || '';
+  } else {
+    name = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   }
 
   // Fetch actual count for accurate metadata
-  const listings = await getListingsByCity(cityData.name, cityData.state || '');
+  const listings = await getListingsByCity(name, state);
   const count = listings.length;
 
+  if (count === 0 && !cityData) {
+    return { title: 'City Not Found' };
+  }
+
+  const title = cityData?.meta_title?.replace('{count}', String(count)) || `${name} IV Therapy — ${count} Verified Clinics | TheDripMap`;
+  const description = cityData?.meta_description?.replace('{count}', String(count)) || `Find and compare ${count} top-rated IV therapy clinics and mobile services in ${name}.`;
+
   return {
-    title: cityData.meta_title?.replace('{count}', String(count)) || `${cityData.name} IV Therapy — ${count} Verified Clinics | TheDripMap`,
-    description: cityData.meta_description?.replace('{count}', String(count)) || `Find and compare ${count} top-rated IV therapy clinics and mobile services in ${cityData.name}.`,
+    title,
+    description,
   };
 }
 
 export default async function IndividualCityPage({ params }: CityPageProps) {
   const { slug } = await params;
-  const cityData = await getCityBySlug(slug);
+  let cityData = await getCityBySlug(slug);
 
+  // Fallback if no specific city record exists but we might have listings
   if (!cityData) {
-    notFound();
+    // Basic reconstruction from slug for the UI
+    const name = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    // We'll check if listings actually exist below
+    cityData = {
+      name,
+      slug,
+      state: '',
+      content: null,
+      meta_title: null,
+      meta_description: null
+    };
   }
 
-  // Fetch actual count for the badge
+  // Fetch actual count for the badge and to verify existence
   const listings = await getListingsByCity(cityData.name, cityData.state || '');
   const count = listings.length;
+
+  // If no listings and no city record, then truly not found
+  if (count === 0 && !cityData.id) {
+    notFound();
+  }
 
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
