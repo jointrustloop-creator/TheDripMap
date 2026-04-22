@@ -71,7 +71,9 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   const { slug } = await params;
   const provider = await getListingBySlug(slug);
   
-  if (!provider) return { title: 'Provider Not Found' };
+  if (!provider || provider.availability === false) {
+    notFound();
+  }
 
   const displayName = provider.name
     .split(' | ')[0]
@@ -88,7 +90,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     title,
     description,
     alternates: {
-      canonical: `/provider/${slug}`,
+      canonical: `https://www.thedripmap.com/provider/${slug}`,
     },
     openGraph: {
       title,
@@ -118,7 +120,9 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
   const sp = await searchParams;
   const provider = await getListingBySlug(slug);
   
-  if (!provider) notFound();
+  if (!provider || provider.availability === false) {
+    notFound();
+  }
 
   const profiles = await getOperatorProfiles();
   const profile = profiles.find(p => p.clinicId === provider.id);

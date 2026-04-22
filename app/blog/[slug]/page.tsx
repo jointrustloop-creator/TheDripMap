@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     title,
     description,
     alternates: {
-      canonical: `/blog/${slug}`,
+      canonical: `https://www.thedripmap.com/blog/${slug}`,
     },
     openGraph: {
       title,

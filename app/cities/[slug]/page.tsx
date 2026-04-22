@@ -44,6 +44,9 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   return {
     title,
     description,
+    alternates: {
+      canonical: `https://www.thedripmap.com/cities/${slug}`,
+    },
   };
 }
 
