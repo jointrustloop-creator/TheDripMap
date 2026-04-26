@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { Phone, ArrowRight, TrendingUp, Zap as ZapIcon, Star as StarIcon, Flame } from 'lucide-react';

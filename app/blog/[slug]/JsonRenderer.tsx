@@ -53,14 +53,15 @@ function RenderNode({ node }: { node: JsonNode }) {
   const children = node.content || node.children;
 
   switch (type) {
-    case 'heading':
+    case 'heading': {
       const level = (node.attrs?.level as number) || 1;
-      const Level = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+      const Level = `h${level}` as React.ElementType;
       return (
         <Level className="font-bold my-4">
           <RenderChildren nodes={children} />
         </Level>
       );
+    }
     case 'paragraph':
     case 'block':
       return (
