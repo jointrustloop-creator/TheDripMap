@@ -5,10 +5,7 @@ import {
   Search, 
   Filter, 
   Zap,
-  CheckCircle2,
-  MapPin,
-  Star,
-  Activity
+  CheckCircle2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Provider, City, TreatmentType, ListingStats } from '../../src/types';
@@ -16,14 +13,15 @@ import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { TrustSignals } from '../../src/components/TrustSignals';
 import { ProviderCard } from '../../src/components/ProviderCard';
+import UrgencyIndicator from '../../src/components/UrgencyIndicator';
 import { cn } from '../../src/lib/utils';
-import { searchListings, getAllCities } from '../../src/lib/data';
+import { searchListings, getCitiesWithListings, slugify } from '../../src/lib/data';
 import { getUserLocation, UserLocation } from '../../src/lib/geo';
 import { calculateValueMetrics } from '../../src/lib/price-utils';
 
 interface SearchClientProps {
   initialProviders: Provider[];
-  topCities: {city: string, state: string, count: number}[];
+  cities: string[];
   initialStats: ListingStats | null;
   totalCount: number;
 }
@@ -38,7 +36,7 @@ const GOAL_KEYWORDS: Record<string, string[]> = {
   'JetLag': ['jet', 'lag', 'travel', 'fatigue', 'energy', 'recovery', 'timezone', 'flight', 'international'],
 };
 
-export default function SearchClient({ initialProviders, topCities: initialTopCities, initialStats, totalCount }: SearchClientProps) {
+export default function SearchClient({ initialProviders, cities: initialCities, initialStats, totalCount }: SearchClientProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   
@@ -62,7 +60,7 @@ export default function SearchClient({ initialProviders, topCities: initialTopCi
   const [activeChips, setActiveChips] = useState<string[]>(['All']);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filteredProviders, setFilteredProviders] = useState<Provider[]>(initialProviders);
-  const [topCities, setTopCities] = useState(initialTopCities);
+  const [cities, setCities] = useState(initialCities);
   const [siteStats, setSiteStats] = useState<ListingStats | null>(initialStats);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [isLoading, setIsLoading] = useState(false); // Start as false since we have initial data
@@ -127,16 +125,16 @@ export default function SearchClient({ initialProviders, topCities: initialTopCi
       if (!startTime || !endTime) return false;
       if (endTime < startTime) endTime.setDate(endTime.getDate() + 1);
       return now >= startTime && now <= endTime;
-    } catch (e) { 
+    } catch { 
       return false; 
     }
   };
 
   useEffect(() => {
     const loadData = async () => {
-      if (!initialTopCities.length) {
-        const cities = await getAllCities();
-        setTopCities(cities);
+      if (!initialCities || !initialCities.length) {
+        const fetchedCities = await getCitiesWithListings();
+        setCities(fetchedCities);
       }
       
       if (!initialStats) {
@@ -153,7 +151,7 @@ export default function SearchClient({ initialProviders, topCities: initialTopCi
       }
     };
     loadData();
-  }, [initialTopCities.length, initialStats]);
+  }, [initialCities?.length, initialStats]);
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -320,6 +318,8 @@ export default function SearchClient({ initialProviders, topCities: initialTopCi
             ))}
           </div>
 
+          {selectedCity !== 'All' && <UrgencyIndicator city={selectedCity} />}
+
           <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 text-left">
             Showing {selectedCity === 'All' ? totalCount : filteredProviders.length} {activeChips.includes('Mobile') ? 'mobile IV ' : ''}clinics {selectedCity === 'All' ? 'nationwide' : `in ${selectedCity}`}
           </div>
@@ -357,19 +357,19 @@ export default function SearchClient({ initialProviders, topCities: initialTopCi
                         {selectedCity === 'All' && <CheckCircle2 size={14} />}
                       </button>
                       
-                      {topCities
-                        .filter(c => c.city.toLowerCase().includes(citySearchQuery.toLowerCase()))
-                        .map(c => (
+                      {cities
+                        .filter(c => c.toLowerCase().includes(citySearchQuery.toLowerCase()))
+                        .map(city => (
                         <button 
-                          key={`${c.city}-${c.state}`}
-                          onClick={() => setSelectedCity(c.city as City)}
+                          key={city}
+                          onClick={() => setSelectedCity(city as City)}
                           className={cn(
                             "w-full text-left px-4 py-2 rounded-xl text-xs font-bold border transition-all flex items-center justify-between",
-                            selectedCity === c.city ? "bg-wellness-50 border-wellness-600 text-wellness-700" : "bg-white border-slate-100 text-slate-600 hover:border-wellness-200"
+                            selectedCity === city ? "bg-wellness-50 border-wellness-600 text-wellness-700" : "bg-white border-slate-100 text-slate-600 hover:border-wellness-200"
                           )}
                         >
-                          <span>{c.city} <span className="text-[10px] opacity-50 ml-1">{c.state}</span></span>
-                          {selectedCity === c.city && <CheckCircle2 size={14} />}
+                          <span>{city}</span>
+                          {selectedCity === city && <CheckCircle2 size={14} />}
                         </button>
                       ))}
                     </div>
@@ -395,13 +395,13 @@ export default function SearchClient({ initialProviders, topCities: initialTopCi
                   </div>
 
                   <div className="bg-wellness-50 rounded-3xl p-6 flex flex-col justify-center">
-                    <h4 className="text-lg font-black text-wellness-900 mb-2">Need help choosing?</h4>
-                    <p className="text-sm text-wellness-700 mb-6 leading-relaxed">Our clinical matching quiz can find the perfect provider for you in 60 seconds.</p>
+                    <h4 className="text-lg font-black text-wellness-900 mb-2">Get exactly what you need.</h4>
+                    <p className="text-sm text-wellness-700 mb-6 leading-relaxed">Not all IV therapy is the same. Our match quiz finds the perfect provider based on your exact goals in 30 seconds.</p>
                     <button 
                       onClick={() => router.push('/quiz')}
                       className="bg-wellness-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-100 flex items-center justify-center gap-2"
                     >
-                      <Zap size={16} /> Start Quiz
+                      <Zap size={16} /> Start Match Quiz
                     </button>
                   </div>
                 </div>
@@ -443,29 +443,54 @@ export default function SearchClient({ initialProviders, topCities: initialTopCi
         </div>
       </section>
 
+      {/* Recently Viewed (Simulated) */}
+      {filteredProviders.length > 3 && (
+        <section className="py-16 px-6 border-t border-slate-100 bg-slate-50/30">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-10">
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Recently Viewed</h2>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <span className="w-2 h-2 bg-slate-300 rounded-full" /> Personal results
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 opacity-60 hover:opacity-100 transition-all duration-500">
+              {filteredProviders.slice().reverse().slice(0, 4).map((provider) => (
+                <div key={`recent-${provider.id}`} className="scale-95 origin-center">
+                  <ProviderCard provider={provider} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Browse by City Section */}
       <section className="py-16 px-6 border-t border-slate-100">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl font-black text-slate-900 mb-10 tracking-tight">Browse by City</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-            {[
-              { name: 'New York', slug: 'new-york' },
-              { name: 'Clearwater', slug: 'clearwater' },
-              { name: 'Washington', slug: 'washington' },
-              { name: 'Houston', slug: 'houston' },
-              { name: 'San Diego', slug: 'san-diego' },
-              { name: 'Tampa', slug: 'tampa' },
-              { name: 'Kansas City', slug: 'kansas-city' }
-            ].map((city) => (
-              <button
-                key={city.slug}
-                onClick={() => router.push(`/iv-therapy/${city.slug}`)}
-                className="p-6 bg-white border border-slate-100 rounded-2xl text-center hover:border-wellness-200 hover:shadow-md transition-all group"
-              >
-                <div className="text-sm font-bold text-slate-900 group-hover:text-wellness-600 transition-colors">{city.name}</div>
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">View City Info</div>
-              </button>
-            ))}
+            {(cities && cities.length > 0 ? cities.slice(0, 14) : [
+              'New York',
+              'Clearwater',
+              'Washington',
+              'Houston',
+              'San Diego',
+              'Tampa',
+              'Miami'
+            ]).map((city: any) => {
+              const cityName = typeof city === 'string' ? city : (city.city || city.name || '');
+              const citySlug = slugify(cityName);
+              return (
+                <button
+                  key={citySlug}
+                  onClick={() => router.push(`/cities/${citySlug}`)}
+                  className="p-6 bg-white border border-slate-100 rounded-2xl text-center hover:border-wellness-200 hover:shadow-md transition-all group"
+                >
+                  <div className="text-sm font-bold text-slate-900 group-hover:text-wellness-600 transition-colors uppercase tracking-tight">{cityName}</div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">View City Info</div>
+                </button>
+              );
+            })}
           </div>
         </div>
       </section>

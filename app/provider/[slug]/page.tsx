@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { 
   MapPin, 
-  ShieldCheck, 
   Zap, 
   Activity,
   Building2,
@@ -15,8 +14,7 @@ import {
   CheckCircle2,
   ExternalLink,
   Phone,
-  Lock,
-  StarHalf
+  Lock
 } from 'lucide-react';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
@@ -26,7 +24,7 @@ import {
   getListingBySlug, 
   slugify, 
   getAllListings, 
-  getStateFromProvider, 
+  getStateFromProvider,
   getOperatorProfiles,
   getSimilarClinics
 } from '../../../src/lib/data';
@@ -36,7 +34,7 @@ import { getStatus } from '../../../src/lib/hours';
 import SmartSummary from '../../../src/components/SmartSummary';
 import { calculateValueMetrics } from '../../../src/lib/price-utils';
 
-export const revalidate = 86400; // 24 hours
+export const revalidate = 3600;
 
 const STATE_MAP: Record<string, string> = {
   'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
@@ -115,9 +113,8 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   };
 }
 
-export default async function ProviderPage({ params, searchParams }: ProviderPageProps) {
+export default async function ProviderPage({ params }: ProviderPageProps) {
   const { slug } = await params;
-  const sp = await searchParams;
   const provider = await getListingBySlug(slug);
   
   if (!provider || provider.availability === false) {
@@ -218,18 +215,12 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
       {
         "@type": "ListItem",
         "position": 2,
-        "name": stateLabel,
-        "item": `https://thedripmap.com/iv-therapy/${stateSlug}`
+        "name": cityLabel,
+        "item": `https://thedripmap.com/cities/${citySlug}`
       },
       {
         "@type": "ListItem",
         "position": 3,
-        "name": cityLabel,
-        "item": `https://thedripmap.com/iv-therapy/${citySlug}`
-      },
-      {
-        "@type": "ListItem",
-        "position": 4,
         "name": provider.name,
         "item": `https://thedripmap.com/provider/${slug}`
       }
@@ -292,8 +283,7 @@ export default async function ProviderPage({ params, searchParams }: ProviderPag
           <BreadcrumbNav 
             items={[
               { label: 'IV Therapy', href: '/search' },
-              { label: stateLabel, href: `/iv-therapy/${stateSlug}` },
-              { label: cityLabel, href: `/iv-therapy/${citySlug}` },
+              { label: cityLabel, href: `/cities/${citySlug}` },
               { label: provider.name }
             ]} 
           />

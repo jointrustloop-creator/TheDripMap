@@ -24,6 +24,25 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/iv-therapy/:state/:city',
+        destination: '/cities/:city',
+        permanent: true,
+      },
+      {
+        source: '/iv-therapy/:city',
+        destination: '/cities/:city',
+        permanent: true,
+      },
+      {
+        source: '/iv-therapy/:state',
+        destination: '/cities',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

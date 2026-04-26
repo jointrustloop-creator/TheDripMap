@@ -30,7 +30,7 @@ export const CompactCityGrid = ({ cities }: CompactCityGridProps) => {
           {cities.map((city, idx) => (
             <Link
               key={idx}
-              href={`/iv-therapy/${slugify(city.city)}`}
+              href={`/cities/${slugify(city.city)}`}
               className="bg-white border border-[#e8f0ec] rounded-[10px] p-[10px_14px] hover:border-wellness-600 hover:-translate-y-1 transition-all duration-300 group shadow-sm"
             >
               <div className="flex flex-col">

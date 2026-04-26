@@ -256,7 +256,7 @@ export default async function UseCasePage({ params }: PageProps) {
             ].map((loc) => (
               <Link 
                 key={`${loc.city}-${loc.state}`}
-                href={`/iv-therapy/${loc.state}/${slugify(loc.city)}?service=${encodeURIComponent(useCase.serviceTag)}`}
+                href={`/cities/${slugify(loc.city)}?service=${encodeURIComponent(useCase.serviceTag)}`}
                 className="p-4 rounded-2xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50 transition-all text-sm font-bold text-slate-700"
               >
                 IV therapy for {useCase.title} in {loc.city}

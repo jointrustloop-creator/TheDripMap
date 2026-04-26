@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ service: 
     openGraph: {
       title,
       description,
-      url: `${siteUrl}/iv-therapy/treatment/${resolvedParams.service}`,
+      url: `${siteUrl}/treatments/${resolvedParams.service}`,
       siteName: 'TheDripMap',
       type: 'website',
       images: [

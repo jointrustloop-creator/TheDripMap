@@ -89,6 +89,27 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
       <head>
         <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const originalFetch = window.fetch;
+                  Object.defineProperty(window, 'fetch', {
+                    configurable: false,
+                    enumerable: true,
+                    get: function() { return originalFetch; },
+                    set: function() { 
+                      console.warn('Blocked attempt to overwrite window.fetch'); 
+                    }
+                  });
+                } catch (e) {
+                  // If it's already non-configurable, we can't do anything
+                }
+              })();
+            `
+          }}
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />

@@ -23,7 +23,7 @@ import { BlogCard } from '../../../src/components/BlogCard';
 import { getBlogPostBySlug, getBlogPosts, slugify, getListingsByIds } from '../../../src/lib/data';
 import { cn } from '../../../src/lib/utils';
 
-export const revalidate = 0; // Disable caching for development
+export const revalidate = 3600;
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -263,7 +263,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   {post.relatedCities.map((city, idx) => (
                     <Link 
                       key={idx}
-                      href={`/iv-therapy/${slugify(city)}`}
+                      href={`/cities/${slugify(city)}`}
                       className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-100 rounded-2xl text-sm font-bold text-slate-600 hover:border-wellness-600 hover:text-wellness-600 transition-all"
                     >
                       <MapPin size={14} /> {city}

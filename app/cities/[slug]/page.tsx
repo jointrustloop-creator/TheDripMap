@@ -8,7 +8,12 @@ import remarkGfm from 'remark-gfm';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
+import UrgencyIndicator from '../../../src/components/UrgencyIndicator';
+import { QuizCTA } from '../../../src/components/QuizCTA';
+import { ProviderCard } from '../../../src/components/ProviderCard';
 import { getCityBySlug, getListingsByCity } from '../../../src/lib/data';
+
+export const revalidate = 3600;
 
 interface CityPageProps {
   params: Promise<{
@@ -53,6 +58,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
 export default async function IndividualCityPage({ params }: CityPageProps) {
   const { slug } = await params;
   let cityData = await getCityBySlug(slug);
+  const foundInTable = !!cityData;
 
   // Fallback if no specific city record exists but we might have listings
   if (!cityData) {
@@ -60,6 +66,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
     const name = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     // We'll check if listings actually exist below
     cityData = {
+      id: `fallback-${slug}`,
       name,
       slug,
       state: '',
@@ -73,8 +80,8 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   const listings = await getListingsByCity(cityData.name, cityData.state || '');
   const count = listings.length;
 
-  // If no listings and no city record, then truly not found
-  if (count === 0 && !cityData.id) {
+  // If no listings and no city record was found in the 'cities' table or match in MOCK_CITIES, then truly not found
+  if (count === 0 && !foundInTable) {
     notFound();
   }
 
@@ -97,10 +104,18 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
         </section>
 
         {/* 2. Listings count badge */}
-        <div className="inline-flex items-center gap-2 bg-wellness-50 text-wellness-700 px-4 py-1.5 rounded-full text-sm font-bold mb-12 border border-wellness-100">
-          <MapPin size={16} />
-          <span>{count} verified providers in {cityData.name}</span>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+          <div className="inline-flex items-center gap-2 bg-wellness-50 text-wellness-700 px-4 py-1.5 rounded-full text-sm font-bold border border-wellness-100">
+            <MapPin size={16} />
+            <span>{count} verified providers in {cityData.name}</span>
+          </div>
+          <div className="flex items-center gap-2 text-wellness-600 font-bold text-sm bg-wellness-50 px-3 py-1 rounded-full border border-wellness-100">
+            <span className="w-2 h-2 bg-wellness-500 rounded-full animate-pulse" />
+            High demand in {cityData.name} this week
+          </div>
         </div>
+
+        <UrgencyIndicator city={cityData.name} />
 
         {/* 3. ReactMarkdown rendering of data.content */}
         {cityData.content ? (
@@ -114,6 +129,27 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
         ) : (
           <section className="mb-12 bg-white p-12 rounded-[3.5rem] border border-slate-100">
             <p className="text-slate-500 italic text-center">Comprehensive hydration guides for {cityData.name} are currently being updated.</p>
+          </section>
+        )}
+
+        <QuizCTA 
+          className="mb-24"
+          title={`Looking for specific results in ${cityData.name}?`}
+          subtitle={`Not all IV protocols are equal. We match you based on your exact wellness goals and the specific offerings of verified ${cityData.name} clinics.`}
+        />
+
+        {/* Trending Section */}
+        {listings.length > 0 && (
+          <section className="mb-24">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Trending in {cityData.name}</h2>
+              <Link href="/search" className="text-sm font-bold text-wellness-600 hover:underline">View all</Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {listings.slice(0, 3).map((provider) => (
+                <ProviderCard key={provider.id} provider={provider} />
+              ))}
+            </div>
           </section>
         )}
 

@@ -5,7 +5,7 @@ import { Footer } from '../../src/components/Footer';
 import { BlogCard } from '../../src/components/BlogCard';
 import { getBlogPosts } from '../../src/lib/data';
 
-export const revalidate = 0;
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Wellness Blog | IV Therapy Guides & Local Insights | TheDripMap",

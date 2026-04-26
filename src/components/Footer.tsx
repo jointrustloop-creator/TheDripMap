@@ -6,11 +6,12 @@ import { MedicalDisclaimer } from './MedicalDisclaimer';
 
 export const Footer = () => {
   const POPULAR_CITIES = [
-    { city: 'San Diego', state: 'CA', slug: 'san-diego' },
-    { city: 'Miami', state: 'FL', slug: 'miami' },
-    { city: 'Houston', state: 'TX', slug: 'houston' },
-    { city: 'Tampa', state: 'FL', slug: 'tampa' },
     { city: 'New York', state: 'NY', slug: 'new-york' },
+    { city: 'Clearwater', state: 'FL', slug: 'clearwater' },
+    { city: 'Houston', state: 'TX', slug: 'houston' },
+    { city: 'San Diego', state: 'CA', slug: 'san-diego' },
+    { city: 'Tampa', state: 'FL', slug: 'tampa' },
+    { city: 'Washington DC', state: 'DC', slug: 'washington' },
     { city: 'Kansas City', state: 'MO', slug: 'kansas-city' },
   ];
 
@@ -28,11 +29,11 @@ export const Footer = () => {
         <div>
           <h4 className="font-bold mb-6 text-sm uppercase tracking-wider text-slate-400">Services</h4>
           <ul className="space-y-4 text-slate-600 text-sm">
-            <li><Link href="/iv-therapy/treatment/nad-plus" className="hover:text-wellness-600 transition-colors">NAD+ Therapy</Link></li>
-            <li><Link href="/iv-therapy/treatment/hangover" className="hover:text-wellness-600 transition-colors">Hangover IV</Link></li>
-            <li><Link href="/iv-therapy/treatment/immune-support" className="hover:text-wellness-600 transition-colors">Immune Support</Link></li>
-            <li><Link href="/iv-therapy/treatment/beauty-glow" className="hover:text-wellness-600 transition-colors">Beauty & Glow</Link></li>
-            <li><Link href="/iv-therapy/treatment/weight-loss" className="hover:text-wellness-600 transition-colors">Weight Loss Drips</Link></li>
+            <li><Link href="/treatments/nad-plus" className="hover:text-wellness-600 transition-colors">NAD+ Therapy</Link></li>
+            <li><Link href="/treatments/hangover" className="hover:text-wellness-600 transition-colors">Hangover IV</Link></li>
+            <li><Link href="/treatments/immune-support" className="hover:text-wellness-600 transition-colors">Immune Support</Link></li>
+            <li><Link href="/treatments/beauty-glow" className="hover:text-wellness-600 transition-colors">Beauty & Glow</Link></li>
+            <li><Link href="/treatments/weight-loss" className="hover:text-wellness-600 transition-colors">Weight Loss Drips</Link></li>
           </ul>
         </div>
         <div>

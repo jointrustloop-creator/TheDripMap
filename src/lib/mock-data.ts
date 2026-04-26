@@ -14,6 +14,15 @@ export const MOCK_CITIES: { city: string, state: string }[] = [
   { city: 'Pleasanton', state: 'CA' },
   { city: 'Cypress', state: 'TX' },
   { city: 'Greenville', state: 'SC' },
+  { city: 'Miami', state: 'FL' },
+  { city: 'Los Angeles', state: 'CA' },
+  { city: 'Toronto', state: 'ON' },
+  { city: 'Mississauga', state: 'ON' },
+  { city: 'Brampton', state: 'ON' },
+  { city: 'Vaughan', state: 'ON' },
+  { city: 'Markham', state: 'ON' },
+  { city: 'Oakville', state: 'ON' },
+  { city: 'Ajax', state: 'ON' },
 ];
 
 export const MOCK_LISTINGS: Provider[] = [
@@ -868,6 +877,116 @@ export const MOCK_LISTINGS: Provider[] = [
       luxuryExperience: 5,
       speedOfService: 4,
       valueForMoney: 3
+    }
+  },
+  {
+    id: 'toronto-1',
+    name: 'Toronto Functional Medicine',
+    city: 'Toronto',
+    state: 'ON',
+    address: 'Yorkville, Toronto, ON',
+    rating: 4.9,
+    reviewCount: 245,
+    priceRange: '$$$',
+    type: 'In-Clinic',
+    specialties: ['NAD+ Plus', 'High-Dose Vit C', 'Ozone Therapy'],
+    amenities: ['Medical Supervision', 'Private Rooms', 'Expert Consultation'],
+    description: 'Premier health center in Toronto specializing in functional medicine and high-quality IV nutrient therapy.',
+    imageUrl: 'https://picsum.photos/seed/toronto-1/800/600',
+    is_featured: true,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 3,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: 'toronto-2',
+    name: 'Timeless Health Clinic',
+    city: 'Toronto',
+    state: 'ON',
+    address: 'Downtown, Toronto, ON',
+    rating: 4.8,
+    reviewCount: 182,
+    priceRange: '$$',
+    type: 'In-Clinic',
+    specialties: ['Immune Support', 'Beauty & Glow', 'Vitamin D'],
+    amenities: ['Modern Lounge', 'Beverage Bar', 'Central Location'],
+    description: 'Specialized IV therapy treatments designed for modern urban professionals in Toronto.',
+    imageUrl: 'https://picsum.photos/seed/toronto-2/800/600',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 5,
+      speedOfService: 4,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: 'mississauga-1',
+    name: 'NewM Clinic',
+    city: 'Mississauga',
+    state: 'ON',
+    address: 'Mississauga, ON (GTA Mobile)',
+    rating: 4.7,
+    reviewCount: 95,
+    priceRange: '$$',
+    type: 'Both',
+    specialties: ['Mobile IV', 'NAD+ Plus', 'Hydration'],
+    amenities: ['Mobile Service', 'Flexible Scheduling'],
+    description: 'Convenient mobile IV therapy serving Mississauga and the Greater Toronto Area.',
+    imageUrl: 'https://picsum.photos/seed/mississauga-1/800/600',
+    is_featured: true,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 3,
+      speedOfService: 5,
+      valueForMoney: 5
+    }
+  },
+  {
+    id: 'oakville-1',
+    name: 'Inside Health Clinic',
+    city: 'Oakville',
+    state: 'ON',
+    address: 'Oakville, ON',
+    rating: 4.9,
+    reviewCount: 88,
+    priceRange: '$$$',
+    type: 'In-Clinic',
+    specialties: ['Oncology Support', 'Naturopathic IV', 'Fatigue'],
+    amenities: ['Clinical Environment', 'Specialized Care'],
+    description: 'Expert naturopathic clinic in Oakville providing advanced IV nutrition for complex health needs.',
+    imageUrl: 'https://picsum.photos/seed/oakville-1/800/600',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 3,
+      speedOfService: 4,
+      valueForMoney: 4
+    }
+  },
+  {
+    id: 'ajax-1',
+    name: 'Aniyah Care',
+    city: 'Ajax',
+    state: 'ON',
+    address: 'Ajax / Whitby area (Mobile)',
+    rating: 4.6,
+    reviewCount: 54,
+    priceRange: '$$',
+    type: 'Mobile',
+    specialties: ['Home Care', 'Mobile IV', 'Hydration'],
+    amenities: ['At-Home Service', 'Compassionate Care'],
+    description: 'Providing essential mobile hydration and nutrient therapy to the Durham region.',
+    imageUrl: 'https://picsum.photos/seed/ajax-1/800/600',
+    is_featured: false,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 2,
+      speedOfService: 5,
+      valueForMoney: 4
     }
   }
 ];

@@ -2,16 +2,9 @@ import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { 
-  Building2, 
-  Map, 
-  Globe, 
-  Star, 
-  Trophy, 
   ArrowRight, 
   ChevronRight,
-  Zap,
-  CheckCircle2,
-  Users
+  Zap
 } from 'lucide-react';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
@@ -230,7 +223,7 @@ export default async function StatisticsPage() {
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
                     <Link 
-                      href={`/iv-therapy/${slugify(item.state)}/${slugify(item.city)}`}
+                      href={`/cities/${slugify(item.city)}`}
                       className="text-lg font-black text-slate-900 group-hover:text-wellness-600 transition-colors"
                     >
                       {item.city}, {item.state}

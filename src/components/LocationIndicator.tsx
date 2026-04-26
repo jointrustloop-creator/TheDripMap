@@ -161,12 +161,13 @@ export const LocationIndicator = () => {
     
     // If not on search page and not on a directory page, redirect to search
     const isDirectoryPage = pathname === '/search' || 
+                          pathname.startsWith('/cities') || 
                           pathname.startsWith('/iv-therapy') || 
                           pathname.startsWith('/iv-therapy-for') ||
                           pathname.startsWith('/provider/');
     
     if (!isDirectoryPage) {
-      router.push(`/iv-therapy/${slugify(city)}`);
+      router.push(`/cities/${slugify(city)}`);
     }
     
     setIsEditing(false);
@@ -237,11 +238,23 @@ export const LocationIndicator = () => {
               )}
 
               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
-                {searchTerm ? 'Search Results' : 'Popular Cities'}
+                {searchTerm ? 'Search Results' : 'Featured & Popular'}
               </div>
               <div className="grid grid-cols-1 gap-1 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                {!searchTerm && (
+                  <button 
+                    onClick={() => handleCitySelect('Toronto', 'ON')}
+                    className="text-left px-3 py-2.5 text-sm font-bold text-wellness-700 bg-wellness-50 hover:bg-wellness-100 rounded-lg transition-colors flex items-center justify-between group/featured"
+                  >
+                    <span>Toronto & GTA</span>
+                    <span className="text-[10px] text-wellness-600 bg-white px-2 py-0.5 rounded-full border border-wellness-100">Featured</span>
+                  </button>
+                )}
+                
                 {filteredCities.length > 0 ? (
-                  filteredCities.map(city => (
+                  filteredCities
+                    .filter(c => c.city !== 'Toronto') // Avoid duplicate if Toronto is in regular list
+                    .map(city => (
                     <button 
                       key={`${city.city}-${city.state}`}
                       onClick={() => handleCitySelect(city.city, city.state)}

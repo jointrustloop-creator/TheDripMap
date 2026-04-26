@@ -13,35 +13,18 @@ export const metadata: Metadata = {
   description: 'Explore our complete directory of cities providing IV therapy. Find top-rated clinics and mobile services across the United States.',
 };
 
+export const revalidate = 3600;
+
 export default async function CitiesHubPage() {
-  let cities = [];
+  const providerCities = await getAllCities();
   
-  if (isSupabaseConfigured()) {
-    // 1. Fetch cities metadata from the dedicated table
-    const { data: dbCities } = await supabase
-      .from('cities')
-      .select('name, slug, state, listings_count');
-      
-    // 2. Fetch ALL cities that have providers from the providers table
-    const providerCities = await getAllCities();
-
-    // 3. Create a map for quick lookup of DB cities by name
-    const dbCityMap = new Map();
-    dbCities?.forEach(c => {
-      dbCityMap.set(c.name.toLowerCase(), c);
-    });
-
-    // 4. Merge providerCities with dbCities metadata
-    cities = providerCities.map(pc => {
-      const dbCity = dbCityMap.get(pc.city.toLowerCase());
-      return {
-        name: pc.city,
-        slug: dbCity?.slug || slugify(pc.city),
-        state: dbCity?.state || pc.state,
-        displayCount: pc.count
-      };
-    }).sort((a, b) => b.displayCount - a.displayCount);
-  }
+  // Create a display-ready list of cities with fallbacks for slug and state
+  const cities = providerCities.map(pc => ({
+    name: pc.city,
+    slug: slugify(pc.city),
+    state: pc.state || 'Ontario', // Default for Toronto/GTA if unknown
+    displayCount: pc.count
+  })).sort((a, b) => b.displayCount - a.displayCount);
 
   return (
     <div className="min-h-screen bg-[#FDFDFB]">

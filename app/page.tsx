@@ -15,6 +15,7 @@ import {
   MapPin
 } from 'lucide-react';
 import { Navbar } from '../src/components/Navbar';
+import LiveStatsBar from '../src/components/LiveStatsBar';
 import { Footer } from '../src/components/Footer';
 import { BlogCard } from '../src/components/BlogCard';
 import { ClinicianSection } from '../src/components/ClinicianSection';
@@ -58,8 +59,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 3600;
 
 export default async function HomePage() {
   const stats = await getSiteStats();
@@ -119,6 +119,7 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
+      <LiveStatsBar />
       
       <script
         type="application/ld+json"
@@ -139,27 +140,30 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center max-w-5xl mx-auto mb-20">
             <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight leading-[1.1] drop-shadow-sm">
-              Find Your Perfect <br />
+              Get Matched to the Right <br />
               <span className="text-wellness-600 relative">
-                IV Therapy Match.
+                IV Therapy Clinic in 30 Seconds.
                 <span className="absolute -inset-1 bg-wellness-100/30 blur-2xl -z-10 rounded-full" />
               </span>
             </h1>
             
             <p className="text-xl md:text-2xl text-slate-500 mb-8 font-medium tracking-tight max-w-3xl mx-auto leading-relaxed">
-              Answer 5 quick questions. We&apos;ll find the right clinic for your exact goal, location, and budget — from {stats.total} verified providers.
+              Not all IV therapy is the same — we match you based on your exact needs, location, and budget.
             </p>
 
             <QuickMatch />
             
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] font-bold text-slate-500 mt-8">
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.total} Clinics</span>
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.cities} Cities</span>
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.states} States</span>
-              <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {stats.avgRating}★ Avg Rating</span>
+            <div className="mt-8 flex flex-col items-center gap-2">
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] font-bold text-slate-500">
+                <span className="flex items-center gap-1.5"><span className="text-wellness-500">✓</span> Used by patients to find the right IV therapy</span>
+                <span className="flex items-center gap-1.5"><span className="text-wellness-500">✓</span> Built to match real needs, not just location</span>
+              </div>
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-2">
+                <span className="flex items-center gap-1.5">{stats.total} Verified Clinics</span>
+                <span className="flex items-center gap-1.5">{stats.cities} US Cities</span>
+              </div>
             </div>
-
-            </div>
+          </div>
 
           <h2 className="text-4xl md:text-5xl font-black text-slate-900 text-center mb-16 tracking-tight">The Smarter Way to Find IV Therapy Clinics Near You</h2>
 
@@ -242,7 +246,7 @@ export default async function HomePage() {
             {services.map((service, idx) => (
               <Link 
                 key={idx}
-                href={`/iv-therapy/treatment/${service.slug}`}
+                href={`/treatments/${service.slug}`}
                 className="bg-white p-8 rounded-[2rem] border border-slate-100 hover:border-wellness-200 hover:shadow-xl transition-all text-center group"
               >
                 <div className="w-12 h-12 bg-wellness-50 rounded-xl flex items-center justify-center text-wellness-600 mx-auto mb-4 group-hover:scale-110 transition-transform">

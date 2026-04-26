@@ -14,15 +14,15 @@ import {
   CheckCircle2,
   MapPin
 } from 'lucide-react';
-import { Navbar } from '../../../../src/components/Navbar';
-import { Footer } from '../../../../src/components/Footer';
-import { ProviderCard } from '../../../../src/components/ProviderCard';
-import { FAQSection } from '../../../../src/components/FAQSection';
-import { BreadcrumbNav } from '../../../../src/components/BreadcrumbNav';
-import { CityGrid } from '../../../../src/components/CityGrid';
-import { QuizCTA } from '../../../../src/components/QuizCTA';
-import { getListingsByServiceAndCity, getListingsByService, getTopHubs } from '../../../../src/lib/data';
-import { Provider } from '../../../../src/types';
+import { Navbar } from '../../../src/components/Navbar';
+import { Footer } from '../../../src/components/Footer';
+import { ProviderCard } from '../../../src/components/ProviderCard';
+import { FAQSection } from '../../../src/components/FAQSection';
+import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
+import { CityGrid } from '../../../src/components/CityGrid';
+import { QuizCTA } from '../../../src/components/QuizCTA';
+import { getListingsByServiceAndCity, getListingsByService, getTopHubs } from '../../../src/lib/data';
+import { Provider } from '../../../src/types';
 
 const SERVICES = [
   { name: 'NAD+ Plus', slug: 'nad-plus', icon: <Activity size={24} />, aliases: ['nad'] },
@@ -79,7 +79,7 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
       
       // Minimum results logic: If we have fewer than 3 specific matches, backfill with top clinics in the city
       if (finalResults.length < 3) {
-        const { getFeaturedListings, getListingsByCity } = await import('../../../../src/lib/data');
+        const { getFeaturedListings, getListingsByCity } = await import('../../../src/lib/data');
         
         // Try featured first
         let fallbackListings = await getFeaturedListings(60, cityToUse || undefined);
@@ -152,7 +152,7 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
         "@type": "ListItem",
         "position": 3,
         "name": service.name,
-        "item": `${siteUrl}/iv-therapy/treatment/${service.slug}`
+        "item": `${siteUrl}/treatments/${service.slug}`
       }
     ]
   };

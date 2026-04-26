@@ -1,13 +1,14 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, Sparkles, ArrowRight, Phone, Globe, Building2 } from 'lucide-react';
+import { MapPin, Sparkles, ArrowRight, Phone, Globe, Building2, TrendingUp, Zap as ZapIcon, Flame, Star as StarIcon } from 'lucide-react';
 import { Provider, OperatorProfile } from '../types';
 import { RatingStars } from './RatingStars';
 import { ServicePill } from './ServicePill';
 import { slugify } from '../lib/data';
 import { cn } from '../lib/utils';
 import { calculateValueMetrics } from '../lib/price-utils';
+import { motion } from 'motion/react';
 
 interface ProviderCardFeaturedProps {
   provider: Provider & { matchScore?: number };
@@ -21,13 +22,33 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
   const valueMetrics = calculateValueMetrics(provider);
   const priceAnchor = provider.priceRange === '$' ? '$99' : provider.priceRange === '$$' ? '$149' : provider.priceRange === '$$$' ? '$199' : '$249';
 
+  // Simulate dynamic badges intelligently based on ID
+  const dynamicBadge = React.useMemo(() => {
+    const idHash = provider.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const options = [
+      { label: '🔥 Popular This Week', color: 'bg-orange-500', icon: <Flame size={14} /> },
+      { label: '⭐ Top Rated in Area', color: 'bg-amber-500', icon: <StarIcon size={14} /> },
+      { label: '📈 Trending', color: 'bg-blue-500', icon: <TrendingUp size={14} /> },
+      { label: '⚡ Fast Response', color: 'bg-emerald-500', icon: <ZapIcon size={14} /> },
+    ];
+    
+    // Fewer badges on featured to keep it clean
+    if (idHash % 10 > 2) return null;
+    return options[idHash % options.length];
+  }, [provider.id]);
+
   return (
-    <div className={cn(
-      "group relative bg-white rounded-[2.5rem] border overflow-hidden transition-all duration-500",
-      isPrimary 
-        ? "border-wellness-200 shadow-2xl shadow-wellness-100 ring-1 ring-wellness-100 p-2" 
-        : "border-slate-100 shadow-lg hover:shadow-xl hover:border-wellness-100"
-    )}>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -5 }}
+      className={cn(
+        "group relative bg-white rounded-[2.5rem] border overflow-hidden transition-all duration-500",
+        isPrimary 
+          ? "border-wellness-200 shadow-2xl shadow-wellness-100 ring-1 ring-wellness-100 p-2" 
+          : "border-slate-100 shadow-lg hover:shadow-xl hover:border-wellness-100"
+      )}
+    >
       <div className={cn(
         "flex flex-col",
         isPrimary ? "md:flex-row" : ""
@@ -49,19 +70,32 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           </Link>
           
-          {isPrimary && (
-            <div className="flex flex-col gap-2 absolute top-4 left-4">
+          <div className="flex flex-col gap-2 absolute top-4 left-4">
+            {isPrimary && (
               <div className="bg-white/90 backdrop-blur-sm text-wellness-700 px-4 py-2 rounded-2xl text-xs font-black shadow-xl flex items-center gap-2">
                 <Sparkles size={14} /> YOUR BEST MATCH
               </div>
+            )}
+            
+            {dynamicBadge && (
+              <motion.div 
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className={cn("text-white px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-wider shadow-xl flex items-center gap-2", dynamicBadge.color)}
+              >
+                {dynamicBadge.icon} {dynamicBadge.label}
+              </motion.div>
+            )}
+
+            {isPrimary && (
               <div className={cn(
                 "px-4 py-2 rounded-2xl text-[10px] font-black shadow-xl flex items-center gap-2 border",
                 valueMetrics.color
               )}>
                 💎 {valueMetrics.label}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {provider.distance !== undefined && (
             <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-slate-900 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg">
@@ -166,6 +200,6 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

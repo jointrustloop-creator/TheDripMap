@@ -9,15 +9,18 @@ import {
   Star,
   ChevronDown,
   ChevronUp,
-  Calendar
+  Calendar,
+  Target,
+  Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { matchProviders } from '../../../src/lib/matching';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { SurveyState, OperatorProfile, Provider, City, TreatmentType } from '../../../src/types';
-import { getOperatorProfiles, getAllListings, getListingsByCity } from '../../../src/lib/data';
+import { getOperatorProfiles, getAllListings, getListingsByCity, slugify } from '../../../src/lib/data';
 import { ClinicImage } from '../../../src/components/ClinicImage';
+import { cn } from '../../../src/lib/utils';
 
 export default function ResultsPage() {
   return (
@@ -291,19 +294,56 @@ function ResultsContent() {
             <span>Matching Complete</span>
           </motion.div>
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">
-            Your Personalized Results
+            These clinics were selected based on your answers
           </h1>
-          <p className="text-lg text-slate-500 max-w-2xl mx-auto">
-            We&apos;ve analyzed {listings.length} providers to find your best clinical fit near <span className="text-slate-900 font-bold">{surveyData.city || 'your area'}</span>.
+          <p className="text-lg text-slate-500 max-w-2xl mx-auto mb-10">
+            Our algorithm analyzed hundreds of data points to find your best clinical fit in <span className="text-slate-900 font-bold">{surveyData.city || 'your area'}</span>.
           </p>
+
+          {/* Selected Criteria Summary */}
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest block w-full mb-2">You selected:</span>
+            {surveyData.goal && (
+              <div className="bg-wellness-50 text-wellness-700 px-4 py-2 rounded-xl text-sm font-bold border border-wellness-100 flex items-center gap-2">
+                <Target size={14} />
+                {GOALS.find(g => g.id === surveyData.goal)?.label || surveyData.goal}
+              </div>
+            )}
+            {surveyData.locationPreference && (
+              <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-xl text-sm font-bold border border-blue-100 flex items-center gap-2">
+                <MapPin size={14} />
+                {surveyData.locationPreference} IV
+              </div>
+            )}
+            {surveyData.urgency && (
+              <div className="bg-amber-50 text-amber-700 px-4 py-2 rounded-xl text-sm font-bold border border-amber-100 flex items-center gap-2">
+                <Calendar size={14} />
+                {surveyData.urgency}
+              </div>
+            )}
+            {surveyData.budget && surveyData.budget !== 'Any' && (
+              <div className="bg-emerald-50 text-emerald-700 px-4 py-2 rounded-xl text-sm font-bold border border-emerald-100 flex items-center gap-2">
+                <span>{surveyData.budget} Budget</span>
+              </div>
+            )}
+            {surveyData.symptoms && surveyData.symptoms.length > 0 && (
+              <div className="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl text-sm font-bold border border-purple-100 flex items-center gap-2">
+                <Activity size={14} />
+                {surveyData.symptoms.length} Symptoms
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="space-y-20">
-          {/* SECTION 1 — "YOUR BEST MATCH" */}
+          {/* SECTION 1 — "BEST MATCH" */}
           <section className="space-y-8">
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-slate-100" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-wellness-600">Your Best Match</span>
+              <div className="flex items-center gap-2 text-wellness-600">
+                <Sparkles size={16} className="animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Our #1 Recommendation: Best Match</span>
+              </div>
               <div className="h-px flex-1 bg-slate-100" />
             </div>
 
@@ -375,7 +415,7 @@ function ResultsContent() {
                     </p>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
                     <a 
                       href={topMatch.website || '#'} 
                       target="_blank" 
@@ -386,7 +426,7 @@ function ResultsContent() {
                       Book Appointment
                     </a>
                     <Link 
-                      href={`/provider/${topMatch.slug || topMatch.id}`}
+                      href={`/provider/${topMatch.slug || slugify(topMatch.name)}`}
                       className="flex-1 bg-white text-slate-900 border-2 border-slate-100 px-8 py-4 rounded-2xl font-bold hover:border-slate-900 transition-all text-center"
                     >
                       View Full Profile
@@ -397,65 +437,75 @@ function ResultsContent() {
             </motion.div>
           </section>
 
-          {/* SECTION 2 — "OTHER STRONG OPTIONS" */}
+          {/* SECTION 2 — "ALTERNATIVE & PREMIUM OPTIONS" */}
           {otherMatches.length > 0 && (
             <section className="space-y-8">
               <div className="flex items-center gap-3">
                 <div className="h-px flex-1 bg-slate-100" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Other Strong Options</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Other Matches</span>
                 <div className="h-px flex-1 bg-slate-100" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {otherMatches.map((provider) => (
-                  <div key={provider.id} className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden shadow-xl shadow-slate-200/50 flex flex-col">
-                    <div className="relative h-48">
-                      <ClinicImage 
-                        name={provider.name}
-                        imageUrl={provider.imageUrl}
-                      />
-                      <div className="absolute top-4 left-4">
-                        <span className="bg-white/90 backdrop-blur-md text-slate-900 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm">
-                          {formatDistance(provider)}
-                        </span>
-                      </div>
+                {otherMatches.map((provider, idx) => (
+                  <div key={provider.id} className="relative group">
+                    <div className="absolute -top-3 left-6 z-10">
+                      <span className={cn(
+                        "px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-md border",
+                        idx === 0 ? "bg-white text-slate-500 border-slate-100" : "bg-wellness-600 text-white border-wellness-500"
+                      )}>
+                        {idx === 0 ? "Alternative Option" : "Premium Option"}
+                      </span>
                     </div>
-                    <div className="p-6 flex-1 flex flex-col">
-                      <div className="flex items-center gap-1 text-wellness-600 mb-2">
-                        <Star size={14} fill="currentColor" />
-                        <span className="text-sm font-bold">{provider.rating}</span>
-                        <span className="text-xs text-slate-400 font-bold ml-1">({provider.reviewCount})</span>
-                      </div>
-                      <h3 className="text-xl font-black text-slate-900 mb-1 line-clamp-1">{provider.name}</h3>
-                      <p className="text-xs text-slate-500 font-bold mb-4">{provider.city}{provider.state ? `, ${provider.state}` : ''}</p>
-                      
-                      <div className="flex flex-wrap gap-2 mb-6">
-                        {provider.specialties.slice(0, 2).map(s => (
-                          <span key={s} className="bg-slate-50 text-slate-500 px-2 py-0.5 rounded-md text-[10px] font-bold border border-slate-100">
-                            {s}
+                    <div className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden shadow-xl shadow-slate-200/50 flex flex-col h-full">
+                      <div className="relative h-48">
+                        <ClinicImage 
+                          name={provider.name}
+                          imageUrl={provider.imageUrl}
+                        />
+                        <div className="absolute top-4 left-4 pt-4">
+                          <span className="bg-white/90 backdrop-blur-md text-slate-900 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm">
+                            {formatDistance(provider)}
                           </span>
-                        ))}
-                        {provider.priceRange && (
-                          <span className="bg-wellness-50 text-wellness-600 px-2 py-0.5 rounded-md text-[10px] font-bold border border-wellness-100">
-                            {provider.priceRange}
-                          </span>
-                        )}
+                        </div>
                       </div>
+                      <div className="p-6 flex-1 flex flex-col">
+                        <div className="flex items-center gap-1 text-wellness-600 mb-2">
+                          <Star size={14} fill="currentColor" />
+                          <span className="text-sm font-bold">{provider.rating}</span>
+                          <span className="text-xs text-slate-400 font-bold ml-1">({provider.reviewCount}) reviews</span>
+                        </div>
+                        <h3 className="text-xl font-black text-slate-900 mb-1 line-clamp-1">{provider.name}</h3>
+                        <p className="text-xs text-slate-500 font-bold mb-4">{provider.city}{provider.state ? `, ${provider.state}` : ''}</p>
+                        
+                        <div className="flex flex-wrap gap-2 mb-6">
+                          {provider.specialties.slice(0, 2).map(s => (
+                            <span key={s} className="bg-slate-50 text-slate-500 px-2 py-0.5 rounded-md text-[10px] font-bold border border-slate-100">
+                              {s}
+                            </span>
+                          ))}
+                          {provider.priceRange && (
+                            <span className="bg-wellness-50 text-wellness-600 px-2 py-0.5 rounded-md text-[10px] font-bold border border-wellness-100">
+                              {provider.priceRange}
+                            </span>
+                          )}
+                        </div>
 
-                      <div className="mt-auto flex gap-3">
-                        <a 
-                          href={provider.website || '#'} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="flex-1 bg-slate-900 text-white py-3 rounded-xl text-xs font-bold hover:bg-slate-800 transition-all text-center"
-                        >
-                          Book
-                        </a>
-                        <Link 
-                          href={`/provider/${provider.slug || provider.id}`}
-                          className="flex-1 bg-white text-slate-900 border border-slate-200 py-3 rounded-xl text-xs font-bold hover:border-slate-900 transition-all text-center"
-                        >
-                          View
-                        </Link>
+                        <div className="mt-auto flex gap-3">
+                          <a 
+                            href={provider.website || '#'} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex-1 bg-slate-900 text-white py-3 rounded-xl text-xs font-bold hover:bg-slate-800 transition-all text-center"
+                          >
+                            Book now
+                          </a>
+                          <Link 
+                            href={`/provider/${provider.slug || slugify(provider.name)}`}
+                            className="flex-1 bg-white text-slate-900 border border-slate-200 py-3 rounded-xl text-xs font-bold hover:border-slate-900 transition-all text-center"
+                          >
+                            Profile
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -463,6 +513,23 @@ function ResultsContent() {
               </div>
             </section>
           )}
+
+          {/* Persistent Retake Reminder */}
+          <div className="bg-slate-900 rounded-[2.5rem] p-10 text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full" />
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+              <div>
+                <h3 className="text-2xl font-black mb-2 tracking-tight">Want better results?</h3>
+                <p className="text-slate-400 font-medium">Refine your match criteria to get even more precise recommendations.</p>
+              </div>
+              <button 
+                onClick={() => router.push('/quiz')}
+                className="bg-white text-slate-900 px-8 py-4 rounded-2xl font-black text-sm hover:bg-slate-100 transition-all shrink-0 flex items-center gap-2"
+              >
+                Retake Quiz to Refine <ArrowRight size={16} />
+              </button>
+            </div>
+          </div>
 
           {/* SECTION 3 — "MORE OPTIONS NEAR YOU" */}
           {moreMatches.length > 0 && (
@@ -497,7 +564,7 @@ function ResultsContent() {
                             <p className="text-[10px] text-slate-500 font-bold">{formatDistance(provider)}</p>
                           </div>
                           <Link 
-                            href={`/provider/${provider.slug || provider.id}`}
+                            href={`/provider/${provider.slug || slugify(provider.name)}`}
                             className="p-2 text-slate-400 hover:text-wellness-600 transition-colors"
                           >
                             <ArrowRight size={18} />
@@ -507,7 +574,7 @@ function ResultsContent() {
                     </div>
                     <div className="text-center pt-8">
                       <Link 
-                        href={`/iv-therapy/${surveyData.state?.toLowerCase() || 'usa'}/${surveyData.city?.toLowerCase().replace(/\s+/g, '-') || ''}`}
+                        href={`/cities/${slugify(surveyData.city)}`}
                         className="inline-flex items-center gap-2 text-wellness-600 font-black text-sm hover:underline"
                       >
                         View all {surveyData.city} listings <ArrowRight size={16} />

@@ -11,11 +11,9 @@ export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navLinks = [
-    { label: 'Cities', href: '/cities' },
     { label: 'Explore Clinics', href: '/search' },
     { label: 'Symptoms', href: '/iv-therapy-for' },
     { label: 'Blog', href: '/blog' },
-    { label: 'For Clinics', href: '/for-clinics' },
   ];
 
   return (
