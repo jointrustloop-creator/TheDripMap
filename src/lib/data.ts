@@ -29,6 +29,8 @@ export const STATE_MAP: Record<string, string> = {
   'district-of-columbia': 'DC', 'ontario': 'ON'
 };
 
+export const GTA_CITIES = ['Toronto', 'North York', 'Richmond Hill', 'Vaughan', 'Mississauga', 'Oakville', 'Brampton', 'Ajax', 'Newmarket'];
+
 // Reverse mapping for full names
 export const REVERSE_STATE_MAP: Record<string, string> = Object.fromEntries(
   Object.entries(STATE_MAP).map(([name, abbr]) => [abbr, name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())])
@@ -234,19 +236,29 @@ export async function getListingsByCity(city: string, state?: string) {
 
     // 2. Standard Search
     const tryQuery = async (cityName: string, stateName?: string) => {
-      let query = supabase.from('providers').select('*').ilike('city', `%${cityName}%`);
+      let query = supabase.from('providers').select('*');
       
-      if (stateName) {
-        // Use mapping to get the abbreviation if a full name was provided
-        const slugState = slugify(stateName);
-        const stateAbbr = STATE_MAP[slugState] || stateName;
+      const gtaCitiesLower = GTA_CITIES.map(c => c.toLowerCase());
+      const isGTA = gtaCitiesLower.includes(cityName.toLowerCase()) || cityName.toLowerCase() === 'gta' || cityName.toLowerCase() === 'ontario';
+
+      // Special case for Toronto & GTA
+      if (isGTA) {
+        query = query.in('city', GTA_CITIES).eq('country', 'Canada').eq('availability', true);
+      } else {
+        query = query.ilike('city', `%${cityName}%`);
         
-        // Use actual names, not slugs, for the ilike search to match DB content
-        const statePattern = stateName.replace(/'/g, "''").trim();
-        const abbrPattern = stateAbbr.replace(/'/g, "''").trim();
-        
-        // Remove state_abbr from query as it doesn't exist in the providers table
-        query = query.or(`state.ilike.%${statePattern}%,state.ilike.%${abbrPattern}%`);
+        if (stateName) {
+          // Use mapping to get the abbreviation if a full name was provided
+          const slugState = slugify(stateName);
+          const stateAbbr = STATE_MAP[slugState] || stateName;
+          
+          // Use actual names, not slugs, for the ilike search to match DB content
+          const statePattern = stateName.replace(/'/g, "''").trim();
+          const abbrPattern = stateAbbr.replace(/'/g, "''").trim();
+          
+          // Remove state_abbr from query as it doesn't exist in the providers table
+          query = query.or(`state.ilike.%${statePattern}%,state.ilike.%${abbrPattern}%`);
+        }
       }
       
       return query.order('reviews', { ascending: false }).limit(200);
@@ -673,7 +685,14 @@ export async function searchListings(query: string, city?: string) {
     let q = supabase.from('providers').select('*');
     
     if (city && city !== 'All') {
-      q = q.ilike('city', `%${city}%`);
+      const gtaCitiesLower = GTA_CITIES.map(c => c.toLowerCase());
+      const isGTA = gtaCitiesLower.includes(city.toLowerCase()) || city.toLowerCase() === 'gta' || city.toLowerCase() === 'ontario';
+      
+      if (isGTA) {
+        q = q.in('city', GTA_CITIES).eq('country', 'Canada').eq('availability', true);
+      } else {
+        q = q.ilike('city', `%${city}%`);
+      }
     }
     
     if (query && query.trim() !== '') {

@@ -12,8 +12,9 @@ export const Navbar = () => {
 
   const navLinks = [
     { label: 'Explore Clinics', href: '/search' },
-    { label: 'Symptoms', href: '/iv-therapy-for' },
+    { label: 'Symptoms', href: '/symptoms' },
     { label: 'Blog', href: '/blog' },
+    { label: 'For Clinics', href: '/for-clinics' },
   ];
 
   return (

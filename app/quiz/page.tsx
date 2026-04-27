@@ -25,7 +25,7 @@ import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 
 import { getUserLocation, getIPLocation } from '../../src/lib/geo';
-import { getAllCities } from '../../src/lib/data';
+import { getAllCities, GTA_CITIES } from '../../src/lib/data';
 
 const STEPS = [
   {
@@ -206,7 +206,17 @@ export default function QuizPage() {
   };
 
   const handleManualLocation = (city: string, state: string) => {
-    setData(prev => ({ ...prev, city, state }));
+    const isCanada = 
+      GTA_CITIES.map(c => c.toLowerCase()).includes(city.toLowerCase()) || 
+      city.toLowerCase() === 'ontario' || 
+      (state && (state.toLowerCase() === 'on' || state.toLowerCase() === 'ontario'));
+      
+    setData(prev => ({ 
+      ...prev, 
+      city, 
+      state,
+      country: isCanada ? 'Canada' : 'US'
+    }));
     setShowManualLocation(false);
   };
 

@@ -6,13 +6,14 @@ import { MedicalDisclaimer } from './MedicalDisclaimer';
 
 export const Footer = () => {
   const POPULAR_CITIES = [
-    { city: 'New York', state: 'NY', slug: 'new-york' },
-    { city: 'Clearwater', state: 'FL', slug: 'clearwater' },
-    { city: 'Houston', state: 'TX', slug: 'houston' },
-    { city: 'San Diego', state: 'CA', slug: 'san-diego' },
-    { city: 'Tampa', state: 'FL', slug: 'tampa' },
-    { city: 'Washington DC', state: 'DC', slug: 'washington' },
-    { city: 'Kansas City', state: 'MO', slug: 'kansas-city' },
+    { city: 'Toronto & GTA', state: 'ON', slug: 'toronto', country: 'Canada' },
+    { city: 'New York', state: 'NY', slug: 'new-york', country: 'US' },
+    { city: 'Clearwater', state: 'FL', slug: 'clearwater', country: 'US' },
+    { city: 'Houston', state: 'TX', slug: 'houston', country: 'US' },
+    { city: 'San Diego', state: 'CA', slug: 'san-diego', country: 'US' },
+    { city: 'Tampa', state: 'FL', slug: 'tampa', country: 'US' },
+    { city: 'Washington DC', state: 'DC', slug: 'washington', country: 'US' },
+    { city: 'Kansas City', state: 'MO', slug: 'kansas-city', country: 'US' },
   ];
 
   return (
@@ -29,11 +30,12 @@ export const Footer = () => {
         <div>
           <h4 className="font-bold mb-6 text-sm uppercase tracking-wider text-slate-400">Services</h4>
           <ul className="space-y-4 text-slate-600 text-sm">
-            <li><Link href="/treatments/nad-plus" className="hover:text-wellness-600 transition-colors">NAD+ Therapy</Link></li>
-            <li><Link href="/treatments/hangover" className="hover:text-wellness-600 transition-colors">Hangover IV</Link></li>
-            <li><Link href="/treatments/immune-support" className="hover:text-wellness-600 transition-colors">Immune Support</Link></li>
-            <li><Link href="/treatments/beauty-glow" className="hover:text-wellness-600 transition-colors">Beauty & Glow</Link></li>
-            <li><Link href="/treatments/weight-loss" className="hover:text-wellness-600 transition-colors">Weight Loss Drips</Link></li>
+            <li><Link href="/search?specialty=NAD%2B+Plus" className="hover:text-wellness-600 transition-colors">NAD+ Therapy</Link></li>
+            <li><Link href="/search?specialty=Myers+Cocktail" className="hover:text-wellness-600 transition-colors">Myers Cocktail</Link></li>
+            <li><Link href="/search?specialty=Vitamin+C+IV" className="hover:text-wellness-600 transition-colors">Vitamin C IV</Link></li>
+            <li><Link href="/search?specialty=Hydration" className="hover:text-wellness-600 transition-colors">Hydration Drips</Link></li>
+            <li><Link href="/search?type=Mobile" className="hover:text-wellness-600 transition-colors">Mobile IV</Link></li>
+            <li><Link href="/search?specialty=Hangover+Relief" className="hover:text-wellness-600 transition-colors">Hangover Relief</Link></li>
           </ul>
         </div>
         <div>
@@ -48,7 +50,7 @@ export const Footer = () => {
                     const newLoc = {
                       city: city.city,
                       state: city.state,
-                      country: 'US',
+                      country: city.country || 'US',
                       isPrecise: false,
                       detectedAt: Date.now()
                     };
@@ -70,11 +72,10 @@ export const Footer = () => {
         <div>
           <h4 className="font-bold mb-6 text-sm uppercase tracking-wider text-slate-400">Company</h4>
           <ul className="space-y-4 text-slate-600 text-sm">
-            <li><Link href="/iv-therapy-for" className="hover:text-wellness-600 transition-colors">Symptoms Hub</Link></li>
-            <li><Link href="/about" className="hover:text-wellness-600 transition-colors">About Us</Link></li>
-            <li><Link href="/contact" className="hover:text-wellness-600 transition-colors">Contact</Link></li>
-            <li><Link href="/privacy" className="hover:text-wellness-600 transition-colors">Privacy Policy</Link></li>
-            <li><Link href="/terms" className="hover:text-wellness-600 transition-colors">Terms of Service</Link></li>
+            <li><Link href="/about" className="hover:text-wellness-600 transition-colors">About</Link></li>
+            <li><Link href="/blog" className="hover:text-wellness-600 transition-colors">Blog</Link></li>
+            <li><Link href="/symptoms" className="hover:text-wellness-600 transition-colors">Symptoms Hub</Link></li>
+            <li><Link href="/for-clinics" className="hover:text-wellness-600 transition-colors">For Clinics</Link></li>
           </ul>
         </div>
       </div>

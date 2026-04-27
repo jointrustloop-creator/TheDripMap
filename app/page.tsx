@@ -17,6 +17,9 @@ import {
 import { Navbar } from '../src/components/Navbar';
 import LiveStatsBar from '../src/components/LiveStatsBar';
 import { Footer } from '../src/components/Footer';
+
+export const revalidate = 86400;
+
 import { BlogCard } from '../src/components/BlogCard';
 import { ClinicianSection } from '../src/components/ClinicianSection';
 import { HowItWorks } from '../src/components/HowItWorks';
@@ -28,7 +31,7 @@ import { cn } from '../src/lib/utils';
 
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getSiteStats();
-  const description = `TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse ${stats.total} clinics across ${stats.cities} US cities or take our free 60-second matching quiz.`;
+  const description = `TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse ${stats.total} clinics across ${stats.cities} cities including Toronto, NYC, and LA.`;
   
   return {
     description,
@@ -58,12 +61,10 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export const revalidate = 3600;
-
 export default async function HomePage() {
   const stats = await getSiteStats();
   const blogPosts = await getBlogPosts();
-  const topHubs = await getTopHubs(7);
+  const topHubs = await getTopHubs(8);
   const latestPosts = blogPosts.slice(0, 3);
 
   const breadcrumbJsonLd = {
@@ -349,9 +350,12 @@ export default async function HomePage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              ...topHubs.map(hub => ({ name: hub.city, slug: hub.slug, isAll: false })),
-              { name: 'Browse All Cities', slug: '', isAll: true }
-            ].map((city, idx) => (
+              { name: 'Toronto & GTA', slug: 'toronto', subtitle: '20+ verified providers', isAll: false },
+              ...topHubs
+                .filter(hub => hub.city.toLowerCase() !== 'toronto')
+                .map(hub => ({ name: hub.city, slug: hub.slug, subtitle: 'View Clinics', isAll: false })),
+              { name: 'Browse All Cities', slug: '', subtitle: '', isAll: true }
+            ].slice(0, 8).map((city, idx) => (
               <Link 
                 key={idx}
                 href={city.isAll ? '/cities' : `/cities/${city.slug}`}
@@ -374,7 +378,9 @@ export default async function HomePage() {
                   {city.name}
                 </span>
                 {!city.isAll && (
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">View Clinics</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">
+                    {city.subtitle || 'View Clinics'}
+                  </span>
                 )}
               </Link>
             ))}

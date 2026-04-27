@@ -22,8 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 3600;
 
 export default async function SearchPage() {
   // SSR the default list of clinics for SEO and initial view

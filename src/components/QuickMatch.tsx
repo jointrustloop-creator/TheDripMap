@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
+import { GTA_CITIES } from '../lib/data';
 
 const GOALS = [
   { id: 'hangover', label: 'Hangover Recovery', icon: <Heart size={18} /> },
@@ -118,10 +119,16 @@ export function QuickMatch() {
       if (stateName) params.set('state', stateName);
       
       // Update global location state so the entire app stays in sync
+      const gtaLower = GTA_CITIES.map(c => c.toLowerCase());
+      const isCanada = gtaLower.includes(cityName.toLowerCase()) || 
+                       cityName.toLowerCase() === 'gta' || 
+                       cityName.toLowerCase() === 'ontario' ||
+                       (stateName && (stateName.toLowerCase() === 'on' || stateName.toLowerCase() === 'ontario'));
+                       
       const newLoc = {
         city: cityName,
         state: stateName || '',
-        country: 'US',
+        country: isCanada ? 'Canada' : 'US',
         isPrecise: false,
         detectedAt: Date.now()
       };

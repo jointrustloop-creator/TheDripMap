@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { LocationInfo } from '../types';
 import { cn } from '../lib/utils';
 import { usePathname, useRouter } from 'next/navigation';
-import { getAllCities, slugify } from '../lib/data';
+import { getAllCities, slugify, GTA_CITIES } from '../lib/data';
 
 export const LocationIndicator = () => {
   const pathname = usePathname();
@@ -148,10 +148,15 @@ export const LocationIndicator = () => {
   );
 
   const handleCitySelect = (city: string, state: string) => {
+    const isCanada = 
+      GTA_CITIES.map(c => c.toLowerCase()).includes(city.toLowerCase()) || 
+      city.toLowerCase() === 'ontario' || 
+      (state && (state.toLowerCase() === 'on' || state.toLowerCase() === 'ontario'));
+
     const newLocation = {
       city,
       state, 
-      country: 'US',
+      country: isCanada ? 'Canada' : 'US',
       isPrecise: false,
       detectedAt: Date.now()
     };
