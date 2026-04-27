@@ -270,14 +270,12 @@ export async function getListingsByCity(city: string, state?: string) {
 
     // 3. Fallback: If nothing found with city + state, try just city
     if ((!response.data || response.data.length === 0) && searchState) {
-      console.log(`Fallback: No results for ${searchCity} in ${searchState}, trying city only...`);
       response = await tryQuery(searchCity);
     }
 
     // 4. Broad Fallback: Search by name or address if city search fails
     if (!response.data || response.data.length === 0) {
       if (searchCity.length >= 3) {
-        console.log(`Broad Fallback: Searching name/address for ${searchCity}...`);
         const { data: broadData } = await supabase
           .from('providers')
           .select('*')
@@ -974,13 +972,26 @@ export async function getCityBySlug(slug: string) {
   }
 
   try {
+    // Use ilike for case-insensitive slug match
     const { data, error } = await supabase
       .from('cities')
       .select('*')
-      .eq('slug', slug)
-      .single();
+      .ilike('slug', slug)
+      .maybeSingle();
 
     if (error || !data) {
+      // Extended fallback: try matching by name if slug fails
+      const namePattern = slug.replace(/-/g, ' ');
+      const { data: nameMatch } = await supabase
+        .from('cities')
+        .select('*')
+        .ilike('name', `%${namePattern}%`)
+        .limit(1)
+        .maybeSingle();
+      
+      if (nameMatch) return nameMatch;
+
+      // Final fallback to mock
       const found = MOCK_CITIES.find(c => slugify(c.city) === slug);
       return found ? { 
         name: found.city, 
@@ -990,7 +1001,8 @@ export async function getCityBySlug(slug: string) {
       } : null;
     }
     return data;
-  } catch {
+  } catch (err) {
+    console.warn('Error in getCityBySlug:', err);
     const found = MOCK_CITIES.find(c => slugify(c.city) === slug);
     return found ? { 
       name: found.city, 

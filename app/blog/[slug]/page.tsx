@@ -81,9 +81,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   
   if (!post) notFound();
 
-  // DEBUG LOGGING AS REQUESTED
-  console.log('RAW CONTENT:', post.content);
-
   const relatedPosts = allPosts
     .filter(p => p.slug !== post.slug && p.category === post.category)
     .slice(0, 2);

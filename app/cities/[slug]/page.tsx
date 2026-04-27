@@ -14,6 +14,34 @@ import { ProviderCard } from '@/src/components/ProviderCard';
 import { getCityBySlug, getListingsByCity } from '@/src/lib/data';
 
 export const revalidate = 3600;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const { createClient } = await import('@supabase/supabase-js');
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // Don't crash during build if env vars are missing or placeholders
+  if (!url || !key || url.includes('placeholder') || key.includes('placeholder')) {
+    console.warn('Skipping generateStaticParams: Supabase keys missing or invalid');
+    return [];
+  }
+
+  try {
+    const supabase = createClient(url, key);
+    const { data } = await supabase
+      .from('cities')
+      .select('slug')
+      .not('slug', 'is', null);
+
+    return (data || []).map((city) => ({
+      slug: String(city.slug),
+    }));
+  } catch (err) {
+    console.error('Error in generateStaticParams during build:', err);
+    return [];
+  }
+}
 
 interface CityPageProps {
   params: Promise<{
@@ -59,32 +87,32 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
 export default async function IndividualCityPage({ params }: CityPageProps) {
   const { slug } = await params;
   let cityData = await getCityBySlug(slug);
-  const foundInTable = !!cityData;
 
-  // Fallback if no specific city record exists but we might have listings
+  // If no city record was found in the 'cities' table or mock data
   if (!cityData) {
-    // Basic reconstruction from slug for the UI
+    // Check if we can reconstruction from slug as a last resort before 404
+    // Only if it looks like a valid-ish city slug
     const name = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    // We'll check if listings actually exist below
-    cityData = {
-      id: `fallback-${slug}`,
-      name,
-      slug,
-      state: '',
-      content: null,
-      meta_title: null,
-      meta_description: null
-    };
+    const listings = await getListingsByCity(name);
+    
+    if (listings.length > 0) {
+      cityData = {
+        id: `fallback-${slug}`,
+        name,
+        slug,
+        state: '',
+        content: null,
+        meta_title: null,
+        meta_description: null
+      };
+    } else {
+      notFound();
+    }
   }
 
-  // Fetch actual count for the badge and to verify existence
+  // Fetch actual listings for display
   const listings = await getListingsByCity(cityData.name, cityData.state || '');
   const count = listings.length;
-
-  // If no city record was found in the 'cities' table, then truly not found
-  if (!foundInTable) {
-    notFound();
-  }
 
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
