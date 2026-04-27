@@ -6,13 +6,13 @@ import { MedicalDisclaimer } from './MedicalDisclaimer';
 
 export const Footer = () => {
   const POPULAR_CITIES = [
-    { city: 'Toronto & GTA', state: 'ON', slug: 'toronto', country: 'Canada' },
+    { city: 'Toronto', state: 'ON', slug: 'toronto', country: 'Canada' },
     { city: 'New York', state: 'NY', slug: 'new-york', country: 'US' },
     { city: 'Clearwater', state: 'FL', slug: 'clearwater', country: 'US' },
     { city: 'Houston', state: 'TX', slug: 'houston', country: 'US' },
     { city: 'San Diego', state: 'CA', slug: 'san-diego', country: 'US' },
     { city: 'Tampa', state: 'FL', slug: 'tampa', country: 'US' },
-    { city: 'Washington DC', state: 'DC', slug: 'washington', country: 'US' },
+    { city: 'Washington DC', state: 'DC', slug: 'washington-dc', country: 'US' },
     { city: 'Kansas City', state: 'MO', slug: 'kansas-city', country: 'US' },
   ];
 
@@ -46,19 +46,8 @@ export const Footer = () => {
                 <Link 
                   href={`/cities/${city.slug}`} 
                   className="hover:text-wellness-600 transition-colors"
-                  onClick={() => {
-                    const newLoc = {
-                      city: city.city,
-                      state: city.state,
-                      country: city.country || 'US',
-                      isPrecise: false,
-                      detectedAt: Date.now()
-                    };
-                    sessionStorage.setItem('tdm_location', JSON.stringify(newLoc));
-                    window.dispatchEvent(new CustomEvent('tdm_location_change', { detail: newLoc }));
-                  }}
                 >
-                  {city.city}, {city.state}
+                  {city.city}
                 </Link>
               </li>
             ))}

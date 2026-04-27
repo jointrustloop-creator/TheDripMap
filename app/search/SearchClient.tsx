@@ -40,24 +40,75 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
   const searchParams = useSearchParams();
   const router = useRouter();
   
-  const initialCity = searchParams.get('city') || searchParams.get('location') || 'All';
-  const initialQuery = searchParams.get('q') || searchParams.get('treatment') || '';
-  
-  const [selectedCity, setSelectedCity] = useState<City | 'All'>(initialCity as City || 'All');
-  const [searchQuery, setSearchQuery] = useState(initialQuery);
-  const [citySearchQuery, setCitySearchQuery] = useState('');
-  
-  // Sync with URL parameters
-  useEffect(() => {
-    const city = searchParams.get('city') || searchParams.get('location') || 'All';
+  // Parse URL parameters
+  const getInitialState = React.useCallback(() => {
+    const city = (searchParams.get('city') || searchParams.get('location') || 'All') as City | 'All';
     const q = searchParams.get('q') || searchParams.get('treatment') || '';
-    setSelectedCity(city as City || 'All');
-    setSearchQuery(q);
+    const type = searchParams.get('type');
+    const specialty = searchParams.get('specialty');
+    
+    // For specialty that doesn't have a direct chip, we might want to add it to the query
+    let initialSearchQuery = q;
+    
+    const chips: string[] = ['All'];
+    let initialTypeFilter: TreatmentType | 'All' = 'All';
+    
+    if (type === 'Mobile') {
+      chips.push('Mobile');
+      initialTypeFilter = 'Mobile';
+    }
+    
+    // Mapping from specialty parameter to our internal chip IDs
+    const specialtyToChip: Record<string, string> = {
+      'NAD+ Plus': 'NAD',
+      'NAD+ Therapy': 'NAD',
+      'Hangover Relief': 'Hangover',
+      'Hangover': 'Hangover',
+      'Hydration': 'Hydration',
+      'Skin Glow': 'SkinGlow',
+      'Beauty & Glow': 'SkinGlow',
+      'Weight Loss': 'WeightLoss',
+      'Immune Support': 'Immune',
+      'Jet Lag': 'JetLag',
+    };
+    
+    if (specialty) {
+      const chipId = specialtyToChip[specialty];
+      if (chipId) {
+        chips.push(chipId);
+      } else {
+        // If no matching chip, add it to the search query if search query is empty
+        if (!initialSearchQuery) initialSearchQuery = specialty;
+      }
+    }
+    
+    return {
+      city,
+      searchQuery: initialSearchQuery,
+      activeChips: chips.length > 1 ? chips.filter(c => c !== 'All') : chips,
+      typeFilter: initialTypeFilter
+    };
   }, [searchParams]);
 
-  const [typeFilter, setTypeFilter] = useState<TreatmentType | 'All'>('All');
+  const initialState = React.useMemo(() => getInitialState(), [getInitialState]);
+  
+  const [selectedCity, setSelectedCity] = useState<City | 'All'>(initialState.city);
+  const [searchQuery, setSearchQuery] = useState(initialState.searchQuery);
+  const [citySearchQuery, setCitySearchQuery] = useState('');
+  
+  const [typeFilter, setTypeFilter] = useState<TreatmentType | 'All'>(initialState.typeFilter);
+  const [activeChips, setActiveChips] = useState<string[]>(initialState.activeChips);
+
+  // Sync with URL parameters
+  useEffect(() => {
+    const state = getInitialState();
+    setSelectedCity(state.city);
+    setSearchQuery(state.searchQuery);
+    setActiveChips(state.activeChips);
+    setTypeFilter(state.typeFilter);
+  }, [getInitialState]);
+  
   const [sortBy, setSortBy] = useState<'best' | 'rating' | 'reviews' | 'distance' | 'value'>('best');
-  const [activeChips, setActiveChips] = useState<string[]>(['All']);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filteredProviders, setFilteredProviders] = useState<Provider[]>(initialProviders);
   const [cities, setCities] = useState(initialCities);
@@ -151,7 +202,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
       }
     };
     loadData();
-  }, [initialCities?.length, initialStats]);
+  }, [initialCities, initialStats]);
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -477,8 +528,8 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
               'San Diego',
               'Tampa',
               'Miami'
-            ]).map((city: any) => {
-              const cityName = typeof city === 'string' ? city : (city.city || city.name || '');
+            ]).map((city) => {
+              const cityName = typeof city === 'string' ? city : (city as any).city || (city as any).name || '';
               const citySlug = slugify(cityName);
               return (
                 <button

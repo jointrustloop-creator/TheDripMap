@@ -5,13 +5,13 @@ import { notFound } from 'next/navigation';
 import { MapPin, ArrowRight } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Navbar } from '../../../src/components/Navbar';
-import { Footer } from '../../../src/components/Footer';
-import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
-import UrgencyIndicator from '../../../src/components/UrgencyIndicator';
-import { QuizCTA } from '../../../src/components/QuizCTA';
-import { ProviderCard } from '../../../src/components/ProviderCard';
-import { getCityBySlug, getListingsByCity } from '../../../src/lib/data';
+import { Navbar } from '@/src/components/Navbar';
+import { Footer } from '@/src/components/Footer';
+import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
+import UrgencyIndicator from '@/src/components/UrgencyIndicator';
+import { QuizCTA } from '@/src/components/QuizCTA';
+import { ProviderCard } from '@/src/components/ProviderCard';
+import { getCityBySlug, getListingsByCity } from '@/src/lib/data';
 
 export const revalidate = 3600;
 
@@ -32,6 +32,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     name = cityData.name;
     state = cityData.state || '';
   } else {
+    // Fallback: convert slug to title case (e.g. "san-diego" -> "San Diego")
     name = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   }
 
@@ -80,8 +81,8 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   const listings = await getListingsByCity(cityData.name, cityData.state || '');
   const count = listings.length;
 
-  // If no listings and no city record was found in the 'cities' table or match in MOCK_CITIES, then truly not found
-  if (count === 0 && !foundInTable) {
+  // If no city record was found in the 'cities' table, then truly not found
+  if (!foundInTable) {
     notFound();
   }
 
@@ -132,26 +133,26 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           </section>
         )}
 
-        <QuizCTA 
-          className="mb-24"
-          title={`Looking for specific results in ${cityData.name}?`}
-          subtitle={`Not all IV protocols are equal. We match you based on your exact wellness goals and the specific offerings of verified ${cityData.name} clinics.`}
-        />
-
-        {/* Trending Section */}
+        {/* List of Providers Section */}
         {listings.length > 0 && (
           <section className="mb-24">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Trending in {cityData.name}</h2>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Clinics in {cityData.name}</h2>
               <Link href="/search" className="text-sm font-bold text-wellness-600 hover:underline">View all</Link>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {listings.slice(0, 3).map((provider) => (
+              {listings.map((provider) => (
                 <ProviderCard key={provider.id} provider={provider} />
               ))}
             </div>
           </section>
         )}
+
+        <QuizCTA 
+          className="mb-24"
+          title={`Looking for specific results in ${cityData.name}?`}
+          subtitle={`Not all IV protocols are equal. We match you based on your exact wellness goals and the specific offerings of verified ${cityData.name} clinics.`}
+        />
 
         {/* 4. CTA button */}
         <div className="flex justify-center mt-12 mb-20">

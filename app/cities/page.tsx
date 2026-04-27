@@ -2,11 +2,11 @@ import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { MapPin, ChevronRight } from 'lucide-react';
-import { Navbar } from '../../src/components/Navbar';
-import { Footer } from '../../src/components/Footer';
-import { BreadcrumbNav } from '../../src/components/BreadcrumbNav';
-import { supabase, isSupabaseConfigured } from '../../src/lib/supabase';
-import { getAllCities, slugify } from '../../src/lib/data';
+import { Navbar } from '@/src/components/Navbar';
+import { Footer } from '@/src/components/Footer';
+import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
+import { supabase, isSupabaseConfigured } from '@/src/lib/supabase';
+import { getAllCities, slugify } from '@/src/lib/data';
 
 export const metadata: Metadata = {
   title: 'Cities Archive - Browse IV Therapy Locations | TheDripMap',

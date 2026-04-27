@@ -245,7 +245,7 @@ export async function getListingsByCity(city: string, state?: string) {
       if (isGTA) {
         query = query.in('city', GTA_CITIES).eq('country', 'Canada').eq('availability', true);
       } else {
-        query = query.ilike('city', `%${cityName}%`);
+        query = query.ilike('city', `%${cityName}%`).eq('availability', true);
         
         if (stateName) {
           // Use mapping to get the abbreviation if a full name was provided

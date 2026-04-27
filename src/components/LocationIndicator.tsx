@@ -168,7 +168,7 @@ export const LocationIndicator = () => {
     const isDirectoryPage = pathname === '/search' || 
                           pathname.startsWith('/cities') || 
                           pathname.startsWith('/iv-therapy') || 
-                          pathname.startsWith('/iv-therapy-for') ||
+                          pathname.startsWith('/symptoms') ||
                           pathname.startsWith('/provider/');
     
     if (!isDirectoryPage) {
