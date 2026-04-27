@@ -1,4 +1,4 @@
-import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { 
   Zap, 
@@ -20,7 +20,6 @@ import { Footer } from '../src/components/Footer';
 import { BlogCard } from '../src/components/BlogCard';
 import { ClinicianSection } from '../src/components/ClinicianSection';
 import { HowItWorks } from '../src/components/HowItWorks';
-import { DripBackground } from '../src/components/DripBackground';
 import { QuickMatch } from '../src/components/QuickMatch';
 import { TrustSignals } from '../src/components/TrustSignals';
 import { getBlogPosts, getSiteStats, getTopHubs } from '../src/lib/data';
@@ -135,40 +134,54 @@ export default async function HomePage() {
       />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-40 px-6 overflow-hidden bg-white">
-        <DripBackground />
-        <div className="max-w-7xl mx-auto relative z-10">
+      <section className="relative pt-32 pb-40 px-6 overflow-hidden min-h-[85vh] flex items-center">
+        <div className="absolute inset-0 z-0">
+          <Image 
+            src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg"
+            alt="Professional IV Therapy Clinic"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[2px]" />
+        </div>
+        
+        <div className="max-w-7xl mx-auto relative z-10 w-full">
           <div className="text-center max-w-5xl mx-auto mb-20">
-            <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight leading-[1.1] drop-shadow-sm">
+            <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight leading-[1.1] drop-shadow-xl">
               Get Matched to the Right <br />
-              <span className="text-wellness-600 relative">
+              <span className="text-wellness-400 relative">
                 IV Therapy Clinic in 30 Seconds.
-                <span className="absolute -inset-1 bg-wellness-100/30 blur-2xl -z-10 rounded-full" />
+                <span className="absolute -inset-1 bg-wellness-400/20 blur-2xl -z-10 rounded-full" />
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-slate-500 mb-8 font-medium tracking-tight max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-slate-200 mb-10 font-medium tracking-tight max-w-3xl mx-auto leading-relaxed">
               Not all IV therapy is the same — we match you based on your exact needs, location, and budget.
             </p>
 
             <QuickMatch />
             
-            <div className="mt-8 flex flex-col items-center gap-2">
-              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] font-bold text-slate-500">
-                <span className="flex items-center gap-1.5"><span className="text-wellness-500">✓</span> Used by patients to find the right IV therapy</span>
-                <span className="flex items-center gap-1.5"><span className="text-wellness-500">✓</span> Built to match real needs, not just location</span>
+            <div className="mt-10 flex flex-col items-center gap-2">
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[14px] font-bold text-slate-100">
+                <span className="flex items-center gap-1.5"><span className="text-wellness-400 font-bold">✓</span> Trusted by patients nationwide</span>
+                <span className="flex items-center gap-1.5"><span className="text-wellness-400 font-bold">✓</span> Clinical grade provider match</span>
               </div>
-              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-2">
-                <span className="flex items-center gap-1.5">{stats.total} Verified Clinics</span>
-                <span className="flex items-center gap-1.5">{stats.cities} US Cities</span>
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[11px] font-black text-white/60 uppercase tracking-[0.2em] mt-4">
+                <span className="flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full">{stats.total} Verified Clinics</span>
+                <span className="flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full">{stats.cities} US Cities</span>
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <h2 className="text-4xl md:text-5xl font-black text-slate-900 text-center mb-16 tracking-tight">The Smarter Way to Find IV Therapy Clinics Near You</h2>
+      {/* Trust & Path Section */}
+      <section className="py-24 px-6 bg-white relative -mt-20 z-20">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-black text-slate-900 text-center mb-16 tracking-tight">The Smarter Way to Find IV Therapy Clinics</h2>
 
-          {/* Path Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-24">
             <Link href="/quiz" className="group relative bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl hover:shadow-2xl hover:border-wellness-200 transition-all duration-500 overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-wellness-50 rounded-bl-[5rem] -mr-8 -mt-8 group-hover:scale-110 transition-transform" />
               <div className="relative z-10">
@@ -202,7 +215,6 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {/* Trust Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto">
             <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm">
               <div className="w-10 h-10 bg-wellness-50 rounded-xl flex items-center justify-center text-wellness-600 shrink-0">
@@ -259,8 +271,74 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Social Proof Images */}
+      <section className="py-24 px-6 bg-white overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="relative h-[400px] md:h-[600px] rounded-[3rem] overflow-hidden shadow-2xl">
+              <Image 
+                src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-two-women.jpg"
+                alt="Friends receiving IV therapy"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-10 left-10 text-white">
+                <span className="font-bold text-sm uppercase tracking-widest text-wellness-400 mb-2 block">Relatable Experience</span>
+                <h3 className="text-3xl font-black tracking-tight">IV Therapy is Better with Friends</h3>
+              </div>
+            </div>
+            <div className="relative h-[400px] md:h-[600px] rounded-[3rem] overflow-hidden shadow-2xl">
+              <Image 
+                src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-man-lounge.jpg"
+                alt="Man relaxing during IV therapy"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-10 left-10 text-white">
+                <span className="font-bold text-sm uppercase tracking-widest text-wellness-400 mb-2 block">Recovery Focused</span>
+                <h3 className="text-3xl font-black tracking-tight">Expert Local Clinics</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <HowItWorks totalListings={stats.total} />
+
+      {/* Mobile IV Section */}
+      <section className="py-32 px-6 bg-slate-900 overflow-hidden relative">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-16 relative z-10">
+          <div className="flex-1 text-center md:text-left">
+            <span className="text-wellness-400 font-bold text-sm uppercase tracking-[0.4em] mb-4 block">Convenience Redefined</span>
+            <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tight leading-[1.1]">
+              The Hospital Experience, <br />
+              <span className="text-wellness-400">In Your Living Room.</span>
+            </h2>
+            <p className="text-xl text-slate-300 mb-10 max-w-xl leading-relaxed">
+              We match you with top-rated mobile IV services that bring hydration, vitamins, and recovery directly to your door.
+            </p>
+            <Link 
+              href="/search"
+              className="inline-flex items-center gap-3 bg-white text-slate-900 px-10 py-5 rounded-2xl font-black text-lg hover:bg-slate-100 transition-all shadow-xl"
+            >
+              Find Mobile IV <ArrowRight size={20} />
+            </Link>
+          </div>
+          <div className="flex-1 w-full">
+            <div className="relative h-[500px] md:h-[650px] rounded-[4rem] overflow-hidden shadow-2xl skew-y-3 md:skew-y-0 md:rotate-3 hover:rotate-0 transition-transform duration-700">
+              <Image 
+                src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-woman-home.jpg"
+                alt="Woman receiving IV therapy at home"
+                fill
+                className="object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Popular Cities Section */}
       <section className="py-24 px-6 bg-white">
@@ -313,7 +391,7 @@ export default async function HomePage() {
       }} />
 
       {/* Blog Preview */}
-      <section className="py-24 px-6">
+      <section className="py-24 px-6 bg-slate-50">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
             <div className="max-w-2xl">
@@ -337,6 +415,43 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Bottom CTA Section */}
+      <section className="py-32 px-6 relative overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <Image 
+            src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-woman-relaxing.jpg"
+            alt="Woman relaxing"
+            fill
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" />
+        </div>
+        
+        <div className="max-w-5xl mx-auto text-center relative z-10">
+          <h2 className="text-4xl md:text-7xl font-black text-white mb-8 tracking-tight leading-[1.1]">
+            Stop Guessing. <br />
+            <span className="text-wellness-400 italic">Start Healing.</span>
+          </h2>
+          <p className="text-2xl text-slate-300 mb-12 max-w-2xl mx-auto leading-relaxed font-medium">
+            Join the thousands of patients who found their perfect IV therapy clinic on TheDripMap.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <Link 
+              href="/quiz"
+              className="w-full sm:w-auto bg-wellness-600 text-white px-12 py-6 rounded-2xl font-black text-xl hover:bg-wellness-700 transition-all shadow-2xl flex items-center justify-center gap-3"
+            >
+              Get My Match Now <ArrowRight size={24} />
+            </Link>
+            <Link 
+              href="/search"
+              className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white backdrop-blur-md px-12 py-6 rounded-2xl font-black text-xl transition-all flex items-center justify-center border border-white/20"
+            >
+              Browse Clinics
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* For Clinicians Section */}
       <ClinicianSection stats={{
         totalListings: stats.total,
@@ -350,3 +465,4 @@ export default async function HomePage() {
     </div>
   );
 }
+
