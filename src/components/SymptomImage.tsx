@@ -14,35 +14,38 @@ export function SymptomImage({ slug, title }: SymptomImageProps) {
   const getSrc = () => {
     const base = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-';
     
-    // Attempt 0: Original slug
-    if (errorCount === 0) return `${base}${slug}.jpg`;
-    
-    // Attempt 1: Handle "and" cases or try common variations
-    if (errorCount === 1) {
-      if (slug.includes('-and-')) {
-        return `${base}${slug.replace('-and-', '-')}.jpg`;
-      }
-      if (slug === 'stress') {
-        return `${base}woman-relaxing.jpg`; // Known working image that fits stress
-      }
-      if (slug === 'cold-and-flu') {
-        return `${base}woman-home.jpg`; // Known working image that fits cold/flu
-      }
-      return `${base}${slug}.png`;
-    }
-    
-    // Attempt 2: More variations
-    if (errorCount === 2) {
-      if (slug.includes('-and-')) {
-        return `${base}${slug.replace('-and-', '-')}.png`;
-      }
-      if (slug === 'cold-and-flu') {
-        return `${base}stomach-flu.jpg`; // User confirmed this works
+    // Mapping known working images to slugs to avoid 400 errors
+    const specialMapping: Record<string, string[]> = {
+      'stress': ['woman-relaxing.jpg', 'woman-home.jpg', 'group-clinic.jpg'],
+      'cold-and-flu': ['woman-home.jpg', 'group-clinic.jpg'],
+      'jet-lag': ['man-lounge.jpg', 'woman-relaxing.jpg'],
+      'hangover': ['two-women.jpg', 'woman-relaxing.jpg'],
+      'fatigue': ['man-lounge.jpg', 'woman-home.jpg'],
+      'sports-recovery': ['man-lounge.jpg', 'group-clinic.jpg'],
+      'migraine': ['woman-relaxing.jpg', 'woman-home.jpg'],
+      'weight-loss': ['woman-relaxing.jpg', 'woman-home.jpg'],
+      'skin-glow': ['woman-relaxing.jpg', 'two-women.jpg'],
+      'stomach-flu': ['woman-home.jpg', 'group-clinic.jpg'],
+      'immunity': ['group-clinic.jpg', 'woman-home.jpg'],
+      'morning-sickness': ['woman-home.jpg', 'woman-relaxing.jpg'],
+      'event-prep': ['group-clinic.jpg', 'two-women.jpg'],
+      'dehydration': ['man-lounge.jpg', 'woman-home.jpg'],
+      'brain-fog': ['man-lounge.jpg', 'woman-relaxing.jpg'],
+    };
+
+    if (specialMapping[slug]) {
+      const fallbacks = specialMapping[slug];
+      if (errorCount < fallbacks.length) {
+        return `${base}${fallbacks[errorCount]}`;
       }
       return `${base}group-clinic.jpg`;
     }
+
+    if (errorCount === 0) return `${base}${slug}.jpg`;
+    if (errorCount === 1 && slug.includes('-and-')) return `${base}${slug.replace('-and-', '-')}.jpg`;
+    if (errorCount === 1) return `${base}${slug}.png`;
+    if (errorCount === 2 && slug.includes('-and-')) return `${base}${slug.replace('-and-', '-')}.png`;
     
-    // Generic fallback
     return `${base}group-clinic.jpg`;
   };
 

@@ -7,6 +7,7 @@ import { Navbar } from '@/src/components/Navbar';
 import { Footer } from '@/src/components/Footer';
 
 import { SymptomImage } from '@/src/components/SymptomImage';
+import { IVAnimation } from '@/src/components/IVAnimation';
 
 export const metadata: Metadata = {
   title: 'IV Therapy for Symptoms & Use Cases | TheDripMap',
@@ -35,8 +36,8 @@ export default async function UseCaseHubPage() {
                 Whether you&apos;re recovering from a long night, preparing for a big event, or just looking for a wellness boost, discover how IV therapy is commonly used to support your goals.
               </p>
             </div>
-            <div className="relative h-[400px] md:h-[500px] rounded-[3rem] overflow-hidden shadow-2xl bg-wellness-700 flex items-center justify-center">
-              <div className="text-white text-9xl font-black opacity-10">IV</div>
+            <div className="relative h-[400px] md:h-[500px] rounded-[3rem] overflow-hidden shadow-2xl">
+              <IVAnimation />
             </div>
           </div>
         </div>
