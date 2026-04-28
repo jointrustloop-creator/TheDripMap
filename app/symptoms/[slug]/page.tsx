@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getUseCaseBySlug, getListingsByService, getAllUseCases, slugify } from '@/src/lib/data';
 import * as Icons from 'lucide-react';
-import { LucideIcon } from 'lucide-react';
 import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
 import { Navbar } from '@/src/components/Navbar';
 import { Footer } from '@/src/components/Footer';
@@ -55,6 +54,7 @@ export async function generateStaticParams() {
 }
 
 import { UseCaseClinicSection } from '@/src/components/UseCaseClinicSection';
+import { SymptomImage } from '@/src/components/SymptomImage';
 
 export default async function UseCasePage({ params }: PageProps) {
   const { slug } = await params;
@@ -62,7 +62,6 @@ export default async function UseCasePage({ params }: PageProps) {
   if (!useCase) notFound();
 
   const clinics = await getListingsByService(useCase.serviceTag, 4);
-  const IconComponent = (Icons as unknown as Record<string, LucideIcon>)[useCase.icon];
 
   const breadcrumbs = [
     { label: 'Home', href: '/' },
@@ -136,9 +135,6 @@ export default async function UseCasePage({ params }: PageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center gap-12">
             <div className="flex-1">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-50 rounded-2xl mb-8">
-                {IconComponent && <IconComponent className="w-8 h-8 text-blue-600" />}
-              </div>
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8 tracking-tight">
                 IV Therapy for {useCase.title} — What to Expect
               </h1>
@@ -153,31 +149,38 @@ export default async function UseCasePage({ params }: PageProps) {
                 )}
               </div>
             </div>
-            <div className="w-full md:w-1/3 bg-blue-50 p-8 rounded-3xl border border-blue-100 h-fit">
-              <h3 className="text-xl font-bold text-blue-900 mb-6 flex items-center">
-                <Icons.FlaskConical className="w-5 h-5 mr-2" /> Common Ingredients
-              </h3>
-              <ul className="space-y-4">
-                {useCase.ingredientsDetailed ? (
-                  useCase.ingredientsDetailed.map((item, idx) => (
-                    <li key={idx} className="flex items-start text-blue-800">
-                      <Icons.CheckCircle2 className="w-5 h-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <span className="font-bold block">{item.name}</span>
-                        <span className="text-sm text-blue-700/80">{item.role}</span>
-                      </div>
-                    </li>
-                  ))
-                ) : (
-                  useCase.ingredients.map((ingredient, idx) => (
-                    <li key={idx} className="flex items-start text-blue-800">
-                      <Icons.CheckCircle2 className="w-5 h-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" />
-                      <span className="font-medium">{ingredient}</span>
-                    </li>
-                  ))
-                )}
-              </ul>
-            </div>
+              <div className="flex flex-col gap-8 w-full md:w-[400px]">
+                <div className="relative w-full aspect-[4/3] rounded-[2.5rem] overflow-hidden shadow-2xl bg-slate-100 group">
+                  <SymptomImage slug={useCase.slug} title={useCase.title} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+                </div>
+
+                <div className="bg-blue-50 p-8 rounded-3xl border border-blue-100 h-fit">
+                  <h3 className="text-xl font-bold text-blue-900 mb-6 flex items-center">
+                    <Icons.FlaskConical className="w-5 h-5 mr-2" /> Common Ingredients
+                  </h3>
+                  <ul className="space-y-4">
+                    {useCase.ingredientsDetailed ? (
+                      useCase.ingredientsDetailed.map((item, idx) => (
+                        <li key={idx} className="flex items-start text-blue-800">
+                          <Icons.CheckCircle2 className="w-5 h-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <span className="font-bold block">{item.name}</span>
+                            <span className="text-sm text-blue-700/80">{item.role}</span>
+                          </div>
+                        </li>
+                      ))
+                    ) : (
+                      useCase.ingredients.map((ingredient, idx) => (
+                        <li key={idx} className="flex items-start text-blue-800">
+                          <Icons.CheckCircle2 className="w-5 h-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" />
+                          <span className="font-medium">{ingredient}</span>
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                </div>
+              </div>
           </div>
         </div>
       </section>

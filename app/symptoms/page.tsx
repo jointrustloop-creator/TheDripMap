@@ -2,10 +2,11 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { getAllUseCases } from '@/src/lib/data';
 import * as Icons from 'lucide-react';
-import { LucideIcon } from 'lucide-react';
 
 import { Navbar } from '@/src/components/Navbar';
 import { Footer } from '@/src/components/Footer';
+
+import { SymptomImage } from '@/src/components/SymptomImage';
 
 export const metadata: Metadata = {
   title: 'IV Therapy for Symptoms & Use Cases | TheDripMap',
@@ -45,30 +46,31 @@ export default async function UseCaseHubPage() {
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {useCases.map((useCase) => {
-              const IconComponent = (Icons as unknown as Record<string, LucideIcon>)[useCase.icon];
-              
-              return (
+            {useCases.map((useCase) => (
                 <Link 
                   key={useCase.slug}
                   href={`/symptoms/${useCase.slug}`}
-                  className="group bg-white p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col items-center text-center"
+                  className="group bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 flex flex-col h-full overflow-hidden"
                 >
-                  <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors duration-300">
-                    {IconComponent && <IconComponent className="w-8 h-8 text-blue-600 group-hover:text-white transition-colors duration-300" />}
+                  <div className="relative h-48 w-full mb-6 rounded-2xl overflow-hidden group-hover:scale-[1.02] transition-transform duration-500 shadow-inner bg-slate-50">
+                    <SymptomImage slug={useCase.slug} title={useCase.title} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-3">
-                    {useCase.title}
-                  </h2>
-                  <p className="text-gray-500 text-sm line-clamp-2">
-                    Learn about how IV therapy is commonly used for {useCase.title.toLowerCase()} and what to expect.
-                  </p>
-                  <div className="mt-6 text-blue-600 font-semibold text-sm flex items-center group-hover:translate-x-1 transition-transform">
-                    Learn More <Icons.ChevronRight className="w-4 h-4 ml-1" />
+                  <div className="flex-1 px-2">
+                    <h2 className="text-2xl font-black text-slate-900 mb-3 tracking-tight group-hover:text-wellness-600 transition-colors">
+                      {useCase.title}
+                    </h2>
+                    <p className="text-slate-500 text-sm leading-relaxed line-clamp-3 mb-6">
+                      {useCase.description}
+                    </p>
+                  </div>
+                  <div className="px-2 mt-auto pb-2">
+                    <div className="text-wellness-600 font-bold text-sm flex items-center gap-2 group-hover:translate-x-1 transition-transform">
+                      Learn About Protocols <Icons.ChevronRight className="w-4 h-4" />
+                    </div>
                   </div>
                 </Link>
-              );
-            })}
+              ))}
           </div>
         </div>
       </section>
