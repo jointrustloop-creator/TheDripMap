@@ -14,8 +14,7 @@ import {
   Star,
   ShieldCheck
 } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import DOMPurify from 'isomorphic-dompurify';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
@@ -250,11 +249,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
             <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline">
               {post.content ? (
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {String(post.content)
-                    .replace(/\\n/g, '\n')
-                    .replace(/\[Full content is now in your app code!\]/g, '')}
-                </ReactMarkdown>
+                <div 
+                  dangerouslySetInnerHTML={{ 
+                    __html: DOMPurify.sanitize(String(post.content)) 
+                  }} 
+                />
               ) : (
                 <div className="bg-slate-50 border border-slate-100 rounded-3xl p-12 text-center">
                   <Zap size={40} className="mx-auto mb-6 text-slate-300" />
