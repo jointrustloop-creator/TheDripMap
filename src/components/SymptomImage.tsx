@@ -14,39 +14,48 @@ export function SymptomImage({ slug, title }: SymptomImageProps) {
   const getSrc = () => {
     const base = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-';
     
-    // Mapping known working images to slugs to avoid 400 errors
-    const specialMapping: Record<string, string[]> = {
-      'stress': ['woman-relaxing.jpg', 'woman-home.jpg', 'group-clinic.jpg'],
-      'cold-and-flu': ['woman-home.jpg', 'group-clinic.jpg'],
-      'jet-lag': ['man-lounge.jpg', 'woman-relaxing.jpg'],
-      'hangover': ['two-women.jpg', 'woman-relaxing.jpg'],
-      'fatigue': ['man-lounge.jpg', 'woman-home.jpg'],
-      'sports-recovery': ['man-lounge.jpg', 'group-clinic.jpg'],
-      'migraine': ['woman-relaxing.jpg', 'woman-home.jpg'],
-      'weight-loss': ['woman-relaxing.jpg', 'woman-home.jpg'],
-      'skin-glow': ['woman-relaxing.jpg', 'two-women.jpg'],
-      'stomach-flu': ['woman-home.jpg', 'group-clinic.jpg'],
-      'immunity': ['group-clinic.jpg', 'woman-home.jpg'],
-      'morning-sickness': ['woman-home.jpg', 'woman-relaxing.jpg'],
-      'event-prep': ['group-clinic.jpg', 'two-women.jpg'],
-      'dehydration': ['man-lounge.jpg', 'woman-home.jpg'],
-      'brain-fog': ['man-lounge.jpg', 'woman-relaxing.jpg'],
+    // Explicit mapping for symptoms where the slug doesn't match a dedicated filename
+    const assetMapping: Record<string, string> = {
+      'stress': 'woman-relaxing.jpg',
+      'cold-and-flu': 'woman-home.jpg',
+      'fatigue': 'man-lounge.jpg',
+      'hangover': 'two-women.jpg',
+      'hangover-recovery': 'two-women.jpg',
+      'jet-lag': 'man-lounge.jpg',
+      'migraine': 'woman-relaxing.jpg',
+      'immunity': 'group-clinic.jpg',
+      'dehydration': 'woman-home.jpg',
+      'sports-recovery': 'man-lounge.jpg',
+      'stomach-flu': 'woman-home.jpg',
+      'skin-glow': 'two-women.jpg',
+      'weight-loss': 'woman-relaxing.jpg',
+      'energy-boost': 'man-lounge.jpg',
     };
 
-    if (specialMapping[slug]) {
-      const fallbacks = specialMapping[slug];
-      if (errorCount < fallbacks.length) {
-        return `${base}${fallbacks[errorCount]}`;
-      }
-      return `${base}group-clinic.jpg`;
+    // Core fallback images we know exist in the bucket
+    const coreFallbacks = [
+      'group-clinic.jpg',
+      'woman-relaxing.jpg',
+      'man-lounge.jpg',
+      'woman-home.jpg',
+      'two-women.jpg'
+    ];
+
+    // Priority 1: Use the explicit mapping if available to avoid 400s
+    if (assetMapping[slug]) {
+      if (errorCount === 0) return `${base}${assetMapping[slug]}`;
+      // If the mapped image somehow fails, use core fallbacks
+      const fallbackIdx = (errorCount - 1) % coreFallbacks.length;
+      return `${base}${coreFallbacks[fallbackIdx]}`;
     }
 
+    // Priority 2: Try the exact slug (for any symptoms not in mapping)
     if (errorCount === 0) return `${base}${slug}.jpg`;
-    if (errorCount === 1 && slug.includes('-and-')) return `${base}${slug.replace('-and-', '-')}.jpg`;
     if (errorCount === 1) return `${base}${slug}.png`;
-    if (errorCount === 2 && slug.includes('-and-')) return `${base}${slug.replace('-and-', '-')}.png`;
-    
-    return `${base}group-clinic.jpg`;
+
+    // Priority 3: Cycle through confirmed working assets
+    const fallbackIdx = (errorCount - 2) % coreFallbacks.length;
+    return `${base}${coreFallbacks[fallbackIdx]}`;
   };
 
   return (
