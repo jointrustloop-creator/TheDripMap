@@ -34,6 +34,7 @@ export interface Provider {
   amenities: string[];
   description: string;
   imageUrl: string;
+  image_url?: string;
   slug?: string;
   is_featured: boolean;
   is_verified?: boolean;

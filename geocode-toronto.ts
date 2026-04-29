@@ -15,8 +15,8 @@ async function geocode(address: string, city: string, state: string) {
     const response = await fetch(url, {
       headers: { 'User-Agent': 'TheDripMap-Geocoding-Utility' }
     });
-    const data = await response.json();
-    if (data && data.length > 0) {
+    const data = await response.json() as any;
+    if (data && Array.isArray(data) && data.length > 0) {
       return {
         lat: parseFloat(data[0].lat),
         lng: parseFloat(data[0].lon)
