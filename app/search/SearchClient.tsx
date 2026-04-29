@@ -528,8 +528,8 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
               'San Diego',
               'Tampa',
               'Miami'
-            ]).map((city) => {
-              const cityName = typeof city === 'string' ? city : (city as any).city || (city as any).name || '';
+            ]).map((city: string | { city?: string; name?: string }) => {
+              const cityName = typeof city === 'string' ? city : city.city || city.name || '';
               const citySlug = slugify(cityName);
               return (
                 <button

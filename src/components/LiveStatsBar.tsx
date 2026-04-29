@@ -3,7 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, Users, Plus, TrendingUp } from 'lucide-react';
 
-export default function LiveStatsBar() {
+interface LiveStatsBarProps {
+  stats?: {
+    totalClinics: number;
+    totalCities: number;
+    growth: string;
+  };
+}
+
+export default function LiveStatsBar({ stats: incomingStats }: LiveStatsBarProps) {
   const [usersCount, setUsersCount] = useState(42);
 
   // Fluctuating user count to simulate real-time activity
@@ -20,17 +28,17 @@ export default function LiveStatsBar() {
   const stats = [
     { 
       icon: <Activity size={14} className="text-emerald-500" />, 
-      text: "1,000+ IV Therapy Clinics",
+      text: `${incomingStats?.totalClinics?.toLocaleString() || '1,000'}+ Verified Clinics`,
       label: "Verified"
     },
     { 
       icon: <TrendingUp size={14} className="text-blue-500" />, 
-      text: "Growing Daily",
-      label: "Growth"
+      text: `${incomingStats?.totalCities?.toLocaleString() || '50'}+ US & Canada Cities`,
+      label: "Coverage"
     },
     { 
       icon: <Plus size={14} className="text-wellness-500" />, 
-      text: "New Clinics Added Weekly",
+      text: `New Clinics Added ${incomingStats?.growth || 'Weekly'}`,
       label: "Expansion"
     },
     { 

@@ -4,14 +4,15 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { MapPin, ArrowRight } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+// import remarkGfm from 'remark-gfm';
 import { Navbar } from '@/src/components/Navbar';
 import { Footer } from '@/src/components/Footer';
 import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
 import UrgencyIndicator from '@/src/components/UrgencyIndicator';
 import { QuizCTA } from '@/src/components/QuizCTA';
-import { ProviderCard } from '@/src/components/ProviderCard';
+import { ListingController } from '@/src/components/ListingController';
 import { getCityBySlug, getListingsByCity } from '@/src/lib/data';
+import { MapTrigger } from '@/src/components/MapTrigger';
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -142,6 +143,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
             <span className="w-2 h-2 bg-wellness-500 rounded-full animate-pulse" />
             High demand in {cityData.name} this week
           </div>
+          <MapTrigger />
         </div>
 
         <UrgencyIndicator city={cityData.name} />
@@ -150,7 +152,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
         {cityData.content ? (
           <section className="mb-12">
             <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline bg-white p-12 rounded-[3.5rem] border border-slate-100 shadow-sm">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown>
                 {String(cityData.content).replace(/\\n/g, '\n')}
               </ReactMarkdown>
             </div>
@@ -163,17 +165,10 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
 
         {/* List of Providers Section */}
         {listings.length > 0 && (
-          <section className="mb-24">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Clinics in {cityData.name}</h2>
-              <Link href="/search" className="text-sm font-bold text-wellness-600 hover:underline">View all</Link>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {listings.map((provider) => (
-                <ProviderCard key={provider.id} provider={provider} />
-              ))}
-            </div>
-          </section>
+          <ListingController 
+            initialProviders={listings} 
+            cityName={cityData.name} 
+          />
         )}
 
         <QuizCTA 

@@ -18,7 +18,57 @@ export function matchProviders(
   operatorProfiles: OperatorProfile[] = [],
   userLocation?: { latitude: number; longitude: number }
 ) {
-  const matched = providers.map(p => {
+  // 0. Hard Location Filtering (PRIORITY #1)
+  let candidates = providers;
+  
+  if (answers.city) {
+    const cityLower = answers.city.toLowerCase();
+    const isGTASelection = ['toronto', 'gta', 'ontario'].includes(cityLower);
+
+    if (isGTASelection) {
+      // Toronto/GTA Logic
+      const gtaCities = ['Toronto', 'Ajax', 'Brampton', 'Mississauga', 'Oakville', 'Richmond Hill', 'Vaughan'].map(c => c.toLowerCase());
+      candidates = providers.filter(p => 
+        gtaCities.includes(p.city.toLowerCase()) && 
+        (p.country?.toLowerCase() === 'canada' || p.country === 'CA')
+      );
+    } else {
+      // US or other specific city logic
+      // Exact City Match
+      candidates = providers.filter(p => 
+        p.city.toLowerCase() === cityLower && 
+        (!answers.state || p.state?.toLowerCase() === answers.state.toLowerCase())
+      );
+
+      // Fallback: If fewer than 3 in exact city, expand to state
+      if (candidates.length < 3 && answers.state) {
+        const stateLower = answers.state.toLowerCase();
+        const stateProviders = providers.filter(p => 
+          p.state?.toLowerCase() === stateLower &&
+          !candidates.some(c => c.id === p.id)
+        );
+        candidates = [...candidates, ...stateProviders];
+      }
+    }
+  }
+
+  // Never match outside the selected country if country is known
+  if (answers.country) {
+    const countryLower = answers.country.toLowerCase();
+    candidates = candidates.filter(p => {
+      if (!p.country) return true; // Assume okay if country unknown
+      const pCountry = p.country.toLowerCase();
+      if (countryLower === 'usa' || countryLower === 'united states' || countryLower === 'us') {
+        return ['usa', 'united states', 'us'].includes(pCountry);
+      }
+      if (countryLower === 'canada' || countryLower === 'ca') {
+        return ['canada', 'ca'].includes(pCountry);
+      }
+      return pCountry === countryLower;
+    });
+  }
+
+  const matched = candidates.map(p => {
     let score = 0;
     const profile = operatorProfiles.find(op => op.clinicId === p.id);
     

@@ -15,6 +15,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import DOMPurify from 'isomorphic-dompurify';
+import ReactMarkdown from 'react-markdown';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
@@ -247,13 +248,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </div>
             )}
 
-            <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline">
+            <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline markdown-body">
               {post.content ? (
-                <div 
-                  dangerouslySetInnerHTML={{ 
-                    __html: DOMPurify.sanitize(String(post.content)) 
-                  }} 
-                />
+                <article className="markdown-body">
+                  <ReactMarkdown>
+                    {String(post.content)}
+                  </ReactMarkdown>
+                </article>
               ) : (
                 <div className="bg-slate-50 border border-slate-100 rounded-3xl p-12 text-center">
                   <Zap size={40} className="mx-auto mb-6 text-slate-300" />

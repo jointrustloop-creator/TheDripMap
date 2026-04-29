@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Phone, ArrowRight, TrendingUp, Zap as ZapIcon, Star as StarIcon, Flame } from 'lucide-react';
+import { Phone, ArrowRight, TrendingUp, Zap as ZapIcon, Star as StarIcon, Flame, Navigation } from 'lucide-react';
 import { Provider } from '../types';
 import { slugify } from '../lib/data';
 import { cn } from '../lib/utils';
@@ -138,7 +138,10 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
           </div>
           <span>·</span>
           {provider.distance !== undefined ? (
-            <span className="font-medium">{provider.distance} miles away</span>
+            <span className="font-bold text-wellness-600 flex items-center gap-1">
+              <Navigation size={10} className="fill-wellness-600" />
+              {provider.distance} miles away
+            </span>
           ) : isMobile ? (
             <span className="font-medium">Comes to you</span>
           ) : (

@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { 
   Zap, 
   MapPin, 
-  Droplets, 
   ShieldCheck, 
   Activity,
   Heart,
@@ -16,7 +15,9 @@ import {
   DollarSign,
   Navigation,
   Lock,
-  Calendar
+  Calendar,
+  Building2,
+  Home
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SurveyState } from '../../src/types';
@@ -80,9 +81,6 @@ const STEPS = [
   }
 ];
 
-function Building2({ size }: { size: number }) { return <Droplets size={size} />; }
-function Home({ size }: { size: number }) { return <Droplets size={size} />; }
-
 export default function QuizPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
@@ -108,8 +106,8 @@ export default function QuizPage() {
             ...prev,
             city: parsed.city,
             state: parsed.state,
-            lat: parsed.latitude,
-            lng: parsed.longitude,
+            lat: parsed.lat || parsed.latitude,
+            lng: parsed.lng || parsed.longitude,
             country: parsed.country
           }));
           setIsLocating(false);
@@ -122,29 +120,34 @@ export default function QuizPage() {
       try {
         // 1. Silent browser geolocation
         const pos = await getUserLocation();
-        setData(prev => ({
-          ...prev,
-          lat: pos.latitude,
-          lng: pos.longitude
-        }));
-        setIsLocating(false);
+        if (pos) {
+          setData(prev => ({
+            ...prev,
+            lat: pos.lat,
+            lng: pos.lng
+          }));
+          setIsLocating(false);
+          return;
+        }
+        throw new Error('Geolocation failed');
       } catch {
         // 2. IP geolocation fallback
         try {
           const ipPos = await getIPLocation();
-          setData(prev => ({
-            ...prev,
-            city: ipPos.city,
-            state: ipPos.region,
-            lat: ipPos.latitude,
-            lng: ipPos.longitude,
-            country: ipPos.country
-          }));
+          if (ipPos) {
+            setData(prev => ({
+              ...prev,
+              city: ipPos.city,
+              state: ipPos.state,
+              lat: ipPos.lat,
+              lng: ipPos.lng
+            }));
+          }
           setIsLocating(false);
-        } catch {
-          // 3. Both failed, show manual input
+        } catch (e) {
+          console.error("All location methods failed", e);
+          setIsLocating(false);
           setShowManualLocation(true);
-          setIsLocating(false);
         }
       }
     }
@@ -167,21 +170,27 @@ export default function QuizPage() {
     try {
       // Try precise location first
       const pos = await getUserLocation();
-      setData(prev => ({
-        ...prev,
-        lat: pos.latitude,
-        lng: pos.longitude
-      }));
+      if (pos) {
+        setData(prev => ({
+          ...prev,
+          lat: pos.lat,
+          lng: pos.lng
+        }));
+      }
       
       // Try to get city name from IP fallback
       try {
         const ipPos = await getIPLocation();
-        setData(prev => ({
-          ...prev,
-          city: ipPos.city,
-          state: ipPos.region
-        }));
-        if (ipPos.city) setCitySearch(ipPos.city);
+        if (ipPos) {
+          setData(prev => ({
+            ...prev,
+            city: ipPos.city,
+            state: ipPos.state,
+            lat: prev.lat || ipPos.lat,
+            lng: prev.lng || ipPos.lng
+          }));
+          if (ipPos.city) setCitySearch(ipPos.city);
+        }
       } catch {
         // Ignore IP failure if we at least have lat/lng
       }
@@ -189,14 +198,16 @@ export default function QuizPage() {
       // Fallback to IP location entirely
       try {
         const ipPos = await getIPLocation();
-        setData(prev => ({
-          ...prev,
-          lat: ipPos.latitude,
-          lng: ipPos.longitude,
-          city: ipPos.city,
-          state: ipPos.region
-        }));
-        if (ipPos.city) setCitySearch(ipPos.city);
+        if (ipPos) {
+          setData(prev => ({
+            ...prev,
+            lat: ipPos.lat,
+            lng: ipPos.lng,
+            city: ipPos.city,
+            state: ipPos.state
+          }));
+          if (ipPos.city) setCitySearch(ipPos.city);
+        }
       } catch (innerErr) {
         console.error("Location detection failed", innerErr);
       }

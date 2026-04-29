@@ -125,12 +125,11 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   const profile = profiles.find(p => p.clinicId === provider.id);
   const stateCode = provider.state || getStateFromProvider(provider);
   const stateName = STATE_MAP[stateCode] || stateCode;
-  const stateSlug = slugify(stateCode);
   const citySlug = slugify(provider.city);
   
   // Fix duplicate breadcrumb labels
   const cityLabel = provider.city;
-  const stateLabel = (stateName === cityLabel) ? `${stateName} State` : stateName;
+
 
   const status = getStatus(provider.hours);
   const isMobile = provider.mobile_service || provider.type === 'Mobile' || profile?.profile_data?.mobileService;

@@ -64,7 +64,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const stats = await getSiteStats();
   const blogPosts = await getBlogPosts();
-  const topHubs = await getTopHubs(8);
+  const topHubs = await getTopHubs(12); // Get more hubs for selection
   const latestPosts = blogPosts.slice(0, 3);
 
   const breadcrumbJsonLd = {
@@ -119,7 +119,11 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
-      <LiveStatsBar />
+      <LiveStatsBar stats={{
+        totalClinics: stats.total,
+        totalCities: stats.cities,
+        growth: "Weekly"
+      }} />
       
       <script
         type="application/ld+json"
@@ -350,10 +354,15 @@ export default async function HomePage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { name: 'Toronto & GTA', slug: 'toronto', subtitle: '20+ verified providers', isAll: false },
+              { name: 'Toronto & GTA', slug: 'toronto', subtitle: topHubs.find(h => h.city.toLowerCase() === 'toronto')?.count ? `${topHubs.find(h => h.city.toLowerCase() === 'toronto')?.count} verified providers` : 'View Clinics', isAll: false },
               ...topHubs
                 .filter(hub => hub.city.toLowerCase() !== 'toronto')
-                .map(hub => ({ name: hub.city, slug: hub.slug, subtitle: 'View Clinics', isAll: false })),
+                .map(hub => ({ 
+                  name: hub.city, 
+                  slug: hub.slug, 
+                  subtitle: hub.count ? `${hub.count} verified clinics` : 'View Clinics', 
+                  isAll: false 
+                })),
               { name: 'Browse All Cities', slug: '', subtitle: '', isAll: true }
             ].slice(0, 8).map((city, idx) => (
               <Link 

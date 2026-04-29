@@ -64,13 +64,26 @@ function ResultsContent() {
         const state = searchParams.get('state');
         
         // Step 1: Fetch by location
-        const [profiles, locationListings] = await Promise.allSettled([
+        const [profilesRes, locationListingsRes] = await Promise.allSettled([
           getOperatorProfiles(),
           city ? getListingsByCity(city, state || undefined) : getAllListings()
         ]);
 
-        if (profiles.status === 'fulfilled') setOperatorProfiles(profiles.value);
-        if (locationListings.status === 'fulfilled') setListings(locationListings.value);
+        let initialListings: Provider[] = [];
+        if (locationListingsRes.status === 'fulfilled') {
+          initialListings = locationListingsRes.value as Provider[];
+        }
+
+        // Apply fallback: if < 3 city matches, expand to state
+        if (city && state && initialListings.length < 3) {
+          const { getListingsByState, deduplicateListings, enrichProvider } = await import('../../../src/lib/data');
+          const stateListings = await getListingsByState(state);
+          // Combine and deduplicate
+          initialListings = deduplicateListings([...initialListings, ...stateListings]).map(enrichProvider);
+        }
+
+        if (profilesRes.status === 'fulfilled') setOperatorProfiles(profilesRes.value as OperatorProfile[]);
+        setListings(initialListings);
       } catch (err) {
         console.error('Error loading results data:', err);
       } finally {

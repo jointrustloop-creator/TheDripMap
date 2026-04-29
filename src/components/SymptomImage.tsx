@@ -12,50 +12,87 @@ export function SymptomImage({ slug, title }: SymptomImageProps) {
   const [errorCount, setErrorCount] = useState(0);
   
   const getSrc = () => {
-    const base = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-';
+    const blogUrl = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/';
+    const symptomsUrl = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/symptoms/';
+    const useCasesUrl = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/use-cases/';
     
-    // Explicit mapping for symptoms where the slug doesn't match a dedicated filename
+    // Explicit mapping for symptoms that don't have a direct name match in the bucket
+    // These are considered "blog images" fallbacks if specific symptom images aren't found
     const assetMapping: Record<string, string> = {
-      'stress': 'woman-relaxing.jpg',
-      'cold-and-flu': 'woman-home.jpg',
-      'fatigue': 'man-lounge.jpg',
-      'hangover': 'two-women.jpg',
-      'hangover-recovery': 'two-women.jpg',
-      'jet-lag': 'man-lounge.jpg',
-      'migraine': 'woman-relaxing.jpg',
-      'immunity': 'group-clinic.jpg',
-      'dehydration': 'woman-home.jpg',
-      'sports-recovery': 'man-lounge.jpg',
-      'stomach-flu': 'woman-home.jpg',
-      'skin-glow': 'two-women.jpg',
-      'weight-loss': 'woman-relaxing.jpg',
-      'energy-boost': 'man-lounge.jpg',
+      'stress': 'iv-therapy-woman-relaxing.jpg',
+      'cold-and-flu': 'iv-therapy-woman-home.jpg',
+      'stomach-flu': 'iv-therapy-woman-home.jpg',
+      'morning-sickness': 'iv-therapy-woman-home.jpg',
+      'dehydration': 'iv-therapy-woman-home.jpg',
+      'migraine': 'iv-therapy-woman-relaxing.jpg',
+      'event-prep': 'iv-therapy-two-women.jpg',
+      'energy-boost': 'iv-therapy-man-lounge.jpg',
+      'fatigue': 'iv-therapy-man-lounge.jpg',
+      'jet-lag': 'iv-therapy-woman-relaxing.jpg',
+      'weight-loss': 'iv-therapy-woman-relaxing.jpg',
+      'sports-recovery': 'iv-therapy-man-lounge.jpg',
+      'hangover': 'iv-therapy-woman-home.jpg',
+      'skin-glow': 'iv-therapy-woman-relaxing.jpg',
+      'immunity': 'iv-therapy-woman-home.jpg',
+      'brain-fog': 'iv-therapy-man-lounge.jpg',
+      'cold-flu': 'iv-therapy-woman-home.jpg',
+      'flu': 'iv-therapy-woman-home.jpg',
+      'recovery': 'iv-therapy-man-lounge.jpg',
     };
 
     // Core fallback images we know exist in the bucket
     const coreFallbacks = [
-      'group-clinic.jpg',
-      'woman-relaxing.jpg',
-      'man-lounge.jpg',
-      'woman-home.jpg',
-      'two-women.jpg'
+      'iv-therapy-woman-relaxing.jpg',
+      'iv-therapy-woman-home.jpg',
+      'iv-therapy-man-lounge.jpg',
+      'iv-therapy-two-women.jpg',
+      'iv-therapy-group-clinic.jpg'
     ];
 
-    // Priority 1: Use the explicit mapping if available to avoid 400s
-    if (assetMapping[slug]) {
-      if (errorCount === 0) return `${base}${assetMapping[slug]}`;
-      // If the mapped image somehow fails, use core fallbacks
-      const fallbackIdx = (errorCount - 1) % coreFallbacks.length;
-      return `${base}${coreFallbacks[fallbackIdx]}`;
-    }
+    const attempts: (string | null)[] = [
+      // 1. Primary: Symptoms bucket (User's specific section images) - EXHAUSTIVE CHECK
+      `${symptomsUrl}${slug}.jpg`,
+      `${symptomsUrl}${slug}.png`,
+      `${symptomsUrl}${title.toLowerCase().replace(/\s+/g, '-')}.jpg`,
+      `${symptomsUrl}${title.toLowerCase().replace(/\s+/g, '_')}.jpg`,
+      `${symptomsUrl}${title.toLowerCase().replace(/\s+/g, '')}.jpg`,
+      `${symptomsUrl}${slug.replace(/-/g, '_')}.jpg`, 
+      `${symptomsUrl}${slug.replace(/-/g, '')}.jpg`,
+      `${symptomsUrl}${slug.replace('-and-', '-')}.jpg`,
+      `${symptomsUrl}${slug.replace('-and-', '&')}.jpg`,
+      `${symptomsUrl}${slug.replace('-and-', '_&_')}.jpg`,
+      `${symptomsUrl}iv-therapy-${slug}.jpg`,
+      `${symptomsUrl}iv-therapy-${slug}.png`,
 
-    // Priority 2: Try the exact slug (for any symptoms not in mapping)
-    if (errorCount === 0) return `${base}${slug}.jpg`;
-    if (errorCount === 1) return `${base}${slug}.png`;
+      // 2. Secondary: Use Cases bucket
+      `${useCasesUrl}${slug}.jpg`,
+      `${useCasesUrl}${slug}.png`,
+      `${useCasesUrl}${title.toLowerCase().replace(/\s+/g, '-')}.jpg`,
+      `${useCasesUrl}${slug.replace(/-/g, '_')}.jpg`,
+      `${useCasesUrl}${slug.replace(/-/g, '')}.jpg`,
 
-    // Priority 3: Cycle through confirmed working assets
-    const fallbackIdx = (errorCount - 2) % coreFallbacks.length;
-    return `${base}${coreFallbacks[fallbackIdx]}`;
+      // 3. Tertiary: Blog images bucket named after symptom
+      `${blogUrl}${slug}.jpg`,
+      `${blogUrl}${slug}.png`,
+      `${blogUrl}${title.toLowerCase().replace(/\s+/g, '-')}.jpg`,
+      `${blogUrl}${title.toLowerCase().replace(/\s+/g, '')}.jpg`,
+      `${blogUrl}iv-therapy-${slug}.jpg`,
+      `${blogUrl}iv-therapy-${slug}.png`,
+      `${blogUrl}${slug.replace(/-/g, '_')}.jpg`, 
+      `${blogUrl}${slug.replace(/-/g, '')}.jpg`,
+
+      // 4. Quaternary: Explicitly mapped "blog images" 
+      assetMapping[slug] ? `${blogUrl}${assetMapping[slug]}` : null,
+      
+      // 5. Final: Core working fallbacks (our blog images)
+      ...coreFallbacks.map(file => `${blogUrl}${file}`),
+    ];
+
+    // Filter out nulls and return the attempt corresponding to current error count
+    const validAttempts = attempts.filter((src): src is string => src !== null);
+    const index = Math.min(errorCount, validAttempts.length - 1);
+    
+    return validAttempts[index];
   };
 
   return (

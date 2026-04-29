@@ -1,6 +1,7 @@
 import { Provider, BlogPost, OperatorProfile, ListingStats } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
 import { MOCK_BLOG_POSTS, MOCK_LISTINGS, MOCK_CITIES } from './mock-data';
+import { htmlToMarkdown, containsHtml } from './blog-utils';
 
 // Helper to slugify strings
 export const slugify = (text: string | null | undefined) => {
@@ -29,7 +30,7 @@ export const STATE_MAP: Record<string, string> = {
   'district-of-columbia': 'DC', 'ontario': 'ON'
 };
 
-export const GTA_CITIES = ['Toronto', 'North York', 'Richmond Hill', 'Vaughan', 'Mississauga', 'Oakville', 'Brampton', 'Ajax', 'Newmarket'];
+export const GTA_CITIES = ['Toronto', 'Ajax', 'Brampton', 'Mississauga', 'Oakville', 'Richmond Hill', 'Vaughan'];
 
 // Reverse mapping for full names
 export const REVERSE_STATE_MAP: Record<string, string> = Object.fromEntries(
@@ -145,6 +146,8 @@ export function enrichProvider(p: any): Provider {
     website: website,
     rating: Number(p.rating) || 0,
     reviewCount: Number(p.review_count || p.reviews || p.reviewCount || p.Reviews) || 0,
+    latitude: p.latitude != null ? Number(p.latitude) : undefined,
+    longitude: p.longitude != null ? Number(p.longitude) : undefined,
     imageUrl: finalImageUrl,
     specialties: specialties,
     amenities: amenities,
@@ -296,17 +299,14 @@ export async function getListingsByCity(city: string, state?: string) {
 
     const dbResults = (response.data || []).map(enrichProvider);
 
-    // If we have total absence in DB results but we has search strings, try mock data
-    if (dbResults.length === 0) {
-      const mockResults = MOCK_LISTINGS.filter(p => 
-        isCityMatch(p.city, searchCity) || 
-        (searchState && p.state?.toLowerCase() === searchState.toLowerCase())
-      ).map(enrichProvider);
-      
-      if (mockResults.length > 0) return mockResults;
-    }
+    // Merge with mock data to ensure real-world vetted listings are always included
+    const mockResults = MOCK_LISTINGS.filter(p => 
+      isCityMatch(p.city, searchCity) || 
+      (searchState && p.state?.toLowerCase() === searchState.toLowerCase())
+    ).map(enrichProvider);
 
-    return dbResults;
+    const merged = deduplicateListings([...dbResults, ...mockResults]);
+    return merged;
   } catch (err) {
     console.error('Error fetching listings by city:', err);
     // Final safety fallback to mock data
@@ -314,6 +314,33 @@ export async function getListingsByCity(city: string, state?: string) {
       isCityMatch(p.city, searchCity) || 
       (searchState && p.state?.toLowerCase() === searchState.toLowerCase())
     ).map(enrichProvider);
+  }
+}
+
+export async function getListingsByState(state: string) {
+  if (!isSupabaseConfigured()) {
+    return MOCK_LISTINGS.filter(p => 
+      p.state?.toLowerCase() === state.toLowerCase()
+    ).map(enrichProvider);
+  }
+  
+  const slugState = slugify(state);
+  const stateAbbr = STATE_MAP[slugState] || state;
+  
+  try {
+    const { data, error } = await supabase
+      .from('providers')
+      .select('*')
+      .or(`state.ilike.${state},state.ilike.${stateAbbr}`)
+      .eq('availability', true)
+      .order('reviews', { ascending: false })
+      .limit(300);
+
+    if (error) throw error;
+    return (data || []).map(enrichProvider);
+  } catch (err) {
+    console.error('Error fetching listings by state:', err);
+    return [];
   }
 }
 
@@ -775,30 +802,56 @@ export async function getFeaturedListings(limit: number = 6, city?: string) {
 }
 
 export async function getSiteStats() {
-  const FALLBACK_STATS = {
-    total: 520,
-    cities: 218,
-    states: 25,
-    avgRating: '4.9',
-    totalReviews: 52400, 
-    topStates: [
-      { name: 'California', count: 82, share: '15.8%' },
-      { name: 'Florida', count: 64, share: '12.3%' },
-      { name: 'Texas', count: 58, share: '11.2%' },
-      { name: 'Ontario', count: 25, share: '4.8%' },
-      { name: 'New York', count: 35, share: '6.7%' }
-    ],
-    topCities: [
-      { city: 'Toronto', state: 'ON', count: 18 },
-      { city: 'Atlanta', state: 'GA', count: 28 },
-      { city: 'Miami', state: 'FL', count: 24 },
-      { city: 'Houston', state: 'TX', count: 21 },
-      { city: 'Los Angeles', state: 'CA', count: 16 }
-    ]
+  const getMockStats = () => {
+    const citiesSet = new Set();
+    const statesSet = new Set();
+    let totalReviews = 0;
+    const stateCounts: Record<string, number> = {};
+    const cityCounts: Record<string, { city: string, state: string, count: number }> = {};
+
+    MOCK_LISTINGS.forEach(p => {
+      if (p.city && p.state) {
+        citiesSet.add(`${p.city.toLowerCase()}-${p.state.toLowerCase()}`);
+        const cityKey = `${p.city}-${p.state}`;
+        if (!cityCounts[cityKey]) {
+          cityCounts[cityKey] = { city: p.city, state: p.state, count: 0 };
+        }
+        cityCounts[cityKey].count++;
+      }
+      if (p.state) {
+        statesSet.add(p.state.toLowerCase());
+        stateCounts[p.state] = (stateCounts[p.state] || 0) + 1;
+      }
+      // Use reviewCount if it exists, otherwise 0
+      totalReviews += (p.reviewCount || 0);
+    });
+
+    const topStates = Object.entries(stateCounts)
+      .map(([name, count]) => ({
+        name,
+        count,
+        share: `${((count / MOCK_LISTINGS.length) * 100).toFixed(1)}%`
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    const topCities = Object.values(cityCounts)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    return {
+      total: MOCK_LISTINGS.length,
+      cities: citiesSet.size,
+      states: statesSet.size,
+      avgRating: '4.9',
+      totalReviews: totalReviews || 5000,
+      topStates,
+      topCities
+    };
   };
 
   if (!isSupabaseConfigured()) {
-    return FALLBACK_STATS;
+    return getMockStats();
   }
 
   try {
@@ -807,13 +860,13 @@ export async function getSiteStats() {
       .select('*', { 
         count: 'exact', 
         head: true 
-      })
+      });
 
     const { data: allData } = await supabase
       .from('providers')
       .select('city, state, reviews, rating')
     
-    if (!allData || allData.length === 0) return FALLBACK_STATS;
+    if (!allData || allData.length === 0) return getMockStats();
 
     // Calculate unique cities and states
     const citiesSet = new Set();
@@ -859,18 +912,19 @@ export async function getSiteStats() {
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);
 
+    const fallback = getMockStats();
     return {
-      total: total || FALLBACK_STATS.total,
-      cities: citiesSet.size || FALLBACK_STATS.cities,
-      states: statesSet.size || FALLBACK_STATS.states,
+      total: total || fallback.total,
+      cities: citiesSet.size || fallback.cities,
+      states: statesSet.size || fallback.states,
       avgRating: '4.9',
-      totalReviews: totalReviews || FALLBACK_STATS.totalReviews,
+      totalReviews: totalReviews || fallback.totalReviews,
       topStates,
       topCities
     }
   } catch (err) {
     console.error('Error in getSiteStats:', err);
-    return FALLBACK_STATS;
+    return getMockStats();
   }
 }
 
@@ -898,7 +952,13 @@ export async function getBlogPosts() {
       if (!error && data && data.length > 0) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return (data as any[]).map(post => {
-          const content = post.content || post.body || post.markdown || '';
+          let content = post.content || post.body || post.markdown || '';
+          
+          // Self-heal: convert to markdown if HTML is detected
+          if (containsHtml(content)) {
+            content = htmlToMarkdown(content);
+          }
+
           const author = post.author || post.author_name || 'TheDripMap Team';
 
           return {
@@ -936,7 +996,12 @@ export async function getBlogPostBySlug(slug: string) {
         if (!error && data) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const post = data as any;
-          const content = post.content || post.body || post.markdown || '';
+          let content = post.content || post.body || post.markdown || '';
+          
+          // Self-heal: convert to markdown if HTML is detected
+          if (containsHtml(content)) {
+            content = htmlToMarkdown(content);
+          }
           
           const author = post.author || post.author_name || 'TheDripMap Team';
 
@@ -1095,10 +1160,27 @@ export async function getListingsByServiceAndCity(service: string, city: string,
     }
     
     // Deduplicate while allowing multiple locations
-    const uniqueListings = deduplicateListings(data || []).map(enrichProvider);
+    const dbResults = deduplicateListings(data || []).map(enrichProvider);
+
+    // Merge with mock data for this city and service
+    const isCityMatch = (pCity: string, search: string) => {
+      const s = search.toLowerCase().trim();
+      const pc = pCity.toLowerCase().trim();
+      return pc === s || slugify(pc) === slugify(s) || pc.includes(s) || s.includes(pc);
+    };
+
+    const mockResults = MOCK_LISTINGS.filter(p => {
+      const cityMatch = isCityMatch(p.city, city);
+      const serviceMatch = !service || 
+        p.specialties.some(s => s.toLowerCase().includes(service.toLowerCase())) ||
+        p.name.toLowerCase().includes(service.toLowerCase());
+      return cityMatch && serviceMatch;
+    }).map(enrichProvider);
+
+    const merged = deduplicateListings([...dbResults, ...mockResults]);
 
     // Clamp to the requested limit
-    return uniqueListings.slice(0, limit);
+    return merged.slice(0, limit);
   } catch (err) {
     console.error('Supabase error in getListingsByServiceAndCity:', err);
     return [];
