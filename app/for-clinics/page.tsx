@@ -169,6 +169,127 @@ export default async function ForClinicsPage() {
           </div>
         </div>
 
+        {/* Pricing Section */}
+        <div className="mb-32">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Simple, Growth-Focused Pricing</h2>
+            <p className="text-slate-500 text-lg">Choose the right tier to amplify your clinic&apos;s visibility and connect with more patients.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Free Tier */}
+            <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] flex flex-col shadow-sm">
+              <div className="mb-8">
+                <h3 className="text-xl font-black text-slate-900 mb-2">Free</h3>
+                <p className="text-slate-500 text-sm">Basic online presence</p>
+              </div>
+              <div className="mb-8">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-black text-slate-900">$0</span>
+                  <span className="text-slate-400 font-bold text-sm">/mo</span>
+                </div>
+                <p className="text-xs text-slate-400 mt-1 font-bold italic">Free forever</p>
+              </div>
+              <div className="space-y-4 mb-10 flex-1">
+                {[
+                  'Listed in directory',
+                  'Phone and website shown',
+                  'Appears in search results'
+                ].map(feature => (
+                  <div key={feature} className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center shrink-0 border border-slate-100">
+                      <span className="text-[10px]">✓</span>
+                    </div>
+                    <span className="text-sm text-slate-600 font-medium">{feature}</span>
+                  </div>
+                ))}
+              </div>
+              <Link 
+                href="/for-clinics/setup"
+                className="w-full py-4 text-center border-2 border-slate-100 text-slate-900 rounded-2xl font-bold hover:bg-slate-50 transition-all"
+              >
+                Get Started
+              </Link>
+            </div>
+
+            {/* Featured Tier */}
+            <div className="bg-white border-4 border-wellness-100 p-8 rounded-[2.5rem] flex flex-col shadow-2xl shadow-wellness-100/30 relative transform lg:-translate-y-4">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-wellness-600 text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
+                Most Popular
+              </div>
+              <div className="mb-8">
+                <h3 className="text-xl font-black text-slate-900 mb-2">Featured</h3>
+                <p className="text-slate-500 text-sm">Everything in Free, plus:</p>
+              </div>
+              <div className="mb-8">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-black text-slate-900">$99</span>
+                  <span className="text-slate-400 font-bold text-sm">/mo</span>
+                </div>
+                <p className="text-xs text-slate-400 mt-1 font-bold">Billed monthly</p>
+              </div>
+              <div className="space-y-4 mb-10 flex-1">
+                {[
+                  'Priority placement in city results',
+                  'Verified green badge',
+                  'Custom description and photos',
+                  'Book Appointment button',
+                  'Patient analytics dashboard'
+                ].map(feature => (
+                  <div key={feature} className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-wellness-50 text-wellness-600 flex items-center justify-center shrink-0 border border-wellness-100">
+                      <span className="text-[10px] font-bold">✓</span>
+                    </div>
+                    <span className="text-sm text-slate-700 font-bold">{feature}</span>
+                  </div>
+                ))}
+              </div>
+              <Link 
+                href="/for-clinics/setup?plan=featured"
+                className="w-full py-4 text-center bg-wellness-600 text-white rounded-2xl font-black shadow-lg shadow-wellness-100 hover:bg-wellness-700 transition-all"
+              >
+                Go Featured
+              </Link>
+            </div>
+
+            {/* Premium Tier */}
+            <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] flex flex-col shadow-sm">
+              <div className="mb-8">
+                <h3 className="text-xl font-black text-slate-900 mb-2">Premium</h3>
+                <p className="text-slate-500 text-sm">Everything in Featured, plus:</p>
+              </div>
+              <div className="mb-8">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-black text-slate-900">$249</span>
+                  <span className="text-slate-400 font-bold text-sm">/mo</span>
+                </div>
+                <p className="text-xs text-slate-400 mt-1 font-bold">Annual billing available</p>
+              </div>
+              <div className="space-y-4 mb-10 flex-1">
+                {[
+                  'Top of city page placement',
+                  'Featured in matching quiz results',
+                  'Monthly performance report',
+                  'Dedicated account manager'
+                ].map(feature => (
+                  <div key={feature} className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center shrink-0 border border-slate-100">
+                      <span className="text-[10px]">✓</span>
+                    </div>
+                    <span className="text-sm text-slate-600 font-medium">{feature}</span>
+                  </div>
+                ))}
+              </div>
+              <Link 
+                href="/for-clinics/setup?plan=premium"
+                className="w-full py-4 text-center border-2 border-slate-900 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all"
+              >
+                Go Premium
+              </Link>
+            </div>
+          </div>
+        </div>
+
         <div className="bg-[#0F6E56] text-white rounded-[4rem] p-12 md:p-20 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-1/2 h-full bg-black/5 skew-x-12 translate-x-1/4" />
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">

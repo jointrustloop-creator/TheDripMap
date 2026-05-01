@@ -114,12 +114,16 @@ function SetupContent() {
     }
     setIsSubmitting(true);
     try {
+      // Get current user if any to link the profile
+      const { data: { user } } = await supabase.auth.getUser();
+
       const { error } = await supabase
         .from('operator_profiles')
         .insert([
           {
             owner_name: formData.ownerName,
             email: formData.email,
+            user_id: user?.id || null,
             clinic_id: clinicId || null,
             profile_data: {
               clinicName: formData.clinicName,
@@ -155,7 +159,8 @@ function SetupContent() {
         }
       }
 
-      router.push('/dashboard');
+      // Redirect with email to help dashboard find the profile if not logged in
+      router.push(`/dashboard?email=${encodeURIComponent(formData.email)}&status=success`);
     } catch (err) {
       console.error('Error saving operator profile:', err);
       alert('There was an error saving your profile. Please try again.');

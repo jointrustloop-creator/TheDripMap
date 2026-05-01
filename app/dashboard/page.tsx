@@ -113,19 +113,27 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-[#FDFDFB]">
         <Navbar />
         <main className="max-w-7xl mx-auto px-6 py-20 text-center">
-          <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-8 text-slate-400">
-            <AlertCircle size={40} />
+          <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-8 text-emerald-600">
+            <CheckCircle2 size={40} />
           </div>
-          <h1 className="text-3xl font-black text-slate-900 mb-4">Profile Not Found</h1>
-          <p className="text-slate-500 mb-8 max-w-md mx-auto">
-            We couldn&apos;t find an operator profile associated with your account. Please complete the setup process.
+          <h1 className="text-3xl font-black text-slate-900 mb-4">Registration Received</h1>
+          <p className="text-slate-600 mb-8 max-w-md mx-auto text-lg">
+            Thank you! We have received your clinic information and will be in touch within 24 hours.
           </p>
-          <Link 
-            href="/for-clinics/setup"
-            className="inline-flex items-center gap-2 bg-wellness-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-wellness-700 transition-all shadow-lg"
-          >
-            Start Setup <ArrowRight size={20} />
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link 
+              href="/"
+              className="inline-flex items-center gap-2 text-slate-500 font-bold hover:text-slate-900 transition-all"
+            >
+              Return Home
+            </Link>
+            <Link 
+              href="/for-clinics/setup"
+              className="inline-flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-lg"
+            >
+              Update Information <ArrowRight size={20} />
+            </Link>
+          </div>
         </main>
         <Footer />
       </div>
