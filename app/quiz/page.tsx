@@ -452,7 +452,7 @@ export default function QuizPage() {
                           ? "bg-wellness-600 text-white" 
                           : "bg-slate-50 text-slate-400 group-hover:text-wellness-600"
                       )}>
-                        {React.cloneElement(option.icon as React.ReactElement, { size: 18 })}
+                        {React.cloneElement(option.icon as React.ReactElement<{ size?: number }>, { size: 18 })}
                       </div>
                       <div className="min-w-0">
                         <h4 className="font-bold text-slate-900 text-sm mb-0.5 leading-none">{option.label}</h4>
