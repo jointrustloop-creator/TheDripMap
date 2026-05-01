@@ -3,32 +3,18 @@ import React, { useEffect, useState } from 'react';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { 
-  BarChart3, 
-  Users, 
-  Settings, 
-  ExternalLink, 
   CheckCircle2,
-  Clock,
-  TrendingUp,
-  MessageSquare,
-  DollarSign,
   ArrowRight,
-  Loader2
+  Loader2,
+  MapPin
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../../src/lib/supabase';
 import Link from 'next/link';
-import { OperatorProfile, Provider } from '../../src/types';
+import { OperatorProfile } from '../../src/types';
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [operator, setOperator] = useState<OperatorProfile | null>(null);
-  const [listing, setListing] = useState<Provider | null>(null);
-  const [stats, setStats] = useState({
-    views: 0,
-    matches: 'Coming soon',
-    rating: '0.0',
-    responseTime: '12m'
-  });
 
   useEffect(() => {
     async function loadDashboardData() {
@@ -62,35 +48,6 @@ export default function DashboardPage() {
         }
 
         setOperator(operatorData);
-
-        // 3. Get listing data if clinic_id exists
-        if (operatorData.clinic_id) {
-          const { data: listingData } = await supabase
-            .from('providers')
-            .select('*')
-            .eq('id', operatorData.clinic_id)
-            .single();
-          
-          if (listingData) {
-            setListing(listingData);
-
-            // 4. Get views count (last 30 days)
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            
-            const { count: viewsCount } = await supabase
-              .from('listing_views')
-              .select('*', { count: 'exact', head: true })
-              .eq('listing_id', operatorData.clinic_id)
-              .gt('viewed_at', thirtyDaysAgo.toISOString());
-
-            setStats(prev => ({
-              ...prev,
-              views: viewsCount || 0,
-              rating: listingData.rating?.toString() || '0.0'
-            }));
-          }
-        }
       } catch (err) {
         console.error('Error loading dashboard:', err);
       } finally {
@@ -109,49 +66,78 @@ export default function DashboardPage() {
     );
   }
 
-  if (!operator) {
-    const hasEmail = typeof window !== 'undefined' && 
-                     (localStorage.getItem('operator_email') || 
-                      new URLSearchParams(window.location.search).get('email'));
-
+  // State 1: Profile Found -> Show "On the List" Success Message
+  if (operator) {
     return (
-      <div className="min-h-screen bg-[#FDFDFB]">
+      <div className="min-h-screen bg-[#FDFDFB] flex flex-col">
         <Navbar />
-        <main className="max-w-7xl mx-auto px-6 py-20 text-center">
-          {hasEmail ? (
-            <>
-              <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-8 text-emerald-600">
-                <CheckCircle2 size={40} />
-              </div>
-              <h1 className="text-3xl font-black text-slate-900 mb-4">Registration Received</h1>
-              <p className="text-slate-600 mb-8 max-w-md mx-auto text-lg">
-                Thank you! We have received your clinic information and will be in touch within 24 hours.
+        <main className="flex-1 flex items-center justify-center p-6 py-20">
+          <div className="max-w-xl w-full text-center">
+            <div className="w-24 h-24 bg-wellness-50 text-wellness-600 rounded-[2rem] flex items-center justify-center mx-auto mb-10 shadow-xl shadow-wellness-100/20">
+              <CheckCircle2 size={48} />
+            </div>
+
+            <h1 className="text-4xl font-black text-slate-900 mb-6 tracking-tight">
+              You&apos;re on the list!
+            </h1>
+            
+            <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm mb-10 text-left">
+              <p className="text-lg text-slate-700 leading-relaxed font-bold mb-6">
+                Thank you for claiming your TheDripMap listing.
               </p>
-            </>
-          ) : (
-            <>
-              <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-8 text-slate-400">
-                <Settings size={40} />
+              
+              <div className="space-y-4 mb-8">
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100 text-slate-400">
+                    <span className="text-xs">1</span>
+                  </div>
+                  <p className="text-slate-600 font-medium pt-1">
+                    Our team will review your profile and activate it within 24 hours.
+                  </p>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100 text-slate-400">
+                    <span className="text-xs">2</span>
+                  </div>
+                  <div className="pt-1">
+                    <p className="text-slate-600 font-medium">
+                      We&apos;ll contact you at <span className="text-slate-900 font-bold">{operator.email}</span> with next steps.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <h1 className="text-3xl font-black text-slate-900 mb-4">Clinic Dashboard</h1>
-              <p className="text-slate-500 mb-8 max-w-md mx-auto text-lg">
-                Manage your clinical network presence, track patient matches, and update your protocols.
-              </p>
-            </>
-          )}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link 
-              href="/"
-              className="inline-flex items-center gap-2 text-slate-500 font-bold hover:text-slate-900 transition-all"
-            >
-              Return Home
-            </Link>
-            <Link 
-              href="/for-clinics/setup"
-              className="inline-flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-lg"
-            >
-              {hasEmail ? 'Update Information' : 'Get Started'} <ArrowRight size={20} />
-            </Link>
+
+              <div className="p-5 bg-wellness-50 rounded-2xl border border-wellness-100">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs font-black text-wellness-700 uppercase tracking-widest">Preview</p>
+                  <span className="text-[10px] font-bold text-wellness-600 bg-wellness-200/30 px-2 py-0.5 rounded-full uppercase tracking-widest">Sample</span>
+                </div>
+                <p className="text-sm text-wellness-900 font-medium">
+                  In the meantime, explore what a verified listing looks like:
+                </p>
+                <Link 
+                  href="/cities/toronto"
+                  className="mt-4 inline-flex items-center gap-2 text-wellness-700 font-black hover:gap-3 transition-all"
+                >
+                  View Example Listing <ArrowRight size={18} />
+                </Link>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link 
+                href="/"
+                className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-slate-900 text-white font-black hover:bg-slate-800 transition-all shadow-lg"
+              >
+                Return Home
+              </Link>
+              <Link 
+                href="/for-clinics/setup"
+                className="w-full sm:w-auto px-10 py-4 rounded-2xl border-2 border-slate-100 text-slate-600 font-bold hover:bg-slate-50 transition-all"
+              >
+                Edit Information
+              </Link>
+            </div>
           </div>
         </main>
         <Footer />
@@ -159,145 +145,35 @@ export default function DashboardPage() {
     );
   }
 
+  // State 2: Profile Not Found -> Show Setup CTA
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
-      
-      <main className="max-w-7xl mx-auto px-6 py-12">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-          <div>
-            <h1 className="text-3xl font-black text-slate-900 mb-2">
-              {listing?.name || 'Clinic Dashboard'}
-            </h1>
-            <p className="text-slate-500">Manage your listing and track your matching performance.</p>
-          </div>
-          <div className="flex items-center gap-3">
-            {listing?.is_verified ? (
-              <div className="bg-emerald-50 text-emerald-700 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 border border-emerald-100">
-                <CheckCircle2 size={16} /> Profile Verified
-              </div>
-            ) : (
-              <div className="bg-amber-50 text-amber-700 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 border border-amber-100">
-                <Clock size={16} /> Verification Pending
-              </div>
-            )}
-            {listing?.subscription_tier && (
-              <div className="bg-wellness-50 text-wellness-700 px-4 py-2 rounded-xl text-sm font-bold border border-wellness-100 uppercase tracking-widest">
-                {listing.subscription_tier}
-              </div>
-            )}
-          </div>
+      <main className="max-w-7xl mx-auto px-6 py-20 text-center">
+        <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-8 text-slate-400">
+          <MapPin size={40} />
         </div>
-
-        {!operator.clinic_id ? (
-          <div className="bg-white border-2 border-dashed border-slate-200 rounded-[2.5rem] p-12 text-center mb-12">
-            <h2 className="text-2xl font-black text-slate-900 mb-4">Listing Not Linked</h2>
-            <p className="text-slate-500 mb-8 max-w-md mx-auto">
-              Your operator profile is created, but it isn&apos;t linked to a clinic listing yet. Complete your profile to see your stats.
-            </p>
-            <Link 
-              href="/for-clinics/setup"
-              className="inline-flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-lg"
-            >
-              Complete Profile <ArrowRight size={20} />
-            </Link>
-          </div>
-        ) : (
-          <>
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-              {[
-                { label: 'Profile Views', value: stats.views.toLocaleString(), icon: <Users className="text-blue-600" />, trend: 'Last 30d' },
-                { label: 'Quiz Matches', value: stats.matches, icon: <TrendingUp className="text-wellness-600" />, trend: 'Coming soon' },
-                { label: 'Avg. Rating', value: stats.rating, icon: <BarChart3 className="text-amber-600" />, trend: 'Live' },
-                { label: 'Response Time', value: stats.responseTime, icon: <Clock className="text-purple-600" />, trend: 'Est.' }
-              ].map((stat, idx) => (
-                <div key={idx} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 bg-slate-50 rounded-2xl">
-                      {stat.icon}
-                    </div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                      {stat.trend}
-                    </span>
-                  </div>
-                  <div className="text-2xl font-black text-slate-900 mb-1">{stat.value}</div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Main Content */}
-              <div className="lg:col-span-2 space-y-8">
-                <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-                  <div className="p-8 border-b border-slate-50 flex items-center justify-between">
-                    <h3 className="text-xl font-bold text-slate-900">Recent Matches</h3>
-                    <button className="text-sm font-bold text-wellness-600 hover:text-wellness-700">View All</button>
-                  </div>
-                  <div className="p-8">
-                    <div className="text-center py-12">
-                      <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
-                        <TrendingUp size={32} />
-                      </div>
-                      <p className="text-slate-500 font-medium">Match tracking is coming soon to your dashboard.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Sidebar */}
-              <div className="space-y-8">
-                <div className="bg-slate-900 text-white rounded-[2.5rem] p-8">
-                  <h3 className="text-xl font-bold mb-4">Profile Strength</h3>
-                  <div className="mb-6">
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="text-slate-400">Completion</span>
-                      <span className="font-bold">{listing?.is_verified ? '100%' : '85%'}</span>
-                    </div>
-                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                      <div className="h-full bg-wellness-500 transition-all duration-1000" style={{ width: listing?.is_verified ? '100%' : '85%' }} />
-                    </div>
-                  </div>
-                  <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-                    {listing?.is_verified 
-                      ? "Your profile is fully verified and performing at peak capacity."
-                      : "Complete your clinical protocols to unlock the \"Verified Partner\" badge and get 2x more matches."}
-                  </p>
-                  <Link 
-                    href="/for-clinics/setup"
-                    className="w-full bg-white text-slate-900 py-4 rounded-2xl font-bold hover:bg-wellness-50 transition-all flex items-center justify-center gap-2"
-                  >
-                    Update Profile <Settings size={18} />
-                  </Link>
-                </div>
-
-                <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm">
-                  <h3 className="text-lg font-bold text-slate-900 mb-4">Quick Links</h3>
-                  <div className="space-y-3">
-                    {[
-                      { label: 'View Public Listing', icon: <ExternalLink size={16} />, href: `/provider/${listing?.slug || listing?.id}` },
-                      { label: 'Manage Reviews', icon: <MessageSquare size={16} />, href: '#' },
-                      { label: 'Billing & Plan', icon: <DollarSign size={16} />, href: '#' }
-                    ].map((link, idx) => (
-                      <Link 
-                        key={idx} 
-                        href={link.href}
-                        className="w-full flex items-center justify-between p-4 rounded-2xl hover:bg-slate-50 transition-colors text-sm font-bold text-slate-600"
-                      >
-                        <span className="flex items-center gap-3">{link.icon} {link.label}</span>
-                        <ArrowRight size={14} className="text-slate-300" />
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
+        <h1 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Clinic Dashboard</h1>
+        <p className="text-slate-500 mb-10 max-w-md mx-auto text-lg leading-relaxed">
+          Manage your clinical network presence, track patient matches, and update your protocols.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link 
+            href="/"
+            className="inline-flex items-center gap-2 text-slate-500 font-bold hover:text-slate-900 transition-all"
+          >
+            Return Home
+          </Link>
+          <Link 
+            href="/for-clinics/setup"
+            className="inline-flex items-center gap-2 bg-slate-900 text-white px-10 py-4 rounded-2xl font-black hover:bg-slate-800 transition-all shadow-lg shadow-slate-200"
+          >
+            Get Started <ArrowRight size={20} />
+          </Link>
+        </div>
       </main>
-
       <Footer />
     </div>
   );
 }
+

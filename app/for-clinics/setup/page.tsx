@@ -159,6 +159,23 @@ function SetupContent() {
 
       console.log('Profile saved successfully:', data);
       
+      // Send Telegram notification
+      try {
+        await fetch('/api/notify-operator', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clinicName: formData.clinicName,
+            ownerName: formData.ownerName,
+            email: formData.email,
+            specialty: formData.primarySpecialty
+          })
+        });
+      } catch (notifyErr) {
+        console.error('Failed to send telegram notification:', notifyErr);
+        // Don't block the user if notification fails
+      }
+      
       // Save email to localStorage for dashboard lookup persistence without auth
       localStorage.setItem('operator_email', formData.email);
 
