@@ -14,7 +14,7 @@ const outfit = Outfit({
   variable: '--font-display',
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://thedripmap.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thedripmap.com';
 const siteName = process.env.NEXT_PUBLIC_SITE_NAME || 'TheDripMap';
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   description: 'Find and compare the best IV therapy clinics near you. Browse verified providers across hundreds of US cities or get matched in 60 seconds.',
   alternates: {
-    canonical: '/',
+    canonical: 'https://www.thedripmap.com',
   },
   openGraph: {
     title: `${siteName} | Find Your Perfect IV Therapy Match`,

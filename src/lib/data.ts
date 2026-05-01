@@ -345,19 +345,30 @@ export async function getListingsByState(state: string) {
 }
 
 export async function getListingBySlug(slug: string) {
+  const matchesSlug = (p: { name: string; city: string; state?: string; slug?: string }, s: string) => {
+    const sName = slugify(p.name);
+    const sWithCity = slugify(`${p.name} ${p.city}`);
+    const sWithFullCity = p.state ? slugify(`${p.name} ${p.city} ${p.state}`) : '';
+    
+    return p.slug === s || 
+           sName === s || 
+           sWithCity === s || 
+           (sWithFullCity && sWithFullCity === s) ||
+           (s.startsWith(sName) && (s.includes(slugify(p.city || '')) || s.length > sName.length + 5));
+  };
+
   if (!isSupabaseConfigured()) {
-    const found = MOCK_LISTINGS.find(p => p.slug === slug || slugify(p.name) === slug);
+    const found = MOCK_LISTINGS.find(p => matchesSlug(p, slug));
     return found ? enrichProvider(found) : null;
   }
   
   try {
     // 1. Try exact slug match
-    // Only include ID check if the slug looks like a UUID to prevent Postgres errors
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
     
     let query = supabase.from('providers').select('*');
     if (isUuid) {
-      query = query.or(`slug.eq.${slug},id.eq.${slug}`);
+      query = query.or(`slug.eq."${slug}",id.eq."${slug}"`);
     } else {
       query = query.eq('slug', slug);
     }
@@ -369,7 +380,6 @@ export async function getListingBySlug(slug: string) {
     }
 
     // 2. Try name match (case-insensitive fuzzy or exact slugified)
-    // We try to match the name by replacing dashes back to spaces
     const nameCandidate = slug.replace(/-/g, ' ');
     const firstWord = nameCandidate.split(' ')[0];
     
@@ -378,37 +388,31 @@ export async function getListingBySlug(slug: string) {
       .from('providers')
       .select('*')
       .or(`name.ilike.%${nameCandidate}%,name.ilike.%${firstWord}%`)
-      .limit(50); // Increased limit for better coverage
+      .limit(100);
 
     if (!nameError && nameMatches && nameMatches.length > 0) {
-      // Still verify with slugify to be absolutely sure
-      const match = nameMatches.find(p => slugify(p.name) === slug);
+      const match = nameMatches.find(p => matchesSlug(p, slug));
       if (match) return enrichProvider(match);
-      
-      // Secondary check: partial match if exact slugify fails (e.g. name changed slightly)
-      const partialMatch = nameMatches.find(p => slugify(p.name).includes(slug) || slug.includes(slugify(p.name)));
-      if (partialMatch) return enrichProvider(partialMatch);
     }
     
     // 2b. Broadest search: if it still fails, just look at the most rated ones in the whole DB
-    // This is expensive but only hits on 404 candidates
     const { data: widerCandidates, error: widerError } = await supabase
       .from('providers')
       .select('*')
       .order('reviews', { ascending: false })
-      .limit(500);
+      .limit(1000);
 
     if (!widerError && widerCandidates) {
-      const match = widerCandidates.find(p => slugify(p.name) === slug || slug.includes(slugify(p.name)));
+      const match = widerCandidates.find(p => matchesSlug(p, slug));
       if (match) return enrichProvider(match);
     }
 
     // 3. Last fallback to mock data
-    const found = MOCK_LISTINGS.find(p => p.slug === slug || slugify(p.name) === slug);
+    const found = MOCK_LISTINGS.find(p => matchesSlug(p, slug));
     return found ? enrichProvider(found) : null;
   } catch (err) {
     console.error('Error in getListingBySlug:', err);
-    const found = MOCK_LISTINGS.find(p => p.slug === slug || slugify(p.name) === slug);
+    const found = MOCK_LISTINGS.find(p => matchesSlug(p, slug));
     return found ? enrichProvider(found) : null;
   }
 }

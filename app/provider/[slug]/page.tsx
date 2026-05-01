@@ -90,14 +90,22 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     alternates: {
       canonical: `https://www.thedripmap.com/provider/${slug}`,
     },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+      },
+    },
     openGraph: {
       title,
       description,
-      url: `https://thedripmap.com/provider/${slug}`,
+      url: `https://www.thedripmap.com/provider/${slug}`,
       type: 'website',
       images: [
         {
-          url: provider.imageUrl || 'https://thedripmap.com/og-image.png',
+          url: provider.imageUrl || 'https://www.thedripmap.com/og-image.png',
           width: 1200,
           height: 630,
           alt: provider.name,
@@ -108,7 +116,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
       card: 'summary_large_image',
       title,
       description,
-      images: [provider.imageUrl || 'https://thedripmap.com/og-image.png'],
+      images: [provider.imageUrl || 'https://www.thedripmap.com/og-image.png'],
     },
   };
 }
@@ -180,7 +188,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
     "description": provider.description,
     "image": provider.imageUrl,
     "telePhone": provider.phone,
-    "url": `https://thedripmap.com/provider/${slug}`,
+    "url": `https://www.thedripmap.com/provider/${slug}`,
     "address": {
       "@type": "PostalAddress",
       "streetAddress": provider.address,
@@ -209,19 +217,19 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://thedripmap.com"
+        "item": "https://www.thedripmap.com"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": cityLabel,
-        "item": `https://thedripmap.com/cities/${citySlug}`
+        "item": `https://www.thedripmap.com/cities/${citySlug}`
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": provider.name,
-        "item": `https://thedripmap.com/provider/${slug}`
+        "item": `https://www.thedripmap.com/provider/${slug}`
       }
     ]
   };
