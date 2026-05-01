@@ -114,56 +114,74 @@ function SetupContent() {
     }
     setIsSubmitting(true);
     try {
-      // Get current user if any to link the profile
+      // 1. Test connection and verify table exists/accessible
+      const { error: pingError } = await supabase.from('operator_profiles').select('id').limit(1);
+      if (pingError && pingError.code !== 'PGRST116') { // PGRST116 is just "no rows", which is fine
+        console.warn('Database connection warning:', pingError);
+      }
+
+      // 2. Get current user if any
       const { data: { user } } = await supabase.auth.getUser();
 
-      const { error } = await supabase
-        .from('operator_profiles')
-        .insert([
-          {
-            owner_name: formData.ownerName,
-            email: formData.email,
-            user_id: user?.id || null,
-            clinic_id: clinicId || null,
-            profile_data: {
-              clinicName: formData.clinicName,
-              primarySpecialty: formData.primarySpecialty,
-              additionalServices: formData.additionalServices,
-              environment: formData.environment,
-              waitTime: formData.waitTime,
-              administerType: formData.administerType,
-              typicalPatientAge: formData.typicalPatientAge,
-              primaryReasons: formData.primaryReasons,
-              priceRange: formData.priceRange,
-              walkInsWelcome: formData.walkInsWelcome,
-              mobileService: formData.mobileService,
-              oneLiner: formData.oneLiner
-            }
-          }
-        ]);
+      // 3. Prepare payload - only include clinic_id if we have one to avoid NOT NULL issues
+      const profilePayload: Record<string, unknown> = {
+        owner_name: formData.ownerName,
+        email: formData.email,
+        profile_data: {
+          ...formData,
+          user_id: user?.id || null // Keep user context inside JSON as backup
+        }
+      };
 
-      if (error) throw error;
-
-      // Update the listings (providers) table if claiming a specific clinic
       if (clinicId) {
-        const { error: updateError } = await supabase
+        profilePayload.clinic_id = clinicId;
+      }
+
+      // Also try user_id at top level if not null
+      if (user?.id) {
+        profilePayload.user_id = user.id;
+      }
+
+      const { data, error } = await supabase
+        .from('operator_profiles')
+        .insert([profilePayload])
+        .select();
+
+      if (error) {
+        console.error('Insert error details:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
+        throw error;
+      }
+
+      console.log('Profile saved successfully:', data);
+      
+      // Save email to localStorage for dashboard lookup persistence without auth
+      localStorage.setItem('operator_email', formData.email);
+
+      // 4. Update the listings table if claiming
+      if (clinicId) {
+        await supabase
           .from('providers')
           .update({ 
             is_claimed: true, 
             claimed_at: new Date().toISOString() 
           })
           .eq('id', clinicId);
-        
-        if (updateError) {
-          console.warn('Error updating provider claim status:', updateError);
-        }
       }
 
-      // Redirect with email to help dashboard find the profile if not logged in
-      router.push(`/dashboard?email=${encodeURIComponent(formData.email)}&status=success`);
-    } catch (err) {
-      console.error('Error saving operator profile:', err);
-      alert('There was an error saving your profile. Please try again.');
+      // Redirect to confirmation success page
+      router.push('/for-clinics/success');
+    } catch (err: unknown) {
+      console.error('Final registration error:', err);
+      const errorObj = err as { message?: string; code?: string };
+      const errorMessage = errorObj.message || 'Unknown database error';
+      const errorCode = errorObj.code || 'NO_CODE';
+      
+      alert(`Registration Error (${errorCode}): ${errorMessage}\n\nPlease contact support if this persists.`);
     } finally {
       setIsSubmitting(false);
     }

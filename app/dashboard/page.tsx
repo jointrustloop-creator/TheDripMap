@@ -38,9 +38,11 @@ export default function DashboardPage() {
       }
 
       try {
-        // 1. Get current user
+        // 1. Get current user or persistent email from local storage/query
         const { data: { user } } = await supabase.auth.getUser();
-        const email = user?.email || new URLSearchParams(window.location.search).get('email');
+        const email = user?.email || 
+                      new URLSearchParams(window.location.search).get('email') || 
+                      localStorage.getItem('operator_email');
 
         if (!email) {
           setLoading(false);
@@ -108,17 +110,35 @@ export default function DashboardPage() {
   }
 
   if (!operator) {
+    const hasEmail = typeof window !== 'undefined' && 
+                     (localStorage.getItem('operator_email') || 
+                      new URLSearchParams(window.location.search).get('email'));
+
     return (
       <div className="min-h-screen bg-[#FDFDFB]">
         <Navbar />
         <main className="max-w-7xl mx-auto px-6 py-20 text-center">
-          <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-8 text-emerald-600">
-            <CheckCircle2 size={40} />
-          </div>
-          <h1 className="text-3xl font-black text-slate-900 mb-4">Registration Received</h1>
-          <p className="text-slate-600 mb-8 max-w-md mx-auto text-lg">
-            Thank you! We have received your clinic information and will be in touch within 24 hours.
-          </p>
+          {hasEmail ? (
+            <>
+              <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-8 text-emerald-600">
+                <CheckCircle2 size={40} />
+              </div>
+              <h1 className="text-3xl font-black text-slate-900 mb-4">Registration Received</h1>
+              <p className="text-slate-600 mb-8 max-w-md mx-auto text-lg">
+                Thank you! We have received your clinic information and will be in touch within 24 hours.
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-8 text-slate-400">
+                <Settings size={40} />
+              </div>
+              <h1 className="text-3xl font-black text-slate-900 mb-4">Clinic Dashboard</h1>
+              <p className="text-slate-500 mb-8 max-w-md mx-auto text-lg">
+                Manage your clinical network presence, track patient matches, and update your protocols.
+              </p>
+            </>
+          )}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link 
               href="/"
@@ -130,7 +150,7 @@ export default function DashboardPage() {
               href="/for-clinics/setup"
               className="inline-flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-lg"
             >
-              Update Information <ArrowRight size={20} />
+              {hasEmail ? 'Update Information' : 'Get Started'} <ArrowRight size={20} />
             </Link>
           </div>
         </main>
