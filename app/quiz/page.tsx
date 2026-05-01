@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { 
   Zap, 
   MapPin, 
@@ -17,13 +18,13 @@ import {
   Lock,
   Calendar,
   Building2,
-  Home
+  Home,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SurveyState } from '../../src/types';
 import { cn } from '../../src/lib/utils';
-import { Navbar } from '../../src/components/Navbar';
-import { Footer } from '../../src/components/Footer';
+import { Logo } from '../../src/components/Logo';
 
 import { getUserLocation, getIPLocation } from '../../src/lib/geo';
 import { getAllCities, GTA_CITIES } from '../../src/lib/data';
@@ -257,10 +258,10 @@ export default function QuizPage() {
 
   if (isLocating) {
     return (
-      <div className="min-h-screen bg-[#FDFDFB] flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-16 h-16 border-4 border-wellness-600 border-t-transparent rounded-full animate-spin mb-6"></div>
-        <h2 className="text-2xl font-black text-slate-900 mb-2">Finding Your Location</h2>
-        <p className="text-slate-500 font-medium">We&apos;re locating nearby clinics for you...</p>
+      <div className="h-[100dvh] flex flex-col items-center justify-center p-6 text-center bg-[#FDFDFB]">
+        <div className="w-12 h-12 border-4 border-wellness-600 border-t-transparent rounded-full animate-spin mb-6"></div>
+        <h2 className="text-xl font-black text-slate-900 mb-2 tracking-tight">Finding Your Location</h2>
+        <p className="text-sm text-slate-500 font-medium">We&apos;re locating nearby clinics for you...</p>
       </div>
     );
   }
@@ -269,85 +270,93 @@ export default function QuizPage() {
     const filteredCities = allCities.filter(c => 
       c.city.toLowerCase().includes(citySearch.toLowerCase()) || 
       c.state.toLowerCase().includes(citySearch.toLowerCase())
-    ).slice(0, 8);
+    ).slice(0, 5);
 
     return (
-      <div className="min-h-screen bg-[#FDFDFB]">
-        <Navbar />
-        <div className="max-w-4xl mx-auto px-6 py-20">
-          <div className="max-w-2xl mb-12">
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">
-              Where are you located?
-            </h2>
-            <p className="text-lg text-slate-500">
-              We couldn&apos;t detect your location automatically. Please enter your city to find clinics near you.
-            </p>
-          </div>
-
-          <div className="relative max-w-xl">
-            <div className="relative">
-              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-              <input 
-                type="text"
-                placeholder="Search your city..."
-                value={citySearch}
-                onChange={(e) => setCitySearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-slate-100 focus:border-wellness-600 focus:outline-none font-bold text-slate-900 transition-all"
-                autoFocus
-              />
+      <div className="h-[100dvh] flex flex-col bg-[#FDFDFB] overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-50 bg-white">
+          <Link href="/"><Logo /></Link>
+          <button onClick={() => router.push('/')} className="text-xs font-bold text-slate-400 hover:text-slate-900 uppercase tracking-widest flex items-center gap-1.5"><X size={14} /> Exit</button>
+        </div>
+        
+        <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-6 overflow-y-auto">
+          <div className="w-full max-w-xl mx-auto space-y-8">
+            <div className="text-center">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 tracking-tight">
+                Where are you located?
+              </h2>
+              <p className="text-sm text-slate-500 max-w-md mx-auto">
+                We couldn&apos;t detect your location. Enter your city to find clinics near you.
+              </p>
             </div>
 
-            {citySearch.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border-2 border-slate-100 shadow-xl z-50 overflow-hidden">
-                {filteredCities.length > 0 ? (
-                  filteredCities.map((c, idx) => (
-                    <button
-                      key={`${c.city}-${c.state}-${idx}`}
-                      onClick={() => handleManualLocation(c.city, c.state)}
-                      className="w-full flex items-center gap-3 px-6 py-4 hover:bg-wellness-50 text-left transition-colors border-b border-slate-50 last:border-0"
-                    >
-                      <MapPin size={16} className="text-slate-400" />
-                      <div>
-                        <span className="font-bold text-slate-900">{c.city}</span>
-                        <span className="text-slate-400 ml-2">{c.state}</span>
-                      </div>
-                    </button>
-                  ))
-                ) : (
-                  <div className="px-6 py-4 text-slate-400 italic">No cities found matching &quot;{citySearch}&quot;</div>
-                )}
+            <div className="relative">
+              <div className="relative">
+                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input 
+                  type="text"
+                  placeholder="Search your city..."
+                  value={citySearch}
+                  onChange={(e) => setCitySearch(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3.5 rounded-xl border-2 border-slate-100 focus:border-wellness-600 focus:outline-none font-bold text-slate-900 transition-all text-sm"
+                  autoFocus
+                />
               </div>
-            )}
 
-            <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {allCities.slice(0, 5).map((c, idx) => (
-                <button
-                  key={`top-${c.city}-${idx}`}
-                  onClick={() => handleManualLocation(c.city, c.state)}
-                  className="px-4 py-3 rounded-xl border border-slate-100 hover:border-wellness-600 hover:bg-wellness-50 font-bold text-slate-600 hover:text-wellness-600 transition-all text-sm"
-                >
-                  {c.city}
-                </button>
-              ))}
-              <button
-                onClick={skipLocation}
-                className="px-4 py-3 rounded-xl border-2 border-dashed border-slate-200 hover:border-wellness-600 hover:bg-wellness-50 font-bold text-slate-400 hover:text-wellness-600 transition-all text-sm"
-              >
-                Skip for now
-              </button>
+              {citySearch.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border-2 border-slate-100 shadow-xl z-50 overflow-hidden">
+                  {filteredCities.length > 0 ? (
+                    filteredCities.map((c, idx) => (
+                      <button
+                        key={`${c.city}-${c.state}-${idx}`}
+                        onClick={() => handleManualLocation(c.city, c.state)}
+                        className="w-full flex items-center gap-3 px-6 py-3.5 hover:bg-wellness-50 text-left transition-colors border-b border-slate-50 last:border-0"
+                      >
+                        <MapPin size={14} className="text-slate-400" />
+                        <div className="text-sm">
+                          <span className="font-bold text-slate-900">{c.city}</span>
+                          <span className="text-slate-400 ml-2">{c.state}</span>
+                        </div>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-6 py-4 text-xs text-slate-400 italic">No cities found matching &quot;{citySearch}&quot;</div>
+                  )}
+                </div>
+              )}
+
+              <div className="mt-8">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 text-center">Top Cities</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {allCities.slice(0, 5).map((c, idx) => (
+                    <button
+                      key={`top-${c.city}-${idx}`}
+                      onClick={() => handleManualLocation(c.city, c.state)}
+                      className="px-3 py-2 rounded-lg border border-slate-100 hover:border-wellness-600 hover:bg-wellness-50 font-bold text-slate-600 hover:text-wellness-600 transition-all text-[11px]"
+                    >
+                      {c.city}
+                    </button>
+                  ))}
+                  <button
+                    onClick={skipLocation}
+                    className="px-3 py-2 rounded-lg border-2 border-dashed border-slate-200 hover:border-wellness-600 hover:bg-wellness-50 font-bold text-slate-400 hover:text-wellness-600 transition-all text-[11px]"
+                  >
+                    Skip
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <Footer />
       </div>
     );
   }
 
   if (isAnalyzing) {
     return (
-      <div className="min-h-screen bg-[#FDFDFB] flex flex-col items-center justify-center p-6">
-        <div className="max-w-md w-full text-center">
-          <div className="relative w-24 h-24 mx-auto mb-12">
+      <div className="h-[100dvh] bg-[#FDFDFB] flex flex-col items-center justify-center p-6 text-center">
+        <div className="max-w-md w-full">
+          <div className="relative w-20 h-20 mx-auto mb-10">
             <div className="absolute inset-0 border-4 border-wellness-100 rounded-full" />
             <motion.div 
               className="absolute inset-0 border-4 border-wellness-600 rounded-full border-t-transparent"
@@ -355,13 +364,13 @@ export default function QuizPage() {
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             />
             <div className="absolute inset-0 flex items-center justify-center text-wellness-600">
-              <Zap size={32} className="animate-pulse" />
+              <Zap size={24} className="animate-pulse" />
             </div>
           </div>
-          <h2 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">Analyzing Clinical Data</h2>
-          <div className="space-y-4">
+          <h2 className="text-2xl font-black text-slate-900 mb-6 tracking-tight">Personalizing Recommendations</h2>
+          <div className="space-y-3">
             <LoadingStep label="Scanning local providers..." delay={0} />
-            <LoadingStep label="Matching with your wellness goals..." delay={800} />
+            <LoadingStep label="Matching with your goals..." delay={800} />
             <LoadingStep label="Verifying clinical protocols..." delay={1600} />
           </div>
         </div>
@@ -372,127 +381,138 @@ export default function QuizPage() {
   const currentStep = STEPS[step];
 
   return (
-    <div className="min-h-screen bg-[#FDFDFB]">
-      <Navbar />
-      
-      <div className="max-w-4xl mx-auto px-6 py-12 md:py-20">
-        {/* Progress Bar */}
-        <div className="mb-12">
-          <div className="flex justify-between items-end mb-4">
-            <div>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-wellness-600">Step {step + 1} of {STEPS.length}</span>
-              <h3 className="text-sm font-bold text-slate-400">Clinical Matching Quiz</h3>
-            </div>
-            <span className="text-sm font-black text-slate-900">{Math.round(progress)}%</span>
-          </div>
-          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-            <motion.div 
-              className="h-full bg-wellness-600"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
-        </div>
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-10"
-          >
-            <div className="max-w-2xl">
-              <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight leading-tight">
-                {currentStep.question}
-              </h2>
-              <p className="text-lg text-slate-500 leading-relaxed">
-                {currentStep.description}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {currentStep.options ? (
-                currentStep.options.map((option) => (
-                  <button
-                    key={option.id}
-                    onClick={() => handleOptionSelect(currentStep.id, option.id)}
-                    className={cn(
-                      "flex items-start gap-5 p-6 rounded-[2rem] border-2 text-left transition-all group",
-                      data[currentStep.id as keyof SurveyState] === option.id 
-                        ? "border-wellness-600 bg-wellness-50 shadow-lg shadow-wellness-100" 
-                        : "border-slate-100 bg-white hover:border-wellness-200 hover:shadow-md"
-                    )}
-                  >
-                    <div className={cn(
-                      "w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 transition-all",
-                      data[currentStep.id as keyof SurveyState] === option.id 
-                        ? "bg-wellness-600 text-white scale-110" 
-                        : "bg-slate-50 text-slate-400 group-hover:bg-wellness-50 group-hover:text-wellness-600"
-                    )}>
-                      {option.icon}
-                    </div>
-                    <div>
-                      <h4 className="font-black text-slate-900 mb-1">{option.label}</h4>
-                      <p className="text-sm text-slate-500 leading-relaxed">{option.desc}</p>
-                    </div>
-                  </button>
-                ))
-              ) : currentStep.type === 'location' ? (
-                <div className="col-span-1 md:col-span-2 space-y-6">
-                  <div className="relative">
-                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                    <input 
-                      type="text"
-                      placeholder="City, State or Zip"
-                      value={citySearch || data.city || ''}
-                      onChange={(e) => {
-                        setCitySearch(e.target.value);
-                        setData(prev => ({ ...prev, city: e.target.value }));
-                      }}
-                      className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-slate-100 focus:border-wellness-600 focus:outline-none font-bold text-slate-900 transition-all"
-                      autoFocus
-                    />
-                  </div>
-                  
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <button 
-                      onClick={handleLocationDetect}
-                      className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-slate-50 border-2 border-slate-100 hover:border-wellness-600 hover:bg-wellness-50 text-slate-600 font-bold transition-all"
-                    >
-                      <Navigation size={18} />
-                      Use my current location
-                    </button>
-                    <button 
-                      onClick={() => handleComplete(data)}
-                      disabled={!data.city && !citySearch}
-                      className="flex-1 bg-wellness-600 text-white px-8 py-4 rounded-2xl font-black hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Find Matches
-                    </button>
-                  </div>
-                </div>
-              ) : null}
-            </div>
-
-            <div className="flex items-center justify-between pt-10 border-t border-slate-100">
-              <button 
-                onClick={() => step > 0 && setStep(step - 1)}
-                disabled={step === 0}
-                className="flex items-center gap-2 text-slate-400 font-bold hover:text-slate-900 transition-colors disabled:opacity-0"
-              >
-                <ChevronLeft size={20} /> Back
-              </button>
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-300">
-                <Lock size={14} /> Your answers are private and never shared
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
+    <div className="h-[100dvh] flex flex-col bg-[#FDFDFB] overflow-hidden">
+      {/* Minimal Header */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-slate-50 bg-white">
+        <Link href="/">
+          <Logo />
+        </Link>
+        <button 
+          onClick={() => router.push('/')}
+          className="text-xs font-bold text-slate-400 hover:text-slate-900 transition-colors uppercase tracking-widest flex items-center gap-1.5"
+        >
+          <X size={14} /> Exit Quiz
+        </button>
       </div>
+      
+      <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-6 overflow-y-auto">
+        <div className="w-full max-w-4xl mx-auto">
+          {/* Progress Bar - Compact */}
+          <div className="mb-6 md:mb-8 max-w-2xl mx-auto">
+            <div className="flex justify-between items-end mb-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-wellness-600">Step {step + 1} of {STEPS.length}</span>
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{Math.round(progress)}% Complete</span>
+            </div>
+            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+              <motion.div 
+                className="h-full bg-wellness-600"
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.5 }}
+              />
+            </div>
+          </div>
 
-      <Footer />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="space-y-6 md:space-y-8"
+            >
+              <div className="max-w-2xl mx-auto text-center">
+                <h2 className="text-2xl md:text-4xl font-black text-slate-900 mb-2 md:mb-3 tracking-tight leading-tight">
+                  {currentStep.question}
+                </h2>
+                <p className="text-sm md:text-base text-slate-500 leading-relaxed max-w-lg mx-auto">
+                  {currentStep.description}
+                </p>
+              </div>
+
+              <div className={cn(
+                "grid gap-3 max-w-2xl mx-auto",
+                currentStep.options && currentStep.options.length > 4 ? "grid-cols-2 md:grid-cols-2" : "grid-cols-1 md:grid-cols-2"
+              )}>
+                {currentStep.options ? (
+                  currentStep.options.map((option) => (
+                    <button
+                      key={option.id}
+                      onClick={() => handleOptionSelect(currentStep.id, option.id)}
+                      className={cn(
+                        "flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all group",
+                        data[currentStep.id as keyof SurveyState] === option.id 
+                          ? "border-wellness-600 bg-wellness-50 shadow-md" 
+                          : "border-slate-100 bg-white hover:border-wellness-200 hover:bg-slate-50/50"
+                      )}
+                    >
+                      <div className={cn(
+                        "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all",
+                        data[currentStep.id as keyof SurveyState] === option.id 
+                          ? "bg-wellness-600 text-white" 
+                          : "bg-slate-50 text-slate-400 group-hover:text-wellness-600"
+                      )}>
+                        {React.cloneElement(option.icon as React.ReactElement, { size: 18 })}
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-bold text-slate-900 text-sm mb-0.5 leading-none">{option.label}</h4>
+                        {option.desc && <p className="text-[10px] text-slate-500 truncate">{option.desc}</p>}
+                      </div>
+                    </button>
+                  ))
+                ) : currentStep.type === 'location' ? (
+                  <div className="col-span-1 md:col-span-2 space-y-4 max-w-md mx-auto w-full">
+                    <div className="relative">
+                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                      <input 
+                        type="text"
+                        placeholder="City, State or Zip"
+                        value={citySearch || data.city || ''}
+                        onChange={(e) => {
+                          setCitySearch(e.target.value);
+                          setData(prev => ({ ...prev, city: e.target.value }));
+                        }}
+                        className="w-full pl-11 pr-4 py-3.5 rounded-xl border-2 border-slate-100 focus:border-wellness-600 focus:outline-none font-bold text-slate-900 transition-all text-sm"
+                        autoFocus
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col gap-3">
+                      <button 
+                        onClick={handleLocationDetect}
+                        className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-50 border-2 border-slate-100 hover:border-wellness-600 hover:bg-wellness-50 text-slate-600 font-bold transition-all text-sm"
+                      >
+                        <Navigation size={14} />
+                        Use my current location
+                      </button>
+                      <button 
+                        onClick={() => handleComplete(data)}
+                        disabled={!data.city && !citySearch}
+                        className="w-full bg-wellness-600 text-white px-8 py-3.5 rounded-xl font-black hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm uppercase tracking-wider"
+                      >
+                        Find Matches
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="flex items-center justify-between pt-6 border-t border-slate-50 max-w-2xl mx-auto w-full">
+                <button 
+                  onClick={() => step > 0 && setStep(step - 1)}
+                  disabled={step === 0}
+                  className="flex items-center gap-2 text-xs text-slate-400 font-bold hover:text-slate-900 transition-colors disabled:opacity-0"
+                >
+                  <ChevronLeft size={16} /> Previous
+                </button>
+                <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-slate-300">
+                  <Lock size={12} /> HIPAA Secure
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
     </div>
   );
 }
