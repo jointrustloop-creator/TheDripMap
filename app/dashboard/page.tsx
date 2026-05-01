@@ -13,7 +13,6 @@ import {
   MessageSquare,
   DollarSign,
   ArrowRight,
-  AlertCircle,
   Loader2
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../../src/lib/supabase';

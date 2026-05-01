@@ -14,7 +14,6 @@ import {
   Star,
   ShieldCheck
 } from 'lucide-react';
-import DOMPurify from 'isomorphic-dompurify';
 import ReactMarkdown from 'react-markdown';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';

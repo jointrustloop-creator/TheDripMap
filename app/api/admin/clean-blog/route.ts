@@ -44,7 +44,7 @@ export async function POST(req: Request) {
 
     for (const post of affectedPosts) {
       const cleanMarkdown = htmlToMarkdown(post.content);
-      const { data, error } = await supabaseService
+      const { error } = await supabaseService
         .from('blog_posts')
         .update({ content: cleanMarkdown })
         .eq('slug', post.slug);
