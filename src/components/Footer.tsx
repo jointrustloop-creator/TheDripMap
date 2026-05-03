@@ -65,6 +65,7 @@ export const Footer = () => {
             <li><Link href="/blog" className="hover:text-wellness-600 transition-colors">Blog</Link></li>
             <li><Link href="/symptoms" className="hover:text-wellness-600 transition-colors">Symptoms Hub</Link></li>
             <li><Link href="/for-clinics" className="hover:text-wellness-600 transition-colors">For Clinics</Link></li>
+            <li><Link href="/contact" className="hover:text-wellness-600 transition-colors">Contact</Link></li>
           </ul>
         </div>
       </div>

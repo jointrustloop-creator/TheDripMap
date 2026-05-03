@@ -1,17 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Sparkles, ArrowRight, Phone, Globe, Building2, TrendingUp, Zap as ZapIcon, Flame, Star as StarIcon } from 'lucide-react';
 import { Provider, OperatorProfile } from '../types';
-import { RatingStars } from './RatingStars';
 import { ServicePill } from './ServicePill';
 import { slugify } from '../lib/data';
 import { cn } from '../lib/utils';
 import { calculateValueMetrics } from '../lib/price-utils';
 import { motion } from 'motion/react';
-import { ClaimListingModal } from './ClaimListingModal';
 
 interface ProviderCardFeaturedProps {
   provider: Provider & { matchScore?: number };
@@ -21,7 +19,6 @@ interface ProviderCardFeaturedProps {
 }
 
 export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = true }: ProviderCardFeaturedProps) => {
-  const [isClaimModalOpen, setIsClaimModalOpen] = useState(false);
   const slug = provider.slug || slugify(provider.name);
   const valueMetrics = calculateValueMetrics(provider);
   const priceAnchor = provider.priceRange === '$' ? '$99' : provider.priceRange === '$$' ? '$149' : provider.priceRange === '$$$' ? '$199' : '$249';
@@ -122,15 +119,11 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
             </div>
           )}
 
-          {/* Claim Listing Overlay */}
+          {/* Status Overlay */}
           {!provider.is_claimed && (
-            <button 
-              onClick={() => setIsClaimModalOpen(true)}
-              className="absolute bottom-4 left-4 right-4 bg-wellness-600/90 backdrop-blur-md py-3 px-5 rounded-2xl flex items-center justify-center gap-3 hover:bg-wellness-700 transition-all border border-white/20 shadow-xl z-10"
-            >
-              <span className="text-xs font-black text-white uppercase tracking-[0.15em]">CLAIM MY LISTING</span>
-              <ArrowRight size={18} className="text-white" />
-            </button>
+            <div className="absolute bottom-4 left-4 right-4 bg-slate-900/40 backdrop-blur-md py-3 px-5 rounded-2xl flex items-center justify-center gap-3 border border-white/10 shadow-xl z-10 pointer-events-none">
+              <span className="text-xs font-black text-white uppercase tracking-[0.15em]">UNCLAIMED</span>
+            </div>
           )}
         </div>
 
@@ -150,7 +143,11 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
                 </h3>
               </Link>
               <div className="flex items-center gap-3 mb-2">
-                <RatingStars rating={provider.rating} count={provider.reviewCount} />
+                {provider.rating > 0 && (
+                  <div className="text-sm font-bold text-slate-900">
+                    ⭐ {provider.rating} ({provider.reviewCount || 0} reviews)
+                  </div>
+                )}
                 <div className="w-1 h-1 bg-slate-200 rounded-full" />
                 <div className="text-xs font-bold text-slate-500 flex items-center gap-1">
                   <MapPin size={12} className="text-wellness-600" /> {provider.city}
@@ -219,12 +216,6 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
           </div>
         </div>
       </div>
-
-      <ClaimListingModal 
-        provider={provider}
-        isOpen={isClaimModalOpen}
-        onClose={() => setIsClaimModalOpen(false)}
-      />
     </motion.div>
   );
 };

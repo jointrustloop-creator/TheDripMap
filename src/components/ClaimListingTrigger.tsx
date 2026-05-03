@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { ClaimListingModal } from './ClaimListingModal';
+import React from 'react';
 import { Provider } from '../types';
+import { useClaimListing } from '../context/ClaimListingContext';
 
 interface ClaimListingTriggerProps {
   provider: Provider;
@@ -11,26 +11,19 @@ interface ClaimListingTriggerProps {
 }
 
 export const ClaimListingTrigger = ({ provider, children, className }: ClaimListingTriggerProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const { openClaimModal } = useClaimListing();
 
   return (
-    <>
-      <button 
-        type="button"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          setIsOpen(true);
-        }}
-        className={className}
-      >
-        {children}
-      </button>
-      <ClaimListingModal 
-        provider={provider}
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-      />
-    </>
+    <button 
+      type="button"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openClaimModal(provider);
+      }}
+      className={className}
+    >
+      {children}
+    </button>
   );
 };

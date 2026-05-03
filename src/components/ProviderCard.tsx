@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { Phone, ArrowRight, TrendingUp, Zap as ZapIcon, Star as StarIcon, Flame, Navigation } from 'lucide-react';
 import { Provider } from '../types';
@@ -10,7 +10,7 @@ import { ClinicImage } from './ClinicImage';
 import { calculateValueMetrics } from '../lib/price-utils';
 import { getStatus } from '../lib/hours';
 import { motion } from 'motion/react';
-import { ClaimListingModal } from './ClaimListingModal';
+import { useClaimListing } from '../context/ClaimListingContext';
 
 interface ProviderCardProps {
   provider: Provider;
@@ -20,7 +20,7 @@ interface ProviderCardProps {
 const DEFAULT_CLINIC_IMAGE = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg';
 
 export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
-  const [isClaimModalOpen, setIsClaimModalOpen] = useState(false);
+  const { openClaimModal } = useClaimListing();
   const slug = provider.slug || slugify(provider.name);
   const valueMetrics = calculateValueMetrics(provider);
 
@@ -82,7 +82,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             {!provider.is_featured && (
               <span className="bg-slate-400/90 backdrop-blur-sm text-white px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
-                Unclaim listing
+                UNCLAIMED
               </span>
             )}
             {provider.is_featured && (
@@ -130,6 +130,17 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
                 {provider.name}
               </h3>
             </Link>
+          </div>
+
+          {/* New Rating Section */}
+          {provider.rating > 0 && (
+            <div className="text-xs text-slate-300 mb-2 font-medium">
+              ⭐ {provider.rating} ({provider.reviewCount || 0} reviews)
+            </div>
+          )}
+
+          {/* Row 2: Delivery Type + Distance */}
+          <div className="flex items-center gap-2 mb-2">
             {isMobile ? (
               <span className="bg-wellness-500/20 backdrop-blur-sm text-wellness-200 border border-wellness-500/30 px-2 py-0.5 rounded-md text-[10px] font-bold whitespace-nowrap">
                 🚐 Mobile
@@ -139,27 +150,17 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
                 🏥 In-Clinic
               </span>
             )}
-          </div>
-
-          {/* Row 2: Rating + Distance */}
-          <div className="flex items-center gap-1.5 text-xs text-slate-300 mb-2">
-            {provider.rating > 0 && provider.reviewCount > 0 && (
-              <>
-                <div className="flex items-center gap-1">
-                  <span className="text-white font-bold">⭐ {provider.rating}</span>
-                  <span>({provider.reviewCount})</span>
-                </div>
-                <span>·</span>
-              </>
-            )}
-            {provider.distance !== undefined ? (
-              <span className="font-bold text-wellness-400 flex items-center gap-1">
-                <Navigation size={10} className="fill-wellness-400" />
-                {provider.distance} mi
-              </span>
-            ) : (
-              <span className="font-medium">{provider.city}, {provider.state || 'US'}</span>
-            )}
+            
+            <div className="flex items-center gap-1.5 text-xs text-slate-300">
+              {provider.distance !== undefined ? (
+                <span className="font-bold text-wellness-400 flex items-center gap-1">
+                  <Navigation size={10} className="fill-wellness-400" />
+                  {provider.distance} mi
+                </span>
+              ) : (
+                <span className="font-medium">{provider.city}, {provider.state || 'US'}</span>
+              )}
+            </div>
           </div>
 
           {/* Row 3: Description (Claimed Only) */}
@@ -254,7 +255,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
           
           {!provider.is_featured && (
             <button 
-              onClick={() => setIsClaimModalOpen(true)}
+              onClick={() => openClaimModal(provider)}
               className="bg-teal-500 text-white px-3 py-2.5 rounded-lg font-bold text-[12px] hover:bg-teal-600 transition-all flex items-center justify-center gap-1.5 shadow-sm uppercase tracking-wider w-full"
             >
               Claim Listing <ArrowRight size={14} />
@@ -262,12 +263,6 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
           )}
         </div>
       </div>
-
-      <ClaimListingModal 
-        provider={provider}
-        isOpen={isClaimModalOpen}
-        onClose={() => setIsClaimModalOpen(false)}
-      />
     </motion.div>
   );
 };

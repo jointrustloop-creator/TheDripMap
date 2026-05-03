@@ -161,7 +161,10 @@ export function ListingController({ initialProviders, cityName }: ListingControl
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
             {providers.map((provider) => (
-              <ProviderCard key={provider.id} provider={provider} />
+              <ProviderCard 
+                key={provider.id} 
+                provider={provider} 
+              />
             ))}
           </motion.div>
         ) : (

@@ -16,6 +16,30 @@ export async function POST(req: Request) {
     console.log('Message:', data.message);
     console.log('------------------------------------');
 
+    // Save to Supabase
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+      if (supabaseUrl && supabaseServiceKey) {
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+        await supabase.from('inquiries').insert({
+          name: data.name,
+          email: data.email,
+          phone: data.phone || null,
+          message: `Subject: ${data.subject}\n\n${data.message}`,
+          listing_id: null,
+          created_at: new Date().toISOString()
+        });
+        console.log('Inquiry saved to Supabase.');
+      } else {
+        console.warn('Supabase credentials missing. Skipping DB insert.');
+      }
+    } catch (dbError) {
+      console.error('Error saving inquiry to Supabase:', dbError);
+    }
+
     // Send email notification if Resend is configured
     if (resend) {
       await resend.emails.send({

@@ -12,13 +12,29 @@ interface ClaimListingModalProps {
   provider: Provider;
   isOpen: boolean;
   onClose: () => void;
+  email: string;
+  setEmail: (email: string) => void;
+  confirmed: boolean;
+  setConfirmed: (confirmed: boolean) => void;
+  isSubmitting: boolean;
+  setIsSubmitting: (isSubmitting: boolean) => void;
+  isSuccess: boolean;
+  setIsSuccess: (isSuccess: boolean) => void;
 }
 
-export const ClaimListingModal = ({ provider, isOpen, onClose }: ClaimListingModalProps) => {
-  const [email, setEmail] = useState('');
-  const [confirmed, setConfirmed] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+export const ClaimListingModal = ({ 
+  provider, 
+  isOpen, 
+  onClose,
+  email,
+  setEmail,
+  confirmed,
+  setConfirmed,
+  isSubmitting,
+  setIsSubmitting,
+  isSuccess,
+  setIsSuccess
+}: ClaimListingModalProps) => {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {

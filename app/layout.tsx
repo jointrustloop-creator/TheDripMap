@@ -3,6 +3,7 @@ import { Inter, Outfit } from 'next/font/google';
 import "./globals.css";
 import Script from "next/script";
 import { ErrorBoundary } from "../src/components/ErrorBoundary";
+import { ClaimListingProvider } from "../src/context/ClaimListingContext";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -136,7 +137,9 @@ export default function RootLayout({
           </>
         )}
         <ErrorBoundary>
-          {children}
+          <ClaimListingProvider>
+            {children}
+          </ClaimListingProvider>
         </ErrorBoundary>
       </body>
     </html>
