@@ -1,30 +1,33 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-
 export async function POST(req: Request) {
   try {
     const data = await req.json();
     
-    // Always log to console for visibility in logs
-    console.log('--- NEW CONTACT FORM SUBMISSION ---');
-    console.log('Date:', new Date().toLocaleString());
-    console.log('Name:', data.name);
-    console.log('Email:', data.email);
-    console.log('Subject:', data.subject);
-    console.log('Message:', data.message);
-    console.log('------------------------------------');
+    // Immediate logging for visibility
+    console.log('--- CONTACT FORM SUBMISSION RECEIVED ---');
+    console.log('Timestamp:', new Date().toISOString());
+    console.log('Payload:', JSON.stringify(data, null, 2));
+    
+    const envStatus = {
+      hasResendKey: !!process.env.RESEND_API_KEY,
+      hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      hasSupabaseServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
+    };
+    console.log('Environment Status:', envStatus);
 
-    // Save to Supabase
+    // 1. Save to Supabase (Inquiries Table)
+    let supabaseSuccess = false;
     try {
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (envStatus.hasSupabaseUrl && envStatus.hasSupabaseServiceKey) {
+        const { createClient } = await import('@supabase/supabase-js');
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
 
-      if (supabaseUrl && supabaseServiceKey) {
-        const supabase = createClient(supabaseUrl, supabaseServiceKey);
-        await supabase.from('inquiries').insert({
+        const { error: dbError } = await supabase.from('inquiries').insert({
           name: data.name,
           email: data.email,
           phone: data.phone || null,
@@ -32,42 +35,74 @@ export async function POST(req: Request) {
           listing_id: null,
           created_at: new Date().toISOString()
         });
-        console.log('Inquiry saved to Supabase.');
+
+        if (dbError) {
+          console.error('Supabase Insert Error:', dbError);
+        } else {
+          console.log('✓ Successfully saved to Supabase inquiries table.');
+          supabaseSuccess = true;
+        }
       } else {
-        console.warn('Supabase credentials missing. Skipping DB insert.');
+        console.warn('MISSING SUPABASE CREDENTIALS - Skipping DB insert');
       }
-    } catch (dbError) {
-      console.error('Error saving inquiry to Supabase:', dbError);
+    } catch (err) {
+      console.error('CRITICAL ERROR during Supabase operation:', err);
     }
 
-    // Send email notification if Resend is configured
-    if (resend) {
-      await resend.emails.send({
-        from: 'TheDripMap Support <onboarding@resend.dev>',
-        to: 'thedripmap@gmail.com',
-        subject: `[TheDripMap] New ${data.subject}: ${data.name}`,
-        text: `
-          New message from contact form:
-          
-          Name: ${data.name}
-          Email: ${data.email}
-          Subject: ${data.subject}
-          
-          Message:
-          ${data.message}
-          
-          ---
-          Date: ${new Date().toLocaleString()}
-        `,
-      });
-      console.log('Email notification sent via Resend.');
-    } else {
-      console.warn('RESEND_API_KEY not found. Skipping email notification.');
+    // 2. Send email notification via Resend
+    let emailSuccess = false;
+    try {
+      if (envStatus.hasResendKey) {
+        const resendInstance = new Resend(process.env.RESEND_API_KEY);
+        const { data: emailData, error: emailError } = await resendInstance.emails.send({
+          from: 'TheDripMap Support <onboarding@resend.dev>',
+          to: 'thedripmap@gmail.com',
+          replyTo: data.email,
+          subject: `[Contact Form] ${data.subject} from ${data.name}`,
+          text: `
+            New Contact Form Submission
+            
+            From: ${data.name}
+            Email: ${data.email}
+            Subject: ${data.subject}
+            
+            Message:
+            ${data.message}
+            
+            ---
+            Submitted at: ${new Date().toLocaleString()}
+          `,
+        });
+
+        if (emailError) {
+          console.error('Resend Email Error:', emailError);
+        } else {
+          console.log('✓ Email sent successfully:', emailData?.id);
+          emailSuccess = true;
+        }
+      } else {
+        console.warn('MISSING RESEND_API_KEY - Skipping email notification');
+      }
+    } catch (err) {
+      console.error('CRITICAL ERROR during Resend operation:', err);
     }
 
-    return NextResponse.json({ success: true, message: 'Message sent successfully' });
+    // Determine final status
+    if (!supabaseSuccess && !emailSuccess) {
+      return NextResponse.json({ 
+        success: false, 
+        message: 'Partial or complete failure - check server logs' 
+      }, { status: 500 });
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Message processed',
+      details: { supabase: supabaseSuccess, email: emailSuccess }
+    });
+
   } catch (error) {
-    console.error('Contact form error:', error);
-    return NextResponse.json({ success: false, error: 'Failed to process message' }, { status: 500 });
+    console.error('Uncaught Exception in /api/contact:', error);
+    return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }

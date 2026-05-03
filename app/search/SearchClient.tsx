@@ -473,7 +473,10 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
           ) : filteredProviders.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredProviders.map((provider) => (
-                <ProviderCard key={provider.id} provider={provider} />
+                <ProviderCard 
+                  key={provider.id} 
+                  provider={provider} 
+                />
               ))}
             </div>
           ) : (
@@ -507,7 +510,9 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 opacity-60 hover:opacity-100 transition-all duration-500">
               {filteredProviders.slice().reverse().slice(0, 4).map((provider) => (
                 <div key={`recent-${provider.id}`} className="scale-95 origin-center">
-                  <ProviderCard provider={provider} />
+                  <ProviderCard 
+                    provider={provider} 
+                  />
                 </div>
               ))}
             </div>
