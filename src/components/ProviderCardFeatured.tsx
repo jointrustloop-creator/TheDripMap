@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Sparkles, ArrowRight, Phone, Globe, Building2, TrendingUp, Zap as ZapIcon, Flame, Star as StarIcon } from 'lucide-react';
@@ -11,6 +11,7 @@ import { slugify } from '../lib/data';
 import { cn } from '../lib/utils';
 import { calculateValueMetrics } from '../lib/price-utils';
 import { motion } from 'motion/react';
+import { ClaimListingModal } from './ClaimListingModal';
 
 interface ProviderCardFeaturedProps {
   provider: Provider & { matchScore?: number };
@@ -20,6 +21,7 @@ interface ProviderCardFeaturedProps {
 }
 
 export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = true }: ProviderCardFeaturedProps) => {
+  const [isClaimModalOpen, setIsClaimModalOpen] = useState(false);
   const slug = provider.slug || slugify(provider.name);
   const valueMetrics = calculateValueMetrics(provider);
   const priceAnchor = provider.priceRange === '$' ? '$99' : provider.priceRange === '$$' ? '$149' : provider.priceRange === '$$$' ? '$199' : '$249';
@@ -38,6 +40,12 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
     if (idHash % 10 > 2) return null;
     return options[idHash % options.length];
   }, [provider.id]);
+
+  const isRealPhoto = provider.imageUrl && 
+                      !provider.imageUrl.includes('placeholder') && 
+                      !provider.imageUrl.includes('default');
+  const showAddPhotoBadge = !isRealPhoto;
+  const DEFAULT_CLINIC_IMAGE = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg';
 
   return (
     <motion.div 
@@ -62,16 +70,25 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
         )}>
           <Link href={`/provider/${slug}`} className="block h-full">
             <Image 
-              src={provider.imageUrl} 
+              src={provider.imageUrl || DEFAULT_CLINIC_IMAGE} 
               alt={`${provider.name} IV therapy clinic in ${provider.city}`}
               fill
               referrerPolicy="no-referrer"
-              className="object-cover group-hover:scale-110 transition-transform duration-700"
+              className={cn(
+                "object-cover group-hover:scale-110 transition-transform duration-700",
+                !isRealPhoto && "opacity-60 bg-slate-900"
+              )}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
           </Link>
           
+          {showAddPhotoBadge && (
+            <div className="absolute bottom-4 left-4 bg-black/40 backdrop-blur-sm text-white/90 px-3 py-1.5 rounded-xl text-[10px] font-bold flex items-center gap-2 border border-white/10 z-20">
+              📷 Add your photo — Claim this listing
+            </div>
+          )}
+
           <div className="flex flex-col gap-2 absolute top-4 left-4">
             {isPrimary && (
               <div className="bg-white/90 backdrop-blur-sm text-wellness-700 px-4 py-2 rounded-2xl text-xs font-black shadow-xl flex items-center gap-2">
@@ -107,13 +124,13 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
 
           {/* Claim Listing Overlay */}
           {!provider.is_claimed && (
-            <Link 
-              href={`/for-clinics?clinicId=${provider.id}&clinicName=${encodeURIComponent(provider.name)}`}
+            <button 
+              onClick={() => setIsClaimModalOpen(true)}
               className="absolute bottom-4 left-4 right-4 bg-wellness-600/90 backdrop-blur-md py-3 px-5 rounded-2xl flex items-center justify-center gap-3 hover:bg-wellness-700 transition-all border border-white/20 shadow-xl z-10"
             >
               <span className="text-xs font-black text-white uppercase tracking-[0.15em]">CLAIM MY LISTING</span>
               <ArrowRight size={18} className="text-white" />
-            </Link>
+            </button>
           )}
         </div>
 
@@ -202,6 +219,12 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
           </div>
         </div>
       </div>
+
+      <ClaimListingModal 
+        provider={provider}
+        isOpen={isClaimModalOpen}
+        onClose={() => setIsClaimModalOpen(false)}
+      />
     </motion.div>
   );
 };

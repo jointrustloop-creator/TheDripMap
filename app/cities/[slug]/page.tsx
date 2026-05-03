@@ -11,8 +11,10 @@ import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
 import UrgencyIndicator from '@/src/components/UrgencyIndicator';
 import { QuizCTA } from '@/src/components/QuizCTA';
 import { ListingController } from '@/src/components/ListingController';
-import { getCityBySlug, getListingsByCity } from '@/src/lib/data';
+import { getCityBySlug, getListingsByCity, getAllCities } from '@/src/lib/data';
 import { MapTrigger } from '@/src/components/MapTrigger';
+import { FAQSection } from '@/src/components/FAQSection';
+import { NearbyCities } from '@/src/components/NearbyCities';
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -115,6 +117,27 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   const listings = await getListingsByCity(cityData.name, cityData.state || '');
   const count = listings.length;
 
+  // Fetch nearby cities in the same state
+  const allCities = await getAllCities();
+  const nearbyCities = allCities
+    .filter(c => c.state === cityData.state && c.city !== cityData.name)
+    .slice(0, 5);
+
+  const faqs = [
+    {
+      question: `How many IV therapy clinics are in ${cityData.name}?`,
+      answer: `There are currently ${count} verified IV therapy providers in ${cityData.name} listed on TheDripMap, including both clinic locations and mobile services.`
+    },
+    {
+      question: `Do clinics in ${cityData.name} offer mobile services?`,
+      answer: `Yes, many providers in ${cityData.name} offer mobile IV therapy where medical professionals bring treatments directly to your home, office, or hotel. You can identify these by looking for the "Mobile Service" badge in the listings.`
+    },
+    {
+      question: `What is the average cost of IV therapy in ${cityData.name}?`,
+      answer: `While prices vary by provider and specific protocol, most standard hydration and wellness drips in ${cityData.name} range from $150 to $300. Specialized treatments like NAD+ therapy typically start at $500.`
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
@@ -133,9 +156,9 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           </h1>
         </section>
 
-        {/* 2. Listings count badge */}
+        {/* 2. Stats bar (verified providers count, high demand badge, quick map view) */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-          <div className="inline-flex items-center gap-2 bg-wellness-50 text-wellness-700 px-4 py-1.5 rounded-full text-sm font-bold border border-wellness-100">
+          <div className="inline-flex items-center gap-2 bg-wellness-50 text-wellness-700 px-4 py-1.5 rounded-full text-sm font-bold border border-wellness-100 shadow-sm">
             <MapPin size={16} />
             <span>{count} verified providers in {cityData.name}</span>
           </div>
@@ -146,24 +169,12 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           <MapTrigger />
         </div>
 
-        <UrgencyIndicator city={cityData.name} />
+        {/* 3. Urgency badges (high demand, others viewing) */}
+        <div className="mb-12">
+          <UrgencyIndicator city={cityData.name} />
+        </div>
 
-        {/* 3. ReactMarkdown rendering of data.content */}
-        {cityData.content ? (
-          <section className="mb-12">
-            <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline bg-white p-12 rounded-[3.5rem] border border-slate-100 shadow-sm">
-              <ReactMarkdown>
-                {String(cityData.content).replace(/\\n/g, '\n')}
-              </ReactMarkdown>
-            </div>
-          </section>
-        ) : (
-          <section className="mb-12 bg-white p-12 rounded-[3.5rem] border border-slate-100">
-            <p className="text-slate-500 italic text-center">Comprehensive hydration guides for {cityData.name} are currently being updated.</p>
-          </section>
-        )}
-
-        {/* List of Providers Section */}
+        {/* 4. Verified Providers listings grid */}
         {listings.length > 0 && (
           <ListingController 
             initialProviders={listings} 
@@ -171,13 +182,41 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           />
         )}
 
+        {/* 5. Match quiz CTA block */}
         <QuizCTA 
           className="mb-24"
           title={`Looking for specific results in ${cityData.name}?`}
           subtitle={`Not all IV protocols are equal. We match you based on your exact wellness goals and the specific offerings of verified ${cityData.name} clinics.`}
         />
 
-        {/* 4. CTA button */}
+        {/* 6. SEO content (all the written content about IV therapy in the city) */}
+        {cityData.content ? (
+          <section className="mb-24">
+            <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline bg-white p-12 rounded-[3.5rem] border border-slate-100 shadow-sm">
+              <ReactMarkdown>
+                {String(cityData.content).replace(/\\n/g, '\n')}
+              </ReactMarkdown>
+            </div>
+          </section>
+        ) : (
+          <section className="mb-24 bg-white p-12 rounded-[3.5rem] border border-slate-100">
+            <p className="text-slate-500 italic text-center">Comprehensive hydration guides for {cityData.name} are currently being updated.</p>
+          </section>
+        )}
+
+        {/* 7. FAQ section */}
+        <div className="-mx-6 mb-24">
+          <FAQSection faqs={faqs} title={`${cityData.name} IV Therapy FAQ`} />
+        </div>
+
+        {/* 8. Helpful Resources and related cities */}
+        {nearbyCities.length > 0 && (
+          <div className="-mx-6 mb-24">
+            <NearbyCities cities={nearbyCities} currentState={cityData.state || ''} />
+          </div>
+        )}
+
+        {/* 9. Find IV Therapy Clinics Near You CTA button */}
         <div className="flex justify-center mt-12 mb-20">
           <Link 
             href="/search"

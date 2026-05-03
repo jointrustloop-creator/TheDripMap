@@ -28,7 +28,9 @@ export const ClinicImage = ({
 }: ClinicImageProps) => {
   // Check if the image URL is forbidden or missing
   const isForbidden = imageUrl?.includes('unsplash.com') || imageUrl?.includes('photo-1519494026892-80bbd2d6fd0d');
-  const hasImage = imageUrl && !isForbidden && !imageUrl.includes('placeholder');
+  
+  // We now show "placeholder" images from Supabase if they exist
+  const hasImage = imageUrl && !isForbidden;
 
   if (!hasImage) {
     return <ClinicImagePlaceholder name={name} initials={initials} size={size} className={className} />;
