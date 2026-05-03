@@ -30,10 +30,12 @@ export default function ContactPage() {
         body: JSON.stringify(data),
       });
 
+      const result = await response.json();
+
       if (response.ok) {
         setIsSuccess(true);
       } else {
-        throw new Error('Something went wrong. Please try again.');
+        throw new Error(result.error || result.message || 'Something went wrong. Please try again.');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send message.');

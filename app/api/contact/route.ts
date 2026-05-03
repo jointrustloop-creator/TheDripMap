@@ -89,9 +89,10 @@ export async function POST(req: Request) {
 
     // Determine final status
     if (!supabaseSuccess && !emailSuccess) {
+      const errorMsg = `Submission failed: ${!envStatus.hasSupabaseUrl || !envStatus.hasSupabaseServiceKey ? '[Supabase Config Missing] ' : ''}${!envStatus.hasResendKey ? '[Resend Config Missing] ' : ''}`;
       return NextResponse.json({ 
         success: false, 
-        message: 'Partial or complete failure - check server logs' 
+        message: errorMsg || 'Partial or complete failure - check server logs' 
       }, { status: 500 });
     }
 

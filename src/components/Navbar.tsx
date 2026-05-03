@@ -15,6 +15,7 @@ export const Navbar = () => {
     { label: 'Symptoms', href: '/symptoms' },
     { label: 'Blog', href: '/blog' },
     { label: 'For Clinics', href: '/for-clinics' },
+    { label: 'Contact', href: '/contact' },
   ];
 
   return (
