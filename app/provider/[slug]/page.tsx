@@ -20,6 +20,7 @@ import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { ClinicImage } from '../../../src/components/ClinicImage';
+import { ClaimListingTrigger } from '../../../src/components/ClaimListingTrigger';
 import { 
   getListingBySlug, 
   slugify, 
@@ -458,12 +459,12 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                     <LockedField icon="📊" label="Specialization focus" text="Hangover / NAD+ / Beauty / etc." />
                   </div>
 
-                  <Link 
-                    href={`/for-clinics?clinicId=${provider.id}&clinicName=${encodeURIComponent(displayName)}&clinicCity=${encodeURIComponent(provider.city)}`}
+                  <ClaimListingTrigger 
+                    provider={provider}
                     className="inline-flex items-center gap-2 bg-wellness-600 text-white px-8 py-4 rounded-2xl font-black text-lg hover:bg-wellness-700 transition-all shadow-lg"
                   >
                     Claim This Listing Free <ArrowRight size={20} />
-                  </Link>
+                  </ClaimListingTrigger>
                 </div>
               </section>
             )}
@@ -788,12 +789,12 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 {/* CLAIM STATUS */}
                 <div className="pt-8 border-t border-slate-50">
                   {!provider.is_claimed ? (
-                    <Link 
-                      href={`/for-clinics?clinicId=${provider.id}&clinicName=${encodeURIComponent(provider.name)}`}
+                  <ClaimListingTrigger 
+                      provider={provider}
                       className="text-sm font-black text-wellness-600 hover:underline flex items-center gap-2"
                     >
                       Own this clinic? Claim your free listing
-                    </Link>
+                    </ClaimListingTrigger>
                   ) : (
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-emerald-600 font-black text-sm">
