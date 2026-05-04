@@ -297,58 +297,104 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
           />
         </div>
 
+        {provider.is_featured && (
+          <div className="mb-12 bg-emerald-600 text-white py-4 px-8 rounded-3xl text-center font-black text-lg shadow-xl shadow-emerald-100 flex items-center justify-center gap-3">
+            <CheckCircle2 size={24} /> Verified & Claimed — This listing is managed by {displayName}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-16">
           {/* LEFT COLUMN */}
           <div className="space-y-16">
             {/* HERO SECTION */}
             <section className="space-y-10">
-              <div className="relative h-[400px] md:h-[550px] rounded-[3rem] overflow-hidden shadow-2xl">
-                <ClinicImage 
-                  name={provider.name}
-                  initials={initials}
-                  imageUrl={(provider.photos && provider.photos.length > 0) ? provider.photos[0] : provider.imageUrl}
-                  size="lg"
-                  className="object-cover"
-                />
+              <div className="flex flex-col md:flex-row gap-8 items-start">
+                {provider.is_featured && provider.imageUrl && (
+                  <div className="w-[160px] h-[160px] rounded-3xl bg-white border border-slate-100 shadow-xl p-4 flex items-center justify-center overflow-hidden shrink-0">
+                    <img 
+                      src={provider.imageUrl} 
+                      alt={`${displayName} logo`}
+                      className="w-full h-full object-contain scale-110"
+                    />
+                  </div>
+                )}
+                <div>
+                  <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
+                    {displayName}
+                  </h1>
+                  
+                  {/* KEY FACTS ROW */}
+                  <div className="flex flex-wrap gap-2">
+                    <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
+                      <span className="text-wellness-600">★</span> {provider.rating} · {provider.reviewCount} reviews
+                    </div>
+                    <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
+                      <span>📍</span> {provider.city}, {stateCode}
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
-                  {displayName}
-                </h1>
-                
-                {/* KEY FACTS ROW */}
-                <div className="flex flex-wrap gap-2 mb-8">
-                  <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
-                    <span className="text-wellness-600">★</span> {provider.rating} · {provider.reviewCount} reviews
-                  </div>
-                  <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
-                    <span>📍</span> {provider.city}, {stateCode}
-                  </div>
-                  {provider.hours && (
-                    <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
-                      <span>{status.isOpen ? '🟢' : '🔴'}</span> {status.text}
-                    </div>
-                  )}
-                  {isMobile && (
-                    <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
-                      <span>🚐</span> Mobile IV available
-                    </div>
-                  )}
-                  {provider.walk_ins_welcome && (
-                    <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
-                      <span>🚶</span> Walk-ins welcome
-                    </div>
-                  )}
-                  {provider.price_range && (
-                    <div className={cn(
-                      "px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 border",
-                      valueMetrics.color
-                    )}>
-                      <span>💎</span> {valueMetrics.label} ({provider.price_range})
-                    </div>
-                  )}
+              {(!provider.is_featured || (provider.photos && provider.photos.length > 0)) && (
+                <div className="relative h-[300px] md:h-[450px] rounded-[3rem] overflow-hidden shadow-2xl">
+                  <ClinicImage 
+                    name={provider.name}
+                    initials={initials}
+                    imageUrl={(provider.photos && provider.photos.length > 0) ? provider.photos[0] : (provider.is_featured ? undefined : provider.imageUrl)}
+                    size="lg"
+                    className="object-cover"
+                  />
                 </div>
+              )}
+
+              {provider.is_featured && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {/* Info Cards */}
+                  <div className="flex flex-col gap-4">
+                    <div className="bg-white p-6 h-full rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                      <div className="text-slate-400 font-bold text-xs uppercase mb-1">Price Range</div>
+                      <div className="text-xl font-black text-slate-900">{provider.price_range || provider.priceRange || 'Competitive'}</div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <div className="bg-white p-6 h-full rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                      <div className="text-slate-400 font-bold text-xs uppercase mb-1">Administered By</div>
+                      <div className="text-xl font-black text-slate-900 line-clamp-1">{profile?.profile_data?.administerType || 'Medical Professionals'}</div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <div className="bg-white p-6 h-full rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                      <div className="text-slate-400 font-bold text-xs uppercase mb-1">Availability</div>
+                      <div className="text-xl font-black text-slate-900 flex items-center gap-2">
+                        <span className={status.isOpen ? "text-emerald-500" : "text-amber-500"}>●</span>
+                        {status.isOpen ? 'Open Now' : 'Closed'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Contact Buttons (filling space if featured) */}
+                  <div className="md:col-span-2 lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    {provider.phone && (
+                      <a 
+                        href={`tel:${provider.phone}`}
+                        className="flex items-center justify-center gap-3 bg-slate-900 text-white px-8 py-5 rounded-[2rem] font-black text-xl hover:bg-slate-800 transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+                      >
+                        📞 Call Now
+                      </a>
+                    )}
+                    {provider.website && (
+                      <a 
+                        href={provider.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-3 bg-wellness-600 text-white px-8 py-5 rounded-[2rem] font-black text-xl hover:bg-wellness-700 transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+                      >
+                        🌐 Visit Website
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
 
                 <div className="flex flex-wrap items-center gap-x-8 gap-y-4 text-base font-bold text-slate-500 mb-8">
                   <div className="flex items-center gap-2">
@@ -358,25 +404,45 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 </div>
 
                 {/* PHONE + WEBSITE ROW */}
-                {(provider.phone || provider.website) && (
+                {!provider.is_featured && (provider.phone || provider.website) && (
                   <div className="flex flex-wrap gap-4 mb-8">
                     {provider.phone && (
-                      <a 
-                        href={`tel:${provider.phone}`}
-                        className="flex items-center gap-2 text-xl font-black text-slate-900 hover:text-wellness-600 transition-colors"
-                      >
-                        <span>📞</span> {provider.phone}
-                      </a>
+                      provider.is_featured ? (
+                        <a 
+                          href={`tel:${provider.phone}`}
+                          className="flex items-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-2xl font-black text-lg hover:bg-slate-800 transition-all shadow-lg"
+                        >
+                          📞 Call Now
+                        </a>
+                      ) : (
+                        <a 
+                          href={`tel:${provider.phone}`}
+                          className="flex items-center gap-2 text-xl font-black text-slate-900 hover:text-wellness-600 transition-colors"
+                        >
+                          <span>📞</span> {provider.phone}
+                        </a>
+                      )
                     )}
                     {provider.website && (
-                      <a 
-                        href={provider.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-xl font-black text-wellness-600 hover:underline"
-                      >
-                        <span>🌐</span> Visit Website →
-                      </a>
+                      provider.is_featured ? (
+                        <a 
+                          href={provider.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 bg-wellness-600 text-white px-6 py-3 rounded-2xl font-black text-lg hover:bg-wellness-700 transition-all shadow-lg"
+                        >
+                          🌐 Visit Website
+                        </a>
+                      ) : (
+                        <a 
+                          href={provider.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-xl font-black text-wellness-600 hover:underline"
+                        >
+                          <span>🌐</span> Visit Website →
+                        </a>
+                      )
                     )}
                   </div>
                 )}
@@ -409,8 +475,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                     </span>
                   )}
                 </div>
-              </div>
-            </section>
+              </section>
 
             {/* ABOUT SECTION */}
             <SmartSummary reviews={provider.reviews_data || []} clinicName={displayName} />
@@ -419,6 +484,13 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               <section className="pt-8 border-t border-slate-100">
                 <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">About {provider.name}</h2>
                 <div className="prose prose-slate max-w-none">
+                  {provider.is_featured && (profile?.one_liner || profile?.profile_data?.oneLiner) && (
+                    <div className="mb-10 p-8 bg-wellness-50 border-l-8 border-wellness-600 rounded-r-[2rem]">
+                      <p className="text-2xl font-black text-wellness-900 italic leading-relaxed">
+                        &quot;{profile.one_liner || profile.profile_data.oneLiner}&quot;
+                      </p>
+                    </div>
+                  )}
                   <p className="text-xl text-slate-600 leading-relaxed whitespace-pre-wrap font-medium">
                     {provider.description}
                   </p>
@@ -431,10 +503,15 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               <section className="pt-8 border-t border-slate-100">
                 <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Services</h2>
                 <div className="flex flex-wrap gap-3">
-                  {provider.specialties.map((service, idx) => (
+                  {[...new Set(provider.specialties)].map((service, idx) => (
                     <span 
                       key={idx} 
-                      className="px-6 py-3 rounded-2xl bg-white border border-slate-100 text-slate-700 font-bold text-sm hover:border-wellness-200 hover:text-wellness-600 transition-all shadow-sm"
+                      className={cn(
+                        "px-6 py-3 rounded-2xl font-bold text-sm transition-all shadow-sm",
+                        provider.is_featured 
+                          ? "bg-emerald-50 border border-emerald-100 text-emerald-700 hover:bg-emerald-100" 
+                          : "bg-white border border-slate-100 text-slate-700 hover:border-wellness-200 hover:text-wellness-600"
+                      )}
                     >
                       {service}
                     </span>
@@ -443,8 +520,8 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               </section>
             )}
 
-            {/* UNCLAIMED LISTING CARD */}
-            {!provider.is_claimed && (
+            {/* UNCLAIMED LISTING CARD / FEATURED BADGE */}
+            {!provider.is_featured && !provider.is_claimed && (
               <section className="pt-8 border-t border-slate-100">
                 <div className="bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200 p-10">
                   <h3 className="text-2xl font-black text-slate-900 mb-2">This listing is unclaimed</h3>
@@ -469,8 +546,24 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               </section>
             )}
 
+            {provider.is_featured && (
+              <section className="pt-8 border-t border-slate-100">
+                <div className="bg-emerald-50 rounded-[2.5rem] border border-emerald-100 p-8 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                      <CheckCircle2 size={32} />
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-black text-emerald-900">Verified & Claimed</h4>
+                      <p className="text-emerald-700 font-bold">This provider has verified their credentials and manages this profile.</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
+
             {/* QUICK FACTS GRID */}
-            {(() => {
+            {!provider.is_featured && (() => {
               const hasFacts = (provider.price_range || provider.priceRange) || 
                                isMobile || 
                                provider.walk_ins_welcome || 
@@ -518,7 +611,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
             })()}
 
             {/* HOURS SECTION */}
-            {provider.hours && Object.keys(provider.hours).length > 0 && (
+            {!provider.is_featured && provider.hours && Object.keys(provider.hours).length > 0 && (
               <section id="hours" className="pt-8 border-t border-slate-100">
                 <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Hours</h2>
                 <div className="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm">
@@ -545,6 +638,71 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                       })}
                     </tbody>
                   </table>
+                </div>
+              </section>
+            )}
+
+            {/* HOURS AND LOCATION - SIDE BY SIDE FOR FEATURED */}
+            {provider.is_featured && (
+              <section id="location-hours" className="pt-16 border-t border-slate-100">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+                  {/* HOURS */}
+                  <div>
+                    <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Clinic Hours</h2>
+                    <div className="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm">
+                      <table className="w-full text-left border-collapse">
+                        <tbody>
+                          {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => {
+                            const dayKey = day.toLowerCase();
+                            const hours = provider.hours?.[dayKey] || 'Closed';
+                            const isToday = new Date().toLocaleDateString('en-US', { weekday: 'long' }) === day;
+                            const isClosed = hours.toLowerCase() === 'closed';
+                            
+                            return (
+                              <tr key={day} className={cn(
+                                "border-b border-slate-50 last:border-0",
+                                isToday && "bg-wellness-50/50 border-l-4 border-l-wellness-600"
+                              )}>
+                                <td className={cn("px-6 py-4 font-bold text-sm", isToday ? "text-wellness-900" : "text-slate-700")}>{day}</td>
+                                <td className={cn(
+                                  "px-6 py-4 font-bold text-sm text-right",
+                                  isClosed ? "text-slate-300" : (isToday ? "text-wellness-700" : "text-slate-600")
+                                )}>{hours}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* LOCATION */}
+                  <div>
+                    <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Location</h2>
+                    <div className="space-y-6">
+                      <div className="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100">
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className="w-12 h-12 rounded-2xl bg-wellness-100 text-wellness-600 flex items-center justify-center">
+                            <MapPin size={24} />
+                          </div>
+                          <div>
+                            <div className="text-slate-400 font-bold text-xs uppercase">Clinic Address</div>
+                            <div className="text-xl font-black text-slate-900">{provider.address}</div>
+                            <div className="text-slate-600 font-bold">{provider.city}, {stateCode}</div>
+                          </div>
+                        </div>
+                        {provider.latitude && provider.longitude && (
+                          <div className="h-48 rounded-2xl overflow-hidden bg-slate-200 border border-slate-200">
+                            <img 
+                              src={`https://api.mapbox.com/styles/v1/mapbox/light-v10/static/pin-s-plus+3b82f6(${provider.longitude},${provider.latitude})/${provider.longitude},${provider.latitude},14,0/600x300@2x?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || 'pk.eyJ1IjoiZHJpcG1hcCIsImEiOiJjbHY5Mmt4Nm0wYTZ2MmpuMGV6MGV6MGV6In0.X'}`}
+                              alt="Clinic map location"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </section>
             )}
@@ -710,6 +868,24 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               </section>
             )}
 
+            {/* UPGRADE CTA FOR CLAIMED CLINICS */}
+            {provider.is_claimed && !provider.is_featured && (
+              <section className="bg-slate-900 rounded-[3rem] p-12 text-center text-white relative overflow-hidden shadow-2xl mt-16">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-wellness-600/20 rounded-full -mr-48 -mt-48 blur-3xl opacity-50" />
+                <div className="relative z-10">
+                  <h2 className="text-3xl md:text-4xl font-black mb-6 tracking-tight">Unlock Your Clinic&apos;s Full Potential</h2>
+                  <p className="text-xl opacity-80 mb-10 max-w-xl mx-auto font-medium leading-relaxed">
+                    Upgrade to a Featured listing to get 5x more visibility, verified badges, and a custom profile redesigned for conversions.
+                  </p>
+                  <button 
+                    className="inline-flex items-center gap-3 bg-wellness-600 text-white px-12 py-6 rounded-2xl font-black text-xl hover:scale-105 transition-all shadow-xl"
+                  >
+                    View Upgrade Options <ArrowRight size={24} />
+                  </button>
+                </div>
+              </section>
+            )}
+
             {/* QUIZ CTA */}
             <section className="bg-wellness-700 rounded-[3rem] p-12 text-center text-white relative overflow-hidden shadow-2xl shadow-wellness-200">
               <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-48 -mt-48 blur-3xl" />
@@ -774,21 +950,23 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 </div>
 
                 {/* LOCATION */}
-                <div className="pt-8 border-t border-slate-50 space-y-4">
-                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Location</div>
-                  <div className="flex items-start gap-4 text-slate-900">
-                    <MapPin size={24} className="text-wellness-600 shrink-0 mt-1" />
-                    <div className="font-bold text-lg leading-relaxed">
-                      {provider.address && provider.address.split(',')[0]}
-                      {provider.address && <br />}
-                      {provider.city}, {stateCode} {provider.postal_code}
+                {!provider.is_featured && (
+                  <div className="pt-8 border-t border-slate-50 space-y-4">
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Location</div>
+                    <div className="flex items-start gap-4 text-slate-900">
+                      <MapPin size={24} className="text-wellness-600 shrink-0 mt-1" />
+                      <div className="font-bold text-lg leading-relaxed">
+                        {provider.address && provider.address.split(',')[0]}
+                        {provider.address && <br />}
+                        {provider.city}, {stateCode} {provider.postal_code}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 {/* CLAIM STATUS */}
                 <div className="pt-8 border-t border-slate-50">
-                  {!provider.is_claimed ? (
+                  {!provider.is_featured && !provider.is_claimed ? (
                   <ClaimListingTrigger 
                       provider={provider}
                       className="text-sm font-black text-wellness-600 hover:underline flex items-center gap-2"
@@ -798,7 +976,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   ) : (
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-emerald-600 font-black text-sm">
-                        <CheckCircle2 size={18} /> Official Clinic Profile
+                        <CheckCircle2 size={18} /> Verified & Claimed Profile
                       </div>
                     </div>
                   )}

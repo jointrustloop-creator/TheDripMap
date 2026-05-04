@@ -69,6 +69,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
         <ClinicImage 
           name={provider.name}
           imageUrl={provider.imageUrl || DEFAULT_CLINIC_IMAGE}
+          initials={provider.is_featured ? ' ' : undefined}
           className="group-hover:scale-105 transition-transform duration-700 h-full w-full opacity-60"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent" />
@@ -87,6 +88,9 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
             )}
             {provider.is_featured && (
               <>
+                <span className="bg-[#10B981] text-white px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
+                  ✅ Verified
+                </span>
                 {dynamicBadge && (
                   <motion.span 
                     animate={{ scale: [1, 1.05, 1] }}
@@ -95,11 +99,6 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
                   >
                     {dynamicBadge.label}
                   </motion.span>
-                )}
-                {provider.is_verified && (
-                  <span className="bg-[#10B981] text-white px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
-                    ✓ Verified
-                  </span>
                 )}
                 <span className={cn(
                   "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1 border",
@@ -165,7 +164,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
 
           {/* Row 3: Description (Claimed Only) */}
           {provider.is_featured && provider.description && (
-            <p className="text-xs text-slate-300 line-clamp-2 mb-3">
+            <p className="text-xs text-slate-300 mb-3">
               {provider.description}
             </p>
           )}
@@ -203,7 +202,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
 
         {/* Card Footer */}
         <div className="px-3 py-3 mt-auto flex flex-col gap-2 bg-gradient-to-t from-slate-950/80 to-transparent">
-          {showAddPhotoBadge && (
+          {showAddPhotoBadge && !provider.is_featured && (
             <div className="text-[10px] text-white/70 mb-1 flex items-center gap-1 font-medium">
               📷 Add your photo — Claim this listing
             </div>

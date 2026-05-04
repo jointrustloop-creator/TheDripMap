@@ -89,7 +89,7 @@ export interface BlogPost {
   metaTitle: string;
   metaDescription: string;
   excerpt?: string;
-  category: 'Educational' | 'Local' | 'Use-Case';
+  category: string;
   content: string;
   date: string;
   lastUpdated?: string;

@@ -33,6 +33,7 @@ export const ClinicImage = ({
   const hasImage = imageUrl && !isForbidden;
 
   if (!hasImage) {
+    if (initials === ' ') return null;
     return <ClinicImagePlaceholder name={name} initials={initials} size={size} className={className} />;
   }
 

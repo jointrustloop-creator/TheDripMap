@@ -191,15 +191,21 @@ export function deduplicateListings(data: any[]): any[] {
 export async function getListingsByCity(city: string, state?: string) {
   const isCityMatch = (pCity: string, search: string) => {
     if (!search || search === 'All') return true;
-    const s = search.toLowerCase().trim();
+    
+    // Handle "City, State" in the search string
+    let searchCity = search.toLowerCase().trim();
+    if (searchCity.includes(',')) {
+      searchCity = searchCity.split(',')[0].trim();
+    }
+    
     const pc = pCity.toLowerCase().trim();
-    return pc === s || slugify(pc) === slugify(s) || pc.includes(s) || s.includes(pc);
+    return pc === searchCity || slugify(pc) === slugify(searchCity);
   };
 
   if (!isSupabaseConfigured()) {
     return MOCK_LISTINGS.filter(p => 
-      isCityMatch(p.city, city) || 
-      (state && p.state?.toLowerCase() === state.toLowerCase())
+      isCityMatch(p.city, city) && 
+      (!state || p.state?.toLowerCase() === state.toLowerCase())
     ).map(enrichProvider);
   }
   
@@ -223,97 +229,81 @@ export async function getListingsByCity(city: string, state?: string) {
   }
 
   try {
-    // 1. Handle Zip Codes
-    const isZip = /^\d{5}/.test(searchCity);
-    if (isZip) {
-      const { data: zipData, error: zipError } = await supabase
+    const slugState = searchState ? slugify(searchState) : null;
+    const stateAbbr = slugState ? (STATE_MAP[slugState] || searchState) : null;
+    const isUSSearch = stateAbbr && Object.values(STATE_MAP).includes(stateAbbr.toUpperCase()) && stateAbbr.toUpperCase() !== 'ON';
+
+    // Step 1: City Match
+    const { data: fetchedData, error } = await supabase
+      .from('providers')
+      .select('*')
+      .ilike('city', `%${searchCity}%`)
+      .eq('availability', true)
+      .limit(10);
+
+    if (error) throw error;
+    let data = fetchedData || [];
+
+    // Guard: Filter out Canada results if US search
+    if (isUSSearch) {
+      data = data.filter(p => p.country?.toLowerCase() !== 'canada' && p.country?.toLowerCase() !== 'ca' && p.city !== 'Toronto');
+    }
+
+    // Step 2: State Fallback (if < 3 results)
+    if (data.length < 3 && searchState) {
+      const statePattern = searchState.replace(/'/g, "''").trim();
+      const stateAbbrPattern = stateAbbr ? stateAbbr.replace(/'/g, "''").trim() : statePattern;
+
+      const { data: stateData, error: stateError } = await supabase
         .from('providers')
         .select('*')
-        .ilike('address', `%${searchCity.substring(0, 5)}%`)
-        .limit(100);
-      
-      if (!zipError && zipData && zipData.length > 0) {
-        return zipData.map(enrichProvider);
-      }
-    }
+        .or(`state.ilike.%${statePattern}%,state.ilike.%${stateAbbrPattern}%`)
+        .eq('availability', true)
+        .limit(10);
 
-    // 2. Standard Search
-    const tryQuery = async (cityName: string, stateName?: string) => {
-      let query = supabase.from('providers').select('*');
-      
-      const gtaCitiesLower = GTA_CITIES.map(c => c.toLowerCase());
-      const isGTA = gtaCitiesLower.includes(cityName.toLowerCase()) || cityName.toLowerCase() === 'gta' || cityName.toLowerCase() === 'ontario';
-
-      // Special case for Toronto & GTA
-      if (isGTA) {
-        query = query.in('city', GTA_CITIES).eq('country', 'Canada').eq('availability', true);
-      } else {
-        query = query.ilike('city', `%${cityName}%`).eq('availability', true);
+      if (!stateError && stateData) {
+        const existingIds = new Set(data.map(p => p.id));
+        let newItems = stateData.filter(p => !existingIds.has(p.id));
         
-        if (stateName) {
-          // Use mapping to get the abbreviation if a full name was provided
-          const slugState = slugify(stateName);
-          const stateAbbr = STATE_MAP[slugState] || stateName;
-          
-          // Use actual names, not slugs, for the ilike search to match DB content
-          const statePattern = stateName.replace(/'/g, "''").trim();
-          const abbrPattern = stateAbbr.replace(/'/g, "''").trim();
-          
-          // Remove state_abbr from query as it doesn't exist in the providers table
-          query = query.or(`state.ilike.%${statePattern}%,state.ilike.%${abbrPattern}%`);
+        if (isUSSearch) {
+          newItems = newItems.filter(p => p.country?.toLowerCase() !== 'canada' && p.country?.toLowerCase() !== 'ca' && p.city !== 'Toronto');
         }
-      }
-      
-      return query.order('reviews', { ascending: false }).limit(200);
-    };
-
-    let response = await tryQuery(searchCity, searchState);
-
-    if (response.error) throw response.error;
-
-    // 3. Fallback: If nothing found with city + state, try just city
-    if ((!response.data || response.data.length === 0) && searchState) {
-      response = await tryQuery(searchCity);
-    }
-
-    // 4. Broad Fallback: Search by name or address if city search fails
-    if (!response.data || response.data.length === 0) {
-      if (searchCity.length >= 3) {
-        const { data: broadData } = await supabase
-          .from('providers')
-          .select('*')
-          .or(`name.ilike.%${searchCity}%,address.ilike.%${searchCity}%,city.ilike.%${searchCity}%`)
-          .limit(50);
         
-        if (broadData && broadData.length > 0) {
-          const seenIds = new Set<string>();
-          return broadData
-            .filter(item => item.id && !seenIds.has(item.id))
-            .map(item => {
-              seenIds.add(item.id);
-              return enrichProvider(item);
-            });
-        }
+        data = [...data, ...newItems];
       }
     }
 
-    const dbResults = (response.data || []).map(enrichProvider);
+    // Step 3: Global/Nearby Fallback (if still < 3 results)
+    if (data.length < 3) {
+      const { data: fallbackData } = await supabase
+        .from('providers')
+        .select('*')
+        .eq('availability', true)
+        .limit(10);
+      
+      if (fallbackData) {
+        const existingIds = new Set(data.map(p => p.id));
+        data = [...data, ...fallbackData.filter(p => !existingIds.has(p.id))];
+      }
+    }
 
-    // Merge with mock data to ensure real-world vetted listings are always included
-    const mockResults = MOCK_LISTINGS.filter(p => 
-      isCityMatch(p.city, searchCity) || 
-      (searchState && p.state?.toLowerCase() === searchState.toLowerCase())
-    ).map(enrichProvider);
+    const dbResults = data.map(enrichProvider);
 
-    const merged = deduplicateListings([...dbResults, ...mockResults]);
-    return merged;
+    // Merge with mock data
+    const mockResults = MOCK_LISTINGS.filter(p => {
+      const cityMatch = isCityMatch(p.city, searchCity);
+      const stateMatch = !searchState || p.state?.toLowerCase() === searchState.toLowerCase() || 
+                        (stateAbbr && stateAbbr.toUpperCase() === p.state);
+      
+      if (isUSSearch && (p.country?.toLowerCase() === 'canada' || p.city === 'Toronto')) return false;
+
+      return cityMatch || stateMatch;
+    }).map(enrichProvider);
+
+    return deduplicateListings([...dbResults, ...mockResults]);
   } catch (err) {
     console.error('Error fetching listings by city:', err);
-    // Final safety fallback to mock data
-    return MOCK_LISTINGS.filter(p => 
-      isCityMatch(p.city, searchCity) || 
-      (searchState && p.state?.toLowerCase() === searchState.toLowerCase())
-    ).map(enrichProvider);
+    return [];
   }
 }
 
@@ -331,7 +321,7 @@ export async function getListingsByState(state: string) {
     const { data, error } = await supabase
       .from('providers')
       .select('*')
-      .or(`state.ilike.${state},state.ilike.${stateAbbr}`)
+      .or(`state.ilike.%${state}%,state.ilike.%${stateAbbr}%`)
       .eq('availability', true)
       .order('reviews', { ascending: false })
       .limit(300);
@@ -577,7 +567,6 @@ export async function getCitiesWithListings() {
     const { data, error } = await supabase
       .from('providers')
       .select('city')
-      .eq('availability', true)
       .not('city', 'is', null)
       .order('city');
 
@@ -718,7 +707,7 @@ export async function searchListings(query: string, city?: string) {
       const isGTA = gtaCitiesLower.includes(city.toLowerCase()) || city.toLowerCase() === 'gta' || city.toLowerCase() === 'ontario';
       
       if (isGTA) {
-        q = q.in('city', GTA_CITIES).eq('country', 'Canada').eq('availability', true);
+        q = q.in('city', GTA_CITIES).eq('country', 'Canada');
       } else {
         q = q.ilike('city', `%${city}%`);
       }
@@ -976,6 +965,17 @@ export async function getBlogPosts() {
             relatedCities: post.relatedCities || post.related_cities || [],
             relatedClinics: post.relatedClinics || post.related_clinics || []
           };
+        }).map(post => {
+          // Runtime Categorization Fallback
+          if (!post.category || post.category === 'Educational' || post.category === 'Local' || post.category === 'Use-Case') {
+            const slug = post.slug;
+            if (['myers-cocktail', 'nad-plus', 'glutathione', 'iv-therapy-for-athletes', 'iv-therapy-for-migraines', 'iv-therapy-for-chronic-fatigue'].includes(slug)) return { ...post, category: 'Treatment Guides' };
+            if (['iv-therapy-anxiety-stress', 'iv-therapy-long-covid', 'iv-therapy-pregnancy', 'iv-therapy-immune-support'].includes(slug)) return { ...post, category: 'Conditions & Symptoms' };
+            if (['iv-therapy-toronto', 'nad-plus-toronto', 'mobile-iv-therapy-toronto', 'hangover-iv-toronto'].includes(slug)) return { ...post, category: 'City Guides' };
+            if (['iv-therapy-weight-loss', 'iv-therapy-anti-aging'].includes(slug)) return { ...post, category: 'Lifestyle & Wellness' };
+            if (['iv-therapy-insurance-coverage-canada'].includes(slug)) return { ...post, category: 'Cost & Insurance' };
+          }
+          return post;
         }) as BlogPost[];
       }
     } catch {

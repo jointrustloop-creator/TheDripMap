@@ -21,33 +21,49 @@ export function matchProviders(
   // 0. Hard Location Filtering (PRIORITY #1)
   let candidates = providers;
   
-  if (answers.city) {
-    const cityLower = answers.city.toLowerCase();
+  if (answers.city && providers.length > 0) {
+    let cityLower = answers.city.toLowerCase().trim();
+    let stateFromCity = answers.state?.toLowerCase().trim();
+
+    if (cityLower.includes(',')) {
+      const parts = cityLower.split(',').map(p => p.trim());
+      cityLower = parts[0];
+      if (!stateFromCity && parts.length > 1) {
+        stateFromCity = parts[1];
+      }
+    }
+
     const isGTASelection = ['toronto', 'gta', 'ontario'].includes(cityLower);
 
     if (isGTASelection) {
-      // Toronto/GTA Logic
       const gtaCities = ['Toronto', 'Ajax', 'Brampton', 'Mississauga', 'Oakville', 'Richmond Hill', 'Vaughan'].map(c => c.toLowerCase());
-      candidates = providers.filter(p => 
+      const filtered = providers.filter(p => 
         gtaCities.includes(p.city.toLowerCase()) && 
         (p.country?.toLowerCase() === 'canada' || p.country === 'CA')
       );
+      if (filtered.length >= 3) candidates = filtered;
     } else {
       // US or other specific city logic
-      // Exact City Match
-      candidates = providers.filter(p => 
+      const exactMatches = providers.filter(p => 
         p.city.toLowerCase() === cityLower && 
-        (!answers.state || p.state?.toLowerCase() === answers.state.toLowerCase())
+        (!stateFromCity || p.state?.toLowerCase() === stateFromCity || 
+         (stateFromCity.length === 2 && p.state === stateFromCity.toUpperCase()))
       );
 
-      // Fallback: If fewer than 3 in exact city, expand to state
-      if (candidates.length < 3 && answers.state) {
-        const stateLower = answers.state.toLowerCase();
-        const stateProviders = providers.filter(p => 
-          p.state?.toLowerCase() === stateLower &&
-          !candidates.some(c => c.id === p.id)
+      if (exactMatches.length >= 3) {
+        candidates = exactMatches;
+      } else {
+        // Broaden to state
+        const stateMatches = providers.filter(p => 
+          (p.state?.toLowerCase() === stateFromCity || (stateFromCity?.length === 2 && p.state === stateFromCity.toUpperCase()))
         );
-        candidates = [...candidates, ...stateProviders];
+        
+        if (stateMatches.length >= 3) {
+          candidates = stateMatches;
+        } else {
+          // Trust the input list (which already has tiered fallbacks from lib/data.ts)
+          candidates = providers;
+        }
       }
     }
   }

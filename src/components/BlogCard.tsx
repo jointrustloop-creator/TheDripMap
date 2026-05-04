@@ -39,9 +39,12 @@ export const BlogCard = ({ post, className }: BlogCardProps) => {
           <div className="absolute top-4 left-4 z-20">
             <span className={cn(
               "px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg",
-              post.category === 'Educational' ? "bg-blue-600 text-white" :
-              post.category === 'Local' ? "bg-wellness-600 text-white" :
-              "bg-amber-500 text-white"
+              post.category === 'Treatment Guides' ? "bg-emerald-600 text-white" :
+              post.category === 'Conditions & Symptoms' ? "bg-purple-600 text-white" :
+              post.category === 'City Guides' ? "bg-wellness-600 text-white" :
+              post.category === 'Lifestyle & Wellness' ? "bg-pink-600 text-white" :
+              post.category === 'Cost & Insurance' ? "bg-blue-600 text-white" :
+              "bg-slate-500 text-white"
             )}>
               {post.category}
             </span>

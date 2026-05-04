@@ -246,9 +246,22 @@ export default function QuizPage() {
     // Simulate analysis time
     setTimeout(() => {
       const query = new URLSearchParams();
+      
+      let finalCity = finalData.city;
+      let finalState = finalData.state;
+
+      // Ensure city and state are separated if they were typed as "City, State"
+      if (finalCity && finalCity.includes(',')) {
+        const parts = finalCity.split(',').map(p => p.trim());
+        finalCity = parts[0];
+        if (!finalState && parts.length > 1) {
+          finalState = parts[1];
+        }
+      }
+
       if (finalData.goal) query.set('goal', finalData.goal);
-      if (finalData.city) query.set('city', finalData.city);
-      if (finalData.state) query.set('state', finalData.state);
+      if (finalCity) query.set('city', finalCity);
+      if (finalState) query.set('state', finalState);
       if (finalData.lat) query.set('lat', finalData.lat.toString());
       if (finalData.lng) query.set('lng', finalData.lng.toString());
       if (finalData.country) query.set('country', finalData.country);
