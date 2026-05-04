@@ -162,6 +162,12 @@ export function enrichProvider(p: any): Provider {
     special_offers: p.special_offers || []
   } as Provider;
 
+  // Hardcoded override: Blue Cypress is In-Clinic, not Mobile
+  if (enriched.name?.toLowerCase().includes('blue cypress') || enriched.slug?.includes('blue-cypress')) {
+    enriched.type = 'In-Clinic';
+    enriched.mobile_service = false;
+  }
+
   return enriched;
 }
 
@@ -229,78 +235,83 @@ export async function getListingsByCity(city: string, state?: string) {
   }
 
   try {
-    const slugState = searchState ? slugify(searchState) : null;
-    const stateAbbr = slugState ? (STATE_MAP[slugState] || searchState) : null;
-    const isUSSearch = stateAbbr && Object.values(STATE_MAP).includes(stateAbbr.toUpperCase()) && stateAbbr.toUpperCase() !== 'ON';
-
-    // Step 1: City Match
-    const { data: fetchedData, error } = await supabase
-      .from('providers')
-      .select('*')
-      .ilike('city', `%${searchCity}%`)
-      .eq('availability', true)
-      .limit(10);
-
-    if (error) throw error;
-    let data = fetchedData || [];
-
-    // Guard: Filter out Canada results if US search
-    if (isUSSearch) {
-      data = data.filter(p => p.country?.toLowerCase() !== 'canada' && p.country?.toLowerCase() !== 'ca' && p.city !== 'Toronto');
-    }
-
-    // Step 2: State Fallback (if < 3 results)
-    if (data.length < 3 && searchState) {
-      const statePattern = searchState.replace(/'/g, "''").trim();
-      const stateAbbrPattern = stateAbbr ? stateAbbr.replace(/'/g, "''").trim() : statePattern;
-
-      const { data: stateData, error: stateError } = await supabase
+    // 1. Handle Zip Codes
+    const isZip = /^\d{5}/.test(searchCity);
+    if (isZip) {
+      const { data: zipData, error: zipError } = await supabase
         .from('providers')
         .select('*')
-        .or(`state.ilike.%${statePattern}%,state.ilike.%${stateAbbrPattern}%`)
-        .eq('availability', true)
-        .limit(10);
-
-      if (!stateError && stateData) {
-        const existingIds = new Set(data.map(p => p.id));
-        let newItems = stateData.filter(p => !existingIds.has(p.id));
-        
-        if (isUSSearch) {
-          newItems = newItems.filter(p => p.country?.toLowerCase() !== 'canada' && p.country?.toLowerCase() !== 'ca' && p.city !== 'Toronto');
-        }
-        
-        data = [...data, ...newItems];
-      }
-    }
-
-    // Step 3: Global/Nearby Fallback (if still < 3 results)
-    if (data.length < 3) {
-      const { data: fallbackData } = await supabase
-        .from('providers')
-        .select('*')
-        .eq('availability', true)
-        .limit(10);
+        .ilike('address', `%${searchCity.substring(0, 5)}%`)
+        .limit(100);
       
-      if (fallbackData) {
-        const existingIds = new Set(data.map(p => p.id));
-        data = [...data, ...fallbackData.filter(p => !existingIds.has(p.id))];
+      if (!zipError && zipData && zipData.length > 0) {
+        return zipData.map(enrichProvider);
       }
     }
 
-    const dbResults = data.map(enrichProvider);
+    // 2. Standard Search
+    const tryQuery = async (cityName: string, stateName?: string) => {
+      let query = supabase.from('providers').select('*');
+      
+      const gtaCitiesLower = GTA_CITIES.map(c => c.toLowerCase());
+      const isGTA = gtaCitiesLower.includes(cityName.toLowerCase()) || cityName.toLowerCase() === 'gta' || cityName.toLowerCase() === 'ontario';
 
-    // Merge with mock data
+      // Special case for Toronto & GTA
+      if (isGTA) {
+        query = query.in('city', GTA_CITIES).eq('country', 'Canada');
+      } else {
+        // HARD FILTER: City must match
+        query = query.ilike('city', `%${cityName}%`);
+        
+        if (stateName) {
+          // Use mapping to get the abbreviation if a full name was provided
+          const slugState = slugify(stateName);
+          const stateAbbr = STATE_MAP[slugState] || stateName;
+          
+          // Use actual names, not slugs, for the ilike search to match DB content
+          const statePattern = stateName.replace(/'/g, "''").trim();
+          const abbrPattern = stateAbbr.replace(/'/g, "''").trim();
+          
+          // HARD FILTER: State must match if provided
+          query = query.or(`state.ilike.${statePattern},state.ilike.${abbrPattern}`);
+          
+          // Enforcement: Ensure we don't match cross-country if we have a state like KY
+          const isUSState = Object.values(STATE_MAP).includes(stateAbbr.toUpperCase()) && stateAbbr.toUpperCase() !== 'ON';
+          if (isUSState) {
+            query = query.eq('country', 'US');
+          }
+        }
+      }
+      
+      return query.order('reviews', { ascending: false }).limit(200);
+    };
+
+    const response = await tryQuery(searchCity, searchState);
+
+    if (response.error) throw response.error;
+
+    // 3. Fallback: If nothing found with city + state, try state only (broadened search)
+    // ONLY if we didn't find anything in the exact city
+    if ((!response.data || response.data.length === 0) && searchState) {
+      const { getListingsByState } = await import('./data'); // Self-referential fix if needed, but we are in data.ts
+      const stateListings = await getListingsByState(searchState);
+      if (stateListings.length > 0) {
+        return stateListings.map(enrichProvider);
+      }
+    }
+
+    const dbResults = (response.data || []).map(enrichProvider);
+
+    // Merge with mock data - apply SAME strict filtering
     const mockResults = MOCK_LISTINGS.filter(p => {
       const cityMatch = isCityMatch(p.city, searchCity);
       const stateMatch = !searchState || p.state?.toLowerCase() === searchState.toLowerCase() || 
-                        (stateAbbr && stateAbbr.toUpperCase() === p.state);
-      
-      if (isUSSearch && (p.country?.toLowerCase() === 'canada' || p.city === 'Toronto')) return false;
-
-      return cityMatch || stateMatch;
+                        (STATE_MAP[slugify(searchState)] === p.state);
+      return cityMatch && stateMatch;
     }).map(enrichProvider);
 
-    return deduplicateListings([...dbResults, ...mockResults]);
+    const merged = deduplicateListings([...dbResults, ...mockResults]);
+    return merged;
   } catch (err) {
     console.error('Error fetching listings by city:', err);
     return [];
@@ -321,8 +332,7 @@ export async function getListingsByState(state: string) {
     const { data, error } = await supabase
       .from('providers')
       .select('*')
-      .or(`state.ilike.%${state}%,state.ilike.%${stateAbbr}%`)
-      .eq('availability', true)
+      .or(`state.ilike.${state},state.ilike.${stateAbbr}`)
       .order('reviews', { ascending: false })
       .limit(300);
 
