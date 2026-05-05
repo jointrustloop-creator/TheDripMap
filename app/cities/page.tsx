@@ -10,6 +10,9 @@ import { getAllCities, slugify } from '@/src/lib/data';
 export const metadata: Metadata = {
   title: 'Cities Archive - Browse IV Therapy Locations | TheDripMap',
   description: 'Explore our complete directory of cities providing IV therapy. Find top-rated clinics and mobile services across the United States.',
+  alternates: {
+    canonical: 'https://www.thedripmap.com/cities',
+  },
 };
 
 export const revalidate = 3600;

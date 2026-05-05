@@ -46,6 +46,12 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'thedripmap.com' }],
+        destination: 'https://www.thedripmap.com/:path*',
+        permanent: true,
+      },
+      {
         source: '/iv-therapy/:state/:city',
         destination: '/cities/:city',
         permanent: true,

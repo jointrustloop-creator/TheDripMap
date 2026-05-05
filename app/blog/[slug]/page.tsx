@@ -58,8 +58,8 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     openGraph: {
       title,
       description,
-      url: `https://thedripmap.com/blog/${slug}`,
-      images: [{ url: post.imageUrl || 'https://thedripmap.com/og-image.png' }],
+      url: `https://www.thedripmap.com/blog/${slug}`,
+      images: [{ url: post.imageUrl || 'https://www.thedripmap.com/og-image.png' }],
       type: 'article',
       publishedTime: post.date,
       modifiedTime: post.lastUpdated || post.date,
@@ -69,7 +69,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       card: 'summary_large_image',
       title,
       description,
-      images: [post.imageUrl || 'https://thedripmap.com/og-image.png'],
+      images: [post.imageUrl || 'https://www.thedripmap.com/og-image.png'],
     },
   };
 }
@@ -106,13 +106,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       "name": "TheDripMap",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://thedripmap.com/logo.png"
+        "url": "https://www.thedripmap.com/logo.png"
       }
     },
     "description": post.metaDescription || post.excerpt,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://thedripmap.com/blog/${slug}`
+      "@id": `https://www.thedripmap.com/blog/${slug}`
     }
   };
 
@@ -124,19 +124,19 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://thedripmap.com"
+        "item": "https://www.thedripmap.com"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Blog",
-        "item": "https://thedripmap.com/blog"
+        "item": "https://www.thedripmap.com/blog"
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": post.title,
-        "item": `https://thedripmap.com/blog/${slug}`
+        "item": `https://www.thedripmap.com/blog/${slug}`
       }
     ]
   };

@@ -10,6 +10,9 @@ import { getSiteStats } from '../../src/lib/data';
 export const metadata: Metadata = {
   title: "Our Mission & Clinical Standards | TheDripMap",
   description: "Learn about the mission behind TheDripMap. We're building the most trusted resource for IV therapy and clinical wellness in the United States.",
+  alternates: {
+    canonical: 'https://www.thedripmap.com/about',
+  },
 };
 
 export default async function AboutPage() {

@@ -12,6 +12,9 @@ import { IVAnimation } from '@/src/components/IVAnimation';
 export const metadata: Metadata = {
   title: 'IV Therapy for Symptoms & Use Cases | TheDripMap',
   description: 'Explore common reasons people seek IV therapy, from hangover recovery and jet lag to immunity boosts and skin glow. Find the right drip for your needs.',
+  alternates: {
+    canonical: 'https://www.thedripmap.com/symptoms',
+  },
 };
 
 export default async function UseCaseHubPage() {

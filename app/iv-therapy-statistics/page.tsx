@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: 'IV Therapy Statistics & Market Data 2025 | TheDripMap',
     description: `Comprehensive IV therapy market statistics from TheDripMap's directory of ${total} verified US clinics. Data on top cities, states, ratings, and trends across ${cities} cities and ${states} states.`,
     alternates: {
-      canonical: '/iv-therapy-statistics',
+      canonical: 'https://www.thedripmap.com/iv-therapy-statistics',
     },
   };
 }

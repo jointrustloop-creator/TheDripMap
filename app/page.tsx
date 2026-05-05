@@ -36,15 +36,15 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     description,
     alternates: {
-      canonical: '/',
+      canonical: 'https://www.thedripmap.com',
     },
     openGraph: {
       description,
-      url: 'https://thedripmap.com',
+      url: 'https://www.thedripmap.com',
       siteName: 'TheDripMap',
       images: [
         {
-          url: 'https://thedripmap.com/og-image.png',
+          url: 'https://www.thedripmap.com/og-image.png',
           width: 1200,
           height: 630,
           alt: 'TheDripMap - Find Your Perfect IV Therapy Match',
@@ -56,7 +56,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: {
       card: 'summary_large_image',
       description,
-      images: ['https://thedripmap.com/og-image.png'],
+      images: ['https://www.thedripmap.com/og-image.png'],
     },
   };
 }
@@ -75,7 +75,7 @@ export default async function HomePage() {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://thedripmap.com"
+        "item": "https://www.thedripmap.com"
       }
     ]
   };
@@ -84,10 +84,10 @@ export default async function HomePage() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "TheDripMap",
-    "url": "https://thedripmap.com",
+    "url": "https://www.thedripmap.com",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://thedripmap.com/search?q={search_term_string}",
+      "target": "https://www.thedripmap.com/search?q={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   };
@@ -96,8 +96,8 @@ export default async function HomePage() {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "TheDripMap",
-    "url": "https://thedripmap.com",
-    "logo": "https://thedripmap.com/logo.png",
+    "url": "https://www.thedripmap.com",
+    "logo": "https://www.thedripmap.com/logo.png",
     "sameAs": [
       "https://www.facebook.com/thedripmap",
       "https://www.instagram.com/thedripmap",

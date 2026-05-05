@@ -23,16 +23,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title,
     description,
     alternates: {
-      canonical: `/symptoms/${slug}`,
+      canonical: `https://www.thedripmap.com/symptoms/${slug}`,
     },
     openGraph: {
       title,
       description,
-      url: `https://thedripmap.com/symptoms/${slug}`,
+      url: `https://www.thedripmap.com/symptoms/${slug}`,
       type: 'website',
       images: [
         {
-          url: 'https://thedripmap.com/og-image.png',
+          url: 'https://www.thedripmap.com/og-image.png',
           width: 1200,
           height: 630,
           alt: `IV Therapy for ${useCase.title}`,
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title,
       description,
-      images: ['https://thedripmap.com/og-image.png'],
+      images: ['https://www.thedripmap.com/og-image.png'],
     },
   };
 }
@@ -89,7 +89,7 @@ export default async function UseCasePage({ params }: PageProps) {
       "@type": "ListItem",
       "position": index + 1,
       "name": crumb.label,
-      "item": `https://thedripmap.com${crumb.href}`,
+      "item": `https://www.thedripmap.com${crumb.href}`,
     })),
   };
 

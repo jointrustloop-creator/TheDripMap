@@ -12,6 +12,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
+    alternates: {
+      canonical: 'https://www.thedripmap.com/search',
+    },
     openGraph: {
       title,
       description,
