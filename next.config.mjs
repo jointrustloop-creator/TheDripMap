@@ -9,30 +9,37 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'picsum.photos',
+        pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
+        pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'loremflickr.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '*.supabase.co',
+        pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'qaqzwfnjajyejehmdvuw.supabase.co',
+        pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'i.pravatar.cc',
+        pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.mapbox.com',
+        pathname: '/**',
       },
     ],
   },

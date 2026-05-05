@@ -90,6 +90,29 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
       <head>
         <script
+          id="fix-fetch-getter"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var descriptor = Object.getOwnPropertyDescriptor(window, 'fetch');
+                  if (descriptor && !descriptor.writable && descriptor.configurable) {
+                    var originalFetch = window.fetch;
+                    Object.defineProperty(window, 'fetch', {
+                      value: originalFetch,
+                      writable: true,
+                      configurable: true,
+                      enumerable: true
+                    });
+                  }
+                } catch (e) {
+                  // Ignore errors
+                }
+              })();
+            `
+          }}
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />

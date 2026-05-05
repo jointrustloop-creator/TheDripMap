@@ -9,26 +9,30 @@ interface ResilientImageProps extends Omit<ImageProps, 'src' | 'onError'> {
 }
 
 export const ResilientImage = ({ src, fallbackSrc, alt, ...props }: ResilientImageProps) => {
-  const [imgSrc, setImgSrc] = useState(src);
-  const [hasError, setHasError] = useState(false);
+  const [imgSrc, setImgSrc] = useState(src || fallbackSrc);
+  const [hasError, setHasError] = useState(!src);
 
   // Sync state if src prop changes
   useEffect(() => {
-    setImgSrc(src);
-    setHasError(false);
-  }, [src]);
+    if (src) {
+      setImgSrc(src);
+      setHasError(false);
+    } else {
+      setImgSrc(fallbackSrc);
+      setHasError(true);
+    }
+  }, [src, fallbackSrc]);
 
-  // Determine if it's a Supabase image that might need unoptimized loading
-  const isSupabase = typeof src === 'string' && src.includes('supabase.co');
-  
+  if (!imgSrc) return null;
+
   return (
     <Image
       {...props}
       src={imgSrc}
       alt={alt}
-      unoptimized={props.unoptimized !== undefined ? props.unoptimized : isSupabase}
+      unoptimized={props.unoptimized}
       onError={() => {
-        if (!hasError) {
+        if (!hasError && fallbackSrc) {
           setImgSrc(fallbackSrc);
           setHasError(true);
         }
