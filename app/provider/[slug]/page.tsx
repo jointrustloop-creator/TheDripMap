@@ -20,6 +20,7 @@ import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { ClinicImage } from '../../../src/components/ClinicImage';
+import { ResilientImage } from '../../../src/components/ResilientImage';
 import { ClaimListingTrigger } from '../../../src/components/ClaimListingTrigger';
 import { 
   getListingBySlug, 
@@ -311,10 +312,13 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               <div className="flex flex-col md:flex-row gap-8 items-start">
                 {provider.is_featured && provider.imageUrl && (
                   <div className="w-[160px] h-[160px] rounded-3xl bg-white border border-slate-100 shadow-xl p-4 flex items-center justify-center overflow-hidden shrink-0">
-                    <img 
+                    <ResilientImage 
                       src={provider.imageUrl} 
                       alt={`${displayName} logo`}
                       className="w-full h-full object-contain scale-110"
+                      width={160}
+                      height={160}
+                      fallbackSrc="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/clinic-logo-placeholder.png"
                     />
                   </div>
                 )}
@@ -692,11 +696,13 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                           </div>
                         </div>
                         {provider.latitude && provider.longitude && (
-                          <div className="h-48 rounded-2xl overflow-hidden bg-slate-200 border border-slate-200">
-                            <img 
+                          <div className="h-48 rounded-2xl overflow-hidden bg-slate-200 border border-slate-200 relative">
+                            <ResilientImage 
                               src={`https://api.mapbox.com/styles/v1/mapbox/light-v10/static/pin-s-plus+3b82f6(${provider.longitude},${provider.latitude})/${provider.longitude},${provider.latitude},14,0/600x300@2x?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || 'pk.eyJ1IjoiZHJpcG1hcCIsImEiOiJjbHY5Mmt4Nm0wYTZ2MmpuMGV6MGV6MGV6In0.X'}`}
                               alt="Clinic map location"
-                              className="w-full h-full object-cover"
+                              fill
+                              className="object-cover"
+                              fallbackSrc="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/map-placeholder.png"
                             />
                           </div>
                         )}

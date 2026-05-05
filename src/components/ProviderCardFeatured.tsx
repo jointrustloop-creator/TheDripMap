@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { ResilientImage } from './ResilientImage';
 import { MapPin, Sparkles, ArrowRight, Phone, Globe, Building2, TrendingUp, Zap as ZapIcon, Flame, Star as StarIcon } from 'lucide-react';
 import { Provider, OperatorProfile } from '../types';
 import { ServicePill } from './ServicePill';
@@ -66,16 +66,16 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
           isPrimary ? "md:w-80 h-72 md:h-auto rounded-[2rem]" : "h-48"
         )}>
           <Link href={`/provider/${slug}`} className="block h-full">
-            <Image 
+            <ResilientImage 
               src={provider.imageUrl || DEFAULT_CLINIC_IMAGE} 
               alt={`${provider.name} IV therapy clinic in ${provider.city}`}
               fill
-              referrerPolicy="no-referrer"
               className={cn(
                 "object-cover group-hover:scale-110 transition-transform duration-700",
                 !isRealPhoto && "opacity-60 bg-slate-900"
               )}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              fallbackSrc="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/clinic-logo-placeholder.png"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
           </Link>

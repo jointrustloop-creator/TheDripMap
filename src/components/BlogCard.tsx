@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { ResilientImage } from './ResilientImage';
 import { Clock, User, ArrowRight } from 'lucide-react';
 import { BlogPost } from '../types';
 import { cn } from '../lib/utils';
@@ -19,13 +19,13 @@ export const BlogCard = ({ post, className }: BlogCardProps) => {
       <Link href={`/blog/${post.slug}`} className="block">
         <div className="relative h-56 overflow-hidden bg-[#1a3a2a] flex flex-col items-center justify-center p-6 text-center uppercase tracking-widest border-b border-[#2a4a3a]">
           {post.imageUrl && !post.imageUrl.includes('picsum.photos') ? (
-            <Image 
+            <ResilientImage 
               src={post.imageUrl} 
               alt={post.title}
               fill
-              referrerPolicy="no-referrer"
               className="object-cover group-hover:scale-110 transition-transform duration-700"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              fallbackSrc="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop"
             />
           ) : (
             <div className="relative z-10 flex flex-col items-center">

@@ -55,6 +55,8 @@ function ResultsContent() {
   const [listings, setListings] = React.useState<Provider[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isAccordionOpen, setIsAccordionOpen] = React.useState(false);
+  const [isExactMatch, setIsExactMatch] = React.useState(true);
+  const [isStateMatch, setIsStateMatch] = React.useState(true);
 
   React.useEffect(() => {
     async function loadData() {
@@ -63,7 +65,7 @@ function ResultsContent() {
         const city = searchParams.get('city');
         const state = searchParams.get('state');
         
-        // Step 1: Fetch by location
+        // Step 1: Fetch by location (tiered logic inside getListingsByCity)
         const [profilesRes, locationListingsRes] = await Promise.allSettled([
           getOperatorProfiles(),
           city ? getListingsByCity(city, state || undefined) : getAllListings()
@@ -74,13 +76,25 @@ function ResultsContent() {
           initialListings = locationListingsRes.value as Provider[];
         }
 
-        // Apply fallback: if < 3 city matches, expand to state
-        if (city && state && initialListings.length < 3) {
-          const { getListingsByState, deduplicateListings, enrichProvider } = await import('../../../src/lib/data');
-          const stateListings = await getListingsByState(state);
-          // Combine and deduplicate
-          initialListings = deduplicateListings([...initialListings, ...stateListings]).map(enrichProvider);
-        }
+        // Check if we found any exact city matches
+        const cityOnlyMatches = initialListings.filter(p => {
+          const pCity = p.city.toLowerCase().trim();
+          let searchCity = city?.toLowerCase().trim() || '';
+          if (searchCity.includes(',')) {
+            searchCity = searchCity.split(',')[0].trim();
+          }
+          return pCity === searchCity || pCity.includes(searchCity) || searchCity.includes(pCity);
+        }).length;
+
+        // Check if we found any state matches
+        const stateOnlyMatches = initialListings.filter(p => {
+          const pState = p.state?.toLowerCase().trim();
+          const searchState = state?.toLowerCase().trim() || '';
+          return pState === searchState || (searchState.length === 2 && pState === searchState);
+        }).length;
+
+        setIsExactMatch(cityOnlyMatches > 0);
+        setIsStateMatch(stateOnlyMatches > 0);
 
         if (profilesRes.status === 'fulfilled') setOperatorProfiles(profilesRes.value as OperatorProfile[]);
         setListings(initialListings);
@@ -309,6 +323,18 @@ function ResultsContent() {
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">
             These clinics were selected based on your answers
           </h1>
+          {!isExactMatch && surveyData.city && (
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 max-w-2xl mx-auto flex items-center gap-3 text-amber-800">
+              <MapPin className="shrink-0" size={20} />
+              <p className="text-sm font-medium text-left">
+                {isStateMatch ? (
+                  <>No exact matches found in <span className="font-bold">{surveyData.city}</span>. We&apos;ve expanded your search to include top-rated providers across <span className="font-bold">{surveyData.state || 'your state'}</span>.</>
+                ) : (
+                  <>Showing nearby results — no exact matches found in <span className="font-bold">{surveyData.city}</span> or <span className="font-bold">{surveyData.state || 'your state'}</span>.</>
+                )}
+              </p>
+            </div>
+          )}
           <p className="text-lg text-slate-500 max-w-2xl mx-auto mb-10">
             Our algorithm analyzed hundreds of data points to find your best clinical fit in <span className="text-slate-900 font-bold">{surveyData.city || 'your area'}</span>.
           </p>

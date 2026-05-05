@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
+import { ResilientImage } from './ResilientImage';
 import { cn } from '../lib/utils';
 import { ClinicImagePlaceholder } from './ClinicImagePlaceholder';
 
@@ -14,7 +14,10 @@ interface ClinicImageProps {
   width?: number;
   height?: number;
   size?: 'sm' | 'lg';
+  fallbackSrc?: string;
 }
+
+const DEFAULT_FALLBACK = 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop';
 
 export const ClinicImage = ({ 
   name, 
@@ -24,13 +27,11 @@ export const ClinicImage = ({
   fill = true,
   width,
   height,
-  size = 'sm'
+  size = 'sm',
+  fallbackSrc = DEFAULT_FALLBACK
 }: ClinicImageProps) => {
-  // Check if the image URL is forbidden or missing
-  const isForbidden = imageUrl?.includes('unsplash.com') || imageUrl?.includes('photo-1519494026892-80bbd2d6fd0d');
-  
   // We now show "placeholder" images from Supabase if they exist
-  const hasImage = imageUrl && !isForbidden;
+  const hasImage = !!imageUrl;
 
   if (!hasImage) {
     if (initials === ' ') return null;
@@ -38,14 +39,14 @@ export const ClinicImage = ({
   }
 
   return (
-    <Image
+    <ResilientImage
       src={imageUrl}
+      fallbackSrc={fallbackSrc}
       alt={name}
       fill={fill}
       width={width}
       height={height}
       className={cn("object-cover", className)}
-      referrerPolicy="no-referrer"
     />
   );
 };

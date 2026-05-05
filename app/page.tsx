@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { ResilientImage } from '../src/components/ResilientImage';
 import Link from 'next/link';
 import { 
   Zap, 
@@ -141,8 +141,9 @@ export default async function HomePage() {
       {/* Hero Section */}
       <section className="relative pt-32 pb-40 px-6 overflow-hidden min-h-[85vh] flex items-center">
         <div className="absolute inset-0 z-0">
-          <Image 
+          <ResilientImage 
             src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg"
+            fallbackSrc="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop"
             alt="Professional IV Therapy Clinic"
             fill
             className="object-cover"
@@ -281,8 +282,9 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="relative h-[400px] md:h-[600px] rounded-[3rem] overflow-hidden shadow-2xl">
-              <Image 
+              <ResilientImage 
                 src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-two-women.jpg"
+                fallbackSrc="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1920&auto=format&fit=crop"
                 alt="Friends receiving IV therapy"
                 fill
                 className="object-cover"
@@ -294,8 +296,9 @@ export default async function HomePage() {
               </div>
             </div>
             <div className="relative h-[400px] md:h-[600px] rounded-[3rem] overflow-hidden shadow-2xl">
-              <Image 
+              <ResilientImage 
                 src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-man-lounge.jpg"
+                fallbackSrc="https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=1920&auto=format&fit=crop"
                 alt="Man relaxing during IV therapy"
                 fill
                 className="object-cover"
@@ -334,8 +337,9 @@ export default async function HomePage() {
           </div>
           <div className="flex-1 w-full">
             <div className="relative h-[500px] md:h-[650px] rounded-[4rem] overflow-hidden shadow-2xl skew-y-3 md:skew-y-0 md:rotate-3 hover:rotate-0 transition-transform duration-700">
-              <Image 
+              <ResilientImage 
                 src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-woman-home.jpg"
+                fallbackSrc="https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?q=80&w=2070&auto=format&fit=crop"
                 alt="Woman receiving IV therapy at home"
                 fill
                 className="object-cover"
@@ -433,8 +437,9 @@ export default async function HomePage() {
       {/* Bottom CTA Section */}
       <section className="py-32 px-6 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image 
+          <ResilientImage 
             src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-woman-relaxing.jpg"
+            fallbackSrc="https://images.unsplash.com/photo-1537368910025-700350fe46c7?q=80&w=2070&auto=format&fit=crop"
             alt="Woman relaxing"
             fill
             className="object-cover"
