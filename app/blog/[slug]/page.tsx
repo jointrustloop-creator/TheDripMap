@@ -15,6 +15,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { ResilientImage } from '../../../src/components/ResilientImage';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
@@ -223,12 +224,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
             {post.imageUrl ? (
               <div className="relative h-[300px] md:h-[450px] rounded-[3rem] overflow-hidden mb-16 shadow-2xl">
-                <Image
+                <ResilientImage
                   src={post.imageUrl}
                   alt={post.title}
                   fill
                   className="object-cover"
                   priority
+                  fallbackSrc="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop"
                 />
               </div>
             ) : (
@@ -296,7 +298,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                       className="group flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 transition-all"
                     >
                       <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0">
-                        <Image src={clinic.imageUrl || `https://picsum.photos/seed/${clinic.id}/200/200`} alt={clinic.name} fill className="object-cover" referrerPolicy="no-referrer" />
+                        <ResilientImage 
+                          src={clinic.imageUrl || `https://picsum.photos/seed/${clinic.id}/200/200`} 
+                          alt={clinic.name} 
+                          fill 
+                          className="object-cover"
+                          fallbackSrc="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/clinic-logo-placeholder.png"
+                        />
                       </div>
                       <div>
                         <h4 className="font-bold text-slate-900 group-hover:text-wellness-600 transition-colors line-clamp-1">{clinic.name}</h4>

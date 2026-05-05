@@ -148,6 +148,7 @@ export default async function HomePage() {
             fill
             className="object-cover"
             priority
+            unoptimized
           />
           <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[2px]" />
         </div>
@@ -288,6 +289,7 @@ export default async function HomePage() {
                 alt="Friends receiving IV therapy"
                 fill
                 className="object-cover"
+                unoptimized
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-10 left-10 text-white">
@@ -302,6 +304,7 @@ export default async function HomePage() {
                 alt="Man relaxing during IV therapy"
                 fill
                 className="object-cover"
+                unoptimized
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-10 left-10 text-white">
@@ -343,6 +346,7 @@ export default async function HomePage() {
                 alt="Woman receiving IV therapy at home"
                 fill
                 className="object-cover"
+                unoptimized
               />
             </div>
           </div>
@@ -443,6 +447,7 @@ export default async function HomePage() {
             alt="Woman relaxing"
             fill
             className="object-cover"
+            unoptimized
           />
           <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" />
         </div>

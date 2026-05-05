@@ -18,11 +18,15 @@ export const ResilientImage = ({ src, fallbackSrc, alt, ...props }: ResilientIma
     setHasError(false);
   }, [src]);
 
+  // Determine if it's a Supabase image that might need unoptimized loading
+  const isSupabase = typeof src === 'string' && src.includes('supabase.co');
+  
   return (
     <Image
       {...props}
       src={imgSrc}
       alt={alt}
+      unoptimized={props.unoptimized !== undefined ? props.unoptimized : isSupabase}
       onError={() => {
         if (!hasError) {
           setImgSrc(fallbackSrc);
