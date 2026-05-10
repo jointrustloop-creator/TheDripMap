@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Activity, Users, Plus, TrendingUp } from 'lucide-react';
+import React from 'react';
+import { Activity, Plus, TrendingUp } from 'lucide-react';
 
 interface LiveStatsBarProps {
   stats?: {
@@ -12,19 +12,6 @@ interface LiveStatsBarProps {
 }
 
 export default function LiveStatsBar({ stats: incomingStats }: LiveStatsBarProps) {
-  const [usersCount, setUsersCount] = useState(42);
-
-  // Fluctuating user count to simulate real-time activity
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setUsersCount(prev => {
-        const change = Math.floor(Math.random() * 5) - 2; // -2 to +2
-        return Math.max(30, Math.min(60, prev + change));
-      });
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
   const stats = [
     { 
       icon: <Activity size={14} className="text-emerald-500" />, 
@@ -40,11 +27,6 @@ export default function LiveStatsBar({ stats: incomingStats }: LiveStatsBarProps
       icon: <Plus size={14} className="text-wellness-500" />, 
       text: `New Clinics Added ${incomingStats?.growth || 'Weekly'}`,
       label: "Expansion"
-    },
-    { 
-      icon: <Users size={14} className="text-amber-500" />, 
-      text: `${usersCount} Users Searching Right Now`,
-      label: "Live"
     },
   ];
 

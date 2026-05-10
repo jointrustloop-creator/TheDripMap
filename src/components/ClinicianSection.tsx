@@ -50,14 +50,7 @@ export const ClinicianSection = ({ stats }: ClinicianSectionProps) => {
             <div className="flex items-center gap-8">
               <div className="text-center">
                 <div className="text-2xl md:text-3xl font-black text-white">{stats.totalListings}+</div>
-                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Clinics</div>
-              </div>
-              <div className="w-px h-8 bg-slate-800" />
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-black text-white">
-                  {stats.avgRating || '4.9'}★
-                </div>
-                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Avg Rating</div>
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Clinics Verified</div>
               </div>
             </div>
 

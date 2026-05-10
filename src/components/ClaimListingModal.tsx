@@ -49,19 +49,52 @@ export const ClaimListingModal = ({
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
 
-      const { error: submitError } = await supabase
-        .from('claim_requests')
-        .insert({
-          listing_id: provider.id,
-          email: email,
-          token: token,
-          expires_at: expiresAt.toISOString(),
-          created_at: new Date().toISOString()
+      let dbSuccess = false;
+      try {
+        const { error: submitError } = await supabase
+          .from('claim_requests')
+          .insert({
+            listing_id: provider.id,
+            email: email,
+            token: token,
+            expires_at: expiresAt.toISOString(),
+            created_at: new Date().toISOString()
+          });
+        
+        if (!submitError) {
+          dbSuccess = true;
+        } else {
+          console.warn('Supabase insertion error:', submitError);
+        }
+      } catch (dbErr) {
+        console.warn('Supabase connection error:', dbErr);
+      }
+
+      // Always try notification even if DB fails
+      let notifySuccess = false;
+      try {
+        const response = await fetch('/api/notify-operator', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clinicName: provider.name,
+            ownerName: 'Claim Request',
+            email: email,
+            specialty: (provider.specialties && provider.specialties[0]) || 'N/A'
+          })
         });
+        if (response.ok) {
+          notifySuccess = true;
+        }
+      } catch (notifyErr) {
+        console.warn('Notification fallback failed:', notifyErr);
+      }
 
-      if (submitError) throw submitError;
-
-      setIsSuccess(true);
+      if (dbSuccess || notifySuccess) {
+        setIsSuccess(true);
+      } else {
+        throw new Error('Both database and notification systems are currently unavailable.');
+      }
     } catch (err) {
       console.error('Error submitting claim:', err);
       const errorResponse = err as { message?: string };

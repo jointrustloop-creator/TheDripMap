@@ -237,7 +237,7 @@ export default async function HomePage() {
               </div>
               <div className="text-left">
                 <h4 className="font-bold text-slate-900 text-sm">{stats.total} Top-Rated Clinics</h4>
-                <p className="text-slate-500 text-xs leading-relaxed">Real businesses with real patient reviews</p>
+                <p className="text-slate-500 text-xs leading-relaxed">529 verified IV therapy providers</p>
               </div>
             </div>
             <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm">

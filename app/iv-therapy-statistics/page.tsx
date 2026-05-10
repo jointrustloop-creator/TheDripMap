@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: 'IV Therapy Statistics & Market Data 2025 | TheDripMap',
-    description: `Comprehensive IV therapy market statistics from TheDripMap's directory of ${total} verified US clinics. Data on top cities, states, ratings, and trends across ${cities} cities and ${states} states.`,
+    description: `Comprehensive IV therapy market statistics from TheDripMap's directory of ${total} verified US clinics. Data on top cities, states, and trends across ${cities} cities and ${states} states.`,
     alternates: {
       canonical: 'https://www.thedripmap.com/iv-therapy-statistics',
     },
@@ -54,10 +54,6 @@ export default async function StatisticsPage() {
     {
       question: "Which US city has the most IV therapy clinics?",
       answer: `${topCities[0]?.city} has the highest concentration of IV therapy clinics in the United States with ${topCities[0]?.count} providers listed on TheDripMap. ${topCities[1]?.city}, ${topCities[1]?.state} ranks second with ${topCities[1]?.count} clinics, followed by ${topCities[2]?.city} with ${topCities[2]?.count}.`
-    },
-    {
-      question: "What is the average rating of IV therapy clinics?",
-      answer: `The average Google rating across all IV therapy clinics listed on TheDripMap is ${stats.avgRating} out of 5 stars. High satisfaction reflects the personalized nature of clinical wellness drips.`
     },
     {
       question: "Are IV therapy clinics available in my city?",
@@ -152,7 +148,7 @@ export default async function StatisticsPage() {
         </section>
 
         {/* Section 1: Key Stats Row */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-24">
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
             <StatCard 
               number={stats.total.toLocaleString()} 
               label="IV therapy clinics listed" 
@@ -162,11 +158,6 @@ export default async function StatisticsPage() {
               number={stats.cities.toLocaleString()} 
               label="Cities with IV therapy clinics" 
               sub={`In ${stats.states} US states`} 
-            />
-            <StatCard 
-              number={`${stats.avgRating}★`} 
-              label="Average clinic rating" 
-              sub="From verified Google reviews" 
             />
             <StatCard 
               number={Math.round(stats.totalReviews / stats.total).toLocaleString()} 
@@ -240,40 +231,6 @@ export default async function StatisticsPage() {
               </div>
             ))}
           </div>
-        </section>
-
-        {/* Section 4: Ratings & Quality */}
-        <section className="mb-24">
-          <h2 className="text-3xl font-black text-slate-900 mb-6 tracking-tight">IV Therapy Clinic Ratings in the United States</h2>
-          <p className="text-lg text-slate-600 mb-10 max-w-4xl leading-relaxed">
-            IV therapy clinics consistently receive exceptionally high ratings from patients. The average rating across all TheDripMap-listed clinics is 4.9 out of 5, reflecting the personalized, attentive nature of IV therapy services compared to traditional medical settings.
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          <StatCard 
-            number={Math.round(stats.total * 0.72).toLocaleString()} 
-            label="Highly rated clinics" 
-            sub="4.9+ star rating or better" 
-          />
-          <StatCard 
-            number={Math.round(stats.total * 0.96).toLocaleString()} 
-            label="Clinics rated 4.5 stars or above" 
-            sub="96% of all listed providers" 
-          />
-          <StatCard 
-            number={stats.avgRating} 
-            label="Average rating across all clinics" 
-            sub="Based on verified Google reviews" 
-          />
-          <StatCard 
-            number={reviewVolume[0].clinics.toLocaleString()} 
-            label="Clinics with 100+ reviews" 
-            sub={`${reviewVolume[0].percentage} have substantial review history`} 
-          />
-          </div>
-          <p className="text-lg text-slate-600 leading-relaxed max-w-5xl">
-            The high average rating of {stats.avgRating} stars across {stats.total.toLocaleString()} clinics reflects the premium, personalized nature of IV therapy services. Unlike traditional medical facilities where wait times and impersonal care often result in lower satisfaction scores, IV therapy clinics typically offer appointment-based or walk-in services in spa-like environments with attentive one-on-one care.
-          </p>
         </section>
 
         {/* Section 5: Review Volume */}

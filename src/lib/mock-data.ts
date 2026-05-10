@@ -4,7 +4,7 @@ export const MOCK_CITIES: { city: string, state: string }[] = [
   { city: 'New York', state: 'NY' },
   { city: 'San Francisco', state: 'CA' },
   { city: 'Clearwater', state: 'FL' },
-  { city: 'Washington DC', state: 'DC' },
+  { city: 'Washington', state: 'DC' },
   { city: 'Kansas City', state: 'MO' },
   { city: 'Tampa', state: 'FL' },
   { city: 'Fairfax', state: 'VA' },

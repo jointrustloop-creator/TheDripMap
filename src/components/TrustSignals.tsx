@@ -6,7 +6,6 @@ import {
   Building2, 
   Map, 
   Globe, 
-  Star,
   CheckCircle2
 } from 'lucide-react';
 
@@ -38,12 +37,6 @@ export const TrustSignals = ({ stats: dynamicStats }: TrustSignalsProps) => {
       value: dynamicStats?.totalStates?.toString() || '...', 
       icon: <Globe className="text-wellness-600" size={24} />,
       suffix: '+'
-    },
-    { 
-      label: 'Average clinic rating', 
-      value: dynamicStats?.avgRating?.toFixed(1) || '...', 
-      icon: <Star className="text-amber-500 fill-amber-500" size={24} />,
-      suffix: '★'
     },
   ];
 
@@ -88,7 +81,7 @@ export const TrustSignals = ({ stats: dynamicStats }: TrustSignalsProps) => {
           className="mt-16 flex items-center justify-center gap-2 text-slate-500 font-medium text-sm"
         >
           <CheckCircle2 size={16} className="text-wellness-600" />
-          <span>Updated daily from verified Google Maps data across the United States.</span>
+          <span>Clinics verified by our team</span>
         </motion.div>
       </div>
     </section>

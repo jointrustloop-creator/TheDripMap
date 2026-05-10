@@ -12,7 +12,7 @@ export const Footer = () => {
     { city: 'Houston', state: 'TX', slug: 'houston', country: 'US' },
     { city: 'San Diego', state: 'CA', slug: 'san-diego', country: 'US' },
     { city: 'Tampa', state: 'FL', slug: 'tampa', country: 'US' },
-    { city: 'Washington DC', state: 'DC', slug: 'washington-dc', country: 'US' },
+    { city: 'Washington', state: 'DC', slug: 'washington', country: 'US' },
     { city: 'Kansas City', state: 'MO', slug: 'kansas-city', country: 'US' },
   ];
 

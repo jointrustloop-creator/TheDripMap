@@ -20,12 +20,14 @@ export async function generateMetadata({ params }: { params: Promise<{ service: 
   
   const title = `${serviceName} IV Therapy Near Me — Top Rated Clinics | TheDripMap`;
   const description = `Find and compare the best ${serviceName} IV therapy providers. Browse top-rated clinics and mobile services specializing in ${serviceName} protocols to help you reach your wellness goals.`;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://thedripmap.com';
+  const siteUrl = 'https://www.thedripmap.com';
 
   return {
     title,
     description,
-    robots: 'noindex, nofollow',
+    alternates: {
+      canonical: `${siteUrl}/treatments/${resolvedParams.service}`,
+    },
     openGraph: {
       title,
       description,
@@ -34,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<{ service: 
       type: 'website',
       images: [
         {
-          url: '/og-image.png',
+          url: `${siteUrl}/og-image.png`,
           width: 1200,
           height: 630,
           alt: `${serviceName} IV Therapy`,
@@ -45,7 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ service: 
       card: 'summary_large_image',
       title,
       description,
-      images: ['/og-image.png'],
+      images: [`${siteUrl}/og-image.png`],
     },
   };
 }

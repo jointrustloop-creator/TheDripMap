@@ -104,6 +104,9 @@ export default async function ForClinicsPage() {
                 <div className="w-full py-3 text-center text-slate-300 font-bold text-sm border-2 border-slate-50 rounded-xl">
                   Claim this listing
                 </div>
+                <p className="mt-4 text-[10px] text-slate-400 italic text-center">
+                  Example listing shown for illustration purposes only
+                </p>
               </div>
               <p className="text-sm text-slate-400 font-medium italic text-center">
                 Missing clinical details, verified badges, and direct booking links.
