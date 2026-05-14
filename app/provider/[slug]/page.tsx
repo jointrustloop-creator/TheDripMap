@@ -318,7 +318,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                       className="w-full h-full object-contain scale-110"
                       width={160}
                       height={160}
-                      fallbackSrc="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/clinic-logo-placeholder.png"
+                      fallbackSrc="src={provider.imageUrl || provider.image_url || 'https://...clinic-logo-placeholder.png'}"
                     />
                   </div>
                 )}
