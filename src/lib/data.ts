@@ -300,15 +300,25 @@ export async function getListingsByCity(city: string, state?: string) {
       }
     }
 
-    const dbResults = (response.data || []).map(enrichProvider);
+      const dbResults = (response.data || []).map(enrichProvider);
 
-    // Merge with mock data - apply SAME strict filtering
-    const mockResults = MOCK_LISTINGS.filter(p => {
-      const cityMatch = isCityMatch(p.city, searchCity);
-      const stateMatch = !searchState || p.state?.toLowerCase() === searchState.toLowerCase() || 
-                        (STATE_MAP[slugify(searchState)] === p.state);
-      return cityMatch && stateMatch;
-    }).map(enrichProvider);
+      // Merge with mock data - apply SAME strict filtering
+      const mockResults = MOCK_LISTINGS.filter(p => {
+        const cityMatch = isCityMatch(p.city, searchCity);
+        const stateMatch = !searchState || p.state?.toLowerCase() === searchState.toLowerCase() || 
+                          (STATE_MAP[slugify(searchState)] === p.state);
+                          
+        // Final sanity check: if state is provided, don't allow wrong country in mock results
+        if (searchState) {
+          const slugState = slugify(searchState);
+          const stateAbbr = STATE_MAP[slugState] || searchState;
+          const isUSState = Object.values(STATE_MAP).includes(stateAbbr.toUpperCase()) && stateAbbr.toUpperCase() !== 'ON';
+          if (isUSState && p.country?.toLowerCase() === 'canada') return false;
+          if (!isUSState && stateAbbr.toUpperCase() === 'ON' && (p.country?.toLowerCase() === 'us' || p.country?.toLowerCase() === 'usa')) return false;
+        }
+
+        return cityMatch && stateMatch;
+      }).map(enrichProvider);
 
     const merged = deduplicateListings([...dbResults, ...mockResults]);
     return merged;
@@ -325,14 +335,23 @@ export async function getListingsByState(state: string) {
     ).map(enrichProvider);
   }
   
-  const slugState = slugify(state);
-  const stateAbbr = STATE_MAP[slugState] || state;
-  
   try {
-    const { data, error } = await supabase
+    const slugState = slugify(state);
+    const stateAbbr = STATE_MAP[slugState] || state;
+    const isUSState = Object.values(STATE_MAP).includes(stateAbbr.toUpperCase()) && stateAbbr.toUpperCase() !== 'ON';
+
+    let query = supabase
       .from('providers')
       .select('*')
-      .or(`state.ilike.${state},state.ilike.${stateAbbr}`)
+      .or(`state.ilike.${state},state.ilike.${stateAbbr}`);
+    
+    if (isUSState) {
+      query = query.eq('country', 'US');
+    } else if (stateAbbr.toUpperCase() === 'ON' || state.toLowerCase() === 'ontario') {
+      query = query.eq('country', 'Canada');
+    }
+
+    const { data, error } = await query
       .order('reviews', { ascending: false })
       .limit(300);
 
@@ -565,6 +584,59 @@ export async function getCitiesFromListings() {
     .filter(c => c.count >= 3)
     .sort((a, b) => b.count - a.count)
     .slice(0, 12);
+}
+
+export async function getPopularCities() {
+  const allCities = await getAllCities();
+  const requestedSlugs = [
+    'toronto',
+    'new-york',
+    'los-angeles',
+    'chicago',
+    'houston',
+    'san-diego',
+    'washington',
+    'clearwater'
+  ];
+  
+  const requestedNames: Record<string, string> = {
+    'toronto': 'Toronto & GTA',
+    'new-york': 'New York',
+    'los-angeles': 'Los Angeles',
+    'chicago': 'Chicago',
+    'houston': 'Houston',
+    'san-diego': 'San Diego',
+    'washington': 'Washington DC',
+    'clearwater': 'Clearwater'
+  };
+
+  // For Toronto, we want to sum GTA cities if they are in the database
+  const gtaLower = GTA_CITIES.map(c => c.toLowerCase());
+  const torontoGTA = allCities.filter(c => 
+    gtaLower.includes(c.city.toLowerCase())
+  );
+  const torontoCount = torontoGTA.reduce((sum, c) => sum + c.count, 0);
+
+  const results = requestedSlugs.map(slug => {
+    if (slug === 'toronto') {
+      return {
+        name: 'Toronto & GTA',
+        slug: 'toronto',
+        count: torontoCount
+      };
+    }
+    
+    // Find matching city by slug
+    const found = allCities.find(c => slugify(c.city) === slug);
+    
+    return {
+      name: requestedNames[slug] || slug,
+      slug: slug,
+      count: found ? found.count : 0
+    };
+  });
+
+  return results;
 }
 
 export async function getCitiesWithListings() {

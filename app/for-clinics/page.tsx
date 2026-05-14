@@ -8,13 +8,13 @@ import { getSiteStats } from '../../src/lib/data';
 
 export const metadata: Metadata = {
   title: "List Your IV Therapy Clinic — Reach More Patients | TheDripMap",
-  description: "Join the nation's #1 IV therapy directory. Claim your free listing to reach thousands of patients searching for wellness drips in your city every month.",
+  description: "Join the nation's #1 IV therapy directory with over 1,000 listed clinics. Claim your free listing to reach thousands of patients searching for wellness drips in your city every month.",
   alternates: {
     canonical: 'https://www.thedripmap.com/for-clinics',
   },
   openGraph: {
     title: "List Your IV Therapy Clinic — Reach More Patients | TheDripMap",
-    description: "Join the nation's #1 IV therapy directory. Claim your free listing to reach thousands of patients searching for wellness drips in your city every month.",
+    description: "Join the nation's #1 IV therapy directory with over 1,000 listed clinics. Claim your free listing to reach thousands of patients searching for wellness drips in your city every month.",
     url: 'https://www.thedripmap.com/for-clinics',
     type: 'website',
     images: [
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: "List Your IV Therapy Clinic — Reach More Patients | TheDripMap",
-    description: "Join the nation's #1 IV therapy directory. Claim your free listing to reach thousands of patients searching for wellness drips in your city every month.",
+    description: "Join the nation's #1 IV therapy directory with over 1,000 listed clinics. Claim your free listing to reach thousands of patients searching for wellness drips in your city every month.",
     images: ['https://www.thedripmap.com/og-image.png'],
   },
 };

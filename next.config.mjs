@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-// Fresh build trigger
+// Fresh build trigger v3 - forcing image cache bust
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,

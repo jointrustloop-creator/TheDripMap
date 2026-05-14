@@ -59,8 +59,10 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
     <motion.div 
       whileHover={{ y: -5 }}
       className={cn(
-        "group relative rounded-3xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full bg-slate-900",
-        !provider.is_featured && "border-slate-200",
+        "group relative rounded-3xl border overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full bg-slate-900",
+        provider.is_featured 
+          ? "border-wellness-500 shadow-wellness-500/10 ring-1 ring-wellness-500/20" 
+          : "border-slate-800",
         className
       )}
     >
@@ -82,14 +84,14 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
           {/* Top Left Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             {!provider.is_featured && (
-              <span className="bg-slate-400/90 backdrop-blur-sm text-white px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
-                UNCLAIMED
+              <span className="bg-slate-500/80 backdrop-blur-sm text-white px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                Unclaimed
               </span>
             )}
             {provider.is_featured && (
               <>
                 <span className="bg-[#10B981] text-white px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
-                  ✅ Verified
+                  ✅ Verified & Claimed
                 </span>
                 {dynamicBadge && (
                   <motion.span 
@@ -132,7 +134,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
           </div>
 
           {/* New Rating Section */}
-          {provider.rating > 0 && (
+          {provider.is_featured && provider.rating > 0 && provider.reviewCount > 0 && (
             <div className="text-xs text-slate-300 mb-2 font-medium">
               ⭐ {provider.rating} ({provider.reviewCount || 0} reviews)
             </div>
@@ -171,33 +173,41 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
 
           {/* Row 4: Price Range (Claimed Only) */}
           {provider.is_featured && (provider.price_range || provider.priceRange) && (
-            <div className="text-xs font-bold text-white mb-3">
+            <div className="text-xs font-bold text-wellness-400 mb-3">
               {provider.price_range || provider.priceRange}
             </div>
           )}
 
-          {/* Row 5: Service Pills (Claimed Only) */}
-          {provider.is_featured && (
-            <div className="flex flex-wrap gap-1.5 mt-auto">
-              {(provider.services || []).length > 0 ? (
-                provider.services?.slice(0, 3).map((s, idx) => {
-                  const name = typeof s === 'string' ? s : (s?.name || '');
-                  if (!name) return null;
-                  return (
-                    <span key={idx} className="bg-white/5 text-slate-300 px-2 py-0.5 rounded text-[10px] font-medium border border-white/10">
-                      {name}
-                    </span>
-                  );
-                })
-              ) : (
-                (provider.specialties || []).slice(0, 3).map((s, idx) => (
-                  <span key={idx} className="bg-white/5 text-slate-300 px-2 py-0.5 rounded text-[10px] font-medium border border-white/10">
-                    {s}
+          {/* Row 5: Service Pills */}
+          <div className="flex flex-wrap gap-1.5 mt-auto">
+            {(provider.services || []).length > 0 ? (
+              provider.services?.slice(0, 3).map((s, idx) => {
+                const name = typeof s === 'string' ? s : (s?.name || '');
+                if (!name) return null;
+                return (
+                  <span key={idx} className={cn(
+                    "px-2 py-0.5 rounded text-[10px] font-medium border",
+                    provider.is_featured 
+                      ? "bg-wellness-500/10 text-wellness-200 border-wellness-500/30" 
+                      : "bg-white/5 text-slate-400 border-white/10"
+                  )}>
+                    {name}
                   </span>
-                ))
-              )}
-            </div>
-          )}
+                );
+              })
+            ) : (
+              (provider.specialties || []).slice(0, 3).map((s, idx) => (
+                <span key={idx} className={cn(
+                  "px-2 py-0.5 rounded text-[10px] font-medium border",
+                  provider.is_featured 
+                    ? "bg-wellness-500/10 text-wellness-200 border-wellness-500/30" 
+                    : "bg-white/5 text-slate-400 border-white/10"
+                )}>
+                  {s}
+                </span>
+              ))
+            )}
+          </div>
         </div>
 
         {/* Card Footer */}

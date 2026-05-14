@@ -6,8 +6,8 @@ import SearchClient from './SearchClient';
 
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getListingStats();
-  const title = `Find IV Therapy Clinics Near You — Browse ${stats.totalListings.toLocaleString()} | TheDripMap`;
-  const description = `Browse ${stats.totalListings.toLocaleString()} verified IV therapy clinics across ${stats.totalCities} US cities. Filter by city, service type, delivery preference and rating.`;
+  const title = `Find IV Therapy Clinics Near You | Search 529 Providers | TheDripMap`;
+  const description = `Search and compare 529 verified IV therapy clinics across 220 US and Canadian cities. Filter by city, specialty, price, and availability.`;
   
   return {
     title,

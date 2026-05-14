@@ -5,9 +5,11 @@ import React, { useState, useEffect } from 'react';
 import { LayoutGrid, Map as MapIcon, Navigation } from 'lucide-react';
 import { Provider } from '../types';
 import { ProviderCard } from './ProviderCard';
+import { ProviderCardFeatured } from './ProviderCardFeatured';
 import dynamic from 'next/dynamic';
 import { calculateDistance, getUserLocation } from '../lib/geo';
 import { motion, AnimatePresence } from 'motion/react';
+import { cn } from '../lib/utils';
 
 // Dynamically import map to avoid SSR issues with Leaflet
 const ListingMap = dynamic(() => import('./ListingMap'), { 
@@ -161,10 +163,13 @@ export function ListingController({ initialProviders, cityName }: ListingControl
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
             {providers.map((provider) => (
-              <ProviderCard 
-                key={provider.id} 
-                provider={provider} 
-              />
+              <div key={provider.id} className={cn(provider.is_featured ? "md:col-span-2 lg:col-span-3" : "")}>
+                {provider.is_featured ? (
+                  <ProviderCardFeatured provider={provider} isPrimary={true} />
+                ) : (
+                  <ProviderCard provider={provider} />
+                )}
+              </div>
             ))}
           </motion.div>
         ) : (

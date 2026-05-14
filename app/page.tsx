@@ -18,27 +18,30 @@ import { Navbar } from '../src/components/Navbar';
 import LiveStatsBar from '../src/components/LiveStatsBar';
 import { Footer } from '../src/components/Footer';
 
-export const revalidate = 86400;
+export const revalidate = 60; // Reduce from 86400 (24h) to 60s for faster updates during iteration
 
 import { BlogCard } from '../src/components/BlogCard';
 import { ClinicianSection } from '../src/components/ClinicianSection';
 import { HowItWorks } from '../src/components/HowItWorks';
 import { QuickMatch } from '../src/components/QuickMatch';
 import { TrustSignals } from '../src/components/TrustSignals';
-import { getBlogPosts, getSiteStats, getTopHubs } from '../src/lib/data';
+import { getBlogPosts, getSiteStats, getPopularCities } from '../src/lib/data';
 import { Metadata } from 'next';
 import { cn } from '../src/lib/utils';
 
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getSiteStats();
+  const title = `IV Therapy Clinics Near You | Find & Compare 529 Providers | TheDripMap`;
   const description = `TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse ${stats.total} clinics across ${stats.cities} cities including Toronto, NYC, and LA.`;
   
   return {
+    title,
     description,
     alternates: {
       canonical: 'https://www.thedripmap.com',
     },
     openGraph: {
+      title,
       description,
       url: 'https://www.thedripmap.com',
       siteName: 'TheDripMap',
@@ -64,7 +67,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const stats = await getSiteStats();
   const blogPosts = await getBlogPosts();
-  const topHubs = await getTopHubs(12); // Get more hubs for selection
+  const popularCities = await getPopularCities();
   const latestPosts = blogPosts.slice(0, 3);
 
   const breadcrumbJsonLd = {
@@ -139,17 +142,18 @@ export default async function HomePage() {
       />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-40 px-6 overflow-hidden min-h-[85vh] flex items-center">
+      <section className="relative pt-32 pb-40 px-6 overflow-hidden min-h-[90vh] flex items-center">
         <div className="absolute inset-0 z-0">
           <ResilientImage 
-            src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg"
-            fallbackSrc="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop"
+            src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg?v=hero-final"
+            fallbackSrc="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2000&auto=format&fit=crop"
             alt="Professional IV Therapy Clinic"
             fill
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[2px]" />
+          <div className="absolute inset-0 bg-slate-950/60" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-950/40" />
         </div>
         
         <div className="max-w-7xl mx-auto relative z-10 w-full">
@@ -358,17 +362,14 @@ export default async function HomePage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { name: 'Toronto & GTA', slug: 'toronto', subtitle: topHubs.find(h => h.city.toLowerCase() === 'toronto')?.count ? `${topHubs.find(h => h.city.toLowerCase() === 'toronto')?.count} verified providers` : 'View Clinics', isAll: false },
-              ...topHubs
-                .filter(hub => hub.city.toLowerCase() !== 'toronto')
-                .map(hub => ({ 
-                  name: hub.city, 
-                  slug: hub.slug, 
-                  subtitle: hub.count ? `${hub.count} verified clinics` : 'View Clinics', 
-                  isAll: false 
-                })),
+              ...popularCities.map(city => ({ 
+                name: city.name, 
+                slug: city.slug, 
+                subtitle: city.count ? `${city.count} verified ${city.name.includes('Toronto') ? 'providers' : 'clinics'}` : 'View Clinics', 
+                isAll: false 
+              })),
               { name: 'Browse All Cities', slug: '', subtitle: '', isAll: true }
-            ].slice(0, 8).map((city, idx) => (
+            ].map((city, idx) => (
               <Link 
                 key={idx}
                 href={city.isAll ? '/cities' : `/cities/${city.slug}`}

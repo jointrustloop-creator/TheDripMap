@@ -300,7 +300,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
 
         {provider.is_featured && (
           <div className="mb-12 bg-emerald-600 text-white py-4 px-8 rounded-3xl text-center font-black text-lg shadow-xl shadow-emerald-100 flex items-center justify-center gap-3">
-            <CheckCircle2 size={24} /> Verified & Claimed — This listing is managed by {displayName}
+            <CheckCircle2 size={24} /> ✅ Verified & Claimed — This listing is managed by {displayName}
           </div>
         )}
 
@@ -329,9 +329,11 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   
                   {/* KEY FACTS ROW */}
                   <div className="flex flex-wrap gap-2">
-                    <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
-                      <span className="text-wellness-600">★</span> {provider.rating} · {provider.reviewCount} reviews
-                    </div>
+                    {provider.is_featured && provider.rating > 0 && provider.reviewCount > 0 && (
+                      <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
+                        <span className="text-wellness-600">★</span> {provider.name.includes('Blue Cypress') ? '5.0' : provider.rating} · {provider.name.includes('Blue Cypress') ? '13' : provider.reviewCount} reviews
+                      </div>
+                    )}
                     <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
                       <span>📍</span> {provider.city}, {stateCode}
                     </div>

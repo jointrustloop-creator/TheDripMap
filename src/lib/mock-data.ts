@@ -719,6 +719,28 @@ export const MOCK_LISTINGS: Provider[] = [
     }
   },
   {
+    id: 'ky-1',
+    name: 'Bluegrass IV & Wellness',
+    city: 'Georgetown',
+    state: 'KY',
+    address: '101 Lexington Rd, Georgetown, KY 40324',
+    rating: 4.8,
+    reviewCount: 32,
+    priceRange: '$$',
+    type: 'In-Clinic',
+    specialties: ['Energy Boost', 'Immune Support', 'Recovery'],
+    amenities: ['Private Suites', 'Refreshments'],
+    description: 'Premier IV hydration and wellness specialty clinic serving Georgetown and the greater Bluegrass region.',
+    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=80',
+    is_featured: true,
+    decisionDrivers: {
+      medicalSupervision: true,
+      luxuryExperience: 4,
+      speedOfService: 4,
+      valueForMoney: 4
+    }
+  },
+  {
     id: 'toronto-functional',
     name: 'Toronto Functional Medicine Centre',
     city: 'Toronto',

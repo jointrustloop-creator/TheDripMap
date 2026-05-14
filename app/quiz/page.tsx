@@ -249,13 +249,24 @@ export default function QuizPage() {
       
       let finalCity = finalData.city;
       let finalState = finalData.state;
+      let finalCountry = finalData.country;
 
       // Ensure city and state are separated if they were typed as "City, State"
       if (finalCity && finalCity.includes(',')) {
         const parts = finalCity.split(',').map(p => p.trim());
         finalCity = parts[0];
-        if (!finalState && parts.length > 1) {
+        if (parts.length > 1) {
           finalState = parts[1];
+          
+          // Detect country from the state part if it changed
+          const usStatesByAbbr = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY', 'DC'];
+          const usStatesByName = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'].map(s => s.toLowerCase());
+
+          if (usStatesByAbbr.includes(finalState.toUpperCase()) || usStatesByName.includes(finalState.toLowerCase())) {
+            finalCountry = 'US';
+          } else if (finalState.toUpperCase() === 'ON' || finalState.toLowerCase() === 'ontario') {
+            finalCountry = 'Canada';
+          }
         }
       }
 
@@ -264,9 +275,10 @@ export default function QuizPage() {
       if (finalState) query.set('state', finalState);
       if (finalData.lat) query.set('lat', finalData.lat.toString());
       if (finalData.lng) query.set('lng', finalData.lng.toString());
-      if (finalData.country) query.set('country', finalData.country);
+      if (finalCountry) query.set('country', finalCountry);
       if (finalData.locationPreference) query.set('type', finalData.locationPreference);
       if (finalData.urgency) query.set('urgency', finalData.urgency);
+      if (finalData.budget) query.set('budget', finalData.budget);
       
       router.push(`/quiz/results?${query.toString()}`);
     }, 2500);

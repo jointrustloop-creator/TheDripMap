@@ -130,7 +130,7 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
 
   if (!service) notFound();
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://thedripmap.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thedripmap.com';
   
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",

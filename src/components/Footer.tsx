@@ -1,20 +1,37 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Logo } from './Logo';
 import { MedicalDisclaimer } from './MedicalDisclaimer';
 
+const POPULAR_CITIES_STATIC = [
+  { name: 'Toronto & GTA', slug: 'toronto' },
+  { name: 'New York', slug: 'new-york' },
+  { name: 'Los Angeles', slug: 'los-angeles' },
+  { name: 'Chicago', slug: 'chicago' },
+  { name: 'Houston', slug: 'houston' },
+  { name: 'San Diego', slug: 'san-diego' },
+  { name: 'Washington DC', slug: 'washington' },
+  { name: 'Clearwater', slug: 'clearwater' },
+];
+
 export const Footer = () => {
-  const POPULAR_CITIES = [
-    { city: 'Toronto', state: 'ON', slug: 'toronto', country: 'Canada' },
-    { city: 'New York', state: 'NY', slug: 'new-york', country: 'US' },
-    { city: 'Clearwater', state: 'FL', slug: 'clearwater', country: 'US' },
-    { city: 'Houston', state: 'TX', slug: 'houston', country: 'US' },
-    { city: 'San Diego', state: 'CA', slug: 'san-diego', country: 'US' },
-    { city: 'Tampa', state: 'FL', slug: 'tampa', country: 'US' },
-    { city: 'Washington', state: 'DC', slug: 'washington', country: 'US' },
-    { city: 'Kansas City', state: 'MO', slug: 'kansas-city', country: 'US' },
-  ];
+  const [citiesWithCounts, setCitiesWithCounts] = useState<{name: string, slug: string, count?: number}[]>(POPULAR_CITIES_STATIC);
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const { getPopularCities } = await import('../lib/data');
+        const data = await getPopularCities();
+        if (data && data.length > 0) {
+          setCitiesWithCounts(data);
+        }
+      } catch (err) {
+        console.error('Error fetching footer city counts:', err);
+      }
+    };
+    fetchCounts();
+  }, []);
 
   return (
     <footer className="bg-white border-t border-slate-200 py-12 px-6 mt-20">
@@ -41,14 +58,19 @@ export const Footer = () => {
         <div>
           <h4 className="font-bold mb-6 text-sm uppercase tracking-wider text-slate-400">Popular Hubs</h4>
           <ul className="space-y-4 text-slate-600 text-sm">
-            {POPULAR_CITIES.map((city, idx) => (
-              <li key={idx}>
+            {citiesWithCounts.map((city, idx) => (
+              <li key={idx} className="flex items-center justify-between group max-w-[200px]">
                 <Link 
                   href={`/cities/${city.slug}`} 
                   className="hover:text-wellness-600 transition-colors"
                 >
-                  {city.city}
+                  {city.name}
                 </Link>
+                {city.count !== undefined && city.count > 0 && (
+                  <span className="text-[10px] bg-slate-50 text-slate-400 px-1.5 py-0.5 rounded-full font-bold group-hover:bg-wellness-50 group-hover:text-wellness-600 transition-colors">
+                    {city.count}
+                  </span>
+                )}
               </li>
             ))}
             <li>

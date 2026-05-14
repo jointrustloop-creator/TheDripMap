@@ -35,13 +35,26 @@ export function matchProviders(
 
     const isGTASelection = ['toronto', 'gta', 'ontario'].includes(cityLower);
 
+    // Derive country if missing but state is a US state abbreviation or full name
+    let effectiveCountry = answers.country;
+    const usStatesByAbbr = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY', 'DC'];
+    const usStatesByName = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'].map(s => s.toLowerCase());
+
+    if (!effectiveCountry && stateFromCity) {
+      if (usStatesByAbbr.includes(stateFromCity.toUpperCase()) || usStatesByName.includes(stateFromCity.toLowerCase())) {
+        effectiveCountry = 'US';
+      } else if (stateFromCity.toUpperCase() === 'ON' || stateFromCity.toLowerCase() === 'ontario') {
+        effectiveCountry = 'Canada';
+      }
+    }
+
     if (isGTASelection) {
       const gtaCities = ['Toronto', 'Ajax', 'Brampton', 'Mississauga', 'Oakville', 'Richmond Hill', 'Vaughan'].map(c => c.toLowerCase());
       const filtered = providers.filter(p => 
         gtaCities.includes(p.city.toLowerCase()) && 
         (p.country?.toLowerCase() === 'canada' || p.country === 'CA')
       );
-      if (filtered.length >= 3) candidates = filtered;
+      if (filtered.length > 0) candidates = filtered;
     } else {
       // US or other specific city logic
       const exactMatches = providers.filter(p => 
@@ -50,27 +63,60 @@ export function matchProviders(
          (stateFromCity.length === 2 && p.state === stateFromCity.toUpperCase()))
       );
 
-      if (exactMatches.length >= 3) {
+      if (exactMatches.length > 0) {
         candidates = exactMatches;
-      } else {
+      } else if (stateFromCity) {
         // Broaden to state
         const stateMatches = providers.filter(p => 
           (p.state?.toLowerCase() === stateFromCity || (stateFromCity?.length === 2 && p.state === stateFromCity.toUpperCase()))
         );
         
-        if (stateMatches.length >= 3) {
+        if (stateMatches.length > 0) {
           candidates = stateMatches;
         } else {
-          // Trust the input list (which already has tiered fallbacks from lib/data.ts)
-          candidates = providers;
+          // If no state matches either, try to filter by derived or explicit country
+          if (effectiveCountry) {
+            const countryLower = effectiveCountry.toLowerCase();
+            const countryFiltered = providers.filter(p => {
+              if (!p.country) return true;
+              const pCountry = p.country.toLowerCase();
+              if (['usa', 'united states', 'us'].includes(countryLower)) {
+                return ['usa', 'united states', 'us'].includes(pCountry);
+              }
+              if (['canada', 'ca'].includes(countryLower)) {
+                return ['canada', 'ca'].includes(pCountry);
+              }
+              return pCountry === countryLower;
+            });
+            if (countryFiltered.length > 0) {
+              candidates = countryFiltered;
+            } else {
+              candidates = providers;
+            }
+          } else {
+            candidates = providers;
+          }
         }
       }
     }
   }
 
-  // Never match outside the selected country if country is known
-  if (answers.country) {
-    const countryLower = answers.country.toLowerCase();
+  // Final country safety filter
+  let countryForFilter = answers.country;
+  // If city/state was Kentucky but country is missing, effectiveCountry is now US
+  if (!countryForFilter && answers.state) {
+    const usStatesByAbbr = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY', 'DC'];
+    const usStatesByName = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'].map(s => s.toLowerCase());
+
+    if (usStatesByAbbr.includes(answers.state.toUpperCase()) || usStatesByName.includes(answers.state.toLowerCase())) {
+      countryForFilter = 'US';
+    } else if (answers.state.toUpperCase() === 'ON' || answers.state.toLowerCase() === 'ontario') {
+      countryForFilter = 'Canada';
+    }
+  }
+
+  if (countryForFilter) {
+    const countryLower = countryForFilter.toLowerCase();
     candidates = candidates.filter(p => {
       if (!p.country) return true; // Assume okay if country unknown
       const pCountry = p.country.toLowerCase();
