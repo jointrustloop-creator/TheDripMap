@@ -13,6 +13,7 @@ import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { TrustSignals } from '../../src/components/TrustSignals';
 import { ProviderCard } from '../../src/components/ProviderCard';
+import { ProviderCardFeatured } from '../../src/components/ProviderCardFeatured';
 import UrgencyIndicator from '../../src/components/UrgencyIndicator';
 import { cn } from '../../src/lib/utils';
 import { searchListings, getCitiesWithListings, slugify } from '../../src/lib/data';
@@ -473,10 +474,13 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
           ) : filteredProviders.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredProviders.map((provider) => (
-                <ProviderCard 
-                  key={provider.id} 
-                  provider={provider} 
-                />
+                <div key={provider.id} className={cn(provider.is_featured ? "md:col-span-2 lg:col-span-3" : "")}>
+                  {provider.is_featured ? (
+                    <ProviderCardFeatured provider={provider} isPrimary={true} />
+                  ) : (
+                    <ProviderCard provider={provider} />
+                  )}
+                </div>
               ))}
             </div>
           ) : (

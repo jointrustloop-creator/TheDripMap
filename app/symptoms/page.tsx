@@ -7,13 +7,34 @@ import { Navbar } from '@/src/components/Navbar';
 import { Footer } from '@/src/components/Footer';
 
 import { SymptomImage } from '@/src/components/SymptomImage';
-import { IVAnimation } from '@/src/components/IVAnimation';
+import { ResilientImage } from '@/src/components/ResilientImage';
 
 export const metadata: Metadata = {
-  title: 'IV Therapy for Symptoms & Use Cases | TheDripMap',
-  description: 'Explore common reasons people seek IV therapy, from hangover recovery and jet lag to immunity boosts and skin glow. Find the right drip for your needs.',
+  title: 'IV Therapy by Symptom & Use Case | TheDripMap',
+  description: 'Find the right IV therapy drip for your specific symptoms. Browse treatments for hangovers, fatigue, migraines, immunity, jet lag, and more.',
   alternates: {
     canonical: 'https://www.thedripmap.com/symptoms',
+  },
+  openGraph: {
+    title: 'IV Therapy by Symptom & Use Case | TheDripMap',
+    description: 'Find the right IV therapy drip for your specific symptoms. Browse treatments for hangovers, fatigue, migraines, immunity, jet lag, and more.',
+    url: 'https://www.thedripmap.com/symptoms',
+    siteName: 'TheDripMap',
+    images: [
+      {
+        url: 'https://www.thedripmap.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'IV Therapy by Symptom',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'IV Therapy by Symptom & Use Case | TheDripMap',
+    description: 'Find the right IV therapy drip for your specific symptoms. Browse treatments for hangovers, fatigue, migraines, immunity, jet lag, and more.',
+    images: ['https://www.thedripmap.com/og-image.png'],
   },
 };
 
@@ -40,7 +61,13 @@ export default async function UseCaseHubPage() {
               </p>
             </div>
             <div className="relative h-[400px] md:h-[500px] rounded-[3rem] overflow-hidden shadow-2xl">
-              <IVAnimation />
+              <ResilientImage 
+                src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg"
+                fallbackSrc="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2000&auto=format&fit=crop"
+                alt="IV Therapy Protocols"
+                fill
+                className="object-cover"
+              />
             </div>
           </div>
         </div>
