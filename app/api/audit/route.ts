@@ -16,6 +16,8 @@ export async function GET() {
     .from('providers')
     .select('id, name, city, state, description')
     .ilike('city', '%New York%')
+    .order('is_featured', { ascending: false })
+    .order('rating', { ascending: false, nullsFirst: false })
     .limit(10);
 
   return NextResponse.json({

@@ -242,6 +242,8 @@ export async function getListingsByCity(city: string, state?: string) {
         .from('providers')
         .select('*')
         .ilike('address', `%${searchCity.substring(0, 5)}%`)
+        .order('is_featured', { ascending: false })
+        .order('rating', { ascending: false, nullsFirst: false })
         .limit(100);
       
       if (!zipError && zipData && zipData.length > 0) {
@@ -283,7 +285,10 @@ export async function getListingsByCity(city: string, state?: string) {
         }
       }
       
-      return query.order('reviews', { ascending: false }).limit(200);
+      return query
+        .order('is_featured', { ascending: false })
+        .order('rating', { ascending: false, nullsFirst: false })
+        .limit(200);
     };
 
     const response = await tryQuery(searchCity, searchState);
@@ -352,7 +357,8 @@ export async function getListingsByState(state: string) {
     }
 
     const { data, error } = await query
-      .order('reviews', { ascending: false })
+      .order('is_featured', { ascending: false })
+      .order('rating', { ascending: false, nullsFirst: false })
       .limit(300);
 
     if (error) throw error;
@@ -418,7 +424,8 @@ export async function getListingBySlug(slug: string) {
     const { data: widerCandidates, error: widerError } = await supabase
       .from('providers')
       .select('*')
-      .order('reviews', { ascending: false })
+      .order('is_featured', { ascending: false })
+      .order('rating', { ascending: false, nullsFirst: false })
       .limit(1000);
 
     if (!widerError && widerCandidates) {
@@ -746,7 +753,8 @@ export async function getListingsByService(service: string, limit: number = 4) {
       .from('providers')
       .select('*')
       .or(filter)
-      .order('reviews', { ascending: false })
+      .order('is_featured', { ascending: false })
+      .order('rating', { ascending: false, nullsFirst: false })
       .limit(2000);
 
     if (error) throw error;
@@ -802,7 +810,8 @@ export async function searchListings(query: string, city?: string) {
     }
 
     const { data, error } = await q
-      .order('reviews', { ascending: false })
+      .order('is_featured', { ascending: false })
+      .order('rating', { ascending: false, nullsFirst: false })
       .limit(2000);
     if (error) throw error;
     
@@ -853,7 +862,8 @@ export async function getFeaturedListings(limit: number = 6, city?: string) {
     }
 
     const { data, error } = await q
-      .order('rating', { ascending: false })
+      .order('is_featured', { ascending: false })
+      .order('rating', { ascending: false, nullsFirst: false })
       .limit(limit);
 
     if (error) throw error;
@@ -1181,6 +1191,8 @@ export async function getAllListings() {
     const { data, error } = await supabase
       .from('providers')
       .select('*')
+      .order('is_featured', { ascending: false })
+      .order('rating', { ascending: false, nullsFirst: false })
       .limit(2000);
 
     if (error) throw error;
@@ -1197,7 +1209,9 @@ export async function getListingsByIds(ids: string[]) {
     const { data, error } = await supabase
       .from('providers')
       .select('*')
-      .in('id', ids);
+      .in('id', ids)
+      .order('is_featured', { ascending: false })
+      .order('rating', { ascending: false, nullsFirst: false });
 
     if (error) throw error;
     return (data || []).map(enrichProvider);
@@ -1220,7 +1234,8 @@ export async function getListingsByServiceAndCity(service: string, city: string,
       .select('*')
       .ilike('city', cityPattern)
       .or(filter)
-      .order('reviews', { ascending: false })
+      .order('is_featured', { ascending: false })
+      .order('rating', { ascending: false, nullsFirst: false })
       .limit(2000);
 
     const error = response.error;
@@ -1237,7 +1252,8 @@ export async function getListingsByServiceAndCity(service: string, city: string,
         .select('*')
         .ilike('city', cityPattern)
         .or(broadFilter)
-        .order('reviews', { ascending: false })
+        .order('is_featured', { ascending: false })
+        .order('rating', { ascending: false, nullsFirst: false })
         .limit(2000);
       
       if (!fallbackError && fallbackData && fallbackData.length > 0) {
@@ -1297,7 +1313,8 @@ export async function getSimilarClinics(currentSlug: string, city: string, state
       .select('*')
       .eq('city', city)
       .neq('slug', currentSlug)
-      .order('reviews', { ascending: false })
+      .order('is_featured', { ascending: false })
+      .order('rating', { ascending: false, nullsFirst: false })
       .limit(limit);
 
     if (cityError) throw cityError;
@@ -1313,7 +1330,8 @@ export async function getSimilarClinics(currentSlug: string, city: string, state
         .eq('state', state)
         .neq('city', city) // Don't pick up city clinics again
         .neq('slug', currentSlug)
-        .order('reviews', { ascending: false })
+        .order('is_featured', { ascending: false })
+        .order('rating', { ascending: false, nullsFirst: false })
         .limit(remaining);
 
       if (stateError) throw stateError;

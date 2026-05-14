@@ -179,7 +179,7 @@ export function matchProviders(
     else if (p.reviewCount >= 10) score += 1;
 
     // 2.3 Featured and Verified Bonuses
-    if (p.is_featured) score += 10;
+    if (p.is_featured) score += 1000;
     if (p.is_verified) score += 8;
 
     // 3. User Goal (Specialties & Keywords)

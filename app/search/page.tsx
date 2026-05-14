@@ -32,8 +32,8 @@ export default async function SearchPage() {
   const { data } = await supabase
     .from('providers')
     .select('*')
-    .order('rating', { ascending: false })
-    .order('reviews', { ascending: false });
+    .order('is_featured', { ascending: false })
+    .order('rating', { ascending: false, nullsFirst: false });
 
   const { count: totalCount } = await supabase
     .from('providers')
