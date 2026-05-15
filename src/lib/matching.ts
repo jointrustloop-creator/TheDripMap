@@ -57,11 +57,14 @@ export function matchProviders(
       if (filtered.length > 0) candidates = filtered;
     } else {
       // US or other specific city logic
-      const exactMatches = providers.filter(p => 
-        p.city.toLowerCase() === cityLower && 
-        (!stateFromCity || p.state?.toLowerCase() === stateFromCity || 
-         (stateFromCity.length === 2 && p.state === stateFromCity.toUpperCase()))
-      );
+      const exactMatches = providers.filter(p => {
+        const pCity = p.city.toLowerCase().trim();
+        const searchCity = cityLower.trim();
+        const isCityMatch = pCity === searchCity || pCity.includes(searchCity) || searchCity.includes(pCity);
+        const isStateMatch = !stateFromCity || p.state?.toLowerCase() === stateFromCity || 
+                             (stateFromCity.length === 2 && p.state === stateFromCity.toUpperCase());
+        return isCityMatch && isStateMatch;
+      });
 
       if (exactMatches.length > 0) {
         candidates = exactMatches;

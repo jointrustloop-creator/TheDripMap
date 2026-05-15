@@ -310,18 +310,18 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
             {/* HERO SECTION */}
             <section className="space-y-10">
               <div className="flex flex-col md:flex-row gap-8 items-start">
-                {provider.is_featured && provider.imageUrl && (
-                  <div className="w-[160px] h-[160px] rounded-3xl bg-white border border-slate-100 shadow-xl p-4 flex items-center justify-center overflow-hidden shrink-0">
-                    <ResilientImage 
-                      src={provider.imageUrl} 
-                      alt={`${displayName} logo`}
-                      className="w-full h-full object-contain scale-110"
-                      width={160}
-                      height={160}
-                      fallbackSrc="src={provider.imageUrl || provider.image_url || 'https://...clinic-logo-placeholder.png'}"
-                    />
-                  </div>
-                )}
+        {provider.is_featured && (provider.imageUrl || provider.image_url) && (
+          <div className="w-[160px] h-[160px] rounded-3xl bg-white border border-slate-100 shadow-xl p-4 flex items-center justify-center overflow-hidden shrink-0">
+            <ResilientImage 
+              src={provider.imageUrl || provider.image_url!} 
+              alt={`${displayName} logo`}
+              className="w-full h-full object-contain scale-110"
+              width={160}
+              height={160}
+              fallbackSrc="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/clinic-logo-placeholder.png"
+            />
+          </div>
+        )}
                 <div>
                   <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
                     {displayName}
@@ -341,12 +341,12 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 </div>
               </div>
 
-              {(!provider.is_featured || (provider.photos && provider.photos.length > 0)) && (
+              {(!provider.is_featured || (provider.photos && provider.photos.length > 0) || provider.imageUrl || provider.image_url) && (
                 <div className="relative h-[300px] md:h-[450px] rounded-[3rem] overflow-hidden shadow-2xl">
                   <ClinicImage 
                     name={provider.name}
                     initials={initials}
-                    imageUrl={(provider.photos && provider.photos.length > 0) ? provider.photos[0] : (provider.is_featured ? undefined : provider.imageUrl)}
+                    imageUrl={(provider.photos && provider.photos.length > 0) ? provider.photos[0] : (provider.is_featured ? undefined : (provider.imageUrl || provider.image_url))}
                     size="lg"
                     className="object-cover"
                   />
@@ -847,7 +847,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                           <ClinicImage 
                             name={clinic.name}
                             initials={cInitials}
-                            imageUrl={clinic.imageUrl}
+                            imageUrl={clinic.imageUrl || clinic.image_url}
                             className="group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>

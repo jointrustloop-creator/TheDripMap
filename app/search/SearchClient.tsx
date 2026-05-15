@@ -370,7 +370,6 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
             ))}
           </div>
 
-          {selectedCity !== 'All' && <UrgencyIndicator city={selectedCity} />}
 
           <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 text-left">
             Showing {selectedCity === 'All' ? totalCount : filteredProviders.length} {activeChips.includes('Mobile') ? 'mobile IV ' : ''}clinics {selectedCity === 'All' ? 'nationwide' : `in ${selectedCity}`}

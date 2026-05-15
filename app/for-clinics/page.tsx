@@ -90,6 +90,7 @@ export default async function ForClinicsPage() {
                     <div className="flex items-center gap-1 text-slate-400 text-xs font-bold">
                       <span className="text-wellness-600">★★★★★</span> 4.9 (127 reviews)
                     </div>
+                    <div className="text-[9px] text-slate-400 italic mt-0.5">Example listing shown for illustration only</div>
                   </div>
                 </div>
                 <div className="mb-4">

@@ -177,23 +177,15 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           </h1>
         </section>
 
-        {/* 2. Stats bar (verified providers count, high demand badge, quick map view) */}
+        {/* 2. Stats bar (verified providers count, quick map view) */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           <div className="inline-flex items-center gap-2 bg-wellness-50 text-wellness-700 px-4 py-1.5 rounded-full text-sm font-bold border border-wellness-100 shadow-sm">
             <MapPin size={16} />
             <span>{count} verified providers in {cityData.name}</span>
           </div>
-          <div className="flex items-center gap-2 text-wellness-600 font-bold text-sm bg-wellness-50 px-3 py-1 rounded-full border border-wellness-100">
-            <span className="w-2 h-2 bg-wellness-500 rounded-full animate-pulse" />
-            High demand in {cityData.name} this week
-          </div>
           <MapTrigger />
         </div>
 
-        {/* 3. Urgency badges (high demand, others viewing) */}
-        <div className="mb-12">
-          <UrgencyIndicator city={cityData.name} />
-        </div>
 
         {/* 4. Verified Providers listings grid */}
         {listings.length > 0 && (

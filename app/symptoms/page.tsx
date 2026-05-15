@@ -10,13 +10,13 @@ import { SymptomImage } from '@/src/components/SymptomImage';
 import { ResilientImage } from '@/src/components/ResilientImage';
 
 export const metadata: Metadata = {
-  title: 'IV Therapy by Symptom & Use Case | TheDripMap',
+  title: 'IV Therapy by Symptom | TheDripMap',
   description: 'Find the right IV therapy drip for your specific symptoms. Browse treatments for hangovers, fatigue, migraines, immunity, jet lag, and more.',
   alternates: {
     canonical: 'https://www.thedripmap.com/symptoms',
   },
   openGraph: {
-    title: 'IV Therapy by Symptom & Use Case | TheDripMap',
+    title: 'IV Therapy by Symptom | TheDripMap',
     description: 'Find the right IV therapy drip for your specific symptoms. Browse treatments for hangovers, fatigue, migraines, immunity, jet lag, and more.',
     url: 'https://www.thedripmap.com/symptoms',
     siteName: 'TheDripMap',
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'IV Therapy by Symptom & Use Case | TheDripMap',
+    title: 'IV Therapy by Symptom | TheDripMap',
     description: 'Find the right IV therapy drip for your specific symptoms. Browse treatments for hangovers, fatigue, migraines, immunity, jet lag, and more.',
     images: ['https://www.thedripmap.com/og-image.png'],
   },

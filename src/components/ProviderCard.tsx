@@ -83,7 +83,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
         <div className="relative h-[160px] shrink-0">
           {/* Top Left Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-            {!provider.is_featured && (
+            {!provider.is_claimed && !provider.is_featured && (
               <span className="bg-slate-500/80 backdrop-blur-sm text-white px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
                 Unclaimed
               </span>
@@ -262,7 +262,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
             )}
           </div>
           
-          {!provider.is_featured && (
+          {!provider.is_claimed && !provider.is_featured && (
             <button 
               onClick={() => openClaimModal(provider)}
               className="bg-teal-500 text-white px-3 py-2.5 rounded-lg font-bold text-[12px] hover:bg-teal-600 transition-all flex items-center justify-center gap-1.5 shadow-sm uppercase tracking-wider w-full"
