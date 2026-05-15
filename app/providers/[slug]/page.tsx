@@ -90,7 +90,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     title,
     description,
     alternates: {
-      canonical: `https://www.thedripmap.com/provider/${slug}`,
+      canonical: `https://www.thedripmap.com/providers/${slug}`,
     },
     robots: {
       index: true,
@@ -103,7 +103,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     openGraph: {
       title,
       description,
-      url: `https://www.thedripmap.com/provider/${slug}`,
+      url: `https://www.thedripmap.com/providers/${slug}`,
       type: 'website',
       images: [
         {
@@ -188,7 +188,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
     "description": provider.description,
     "image": provider.imageUrl,
     "telePhone": provider.phone,
-    "url": `https://www.thedripmap.com/provider/${slug}`,
+    "url": `https://www.thedripmap.com/providers/${slug}`,
     "address": {
       "@type": "PostalAddress",
       "streetAddress": provider.address,
@@ -229,7 +229,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
         "@type": "ListItem",
         "position": 3,
         "name": provider.name,
-        "item": `https://www.thedripmap.com/provider/${slug}`
+        "item": `https://www.thedripmap.com/providers/${slug}`
       }
     ]
   };

@@ -116,7 +116,7 @@ export default function ListingMap({ providers }: ListingMapProps) {
               </div>
               <p className="text-[10px] text-slate-500 line-clamp-2 mb-3">{provider.description}</p>
               <Link 
-                href={`/provider/${provider.slug || slugify(provider.name)}`}
+                href={`/providers/${provider.slug || slugify(provider.name)}`}
                 className="block w-full bg-wellness-600 text-white text-center py-2 rounded-lg text-xs font-bold hover:bg-wellness-700 transition-colors"
               >
                 View Clinic Info

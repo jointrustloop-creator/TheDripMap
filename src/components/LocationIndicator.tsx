@@ -169,7 +169,7 @@ export const LocationIndicator = () => {
                           pathname.startsWith('/cities') || 
                           pathname.startsWith('/iv-therapy') || 
                           pathname.startsWith('/symptoms') ||
-                          pathname.startsWith('/provider/');
+                          pathname.startsWith('/providers/');
     
     if (!isDirectoryPage) {
       router.push(`/cities/${slugify(city)}`);

@@ -133,7 +133,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
         {/* Card Body */}
         <div className="px-5 pb-5 flex-1 flex flex-col">
           <div className="flex justify-between items-start gap-2 mb-3">
-            <Link href={`/provider/${slug}`} className="flex-1">
+            <Link href={`/providers/${slug}`} className="flex-1">
               <h3 className={cn(
                 "text-xl font-black leading-tight line-clamp-2 transition-colors",
                 provider.is_featured ? "text-slate-900 group-hover:text-wellness-600" : "text-slate-600"
@@ -205,7 +205,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
         )}>
           <div className="flex gap-2">
             <Link 
-              href={`/provider/${slug}`}
+              href={`/providers/${slug}`}
               className={cn(
                 "flex-1 px-4 py-3 rounded-2xl font-black text-xs transition-all flex items-center justify-center gap-2 shadow-sm",
                 provider.is_featured 

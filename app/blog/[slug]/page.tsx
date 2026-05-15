@@ -294,7 +294,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   {relatedClinics.map((clinic) => (
                     <Link 
                       key={clinic.id}
-                      href={`/provider/${slugify(clinic.name)}`}
+                      href={`/providers/${clinic.slug || slugify(clinic.name)}`}
                       className="group flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 transition-all"
                     >
                       <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0">

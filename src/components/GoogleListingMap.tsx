@@ -59,7 +59,7 @@ const MarkerWithInfoWindow = ({ provider }: { provider: Provider }) => {
             </div>
             <div className="flex gap-2">
               <Link 
-                href={`/provider/${slug}`}
+                href={`/providers/${slug}`}
                 className="flex-1 bg-wellness-600 text-white text-[10px] font-bold py-1.5 rounded text-center hover:bg-wellness-700 transition-colors"
               >
                 Profile

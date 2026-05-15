@@ -65,7 +65,7 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
           "relative overflow-hidden",
           isPrimary ? "md:w-80 h-72 md:h-auto rounded-[2rem]" : "h-48"
         )}>
-          <Link href={`/provider/${slug}`} className="block h-full">
+          <Link href={`/providers/${slug}`} className="block h-full">
             <ResilientImage 
               src={provider.imageUrl || DEFAULT_CLINIC_IMAGE} 
               alt={`${provider.name} IV therapy clinic in ${provider.city}`}
@@ -132,7 +132,7 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
         )}>
           <div className="flex justify-between items-start mb-4">
             <div>
-              <Link href={`/provider/${slug}`} className="block">
+              <Link href={`/providers/${slug}`} className="block">
                 <h3 className={cn(
                   "font-black text-slate-900 group-hover:text-wellness-600 transition-colors leading-tight",
                   isPrimary ? "text-3xl mb-3" : "text-xl mb-1"
@@ -202,7 +202,7 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
 
           <div className="flex flex-col sm:flex-row items-center gap-4 mt-auto">
             <Link 
-              href={`/provider/${slug}`}
+              href={`/providers/${slug}`}
               className="w-full sm:w-auto bg-wellness-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-100 flex items-center justify-center gap-2"
             >
               View Full Details <ArrowRight size={20} />

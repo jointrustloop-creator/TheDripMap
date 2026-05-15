@@ -465,7 +465,7 @@ function ResultsContent() {
                       Book Appointment
                     </a>
                     <Link 
-                      href={`/provider/${topMatch.slug || slugify(topMatch.name)}`}
+                      href={`/providers/${topMatch.slug || slugify(topMatch.name)}`}
                       className="flex-1 bg-white text-slate-900 border-2 border-slate-100 px-8 py-4 rounded-2xl font-bold hover:border-slate-900 transition-all text-center"
                     >
                       View Full Profile
@@ -539,7 +539,7 @@ function ResultsContent() {
                             Book now
                           </a>
                           <Link 
-                            href={`/provider/${provider.slug || slugify(provider.name)}`}
+                            href={`/providers/${provider.slug || slugify(provider.name)}`}
                             className="flex-1 bg-white text-slate-900 border border-slate-200 py-3 rounded-xl text-xs font-bold hover:border-slate-900 transition-all text-center"
                           >
                             Profile
@@ -603,7 +603,7 @@ function ResultsContent() {
                             <p className="text-[10px] text-slate-500 font-bold">{formatDistance(provider)}</p>
                           </div>
                           <Link 
-                            href={`/provider/${provider.slug || slugify(provider.name)}`}
+                            href={`/providers/${provider.slug || slugify(provider.name)}`}
                             className="p-2 text-slate-400 hover:text-wellness-600 transition-colors"
                           >
                             <ArrowRight size={18} />
