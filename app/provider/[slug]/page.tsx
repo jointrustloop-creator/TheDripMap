@@ -134,14 +134,12 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   const profiles = await getOperatorProfiles();
   const profile = profiles.find(p => p.clinicId === provider.id);
   const stateCode = provider.state || getStateFromProvider(provider);
+  const timezone = (stateCode === 'ON' || stateCode === 'Ontario') ? 'America/Toronto' : 'America/New_York';
   const stateName = STATE_MAP[stateCode] || stateCode;
   const citySlug = slugify(provider.city);
-  
-  // Fix duplicate breadcrumb labels
   const cityLabel = provider.city;
-
-
-  const status = getStatus(provider.hours);
+  
+  const status = getStatus(provider.hours, timezone);
   const isMobile = provider.mobile_service || provider.type === 'Mobile' || profile?.profile_data?.mobileService;
 
   const displayName = provider.name
@@ -323,7 +321,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
           </div>
         )}
                 <div>
-                  <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
+                  <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
                     {displayName}
                   </h1>
                   
@@ -347,7 +345,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 </div>
               </div>
 
-              {(!provider.is_featured || (provider.photos && provider.photos.length > 0) || provider.imageUrl || provider.image_url) && (
+              {(!provider.is_featured || (provider.photos && provider.photos.length > 0)) && (
                 <div className="relative h-[300px] md:h-[450px] rounded-[3rem] overflow-hidden shadow-2xl">
                   <ClinicImage 
                     name={provider.name}

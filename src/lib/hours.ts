@@ -5,10 +5,15 @@ export interface StatusResult {
   todayHours: string;
 }
 
-export function getStatus(hours: Record<string, string> | undefined): StatusResult {
+export function getStatus(hours: Record<string, string> | undefined, timezone?: string): StatusResult {
   if (!hours) return { isOpen: false, text: 'Closed', todayHours: 'Closed' };
   
-  const now = new Date();
+  // Use provided timezone or fallback to America/New_York (Eastern Time)
+  const tz = timezone || 'America/New_York';
+  
+  // Get current time in correct timezone
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: tz }));
+  
   const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const today = days[now.getDay()];
   const todayHours = hours[today];
@@ -36,7 +41,7 @@ export function getStatus(hours: Record<string, string> | undefined): StatusResu
       if (modifier === 'PM' && h < 12) h += 12;
       if (modifier === 'AM' && h === 12) h = 0;
       
-      const d = new Date();
+      const d = new Date(now); // Base it on current clinic time
       d.setHours(h, m, 0, 0);
       return d;
     };
