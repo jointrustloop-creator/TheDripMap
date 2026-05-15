@@ -16,8 +16,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const useCase = await getUseCaseBySlug(slug);
   if (!useCase) return { title: 'Not Found' };
 
-  const title = `IV Therapy for ${useCase.title} — Find Clinics Near You | TheDripMap`;
-  const description = `Learn about how IV therapy is commonly used for ${useCase.title.toLowerCase()}. Find top-rated clinics and what to expect from your session.`;
+  const title = `IV Therapy for ${useCase.title} — Protocols & Local Clinics | TheDripMap`;
+  const description = `Clinically-reviewed protocols for ${useCase.title.toLowerCase()} via IV therapy. Find clinics near you specializing in ${useCase.title.toLowerCase()} support.`;
 
   return {
     title,
@@ -32,10 +32,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       type: 'website',
       images: [
         {
-          url: 'https://www.thedripmap.com/og-image.png',
+          url: 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg',
           width: 1200,
           height: 630,
-          alt: `IV Therapy for ${useCase.title}`,
+          alt: `IV Therapy protocol for ${useCase.title}`,
         },
       ],
     },
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title,
       description,
-      images: ['https://www.thedripmap.com/og-image.png'],
+      images: ['https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg'],
     },
   };
 }

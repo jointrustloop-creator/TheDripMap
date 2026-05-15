@@ -10,31 +10,31 @@ import { SymptomImage } from '@/src/components/SymptomImage';
 import { ResilientImage } from '@/src/components/ResilientImage';
 
 export const metadata: Metadata = {
-  title: 'IV Therapy by Symptom | TheDripMap',
-  description: 'Find the right IV therapy drip for your specific symptoms. Browse treatments for hangovers, fatigue, migraines, immunity, jet lag, and more.',
+  title: 'IV Therapy for Symptoms & Conditions — Treatment Protocols | TheDripMap',
+  description: 'Comprehensive directory of IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',
   alternates: {
     canonical: 'https://www.thedripmap.com/symptoms',
   },
   openGraph: {
-    title: 'IV Therapy by Symptom | TheDripMap',
-    description: 'Find the right IV therapy drip for your specific symptoms. Browse treatments for hangovers, fatigue, migraines, immunity, jet lag, and more.',
+    title: 'IV Therapy for Symptoms & Conditions — Treatment Protocols | TheDripMap',
+    description: 'Comprehensive directory of IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',
     url: 'https://www.thedripmap.com/symptoms',
     siteName: 'TheDripMap',
     images: [
       {
-        url: 'https://www.thedripmap.com/og-image.png',
+        url: 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg',
         width: 1200,
         height: 630,
-        alt: 'IV Therapy by Symptom',
+        alt: 'IV Therapy by Symptom protocols',
       },
     ],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'IV Therapy by Symptom | TheDripMap',
-    description: 'Find the right IV therapy drip for your specific symptoms. Browse treatments for hangovers, fatigue, migraines, immunity, jet lag, and more.',
-    images: ['https://www.thedripmap.com/og-image.png'],
+    title: 'IV Therapy for Symptoms & Conditions — Treatment Protocols | TheDripMap',
+    description: 'Comprehensive directory of IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',
+    images: ['https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg'],
   },
 };
 

@@ -14,7 +14,6 @@ import { Footer } from '../../src/components/Footer';
 import { TrustSignals } from '../../src/components/TrustSignals';
 import { ProviderCard } from '../../src/components/ProviderCard';
 import { ProviderCardFeatured } from '../../src/components/ProviderCardFeatured';
-import UrgencyIndicator from '../../src/components/UrgencyIndicator';
 import { cn } from '../../src/lib/utils';
 import { searchListings, getCitiesWithListings, slugify } from '../../src/lib/data';
 import { getUserLocation, UserLocation } from '../../src/lib/geo';

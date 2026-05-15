@@ -145,8 +145,8 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
                   provider.rating > 0 ? (
                     <div className="text-[13px] font-black text-slate-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100 flex items-center gap-1.5">
                       <StarIcon size={12} className="text-amber-500" fill="currentColor" />
-                      {provider.name.includes('Blue Cypress') ? '5.0' : provider.rating}
-                      <span className="text-slate-400 font-bold ml-1">({provider.name.includes('Blue Cypress') ? '13' : (provider.reviewCount || 0)} reviews)</span>
+                      {provider.rating}
+                      <span className="text-slate-400 font-bold ml-1">({provider.reviewCount || 0} reviews)</span>
                     </div>
                   ) : (
                     <div className="text-[10px] font-black text-emerald-700 uppercase tracking-wider bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100 flex items-center gap-1.5 shadow-sm">

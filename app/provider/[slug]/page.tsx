@@ -36,7 +36,7 @@ import { getStatus } from '../../../src/lib/hours';
 import SmartSummary from '../../../src/components/SmartSummary';
 import { calculateValueMetrics } from '../../../src/lib/price-utils';
 
-export const revalidate = 3600;
+export const revalidate = 60; // Revalidate every minute for live-ish data updates
 
 const STATE_MAP: Record<string, string> = {
   'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
@@ -330,7 +330,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                     {provider.is_featured && (
                       provider.rating > 0 && provider.reviewCount > 0 ? (
                         <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
-                          <span className="text-wellness-600">★</span> {provider.name.includes('Blue Cypress') ? '5.0' : provider.rating} · {provider.name.includes('Blue Cypress') ? '13' : provider.reviewCount} reviews
+                          <span className="text-wellness-600">★</span> {provider.rating} · {provider.reviewCount} reviews
                         </div>
                       ) : (
                         <div className="bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full text-[13px] font-black flex items-center gap-1.5 border border-emerald-100 uppercase tracking-wider">
