@@ -8,7 +8,6 @@ import ReactMarkdown from 'react-markdown';
 import { Navbar } from '@/src/components/Navbar';
 import { Footer } from '@/src/components/Footer';
 import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
-import UrgencyIndicator from '@/src/components/UrgencyIndicator';
 import { QuizCTA } from '@/src/components/QuizCTA';
 import { ListingController } from '@/src/components/ListingController';
 import { getCityBySlug, getListingsByCity, getAllCities } from '@/src/lib/data';

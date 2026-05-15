@@ -329,10 +329,16 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   
                   {/* KEY FACTS ROW */}
                   <div className="flex flex-wrap gap-2">
-                    {provider.is_featured && provider.rating > 0 && provider.reviewCount > 0 && (
-                      <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
-                        <span className="text-wellness-600">★</span> {provider.name.includes('Blue Cypress') ? '5.0' : provider.rating} · {provider.name.includes('Blue Cypress') ? '13' : provider.reviewCount} reviews
-                      </div>
+                    {provider.is_featured && (
+                      provider.rating > 0 && provider.reviewCount > 0 ? (
+                        <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
+                          <span className="text-wellness-600">★</span> {provider.name.includes('Blue Cypress') ? '5.0' : provider.rating} · {provider.name.includes('Blue Cypress') ? '13' : provider.reviewCount} reviews
+                        </div>
+                      ) : (
+                        <div className="bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full text-[13px] font-black flex items-center gap-1.5 border border-emerald-100 uppercase tracking-wider">
+                          ✨ New Clinic · Be the first to review
+                        </div>
+                      )
                     )}
                     <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
                       <span>📍</span> {provider.city}, {stateCode}
@@ -346,7 +352,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   <ClinicImage 
                     name={provider.name}
                     initials={initials}
-                    imageUrl={(provider.photos && provider.photos.length > 0) ? provider.photos[0] : (provider.is_featured ? undefined : (provider.imageUrl || provider.image_url))}
+                    imageUrl={(provider.photos && provider.photos.length > 0) ? provider.photos[0] : (provider.imageUrl || provider.image_url)}
                     size="lg"
                     className="object-cover"
                   />

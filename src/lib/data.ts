@@ -96,13 +96,25 @@ export function enrichProvider(p: any): Provider {
     .filter(s => typeof s === 'string');
 
   const imageUrl = (p.imageUrl as string) || (p.image_url as string) || (p.ImageURL as string);
-  // Remove picsum fallback, let ClinicImage handle missing images
-  const finalImageUrl = imageUrl && !imageUrl.includes('picsum.photos') && !imageUrl.includes('unsplash.com')
+  // Remove picsum fallback unless it's a featured clinic (who might have set their own photos)
+  // But generally we want to trust the DB more now.
+  const isFeatured = !!p.is_featured;
+  const finalImageUrl = imageUrl && (!imageUrl.includes('picsum.photos') || isFeatured)
     ? imageUrl 
     : null;
 
   // Map working_hours to hours if available
-  const rawHours = p.working_hours || p.workingHours || p.hours || {};
+  let rawHours = p.working_hours || p.workingHours || p.hours || {};
+  
+  // If it's a string (e.g. from DB JSON field that wasn't automatically parsed), parse it
+  if (typeof rawHours === 'string') {
+    try {
+      rawHours = JSON.parse(rawHours);
+    } catch {
+      rawHours = {};
+    }
+  }
+
   const hours: Record<string, string> = {};
   
   if (rawHours && typeof rawHours === 'object') {
@@ -110,6 +122,7 @@ export function enrichProvider(p: any): Provider {
       // Keep keys as provided but also ensure we have lowercase versions for easier lookup
       const dayKey = day.toLowerCase();
       if (Array.isArray(val)) {
+        // Handle ["9AM-5PM"] or ["Closed"]
         hours[dayKey] = val[0] || 'Closed';
       } else if (typeof val === 'string') {
         hours[dayKey] = val;

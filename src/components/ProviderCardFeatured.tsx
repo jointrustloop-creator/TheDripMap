@@ -88,14 +88,15 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
 
           <div className="flex flex-col gap-2 absolute top-4 left-4">
             {provider.is_featured && (
-              <div className="bg-emerald-600 text-white px-4 py-2 rounded-2xl text-[10px] font-black shadow-xl flex items-center gap-2">
-                ✅ Verified & Claimed
+              <div className="bg-emerald-600 text-white px-4 py-2 rounded-2xl text-[10px] font-black shadow-xl flex items-center gap-2 border border-emerald-500/50">
+                <span className="bg-white text-emerald-600 rounded-full p-0.5"><StarIcon size={8} fill="currentColor" /></span>
+                Verified & Claimed
               </div>
             )}
             
             {isPrimary && (
-              <div className="bg-white/90 backdrop-blur-sm text-wellness-700 px-4 py-2 rounded-2xl text-xs font-black shadow-xl flex items-center gap-2">
-                <Sparkles size={14} /> YOUR BEST MATCH
+              <div className="bg-amber-400 text-slate-900 px-4 py-2 rounded-2xl text-[10px] font-black shadow-xl flex items-center gap-2 uppercase tracking-wider">
+                <Sparkles size={14} fill="currentColor" /> EXPERT PICK
               </div>
             )}
             
@@ -108,15 +109,6 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
                 {dynamicBadge.icon} {dynamicBadge.label}
               </motion.div>
             )}
-
-            {isPrimary && (
-              <div className={cn(
-                "px-4 py-2 rounded-2xl text-[10px] font-black shadow-xl flex items-center gap-2 border",
-                valueMetrics.color
-              )}>
-                💎 {valueMetrics.label}
-              </div>
-            )}
           </div>
 
           {provider.distance !== undefined && (
@@ -126,7 +118,7 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
           )}
 
           {/* Status Overlay */}
-          {!(provider.is_claimed || provider.is_featured || (provider as any).claimed_status === 'claimed') && (
+          {!(provider.is_claimed === true || provider.is_featured === true || (provider as any).claimed_status === 'claimed') && (
             <div className="absolute bottom-4 left-4 right-4 bg-slate-900/40 backdrop-blur-md py-3 px-5 rounded-2xl flex items-center justify-center gap-3 border border-white/10 shadow-xl z-10 pointer-events-none">
               <span className="text-xs font-black text-white uppercase tracking-[0.15em]">UNCLAIMED</span>
             </div>
@@ -143,16 +135,24 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
               <Link href={`/provider/${slug}`} className="block">
                 <h3 className={cn(
                   "font-black text-slate-900 group-hover:text-wellness-600 transition-colors leading-tight",
-                  isPrimary ? "text-3xl mb-2" : "text-xl mb-1"
+                  isPrimary ? "text-3xl mb-3" : "text-xl mb-1"
                 )}>
                   {provider.name}
                 </h3>
               </Link>
-              <div className="flex items-center gap-3 mb-2">
-                {provider.is_featured && provider.rating > 0 && provider.reviewCount > 0 && (
-                  <div className="text-sm font-bold text-slate-900">
-                    ⭐ {provider.name.includes('Blue Cypress') ? '5.0' : provider.rating} ({provider.name.includes('Blue Cypress') ? '13' : (provider.reviewCount || 0)} reviews)
-                  </div>
+              <div className="flex flex-wrap items-center gap-3 mb-3">
+                {provider.is_featured && (
+                  provider.rating > 0 ? (
+                    <div className="text-[13px] font-black text-slate-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100 flex items-center gap-1.5">
+                      <StarIcon size={12} className="text-amber-500" fill="currentColor" />
+                      {provider.name.includes('Blue Cypress') ? '5.0' : provider.rating}
+                      <span className="text-slate-400 font-bold ml-1">({provider.name.includes('Blue Cypress') ? '13' : (provider.reviewCount || 0)} reviews)</span>
+                    </div>
+                  ) : (
+                    <div className="text-[10px] font-black text-emerald-700 uppercase tracking-wider bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100 flex items-center gap-1.5 shadow-sm">
+                      ✨ New Clinic · Be the first to review
+                    </div>
+                  )
                 )}
                 <div className="w-1 h-1 bg-slate-200 rounded-full" />
                 <div className="text-xs font-bold text-slate-500 flex items-center gap-1">
