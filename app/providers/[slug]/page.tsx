@@ -296,9 +296,13 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
           />
         </div>
 
-        {provider.is_featured && (
+        {provider.is_featured ? (
           <div className="mb-12 bg-emerald-600 text-white py-4 px-8 rounded-3xl text-center font-black text-lg shadow-xl shadow-emerald-100 flex items-center justify-center gap-3">
             <CheckCircle2 size={24} /> ✅ Verified & Claimed — This listing is managed by {displayName}
+          </div>
+        ) : (
+          <div className="mb-12 bg-slate-900 text-white py-4 px-8 rounded-3xl text-center font-black text-lg shadow-xl shadow-slate-100 flex items-center justify-center gap-3">
+            ⚠️ UNCLAIMED LISTING — This clinic has not been verified yet
           </div>
         )}
 
@@ -308,18 +312,6 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
             {/* HERO SECTION */}
             <section className="space-y-10">
               <div className="flex flex-col md:flex-row gap-8 items-start">
-        {provider.is_featured && (provider.imageUrl || provider.image_url) && (
-          <div className="w-[160px] h-[160px] rounded-3xl bg-white border border-slate-100 shadow-xl p-4 flex items-center justify-center overflow-hidden shrink-0">
-            <ResilientImage 
-              src={provider.imageUrl || provider.image_url!} 
-              alt={`${displayName} logo`}
-              className="w-full h-full object-contain scale-110"
-              width={160}
-              height={160}
-              fallbackSrc="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/clinic-logo-placeholder.png"
-            />
-          </div>
-        )}
                 <div>
                   <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
                     {displayName}
@@ -345,17 +337,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 </div>
               </div>
 
-              {provider.is_featured && (
-                <div className="relative h-[300px] md:h-[450px] rounded-[3rem] overflow-hidden shadow-2xl">
-                  <ClinicImage 
-                    name={provider.name}
-                    initials={initials}
-                    imageUrl={(provider.photos && provider.photos.length > 0) ? provider.photos[0] : (provider.imageUrl || provider.image_url)}
-                    size="lg"
-                    className="object-cover"
-                  />
-                </div>
-              )}
+              {/* Hero image removed for unclaimed if is_featured is false */}
 
               {provider.is_featured && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -474,16 +456,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                       <User size={14} /> Walk-ins
                     </span>
                   )}
-                  {provider.is_top_rated && (
-                    <span className="bg-amber-500 text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-lg">
-                      <Star size={14} fill="white" /> Top Rated
-                    </span>
-                  )}
-                  {provider.is_featured && (
-                    <span className="bg-wellness-600 text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-lg">
-                      <Star size={14} fill="white" /> Featured
-                    </span>
-                  )}
+                  {/* Top Rated and Featured badges removed */}
                 </div>
               </section>
 
@@ -535,16 +508,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               <section className="pt-8 border-t border-slate-100">
                 <div className="bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200 p-10">
                   <h3 className="text-2xl font-black text-slate-900 mb-2">This listing is unclaimed</h3>
-                  <p className="text-slate-500 font-bold mb-8 text-lg">Claim it free to add:</p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-                    <LockedField icon="📷" label="Photos" text="Add clinic photos to stand out" />
-                    <LockedField icon="📝" label="About this clinic" text="Write your clinic's story" />
-                    <LockedField icon="⚕️" label="Staff credentials" text="RN / NP / MD administered" />
-                    <LockedField icon="🏥" label="Clinic environment" text="Medical / Spa-like / Quick" />
-                    <LockedField icon="💬" label="Your one-liner" text="What makes your clinic different" />
-                    <LockedField icon="📊" label="Specialization focus" text="Hangover / NAD+ / Beauty / etc." />
-                  </div>
+                  <p className="text-slate-500 font-bold mb-8 text-lg">Claim it free to add photos and update your clinic story</p>
 
                   <ClaimListingTrigger 
                     provider={provider}
@@ -840,11 +804,12 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                       .trim();
                     const cStateCode = clinic.state || getStateFromProvider(clinic);
                     const cInitials = getInitials(clinic.name, clinic.city, allListings);
+                    const cSlug = clinic.slug || slugify(clinic.name);
                     
                     return (
                       <Link 
                         key={clinic.id} 
-                        href={`/providers/${clinic.slug || slugify(clinic.name)}`}
+                        href={`/providers/${cSlug}`}
                         className="bg-white rounded-[2rem] border border-slate-100 p-6 hover:shadow-xl transition-all group flex flex-col h-full"
                       >
                         <div className="relative h-40 rounded-2xl overflow-hidden mb-6">
@@ -950,7 +915,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                     status.isOpen ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
                   )}>
                     <span className={cn("w-2.5 h-2.5 rounded-full", status.isOpen ? "bg-emerald-500" : "bg-red-500")} />
-                    {status.isOpen ? 'Open Now' : 'Closed'}
+                    {status.isOpen ? 'OPEN NOW' : 'CLOSED'}
                   </div>
                   <div className="text-3xl font-black text-slate-900">{status.todayHours}</div>
                 </div>
@@ -1003,7 +968,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                     </ClaimListingTrigger>
                   ) : (
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-emerald-600 font-black text-sm">
+                      <div className="flex items-center gap-2 text-emerald-600 font-black text-sm uppercase tracking-tight">
                         <CheckCircle2 size={18} /> Verified & Claimed Profile
                       </div>
                     </div>

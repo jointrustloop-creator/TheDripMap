@@ -23,25 +23,11 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
   const valueMetrics = calculateValueMetrics(provider);
   const priceAnchor = provider.priceRange === '$' ? '$99' : provider.priceRange === '$$' ? '$149' : provider.priceRange === '$$$' ? '$199' : '$249';
 
-  // Simulate dynamic badges intelligently based on ID
-  const dynamicBadge = React.useMemo(() => {
-    const idHash = provider.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const options = [
-      { label: '🔥 Popular This Week', color: 'bg-orange-500', icon: <Flame size={14} /> },
-      { label: '⭐ Top Rated in Area', color: 'bg-amber-500', icon: <StarIcon size={14} /> },
-      { label: '📈 Trending', color: 'bg-blue-500', icon: <TrendingUp size={14} /> },
-      { label: '⚡ Fast Response', color: 'bg-emerald-500', icon: <ZapIcon size={14} /> },
-    ];
-    
-    // Fewer badges on featured to keep it clean
-    if (idHash % 10 > 2) return null;
-    return options[idHash % options.length];
-  }, [provider.id]);
+  // Dynamic badge logic removed
 
   const isRealPhoto = provider.imageUrl && 
                       !provider.imageUrl.includes('placeholder') && 
                       !provider.imageUrl.includes('default');
-  const showAddPhotoBadge = !isRealPhoto;
   const DEFAULT_CLINIC_IMAGE = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg';
 
   return (
@@ -80,34 +66,17 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
           </Link>
           
-          {showAddPhotoBadge && (
-            <div className="absolute bottom-4 left-4 bg-black/40 backdrop-blur-sm text-white/90 px-3 py-1.5 rounded-xl text-[10px] font-bold flex items-center gap-2 border border-white/10 z-20">
-              📷 Add your photo — Claim this listing
-            </div>
-          )}
 
           <div className="flex flex-col gap-2 absolute top-4 left-4">
-            {provider.is_featured && (
+            {provider.is_featured ? (
               <div className="bg-emerald-600 text-white px-4 py-2 rounded-2xl text-[10px] font-black shadow-xl flex items-center gap-2 border border-emerald-500/50">
                 <span className="bg-white text-emerald-600 rounded-full p-0.5"><StarIcon size={8} fill="currentColor" /></span>
                 Verified & Claimed
               </div>
-            )}
-            
-            {isPrimary && (
-              <div className="bg-amber-400 text-slate-900 px-4 py-2 rounded-2xl text-[10px] font-black shadow-xl flex items-center gap-2 uppercase tracking-wider">
-                <Sparkles size={14} fill="currentColor" /> EXPERT PICK
+            ) : (
+              <div className="bg-slate-900/60 backdrop-blur-md text-white px-4 py-2 rounded-2xl text-[10px] font-black shadow-xl flex items-center gap-2 border border-white/10 uppercase tracking-widest">
+                UNCLAIMED LISTING
               </div>
-            )}
-            
-            {dynamicBadge && (
-              <motion.div 
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className={cn("text-white px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-wider shadow-xl flex items-center gap-2", dynamicBadge.color)}
-              >
-                {dynamicBadge.icon} {dynamicBadge.label}
-              </motion.div>
             )}
           </div>
 
@@ -117,12 +86,7 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
             </div>
           )}
 
-          {/* Status Overlay */}
-          {!(provider.is_claimed === true || provider.is_featured === true || (provider as any).claimed_status === 'claimed') && (
-            <div className="absolute bottom-4 left-4 right-4 bg-slate-900/40 backdrop-blur-md py-3 px-5 rounded-2xl flex items-center justify-center gap-3 border border-white/10 shadow-xl z-10 pointer-events-none">
-              <span className="text-xs font-black text-white uppercase tracking-[0.15em]">UNCLAIMED</span>
-            </div>
-          )}
+          {/* Status Overlay removed */}
         </div>
 
         {/* Content Section */}
@@ -141,18 +105,12 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
                 </h3>
               </Link>
               <div className="flex flex-wrap items-center gap-3 mb-3">
-                {provider.is_featured && (
-                  provider.rating > 0 ? (
-                    <div className="text-[13px] font-black text-slate-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100 flex items-center gap-1.5">
-                      <StarIcon size={12} className="text-amber-500" fill="currentColor" />
-                      {provider.rating}
-                      <span className="text-slate-400 font-bold ml-1">({provider.reviewCount || 0} reviews)</span>
-                    </div>
-                  ) : (
-                    <div className="text-[10px] font-black text-emerald-700 uppercase tracking-wider bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100 flex items-center gap-1.5 shadow-sm">
-                      ✨ New Clinic · Be the first to review
-                    </div>
-                  )
+                {provider.is_featured && provider.rating > 0 && (
+                  <div className="text-[13px] font-black text-slate-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100 flex items-center gap-1.5">
+                    <StarIcon size={12} className="text-amber-500" fill="currentColor" />
+                    {provider.rating}
+                    <span className="text-slate-400 font-bold ml-1">({provider.reviewCount || 0} reviews)</span>
+                  </div>
                 )}
                 <div className="w-1 h-1 bg-slate-200 rounded-full" />
                 <div className="text-xs font-bold text-slate-500 flex items-center gap-1">

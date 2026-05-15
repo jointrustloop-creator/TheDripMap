@@ -35,27 +35,10 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
                       !provider.imageUrl.includes('placeholder') && 
                       !provider.imageUrl.includes('default');
   
-  const showAddPhotoBadge = !isRealPhoto;
 
-  // Simulate dynamic badges intelligently based on ID
-  const dynamicBadge = React.useMemo(() => {
-    // Only show dynamic badge for claimed/featured clinics
-    if (!provider.is_featured) return null;
-    
-    const idHash = provider.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const options = [
-      { label: '🔥 Popular This Week', color: 'bg-orange-500', icon: <Flame size={12} /> },
-      { label: '⭐ Top Rated in Area', color: 'bg-amber-500', icon: <StarIcon size={12} /> },
-      { label: '📈 Trending', color: 'bg-blue-500', icon: <TrendingUp size={12} /> },
-      { label: '⚡ Fast Response', color: 'bg-emerald-500', icon: <ZapIcon size={12} /> },
-    ];
-    
-    // Only show dynamic badge for ~30% of clinics to keep it premium
-    if (idHash % 10 > 2) return null;
-    return options[idHash % options.length];
-  }, [provider.id, provider.is_featured]);
+  // Dynamic badge logic removed
 
-  const isClaimed = provider.is_claimed === true || provider.is_featured === true || (provider as any).claimed_status === 'claimed';
+  const isClaimed = provider.is_featured === true;
 
   return (
     <motion.div 
@@ -93,27 +76,16 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
         <div className="relative h-[140px] shrink-0">
           {/* Top Left Badges */}
           <div className="absolute top-4 left-4 flex flex-col gap-2">
-            {!isClaimed && (
+            {!provider.is_featured && (
               <span className="bg-slate-400 text-white px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-[0.1em] shadow-sm">
-                Unclaimed Listing
+                UNCLAIMED LISTING
               </span>
             )}
             {provider.is_featured && (
-              <>
-                <span className="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1.5 border border-emerald-500/50">
-                  <span className="bg-white text-emerald-600 rounded-full p-0.5"><StarIcon size={8} fill="currentColor" /></span>
-                  Verified & Claimed
-                </span>
-                {dynamicBadge && (
-                  <motion.span 
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className={cn("text-white px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1.5", dynamicBadge.color)}
-                  >
-                    {dynamicBadge.icon} {dynamicBadge.label}
-                  </motion.span>
-                )}
-              </>
+              <span className="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1.5 border border-emerald-500/50">
+                <span className="bg-white text-emerald-600 rounded-full p-0.5"><StarIcon size={8} fill="currentColor" /></span>
+                Verified & Claimed
+              </span>
             )}
           </div>
 
@@ -145,24 +117,27 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
 
           {/* Rating Section */}
           <div className="mb-4">
-            {provider.is_featured && (
-              provider.rating > 0 ? (
-                <div className="flex items-center gap-1 text-[11px] font-black text-slate-700">
-                  <div className="flex items-center text-amber-500">
-                    <StarIcon size={12} fill="currentColor" />
-                  </div>
-                  {provider.rating} <span className="text-slate-400 font-bold ml-1">({provider.reviewCount || 0} reviews)</span>
+            {provider.is_featured && provider.rating > 0 && (
+              <div className="flex items-center gap-1 text-[11px] font-black text-slate-700">
+                <div className="flex items-center text-amber-500">
+                  <StarIcon size={12} fill="currentColor" />
                 </div>
-              ) : (
-                <div className="text-[9px] font-black text-emerald-600 uppercase tracking-wider flex items-center gap-1 bg-emerald-50 w-fit px-2 py-0.5 rounded-md border border-emerald-100">
-                  ✨ New Clinic · Be the first to review
-                </div>
-              )
+                {provider.rating} <span className="text-slate-400 font-bold ml-1">({provider.reviewCount || 0} reviews)</span>
+              </div>
             )}
           </div>
 
-          {/* Location & Service Row */}
+          {/* Status Row */}
           <div className="flex items-center gap-3 mb-4">
+            {provider.hours && (
+              <div className={cn(
+                "text-[10px] font-black uppercase tracking-tight",
+                status.isOpen ? "text-emerald-600" : "text-amber-600"
+              )}>
+                {status.isOpen ? "● OPEN NOW" : "● CLOSED"}
+              </div>
+            )}
+            {provider.hours && <div className="w-1 h-1 bg-slate-200 rounded-full" />}
             <div className="flex items-center gap-1 text-[11px] font-bold text-slate-500">
               <Navigation size={12} className={provider.is_featured ? "text-wellness-600" : "text-slate-400"} />
               {provider.distance ? `${provider.distance} mi` : provider.city}

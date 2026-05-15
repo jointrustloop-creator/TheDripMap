@@ -1,6 +1,6 @@
 import { Provider, BlogPost, OperatorProfile, ListingStats } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
-import { MOCK_BLOG_POSTS, MOCK_LISTINGS, MOCK_CITIES } from './mock-data';
+import { MOCK_BLOG_POSTS } from './mock-data';
 import { htmlToMarkdown, containsHtml } from './blog-utils';
 
 // Helper to slugify strings
@@ -175,12 +175,7 @@ export function enrichProvider(p: any): Provider {
     special_offers: p.special_offers || []
   } as Provider;
 
-  // Hardcoded override: Blue Cypress is In-Clinic, not Mobile
-  if (enriched.name?.toLowerCase().includes('blue cypress') || enriched.slug?.includes('blue-cypress')) {
-    enriched.type = 'In-Clinic';
-    enriched.mobile_service = false;
-  }
-
+  // Hardcoded override removed
   return enriched;
 }
 
@@ -222,10 +217,7 @@ export async function getListingsByCity(city: string, state?: string) {
   };
 
   if (!isSupabaseConfigured()) {
-    return MOCK_LISTINGS.filter(p => 
-      isCityMatch(p.city, city) && 
-      (!state || p.state?.toLowerCase() === state.toLowerCase())
-    ).map(enrichProvider);
+    return [];
   }
   
   let searchCity = city?.trim();
@@ -320,23 +312,8 @@ export async function getListingsByCity(city: string, state?: string) {
 
       const dbResults = (response.data || []).map(enrichProvider);
 
-      // Merge with mock data - apply SAME strict filtering
-      const mockResults = MOCK_LISTINGS.filter(p => {
-        const cityMatch = isCityMatch(p.city, searchCity);
-        const stateMatch = !searchState || p.state?.toLowerCase() === searchState.toLowerCase() || 
-                          (STATE_MAP[slugify(searchState)] === p.state);
-                          
-        // Final sanity check: if state is provided, don't allow wrong country in mock results
-        if (searchState) {
-          const slugState = slugify(searchState);
-          const stateAbbr = STATE_MAP[slugState] || searchState;
-          const isUSState = Object.values(STATE_MAP).includes(stateAbbr.toUpperCase()) && stateAbbr.toUpperCase() !== 'ON';
-          if (isUSState && p.country?.toLowerCase() === 'canada') return false;
-          if (!isUSState && stateAbbr.toUpperCase() === 'ON' && (p.country?.toLowerCase() === 'us' || p.country?.toLowerCase() === 'usa')) return false;
-        }
-
-        return cityMatch && stateMatch;
-      }).map(enrichProvider);
+      // Merge with mock results removed
+      const mockResults = [];
 
     const merged = deduplicateListings([...dbResults, ...mockResults]);
     return merged;
@@ -348,9 +325,7 @@ export async function getListingsByCity(city: string, state?: string) {
 
 export async function getListingsByState(state: string) {
   if (!isSupabaseConfigured()) {
-    return MOCK_LISTINGS.filter(p => 
-      p.state?.toLowerCase() === state.toLowerCase()
-    ).map(enrichProvider);
+    return [];
   }
   
   try {
@@ -396,8 +371,7 @@ export async function getListingBySlug(slug: string) {
   };
 
   if (!isSupabaseConfigured()) {
-    const found = MOCK_LISTINGS.find(p => matchesSlug(p, slug));
-    return found ? enrichProvider(found) : null;
+    return null;
   }
   
   try {
@@ -446,33 +420,17 @@ export async function getListingBySlug(slug: string) {
       if (match) return enrichProvider(match);
     }
 
-    // 3. Last fallback to mock data
-    const found = MOCK_LISTINGS.find(p => matchesSlug(p, slug));
-    return found ? enrichProvider(found) : null;
+    // 3. Last fallback removed
+    return null;
   } catch (err) {
     console.error('Error in getListingBySlug:', err);
-    const found = MOCK_LISTINGS.find(p => matchesSlug(p, slug));
-    return found ? enrichProvider(found) : null;
+    return null;
   }
 }
 
 export async function getAllCities(): Promise<{ city: string, state: string, stateAbbr: string, count: number }[]> {
   const getMockCities = () => {
-    const cityCounts = new Map<string, { city: string, stateAbbr: string, count: number }>();
-    MOCK_LISTINGS.forEach(p => {
-      const stateAbbr = p.state?.toUpperCase() || 'US';
-      const key = `${p.city}|${stateAbbr}`;
-      const existing = cityCounts.get(key);
-      if (existing) {
-        existing.count++;
-      } else {
-        cityCounts.set(key, { city: p.city, stateAbbr, count: 1 });
-      }
-    });
-    return Array.from(cityCounts.values()).map(c => ({
-      ...c,
-      state: REVERSE_STATE_MAP[c.stateAbbr] || c.stateAbbr
-    })).sort((a, b) => b.count - a.count);
+    return [];
   };
 
   if (!isSupabaseConfigured()) return getMockCities();
@@ -535,23 +493,7 @@ export async function getAllCities(): Promise<{ city: string, state: string, sta
 
 export async function getTopHubs(limit: number = 8) {
   const getMockHubs = () => {
-    const cityCounts: Record<string, { city: string, state: string, count: number }> = {};
-    MOCK_LISTINGS.forEach(p => {
-      const key = p.city;
-      if (!cityCounts[key]) {
-        cityCounts[key] = { city: p.city, state: p.state || '', count: 0 };
-      }
-      cityCounts[key].count++;
-    });
-    return Object.values(cityCounts)
-      .sort((a, b) => b.count - a.count)
-      .slice(0, limit)
-      .map(h => ({
-        city: h.city,
-        state: h.state,
-        slug: slugify(h.city),
-        count: h.count
-      }));
+    return [];
   };
 
   if (!isSupabaseConfigured()) return getMockHubs();
@@ -656,8 +598,7 @@ export async function getPopularCities() {
 
 export async function getCitiesWithListings() {
   if (!isSupabaseConfigured()) {
-    const uniqueCities = [...new Set(MOCK_LISTINGS.map(p => p.city))];
-    return uniqueCities.filter(Boolean).sort();
+    return [];
   }
 
   try {
@@ -786,15 +727,7 @@ export async function searchListings(query: string, city?: string) {
   };
 
   if (!isSupabaseConfigured()) {
-    const searchTerm = query.toLowerCase().trim();
-    return MOCK_LISTINGS.filter(p => {
-      const matchCity = isCityMatch(p.city, city);
-      const matchQuery = !searchTerm || 
-        p.name.toLowerCase().includes(searchTerm) || 
-        p.description.toLowerCase().includes(searchTerm) ||
-        p.specialties.some(s => s.toLowerCase().includes(searchTerm));
-      return matchCity && matchQuery;
-    }).map(enrichProvider);
+    return [];
   }
 
   try {
@@ -825,15 +758,7 @@ export async function searchListings(query: string, city?: string) {
     
     let results = data || [];
     if (results.length === 0) {
-      const searchTerm = query.toLowerCase().trim();
-      results = MOCK_LISTINGS.filter(p => {
-        const matchCity = isCityMatch(p.city, city);
-        const matchQuery = !searchTerm || 
-          p.name.toLowerCase().includes(searchTerm) || 
-          p.description.toLowerCase().includes(searchTerm) ||
-          p.specialties.some(s => s.toLowerCase().includes(searchTerm));
-        return matchCity && matchQuery;
-      });
+      return [];
     }
 
     // Deduplicate by content to ensure clean search results
@@ -853,10 +778,7 @@ export async function getFeaturedListings(limit: number = 6, city?: string) {
   };
 
   if (!isSupabaseConfigured()) {
-    return MOCK_LISTINGS
-      .filter(p => p.is_featured && isCityMatch(p.city, city))
-      .slice(0, limit)
-      .map(enrichProvider);
+    return [];
   }
   
   try {
@@ -880,66 +802,23 @@ export async function getFeaturedListings(limit: number = 6, city?: string) {
       return deduplicateListings(data).map(enrichProvider);
     }
     
-    // Fallback to mock if no DB results
-    return MOCK_LISTINGS
-      .filter(p => p.is_featured && isCityMatch(p.city, city))
-      .slice(0, limit)
-      .map(enrichProvider);
+    return [];
   } catch (err) {
     console.warn('Supabase error in getFeaturedListings:', err);
-    return MOCK_LISTINGS
-      .filter(p => p.is_featured && isCityMatch(p.city, city))
-      .slice(0, limit)
-      .map(enrichProvider);
+    return [];
   }
 }
 
 export async function getSiteStats() {
   const getMockStats = () => {
-    const citiesSet = new Set();
-    const statesSet = new Set();
-    let totalReviews = 0;
-    const stateCounts: Record<string, number> = {};
-    const cityCounts: Record<string, { city: string, state: string, count: number }> = {};
-
-    MOCK_LISTINGS.forEach(p => {
-      if (p.city && p.state) {
-        citiesSet.add(`${p.city.toLowerCase()}-${p.state.toLowerCase()}`);
-        const cityKey = `${p.city}-${p.state}`;
-        if (!cityCounts[cityKey]) {
-          cityCounts[cityKey] = { city: p.city, state: p.state, count: 0 };
-        }
-        cityCounts[cityKey].count++;
-      }
-      if (p.state) {
-        statesSet.add(p.state.toLowerCase());
-        stateCounts[p.state] = (stateCounts[p.state] || 0) + 1;
-      }
-      // Use reviewCount if it exists, otherwise 0
-      totalReviews += (p.reviewCount || 0);
-    });
-
-    const topStates = Object.entries(stateCounts)
-      .map(([name, count]) => ({
-        name,
-        count,
-        share: `${((count / MOCK_LISTINGS.length) * 100).toFixed(1)}%`
-      }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
-
-    const topCities = Object.values(cityCounts)
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 10);
-
     return {
-      total: MOCK_LISTINGS.length,
-      cities: citiesSet.size,
-      states: statesSet.size,
-      avgRating: '4.9',
-      totalReviews: totalReviews || 5000,
-      topStates,
-      topCities
+      total: 0,
+      cities: 0,
+      states: 0,
+      avgRating: '0.0',
+      totalReviews: 0,
+      topStates: [],
+      topCities: []
     };
   };
 
@@ -1131,13 +1010,7 @@ export async function getBlogPostBySlug(slug: string) {
 
 export async function getCityBySlug(slug: string) {
   if (!isSupabaseConfigured()) {
-    const found = MOCK_CITIES.find(c => slugify(c.city) === slug);
-    return found ? { 
-      name: found.city, 
-      state: found.state, 
-      slug: slugify(found.city),
-      id: `mock-${slug}`
-    } : null;
+    return null;
   }
 
   try {
@@ -1160,25 +1033,12 @@ export async function getCityBySlug(slug: string) {
       
       if (nameMatch) return nameMatch;
 
-      // Final fallback to mock
-      const found = MOCK_CITIES.find(c => slugify(c.city) === slug);
-      return found ? { 
-        name: found.city, 
-        state: found.state, 
-        slug: slugify(found.city),
-        id: `mock-${slug}`
-      } : null;
+      return null;
     }
     return data;
   } catch (err) {
     console.warn('Error in getCityBySlug:', err);
-    const found = MOCK_CITIES.find(c => slugify(c.city) === slug);
-    return found ? { 
-      name: found.city, 
-      state: found.state, 
-      slug: slugify(found.city),
-      id: `mock-${slug}`
-    } : null;
+    return null;
   }
 }
 
@@ -1193,7 +1053,7 @@ export async function getAllUseCases() {
 }
 
 export async function getAllListings() {
-  if (!isSupabaseConfigured()) return MOCK_LISTINGS.map(enrichProvider);
+  if (!isSupabaseConfigured()) return [];
   
   try {
     const { data, error } = await supabase
@@ -1204,10 +1064,9 @@ export async function getAllListings() {
       .limit(2000);
 
     if (error) throw error;
-    const results = data && data.length > 0 ? data : MOCK_LISTINGS;
-    return results.map(enrichProvider);
+    return (data || []).map(enrichProvider);
   } catch {
-    return MOCK_LISTINGS.map(enrichProvider);
+    return [];
   }
 }
 
@@ -1272,20 +1131,8 @@ export async function getListingsByServiceAndCity(service: string, city: string,
     // Deduplicate while allowing multiple locations
     const dbResults = deduplicateListings(data || []).map(enrichProvider);
 
-    // Merge with mock data for this city and service
-    const isCityMatch = (pCity: string, search: string) => {
-      const s = search.toLowerCase().trim();
-      const pc = pCity.toLowerCase().trim();
-      return pc === s || slugify(pc) === slugify(s) || pc.includes(s) || s.includes(pc);
-    };
-
-    const mockResults = MOCK_LISTINGS.filter(p => {
-      const cityMatch = isCityMatch(p.city, city);
-      const serviceMatch = !service || 
-        p.specialties.some(s => s.toLowerCase().includes(service.toLowerCase())) ||
-        p.name.toLowerCase().includes(service.toLowerCase());
-      return cityMatch && serviceMatch;
-    }).map(enrichProvider);
+    // Merge with mock results removed
+    const mockResults = [];
 
     const merged = deduplicateListings([...dbResults, ...mockResults]);
 

@@ -33,7 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Provider routes
   const providers = await getAllListings();
   const providerRoutes = providers.map((p) => ({
-    url: `${baseUrl}/provider/${slugify(p.name)}`,
+    url: `${baseUrl}/providers/${p.slug || slugify(p.name)}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
     priority: 0.7,
