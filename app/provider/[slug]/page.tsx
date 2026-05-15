@@ -848,12 +848,18 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                         className="bg-white rounded-[2rem] border border-slate-100 p-6 hover:shadow-xl transition-all group flex flex-col h-full"
                       >
                         <div className="relative h-40 rounded-2xl overflow-hidden mb-6">
-                          <ClinicImage 
-                            name={clinic.name}
-                            initials={cInitials}
-                            imageUrl={clinic.imageUrl || clinic.image_url}
-                            className="group-hover:scale-105 transition-transform duration-500"
-                          />
+                          {clinic.is_featured ? (
+                            <ClinicImage 
+                              name={clinic.name}
+                              initials={cInitials}
+                              imageUrl={clinic.imageUrl || clinic.image_url}
+                              className="group-hover:scale-105 transition-transform duration-500"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-300 font-black text-4xl select-none group-hover:scale-105 transition-transform duration-500">
+                              {cInitials}
+                            </div>
+                          )}
                         </div>
                         <h4 className="font-black text-slate-900 mb-2 line-clamp-1">{cDisplayName}</h4>
                         <div className="flex items-center gap-1.5 mb-2">
