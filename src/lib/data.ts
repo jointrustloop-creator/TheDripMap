@@ -617,12 +617,7 @@ export async function getPopularCities() {
     'clearwater': 'Clearwater'
   };
 
-  // For Toronto, we want to sum GTA cities if they are in the database
-  const gtaLower = GTA_CITIES.map(c => c.toLowerCase());
-  const torontoGTA = allCities.filter(c => 
-    gtaLower.includes(c.city.toLowerCase())
-  );
-  const torontoCount = torontoGTA.reduce((sum, c) => sum + c.count, 0);
+  const torontoCount = 46; // Updated from dynamic/45 per request
 
   const results = requestedSlugs.map(slug => {
     if (slug === 'toronto') {

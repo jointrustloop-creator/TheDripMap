@@ -41,6 +41,26 @@ const nextConfig = {
         hostname: 'api.mapbox.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'signaturebeautylounge.ca',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.signaturebeautylounge.ca',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'signaturemedispa.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.signaturemedispa.com',
+        pathname: '/**',
+      },
     ],
   },
   async redirects() {

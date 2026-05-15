@@ -126,7 +126,7 @@ export const ProviderCardFeatured = ({ provider, operatorProfile, isPrimary = tr
           )}
 
           {/* Status Overlay */}
-          {!provider.is_claimed && !provider.is_featured && (
+          {!(provider.is_claimed || provider.is_featured || (provider as any).claimed_status === 'claimed') && (
             <div className="absolute bottom-4 left-4 right-4 bg-slate-900/40 backdrop-blur-md py-3 px-5 rounded-2xl flex items-center justify-center gap-3 border border-white/10 shadow-xl z-10 pointer-events-none">
               <span className="text-xs font-black text-white uppercase tracking-[0.15em]">UNCLAIMED</span>
             </div>

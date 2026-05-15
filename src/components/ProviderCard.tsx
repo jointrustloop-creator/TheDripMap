@@ -55,6 +55,8 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
     return options[idHash % options.length];
   }, [provider.id, provider.is_featured]);
 
+  const isClaimed = provider.is_claimed === true || provider.is_featured === true || (provider as any).claimed_status === 'claimed';
+
   return (
     <motion.div 
       whileHover={{ y: -5 }}
@@ -83,7 +85,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
         <div className="relative h-[160px] shrink-0">
           {/* Top Left Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-            {!provider.is_claimed && !provider.is_featured && (
+            {!isClaimed && (
               <span className="bg-slate-500/80 backdrop-blur-sm text-white px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
                 Unclaimed
               </span>
@@ -212,37 +214,14 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
 
         {/* Card Footer */}
         <div className="px-3 py-3 mt-auto flex flex-col gap-2 bg-gradient-to-t from-slate-950/80 to-transparent">
-          {showAddPhotoBadge && !provider.is_featured && (
+          {showAddPhotoBadge && !isClaimed && (
             <div className="text-[10px] text-white/70 mb-1 flex items-center gap-1 font-medium">
               📷 Add your photo — Claim this listing
             </div>
           )}
           
           <div className="flex gap-2">
-            {!provider.is_featured ? (
-              <>
-                <div className="flex gap-2 w-full">
-                  {provider.phone && (
-                    <a 
-                      href={`tel:${provider.phone}`}
-                      className="flex-1 bg-white/10 backdrop-blur-sm text-white px-3 py-2 rounded-lg font-bold text-[11px] hover:bg-white/20 transition-all flex items-center justify-center gap-1.5 border border-white/10"
-                    >
-                      <Phone size={14} /> Call
-                    </a>
-                  )}
-                  {provider.website && (
-                    <a 
-                      href={provider.website.startsWith('http') ? provider.website : `https://${provider.website}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 bg-white/10 backdrop-blur-sm text-white px-3 py-2 rounded-lg font-bold text-[11px] hover:bg-white/20 transition-all flex items-center justify-center gap-1.5 border border-white/10"
-                    >
-                      Website
-                    </a>
-                  )}
-                </div>
-              </>
-            ) : (
+            {isClaimed && provider.is_featured ? (
               <div className="flex gap-2 w-full">
                 {provider.phone && (
                   <a 
@@ -259,10 +238,31 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
                   View Profile
                 </Link>
               </div>
+            ) : (
+              <div className="flex gap-2 w-full">
+                {provider.phone && (
+                  <a 
+                    href={`tel:${provider.phone}`}
+                    className="flex-1 bg-white/10 backdrop-blur-sm text-white px-3 py-2 rounded-lg font-bold text-[11px] hover:bg-white/20 transition-all flex items-center justify-center gap-1.5 border border-white/10"
+                  >
+                    <Phone size={14} /> Call
+                  </a>
+                )}
+                {provider.website && (
+                  <a 
+                    href={provider.website.startsWith('http') ? provider.website : `https://${provider.website}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 bg-white/10 backdrop-blur-sm text-white px-3 py-2 rounded-lg font-bold text-[11px] hover:bg-white/20 transition-all flex items-center justify-center gap-1.5 border border-white/10"
+                  >
+                    Website
+                  </a>
+                )}
+              </div>
             )}
           </div>
           
-          {!provider.is_claimed && !provider.is_featured && (
+          {!isClaimed && (
             <button 
               onClick={() => openClaimModal(provider)}
               className="bg-teal-500 text-white px-3 py-2.5 rounded-lg font-bold text-[12px] hover:bg-teal-600 transition-all flex items-center justify-center gap-1.5 shadow-sm uppercase tracking-wider w-full"
