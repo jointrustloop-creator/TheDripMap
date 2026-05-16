@@ -351,7 +351,7 @@ export async function getListingsByState(state: string) {
       .or(`state.ilike.${state},state.ilike.${stateAbbr}`);
     
     if (isUSState) {
-      query = query.eq('country', 'US');
+      query = query.ilike('country', '%United%');
     } else if (stateAbbr.toUpperCase() === 'ON' || state.toLowerCase() === 'ontario') {
       query = query.eq('country', 'Canada');
     }
