@@ -280,12 +280,17 @@ export async function getListingsByCity(city: string, state?: string) {
           const abbrPattern = stateAbbr.replace(/'/g, "''").trim();
           
           // HARD FILTER: State must match if provided
+          // HARD FILTER: State must match if provided
           query = query.or(`state.ilike.%${statePattern}%,state.ilike.%${abbrPattern}%`);
           
           // Enforcement: Ensure we don't match cross-country if we have a state like KY
           const isUSState = Object.values(STATE_MAP).includes(stateAbbr.toUpperCase()) && stateAbbr.toUpperCase() !== 'ON';
 if (isUSState) {
   query = query.ilike('country', '%US%');
+}
+          }
+        }
+      }
 }
           }
         }
