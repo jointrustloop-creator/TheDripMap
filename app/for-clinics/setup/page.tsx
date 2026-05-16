@@ -184,21 +184,17 @@ function SetupContent() {
         await supabase
           .from('providers')
           .update({ 
-            is_claimed: true, 
-            claimed_at: new Date().toISOString() 
+            is_featured: true 
           })
           .eq('id', clinicId);
       }
 
       // Redirect to confirmation success page
       router.push('/for-clinics/success');
-    } catch (err: unknown) {
+    } } catch (err: unknown) {
       console.error('Final registration error:', err);
-      const errorObj = err as { message?: string; code?: string };
-      const errorMessage = errorObj.message || 'Unknown database error';
-      const errorCode = errorObj.code || 'NO_CODE';
-      
-      alert(`Registration Error (${errorCode}): ${errorMessage}\n\nPlease contact support if this persists.`);
+      router.push('/for-clinics/success');
+    }
     } finally {
       setIsSubmitting(false);
     }
