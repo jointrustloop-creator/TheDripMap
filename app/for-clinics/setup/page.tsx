@@ -194,8 +194,7 @@ function SetupContent() {
     } } catch (err: unknown) {
       console.error('Final registration error:', err);
       router.push('/for-clinics/success');
-    }
-    } finally {
+        } finally {
       setIsSubmitting(false);
     }
   };
