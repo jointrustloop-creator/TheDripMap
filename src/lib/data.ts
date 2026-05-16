@@ -285,7 +285,7 @@ export async function getListingsByCity(city: string, state?: string) {
           // Enforcement: Ensure we don't match cross-country if we have a state like KY
           const isUSState = Object.values(STATE_MAP).includes(stateAbbr.toUpperCase()) && stateAbbr.toUpperCase() !== 'ON';
           if (isUSState) {
-            query = query.eq('country', 'US');
+            query = query.ilike('country', '%United%');
           }
         }
       }
