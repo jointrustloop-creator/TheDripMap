@@ -256,7 +256,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
     "itemListElement": listings.map((l, i) => ({
       "@type": "ListItem",
       "position": i + 1,
-      "url": `https://thedripmap.com/provider/${l.slug || slugify(l.name)}`,
+      "url": `https://thedripmap.com/providers/${l.slug || slugify(l.name)}`,
       "name": l.name
     }))
   };
