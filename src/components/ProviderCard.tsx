@@ -56,12 +56,14 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
         "absolute inset-0 z-0",
         !provider.is_featured && "brightness-[0.8] contrast-[0.9]"
       )}>
-        <ClinicImage 
-          name={provider.name}
-          imageUrl={provider.imageUrl || (provider.is_featured ? DEFAULT_CLINIC_IMAGE : undefined)}
-          initials={provider.is_featured ? ' ' : undefined}
-          className="group-hover:scale-105 transition-transform duration-700 h-full w-full opacity-30"
-        />
+        {provider.is_featured && (
+          <ClinicImage
+            name={provider.name}
+            imageUrl={provider.imageUrl || DEFAULT_CLINIC_IMAGE}
+            initials={' '}
+            className="group-hover:scale-105 transition-transform duration-700 h-full w-full opacity-30"
+          />
+        )}
         <div className={cn(
           "absolute inset-0",
           provider.is_featured 
