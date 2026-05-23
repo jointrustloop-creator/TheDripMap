@@ -14,7 +14,7 @@ export async function POST(req: Request) {
         try {
           const resend = new Resend(process.env.RESEND_API_KEY);
           await resend.emails.send({
-            from: 'TheDripMap <info@thedripmap.com>',
+            from: 'TheDripMap <onboarding@resend.dev>',
             to: 'info@thedripmap.com',
             replyTo: email,
             subject: `New clinic claim: ${clinicName || 'Unknown'}`,
