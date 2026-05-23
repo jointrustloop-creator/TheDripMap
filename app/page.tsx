@@ -31,7 +31,7 @@ import { cn } from '../src/lib/utils';
 
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getSiteStats();
-  const title = `IV Therapy Clinics Near You | Find & Compare 529 Providers | TheDripMap`;
+  const title = `IV Therapy Clinics Near You | Find & Compare ${stats.total} Providers | TheDripMap`;
   const description = `TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse ${stats.total} clinics across ${stats.cities} cities including Toronto, NYC, and LA.`;
   
   return {
@@ -241,7 +241,7 @@ export default async function HomePage() {
               </div>
               <div className="text-left">
                 <h4 className="font-bold text-slate-900 text-sm">{stats.total} Top-Rated Clinics</h4>
-                <p className="text-slate-500 text-xs leading-relaxed">529 verified IV therapy providers</p>
+                <p className="text-slate-500 text-xs leading-relaxed">{stats.total} verified IV therapy providers</p>
               </div>
             </div>
             <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm">
