@@ -74,7 +74,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     return { title: 'City Not Found' };
   }
 
-  const title = cityData?.meta_title?.replace('{count}', String(count)) || `${name} IV Therapy — ${count} Verified Clinics | TheDripMap`;
+  const title = cityData?.meta_title?.replace('{count}', String(count)) || `${name} IV Therapy — ${count} Clinics | TheDripMap`;
   const description = cityData?.meta_description?.replace('{count}', String(count)) || `Find and compare ${count} top-rated IV therapy clinics and mobile services in ${name}.`;
 
   return {
@@ -146,7 +146,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   const faqs = [
     {
       question: `How many IV therapy clinics are in ${cityData.name}?`,
-      answer: `There are currently ${count} verified IV therapy providers in ${cityData.name} listed on TheDripMap, including both clinic locations and mobile services.`
+      answer: `There are currently ${count} IV therapy providers in ${cityData.name} listed on TheDripMap, including both clinic locations and mobile services.`
     },
     {
       question: `Do clinics in ${cityData.name} offer mobile services?`,
@@ -180,7 +180,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           <div className="inline-flex items-center gap-2 bg-wellness-50 text-wellness-700 px-4 py-1.5 rounded-full text-sm font-bold border border-wellness-100 shadow-sm">
             <MapPin size={16} />
-            <span>{count} verified providers in {cityData.name}</span>
+            <span>{count} providers in {cityData.name}</span>
           </div>
           <MapTrigger />
         </div>

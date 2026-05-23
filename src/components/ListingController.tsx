@@ -90,7 +90,7 @@ export function ListingController({ initialProviders, cityName }: ListingControl
       {/* Header with View Toggle */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-6">
         <div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Verified Providers in {cityName}</h2>
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Providers in {cityName}</h2>
           <p className="text-slate-500 font-medium">Compare the best IV therapy and hydration services near you.</p>
         </div>
         
