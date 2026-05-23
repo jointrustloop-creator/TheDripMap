@@ -94,6 +94,8 @@ const TIMEZONE_MAP: Record<string, string> = {
   'YT': 'America/Whitehorse', 'Yukon': 'America/Whitehorse',
 };
 
+const DEFAULT_CLINIC_IMAGE = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg';
+
 interface ProviderPageProps {
   params: Promise<{
     slug: string;
@@ -380,7 +382,16 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 </div>
               </div>
 
-              {/* Hero image removed for unclaimed if is_featured is false */}
+              {provider.is_featured && (
+                <div className="relative w-full h-96 md:h-[28rem] rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-100 bg-slate-100">
+                  <ClinicImage
+                    name={provider.name}
+                    imageUrl={provider.imageUrl || DEFAULT_CLINIC_IMAGE}
+                    initials={' '}
+                    className="h-full w-full"
+                  />
+                </div>
+              )}
 
               {provider.is_featured && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
