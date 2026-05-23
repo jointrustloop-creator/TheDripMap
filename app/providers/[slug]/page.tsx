@@ -2,9 +2,9 @@ import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { 
-  MapPin, 
-  Zap, 
+import {
+  MapPin,
+  Zap,
   Activity,
   Building2,
   Home,
@@ -13,8 +13,7 @@ import {
   User,
   CheckCircle2,
   ExternalLink,
-  Phone,
-  Lock
+  Phone
 } from 'lucide-react';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
@@ -1065,19 +1064,3 @@ function BestForCard({ icon, label, value }: { icon: React.ReactNode, label: str
   );
 }
 
-function LockedField({ icon, label, text }: { icon: string, label: string, text: string }) {
-  return (
-    <div className="flex items-start gap-4">
-      <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-lg shadow-sm shrink-0">
-        {icon}
-      </div>
-      <div>
-        <div className="flex items-center gap-1.5 mb-0.5">
-          <span className="font-black text-slate-900 text-sm">{label}</span>
-          <Lock size={12} className="text-slate-300" />
-        </div>
-        <p className="text-slate-400 text-xs font-bold">{text}</p>
-      </div>
-    </div>
-  );
-}

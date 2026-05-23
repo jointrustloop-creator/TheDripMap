@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Phone, ArrowRight, TrendingUp, Zap as ZapIcon, Star as StarIcon, Flame, Navigation } from 'lucide-react';
+import { ArrowRight, Star as StarIcon, Navigation } from 'lucide-react';
 import { Provider } from '../types';
 import { slugify } from '../lib/data';
 import { cn } from '../lib/utils';
@@ -25,18 +25,9 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
   const valueMetrics = calculateValueMetrics(provider);
 
   const status = getStatus(provider.hours);
-  const isOpenNow = status.isOpen;
-  const openStatus = provider.hours ? isOpenNow : null;
-  const isMobile = provider.mobile_service || 
-                   provider.type === 'Mobile' || 
+  const isMobile = provider.mobile_service ||
+                   provider.type === 'Mobile' ||
                    provider.specialties?.some(s => (s?.toString() || '').toLowerCase().includes('mobile'));
-
-  const isRealPhoto = provider.imageUrl && 
-                      !provider.imageUrl.includes('placeholder') && 
-                      !provider.imageUrl.includes('default');
-  
-
-  // Dynamic badge logic removed
 
   const isClaimed = provider.is_featured === true;
 
