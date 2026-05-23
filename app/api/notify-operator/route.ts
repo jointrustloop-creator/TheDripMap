@@ -1,18 +1,59 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
+const SUPABASE_PROJECT_REF = 'qaqzwfnjajyejehmdvuw';
+const SITE_URL = 'https://www.thedripmap.com';
+
 export async function POST(req: Request) {
     try {
       const body = await req.json();
-      const { clinicName, ownerName, email, specialty, phone } = body || {};
+      const {
+        clinicName,
+        ownerName,
+        ownerPhone,
+        email,
+        specialty,
+        token,
+        listingId,
+        providerSlug,
+      } = body || {};
 
       if (!email) {
         return NextResponse.json({ error: 'Email is required' }, { status: 400 });
       }
 
       if (process.env.RESEND_API_KEY) {
+        const resend = new Resend(process.env.RESEND_API_KEY);
+
+        if (token) {
+          const verifyUrl = `${SITE_URL}/verify-claim?token=${encodeURIComponent(token)}`;
+          try {
+            await resend.emails.send({
+              from: 'TheDripMap <info@thedripmap.com>',
+              to: email,
+              replyTo: 'info@thedripmap.com',
+              subject: `Verify your claim for ${clinicName || 'your clinic'} on TheDripMap`,
+              text: `Hi ${ownerName || 'there'},
+
+Thanks for submitting a claim for ${clinicName || 'your clinic'} on TheDripMap.
+
+To confirm you're the rightful owner, click the link below within the next 7 days:
+
+${verifyUrl}
+
+If you didn't submit this claim, you can safely ignore this email.
+
+— The TheDripMap Team
+`,
+            });
+          } catch (emailErr) {
+            console.error('Resend owner verification email error:', emailErr);
+          }
+        }
+
         try {
-          const resend = new Resend(process.env.RESEND_API_KEY);
+          const publicUrl = providerSlug ? `${SITE_URL}/providers/${providerSlug}` : '(no slug)';
+          const supabaseUrl = `https://supabase.com/dashboard/project/${SUPABASE_PROJECT_REF}/editor`;
           await resend.emails.send({
             from: 'TheDripMap <info@thedripmap.com>',
             to: 'info@thedripmap.com',
@@ -21,16 +62,20 @@ export async function POST(req: Request) {
             text: `New clinic claim request
 
 Clinic: ${clinicName || 'Unknown'}
-Owner: ${ownerName || 'Not provided'}
-Email: ${email}
-Phone: ${phone || 'Not listed'}
+Owner name: ${ownerName || 'Not provided'}
+Owner email: ${email}
+Owner phone: ${ownerPhone || 'Not provided'}
 Specialty: ${specialty || 'N/A'}
 
-Review at: https://supabase.com/dashboard
+Listing ID: ${listingId || '(unknown)'}
+Public listing: ${publicUrl}
+Manage in Supabase: ${supabaseUrl}
+
+Status: pending verification (owner must click the link in their verification email)
 `,
           });
         } catch (emailErr) {
-          console.error('Resend email error:', emailErr);
+          console.error('Resend operator notification error:', emailErr);
         }
       }
 
@@ -42,22 +87,16 @@ Review at: https://supabase.com/dashboard
         return NextResponse.json({ success: true, warning: 'Notification skipped (config missing)' });
       }
 
-      const message = `🏥 New Clinic Signup!\n\nClinic: ${clinicName || 'Unknown'}\nOwner: ${ownerName || 'Claim Request'}\nEmail: ${email}\nSpecialty: ${specialty || 'N/A'}\n\nReview at: https://supabase.com/dashboard`;
+      const message = `🏥 New Clinic Signup!\n\nClinic: ${clinicName || 'Unknown'}\nOwner: ${ownerName || 'Not provided'}\nEmail: ${email}\nPhone: ${ownerPhone || 'Not provided'}\nSpecialty: ${specialty || 'N/A'}\n\nReview at: https://supabase.com/dashboard`;
 
-      // Use a timeout for the telegram fetch to prevent hanging
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 8000);
 
       try {
         const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            chat_id: CHAT_ID,
-            text: message,
-          }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: CHAT_ID, text: message }),
           signal: controller.signal
         });
 
@@ -66,7 +105,6 @@ Review at: https://supabase.com/dashboard
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
           console.error('Telegram API error:', errorData);
-          // Still return true so the user isn't stuck
           return NextResponse.json({ success: true, warning: 'Notification slightly delayed' });
         }
       } catch (fErr) {
@@ -77,10 +115,9 @@ Review at: https://supabase.com/dashboard
       return NextResponse.json({ success: true });
     } catch (error) {
       console.error('Notification API error:', error);
-      // Even on error, if we can at least log the email, it's better than nothing
-      return NextResponse.json({ 
-        success: true, 
-        warning: 'Fallback mode active' 
+      return NextResponse.json({
+        success: true,
+        warning: 'Fallback mode active'
       });
     }
 }

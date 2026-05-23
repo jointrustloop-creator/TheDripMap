@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Check, ArrowRight, Mail, Loader2 } from 'lucide-react';
+import { X, Check, ArrowRight, Mail, Loader2, User, Phone } from 'lucide-react';
 import { Logo } from './Logo';
 import { Provider } from '../types';
 import { supabase } from '../lib/supabase';
@@ -36,15 +36,29 @@ export const ClaimListingModal = ({
   setIsSuccess
 }: ClaimListingModalProps) => {
   const [error, setError] = useState<string | null>(null);
+  const [ownerName, setOwnerName] = useState('');
+  const [ownerPhone, setOwnerPhone] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !confirmed) return;
+    if (!ownerName.trim() || !ownerPhone.trim() || !email || !confirmed) return;
 
     setIsSubmitting(true);
     setError(null);
 
     try {
+      const { data: latest } = await supabase
+        .from('providers')
+        .select('is_claimed')
+        .eq('id', provider.id)
+        .maybeSingle();
+
+      if (latest?.is_claimed) {
+        setError('This listing has already been claimed. If you believe this is a mistake, contact info@thedripmap.com.');
+        setIsSubmitting(false);
+        return;
+      }
+
       const token = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2) + Date.now().toString(36);
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
@@ -56,6 +70,8 @@ export const ClaimListingModal = ({
           .insert({
             listing_id: provider.id,
             email: email,
+            owner_name: ownerName.trim(),
+            owner_phone: ownerPhone.trim(),
             token: token,
             expires_at: expiresAt.toISOString(),
             created_at: new Date().toISOString()
@@ -78,10 +94,13 @@ export const ClaimListingModal = ({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             clinicName: provider.name,
-            ownerName: 'Claim Request',
+            ownerName: ownerName.trim(),
+            ownerPhone: ownerPhone.trim(),
             email: email,
-            phone: provider.phone || null,
-            specialty: (provider.specialties && provider.specialties[0]) || 'N/A'
+            specialty: (provider.specialties && provider.specialties[0]) || 'N/A',
+            token: token,
+            listingId: provider.id,
+            providerSlug: provider.slug || null,
           })
         });
         if (response.ok) {
@@ -168,6 +187,22 @@ export const ClaimListingModal = ({
 
             {/* Form Content */}
             {!isSuccess ? (
+              provider.is_claimed ? (
+                <div className="p-8 pt-4">
+                  <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6 text-center">
+                    <h3 className="font-black text-amber-900 text-lg mb-2">This listing is already claimed</h3>
+                    <p className="text-amber-700 text-sm leading-relaxed">
+                      Someone has already verified ownership of <span className="font-bold">{provider.name}</span>. If you believe this is a mistake, contact <a href="mailto:info@thedripmap.com" className="underline">info@thedripmap.com</a>.
+                    </p>
+                  </div>
+                  <button
+                    onClick={onClose}
+                    className="mt-6 w-full bg-slate-900 text-white p-4 rounded-2xl font-bold hover:bg-slate-800 transition-all"
+                  >
+                    Close
+                  </button>
+                </div>
+              ) : (
               <form onSubmit={handleSubmit} className="p-8 pt-4">
                 <div className="space-y-4 mb-8">
                   {/* Read-only fields */}
@@ -190,7 +225,39 @@ export const ClaimListingModal = ({
                     </div>
                   </div>
 
-                  {/* Input field */}
+                  {/* Owner Name */}
+                  <div className="space-y-2">
+                    <label htmlFor="ownerName" className="text-[11px] font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                      <User size={14} className="text-wellness-600" /> Your full name
+                    </label>
+                    <input
+                      id="ownerName"
+                      type="text"
+                      required
+                      placeholder="Jane Smith"
+                      value={ownerName}
+                      onChange={(e) => setOwnerName(e.target.value)}
+                      className="w-full bg-white border-2 border-slate-100 p-4 rounded-2xl text-slate-900 font-medium focus:border-wellness-500 focus:outline-none transition-colors shadow-sm"
+                    />
+                  </div>
+
+                  {/* Owner Phone */}
+                  <div className="space-y-2">
+                    <label htmlFor="ownerPhone" className="text-[11px] font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                      <Phone size={14} className="text-wellness-600" /> Your phone number
+                    </label>
+                    <input
+                      id="ownerPhone"
+                      type="tel"
+                      required
+                      placeholder="(555) 123-4567"
+                      value={ownerPhone}
+                      onChange={(e) => setOwnerPhone(e.target.value)}
+                      className="w-full bg-white border-2 border-slate-100 p-4 rounded-2xl text-slate-900 font-medium focus:border-wellness-500 focus:outline-none transition-colors shadow-sm"
+                    />
+                  </div>
+
+                  {/* Email */}
                   <div className="space-y-2">
                     <label htmlFor="email" className="text-[11px] font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                       <Mail size={14} className="text-wellness-600" /> Enter your clinic email address
@@ -234,7 +301,7 @@ export const ClaimListingModal = ({
 
                 <button
                   type="submit"
-                  disabled={isSubmitting || !email || !confirmed}
+                  disabled={isSubmitting || !ownerName.trim() || !ownerPhone.trim() || !email || !confirmed}
                   className={cn(
                     "w-full bg-wellness-600 text-white p-5 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-wellness-200/50 hover:bg-wellness-700 hover:-translate-y-1 active:translate-y-0 transition-all disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none",
                     isSubmitting && "opacity-80"
@@ -247,6 +314,7 @@ export const ClaimListingModal = ({
                   )}
                 </button>
               </form>
+              )
             ) : (
               <div className="p-8 pt-0 flex justify-center">
                 <button
