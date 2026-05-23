@@ -29,7 +29,7 @@ export async function POST(req: Request) {
       try {
         const resend = new Resend(process.env.RESEND_API_KEY);
         await resend.emails.send({
-          from: 'TheDripMap <onboarding@resend.dev>',
+          from: 'TheDripMap <info@thedripmap.com>',
           to: 'info@thedripmap.com',
           replyTo: data.email,
           subject: `New contact form: ${data.subject || 'No subject'}`,
