@@ -139,7 +139,7 @@ export default function ContactPage() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-wellness-600/20 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-700" />
               <h3 className="text-xl font-black mb-4 relative z-10">Clinic Partnerships</h3>
               <p className="text-slate-400 font-medium mb-8 relative z-10 leading-relaxed text-sm">
-                Ready to scale your IV hydration clinic? Join 500+ providers already on TheDripMap.
+                Ready to scale your IV hydration clinic? Join 549+ providers already on TheDripMap.
               </p>
               <a 
                 href="/for-clinics" 

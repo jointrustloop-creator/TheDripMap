@@ -6,33 +6,39 @@ import { Footer } from '../../src/components/Footer';
 import { ShieldCheck, ArrowRight, BarChart, Users, Globe } from 'lucide-react';
 import { getSiteStats } from '../../src/lib/data';
 
-export const metadata: Metadata = {
-  title: "List Your IV Therapy Clinic — Reach More Patients | TheDripMap",
-  description: "Join the nation's #1 IV therapy directory with over 1,000 listed clinics. Claim your free listing to reach thousands of patients searching for wellness drips in your city every month.",
-  alternates: {
-    canonical: 'https://www.thedripmap.com/for-clinics',
-  },
-  openGraph: {
-    title: "List Your IV Therapy Clinic — Reach More Patients | TheDripMap",
-    description: "Join the nation's #1 IV therapy directory with over 1,000 listed clinics. Claim your free listing to reach thousands of patients searching for wellness drips in your city every month.",
-    url: 'https://www.thedripmap.com/for-clinics',
-    type: 'website',
-    images: [
-      {
-        url: 'https://www.thedripmap.com/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'TheDripMap for Clinics',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: "List Your IV Therapy Clinic — Reach More Patients | TheDripMap",
-    description: "Join the nation's #1 IV therapy directory with over 1,000 listed clinics. Claim your free listing to reach thousands of patients searching for wellness drips in your city every month.",
-    images: ['https://www.thedripmap.com/og-image.png'],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const stats = await getSiteStats();
+  const title = "List Your IV Therapy Clinic — Reach More Patients | TheDripMap";
+  const description = `Join the nation's #1 IV therapy directory with ${stats.total.toLocaleString()}+ listed clinics. Claim your free listing to reach thousands of patients searching for wellness drips in your city every month.`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: 'https://www.thedripmap.com/for-clinics',
+    },
+    openGraph: {
+      title,
+      description,
+      url: 'https://www.thedripmap.com/for-clinics',
+      type: 'website',
+      images: [
+        {
+          url: 'https://www.thedripmap.com/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: 'TheDripMap for Clinics',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['https://www.thedripmap.com/og-image.png'],
+    },
+  };
+}
 
 export default async function ForClinicsPage() {
   const stats = await getSiteStats();

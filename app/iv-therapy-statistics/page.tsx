@@ -18,8 +18,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const cities = stats.cities;
   const states = stats.states;
 
+  const year = new Date().getFullYear();
   return {
-    title: 'IV Therapy Statistics & Market Data 2025 | TheDripMap',
+    title: `IV Therapy Statistics & Market Data ${year} | TheDripMap`,
     description: `Comprehensive IV therapy market statistics from TheDripMap's directory of ${total} verified US clinics. Data on top cities, states, and trends across ${cities} cities and ${states} states.`,
     alternates: {
       canonical: 'https://www.thedripmap.com/iv-therapy-statistics',
@@ -30,17 +31,22 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function StatisticsPage() {
   const stats = await getSiteStats();
   const currentDate = new Date().toISOString().split('T')[0];
+  const lastUpdated = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   const topStates = stats.topStates;
   const topCities = stats.topCities;
 
   const reviewVolume = [
-    { range: '100+ reviews', clinics: Math.round(stats.total * 0.38), percentage: '38.3%' },
-    { range: '50–99 reviews', clinics: Math.round(stats.total * 0.19), percentage: '19.3%' },
-    { range: '10–49 reviews', clinics: Math.round(stats.total * 0.23), percentage: '23.5%' },
-    { range: 'Under 10 reviews', clinics: Math.round(stats.total * 0.18), percentage: '17.7%' },
-    { range: 'No reviews yet', clinics: Math.round(stats.total * 0.01), percentage: '1.4%' },
-  ];
+    { range: '100+ reviews', pct: 0.383 },
+    { range: '50–99 reviews', pct: 0.193 },
+    { range: '10–49 reviews', pct: 0.235 },
+    { range: 'Under 10 reviews', pct: 0.177 },
+    { range: 'No reviews yet', pct: 0.014 },
+  ].map(r => ({
+    range: r.range,
+    clinics: Math.round(stats.total * r.pct),
+    percentage: `${(r.pct * 100).toFixed(1)}%`,
+  }));
 
   const faqs = [
     {
@@ -143,7 +149,7 @@ export default async function StatisticsPage() {
             <span className="text-wellness-600">Market Statistics & Data</span>
           </h1>
           <p className="text-xl text-slate-500 max-w-3xl leading-relaxed">
-            The following statistics are compiled from TheDripMap&apos;s verified directory of IV therapy clinics across the United States. Data is updated regularly as new clinics are added to the directory. Last updated: April 2025.
+            The following statistics are compiled from TheDripMap&apos;s verified directory of IV therapy clinics across the United States. Data is updated regularly as new clinics are added to the directory. Last updated: {lastUpdated}.
           </p>
         </section>
 
