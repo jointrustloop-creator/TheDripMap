@@ -40,6 +40,18 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
 
   const isClaimed = provider.is_featured === true;
 
+  const getInitials = (name: string) => {
+    if (!name) return 'IV';
+    let words = name.trim().split(/\s+/);
+    if (words.length > 1 && ['the', 'a', 'an'].includes(words[0].toLowerCase())) {
+      words = words.slice(1);
+    }
+    const first = words[0]?.[0] || '';
+    const second = words[1]?.[0] || '';
+    return (first + second).toUpperCase().slice(0, 2);
+  };
+  const initials = getInitials(provider.name);
+
   return (
     <motion.div 
       whileHover={{ y: -5 }}
@@ -76,6 +88,11 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
       <div className="relative z-10 flex flex-col h-full">
         {/* Photo Area */}
         <div className="relative h-[140px] shrink-0">
+          {!provider.is_featured && (
+            <div className="absolute inset-0 bg-slate-100 flex items-center justify-center text-slate-300 font-black text-5xl select-none">
+              {initials}
+            </div>
+          )}
           {/* Top Left Badges */}
           <div className="absolute top-4 left-4 flex flex-col gap-2">
             {!provider.is_featured && (
