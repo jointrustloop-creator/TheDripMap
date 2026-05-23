@@ -9,8 +9,13 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Email is required' }, { status: 400 });
       }
 
-      const BOT_TOKEN = '8690236169:AAE4yUqK0PK3iUmpjXytGnR5Zmkxi3xAe6c';
-      const CHAT_ID = '1500233539';
+      const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+      const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+
+      if (!BOT_TOKEN || !CHAT_ID) {
+        console.error('Telegram credentials missing — set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID');
+        return NextResponse.json({ success: true, warning: 'Notification skipped (config missing)' });
+      }
 
       const message = `🏥 New Clinic Signup!\n\nClinic: ${clinicName || 'Unknown'}\nOwner: ${ownerName || 'Claim Request'}\nEmail: ${email}\nSpecialty: ${specialty || 'N/A'}\n\nReview at: https://supabase.com/dashboard`;
 
