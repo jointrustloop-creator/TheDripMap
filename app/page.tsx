@@ -31,8 +31,8 @@ import { cn } from '../src/lib/utils';
 
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getSiteStats();
-  const title = `IV Therapy Clinics Near You | Find & Compare ${stats.total} Providers | TheDripMap`;
-  const description = `TheDripMap matches you to the right IV therapy clinic based on your goals, location, and budget. Browse ${stats.total} clinics across ${stats.cities} cities including Toronto, NYC, and LA.`;
+  const title = `IV Therapy Clinics Near Me — Find & Compare ${stats.total}+ Providers | TheDripMap`;
+  const description = `Find the best IV therapy clinic near you. Compare ${stats.total}+ verified providers across the US and Canada. Filter by treatment, price, and location. Book in 30 seconds.`;
   
   return {
     title,
