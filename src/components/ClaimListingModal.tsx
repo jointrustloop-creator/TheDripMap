@@ -94,7 +94,7 @@ export const ClaimListingModal = ({
         setIsSuccess(true);
       } else {
         // Detailed error for better UX
-        setError('We were unable to process your claim at this moment. Please try again in a few minutes or contact support@thedripmap.com directly.');
+        setError('We were unable to process your claim at this moment. Please try again in a few minutes or contact info@thedripmap.com directly.');
       }
     } catch (err) {
       console.error('Error submitting claim:', err);

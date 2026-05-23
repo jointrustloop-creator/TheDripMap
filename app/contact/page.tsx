@@ -103,10 +103,10 @@ export default function ContactPage() {
                 <div className="group">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Email Address</p>
                   <a 
-                    href="mailto:thedripmap@gmail.com" 
+                    href="mailto:info@thedripmap.com" 
                     className="text-xl font-bold text-slate-900 hover:text-wellness-600 transition-colors break-words block"
                   >
-                    thedripmap@gmail.com
+                    info@thedripmap.com
                   </a>
                 </div>
 
