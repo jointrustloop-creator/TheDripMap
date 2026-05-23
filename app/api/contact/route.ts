@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     if (process.env.RESEND_API_KEY) {
       try {
         const resend = new Resend(process.env.RESEND_API_KEY);
-        await resend.emails.send({
+        const result = await resend.emails.send({
           from: 'TheDripMap <info@thedripmap.com>',
           to: 'info@thedripmap.com',
           replyTo: data.email,
@@ -44,12 +44,27 @@ Message:
 ${data.message || '(empty)'}
 `,
         });
+        if (result?.error) {
+          console.error('Resend returned error:', result.error);
+          return NextResponse.json({
+            success: true,
+            debug_resend_response: result,
+          });
+        }
+        return NextResponse.json({ success: true, debug_resend_response: result });
       } catch (emailErr) {
         console.error('Resend email error:', emailErr);
+        return NextResponse.json({
+          success: true,
+          debug_email_error: String(emailErr),
+          debug_email_error_detail: emailErr instanceof Error
+            ? { message: emailErr.message, name: emailErr.name }
+            : emailErr,
+        });
       }
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, debug_note: 'RESEND_API_KEY not set in env' });
 
   } catch (error) {
     console.error('Contact form error:', error);
