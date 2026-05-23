@@ -5,8 +5,9 @@ import { Suspense } from 'react';
 import SearchClient from './SearchClient';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const title = `Find IV Therapy Clinics Near You | Search 529 Providers | TheDripMap`;
-  const description = `Search and compare 529 verified IV therapy clinics across 220 US and Canadian cities. Filter by city, specialty, price, and availability.`;
+  const stats = await getListingStats();
+  const title = `Find IV Therapy Clinics Near You | Search ${stats.totalListings} Providers | TheDripMap`;
+  const description = `Search and compare ${stats.totalListings} verified IV therapy clinics across ${stats.totalCities} US and Canadian cities. Filter by city, specialty, price, and availability.`;
   
   return {
     title,
