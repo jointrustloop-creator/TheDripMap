@@ -74,8 +74,8 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     return { title: 'City Not Found' };
   }
 
-  const title = cityData?.meta_title?.replace('{count}', String(count)) || `${name} IV Therapy — ${count} Clinics | TheDripMap`;
-  const description = cityData?.meta_description?.replace('{count}', String(count)) || `Find and compare ${count} top-rated IV therapy clinics and mobile services in ${name}.`;
+  const title = cityData?.meta_title?.replace('{count}', String(count)) || `IV Therapy in ${name} — ${count} Top-Rated Clinics Near You | TheDripMap`;
+  const description = cityData?.meta_description?.replace('{count}', String(count)) || `Find and compare ${count} IV therapy clinics in ${name}. Read reviews, compare prices, and book hangover recovery, NAD+, immune support and hydration drips near you.`;
 
   return {
     title,
