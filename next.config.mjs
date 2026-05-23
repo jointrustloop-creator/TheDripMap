@@ -72,6 +72,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/provider/:slug',
+        destination: '/providers/:slug',
+        permanent: true,
+      },
+      {
         source: '/iv-therapy/:state/:city',
         destination: '/cities/:city',
         permanent: true,
