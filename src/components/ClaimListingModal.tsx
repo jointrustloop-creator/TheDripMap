@@ -80,6 +80,7 @@ export const ClaimListingModal = ({
             clinicName: provider.name,
             ownerName: 'Claim Request',
             email: email,
+            phone: provider.phone || null,
             specialty: (provider.specialties && provider.specialties[0]) || 'N/A'
           })
         });

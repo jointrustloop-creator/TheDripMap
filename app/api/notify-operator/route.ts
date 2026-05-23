@@ -1,12 +1,37 @@
 import { NextResponse } from 'next/server';
+import { Resend } from 'resend';
 
 export async function POST(req: Request) {
     try {
       const body = await req.json();
-      const { clinicName, ownerName, email, specialty } = body || {};
+      const { clinicName, ownerName, email, specialty, phone } = body || {};
 
       if (!email) {
         return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+      }
+
+      if (process.env.RESEND_API_KEY) {
+        try {
+          const resend = new Resend(process.env.RESEND_API_KEY);
+          await resend.emails.send({
+            from: 'TheDripMap <info@thedripmap.com>',
+            to: 'info@thedripmap.com',
+            replyTo: email,
+            subject: `New clinic claim: ${clinicName || 'Unknown'}`,
+            text: `New clinic claim request
+
+Clinic: ${clinicName || 'Unknown'}
+Owner: ${ownerName || 'Not provided'}
+Email: ${email}
+Phone: ${phone || 'Not listed'}
+Specialty: ${specialty || 'N/A'}
+
+Review at: https://supabase.com/dashboard
+`,
+          });
+        } catch (emailErr) {
+          console.error('Resend email error:', emailErr);
+        }
       }
 
       const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
