@@ -7,11 +7,27 @@ import { Footer } from '@/src/components/Footer';
 import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
 import { getAllCities, slugify } from '@/src/lib/data';
 
+const citiesTitle = 'Cities Archive - Browse IV Therapy Locations | TheDripMap';
+const citiesDescription = 'Explore our complete directory of cities providing IV therapy. Find top-rated clinics and mobile services across the United States.';
+const citiesOgImage = 'https://www.thedripmap.com/og-image.png';
+
 export const metadata: Metadata = {
-  title: 'Cities Archive - Browse IV Therapy Locations | TheDripMap',
-  description: 'Explore our complete directory of cities providing IV therapy. Find top-rated clinics and mobile services across the United States.',
-  alternates: {
-    canonical: 'https://www.thedripmap.com/cities',
+  title: citiesTitle,
+  description: citiesDescription,
+  alternates: { canonical: 'https://www.thedripmap.com/cities' },
+  openGraph: {
+    title: citiesTitle,
+    description: citiesDescription,
+    url: 'https://www.thedripmap.com/cities',
+    type: 'website',
+    siteName: 'TheDripMap',
+    images: [{ url: citiesOgImage, width: 1200, height: 630, alt: 'TheDripMap' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: citiesTitle,
+    description: citiesDescription,
+    images: [citiesOgImage],
   },
 };
 

@@ -3,9 +3,28 @@ import { Metadata } from 'next';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 
+const privacyTitle = "Privacy Policy | TheDripMap";
+const privacyDescription = "Our commitment to protecting your privacy and medical data.";
+const privacyOgImage = 'https://www.thedripmap.com/og-image.png';
+
 export const metadata: Metadata = {
-  title: "Privacy Policy | TheDripMap",
-  description: "Our commitment to protecting your privacy and medical data.",
+  title: privacyTitle,
+  description: privacyDescription,
+  alternates: { canonical: 'https://www.thedripmap.com/privacy' },
+  openGraph: {
+    title: privacyTitle,
+    description: privacyDescription,
+    url: 'https://www.thedripmap.com/privacy',
+    type: 'website',
+    siteName: 'TheDripMap',
+    images: [{ url: privacyOgImage, width: 1200, height: 630, alt: 'TheDripMap' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: privacyTitle,
+    description: privacyDescription,
+    images: [privacyOgImage],
+  },
 };
 
 export default function PrivacyPage() {

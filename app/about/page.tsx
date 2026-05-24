@@ -7,11 +7,27 @@ import { ShieldCheck, Zap, Heart, Clock, Star, MapPin, CheckCircle2 } from 'luci
 import { IVAnimation } from '../../src/components/IVAnimation';
 import { getSiteStats } from '../../src/lib/data';
 
+const aboutTitle = "Our Mission & Clinical Standards | TheDripMap";
+const aboutDescription = "Learn about the mission behind TheDripMap. We're building the most trusted resource for IV therapy and clinical wellness in the United States.";
+const aboutOgImage = 'https://www.thedripmap.com/og-image.png';
+
 export const metadata: Metadata = {
-  title: "Our Mission & Clinical Standards | TheDripMap",
-  description: "Learn about the mission behind TheDripMap. We're building the most trusted resource for IV therapy and clinical wellness in the United States.",
-  alternates: {
-    canonical: 'https://www.thedripmap.com/about',
+  title: aboutTitle,
+  description: aboutDescription,
+  alternates: { canonical: 'https://www.thedripmap.com/about' },
+  openGraph: {
+    title: aboutTitle,
+    description: aboutDescription,
+    url: 'https://www.thedripmap.com/about',
+    type: 'website',
+    siteName: 'TheDripMap',
+    images: [{ url: aboutOgImage, width: 1200, height: 630, alt: 'TheDripMap' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: aboutTitle,
+    description: aboutDescription,
+    images: [aboutOgImage],
   },
 };
 

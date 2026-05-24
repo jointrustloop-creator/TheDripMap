@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: 'TheDripMap',
     images: [
       {
-        url: 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg',
+        url: 'https://www.thedripmap.com/og-image.png',
         width: 1200,
         height: 630,
         alt: 'IV Therapy by Symptom protocols',
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'IV Therapy for Symptoms & Conditions — Treatment Protocols | TheDripMap',
     description: 'Comprehensive directory of IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',
-    images: ['https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg'],
+    images: ['https://www.thedripmap.com/og-image.png'],
   },
 };
 
@@ -62,7 +62,7 @@ export default async function UseCaseHubPage() {
             </div>
             <div className="relative h-[400px] md:h-[500px] rounded-[3rem] overflow-hidden shadow-2xl">
               <ResilientImage 
-                src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg"
+                src="https://www.thedripmap.com/og-image.png"
                 fallbackSrc="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2000&auto=format&fit=crop"
                 alt="IV Therapy Protocols"
                 fill

@@ -3,9 +3,28 @@ import { Metadata } from 'next';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 
+const termsTitle = "Terms of Service | TheDripMap";
+const termsDescription = "The rules and guidelines for using TheDripMap platform.";
+const termsOgImage = 'https://www.thedripmap.com/og-image.png';
+
 export const metadata: Metadata = {
-  title: "Terms of Service | TheDripMap",
-  description: "The rules and guidelines for using TheDripMap platform.",
+  title: termsTitle,
+  description: termsDescription,
+  alternates: { canonical: 'https://www.thedripmap.com/terms' },
+  openGraph: {
+    title: termsTitle,
+    description: termsDescription,
+    url: 'https://www.thedripmap.com/terms',
+    type: 'website',
+    siteName: 'TheDripMap',
+    images: [{ url: termsOgImage, width: 1200, height: 630, alt: 'TheDripMap' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: termsTitle,
+    description: termsDescription,
+    images: [termsOgImage],
+  },
 };
 
 export default function TermsPage() {

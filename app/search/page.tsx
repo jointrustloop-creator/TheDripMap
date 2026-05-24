@@ -21,6 +21,13 @@ export async function generateMetadata(): Promise<Metadata> {
       url: 'https://www.thedripmap.com/search',
       type: 'website',
       siteName: 'TheDripMap',
+      images: [{ url: 'https://www.thedripmap.com/og-image.png', width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['https://www.thedripmap.com/og-image.png'],
     },
   };
 }
