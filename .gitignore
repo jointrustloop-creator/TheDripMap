@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+/out/
+next-env.d.ts
+
+# Local env files — CONTAIN SECRETS
+.env
+.env*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Testing / coverage
+/coverage
+
+# Editor / OS
+.DS_Store
+*.pem
+.vscode/
+.idea/
+
+# Vercel
+.vercel/
+
+# TypeScript build cache
+*.tsbuildinfo
+
+# Working notes (often contains pasted secrets / scratch content)
+Claude.md
+
+# Research / staging data (delete after import or move out of repo)
+scripts/la-clinics-import.json
