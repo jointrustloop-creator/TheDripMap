@@ -23,17 +23,19 @@ import { CityGrid } from '../../../src/components/CityGrid';
 import { QuizCTA } from '../../../src/components/QuizCTA';
 import { getListingsByServiceAndCity, getListingsByService, getTopHubs } from '../../../src/lib/data';
 import { Provider } from '../../../src/types';
+import { getTreatmentContent } from '../../../src/lib/treatment-content';
 
 const SERVICES = [
-  { name: 'NAD+ Plus', slug: 'nad-plus', icon: <Activity size={24} />, aliases: ['nad'] },
-  { name: 'Hangover', slug: 'hangover', icon: <Heart size={24} /> },
-  { name: 'Immune Support', slug: 'immune-support', icon: <ShieldCheck size={24} /> },
-  { name: 'Beauty Glow', slug: 'beauty-glow', icon: <Sparkles size={24} /> },
-  { name: 'Weight Loss', slug: 'weight-loss', icon: <Activity size={24} /> },
-  { name: 'Hydration', slug: 'hydration', icon: <Droplets size={24} /> },
-  { name: 'Recovery', slug: 'recovery', icon: <Dumbbell size={24} /> },
-  { name: 'Myers Cocktail', slug: 'myers-cocktail', icon: <Zap size={24} /> },
-  { name: 'Jet Lag', slug: 'jet-lag', icon: <Droplets size={24} /> },
+  { name: 'NAD+ Plus',      slug: 'nad-plus',       icon: <Activity size={24} />,     aliases: ['nad', 'nad-plus-therapy'] },
+  { name: 'Hangover',       slug: 'hangover',       icon: <Heart size={24} />,        aliases: ['hangover-recovery'] },
+  { name: 'Immune Support', slug: 'immune-support', icon: <ShieldCheck size={24} />,  aliases: [] },
+  { name: 'Beauty Glow',    slug: 'beauty-glow',    icon: <Sparkles size={24} />,     aliases: [] },
+  { name: 'Weight Loss',    slug: 'weight-loss',    icon: <Activity size={24} />,     aliases: [] },
+  { name: 'Hydration',      slug: 'hydration',      icon: <Droplets size={24} />,     aliases: [] },
+  { name: 'Recovery',       slug: 'recovery',       icon: <Dumbbell size={24} />,     aliases: ['athletic-recovery'] },
+  { name: 'Myers Cocktail', slug: 'myers-cocktail', icon: <Zap size={24} />,          aliases: [] },
+  { name: 'Jet Lag',        slug: 'jet-lag',        icon: <Droplets size={24} />,     aliases: [] },
+  { name: 'Energy Boost',   slug: 'energy-boost',   icon: <Zap size={24} />,          aliases: [] },
 ];
 
 export default function ServicePage({ params }: { params: Promise<{ service: string }> }) {
@@ -130,6 +132,7 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
 
   if (!service) notFound();
 
+  const content = getTreatmentContent(service.name);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://thedripmap.com';
   
   const breadcrumbJsonLd = {
@@ -157,17 +160,37 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
     ]
   };
 
-  const procedureJsonLd = {
+  const procedureJsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "MedicalProcedure",
     "name": `${service.name} IV Therapy`,
-    "description": `Specialized intravenous treatment for ${service.name}.`,
+    "description": content
+      ? content.description.split('\n\n')[0]
+      : `Specialized intravenous treatment for ${service.name}.`,
     "procedureType": "Intravenous Therapy",
     "relevantSpecialty": {
       "@type": "MedicalSpecialty",
-      "name": "Preventive Medicine"
+      "name": content?.relevantSpecialty || "Preventive Medicine"
     }
   };
+  if (content) {
+    procedureJsonLd["alternateName"] = content.alternateName;
+    procedureJsonLd["howPerformed"] = content.howItWorks;
+    procedureJsonLd["preparation"] = `No specific preparation required. Sessions typically last ${content.sessionDuration}.`;
+    procedureJsonLd["followup"] = "No recovery time required after treatment.";
+    const [minStr, maxStr] = content.costRange
+      .replace(/\$/g, '')
+      .split(/\s*to\s*/)
+      .map((s) => Number(s.replace(/[^0-9]/g, '')));
+    if (minStr && maxStr) {
+      procedureJsonLd["estimatedCost"] = {
+        "@type": "MonetaryAmount",
+        "currency": "USD",
+        "minValue": minStr,
+        "maxValue": maxStr,
+      };
+    }
+  }
 
   const faqs = [
     {
@@ -230,7 +253,7 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
               <span>Specialized {service.name} Protocols</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
-              Best <span className="text-wellness-600">{service.name} IV Therapy</span> {currentCity && currentCity !== 'All' ? `in ${currentCity}` : 'Near Me'}
+              <span className="text-wellness-600">{service.name} IV Therapy</span> — Find Clinics Near You
             </h1>
             <p className="text-xl text-slate-500 leading-relaxed mb-10">
               Compare {listings.length} top-rated clinics and mobile services specializing in {service.name} IV therapy. Find the perfect treatment for your wellness goals today.
@@ -293,36 +316,92 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
           )}
         </section>
 
-        {/* Service Info Section */}
-        <section className="py-20 px-10 bg-slate-900 text-white rounded-[3rem] mb-24 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-1/3 h-full bg-slate-800/50 skew-x-12 translate-x-1/4" />
-          <div className="relative z-10 max-w-2xl">
-            <h2 className="text-4xl font-black mb-6 tracking-tight">Understanding {service.name} IV Therapy</h2>
-            <p className="text-lg text-slate-300 leading-relaxed mb-8">
-              {service.name} IV therapy is a powerful clinical tool for maintaining optimal health and recovering quickly from life&apos;s demands. By delivering nutrients directly into your bloodstream, you achieve 100% absorption, bypassing the digestive system for immediate cellular benefit.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-wellness-600 rounded-xl flex items-center justify-center shrink-0">
-                  <Activity size={20} className="text-white" />
-                </div>
-                <div>
-                  <h4 className="font-bold mb-1">High Bioavailability</h4>
-                  <p className="text-xs text-slate-400">Direct delivery ensures your body gets the full benefit of every nutrient.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-wellness-600 rounded-xl flex items-center justify-center shrink-0">
-                  <Sparkles size={20} className="text-white" />
-                </div>
-                <div>
-                  <h4 className="font-bold mb-1">Targeted Wellness</h4>
-                  <p className="text-xs text-slate-400">Protocols designed specifically to address your unique health goals.</p>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* View All Clinics CTA */}
+        <section className="mb-16 -mt-12 flex justify-center">
+          <Link
+            href={`/search?q=${encodeURIComponent(service.name)}`}
+            className="inline-flex items-center gap-3 bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-slate-800 transition-all shadow-xl"
+          >
+            View all {service.name} clinics <ArrowRight size={20} />
+          </Link>
         </section>
+
+        {content ? (
+          <>
+            {/* About this treatment */}
+            <section className="mb-20">
+              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-8">About {service.name} IV Therapy</h2>
+              <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm p-10 md:p-14 space-y-6">
+                {content.description.split('\n\n').map((para, i) => (
+                  <p key={i} className="text-lg text-slate-600 leading-relaxed">
+                    {para}
+                  </p>
+                ))}
+              </div>
+            </section>
+
+            {/* How it works */}
+            <section className="mb-20">
+              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-8">How {service.name} IV Therapy Works</h2>
+              <div className="bg-wellness-50 border border-wellness-100 rounded-[3rem] p-10 md:p-14">
+                <p className="text-lg text-wellness-900 leading-relaxed">{content.howItWorks}</p>
+                {content.primaryIngredients.length > 0 && (
+                  <div className="mt-8 pt-8 border-t border-wellness-100">
+                    <div className="text-xs font-black uppercase tracking-widest text-wellness-700 mb-3">Primary ingredients</div>
+                    <div className="flex flex-wrap gap-2">
+                      {content.primaryIngredients.map((ing, i) => (
+                        <span key={i} className="bg-white px-4 py-2 rounded-xl text-sm font-bold text-wellness-900 border border-wellness-200">
+                          {ing}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* Benefits */}
+            <section className="mb-20">
+              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-8">Benefits of {service.name} IV Therapy</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {content.benefits.map((benefit, i) => (
+                  <div key={i} className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8 flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                      <CheckCircle2 size={22} />
+                    </div>
+                    <p className="text-base font-bold text-slate-800 leading-relaxed">{benefit}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* What to expect + Cost */}
+            <section className="mb-24 grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="bg-slate-900 text-white rounded-[3rem] p-10">
+                <h3 className="text-2xl font-black tracking-tight mb-4">What to Expect</h3>
+                <p className="text-base text-slate-300 leading-relaxed mb-6">{content.whatToExpect}</p>
+                <div className="text-xs font-black uppercase tracking-widest text-wellness-400 mb-1">Session duration</div>
+                <div className="text-xl font-black">{content.sessionDuration}</div>
+              </div>
+              <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm p-10">
+                <h3 className="text-2xl font-black tracking-tight text-slate-900 mb-4">Cost</h3>
+                <div className="text-4xl font-black text-wellness-600 mb-4">{content.costRange}</div>
+                <p className="text-base text-slate-600 leading-relaxed">{content.costContext}</p>
+              </div>
+            </section>
+          </>
+        ) : (
+          // Fallback for any treatment without dedicated content (shouldn't happen for canonical slugs)
+          <section className="py-20 px-10 bg-slate-900 text-white rounded-[3rem] mb-24 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-1/3 h-full bg-slate-800/50 skew-x-12 translate-x-1/4" />
+            <div className="relative z-10 max-w-2xl">
+              <h2 className="text-4xl font-black mb-6 tracking-tight">About {service.name} IV Therapy</h2>
+              <p className="text-lg text-slate-300 leading-relaxed">
+                {service.name} IV therapy delivers a targeted combination of vitamins, minerals, and nutrients directly into your bloodstream for 100% absorption and rapid results. Speak with a participating clinic for details on protocols, pricing, and what to expect.
+              </p>
+            </div>
+          </section>
+        )}
 
         {/* Match Quiz CTA */}
         <QuizCTA 

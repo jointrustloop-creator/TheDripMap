@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import React from "react";
 
 const SERVICES = [
-  { name: 'NAD+ Plus', slug: 'nad-plus', aliases: ['nad'] },
-  { name: 'Hangover', slug: 'hangover' },
-  { name: 'Immune Support', slug: 'immune-support' },
-  { name: 'Beauty Glow', slug: 'beauty-glow' },
-  { name: 'Weight Loss', slug: 'weight-loss' },
-  { name: 'Hydration', slug: 'hydration' },
-  { name: 'Recovery', slug: 'recovery' },
-  { name: 'Myers Cocktail', slug: 'myers-cocktail' },
+  { name: 'NAD+ Plus',      slug: 'nad-plus',       aliases: ['nad', 'nad-plus-therapy'] },
+  { name: 'Hangover',       slug: 'hangover',       aliases: ['hangover-recovery'] },
+  { name: 'Immune Support', slug: 'immune-support', aliases: [] },
+  { name: 'Beauty Glow',    slug: 'beauty-glow',    aliases: [] },
+  { name: 'Weight Loss',    slug: 'weight-loss',    aliases: [] },
+  { name: 'Hydration',      slug: 'hydration',      aliases: [] },
+  { name: 'Recovery',       slug: 'recovery',       aliases: ['athletic-recovery'] },
+  { name: 'Myers Cocktail', slug: 'myers-cocktail', aliases: [] },
+  { name: 'Jet Lag',        slug: 'jet-lag',        aliases: [] },
+  { name: 'Energy Boost',   slug: 'energy-boost',   aliases: [] },
 ];
 
 export async function generateMetadata({ params }: { params: Promise<{ service: string }> }): Promise<Metadata> {
@@ -17,9 +19,9 @@ export async function generateMetadata({ params }: { params: Promise<{ service: 
   const serviceSlug = resolvedParams.service.toLowerCase();
   const service = SERVICES.find(s => s.slug === serviceSlug || (s.aliases && s.aliases.includes(serviceSlug)));
   const serviceName = service ? service.name : serviceSlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-  
-  const title = `${serviceName} IV Therapy Near Me — Top Rated Clinics | TheDripMap`;
-  const description = `Find and compare the best ${serviceName} IV therapy providers. Browse top-rated clinics and mobile services specializing in ${serviceName} protocols to help you reach your wellness goals.`;
+
+  const title = `${serviceName} IV Therapy Clinics Near Me | TheDripMap`;
+  const description = `Find ${serviceName} IV therapy clinics near you. Compare top-rated providers, see pricing, and book your ${serviceName} drip session — in-clinic or mobile.`;
   const siteUrl = 'https://www.thedripmap.com';
 
   return {
