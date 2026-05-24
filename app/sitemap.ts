@@ -3,7 +3,8 @@ import { getAllListings, getBlogPosts, getAllCities, slugify } from '../src/lib/
 import { USE_CASES } from '../src/lib/use-cases';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thedripmap.com';
+  const rawBaseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thedripmap.com';
+  const baseUrl = rawBaseUrl.replace(/^https?:\/\/thedripmap\.com/, 'https://www.thedripmap.com');
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${baseUrl}/`,                       priority: 1.0, changeFrequency: 'daily',   lastModified: new Date() },
