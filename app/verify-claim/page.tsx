@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
 import { Resend } from 'resend';
@@ -8,6 +9,11 @@ import { Footer } from '../../src/components/Footer';
 import { slugify } from '../../src/lib/data';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Verify Your Claim | TheDripMap',
+  robots: { index: false, follow: false },
+};
 
 const SITE_URL = 'https://www.thedripmap.com';
 
