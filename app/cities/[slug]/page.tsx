@@ -11,6 +11,7 @@ import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
 import { QuizCTA } from '@/src/components/QuizCTA';
 import { ListingController } from '@/src/components/ListingController';
 import { getCityBySlug, getListingsByCity, getAllCities } from '@/src/lib/data';
+import { getCityIntro } from '@/src/lib/city-intros';
 import { MapTrigger } from '@/src/components/MapTrigger';
 import { FAQSection } from '@/src/components/FAQSection';
 import { NearbyCities } from '@/src/components/NearbyCities';
@@ -186,11 +187,26 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
         </div>
 
         {/* 3. Intro paragraph */}
-        <section className="mb-12 max-w-4xl">
-          <p className="text-lg text-slate-600 leading-relaxed">
-            Looking for IV therapy in {cityData.name}? Compare {count === 1 ? '1 top-rated clinic' : `${count} top-rated clinics`} offering hydration drips, NAD+, immune support, hangover recovery, and beauty treatments. Read reviews, see prices, and book your session — in-clinic or mobile, whichever you prefer.
-          </p>
-        </section>
+        {(() => {
+          const intro = getCityIntro(slug);
+          if (intro) {
+            return (
+              <section className="mb-12 max-w-4xl space-y-4">
+                <p className="text-lg text-slate-600 leading-relaxed">{intro.localContext}</p>
+                <p className="text-lg text-slate-600 leading-relaxed">
+                  With {count} {count === 1 ? 'clinic' : 'clinics'} in {cityData.name}, popular treatments include {intro.popularTreatments.join(', ')}. {intro.pricing}
+                </p>
+              </section>
+            );
+          }
+          return (
+            <section className="mb-12 max-w-4xl">
+              <p className="text-lg text-slate-600 leading-relaxed">
+                Looking for IV therapy in {cityData.name}? Compare {count === 1 ? '1 top-rated clinic' : `${count} top-rated clinics`} offering hydration drips, NAD+, immune support, hangover recovery, and beauty treatments. Read reviews, see prices, and book your session — in-clinic or mobile, whichever you prefer.
+              </p>
+            </section>
+          );
+        })()}
 
         {/* 4. Verified Providers listings grid */}
         {listings.length > 0 && (
