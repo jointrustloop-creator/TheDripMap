@@ -125,10 +125,12 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     .split(' - Drip')[0]
     .trim();
 
-  const title = `${displayName} — IV Therapy in ${provider.city}, ${provider.state} | TheDripMap`;
+  const topSpecialties = provider.specialties?.slice(0, 3).join(', ') || 'hydration, NAD+, immune support';
+
+  const title = `${displayName} — IV Therapy in ${provider.city}, ${provider.state} | Reviews & Booking | TheDripMap`;
   const description = provider.reviewCount > 0
-    ? `Read ${provider.reviewCount} reviews for ${provider.name} in ${provider.city}, ${provider.state}. Top-rated IV therapy clinic offering hydration, NAD+, and wellness drips.`
-    : `Find details for ${provider.name} in ${provider.city}, ${provider.state}. Top-rated IV therapy clinic offering hydration, NAD+, and wellness drips.`;
+    ? `Read reviews for ${displayName} in ${provider.city}, ${provider.state}. ${provider.rating} stars, ${provider.reviewCount} reviews. IV therapy treatments include ${topSpecialties}. Book your session today.`
+    : `Find ${displayName} in ${provider.city}, ${provider.state}. IV therapy treatments include ${topSpecialties}. Compare prices and book your drip session today on TheDripMap.`;
 
   return {
     title,
