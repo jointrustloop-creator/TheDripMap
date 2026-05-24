@@ -722,22 +722,18 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                         </div>
                         {provider.latitude && provider.longitude && (
                           <div className="h-48 rounded-2xl overflow-hidden bg-slate-200 border border-slate-200 relative">
-                            {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? (
-                              <ResilientImage 
-                                src={`https://maps.googleapis.com/maps/api/staticmap?center=${provider.latitude},${provider.longitude}&zoom=14&size=600x300&markers=color:blue%7C${provider.latitude},${provider.longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
+                            {process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ? (
+                              <ResilientImage
+                                src={`https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+3b82f6(${provider.longitude},${provider.latitude})/${provider.longitude},${provider.latitude},14,0/600x300@2x?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`}
                                 alt="Clinic map location"
                                 fill
                                 className="object-cover"
                                 fallbackSrc="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/map-placeholder.png"
                               />
                             ) : (
-                              <ResilientImage 
-                                src={`https://api.mapbox.com/styles/v1/mapbox/light-v10/static/pin-s-plus+3b82f6(${provider.longitude},${provider.latitude})/${provider.longitude},${provider.latitude},14,0/600x300@2x?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || 'pk.eyJ1IjoiZHJpcG1hcCIsImEiOiJjbHY5Mmt4Nm0wYTZ2MmpuMGV6MGV6MGV6In0.X'}`}
-                                alt="Clinic map location"
-                                fill
-                                className="object-cover"
-                                fallbackSrc="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/map-placeholder.png"
-                              />
+                              <div className="flex items-center justify-center h-full text-slate-400 text-sm font-medium">
+                                Map preview unavailable
+                              </div>
                             )}
                           </div>
                         )}

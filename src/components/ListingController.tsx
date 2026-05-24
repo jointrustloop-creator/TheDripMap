@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 
 // Dynamically import map to avoid SSR issues
-const GoogleListingMap = dynamic(() => import('./GoogleListingMap'), { 
+const MapboxListingMap = dynamic(() => import('./MapboxListingMap'), {
   ssr: false,
   loading: () => (
     <div className="h-[600px] w-full bg-slate-100 rounded-[2.5rem] flex items-center justify-center animate-pulse">
@@ -180,7 +180,7 @@ export function ListingController({ initialProviders, cityName }: ListingControl
             exit={{ opacity: 0 }}
             className="relative h-[600px] w-full rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-2xl"
           >
-            <GoogleListingMap providers={providers} />
+            <MapboxListingMap providers={providers} />
           </motion.div>
         )}
       </AnimatePresence>
