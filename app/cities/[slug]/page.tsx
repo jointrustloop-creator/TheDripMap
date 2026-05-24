@@ -172,12 +172,12 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
         {/* 1. H1 city name */}
         <section className="mt-12 mb-8">
           <h1 className="text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-            {cityData.name}
+            IV Therapy in {cityData.name} — {count} {count === 1 ? 'Clinic' : 'Clinics'} Near You
           </h1>
         </section>
 
         {/* 2. Stats bar (verified providers count, quick map view) */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div className="inline-flex items-center gap-2 bg-wellness-50 text-wellness-700 px-4 py-1.5 rounded-full text-sm font-bold border border-wellness-100 shadow-sm">
             <MapPin size={16} />
             <span>{count} providers in {cityData.name}</span>
@@ -185,6 +185,12 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           <MapTrigger />
         </div>
 
+        {/* 3. Intro paragraph */}
+        <section className="mb-12 max-w-4xl">
+          <p className="text-lg text-slate-600 leading-relaxed">
+            Looking for IV therapy in {cityData.name}? Compare {count === 1 ? '1 top-rated clinic' : `${count} top-rated clinics`} offering hydration drips, NAD+, immune support, hangover recovery, and beauty treatments. Read reviews, see prices, and book your session — in-clinic or mobile, whichever you prefer.
+          </p>
+        </section>
 
         {/* 4. Verified Providers listings grid */}
         {listings.length > 0 && (
