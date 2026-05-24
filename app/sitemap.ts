@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { getAllListings, getBlogPosts, getAllCities, slugify } from '../src/lib/data';
 import { USE_CASES } from '../src/lib/use-cases';
+import { STATES } from '../src/lib/states';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const rawBaseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thedripmap.com';
@@ -10,6 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/`,                       priority: 1.0, changeFrequency: 'daily',   lastModified: new Date() },
     { url: `${baseUrl}/search`,                 priority: 0.9, changeFrequency: 'daily',   lastModified: new Date() },
     { url: `${baseUrl}/cities`,                 priority: 0.9, changeFrequency: 'daily',   lastModified: new Date() },
+    { url: `${baseUrl}/states`,                 priority: 0.85, changeFrequency: 'weekly', lastModified: new Date() },
     { url: `${baseUrl}/quiz`,                   priority: 0.8, changeFrequency: 'monthly', lastModified: new Date() },
     { url: `${baseUrl}/blog`,                   priority: 0.8, changeFrequency: 'daily',   lastModified: new Date() },
     { url: `${baseUrl}/about`,                  priority: 0.6, changeFrequency: 'monthly', lastModified: new Date() },
@@ -36,6 +38,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     }));
 
+  const stateRoutes = STATES.map((s) => ({
+    url: `${baseUrl}/states/${s.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.85,
+  }));
+
   const providers = await getAllListings();
   const providerRoutes = providers
     .filter((p) => p.name)
@@ -54,5 +63,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticRoutes, ...symptomRoutes, ...cityRoutes, ...providerRoutes, ...blogRoutes];
+  return [...staticRoutes, ...symptomRoutes, ...stateRoutes, ...cityRoutes, ...providerRoutes, ...blogRoutes];
 }
