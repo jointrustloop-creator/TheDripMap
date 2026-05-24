@@ -63,6 +63,15 @@ const nextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      // Map static-style /og-image.png URL to the dynamic ImageResponse route
+      {
+        source: '/og-image.png',
+        destination: '/og-image',
+      },
+    ];
+  },
   async redirects() {
     return [
       {
