@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
-import { RoiCalculator } from '../../src/components/RoiCalculator';
+import { ClinicAudit } from '../../src/components/ClinicAudit';
 import { ShieldCheck, ArrowRight, BarChart, Users, Globe } from 'lucide-react';
 import { getSiteStats } from '../../src/lib/data';
 
@@ -99,9 +99,11 @@ export default async function ForClinicsPage() {
           ))}
         </div>
 
-        {/* ROI Calculator — concrete proof of expected return per city */}
+        {/* Listing audit — clinic owner types their name, sees their actual listing vs claimed,
+            plus top competitors in their city. Replaces a tepid ROI calculator with a personal,
+            actionable conversion tool. */}
         <div className="mb-24">
-          <RoiCalculator popularCities={['Toronto', 'New York', 'Houston', 'San Francisco', 'Vancouver', 'Miami']} />
+          <ClinicAudit />
         </div>
 
         {/* Comparison Section */}
