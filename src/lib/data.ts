@@ -594,54 +594,31 @@ export async function getCitiesFromListings() {
 }
 
 export async function getPopularCities() {
-  const allCities = await getAllCities();
-  const requestedSlugs = [
-    'toronto',
-    'new-york',
-    'los-angeles',
-    'chicago',
-    'houston',
-    'san-diego',
-    'washington',
-    'clearwater'
+  // Use the SAME query as the city page (getListingsByCity) so the count shown
+  // in the footer matches the count the user sees when they click through.
+  // For major metros this is metro-inclusive (Houston includes Tomball/Cypress,
+  // NYC includes outer boroughs, Toronto/GTA includes Mississauga/Oakville/etc).
+  const popular = [
+    { slug: 'toronto',     name: 'Toronto & GTA',  cityArg: 'Toronto',      stateArg: 'Ontario' },
+    { slug: 'new-york',    name: 'New York',       cityArg: 'New York',     stateArg: 'New York' },
+    { slug: 'los-angeles', name: 'Los Angeles',    cityArg: 'Los Angeles',  stateArg: 'California' },
+    { slug: 'chicago',     name: 'Chicago',        cityArg: 'Chicago',      stateArg: 'Illinois' },
+    { slug: 'houston',     name: 'Houston',        cityArg: 'Houston',      stateArg: 'Texas' },
+    { slug: 'san-diego',   name: 'San Diego',      cityArg: 'San Diego',    stateArg: 'California' },
+    { slug: 'washington',  name: 'Washington DC',  cityArg: 'Washington',   stateArg: 'District of Columbia' },
+    { slug: 'clearwater',  name: 'Clearwater',     cityArg: 'Clearwater',   stateArg: 'Florida' },
   ];
-  
-  const requestedNames: Record<string, string> = {
-    'toronto': 'Toronto & GTA',
-    'new-york': 'New York',
-    'los-angeles': 'Los Angeles',
-    'chicago': 'Chicago',
-    'houston': 'Houston',
-    'san-diego': 'San Diego',
-    'washington': 'Washington DC',
-    'clearwater': 'Clearwater'
-  };
 
-  // For Toronto, we want to sum GTA cities if they are in the database
-  const gtaLower = GTA_CITIES.map(c => c.toLowerCase());
-  const torontoGTA = allCities.filter(c => 
-    gtaLower.includes(c.city.toLowerCase())
+  const results = await Promise.all(
+    popular.map(async (p) => {
+      try {
+        const listings = await getListingsByCity(p.cityArg, p.stateArg);
+        return { name: p.name, slug: p.slug, count: listings.length };
+      } catch {
+        return { name: p.name, slug: p.slug, count: 0 };
+      }
+    })
   );
-  const torontoCount = torontoGTA.reduce((sum, c) => sum + c.count, 0);
-
-  const results = requestedSlugs.map(slug => {
-    if (slug === 'toronto') {
-      return {
-        name: 'Toronto & GTA',
-        slug: 'toronto',
-        count: torontoCount
-      };
-    }
-    
-    // Find matching city by slug
-    const found = allCities.find(c => slugify(c.city) === slug);
-    
-    return {
-      name: requestedNames[slug] || slug,
-      slug: slug,
-      count: found ? found.count : 0
-    };
-  });
 
   return results;
 }
