@@ -2,7 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, ArrowRight, Sparkles } from 'lucide-react';
+import { MapPin, ArrowRight, Sparkles, Zap, BookOpen, HelpCircle } from 'lucide-react';
 import { Navbar } from '@/src/components/Navbar';
 import { Footer } from '@/src/components/Footer';
 import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
@@ -170,6 +170,71 @@ export default async function CitiesHubPage() {
           </div>
         )}
 
+        {/* Cross-links — keeps visitors moving after they've browsed cities */}
+        <section className="mt-24 bg-white rounded-[3rem] border border-slate-100 shadow-sm p-10 md:p-14">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-wellness-600 mb-4">
+            Browse a different way
+          </p>
+          <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-10 tracking-tight">
+            City not what you needed?
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Link
+              href="/treatments"
+              className="group bg-slate-50 hover:bg-wellness-50 rounded-[1.5rem] p-7 transition-all"
+            >
+              <div className="w-10 h-10 rounded-xl bg-white text-wellness-600 flex items-center justify-center mb-4 shadow-sm">
+                <Zap size={20} />
+              </div>
+              <h3 className="text-xl font-black text-slate-900 mb-2 tracking-tight">
+                Browse by treatment
+              </h3>
+              <p className="text-sm text-slate-600 leading-relaxed mb-4">
+                NAD+, Myers Cocktail, Hangover, Beauty Glow and 6 more — full
+                details, costs, and clinics that offer each protocol.
+              </p>
+              <span className="text-xs font-black text-wellness-600 uppercase tracking-widest group-hover:underline">
+                See all treatments →
+              </span>
+            </Link>
+            <Link
+              href="/guide"
+              className="group bg-slate-50 hover:bg-wellness-50 rounded-[1.5rem] p-7 transition-all"
+            >
+              <div className="w-10 h-10 rounded-xl bg-white text-wellness-600 flex items-center justify-center mb-4 shadow-sm">
+                <BookOpen size={20} />
+              </div>
+              <h3 className="text-xl font-black text-slate-900 mb-2 tracking-tight">
+                Read the guides
+              </h3>
+              <p className="text-sm text-slate-600 leading-relaxed mb-4">
+                Cost guide, how to choose a clinic, IV vs oral supplements,
+                first-time tips, mobile vs clinic.
+              </p>
+              <span className="text-xs font-black text-wellness-600 uppercase tracking-widest group-hover:underline">
+                See guides →
+              </span>
+            </Link>
+            <Link
+              href="/quiz"
+              className="group bg-slate-900 hover:bg-slate-800 text-white rounded-[1.5rem] p-7 transition-all"
+            >
+              <div className="w-10 h-10 rounded-xl bg-wellness-600 text-white flex items-center justify-center mb-4 shadow-sm">
+                <HelpCircle size={20} />
+              </div>
+              <h3 className="text-xl font-black mb-2 tracking-tight">
+                Not sure where to start?
+              </h3>
+              <p className="text-sm text-slate-300 leading-relaxed mb-4">
+                60-second quiz matches your symptoms to the right protocol and
+                shows clinics that offer it.
+              </p>
+              <span className="text-xs font-black text-wellness-300 uppercase tracking-widest">
+                Take the quiz →
+              </span>
+            </Link>
+          </div>
+        </section>
       </main>
       <Footer />
     </div>
