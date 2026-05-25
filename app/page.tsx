@@ -356,34 +356,80 @@ export default async function HomePage() {
       {/* How It Works */}
       <HowItWorks totalListings={stats.total} />
 
-      {/* Mobile IV Section */}
-      <section className="py-32 px-6 bg-slate-900 overflow-hidden relative">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-16 relative z-10">
-          <div className="flex-1 text-center md:text-left">
-            <span className="text-wellness-400 font-bold text-sm uppercase tracking-[0.4em] mb-4 block">Convenience Redefined</span>
-            <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tight leading-[1.1]">
-              The Hospital Experience, <br />
-              <span className="text-wellness-400">In Your Living Room.</span>
+      {/* Mobile IV Section — premium dark editorial layout */}
+      <section className="py-32 px-6 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden relative">
+        {/* Decorative wellness-color glows */}
+        <div className="absolute top-20 -left-32 w-[500px] h-[500px] bg-wellness-500/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-20 -right-32 w-[400px] h-[400px] bg-wellness-400/10 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] items-center gap-12 lg:gap-20 relative z-10">
+          {/* LEFT — content */}
+          <div className="text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-wellness-400/10 border border-wellness-400/20 rounded-full mb-8">
+              <span className="w-1.5 h-1.5 bg-wellness-400 rounded-full animate-pulse" />
+              <span className="text-wellness-400 font-black text-[11px] uppercase tracking-[0.25em]">Mobile IV Therapy</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tight leading-[1.05]">
+              A nurse at your door <br className="hidden md:block" />
+              in <span className="text-wellness-400">60 minutes.</span>
             </h2>
-            <p className="text-xl text-slate-300 mb-10 max-w-xl leading-relaxed">
-              We match you with top-rated mobile IV services that bring hydration, vitamins, and recovery directly to your door.
+            <p className="text-lg md:text-xl text-slate-300 mb-10 max-w-xl lg:max-w-none leading-relaxed">
+              No clinic visit, no waiting room. Top-rated licensed providers come to your home, hotel, or office — with hospital-grade IV therapy, set up in five minutes.
             </p>
-            <Link 
-              href="/search"
-              className="inline-flex items-center gap-3 bg-white text-slate-900 px-10 py-5 rounded-2xl font-black text-lg hover:bg-slate-100 transition-all shadow-xl"
+
+            {/* Inline stat row */}
+            <div className="flex flex-wrap justify-center lg:justify-start gap-4 mb-10">
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-5 py-3">
+                <div className="text-2xl font-black text-wellness-400 leading-none">60min</div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">avg dispatch</div>
+              </div>
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-5 py-3">
+                <div className="text-2xl font-black text-wellness-400 leading-none">RN/NP</div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">licensed staff</div>
+              </div>
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-5 py-3">
+                <div className="text-2xl font-black text-wellness-400 leading-none">$0</div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">match fee</div>
+              </div>
+            </div>
+
+            <Link
+              href="/search?type=mobile"
+              className="inline-flex items-center gap-3 bg-wellness-400 text-slate-950 px-8 py-4 rounded-2xl font-black text-base hover:bg-wellness-300 transition-all shadow-2xl shadow-wellness-500/20 hover:scale-[1.02] active:scale-[0.99]"
             >
-              Find Mobile IV <ArrowRight size={20} />
+              Find Mobile IV Near You <ArrowRight size={18} />
             </Link>
           </div>
-          <div className="flex-1 w-full">
-            <div className="relative h-[500px] md:h-[650px] rounded-[4rem] overflow-hidden shadow-2xl skew-y-3 md:skew-y-0 md:rotate-3 hover:rotate-0 transition-transform duration-700">
-              <ResilientImage 
-                src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-woman-home.jpg"
+
+          {/* RIGHT — image, framed editorial-style (no skew gimmick) */}
+          <div className="relative">
+            <div className="relative h-[480px] md:h-[600px] rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10">
+              <ResilientImage
+                src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/mobile-iv-therapy-kit-home-delivery.jpg"
                 fallbackSrc="https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?q=80&w=2070&auto=format&fit=crop"
-                alt="Woman receiving IV therapy at home"
+                alt="Mobile IV therapy kit delivered to your home"
                 fill
                 className="object-cover"
               />
+              {/* Bottom-edge text overlay */}
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent p-8">
+                <div className="text-white">
+                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-wellness-400 mb-1.5">In-home setup</div>
+                  <div className="text-lg md:text-xl font-black tracking-tight leading-tight">
+                    Hospital-grade kit. Five-minute setup.
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Floating credibility badge */}
+            <div className="hidden md:flex absolute -bottom-6 -left-6 bg-white text-slate-900 px-5 py-4 rounded-2xl shadow-2xl items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
+                <ShieldCheck size={20} />
+              </div>
+              <div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Vetted by</div>
+                <div className="text-sm font-black text-slate-900">TheDripMap medical team</div>
+              </div>
             </div>
           </div>
         </div>
@@ -397,43 +443,33 @@ export default async function HomePage() {
             <p className="text-xl text-slate-500">Find the best local IV therapy providers and mobile services in your area.</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              ...popularCities.map(city => ({ 
-                name: city.name, 
-                slug: city.slug, 
-                subtitle: city.count ? `${city.count} verified ${city.name.includes('Toronto') ? 'providers' : 'clinics'}` : 'View Clinics', 
-                isAll: false 
-              })),
-              { name: 'Browse All Cities', slug: '', subtitle: '', isAll: true }
-            ].map((city, idx) => (
-              <Link 
+            {popularCities.map((city, idx) => (
+              <Link
                 key={idx}
-                href={city.isAll ? '/cities' : `/cities/${city.slug}`}
-                className={cn(
-                  "p-8 rounded-[2rem] border transition-all text-center group flex flex-col items-center justify-center min-h-[160px]",
-                  city.isAll 
-                    ? "bg-slate-900 border-slate-900 text-white hover:bg-slate-800" 
-                    : "bg-white border-slate-100 hover:border-wellness-200 hover:shadow-xl"
-                )}
+                href={`/cities/${city.slug}`}
+                className="p-8 rounded-[2rem] border transition-all text-center group flex flex-col items-center justify-center min-h-[160px] bg-white border-slate-100 hover:border-wellness-200 hover:shadow-xl"
               >
-                {!city.isAll && (
-                  <div className="w-10 h-10 bg-wellness-50 rounded-xl flex items-center justify-center text-wellness-600 mb-4 group-hover:scale-110 transition-transform">
-                    <MapPin size={20} />
-                  </div>
-                )}
-                <span className={cn(
-                  "font-black tracking-tight",
-                  city.isAll ? "text-lg" : "text-slate-900 group-hover:text-wellness-600 transition-colors"
-                )}>
+                <div className="w-10 h-10 bg-wellness-50 rounded-xl flex items-center justify-center text-wellness-600 mb-4 group-hover:scale-110 transition-transform">
+                  <MapPin size={20} />
+                </div>
+                <span className="font-black tracking-tight text-slate-900 group-hover:text-wellness-600 transition-colors">
                   {city.name}
                 </span>
-                {!city.isAll && (
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">
-                    {city.subtitle || 'View Clinics'}
-                  </span>
-                )}
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">
+                  {city.count ? `${city.count} verified ${city.name.includes('Toronto') ? 'providers' : 'clinics'}` : 'View Clinics'}
+                </span>
               </Link>
             ))}
+          </div>
+
+          {/* Centered standalone CTA — pulled out of the grid so it doesn't compete with city cards */}
+          <div className="flex justify-center mt-12">
+            <Link
+              href="/cities"
+              className="inline-flex items-center gap-3 bg-slate-900 hover:bg-slate-800 text-white px-10 py-5 rounded-2xl font-black text-base transition-all shadow-xl hover:scale-[1.02] active:scale-[0.99]"
+            >
+              Browse All {stats.cities}+ Cities <ArrowRight size={18} />
+            </Link>
           </div>
         </div>
       </section>
