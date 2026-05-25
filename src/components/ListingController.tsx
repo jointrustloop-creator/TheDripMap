@@ -66,6 +66,18 @@ export function ListingController({ initialProviders, cityName }: ListingControl
     }
   };
 
+  // Claimed listings always pinned to the top, then distance, then rating.
+  // Without the is_featured tiebreaker, granting location would push claimed
+  // listings down the page based on raw proximity — defeating the value of
+  // the claim. We promise "always shown first" in the UI; this enforces it.
+  const sortProviders = (list: Provider[]): Provider[] =>
+    list.slice().sort((a, b) => {
+      if (a.is_featured !== b.is_featured) return a.is_featured ? -1 : 1;
+      const distDiff = (a.distance ?? 9999) - (b.distance ?? 9999);
+      if (distDiff !== 0) return distDiff;
+      return (b.rating ?? 0) - (a.rating ?? 0);
+    });
+
   useEffect(() => {
     // Initial fetch of user location
     const fetchLocation = async () => {
@@ -88,8 +100,7 @@ export function ListingController({ initialProviders, cityName }: ListingControl
           return p;
         });
 
-        // Sort by distance if location is available
-        setProviders(updatedProviders.sort((a, b) => (a.distance || 9999) - (b.distance || 9999)));
+        setProviders(sortProviders(updatedProviders));
       }
     };
 
@@ -113,7 +124,7 @@ export function ListingController({ initialProviders, cityName }: ListingControl
         }
         return p;
       });
-      setProviders(updatedProviders.sort((a, b) => (a.distance || 9999) - (b.distance || 9999)));
+      setProviders(sortProviders(updatedProviders));
     }
   };
 
