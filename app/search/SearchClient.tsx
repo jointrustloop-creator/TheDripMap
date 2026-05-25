@@ -330,12 +330,10 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pt-8 border-t border-slate-50">
             <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-              {selectedCity === 'All' ? `All Clinics (${totalCount})` : `IV Therapy in ${selectedCity}`}
-              {selectedCity !== 'All' && (
-                <span className="text-wellness-600 ml-2">
-                  ({filteredProviders.length})
-                </span>
-              )}
+              {selectedCity === 'All' ? 'All Clinics' : `IV Therapy in ${selectedCity}`}
+              <span className="text-wellness-600 ml-2">
+                ({filteredProviders.length})
+              </span>
             </h2>
             
             <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -394,7 +392,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
 
 
           <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 text-left">
-            Showing {selectedCity === 'All' ? totalCount : filteredProviders.length} {activeChips.includes('Mobile') ? 'mobile IV ' : ''}clinics {selectedCity === 'All' ? 'nationwide' : `in ${selectedCity}`}
+            Showing {filteredProviders.length} {activeChips.includes('Mobile') ? 'mobile IV ' : ''}clinics {selectedCity === 'All' ? 'nationwide' : `in ${selectedCity}`}
           </div>
 
           <AnimatePresence>
