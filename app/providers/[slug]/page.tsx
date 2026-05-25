@@ -185,7 +185,8 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   }
 
   const profiles = await getOperatorProfiles();
-  const profile = profiles.find(p => p.clinicId === provider.id);
+  // Match on either camelCase or snake_case — DB stores clinic_id, type allows both.
+  const profile = profiles.find(p => p.clinicId === provider.id || p.clinic_id === provider.id);
   const stateCode = provider.state || getStateFromProvider(provider);
   const timezone = TIMEZONE_MAP[stateCode] || 'America/New_York';
   const stateName = STATE_MAP[stateCode] || stateCode;
@@ -504,6 +505,74 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 </div>
               )}
 
+              {/* IN THEIR WORDS — editorial pull-quote from the owner's onboarding survey.
+                  Only renders for claimed clinics that submitted a one-liner. */}
+              {provider.is_featured && (profile?.one_liner || profile?.profile_data?.oneLiner) && (
+                <section className="relative bg-gradient-to-br from-wellness-50 via-white to-emerald-50/50 rounded-[2.5rem] p-10 md:p-14 border border-wellness-100 overflow-hidden">
+                  <div aria-hidden className="absolute top-2 left-6 text-[8rem] md:text-[10rem] font-black text-wellness-200/60 leading-none select-none pointer-events-none">&ldquo;</div>
+                  <div className="relative">
+                    <div className="text-[10px] font-black uppercase tracking-[0.25em] text-wellness-700 mb-6 ml-1">
+                      In their words
+                    </div>
+                    <p className="text-2xl md:text-3xl lg:text-[2rem] font-medium text-slate-900 leading-snug italic max-w-3xl mb-8 tracking-tight">
+                      {profile.one_liner || profile.profile_data.oneLiner}
+                    </p>
+                    {(profile.owner_name || profile.ownerName || profile.profile_data?.ownerName) && (
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center font-black text-sm shrink-0">
+                          {((profile.owner_name || profile.ownerName || profile.profile_data?.ownerName) as string).trim().charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="text-sm font-black text-slate-900">
+                            — {profile.owner_name || profile.ownerName || profile.profile_data?.ownerName}
+                          </div>
+                          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                            Owner, {displayName}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </section>
+              )}
+
+              {/* {CLINIC} AT A GLANCE — survey-driven facts as compact icon cards.
+                  Only the cards with actual data render; nothing is faked. */}
+              {provider.is_featured && profile?.profile_data && (() => {
+                const pd = profile.profile_data;
+                const items = [
+                  pd.waitTime ? { icon: '🕒', label: 'Wait time', value: pd.waitTime } : null,
+                  pd.environment ? { icon: '🏛', label: 'Environment', value: pd.environment } : null,
+                  pd.administerType ? { icon: '👩‍⚕️', label: 'Administered by', value: pd.administerType } : null,
+                  pd.primarySpecialty ? { icon: '💉', label: 'Specialty', value: pd.primarySpecialty } : null,
+                  pd.mobileService === true ? { icon: '🚗', label: 'Mobile service', value: 'Available' } : null,
+                  pd.walkInsWelcome === true ? { icon: '🚪', label: 'Walk-ins', value: 'Welcome' } : null,
+                ].filter(Boolean) as { icon: string; label: string; value: string }[];
+                if (items.length === 0) return null;
+                return (
+                  <section>
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="h-px flex-1 bg-slate-100" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                        {displayName} at a glance
+                      </span>
+                      <div className="h-px flex-1 bg-slate-100" />
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                      {items.map((it) => (
+                        <div key={it.label} className="bg-white border border-slate-100 hover:border-wellness-200 transition-colors rounded-2xl p-5 flex items-start gap-3 shadow-sm">
+                          <div className="text-2xl leading-none shrink-0" aria-hidden>{it.icon}</div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{it.label}</div>
+                            <div className="text-sm font-black text-slate-900 leading-snug">{it.value}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                );
+              })()}
+
               {provider.is_featured && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {/* Info Cards */}
@@ -636,13 +705,8 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               <section className="pt-8 border-t border-slate-100">
                 <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">About {provider.name}</h2>
                 <div className="prose prose-slate max-w-none">
-                  {provider.is_featured && (profile?.one_liner || profile?.profile_data?.oneLiner) && (
-                    <div className="mb-10 p-8 bg-wellness-50 border-l-8 border-wellness-600 rounded-r-[2rem]">
-                      <p className="text-2xl font-black text-wellness-900 italic leading-relaxed">
-                        &quot;{profile.one_liner || profile.profile_data.oneLiner}&quot;
-                      </p>
-                    </div>
-                  )}
+                  {/* One-liner pull-quote is now rendered in the "In Their Words" section
+                      at the top of the page — not repeated here. */}
                   <p className="text-xl text-slate-600 leading-relaxed whitespace-pre-wrap font-medium">
                     {provider.description}
                   </p>

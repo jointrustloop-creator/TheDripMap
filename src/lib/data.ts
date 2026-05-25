@@ -1284,7 +1284,13 @@ export async function getOperatorProfiles() {
       .select('*');
 
     if (error) throw error;
-    return data as OperatorProfile[];
+    // DB column is `clinic_id` (snake_case). Some consumers read `clinicId` (camelCase).
+    // Mirror both so either lookup style works.
+    return (data || []).map((p: Record<string, unknown>) => ({
+      ...p,
+      clinicId: p.clinicId ?? p.clinic_id,
+      clinic_id: p.clinic_id ?? p.clinicId,
+    })) as OperatorProfile[];
   } catch {
     return [];
   }
