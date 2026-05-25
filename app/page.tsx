@@ -144,16 +144,18 @@ export default async function HomePage() {
       {/* Hero Section */}
       <section className="relative pt-32 pb-40 px-6 overflow-hidden min-h-[90vh] flex items-center">
         <div className="absolute inset-0 z-0">
-          <ResilientImage 
-            src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg?v=hero-final"
+          <ResilientImage
+            src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-spa-reception-recliners.jpg"
             fallbackSrc="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2000&auto=format&fit=crop"
             alt="Professional IV Therapy Clinic"
             fill
-            className="object-cover"
+            className="object-cover object-center"
             priority
           />
-          <div className="absolute inset-0 bg-slate-950/60" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-950/40" />
+          {/* Stronger overlay on mobile portrait so the white headline stays readable
+              even when the hero image gets aggressively cropped */}
+          <div className="absolute inset-0 bg-slate-950/75 md:bg-slate-950/60" />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-transparent to-slate-950/60" />
         </div>
         
         <div className="max-w-7xl mx-auto relative z-10 w-full">

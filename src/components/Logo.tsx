@@ -37,7 +37,7 @@ export const Logo = ({ className, iconOnly = false }: LogoProps) => {
         width={1500}
         height={350}
         priority
-        className="h-24 md:h-32 w-auto -ml-5 md:-ml-8"
+        className="h-12 md:h-20 lg:h-32 w-auto -ml-2 md:-ml-5 lg:-ml-8"
       />
     </div>
   );
