@@ -24,15 +24,20 @@ export const Logo = ({ className, iconOnly = false }: LogoProps) => {
     );
   }
 
+  // Visual crop: largerlogo.jpg has roughly equal whitespace padding on both
+  // sides of the actual logo mark. To make "left-align" actually look
+  // left-aligned, we pull the image leftward with a negative margin and clip
+  // the overflow on the parent. Tune the negative margin if the padding ratio
+  // changes (or replace the source with a tight-cropped image).
   return (
-    <div className={cn('flex items-center select-none', className)}>
+    <div className={cn('flex items-center select-none overflow-hidden', className)}>
       <Image
         src={LOGO_URL}
         alt="TheDripMap — Your Guide to Feeling Better"
         width={1500}
         height={350}
         priority
-        className="h-24 md:h-32 w-auto"
+        className="h-24 md:h-32 w-auto -ml-5 md:-ml-8"
       />
     </div>
   );
