@@ -236,6 +236,27 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   const patientTestimonials = provider.is_featured
     ? await getApprovedTestimonials(provider.id)
     : [];
+
+  // Blend Google rating with patient testimonials so a clinic with 0 Google reviews
+  // but verified TheDripMap testimonials still shows a meaningful rating.
+  const googleRating = Number(provider.rating) || 0;
+  const googleCount = Number(provider.reviewCount) || 0;
+  const testimonialCount = patientTestimonials.length;
+  const testimonialRatingSum = patientTestimonials.reduce(
+    (sum, t) => sum + (Number(t.rating) || 0),
+    0
+  );
+
+  const totalCount = googleCount + testimonialCount;
+  const totalSum = googleRating * googleCount + testimonialRatingSum;
+  const displayRating = totalCount > 0 ? Number((totalSum / totalCount).toFixed(1)) : 0;
+  const displayReviewCount = totalCount;
+  const ratingSource: 'google' | 'testimonials' | 'blended' =
+    googleCount > 0 && testimonialCount > 0
+      ? 'blended'
+      : testimonialCount > 0
+      ? 'testimonials'
+      : 'google';
   const isCityMatch = similarClinics.every(c => c.city === provider.city);
   const similarTitle = isCityMatch && similarClinics.length >= 3 
     ? `Other IV therapy clinics in ${provider.city}` 
@@ -262,10 +283,10 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
       "latitude": provider.latitude,
       "longitude": provider.longitude
     },
-    "aggregateRating": provider.reviewCount > 0 ? {
+    "aggregateRating": displayReviewCount > 0 ? {
       "@type": "AggregateRating",
-      "ratingValue": provider.rating,
-      "reviewCount": provider.reviewCount
+      "ratingValue": displayRating,
+      "reviewCount": displayReviewCount
     } : undefined
   };
 
@@ -402,10 +423,10 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
 
             {/* Key facts row, overlaid on photo */}
             <div className="flex flex-wrap gap-2 md:gap-3">
-              {provider.rating > 0 && provider.reviewCount > 0 && (
+              {displayRating > 0 && displayReviewCount > 0 && (
                 <div className="bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 shadow-md">
                   <Star size={13} fill="currentColor" className="text-amber-500" />
-                  {provider.rating} · {provider.reviewCount} reviews
+                  {displayRating} · {displayReviewCount} {ratingSource === 'testimonials' ? 'patient testimonials' : 'reviews'}
                 </div>
               )}
               <div className="bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 shadow-md">
@@ -1298,12 +1319,15 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   )}
 
                   {/* RATING — quick credibility anchor */}
-                  {provider.is_featured && provider.rating > 0 && provider.reviewCount > 0 && (
+                  {provider.is_featured && displayRating > 0 && displayReviewCount > 0 && (
                     <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <Star size={14} fill="currentColor" className="text-amber-500" />
-                        <span className="text-sm font-black text-slate-900">{provider.rating}</span>
-                        <span className="text-xs text-slate-500 font-bold">({provider.reviewCount} reviews)</span>
+                        <span className="text-sm font-black text-slate-900">{displayRating}</span>
+                        <span className="text-xs text-slate-500 font-bold">
+                          ({displayReviewCount}{' '}
+                          {ratingSource === 'testimonials' ? 'patient testimonials' : 'reviews'})
+                        </span>
                       </div>
                       <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">
                         ✓ Verified
