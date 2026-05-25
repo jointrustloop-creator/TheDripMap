@@ -48,12 +48,37 @@ export default async function ForClinicsPage() {
       <Navbar />
       
       <main className="max-w-7xl mx-auto px-6 py-20">
-        <div className="text-center max-w-3xl mx-auto mb-20">
+        <div className="text-center max-w-3xl mx-auto mb-12">
           <h1 className="text-5xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
             Your clinic is already on <span className="text-wellness-600">TheDripMap</span>. Make it work for you.
           </h1>
           <p className="text-xl text-slate-500 leading-relaxed">
-            {stats.total.toLocaleString()}+ clinics listed across the US. Patients are actively searching. Claim your free listing in 2 minutes.
+            {stats.total.toLocaleString()}+ clinics listed across the US and Canada. Patients are actively searching. Claim your free listing in 2 minutes.
+          </p>
+        </div>
+
+        {/* Real-numbers stat strip — concrete proof that traffic is real */}
+        <div className="bg-slate-900 text-white rounded-[2rem] py-8 px-6 md:px-12 mb-20">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 text-center">
+            <div>
+              <div className="text-3xl md:text-4xl font-black text-wellness-400 mb-1">19,700</div>
+              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">monthly Google impressions</div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-black text-wellness-400 mb-1">{stats.total.toLocaleString()}</div>
+              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">clinics listed</div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-black text-wellness-400 mb-1">{stats.cities.toLocaleString()}</div>
+              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">cities covered</div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-black text-wellness-400 mb-1">+83%</div>
+              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">week-over-week impression growth</div>
+            </div>
+          </div>
+          <p className="text-center text-xs text-slate-400 mt-6 font-medium italic">
+            Source: Google Search Console, last 28 days. Canadian searches convert at <span className="text-wellness-400 font-bold not-italic">12.5×</span> the US rate — we&apos;re building Canadian coverage fast.
           </p>
         </div>
 

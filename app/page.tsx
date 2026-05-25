@@ -191,37 +191,29 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-black text-slate-900 text-center mb-16 tracking-tight">The Smarter Way to Find IV Therapy Clinics</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-24">
-            <Link href="/quiz" className="group relative bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl hover:shadow-2xl hover:border-wellness-200 transition-all duration-500 overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-wellness-50 rounded-bl-[5rem] -mr-8 -mt-8 group-hover:scale-110 transition-transform" />
+          {/* Single primary CTA — Smart Match. Browse Directory demoted to a secondary
+              text link below so the visitor has one clear next action, not two competing ones. */}
+          <div className="max-w-3xl mx-auto mb-12">
+            <Link href="/quiz" className="group relative block bg-white p-10 md:p-12 rounded-[3rem] border border-slate-100 shadow-xl hover:shadow-2xl hover:border-wellness-200 transition-all duration-500 overflow-hidden">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-wellness-50 rounded-bl-[5rem] -mr-10 -mt-10 group-hover:scale-110 transition-transform" />
               <div className="relative z-10">
                 <div className="w-14 h-14 bg-wellness-600 rounded-2xl flex items-center justify-center text-white mb-8 shadow-lg shadow-wellness-100">
                   <Zap size={28} />
                 </div>
-                <h3 className="text-3xl font-black text-slate-900 mb-4">The Smart Match</h3>
-                <p className="text-slate-500 leading-relaxed mb-8">
-                  Not sure which IV is right for you? Our clinical algorithm matches you based on goals, symptoms, and budget.
+                <h3 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight">The Smart Match</h3>
+                <p className="text-slate-500 leading-relaxed mb-8 text-lg max-w-xl">
+                  Not sure which IV is right for you? Our clinical algorithm matches you based on goals, symptoms, location, and budget — in 60 seconds.
                 </p>
-                <div className="flex items-center gap-2 text-wellness-600 font-bold">
-                  Start Quiz <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                <div className="inline-flex items-center gap-2 bg-wellness-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-wellness-700 transition-colors">
+                  Start the 60-Second Quiz <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
             </Link>
-
-            <Link href="/search" className="group relative bg-slate-900 p-10 rounded-[3rem] border border-slate-800 shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-slate-800 rounded-bl-[5rem] -mr-8 -mt-8 group-hover:scale-110 transition-transform" />
-              <div className="relative z-10">
-                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-slate-900 mb-8 shadow-lg">
-                  <Search size={28} />
-                </div>
-                <h3 className="text-3xl font-black text-white mb-4">Browse Directory</h3>
-                <p className="text-slate-400 leading-relaxed mb-8">
-                  Already know what you need? Filter through {stats.total} top-rated clinics by city, service, or price.
-                </p>
-                <div className="flex items-center gap-2 text-white font-bold">
-                  Explore Now <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
+          </div>
+          <div className="text-center mb-24">
+            <Link href="/search" className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-wellness-600 transition-colors">
+              <Search size={14} />
+              Or browse all {stats.total} clinics directly →
             </Link>
           </div>
 

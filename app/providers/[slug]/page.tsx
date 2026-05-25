@@ -347,12 +347,46 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
             <CheckCircle2 size={24} /> ✅ Verified & Claimed — This listing is managed by {displayName}
           </div>
         ) : (
-          <ClaimListingTrigger
-            provider={provider}
-            className="mb-12 w-full bg-slate-900 hover:bg-slate-800 text-white py-5 px-8 rounded-3xl text-center font-black text-lg shadow-xl shadow-slate-100 flex items-center justify-center gap-3 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
-          >
-            <span>⚠️ Is this your clinic? Claim it free in 2 minutes →</span>
-          </ClaimListingTrigger>
+          <div className="mb-12 space-y-6">
+            <ClaimListingTrigger
+              provider={provider}
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white py-5 px-8 rounded-3xl text-center font-black text-lg shadow-xl shadow-slate-100 flex items-center justify-center gap-3 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+            >
+              <span>⚠️ Is this your clinic? Claim it free in 2 minutes →</span>
+            </ClaimListingTrigger>
+
+            {/* "Missing from this listing" — applies social pressure on the clinic owner.
+                Only renders for unclaimed listings. */}
+            <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8">
+              <div className="flex items-center gap-2 mb-5">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Missing from this listing</span>
+                <div className="h-px flex-1 bg-slate-200" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white border border-slate-100 rounded-2xl p-5 opacity-70">
+                  <div className="text-2xl mb-2 grayscale">📸</div>
+                  <div className="font-bold text-slate-700 text-sm mb-1">Custom photos &amp; clinic description</div>
+                  <div className="text-xs text-slate-400 leading-relaxed">Showcase your space, staff, and what makes your protocol different.</div>
+                </div>
+                <div className="bg-white border border-slate-100 rounded-2xl p-5 opacity-70">
+                  <div className="text-2xl mb-2 grayscale">💉</div>
+                  <div className="font-bold text-slate-700 text-sm mb-1">Drip menu with transparent pricing</div>
+                  <div className="text-xs text-slate-400 leading-relaxed">List your Myers, NAD+, hangover, and add-ons with prices upfront.</div>
+                </div>
+                <div className="bg-white border border-slate-100 rounded-2xl p-5 opacity-70">
+                  <div className="text-2xl mb-2 grayscale">💬</div>
+                  <div className="font-bold text-slate-700 text-sm mb-1">Verified responses to reviews</div>
+                  <div className="text-xs text-slate-400 leading-relaxed">Reply to reviews and patients see you&apos;re engaged. Boosts trust.</div>
+                </div>
+              </div>
+              <ClaimListingTrigger
+                provider={provider}
+                className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-wellness-600 hover:text-wellness-700"
+              >
+                <span>Add all of this when you claim →</span>
+              </ClaimListingTrigger>
+            </div>
+          </div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-16">

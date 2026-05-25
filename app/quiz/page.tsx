@@ -31,6 +31,12 @@ import { getAllCities, GTA_CITIES } from '../../src/lib/data';
 
 const STEPS = [
   {
+    id: 'city',
+    question: "Where are you located?",
+    description: "We'll show you clinics in your area first. We try to auto-detect — confirm or edit below.",
+    type: 'location'
+  },
+  {
     id: 'goal',
     question: "What's your primary wellness goal today?",
     description: "We'll match you with clinics specializing in your specific needs.",
@@ -74,12 +80,6 @@ const STEPS = [
       { id: '$400+', label: '$400+', icon: <DollarSign size={24} />, desc: 'Concierge and NAD+ protocols' },
     ]
   },
-  {
-    id: 'city',
-    question: "Where are you located?",
-    description: "We'll find clinics near you",
-    type: 'location'
-  }
 ];
 
 interface IconProps {
@@ -515,12 +515,21 @@ export default function QuizPage() {
                         <Navigation size={14} />
                         Use my current location
                       </button>
-                      <button 
-                        onClick={() => handleComplete(data)}
+                      <button
+                        onClick={() => {
+                          // Persist the typed city into data if user typed but didn't click an autocomplete
+                          const finalData = { ...data, city: data.city || citySearch };
+                          setData(finalData);
+                          if (step < STEPS.length - 1) {
+                            setStep(step + 1);
+                          } else {
+                            handleComplete(finalData);
+                          }
+                        }}
                         disabled={!data.city && !citySearch}
                         className="w-full bg-wellness-600 text-white px-8 py-3.5 rounded-xl font-black hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm uppercase tracking-wider"
                       >
-                        Find Matches
+                        {step < STEPS.length - 1 ? 'Continue →' : 'Find Matches'}
                       </button>
                     </div>
                   </div>

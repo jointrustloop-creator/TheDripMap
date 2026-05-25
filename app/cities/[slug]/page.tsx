@@ -171,17 +171,28 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
       <main className="max-w-7xl mx-auto px-6 py-12">
-        <BreadcrumbNav 
+        <BreadcrumbNav
           items={[
             { label: 'Cities', href: '/cities' },
             { label: cityData.name }
-          ]} 
+          ]}
         />
 
-        {/* 1. H1 city name */}
-        <section className="mt-12 mb-8">
+        {/* Clinic-owner CTA banner — top-of-page so clinic owners spot it before the patient flow */}
+        <Link
+          href="/for-clinics"
+          className="mt-8 mb-8 group flex items-center justify-between gap-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-slate-300 rounded-2xl px-5 py-3 transition-all"
+        >
+          <span className="text-sm font-bold text-slate-700">
+            Own a clinic in {cityData.name}? <span className="text-wellness-600">Claim your free listing in 2 minutes.</span>
+          </span>
+          <ArrowRight size={16} className="text-slate-400 group-hover:text-wellness-600 group-hover:translate-x-1 transition-all shrink-0" />
+        </Link>
+
+        {/* 1. H1 — verb-led for stronger intent match */}
+        <section className="mt-4 mb-8">
           <h1 className="text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-            IV Therapy in {cityData.name} — {count} {count === 1 ? 'Clinic' : 'Clinics'} Near You
+            Find IV Therapy in {cityData.name} <span className="text-slate-300">·</span> <span className="text-wellness-600">Compare {count} {count === 1 ? 'Clinic' : 'Clinics'}</span>
           </h1>
         </section>
 
