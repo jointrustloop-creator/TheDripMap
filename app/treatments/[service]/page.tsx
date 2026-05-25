@@ -50,6 +50,9 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
   const [topCities, setTopCities] = useState<{ city: string; state: string; count: number }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentCity, setCurrentCity] = useState<string | null>(cityParam);
+  // True when the visitor picked a city but it had 0 matches for this treatment,
+  // so we broadened to nationwide top-rated. Drives the "Showing nearby options" banner.
+  const [isBroadened, setIsBroadened] = useState(false);
 
   useEffect(() => {
     if (!service) return;
@@ -72,31 +75,29 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
       }
 
       const [serviceListings, hubs] = await Promise.all([
-        cityToUse && cityToUse !== 'All' 
+        cityToUse && cityToUse !== 'All'
           ? getListingsByServiceAndCity(service.name, cityToUse, 60)
           : getListingsByService(service.name, 60),
         getTopHubs(8)
       ]);
 
       const finalResults = [...serviceListings];
-      
-      // Minimum results logic: If we have fewer than 3 specific matches, backfill with top clinics in the city
-      if (finalResults.length < 3) {
+      const isCityFiltered = !!cityToUse && cityToUse !== 'All';
+      let broadened = false;
+
+      // Tiered fallback so a tiny city (Bracebridge, etc.) never shows 0 cards:
+      // 1) other clinics in the same city
+      // 2) nationwide top-rated for this treatment
+      if (finalResults.length < 3 && isCityFiltered) {
         const { getFeaturedListings, getListingsByCity } = await import('../../../src/lib/data');
-        
-        // Try featured first
         let fallbackListings = await getFeaturedListings(60, cityToUse || undefined);
-        
-        // If featured didn't give us enough, try all top rated in city
-        if (fallbackListings.length < 3 && cityToUse) {
-          const cityListings = await getListingsByCity(cityToUse);
+        if (fallbackListings.length < 3) {
+          const cityListings = await getListingsByCity(cityToUse!);
           fallbackListings = [...fallbackListings, ...cityListings];
         }
-        
-        // Add fallbacks that aren't already in results (avoid doubles)
+
         const existingIds = new Set(finalResults.map(p => p.id));
         const existingBrands = new Set(finalResults.map(p => p.name.toLowerCase().split(' - ')[0].split(' (')[0].trim()));
-        
         fallbackListings.forEach(p => {
           const brand = p.name.toLowerCase().split(' - ')[0].split(' (')[0].trim();
           if (!existingIds.has(p.id) && !existingBrands.has(brand) && finalResults.length < 60) {
@@ -107,8 +108,25 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
         });
       }
 
+      // Hard floor: if city + nearby still under 3, broaden to nationwide top-rated
+      // for this treatment. Show a banner so users know we expanded the radius.
+      if (finalResults.length < 3 && isCityFiltered) {
+        const nationwide = await getListingsByService(service.name, 24);
+        const existingIds = new Set(finalResults.map(p => p.id));
+        const existingBrands = new Set(finalResults.map(p => p.name.toLowerCase().split(' - ')[0].split(' (')[0].trim()));
+        nationwide.forEach(p => {
+          const brand = p.name.toLowerCase().split(' - ')[0].split(' (')[0].trim();
+          if (!existingIds.has(p.id) && !existingBrands.has(brand)) {
+            finalResults.push(p);
+            existingIds.add(p.id);
+            existingBrands.add(brand);
+          }
+        });
+        broadened = true;
+      }
+
       setListings(finalResults);
-      
+      setIsBroadened(broadened);
       setTopCities(hubs);
       setCurrentCity(cityToUse);
       setIsLoading(false);
@@ -370,11 +388,36 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
               <p className="text-slate-500 font-bold">Finding specialized providers...</p>
             </div>
           ) : listings.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {listings.map((provider) => (
-                <ProviderCard key={provider.id} provider={provider} />
-              ))}
-            </div>
+            <>
+              {/* Banner shown when the visitor's city had 0 clinics and we
+                  broadened to nationwide top-rated for this treatment. */}
+              {isBroadened && currentCity && currentCity !== 'All' && (
+                <div className="mb-8 bg-amber-50 border-2 border-amber-200 rounded-3xl p-5 flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                    <MapPin size={18} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-black text-amber-900 mb-1">
+                      No {service.name} clinics in {currentCity} yet — showing top-rated nationwide.
+                    </p>
+                    <p className="text-xs text-amber-800 font-medium leading-relaxed">
+                      Mobile IV providers in some listings will travel beyond their home city — check individual clinic pages for service area.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => selectCity(null)}
+                    className="text-xs font-black text-amber-900 uppercase tracking-widest hover:underline whitespace-nowrap"
+                  >
+                    Clear filter →
+                  </button>
+                </div>
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {listings.map((provider) => (
+                  <ProviderCard key={provider.id} provider={provider} />
+                ))}
+              </div>
+            </>
           ) : (
             <div className="text-center py-16 px-6 bg-white rounded-[3rem] border border-slate-100 shadow-sm">
               <MapPin size={48} className="mx-auto text-slate-200 mb-4" />
