@@ -24,11 +24,12 @@ export const Logo = ({ className, iconOnly = false }: LogoProps) => {
     );
   }
 
-  // Visual crop: largerlogo.jpg has roughly equal whitespace padding on both
-  // sides of the actual logo mark. To make "left-align" actually look
-  // left-aligned, we pull the image leftward with a negative margin and clip
-  // the overflow on the parent. Tune the negative margin if the padding ratio
-  // changes (or replace the source with a tight-cropped image).
+  // largerlogo.jpg has whitespace padding around the actual mark. We crop
+  // that padding visually by pulling the image left with a small negative
+  // margin and clipping overflow. Logo sizes are now nav-appropriate
+  // (~10-12 → ~40-48px tall) — anything bigger crowded out the nav links and
+  // forced "Explore Clinics" / "For Clinics" / "Get Matched" onto a second
+  // line on standard laptop widths.
   return (
     <div className={cn('flex items-center select-none overflow-hidden', className)}>
       <Image
@@ -37,7 +38,7 @@ export const Logo = ({ className, iconOnly = false }: LogoProps) => {
         width={1500}
         height={350}
         priority
-        className="h-12 md:h-20 lg:h-32 w-auto -ml-2 md:-ml-5 lg:-ml-8"
+        className="h-10 md:h-12 w-auto -ml-2 md:-ml-3"
       />
     </div>
   );
