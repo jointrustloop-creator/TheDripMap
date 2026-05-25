@@ -1,14 +1,17 @@
 import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { MapPin, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
+import { MapPin, ArrowRight, Sparkles } from 'lucide-react';
 import { Navbar } from '@/src/components/Navbar';
 import { Footer } from '@/src/components/Footer';
 import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
 import { getAllCities, slugify } from '@/src/lib/data';
+import { getCityPhoto, getCityGradient, getCityInitial } from '@/src/lib/city-images';
 
-const citiesTitle = 'Cities Archive - Browse IV Therapy Locations | TheDripMap';
-const citiesDescription = 'Explore our complete directory of cities providing IV therapy. Find top-rated clinics and mobile services across the United States.';
+const citiesTitle = 'Cities Archive — Browse IV Therapy Locations | TheDripMap';
+const citiesDescription =
+  'Explore our complete directory of cities providing IV therapy. Find top-rated clinics and mobile services across the US and Canada.';
 const citiesOgImage = 'https://www.thedripmap.com/og-image.png';
 
 export const metadata: Metadata = {
@@ -35,64 +38,124 @@ export const revalidate = 3600;
 
 export default async function CitiesHubPage() {
   const providerCities = await getAllCities();
-  
-  // Create a display-ready list of cities with fallbacks for slug and state
-  const cities = providerCities.map(pc => ({
-    name: pc.city,
-    slug: slugify(pc.city),
-    state: pc.state || 'Ontario', // Default for Toronto/GTA if unknown
-    displayCount: pc.count
-  })).sort((a, b) => b.displayCount - a.displayCount);
+
+  const cities = providerCities
+    .map((pc) => ({
+      name: pc.city,
+      slug: slugify(pc.city),
+      state: pc.state || 'Ontario',
+      count: pc.count,
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  const totalProviders = cities.reduce((sum, c) => sum + c.count, 0);
 
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
       <main className="max-w-7xl mx-auto px-6 py-12">
-        <BreadcrumbNav 
-          items={[
-            { label: 'Cities', href: '/cities' }
-          ]} 
-        />
+        <BreadcrumbNav items={[{ label: 'Cities', href: '/cities' }]} />
 
-        <section className="mt-12 mb-20 text-center max-w-2xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight">
-            Find IV Therapy <span className="text-wellness-600">By City</span>
+        <section className="mt-12 mb-16 text-center max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 bg-wellness-50 text-wellness-700 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.2em] mb-6 border border-wellness-100">
+            <Sparkles size={14} />
+            {cities.length} cities · {totalProviders.toLocaleString()} clinics
+          </div>
+          <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tighter leading-[0.95]">
+            Find IV Therapy{' '}
+            <span className="bg-gradient-to-r from-wellness-600 to-emerald-500 bg-clip-text text-transparent">
+              by city
+            </span>
           </h1>
           <p className="text-xl text-slate-500 leading-relaxed">
-            Browse our directory of {cities.length} cities with active, verified IV therapy providers.
+            Browse every city in our directory. Tap any card for clinics, reviews, prices, and instant booking.
           </p>
         </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {cities.map((city) => (
-            <Link 
-              key={city.slug}
-              href={`/cities/${city.slug}`}
-              className="group bg-white p-8 rounded-[2rem] border border-slate-100 hover:border-wellness-200 hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex justify-between items-start mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-wellness-50 flex items-center justify-center text-wellness-600 group-hover:bg-wellness-600 group-hover:text-white transition-colors duration-300">
-                    <MapPin size={24} />
-                  </div>
-                  <div className="bg-slate-50 text-slate-500 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-                    {city.displayCount} Listings
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {cities.map((city, idx) => {
+            const photo = getCityPhoto(city.slug);
+            const gradient = getCityGradient(city.slug);
+            const initials = getCityInitial(city.name);
+            // Top 3 by provider count get a bigger card on lg+ for visual rhythm.
+            // Easy way to highlight your strongest markets without manual config.
+            const isFeatured = idx < 3;
+
+            return (
+              <Link
+                key={city.slug}
+                href={`/cities/${city.slug}`}
+                className={`group relative overflow-hidden rounded-[2rem] shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 ${
+                  isFeatured ? 'lg:col-span-1 aspect-[4/5]' : 'aspect-[4/5]'
+                }`}
+              >
+                {/* Background: photo if curated, gradient otherwise */}
+                {photo ? (
+                  <>
+                    <Image
+                      src={photo}
+                      alt={`${city.name} skyline`}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-110 transition-transform duration-[1500ms] ease-out"
+                      unoptimized
+                    />
+                    {/* Dark gradient overlay for legibility */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-slate-950/10" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-wellness-600/0 to-wellness-600/0 group-hover:from-wellness-600/30 group-hover:to-transparent transition-all duration-500" />
+                  </>
+                ) : (
+                  <>
+                    {/* Gradient fallback with initials as visual anchor */}
+                    <div className={`absolute inset-0 ${gradient}`} />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.25),transparent_50%)]" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-white/15 font-black text-[12rem] leading-none tracking-tighter select-none">
+                        {initials}
+                      </span>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/30 to-transparent" />
+                  </>
+                )}
+
+                {/* Top right: listing count chip */}
+                <div className="absolute top-5 right-5 z-10">
+                  <div className="bg-white/95 backdrop-blur-md text-slate-900 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                    {city.count} {city.count === 1 ? 'clinic' : 'clinics'}
                   </div>
                 </div>
-                <h2 className="text-2xl font-black text-slate-900 mb-1 group-hover:text-wellness-600 transition-colors">
-                  {city.name}
-                </h2>
-                <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest mb-6">
-                  {city.state || 'United States'}
-                </p>
-              </div>
-              
-              <div className="flex items-center gap-2 text-wellness-600 font-black text-sm uppercase tracking-widest">
-                <span>Browse Providers</span>
-                <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
-          ))}
+
+                {/* Top left: state pill */}
+                <div className="absolute top-5 left-5 z-10">
+                  <div className="bg-slate-950/40 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.25em]">
+                    {city.state}
+                  </div>
+                </div>
+
+                {/* Bottom: city name + CTA */}
+                <div className="absolute inset-x-0 bottom-0 p-6 md:p-7 z-10 flex flex-col gap-3">
+                  <div className="flex items-center gap-2 text-white/80">
+                    <MapPin size={14} />
+                    <span className="text-[11px] font-black uppercase tracking-[0.25em]">
+                      IV Therapy
+                    </span>
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight leading-[0.95] drop-shadow-lg">
+                    {city.name}
+                  </h2>
+                  <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/20">
+                    <span className="text-white font-black text-sm uppercase tracking-widest">
+                      Browse providers
+                    </span>
+                    <div className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-wellness-600 group-hover:translate-x-1 transition-all">
+                      <ArrowRight size={16} />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
 
         {cities.length === 0 && (
@@ -101,9 +164,16 @@ export default async function CitiesHubPage() {
               <MapPin size={48} />
             </div>
             <h3 className="text-xl font-bold text-slate-900 mb-2">No cities found</h3>
-            <p className="text-slate-500">We are currently updating our city directory. Please check back soon.</p>
+            <p className="text-slate-500">
+              We are currently updating our city directory. Please check back soon.
+            </p>
           </div>
         )}
+
+        {/* Subtle attribution row — Unsplash terms require credit somewhere */}
+        <p className="text-center text-[10px] font-bold text-slate-300 uppercase tracking-widest mt-16">
+          City photography courtesy of Unsplash contributors
+        </p>
       </main>
       <Footer />
     </div>
