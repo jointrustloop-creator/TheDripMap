@@ -170,10 +170,6 @@ export default async function CitiesHubPage() {
           </div>
         )}
 
-        {/* Subtle attribution row — Unsplash terms require credit somewhere */}
-        <p className="text-center text-[10px] font-bold text-slate-300 uppercase tracking-widest mt-16">
-          City photography courtesy of Unsplash contributors
-        </p>
       </main>
       <Footer />
     </div>
