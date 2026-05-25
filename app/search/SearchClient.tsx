@@ -53,7 +53,8 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
     const chips: string[] = ['All'];
     let initialTypeFilter: TreatmentType | 'All' = 'All';
     
-    if (type === 'Mobile') {
+    // Case-insensitive type URL parsing — ?type=mobile, ?type=Mobile, ?type=MOBILE all activate the chip.
+    if (type && type.toLowerCase() === 'mobile') {
       chips.push('Mobile');
       initialTypeFilter = 'Mobile';
     }
@@ -148,11 +149,15 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
     }
   };
 
-  const isOpenNow = (hours?: Record<string, string>) => {
+  // Handles both legacy `hours` format ({monday: "10AM-8PM"}) and the actual
+  // working_hours format from Supabase ({Monday: ["10AM-8PM"]} — capitalized keys, array values).
+  const isOpenNow = (hours?: Record<string, string | string[]>) => {
     if (!hours) return false;
     const now = new Date();
-    const day = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-    const timeRange = hours[day];
+    const weekday = now.toLocaleDateString('en-US', { weekday: 'long' }); // "Monday"
+    // Try capitalized key first (DB format), fall back to lowercase
+    const raw = hours[weekday] ?? hours[weekday.toLowerCase()];
+    const timeRange: string | undefined = Array.isArray(raw) ? raw[0] : raw;
     if (!timeRange || timeRange.toLowerCase().includes('closed')) return false;
     try {
       const cleanRange = timeRange.replace(/\s+/g, '');
@@ -176,9 +181,28 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
       if (!startTime || !endTime) return false;
       if (endTime < startTime) endTime.setDate(endTime.getDate() + 1);
       return now >= startTime && now <= endTime;
-    } catch { 
-      return false; 
+    } catch {
+      return false;
     }
+  };
+
+  // Mobile-IV detection heuristic — only ~5 of 705 providers have type='Mobile' set,
+  // and there's no mobile_service column. Catch mobile providers by name/desc/specialty
+  // signals instead: "mobile" in name, "we come to you", "in-home", "concierge",
+  // or a specialty literally including "Mobile".
+  const isMobileProvider = (p: Provider): boolean => {
+    if (p.type === 'Mobile' || p.type === 'Both') return true;
+    const name = (p.name || '').toLowerCase();
+    const desc = (p.description || '').toLowerCase();
+    const specialties = (p.specialties || []).join(' ').toLowerCase();
+    const haystack = `${name} ${desc} ${specialties}`;
+    return /\bmobile\b|\bconcierge\b|\bin[\s-]home\b|come to you|at[\s-]your[\s-](?:home|office|hotel)|house calls?|delivered to your/.test(haystack);
+  };
+
+  // Top-rated heuristic — there's no is_top_rated column. Define "top rated" as
+  // rating >= 4.7 AND at least 20 reviews so we don't surface fluke 5-star/1-review listings.
+  const isTopRated = (p: Provider): boolean => {
+    return (p.rating ?? 0) >= 4.7 && (p.reviewCount ?? p.reviews ?? 0) >= 20;
   };
 
   useEffect(() => {
@@ -221,7 +245,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
       // Apply Chips Filters
       if (!activeChips.includes('All')) {
         if (activeChips.includes('Mobile')) {
-          results = results.filter(p => p.mobile_service || p.type === 'Mobile');
+          results = results.filter(isMobileProvider);
         }
         if (activeChips.includes('Value')) {
           results = results.filter(p => {
@@ -229,14 +253,11 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
             return metrics.score >= 70;
           });
         }
-        if (activeChips.includes('Walk-ins')) {
-          results = results.filter(p => p.walk_ins_welcome);
-        }
         if (activeChips.includes('Open')) {
-          results = results.filter(p => isOpenNow(p.hours));
+          results = results.filter(p => isOpenNow(p.working_hours));
         }
         if (activeChips.includes('TopRated')) {
-          results = results.filter(p => p.is_top_rated);
+          results = results.filter(isTopRated);
         }
         
         const activeGoalChips = Object.keys(GOAL_KEYWORDS).filter(id => activeChips.includes(id));
