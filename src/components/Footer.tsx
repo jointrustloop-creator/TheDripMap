@@ -41,7 +41,7 @@ export const Footer = () => {
             <Logo />
           </Link>
           <p className="text-slate-500 max-w-sm leading-relaxed">
-            The premium directory for IV therapy and clinical wellness. We help you find the perfect provider based on your specific health goals and lifestyle needs.
+            The IV therapy matching platform. We match you with the right clinic based on your specific health goals, location, and budget — in under 60 seconds.
           </p>
         </div>
         <div>
