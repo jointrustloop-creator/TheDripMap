@@ -22,6 +22,7 @@ import { ClinicImage } from '../../../src/components/ClinicImage';
 import { ResilientImage } from '../../../src/components/ResilientImage';
 import { ClaimListingTrigger } from '../../../src/components/ClaimListingTrigger';
 import { StickyClaimRail } from '../../../src/components/StickyClaimRail';
+import { MessageClinicButton } from '../../../src/components/MessageClinicButton';
 import { 
   getListingBySlug, 
   slugify, 
@@ -1263,6 +1264,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                         <Phone size={18} /> Call Clinic
                       </a>
                     )}
+                    <MessageClinicButton provider={provider} variant="secondary" />
                   </div>
 
                   {/* ADDRESS + DIRECTIONS — clickable to open in maps */}
