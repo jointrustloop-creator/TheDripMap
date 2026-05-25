@@ -3,10 +3,9 @@ import Image from 'next/image';
 import { Droplets } from 'lucide-react';
 import { cn } from '../lib/utils';
 
-// Official TheDripMap logo (on white background) hosted in Supabase storage.
-// Note: filename has a typo ("drimap" not "dripmap") — kept as-is to match the storage object.
+// Official TheDripMap logo — high-res "largerlogo" version, hosted in Supabase storage.
 const LOGO_URL =
-  'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/thedrimaplogo-white.jpeg';
+  'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/largerlogo.jpg';
 
 interface LogoProps {
   className?: string;
@@ -30,10 +29,10 @@ export const Logo = ({ className, iconOnly = false }: LogoProps) => {
       <Image
         src={LOGO_URL}
         alt="TheDripMap — Your Guide to Feeling Better"
-        width={620}
-        height={170}
+        width={1500}
+        height={350}
         priority
-        className="h-14 md:h-16 w-auto"
+        className="h-20 md:h-24 w-auto"
       />
     </div>
   );
