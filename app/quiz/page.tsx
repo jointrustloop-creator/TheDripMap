@@ -536,7 +536,7 @@ export default function QuizPage() {
                   <ChevronLeft size={16} /> Previous
                 </button>
                 <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-slate-300">
-                  <Lock size={12} /> HIPAA Secure
+                  <Lock size={12} /> Encrypted & Private
                 </div>
               </div>
             </motion.div>

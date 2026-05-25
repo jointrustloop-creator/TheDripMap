@@ -347,9 +347,12 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
             <CheckCircle2 size={24} /> ✅ Verified & Claimed — This listing is managed by {displayName}
           </div>
         ) : (
-          <div className="mb-12 bg-slate-900 text-white py-4 px-8 rounded-3xl text-center font-black text-lg shadow-xl shadow-slate-100 flex items-center justify-center gap-3">
-            ⚠️ UNCLAIMED LISTING — This clinic has not been verified yet
-          </div>
+          <ClaimListingTrigger
+            provider={provider}
+            className="mb-12 w-full bg-slate-900 hover:bg-slate-800 text-white py-5 px-8 rounded-3xl text-center font-black text-lg shadow-xl shadow-slate-100 flex items-center justify-center gap-3 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+          >
+            <span>⚠️ Is this your clinic? Claim it free in 2 minutes →</span>
+          </ClaimListingTrigger>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-16">

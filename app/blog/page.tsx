@@ -48,7 +48,7 @@ export default async function BlogPage() {
             Wellness <span className="text-wellness-600">Insights</span>
           </h1>
           <p className="text-xl text-slate-500 leading-relaxed font-medium">
-            Expert guides on IV therapy, clinical wellness, and local health trends across the United States.
+            Expert guides on IV therapy, clinical wellness, and local health trends across the US and Canada.
           </p>
         </div>
 

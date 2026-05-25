@@ -14,7 +14,6 @@ export const Navbar = () => {
     { label: 'Explore Clinics', href: '/search' },
     { label: 'Symptoms', href: '/symptoms' },
     { label: 'Blog', href: '/blog' },
-    { label: 'For Clinics', href: '/for-clinics' },
     { label: 'Contact', href: '/contact' },
   ];
 
@@ -33,7 +32,13 @@ export const Navbar = () => {
                 {link.label}
               </Link>
             ))}
-            <Link 
+            <Link
+              href="/for-clinics"
+              className="border-2 border-slate-900 text-slate-900 px-5 py-2 rounded-full hover:bg-slate-900 hover:text-white transition-all font-bold"
+            >
+              For Clinics
+            </Link>
+            <Link
               href="/quiz"
               className="bg-wellness-600 text-white px-6 py-2.5 rounded-full hover:bg-wellness-700 transition-all shadow-md shadow-wellness-100 flex items-center gap-2"
             >
@@ -74,10 +79,17 @@ export const Navbar = () => {
                   {link.label}
                 </Link>
               ))}
-              <Link 
+              <Link
+                href="/for-clinics"
+                onClick={() => setIsMenuOpen(false)}
+                className="w-full border-2 border-slate-900 text-slate-900 px-6 py-4 rounded-2xl font-bold text-center mt-2"
+              >
+                For Clinics
+              </Link>
+              <Link
                 href="/quiz"
                 onClick={() => setIsMenuOpen(false)}
-                className="w-full bg-wellness-600 text-white px-6 py-4 rounded-2xl font-bold text-center flex items-center justify-center gap-2 mt-2"
+                className="w-full bg-wellness-600 text-white px-6 py-4 rounded-2xl font-bold text-center flex items-center justify-center gap-2"
               >
                 <Zap size={20} />
                 Get Matched

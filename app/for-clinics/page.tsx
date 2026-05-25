@@ -189,7 +189,7 @@ export default async function ForClinicsPage() {
             <p className="text-slate-500 text-lg">Choose the right tier to amplify your clinic&apos;s visibility and connect with more patients.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Free Tier */}
             <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] flex flex-col shadow-sm">
               <div className="mb-8">
@@ -265,41 +265,8 @@ export default async function ForClinicsPage() {
               </Link>
             </div>
 
-            {/* Premium Tier */}
-            <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] flex flex-col shadow-sm">
-              <div className="mb-8">
-                <h3 className="text-xl font-black text-slate-900 mb-2">Premium</h3>
-                <p className="text-slate-500 text-sm">Everything in Featured, plus:</p>
-              </div>
-              <div className="mb-8">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-slate-900">$249</span>
-                  <span className="text-slate-400 font-bold text-sm">/mo</span>
-                </div>
-                <p className="text-xs text-slate-400 mt-1 font-bold">Annual billing available</p>
-              </div>
-              <div className="space-y-4 mb-10 flex-1">
-                {[
-                  'Top of city page placement',
-                  'Featured in matching quiz results',
-                  'Monthly performance report',
-                  'Dedicated account manager'
-                ].map(feature => (
-                  <div key={feature} className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center shrink-0 border border-slate-100">
-                      <span className="text-[10px]">✓</span>
-                    </div>
-                    <span className="text-sm text-slate-600 font-medium">{feature}</span>
-                  </div>
-                ))}
-              </div>
-              <Link 
-                href="/for-clinics/setup?plan=premium"
-                className="w-full py-4 text-center border-2 border-slate-900 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all"
-              >
-                Go Premium
-              </Link>
-            </div>
+            {/* Premium tier hidden until we have a paying customer (per GOAL.md:
+                "Do NOT build payment infrastructure until a clinic asks to pay"). */}
           </div>
         </div>
 
