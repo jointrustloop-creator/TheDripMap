@@ -356,81 +356,70 @@ export default async function HomePage() {
       {/* How It Works */}
       <HowItWorks totalListings={stats.total} />
 
-      {/* Mobile IV Section — premium dark editorial layout */}
-      <section className="py-32 px-6 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden relative">
-        {/* Decorative wellness-color glows */}
-        <div className="absolute top-20 -left-32 w-[500px] h-[500px] bg-wellness-500/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-20 -right-32 w-[400px] h-[400px] bg-wellness-400/10 rounded-full blur-[120px] pointer-events-none" />
+      {/* Situation Matcher — solves the #1 pre-booking confusion barrier:
+          "I don't know which drip I actually need." Maps real life moments
+          to the right protocol, then dumps the visitor straight into the
+          quiz to finish the match. */}
+      <section className="py-28 md:py-36 px-6 bg-[#FAFAF7] overflow-hidden relative">
+        {/* Subtle decorative gradient — warm and editorial, not loud */}
+        <div className="absolute top-0 -left-32 w-[600px] h-[600px] bg-wellness-100/40 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute bottom-0 -right-32 w-[500px] h-[500px] bg-amber-100/30 rounded-full blur-[140px] pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] items-center gap-12 lg:gap-20 relative z-10">
-          {/* LEFT — content */}
-          <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-wellness-400/10 border border-wellness-400/20 rounded-full mb-8">
-              <span className="w-1.5 h-1.5 bg-wellness-400 rounded-full animate-pulse" />
-              <span className="text-wellness-400 font-black text-[11px] uppercase tracking-[0.25em]">Mobile IV Therapy</span>
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="text-center mb-14 md:mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-wellness-200 rounded-full mb-6 shadow-sm">
+              <span className="w-1.5 h-1.5 bg-wellness-500 rounded-full" />
+              <span className="text-wellness-700 font-black text-[11px] uppercase tracking-[0.25em]">60-Second Match</span>
             </div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tight leading-[1.05]">
-              A nurse at your door <br className="hidden md:block" />
-              in <span className="text-wellness-400">60 minutes.</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.05] mb-6 text-balance max-w-3xl mx-auto">
+              What are you <em className="text-wellness-600 not-italic">actually</em> going through?
             </h2>
-            <p className="text-lg md:text-xl text-slate-300 mb-10 max-w-xl lg:max-w-none leading-relaxed">
-              No clinic visit, no waiting room. Top-rated licensed providers come to your home, hotel, or office — with hospital-grade IV therapy, set up in five minutes.
+            <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
+              Most people booking their first IV therapy have no idea what to ask for. Pick the moment closest to yours — we&apos;ll match you with the right drip <em>and</em> the right clinic in 60 seconds.
             </p>
-
-            {/* Inline stat row */}
-            <div className="flex flex-wrap justify-center lg:justify-start gap-4 mb-10">
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-5 py-3">
-                <div className="text-2xl font-black text-wellness-400 leading-none">60min</div>
-                <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">avg dispatch</div>
-              </div>
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-5 py-3">
-                <div className="text-2xl font-black text-wellness-400 leading-none">RN/NP</div>
-                <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">licensed staff</div>
-              </div>
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-5 py-3">
-                <div className="text-2xl font-black text-wellness-400 leading-none">$0</div>
-                <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">match fee</div>
-              </div>
-            </div>
-
-            <Link
-              href="/search?type=mobile"
-              className="inline-flex items-center gap-3 bg-wellness-400 text-slate-950 px-8 py-4 rounded-2xl font-black text-base hover:bg-wellness-300 transition-all shadow-2xl shadow-wellness-500/20 hover:scale-[1.02] active:scale-[0.99]"
-            >
-              Find Mobile IV Near You <ArrowRight size={18} />
-            </Link>
           </div>
 
-          {/* RIGHT — image, framed editorial-style (no skew gimmick) */}
-          <div className="relative">
-            <div className="relative h-[480px] md:h-[600px] rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10">
-              <ResilientImage
-                src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/mobile-iv-therapy-kit-home-delivery.jpg"
-                fallbackSrc="https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?q=80&w=2070&auto=format&fit=crop"
-                alt="Mobile IV therapy kit delivered to your home"
-                fill
-                className="object-cover"
-              />
-              {/* Bottom-edge text overlay */}
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent p-8">
-                <div className="text-white">
-                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-wellness-400 mb-1.5">In-home setup</div>
-                  <div className="text-lg md:text-xl font-black tracking-tight leading-tight">
-                    Hospital-grade kit. Five-minute setup.
-                  </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 mb-14">
+            {[
+              { emoji: '🍷', label: 'Out too late last night',     drip: 'Hangover Recovery' },
+              { emoji: '🤧', label: 'Catching something nasty',     drip: 'Immune Support' },
+              { emoji: '😴', label: 'Brain fog all week',           drip: 'NAD+ / Energy' },
+              { emoji: '💪', label: 'Big workout or race coming',   drip: 'Athletic Recovery' },
+              { emoji: '👰', label: 'Wedding in a week',            drip: 'Beauty Glow' },
+              { emoji: '✈️', label: 'Just landed jet-lagged',       drip: 'Hydration + B-complex' },
+              { emoji: '🌡️', label: 'Bug or stomach flu',           drip: 'Hydration Drip' },
+              { emoji: '🎉', label: 'Vegas / bachelor weekend',     drip: 'Hangover + Recovery' },
+            ].map((s) => (
+              <Link
+                key={s.label}
+                href="/quiz"
+                className="group block bg-white rounded-[2rem] p-5 md:p-7 border border-slate-100 hover:border-wellness-300 hover:shadow-xl shadow-sm transition-all duration-300 hover:-translate-y-1"
+              >
+                <div className="text-3xl md:text-4xl mb-3 md:mb-4 leading-none" aria-hidden>{s.emoji}</div>
+                <div className="font-black text-slate-900 text-sm md:text-base mb-2 md:mb-3 leading-tight tracking-tight">
+                  {s.label}
                 </div>
-              </div>
-            </div>
-            {/* Floating credibility badge */}
-            <div className="hidden md:flex absolute -bottom-6 -left-6 bg-white text-slate-900 px-5 py-4 rounded-2xl shadow-2xl items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
-                <ShieldCheck size={20} />
-              </div>
-              <div>
-                <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Vetted by</div>
-                <div className="text-sm font-black text-slate-900">TheDripMap medical team</div>
-              </div>
-            </div>
+                <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-wellness-600">
+                  <span>{s.drip}</span>
+                  <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Bottom CTA */}
+          <div className="text-center">
+            <Link
+              href="/quiz"
+              className="inline-flex items-center gap-3 bg-wellness-600 hover:bg-wellness-700 text-white px-10 py-5 rounded-2xl font-black text-base transition-all shadow-2xl shadow-wellness-300/40 hover:scale-[1.02] active:scale-[0.99]"
+            >
+              <Zap size={18} />
+              <span>Take the full 60-second match quiz</span>
+              <ArrowRight size={18} />
+            </Link>
+            <p className="text-xs text-slate-400 mt-5 font-bold tracking-wide">
+              5 questions · No signup · No spam · Just the right drip and the right clinic
+            </p>
           </div>
         </div>
       </section>
