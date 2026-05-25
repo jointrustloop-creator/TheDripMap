@@ -11,6 +11,7 @@ import { calculateValueMetrics } from '../lib/price-utils';
 import { getStatus } from '../lib/hours';
 import { motion } from 'motion/react';
 import { useClaimListing } from '../context/ClaimListingContext';
+import { CompareToggle } from './CompareToggle';
 
 interface ProviderCardProps {
   provider: Provider;
@@ -100,7 +101,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
           </div>
 
           {/* Top Right Score/Distance on Featured */}
-          <div className="absolute top-4 right-4">
+          <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
             {provider.is_featured && (
               <div className={cn(
                 "px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md border bg-white",
@@ -109,6 +110,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
                 {valueMetrics.label}
               </div>
             )}
+            <CompareToggle provider={provider} />
           </div>
         </div>
 
