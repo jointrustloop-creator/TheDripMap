@@ -4,6 +4,7 @@ import "./globals.css";
 import Script from "next/script";
 import { ErrorBoundary } from "../src/components/ErrorBoundary";
 import { ClaimListingProvider } from "../src/context/ClaimListingContext";
+import { EmailCapturePopup } from "../src/components/EmailCapturePopup";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -138,6 +139,7 @@ export default function RootLayout({
         <ErrorBoundary>
           <ClaimListingProvider>
             {children}
+            <EmailCapturePopup />
           </ClaimListingProvider>
         </ErrorBoundary>
       </body>
