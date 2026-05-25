@@ -236,7 +236,10 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           <section className="mb-24">
             <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline bg-white p-12 rounded-[3.5rem] border border-slate-100 shadow-sm">
               <ReactMarkdown>
-                {String(cityData.content).replace(/\\n/g, '\n')}
+                {String(cityData.content)
+                  .replace(/\\n/g, '\n')
+                  .replace(/\{count\}/g, String(count))
+                  .replace(/\{city\}/g, cityData.name)}
               </ReactMarkdown>
             </div>
           </section>
