@@ -17,14 +17,10 @@ const supabase = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
-// Mirror the GTA grouping from src/lib/data.ts so Toronto correctly counts the metro.
-const GTA_CITIES = [
-  'Toronto', 'Mississauga', 'Brampton', 'Markham', 'Vaughan',
-  'Richmond Hill', 'Oakville', 'Burlington', 'Ajax', 'Pickering',
-  'Whitby', 'Oshawa', 'Milton', 'Aurora', 'Newmarket',
-  'King City', 'East Gwillimbury', 'Stouffville', 'Caledon',
-  'Halton Hills', 'Etobicoke', 'Scarborough', 'North York', 'York',
-];
+// Mirror the EXACT GTA grouping from src/lib/data.ts (kept in sync — if data.ts
+// GTA_CITIES changes, update this too). Wider list would produce a different
+// Toronto count from what the city page actually shows.
+const GTA_CITIES = ['Toronto', 'Ajax', 'Brampton', 'Mississauga', 'Oakville', 'Richmond Hill', 'Vaughan'];
 
 // State full-name → 2-letter abbr (matches src/lib/data.ts STATE_MAP behavior)
 const STATE_ABBR = {
