@@ -36,8 +36,8 @@ export const Footer = () => {
   return (
     <footer className="bg-white border-t border-slate-200 py-12 px-6 mt-20">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
-        <div className="lg:col-span-2">
-          <Link href="/" className="inline-block mb-6">
+        <div className="lg:col-span-2 flex flex-col items-start text-left">
+          <Link href="/" className="inline-flex mb-6 self-start">
             <Logo />
           </Link>
           <p className="text-slate-500 max-w-sm leading-relaxed">
