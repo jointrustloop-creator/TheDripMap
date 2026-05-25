@@ -1069,73 +1069,116 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
             </div>
           </div>
 
-          {/* RIGHT COLUMN (SIDEBAR) */}
+          {/* RIGHT COLUMN — sticky booking/contact card */}
           <aside>
-            <div className="sticky top-32 space-y-6">
-              <div className="bg-white rounded-[3rem] border border-slate-100 shadow-2xl p-10 space-y-10">
-                {/* STATUS */}
-                <div className="text-center pb-8 border-b border-slate-50">
-                  <div className={cn(
-                    "inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest mb-4",
-                    status.isOpen ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
-                  )}>
-                    <span className={cn("w-2.5 h-2.5 rounded-full", status.isOpen ? "bg-emerald-500" : "bg-red-500")} />
-                    {status.isOpen ? 'OPEN NOW' : 'CLOSED'}
-                  </div>
-                  <div className="text-3xl font-black text-slate-900">{status.todayHours}</div>
-                </div>
-
-                {/* ACTIONS */}
-                <div className="space-y-4">
-                  {provider.website && (
-                    <a 
-                      href={provider.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full bg-wellness-700 text-white px-8 py-6 rounded-2xl font-black text-lg hover:bg-wellness-800 transition-all shadow-xl shadow-wellness-100 flex items-center justify-center gap-3"
-                    >
-                      Book Appointment <ExternalLink size={20} />
-                    </a>
-                  )}
-                  {provider.phone && (
-                    <a 
-                      href={`tel:${provider.phone}`}
-                      className="w-full bg-white border-2 border-slate-100 text-slate-900 px-8 py-6 rounded-2xl font-black text-lg hover:border-slate-900 transition-all flex items-center justify-center gap-3"
-                    >
-                      <Phone size={20} /> Call Clinic
-                    </a>
-                  )}
-                </div>
-
-                {/* LOCATION */}
-                {!provider.is_featured && (
-                  <div className="pt-8 border-t border-slate-50 space-y-4">
-                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Location</div>
-                    <div className="flex items-start gap-4 text-slate-900">
-                      <MapPin size={24} className="text-wellness-600 shrink-0 mt-1" />
-                      <div className="font-bold text-lg leading-relaxed">
-                        {provider.address && provider.address.split(',')[0]}
-                        {provider.address && <br />}
-                        {provider.city}, {stateCode} {provider.postal_code}
+            <div className="sticky top-24 space-y-4">
+              <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden">
+                {/* CARD HEADER — small logo + clinic name (visible after user scrolls past hero) */}
+                {provider.is_featured && (
+                  <div className="bg-gradient-to-br from-slate-50 to-white px-6 py-5 border-b border-slate-100 flex items-center gap-3">
+                    {provider.imageUrl && (
+                      <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 p-1.5 shrink-0 flex items-center justify-center">
+                        <ResilientImage
+                          src={provider.imageUrl}
+                          fallbackSrc={DEFAULT_CLINIC_IMAGE}
+                          alt={`${provider.name} logo`}
+                          width={48}
+                          height={48}
+                          className="w-full h-full object-contain"
+                          fill={false}
+                        />
                       </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="font-black text-slate-900 text-sm truncate">{provider.name}</div>
+                      <div className="text-[11px] text-slate-500 font-bold truncate">{provider.city}, {stateCode}</div>
                     </div>
                   </div>
                 )}
 
-                {/* CLAIM STATUS */}
-                <div className="pt-8 border-t border-slate-50">
-                  {!provider.is_featured && !provider.is_claimed ? (
-                  <ClaimListingTrigger 
-                      provider={provider}
-                      className="text-sm font-black text-wellness-600 hover:underline flex items-center gap-2"
-                    >
-                      Own this clinic? Claim your free listing
-                    </ClaimListingTrigger>
-                  ) : (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-emerald-600 font-black text-sm uppercase tracking-tight">
-                        <CheckCircle2 size={18} /> Verified & Claimed Profile
+                <div className="px-6 py-6 space-y-6">
+                  {/* STATUS — friendlier than the old "OPEN NOW · 10AM-8PM" stacked block */}
+                  <div className="flex items-center gap-3">
+                    <span className={cn(
+                      'w-2.5 h-2.5 rounded-full shrink-0 ring-4',
+                      status.isOpen ? 'bg-emerald-500 ring-emerald-100' : 'bg-amber-500 ring-amber-100'
+                    )} />
+                    <div className="min-w-0 flex-1">
+                      <div className={cn(
+                        'text-xs font-black uppercase tracking-widest',
+                        status.isOpen ? 'text-emerald-600' : 'text-amber-600'
+                      )}>
+                        {status.isOpen ? 'Open now' : 'Currently closed'}
                       </div>
+                      <div className="text-sm font-bold text-slate-900">{status.todayHours}</div>
+                    </div>
+                  </div>
+
+                  {/* PRIMARY ACTIONS — Book is the conversion CTA */}
+                  <div className="space-y-3">
+                    {provider.website && (
+                      <a
+                        href={provider.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full bg-wellness-600 text-white px-6 py-4 rounded-2xl font-black text-base hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-200/50 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+                      >
+                        Book Appointment <ExternalLink size={18} />
+                      </a>
+                    )}
+                    {provider.phone && (
+                      <a
+                        href={`tel:${provider.phone}`}
+                        className="w-full bg-white border-2 border-slate-200 text-slate-900 px-6 py-4 rounded-2xl font-black text-base hover:border-slate-900 transition-all flex items-center justify-center gap-2"
+                      >
+                        <Phone size={18} /> Call Clinic
+                      </a>
+                    )}
+                  </div>
+
+                  {/* ADDRESS + DIRECTIONS — clickable to open in maps */}
+                  {provider.address && (
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${provider.address} ${provider.city} ${stateCode}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex items-start gap-3 pt-4 border-t border-slate-100 hover:text-wellness-600 transition-colors"
+                    >
+                      <MapPin size={18} className="text-wellness-600 shrink-0 mt-0.5" />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-slate-700 leading-relaxed group-hover:text-wellness-700">
+                          {provider.address}
+                        </div>
+                        <div className="text-[11px] font-black text-wellness-600 uppercase tracking-widest mt-1 flex items-center gap-1">
+                          Get directions <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
+                        </div>
+                      </div>
+                    </a>
+                  )}
+
+                  {/* RATING — quick credibility anchor */}
+                  {provider.is_featured && provider.rating > 0 && provider.reviewCount > 0 && (
+                    <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <Star size={14} fill="currentColor" className="text-amber-500" />
+                        <span className="text-sm font-black text-slate-900">{provider.rating}</span>
+                        <span className="text-xs text-slate-500 font-bold">({provider.reviewCount} reviews)</span>
+                      </div>
+                      <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">
+                        ✓ Verified
+                      </span>
+                    </div>
+                  )}
+
+                  {/* UNCLAIMED CTA — sidebar variant */}
+                  {!provider.is_featured && (
+                    <div className="pt-4 border-t border-slate-100">
+                      <ClaimListingTrigger
+                        provider={provider}
+                        className="text-xs font-black text-wellness-600 hover:underline flex items-center gap-1"
+                      >
+                        <span>Own this clinic? Claim your free listing →</span>
+                      </ClaimListingTrigger>
                     </div>
                   )}
                 </div>
