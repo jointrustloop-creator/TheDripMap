@@ -11,11 +11,17 @@ import { cn } from '../lib/utils';
 
 interface MapboxListingMapProps {
   providers: Provider[];
+  /** ID of provider currently being hovered/focused in a sibling list — pin gets visual emphasis */
+  hoveredProviderId?: string | null;
+  /** Called when a pin is clicked; used by SplitListingView to scroll the matching card into view */
+  onMarkerClick?: (providerId: string) => void;
+  /** Removes the rounded corners + drop shadow wrapper so this can be embedded in a sticky split layout */
+  bare?: boolean;
 }
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
 
-export const MapboxListingMap = ({ providers }: MapboxListingMapProps) => {
+export const MapboxListingMap = ({ providers, hoveredProviderId, onMarkerClick, bare = false }: MapboxListingMapProps) => {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
 
   const center = useMemo(() => {
@@ -29,7 +35,7 @@ export const MapboxListingMap = ({ providers }: MapboxListingMapProps) => {
 
   if (!MAPBOX_TOKEN) {
     return (
-      <div className="h-[calc(100vh-280px)] min-h-[500px] w-full rounded-3xl bg-slate-100 flex flex-col items-center justify-center p-8 text-center border-2 border-slate-200 border-dashed">
+      <div className="h-full min-h-[500px] w-full rounded-3xl bg-slate-100 flex flex-col items-center justify-center p-8 text-center border-2 border-slate-200 border-dashed">
         <h2 className="text-xl font-black text-slate-900 mb-4">Map unavailable</h2>
         <p className="text-sm text-slate-600 max-w-md font-medium">
           Set <code className="bg-slate-200 px-1 rounded">NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN</code> in your environment to enable the interactive map.
@@ -40,8 +46,12 @@ export const MapboxListingMap = ({ providers }: MapboxListingMapProps) => {
 
   const selectedSlug = selectedProvider ? (selectedProvider.slug || slugify(selectedProvider.name)) : '';
 
+  const wrapperClasses = bare
+    ? 'h-full w-full relative z-0'
+    : 'h-[calc(100vh-280px)] min-h-[500px] w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white relative z-0';
+
   return (
-    <div className="h-[calc(100vh-280px)] min-h-[500px] w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white relative z-0">
+    <div className={wrapperClasses}>
       <Map
         mapboxAccessToken={MAPBOX_TOKEN}
         initialViewState={{ ...center, zoom: 11 }}
@@ -51,6 +61,7 @@ export const MapboxListingMap = ({ providers }: MapboxListingMapProps) => {
         <NavigationControl position="top-right" />
         {providers.map(p => {
           if (!p.latitude || !p.longitude) return null;
+          const isHovered = hoveredProviderId === p.id;
           return (
             <Marker
               key={p.id}
@@ -59,12 +70,18 @@ export const MapboxListingMap = ({ providers }: MapboxListingMapProps) => {
               onClick={(e) => {
                 e.originalEvent.stopPropagation();
                 setSelectedProvider(p);
+                onMarkerClick?.(p.id);
               }}
             >
               <div
                 className={cn(
-                  "w-7 h-7 rounded-full border-2 border-white shadow-md cursor-pointer transform hover:scale-110 transition-transform",
-                  p.is_featured ? "bg-emerald-500" : "bg-blue-500"
+                  'rounded-full border-2 border-white shadow-md cursor-pointer transition-all',
+                  // Featured pins are green/larger; unclaimed are blue/smaller
+                  p.is_featured ? 'bg-emerald-500' : 'bg-blue-500',
+                  // Hover state: bigger, white-ringed, elevated z
+                  isHovered
+                    ? 'w-10 h-10 ring-4 ring-wellness-300 z-10 scale-110'
+                    : 'w-7 h-7 hover:scale-110'
                 )}
                 title={p.name}
               />

@@ -1,8 +1,7 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { LayoutGrid, Map as MapIcon, Navigation } from 'lucide-react';
+import { Columns, LayoutGrid, Map as MapIcon, Navigation } from 'lucide-react';
 import { Provider } from '../types';
 import { ProviderCard } from './ProviderCard';
 import { ProviderCardFeatured } from './ProviderCardFeatured';
@@ -11,7 +10,7 @@ import { calculateDistance, getUserLocation } from '../lib/geo';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 
-// Dynamically import map to avoid SSR issues
+// Dynamically import map/split-view to avoid SSR issues
 const MapboxListingMap = dynamic(() => import('./MapboxListingMap'), {
   ssr: false,
   loading: () => (
@@ -24,15 +23,48 @@ const MapboxListingMap = dynamic(() => import('./MapboxListingMap'), {
   )
 });
 
+const SplitListingView = dynamic(() => import('./SplitListingView'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[600px] w-full bg-slate-50 rounded-[2.5rem] flex items-center justify-center animate-pulse">
+      <span className="text-slate-400 font-medium">Loading split view…</span>
+    </div>
+  )
+});
+
+type ViewMode = 'split' | 'grid' | 'map';
+
 interface ListingControllerProps {
   initialProviders: Provider[];
   cityName: string;
 }
 
 export function ListingController({ initialProviders, cityName }: ListingControllerProps) {
-  const [view, setView] = useState<'grid' | 'map'>('grid');
+  // Default to grid for SSR (so initial paint matches), then upgrade to split on lg+ after mount.
+  const [view, setView] = useState<ViewMode>('grid');
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   const [providers, setProviders] = useState<Provider[]>(initialProviders);
+
+  // Upgrade to split view on lg+ viewports after hydration, unless user already toggled.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const storedPref = sessionStorage.getItem('tdm_view_pref');
+    if (storedPref === 'split' || storedPref === 'grid' || storedPref === 'map') {
+      setView(storedPref as ViewMode);
+      return;
+    }
+    const isLargeViewport = window.matchMedia('(min-width: 1024px)').matches;
+    if (isLargeViewport) {
+      setView('split');
+    }
+  }, []);
+
+  const changeView = (next: ViewMode) => {
+    setView(next);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('tdm_view_pref', next);
+    }
+  };
 
   useEffect(() => {
     // Initial fetch of user location
@@ -40,7 +72,7 @@ export function ListingController({ initialProviders, cityName }: ListingControl
       const location = await getUserLocation();
       if (location) {
         setUserLocation(location);
-        
+
         // Calculate distances
         const updatedProviders = initialProviders.map(p => {
           if (p.latitude != null && p.longitude != null) {
@@ -55,12 +87,12 @@ export function ListingController({ initialProviders, cityName }: ListingControl
           }
           return p;
         });
-        
+
         // Sort by distance if location is available
         setProviders(updatedProviders.sort((a, b) => (a.distance || 9999) - (b.distance || 9999)));
       }
     };
-    
+
     fetchLocation();
   }, [initialProviders]);
 
@@ -85,6 +117,12 @@ export function ListingController({ initialProviders, cityName }: ListingControl
     }
   };
 
+  const viewButtons: { id: ViewMode; label: string; icon: React.ReactNode; hideOnMobile?: boolean }[] = [
+    { id: 'split', label: 'Split', icon: <Columns size={18} />, hideOnMobile: true },
+    { id: 'grid', label: 'Grid', icon: <LayoutGrid size={18} /> },
+    { id: 'map', label: 'Map', icon: <MapIcon size={18} /> },
+  ];
+
   return (
     <section className="mb-24">
       {/* Header with View Toggle */}
@@ -93,43 +131,31 @@ export function ListingController({ initialProviders, cityName }: ListingControl
           <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Providers in {cityName}</h2>
           <p className="text-slate-500 font-medium">Compare the best IV therapy and hydration services near you.</p>
         </div>
-        
-        <div className="flex items-center gap-3 p-1.5 bg-slate-100 rounded-2xl">
-          <button 
-            onClick={() => setView('grid')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
-              view === 'grid' 
-                ? 'bg-white text-wellness-600 shadow-sm' 
-                : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            <LayoutGrid size={18} />
-            Grid View
-          </button>
-          <button 
-            id="map-view-trigger"
-            onClick={() => setView('map')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all relative ${
-              view === 'map' 
-                ? 'bg-white text-wellness-600 shadow-sm' 
-                : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            <MapIcon size={18} />
-            Map View
-            {view === 'grid' && (
-              <span className="absolute -top-1 -right-1 flex h-4 w-4">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-wellness-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-4 w-4 bg-wellness-500"></span>
-              </span>
-            )}
-          </button>
+
+        <div className="flex items-center gap-1 p-1.5 bg-slate-100 rounded-2xl">
+          {viewButtons.map((b) => (
+            <button
+              key={b.id}
+              id={b.id === 'map' ? 'map-view-trigger' : undefined}
+              onClick={() => changeView(b.id)}
+              className={cn(
+                'flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all',
+                b.hideOnMobile && 'hidden lg:flex',
+                view === b.id
+                  ? 'bg-white text-wellness-600 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              )}
+            >
+              {b.icon}
+              {b.label}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Location Access Bar (if not granted) */}
       {!userLocation && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8 p-4 bg-wellness-50 rounded-2xl border border-wellness-100 flex items-center justify-between shadow-sm"
@@ -143,7 +169,7 @@ export function ListingController({ initialProviders, cityName }: ListingControl
               <p className="text-xs text-slate-500">Enable location to see clinics ranked by proximity to you.</p>
             </div>
           </div>
-          <button 
+          <button
             onClick={requestLocation}
             className="bg-wellness-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-wellness-700 transition-colors shadow-lg shadow-wellness-200/50"
           >
@@ -154,8 +180,17 @@ export function ListingController({ initialProviders, cityName }: ListingControl
 
       {/* Main Content Area with AnimatePresence */}
       <AnimatePresence mode="wait">
-        {view === 'grid' ? (
-          <motion.div 
+        {view === 'split' ? (
+          <motion.div
+            key="split"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <SplitListingView providers={providers} cityName={cityName} />
+          </motion.div>
+        ) : view === 'grid' ? (
+          <motion.div
             key="grid"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -173,7 +208,7 @@ export function ListingController({ initialProviders, cityName }: ListingControl
             ))}
           </motion.div>
         ) : (
-          <motion.div 
+          <motion.div
             key="map"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
