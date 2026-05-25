@@ -24,6 +24,7 @@ import { QuizCTA } from '../../../src/components/QuizCTA';
 import { getListingsByServiceAndCity, getListingsByService, getTopHubs } from '../../../src/lib/data';
 import { Provider } from '../../../src/types';
 import { getTreatmentContent } from '../../../src/lib/treatment-content';
+import { slugify } from '../../../src/lib/data';
 
 const SERVICES = [
   { name: 'NAD+ Plus',      slug: 'nad-plus',       icon: <Activity size={24} />,     aliases: ['nad', 'nad-plus-therapy'] },
@@ -129,6 +130,19 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
     window.addEventListener('tdm_location_change', handleLocationChange);
     return () => window.removeEventListener('tdm_location_change', handleLocationChange);
   }, []);
+
+  const selectCity = (cityName: string | null) => {
+    setCurrentCity(cityName);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (cityName) url.searchParams.set('city', cityName);
+      else url.searchParams.delete('city');
+      window.history.replaceState({}, '', url.toString());
+      if (cityName) {
+        sessionStorage.setItem('tdm_location', JSON.stringify({ city: cityName }));
+      }
+    }
+  };
 
   if (!service) notFound();
 
@@ -246,19 +260,26 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
         />
 
         {/* Hero Section */}
-        <section className="mb-20">
+        <section className="mb-12">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 bg-wellness-50 text-wellness-700 px-4 py-1.5 rounded-full text-sm font-bold mb-6 border border-wellness-100">
               <Zap size={16} />
               <span>Specialized {service.name} Protocols</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
-              <span className="text-wellness-600">{service.name} IV Therapy</span> — Find Clinics Near You
+              <span className="text-wellness-600">{service.name} IV Therapy</span>
+              {currentCity && currentCity !== 'All' ? (
+                <> in <span className="text-slate-900">{currentCity}</span></>
+              ) : (
+                <> — Find Clinics Near You</>
+              )}
             </h1>
             <p className="text-xl text-slate-500 leading-relaxed mb-10">
-              Compare {listings.length} top-rated clinics and mobile services specializing in {service.name} IV therapy. Find the perfect treatment for your wellness goals today.
+              {currentCity && currentCity !== 'All'
+                ? `Compare ${listings.length} top-rated ${service.name} IV therapy clinics and mobile services in ${currentCity}. Real ratings, real pricing, book in under a minute.`
+                : `Compare ${listings.length} top-rated clinics and mobile services specializing in ${service.name} IV therapy. Find the perfect treatment for your wellness goals today.`}
             </p>
-            
+
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm">
                 <CheckCircle2 size={18} className="text-wellness-600" />
@@ -275,6 +296,59 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
             </div>
           </div>
         </section>
+
+        {/* City Chip Row — quick local filter */}
+        {topCities.length > 0 && (
+          <section className="mb-14">
+            <div className="flex items-center gap-3 mb-4">
+              <MapPin size={16} className="text-wellness-600" />
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
+                Browse by city
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2.5">
+              <button
+                onClick={() => selectCity(null)}
+                className={`px-4 py-2 rounded-full text-sm font-black transition-all border-2 ${
+                  !currentCity || currentCity === 'All'
+                    ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                    : 'bg-white text-slate-700 border-slate-200 hover:border-slate-900'
+                }`}
+              >
+                All cities
+              </button>
+              {topCities.map((c) => {
+                const isActive = currentCity && currentCity.toLowerCase() === c.city.toLowerCase();
+                return (
+                  <button
+                    key={c.city}
+                    onClick={() => selectCity(c.city)}
+                    className={`px-4 py-2 rounded-full text-sm font-black transition-all border-2 inline-flex items-center gap-1.5 ${
+                      isActive
+                        ? 'bg-wellness-600 text-white border-wellness-600 shadow-md'
+                        : 'bg-white text-slate-700 border-slate-200 hover:border-wellness-600 hover:text-wellness-600'
+                    }`}
+                  >
+                    {c.city}
+                    <span className={`text-[10px] font-black ${isActive ? 'opacity-80' : 'text-slate-400'}`}>
+                      {c.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            {currentCity && currentCity !== 'All' && (
+              <div className="mt-4">
+                <Link
+                  href={`/cities/${slugify(currentCity)}`}
+                  className="inline-flex items-center gap-2 text-sm font-black text-wellness-600 hover:text-wellness-700"
+                >
+                  See full {currentCity} guide <ArrowRight size={14} />
+                </Link>
+              </div>
+            )}
+          </section>
+        )}
 
         {/* Featured Listings Grid */}
         <section className="mb-24">
@@ -302,15 +376,31 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
               ))}
             </div>
           ) : (
-            <div className="text-center py-20 bg-white rounded-[3rem] border border-slate-100 shadow-sm">
+            <div className="text-center py-16 px-6 bg-white rounded-[3rem] border border-slate-100 shadow-sm">
               <MapPin size={48} className="mx-auto text-slate-200 mb-4" />
-              <h3 className="text-xl font-bold text-slate-900 mb-2">No {service.name} providers found in {currentCity}</h3>
-              <p className="text-slate-500 mb-6">Try searching in a nearby city or browse all providers.</p>
-              <button 
-                onClick={() => setCurrentCity('All')}
-                className="text-wellness-600 font-bold hover:underline"
+              <h3 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">
+                No {service.name} clinics found in {currentCity}
+              </h3>
+              <p className="text-slate-500 mb-8 max-w-md mx-auto">
+                Try a nearby city — these hubs all have active {service.name} providers:
+              </p>
+              <div className="flex flex-wrap gap-2.5 justify-center mb-8 max-w-2xl mx-auto">
+                {topCities.slice(0, 6).map((c) => (
+                  <button
+                    key={c.city}
+                    onClick={() => selectCity(c.city)}
+                    className="px-4 py-2 rounded-full text-sm font-black bg-wellness-50 text-wellness-700 border-2 border-wellness-100 hover:bg-wellness-600 hover:text-white hover:border-wellness-600 transition-all"
+                  >
+                    {c.city}
+                    <span className="ml-1.5 text-[10px] font-black opacity-70">{c.count}</span>
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => selectCity(null)}
+                className="text-wellness-600 font-black hover:underline text-sm"
               >
-                Show all {service.name} providers
+                Or show all {service.name} clinics →
               </button>
             </div>
           )}
