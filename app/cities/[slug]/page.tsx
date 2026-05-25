@@ -16,7 +16,9 @@ import { MapTrigger } from '@/src/components/MapTrigger';
 import { FAQSection } from '@/src/components/FAQSection';
 import { NearbyCities } from '@/src/components/NearbyCities';
 
-export const revalidate = 3600;
+// Short revalidate so listings_count / new providers propagate within ~1 minute,
+// not 1 hour. Volume is low enough that origin load isn't a concern.
+export const revalidate = 60;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
