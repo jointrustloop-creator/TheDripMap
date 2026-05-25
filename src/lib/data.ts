@@ -1035,6 +1035,9 @@ export async function getBlogPosts() {
             metaDescription: post.metaDescription || post.meta_description || post.excerpt || post.description || '',
             excerpt: post.excerpt || post.meta_description || '',
             imageUrl: post.imageUrl || post.image_url || post.ImageURL || null,
+            authorImageUrl: post.authorImageUrl || post.author_image_url || null,
+            lastUpdated: post.lastUpdated || post.last_updated || null,
+            reviewedBy: post.reviewedBy || post.reviewed_by || null,
             relatedCities: post.relatedCities || post.related_cities || [],
             relatedClinics: post.relatedClinics || post.related_clinics || []
           };
@@ -1089,7 +1092,10 @@ export async function getBlogPostBySlug(slug: string) {
             metaTitle: post.metaTitle || post.meta_title || post.title || '',
             metaDescription: post.metaDescription || post.meta_description || post.excerpt || post.description || '',
             excerpt: post.excerpt || post.meta_description || '',
-            imageUrl: post.imageUrl || post.ImageURL || null,
+            imageUrl: post.imageUrl || post.image_url || post.ImageURL || null,
+            authorImageUrl: post.authorImageUrl || post.author_image_url || null,
+            lastUpdated: post.lastUpdated || post.last_updated || null,
+            reviewedBy: post.reviewedBy || post.reviewed_by || null,
             relatedCities: post.relatedCities || post.related_cities || [],
             relatedClinics: post.relatedClinics || post.related_clinics || []
           } as BlogPost;
