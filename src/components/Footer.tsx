@@ -47,12 +47,13 @@ export const Footer = () => {
         <div>
           <h4 className="font-bold mb-6 text-sm uppercase tracking-wider text-slate-400">Services</h4>
           <ul className="space-y-4 text-slate-600 text-sm">
-            <li><Link href="/search?specialty=NAD%2B+Plus" className="hover:text-wellness-600 transition-colors">NAD+ Therapy</Link></li>
-            <li><Link href="/search?specialty=Myers+Cocktail" className="hover:text-wellness-600 transition-colors">Myers Cocktail</Link></li>
-            <li><Link href="/search?specialty=Vitamin+C+IV" className="hover:text-wellness-600 transition-colors">Vitamin C IV</Link></li>
-            <li><Link href="/search?specialty=Hydration" className="hover:text-wellness-600 transition-colors">Hydration Drips</Link></li>
+            <li><Link href="/treatments" className="hover:text-wellness-600 transition-colors font-bold text-slate-900">All Treatments →</Link></li>
+            <li><Link href="/treatments/nad-plus" className="hover:text-wellness-600 transition-colors">NAD+ Therapy</Link></li>
+            <li><Link href="/treatments/myers-cocktail" className="hover:text-wellness-600 transition-colors">Myers Cocktail</Link></li>
+            <li><Link href="/treatments/immune-support" className="hover:text-wellness-600 transition-colors">Vitamin C IV</Link></li>
+            <li><Link href="/treatments/hydration" className="hover:text-wellness-600 transition-colors">Hydration Drips</Link></li>
             <li><Link href="/search?type=Mobile" className="hover:text-wellness-600 transition-colors">Mobile IV</Link></li>
-            <li><Link href="/search?specialty=Hangover+Relief" className="hover:text-wellness-600 transition-colors">Hangover Relief</Link></li>
+            <li><Link href="/treatments/hangover" className="hover:text-wellness-600 transition-colors">Hangover Relief</Link></li>
           </ul>
         </div>
         <div>
