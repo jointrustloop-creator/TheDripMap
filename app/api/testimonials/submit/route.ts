@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import crypto from 'crypto';
 
 export async function POST(req: Request) {
   try {
@@ -48,9 +49,13 @@ export async function POST(req: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
+    const newId = crypto.randomUUID();
+    const moderationToken = crypto.randomBytes(24).toString('hex');
+
     const { data: inserted, error: insertError } = await supabase
       .from('testimonials')
       .insert({
+        id: newId,
         provider_id: providerId,
         author_name: authorName.slice(0, 120),
         author_email: authorEmail.slice(0, 240),
@@ -58,6 +63,8 @@ export async function POST(req: Request) {
         title,
         body: body.slice(0, 4000),
         visit_date: visitDate,
+        moderation_token: moderationToken,
+        status: 'pending',
       })
       .select('id, moderation_token')
       .single();
