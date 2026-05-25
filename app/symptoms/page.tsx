@@ -61,10 +61,10 @@ export default async function UseCaseHubPage() {
               </p>
             </div>
             <div className="relative h-[400px] md:h-[500px] rounded-[3rem] overflow-hidden shadow-2xl">
-              <ResilientImage 
-                src="https://www.thedripmap.com/og-image.png"
-                fallbackSrc="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2000&auto=format&fit=crop"
-                alt="IV Therapy Protocols"
+              <ResilientImage
+                src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-woman-relaxing.jpg"
+                fallbackSrc="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-modern-clinic-recliners.jpg"
+                alt="Woman relaxing during IV therapy session"
                 fill
                 className="object-cover"
               />

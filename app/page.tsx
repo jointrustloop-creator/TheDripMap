@@ -145,9 +145,9 @@ export default async function HomePage() {
       <section className="relative pt-32 pb-40 px-6 overflow-hidden min-h-[90vh] flex items-center">
         <div className="absolute inset-0 z-0">
           <ResilientImage
-            src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-spa-reception-recliners.jpg"
-            fallbackSrc="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2000&auto=format&fit=crop"
-            alt="Professional IV Therapy Clinic"
+            src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-two-women.jpg"
+            fallbackSrc="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-spa-reception-recliners.jpg"
+            alt="Two women receiving IV therapy together"
             fill
             className="object-cover object-center"
             priority
