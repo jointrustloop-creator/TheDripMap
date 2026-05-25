@@ -75,8 +75,16 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     return { title: 'City Not Found' };
   }
 
-  const title = cityData?.meta_title?.replace('{count}', String(count)) || `IV Therapy in ${name} — ${count} Top-Rated Clinics Near You | TheDripMap`;
-  const description = cityData?.meta_description?.replace('{count}', String(count)) || `Find and compare ${count} IV therapy clinics in ${name}. Read reviews, compare prices, and book hangover recovery, NAD+, immune support and hydration drips near you.`;
+  // Per-city override (city-intros.ts) takes highest priority for specific high-traffic SEO pages.
+  const intro = getCityIntro(slug);
+  const title =
+    intro?.metaTitle ||
+    cityData?.meta_title?.replace('{count}', String(count)) ||
+    `IV Therapy in ${name} — ${count} Top-Rated Clinics Near You | TheDripMap`;
+  const description =
+    intro?.metaDescription ||
+    cityData?.meta_description?.replace('{count}', String(count)) ||
+    `Find and compare ${count} IV therapy clinics in ${name}. Read reviews, compare prices, and book hangover recovery, NAD+, immune support and hydration drips near you.`;
 
   return {
     title,
