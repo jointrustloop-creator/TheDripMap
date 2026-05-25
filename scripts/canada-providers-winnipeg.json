@@ -1,0 +1,134 @@
+[
+  {
+    "name": "Theradrip Mobile IV Therapy",
+    "city": "Winnipeg",
+    "state": "Manitoba",
+    "country": "Canada",
+    "address": "Mobile service — Winnipeg, MB",
+    "phone": "(431) 792-3747",
+    "website": "https://www.theradrip.ca",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "The Nature Doctors",
+    "city": "Winnipeg",
+    "state": "Manitoba",
+    "country": "Canada",
+    "address": "1200 Waverley Street, Suite 7, Winnipeg, MB R3T 0P4",
+    "phone": "(204) 943-6079",
+    "website": "https://www.thenaturedoctors.ca",
+    "rating": 5.0,
+    "reviews": 17
+  },
+  {
+    "name": "Centre for Natural Pain Solutions",
+    "city": "Winnipeg",
+    "state": "Manitoba",
+    "country": "Canada",
+    "address": "578 Broadway, Winnipeg, MB R3C 0W5",
+    "phone": "(204) 775-4539",
+    "website": "https://cfnps.ca",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Winnipeg Clinic Infusion Centre",
+    "city": "Winnipeg",
+    "state": "Manitoba",
+    "country": "Canada",
+    "address": "425 St. Mary Avenue, Winnipeg, MB R3C 0N2",
+    "phone": "(204) 957-3286",
+    "website": "https://www.winnipegclinic.com/infusion-centre",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "The Gray Clinic",
+    "city": "Winnipeg",
+    "state": "Manitoba",
+    "country": "Canada",
+    "address": "1053 Autumnwood Drive, Winnipeg, MB R2J 1C6",
+    "phone": "(204) 661-7070",
+    "website": "https://www.thegrayclinic.ca",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Prime Medical Services",
+    "city": "Winnipeg",
+    "state": "Manitoba",
+    "country": "Canada",
+    "address": "1555 Inkster Blvd, Winnipeg, MB R2X 1R2",
+    "phone": "(204) 837-7463",
+    "website": "https://www.primemedicalsvc.com",
+    "rating": 5.0,
+    "reviews": 207
+  },
+  {
+    "name": "Enhance Aesthetics and Laser",
+    "city": "Winnipeg",
+    "state": "Manitoba",
+    "country": "Canada",
+    "address": "2227 Henderson Hwy, East St. Paul, MB R2E 0B8",
+    "phone": "(431) 801-8430",
+    "website": "https://www.enhanceaesthetics.ca",
+    "rating": 5.0,
+    "reviews": 107
+  },
+  {
+    "name": "L'atelier Medical Aesthetics",
+    "city": "Winnipeg",
+    "state": "Manitoba",
+    "country": "Canada",
+    "address": "186 Provencher Boulevard, Winnipeg, MB R2H 0G4",
+    "phone": "(204) 793-6065",
+    "website": "https://www.ateliermedicalaesthetics.com",
+    "rating": 4.9,
+    "reviews": 49
+  },
+  {
+    "name": "Skin Suite Laser & Medical Aesthetics",
+    "city": "Winnipeg",
+    "state": "Manitoba",
+    "country": "Canada",
+    "address": "1365 Grant Ave, Winnipeg, MB R3M 1Z8",
+    "phone": "(204) 505-7546",
+    "website": "https://www.skinsuitewpg.ca",
+    "rating": 5.0,
+    "reviews": null
+  },
+  {
+    "name": "Fortify Wellness",
+    "city": "Winnipeg",
+    "state": "Manitoba",
+    "country": "Canada",
+    "address": "100-123 Marion Street, Winnipeg, MB R2H 3G9",
+    "phone": "(204) 231-5333",
+    "website": "https://thisisfortify.com",
+    "rating": 4.9,
+    "reviews": 210
+  },
+  {
+    "name": "Visage Clinical Beauty",
+    "city": "Winnipeg",
+    "state": "Manitoba",
+    "country": "Canada",
+    "address": "160 Provencher Boulevard #101, Winnipeg, MB R2H 0H3",
+    "phone": "(204) 400-4605",
+    "website": "https://visagebeauty.ca",
+    "rating": 4.9,
+    "reviews": 148
+  },
+  {
+    "name": "Via Natural Medicine",
+    "city": "Winnipeg",
+    "state": "Manitoba",
+    "country": "Canada",
+    "address": "554 Des Meurons Street, Unit A, Winnipeg, MB R2H 2P8",
+    "phone": "(204) 615-5225",
+    "website": "https://vianatural.ca",
+    "rating": 4.9,
+    "reviews": 32
+  }
+]

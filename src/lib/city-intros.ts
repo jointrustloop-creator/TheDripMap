@@ -2,6 +2,11 @@ export interface CityIntro {
   localContext: string;
   pricing: string;
   popularTreatments: string[];
+  // For cities with 0 direct provider listings, optionally pull from these nearby cities.
+  nearbyProviderCities?: string[];
+  // Optional custom meta title; falls back to template default if absent.
+  metaTitle?: string;
+  metaDescription?: string;
 }
 
 const intros: Record<string, CityIntro> = {
@@ -63,6 +68,15 @@ const intros: Record<string, CityIntro> = {
     localContext: `Glendale's IV therapy market serves both LA-adjacent commuters and the local Armenian-American community, with a notable concentration of beauty- and recovery-focused clinics. The Glendale offering overlaps heavily with greater LA pricing and protocols, while remaining more accessible than Beverly Hills or West Hollywood.`,
     pricing: `Mid-to-upper LA-area pricing — typically $175 to $400 for standard drips, with beauty and glow protocols at the higher end.`,
     popularTreatments: ['Beauty Glow', 'Hangover Recovery', 'Hydration', 'Energy Boost'],
+  },
+
+  'san-carlos': {
+    localContext: `San Carlos sits in the heart of the San Francisco Bay Area Peninsula, with strong IV therapy demand driven by the local tech workforce, Stanford and Sequoia Hospital-adjacent medical community, and active recreational culture along the Crystal Springs trails and Pulgas Ridge. Many San Carlos residents also tap into clinics in nearby Redwood City, San Mateo, San Ramon, Belmont, and Palo Alto for specialty protocols. The Peninsula market overall skews toward longevity, NAD+, and recovery drips rather than the recovery-only mix of typical metro markets.`,
+    pricing: `Peninsula pricing aligns with broader Bay Area rates — typically $200 to $400 for standard wellness drips, with NAD+ protocols running $700 to $1,200+. Mobile in-home service across Belmont, Redwood City, San Mateo, and San Carlos usually adds $50 to $100 per session.`,
+    popularTreatments: ['NAD+ Plus', 'Hydration', 'Immune Support', 'Recovery'],
+    nearbyProviderCities: ['San Ramon'],
+    metaTitle: 'IV Therapy San Carlos CA — Bay Area Peninsula Clinics & Mobile Drips | TheDripMap',
+    metaDescription: 'IV therapy in San Carlos, CA. Compare Bay Area Peninsula clinics for NAD+, hydration, immune support and recovery drips. In-clinic and mobile providers serving San Carlos, Redwood City, Belmont, and San Ramon.',
   },
 };
 

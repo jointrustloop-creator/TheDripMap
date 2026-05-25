@@ -238,6 +238,46 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           </section>
         )}
 
+        {/* 6b. Browse Treatments — links every city page to /treatments/[slug] */}
+        <section className="mb-24">
+          <div className="bg-gradient-to-br from-wellness-50 to-white p-10 md:p-14 rounded-[3rem] border border-wellness-100">
+            <h3 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">Browse IV Treatments in {cityData.name}</h3>
+            <p className="text-lg text-slate-600 mb-10 max-w-3xl">
+              Most {cityData.name} clinics offer these popular treatment protocols. Tap any drip for the full breakdown — benefits, who it&apos;s for, cost, and how to find a provider near you.
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { slug: 'nad-plus-therapy',  label: 'NAD+ Therapy' },
+                { slug: 'hangover-recovery', label: 'Hangover Recovery' },
+                { slug: 'myers-cocktail',    label: 'Myers Cocktail' },
+                { slug: 'immune-support',    label: 'Immune Support' },
+                { slug: 'beauty-glow',       label: 'Beauty Glow' },
+                { slug: 'hydration',         label: 'Hydration Drip' },
+                { slug: 'energy-boost',      label: 'Energy Boost' },
+                { slug: 'athletic-recovery', label: 'Athletic Recovery' },
+              ].map((t) => (
+                <Link
+                  key={t.slug}
+                  href={`/treatments/${t.slug}`}
+                  className="bg-white p-5 rounded-2xl border border-slate-100 hover:border-wellness-300 hover:shadow-md transition-all text-center"
+                >
+                  <span className="font-bold text-slate-900 text-sm">{t.label}</span>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-8 flex flex-wrap gap-3 items-center">
+              <span className="text-sm font-bold text-slate-500">Plus reference guides:</span>
+              <Link href="/guide/iv-therapy-cost-guide" className="text-sm font-bold text-wellness-600 hover:text-wellness-700">Cost guide</Link>
+              <span className="text-slate-300">·</span>
+              <Link href="/guide/how-to-choose-iv-therapy-clinic" className="text-sm font-bold text-wellness-600 hover:text-wellness-700">How to choose a clinic</Link>
+              <span className="text-slate-300">·</span>
+              <Link href="/guide/first-time-iv-therapy-what-to-expect" className="text-sm font-bold text-wellness-600 hover:text-wellness-700">First-time guide</Link>
+              <span className="text-slate-300">·</span>
+              <Link href="/guide/mobile-iv-therapy-vs-clinic" className="text-sm font-bold text-wellness-600 hover:text-wellness-700">Mobile vs in-clinic</Link>
+            </div>
+          </div>
+        </section>
+
         {/* 7. FAQ section */}
         <div className="-mx-6 mb-24">
           <FAQSection faqs={faqs} title={`${cityData.name} IV Therapy FAQ`} />

@@ -266,7 +266,7 @@ export default async function HomePage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {services.map((service, idx) => (
-              <Link 
+              <Link
                 key={idx}
                 href={`/treatments/${service.slug}`}
                 className="bg-white p-8 rounded-[2rem] border border-slate-100 hover:border-wellness-200 hover:shadow-xl transition-all text-center group"
@@ -277,6 +277,48 @@ export default async function HomePage() {
                 <span className="font-bold text-slate-900 group-hover:text-wellness-600 transition-colors">{service.name}</span>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Helpful Guides — internal-link buildout to /guide/* */}
+      <section className="py-24 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-6xl font-black text-slate-900 mb-4 tracking-tight">Before You Book</h2>
+            <p className="text-xl text-slate-500 max-w-2xl mx-auto">Plain-English answers to the questions every first-time IV therapy patient asks.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Link
+              href="/guide/iv-therapy-cost-guide"
+              className="group bg-gradient-to-br from-slate-50 to-white p-10 rounded-[2rem] border border-slate-100 hover:border-wellness-300 hover:shadow-xl transition-all"
+            >
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-wellness-600 mb-3">Reference Guide</div>
+              <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tight group-hover:text-wellness-600 transition-colors">IV Therapy Cost Guide</h3>
+              <p className="text-slate-500 text-sm leading-relaxed">What to expect to pay for hangover, NAD+, Myers Cocktail, and recovery drips across US and Canadian metros.</p>
+            </Link>
+            <Link
+              href="/guide/how-to-choose-iv-therapy-clinic"
+              className="group bg-gradient-to-br from-slate-50 to-white p-10 rounded-[2rem] border border-slate-100 hover:border-wellness-300 hover:shadow-xl transition-all"
+            >
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-wellness-600 mb-3">Reference Guide</div>
+              <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tight group-hover:text-wellness-600 transition-colors">How to Choose a Clinic</h3>
+              <p className="text-slate-500 text-sm leading-relaxed">The 7 things every reputable IV therapy clinic should have — staff credentials, ingredients, screening, pricing.</p>
+            </Link>
+            <Link
+              href="/guide/first-time-iv-therapy-what-to-expect"
+              className="group bg-gradient-to-br from-slate-50 to-white p-10 rounded-[2rem] border border-slate-100 hover:border-wellness-300 hover:shadow-xl transition-all"
+            >
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-wellness-600 mb-3">Reference Guide</div>
+              <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tight group-hover:text-wellness-600 transition-colors">First-Time IV Therapy</h3>
+              <p className="text-slate-500 text-sm leading-relaxed">Step-by-step walkthrough of a typical first IV therapy session — from intake to needle, infusion, and after.</p>
+            </Link>
+          </div>
+          <div className="mt-8 flex flex-wrap gap-3 items-center justify-center">
+            <span className="text-sm font-bold text-slate-500">More guides:</span>
+            <Link href="/guide/mobile-iv-therapy-vs-clinic" className="text-sm font-bold text-wellness-600 hover:text-wellness-700">Mobile vs in-clinic</Link>
+            <span className="text-slate-300">·</span>
+            <Link href="/guide/iv-therapy-vs-oral-supplements" className="text-sm font-bold text-wellness-600 hover:text-wellness-700">IV vs oral supplements</Link>
           </div>
         </div>
       </section>

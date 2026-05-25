@@ -34,3 +34,8 @@ Claude.md
 
 # Research / staging data (delete after import or move out of repo)
 scripts/la-clinics-import.json
+scripts/outreach-drafts.md
+
+# GSC raw exports (analytics data — don't commit)
+gsc-export/
+thedripmap.com-Performance-on-Search-*.zip

@@ -1,0 +1,134 @@
+[
+  {
+    "name": "The Clinic YYC",
+    "city": "Calgary",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "611 2 Ave SW, Main Floor, Calgary, AB T2P 1N9",
+    "phone": "(587) 353-5933",
+    "website": "https://theclinicyyc.ca",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Essence Wellness Clinic - Marda Loop",
+    "city": "Calgary",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "3425 22 St SW #305, Calgary, AB T2T 6S8",
+    "phone": "(403) 383-3228",
+    "website": "https://www.essencewellness.ca",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Nova Naturopathic Clinic",
+    "city": "Calgary",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "6707 Elbow Dr SW #208, Calgary, AB T2V 0E4",
+    "phone": "(587) 391-5753",
+    "website": "https://www.novaclinic.ca",
+    "rating": 5.0,
+    "reviews": 34
+  },
+  {
+    "name": "The Drip Wellness Group",
+    "city": "Calgary",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "1819 4 St SW, Calgary, AB T2S 1W2",
+    "phone": "(825) 734-3747",
+    "website": "https://thedripwellnessgroup.com",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Feel Good IV Therapy",
+    "city": "Calgary",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "3315 26 Ave SW #3, Calgary, AB T3E 0N2",
+    "phone": "(587) 434-5064",
+    "website": "https://www.feelgoodivtherapy.com",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Action Health",
+    "city": "Calgary",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "7722 Elbow Dr SW, Calgary, AB",
+    "phone": "(403) 243-8114",
+    "website": "https://www.actionhealth.ca",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Neurvana Naturopathic Medicine",
+    "city": "Calgary",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "2020 4 St SW #330, Calgary, AB",
+    "phone": "(587) 997-4649",
+    "website": "https://neurvanahealth.com",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Best Skin Beauty Clinic",
+    "city": "Calgary",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "2 Royal Vista Link NW, Calgary, AB T3R 0K4",
+    "phone": "(587) 899-9928",
+    "website": "https://www.bestskinclinic.ca",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Evolve Chiropractic & Wellness",
+    "city": "Calgary",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "530 8 Ave SW, Suite 110, Calgary, AB",
+    "phone": "(403) 474-7792",
+    "website": "https://www.evolvechiro.ca",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Core Health Centre",
+    "city": "Calgary",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "700 2 St SW #330, Calgary, AB T2P 2W2",
+    "phone": "(403) 237-6000",
+    "website": "https://www.mycorehealth.com",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Marda Loop Naturopathic and Wellness Clinic",
+    "city": "Calgary",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "1519 34 Ave SW, Unit 1, Calgary, AB T2T 2B1",
+    "phone": "(403) 910-1133",
+    "website": "https://mardaloopwellness.com",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Anara Infusion & Wellness",
+    "city": "Calgary",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "180 Quarry Park Blvd SE, Calgary, AB T2C 3G3",
+    "phone": "(403) 222-0741",
+    "website": "https://anarainfusion.com",
+    "rating": null,
+    "reviews": null
+  }
+]

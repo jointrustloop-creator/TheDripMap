@@ -1,0 +1,145 @@
+[
+  {
+    "name": "The Centre for Health Innovation",
+    "city": "Ottawa",
+    "state": "Ontario",
+    "country": "Canada",
+    "address": "429 MacLaren Street, Ottawa, ON K2P 0M7",
+    "phone": "(613) 792-1222",
+    "website": "https://thechi.ca",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Revivelife Clinic",
+    "city": "Ottawa",
+    "state": "Ontario",
+    "country": "Canada",
+    "address": "69 Kempster Ave, Ottawa, ON K2B 6M2",
+    "phone": "(613) 829-7100",
+    "website": "https://revivelifeclinic.com",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "NutriChem Compounding Pharmacy & Clinic",
+    "city": "Ottawa",
+    "state": "Ontario",
+    "country": "Canada",
+    "address": "2599 Carling Ave, Ottawa, ON K2B 7H7",
+    "phone": "(613) 721-3669",
+    "website": "https://nutrichem.com",
+    "rating": 4.3,
+    "reviews": 115
+  },
+  {
+    "name": "Somerset Health & Wellness Centre",
+    "city": "Ottawa",
+    "state": "Ontario",
+    "country": "Canada",
+    "address": "190 Somerset St W, Suite 210, Ottawa, ON K2P 0J4",
+    "phone": "(613) 656-9629",
+    "website": "https://somersethealth.ca",
+    "rating": 4.9,
+    "reviews": 274
+  },
+  {
+    "name": "Ottawa Integrative Health Centre",
+    "city": "Ottawa",
+    "state": "Ontario",
+    "country": "Canada",
+    "address": "904 Lady Ellen Pl, Ottawa, ON K1Z 5L5",
+    "phone": "(613) 798-1000",
+    "website": "https://www.oihc.ca",
+    "rating": 4.2,
+    "reviews": null
+  },
+  {
+    "name": "RevIVe U Mobile IV Wellness Clinic",
+    "city": "Ottawa",
+    "state": "Ontario",
+    "country": "Canada",
+    "address": "Mobile service area, Ottawa, ON",
+    "phone": "(613) 301-0051",
+    "website": "https://www.reviveu.ca",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "ElevateRx Medical Aesthetics",
+    "city": "Ottawa",
+    "state": "Ontario",
+    "country": "Canada",
+    "address": "164 Lebreton St N, Ottawa, ON K1R 7H8",
+    "phone": "(613) 518-1942",
+    "website": "https://www.elevaterx.ca",
+    "rating": 5.0,
+    "reviews": 154
+  },
+  {
+    "name": "Elysian Wellness Centre - Hunt Club",
+    "city": "Ottawa",
+    "state": "Ontario",
+    "country": "Canada",
+    "address": "290 W Hunt Club Rd, Unit 4A, Ottawa, ON K2E 0B7",
+    "phone": "(613) 224-2077",
+    "website": "https://elysianwellnesscentre.com",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Refined Image Ottawa",
+    "city": "Ottawa",
+    "state": "Ontario",
+    "country": "Canada",
+    "address": "408A Churchill Ave N, Ottawa, ON K1Z 5C6",
+    "phone": "(613) 725-5088",
+    "website": "https://refinedimageottawa.com",
+    "rating": 4.9,
+    "reviews": 344
+  },
+  {
+    "name": "Skin Logic Ottawa",
+    "city": "Ottawa",
+    "state": "Ontario",
+    "country": "Canada",
+    "address": "11 Holland Ave, Suite 400, Ottawa, ON K1Y 4S1",
+    "phone": "(613) 728-6773",
+    "website": "https://skinlogicottawa.com",
+    "rating": 4.9,
+    "reviews": 120
+  },
+  {
+    "name": "Elixir Beauty Clinic",
+    "city": "Ottawa",
+    "state": "Ontario",
+    "country": "Canada",
+    "address": "1279 Wellington St W, Ottawa, ON K1Y 3A8",
+    "phone": "(613) 818-2066",
+    "website": "https://elixirbeautyottawa.com",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Pure Medical Cosmetics",
+    "city": "Ottawa",
+    "state": "Ontario",
+    "country": "Canada",
+    "address": "4289 Innes Rd, Orleans, ON K1E 0A8",
+    "phone": "(343) 883-7873",
+    "website": "https://www.puremedicalcosmetics.com",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "LyfeMedica Wellness Clinic - Ottawa",
+    "city": "Ottawa",
+    "state": "Ontario",
+    "country": "Canada",
+    "address": "1280 Old Innes Rd, Unit 802, Ottawa, ON K1B 5M6",
+    "phone": "(905) 338-0151",
+    "website": "https://lyfemedica.com",
+    "rating": null,
+    "reviews": null
+  }
+]

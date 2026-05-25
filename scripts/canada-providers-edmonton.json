@@ -1,0 +1,123 @@
+[
+  {
+    "name": "VitaDrip IV",
+    "city": "Edmonton",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "Suite 2367, 8882 170 Street NW, Edmonton, AB T5T 4M2",
+    "phone": "(780) 652-3258",
+    "website": "https://www.vitadripiv.ca/",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "TruMed Naturopath Clinic",
+    "city": "Edmonton",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "14620 Stony Plain Road, Edmonton, AB T5N 3S2",
+    "phone": "(780) 757-8378",
+    "website": "https://www.trumed.ca/",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Optimum Wellness Integrated Clinic",
+    "city": "Edmonton",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "Suite 201, 9080 25 Avenue SW, Edmonton, AB T6X 2H4",
+    "phone": "(780) 439-1200",
+    "website": "https://optimumwellnessclinic.ca/",
+    "rating": 4.7,
+    "reviews": 118
+  },
+  {
+    "name": "Emerald Medical and Wellness Centre",
+    "city": "Edmonton",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "9943 109 Street NW, Edmonton, AB T5K 1H6",
+    "phone": "(587) 402-4392",
+    "website": "https://emeraldwellness.ca/iv-therapy-edmonton",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Bliss MediSpa & Integrated Wellness",
+    "city": "Edmonton",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "5954 Mullen Way NW, Edmonton, AB T6R 0S9",
+    "phone": "(780) 432-1535",
+    "website": "https://www.blissmedispa.ca/wellness-edmonton/iv-nutrient-therapy/",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Hydro Oasis Wellness",
+    "city": "Edmonton",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "10328 73 Avenue NW, Edmonton, AB T6E 6N5",
+    "phone": "(780) 616-6654",
+    "website": "https://www.hydrooasiswellness.com/",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Zia IV Infusion & Injection Lounge",
+    "city": "Edmonton",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "4424 Calgary Trail NW, Edmonton, AB T6H 5W6",
+    "phone": null,
+    "website": "https://www.ziaiv.ca/",
+    "rating": null,
+    "reviews": 20
+  },
+  {
+    "name": "VitaPoke Infusion Lounge (Poke Beauty)",
+    "city": "Edmonton",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "Edmonton, AB (in-clinic and mobile, Edmonton, Sherwood Park, St. Albert)",
+    "phone": "(780) 202-7669",
+    "website": "https://www.pokebeauty.ca/services/iv-therapy",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Tonic IV",
+    "city": "Edmonton",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "Mobile service across Edmonton, Sherwood Park, St. Albert, AB",
+    "phone": "(780) 851-5822",
+    "website": "https://toniciv.ca/",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Viva Wellness Drip Edmonton",
+    "city": "Edmonton",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "Mobile service across Greater Edmonton Area, AB",
+    "phone": null,
+    "website": "https://edmonton.vivawellnessdrip.com/",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Feel Irie Medical Services",
+    "city": "Edmonton",
+    "state": "Alberta",
+    "country": "Canada",
+    "address": "Mobile IV service, Edmonton, AB",
+    "phone": null,
+    "website": "https://www.feeliriemedicalservices.ca/iv-drip",
+    "rating": null,
+    "reviews": null
+  }
+]

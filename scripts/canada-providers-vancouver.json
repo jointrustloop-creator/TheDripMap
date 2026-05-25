@@ -1,0 +1,145 @@
+[
+  {
+    "name": "The IV Health Centre",
+    "city": "Vancouver",
+    "state": "British Columbia",
+    "country": "Canada",
+    "address": "1060 Homer Street, Vancouver, BC V6B 2W9",
+    "phone": "(604) 974-8999",
+    "website": "https://theiv.ca",
+    "rating": 4.8,
+    "reviews": 120
+  },
+  {
+    "name": "Promethean Clinic",
+    "city": "Vancouver",
+    "state": "British Columbia",
+    "country": "Canada",
+    "address": "1330-1111 W Georgia St, Vancouver, BC V6E 4M3",
+    "phone": "(778) 879-7666",
+    "website": "https://prometheanclinic.ca",
+    "rating": 4.9,
+    "reviews": 85
+  },
+  {
+    "name": "Electra Health",
+    "city": "Vancouver",
+    "state": "British Columbia",
+    "country": "Canada",
+    "address": "MZ1-970 Burrard Street, Vancouver, BC V6Z 2R4",
+    "phone": "(604) 685-4325",
+    "website": "https://electrahealth.ca",
+    "rating": 4.6,
+    "reviews": 148
+  },
+  {
+    "name": "ZipDrip Mobile IV Therapy",
+    "city": "Vancouver",
+    "state": "British Columbia",
+    "country": "Canada",
+    "address": "943 W Broadway, Vancouver, BC V5Z 4E1",
+    "phone": "(778) 910-0075",
+    "website": "https://zipdrip.ca",
+    "rating": 5.0,
+    "reviews": 110
+  },
+  {
+    "name": "Luminary Health and Longevity Clinic",
+    "city": "Vancouver",
+    "state": "British Columbia",
+    "country": "Canada",
+    "address": "301-533 Smithe Street, Vancouver, BC V6B 0H2",
+    "phone": "(604) 216-3320",
+    "website": "https://luminaryhealth.ca",
+    "rating": 4.9,
+    "reviews": 42
+  },
+  {
+    "name": "Mint Integrative Health",
+    "city": "Vancouver",
+    "state": "British Columbia",
+    "country": "Canada",
+    "address": "485-1541 W Broadway, Vancouver, BC V6J 1W7",
+    "phone": "(604) 251-3456",
+    "website": "https://mintintegrative.com",
+    "rating": 4.8,
+    "reviews": 95
+  },
+  {
+    "name": "8 West Clinic",
+    "city": "Vancouver",
+    "state": "British Columbia",
+    "country": "Canada",
+    "address": "300-1788 W Broadway, Vancouver, BC V6J 1Y1",
+    "phone": "(604) 733-1669",
+    "website": "https://www.8west.ca",
+    "rating": 4.8,
+    "reviews": 210
+  },
+  {
+    "name": "Limelight Wellness Centre",
+    "city": "Vancouver",
+    "state": "British Columbia",
+    "country": "Canada",
+    "address": "488 Drake Street, Vancouver, BC V6B 5S9",
+    "phone": "(604) 262-1002",
+    "website": "https://limelightwellness.ca",
+    "rating": 4.9,
+    "reviews": 76
+  },
+  {
+    "name": "Skinnovate",
+    "city": "Vancouver",
+    "state": "British Columbia",
+    "country": "Canada",
+    "address": "591 Cardero Street, Vancouver, BC V6G 3L2",
+    "phone": "(604) 416-2799",
+    "website": "https://skinnovate.ca",
+    "rating": 5.0,
+    "reviews": 38
+  },
+  {
+    "name": "Acupoint Wellness Centre",
+    "city": "Vancouver",
+    "state": "British Columbia",
+    "country": "Canada",
+    "address": "618-808 Nelson Street, Vancouver, BC V6Z 2H2",
+    "phone": "(604) 688-7710",
+    "website": "https://acupoint.ca",
+    "rating": 4.9,
+    "reviews": 40
+  },
+  {
+    "name": "Crossroads Naturopathic Wellness Clinic",
+    "city": "Vancouver",
+    "state": "British Columbia",
+    "country": "Canada",
+    "address": "350-507 W Broadway, Vancouver, BC V5Z 1E6",
+    "phone": "(604) 568-6899",
+    "website": "https://crossroadsnaturopathic.com",
+    "rating": 4.8,
+    "reviews": 65
+  },
+  {
+    "name": "Vancouver Laser & Skin Care Centre",
+    "city": "Vancouver",
+    "state": "British Columbia",
+    "country": "Canada",
+    "address": "309-750 W Broadway, Vancouver, BC V5Z 1H8",
+    "phone": "(604) 708-9891",
+    "website": "https://www.vancouverlaser.com",
+    "rating": 4.5,
+    "reviews": 61
+  },
+  {
+    "name": "Eterna Wellness",
+    "city": "Vancouver",
+    "state": "British Columbia",
+    "country": "Canada",
+    "address": "800-1401 W Broadway, Vancouver, BC V6H 1H6",
+    "phone": "(604) 844-1884",
+    "website": "https://eternawellness.ca",
+    "rating": 4.9,
+    "reviews": 55
+  }
+]

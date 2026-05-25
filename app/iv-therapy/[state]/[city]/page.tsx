@@ -21,6 +21,7 @@ import { BreadcrumbNav } from '../../../../src/components/BreadcrumbNav';
 import { NearbyCities } from '../../../../src/components/NearbyCities';
 import { getListingsByCity, getAllCities, slugify, STATE_MAP, REVERSE_STATE_MAP } from '../../../../src/lib/data';
 import { isSupabaseConfigured } from '../../../../src/lib/supabase';
+import { getCityIntro } from '../../../../src/lib/city-intros';
 import { Provider } from '../../../../src/types';
 
 export const revalidate = 0; // Disable cache for now to fix 404s and stale data
@@ -104,8 +105,13 @@ export async function generateMetadata({ params, searchParams }: CityPageProps):
   const listings = await getListingsByCity(cityName, state);
   const count = listings.length;
 
-  const title = `IV Therapy in ${cityName}, ${cityInfo.stateAbbr} — ${count} Clinics | TheDripMap`;
-  const description = `Find and compare ${count} IV therapy clinics in ${cityName}, ${state}. Read reviews, compare prices, and book top-rated hydration and wellness drips.`;
+  const intro = getCityIntro(city);
+  const title =
+    intro?.metaTitle ??
+    `IV Therapy in ${cityName}, ${cityInfo.stateAbbr} — ${count} Clinics | TheDripMap`;
+  const description =
+    intro?.metaDescription ??
+    `Find and compare ${count} IV therapy clinics in ${cityName}, ${state}. Read reviews, compare prices, and book top-rated hydration and wellness drips.`;
 
   return {
     title,
@@ -159,6 +165,20 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
     listings = await getListingsByCity(cityName, stateName || state);
   } catch (error) {
     console.error('Error fetching listings for city page:', error);
+  }
+
+  // City-specific content override (rich intro, custom meta, optional nearby provider list)
+  const cityIntro = getCityIntro(city);
+
+  // If this city has 0 listings but defines nearby provider cities, pull from those
+  let nearbyProviders: Provider[] = [];
+  if (listings.length === 0 && cityIntro?.nearbyProviderCities?.length) {
+    for (const nc of cityIntro.nearbyProviderCities) {
+      try {
+        const found = await getListingsByCity(nc, stateName || state);
+        nearbyProviders.push(...found);
+      } catch {}
+    }
   }
 
   if (service) {
@@ -392,6 +412,17 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
               listings.map((provider) => (
                 <ProviderCard key={provider.id} provider={provider} />
               ))
+            ) : nearbyProviders.length > 0 ? (
+              <>
+                <div className="col-span-full mb-6 -mt-4">
+                  <p className="text-slate-600 text-base">
+                    No direct {cityName} listings yet — here are nearby {stateName} providers serving the {cityName} area:
+                  </p>
+                </div>
+                {nearbyProviders.map((provider) => (
+                  <ProviderCard key={provider.id} provider={provider} />
+                ))}
+              </>
             ) : (
               <div className="col-span-full py-20 text-center bg-white rounded-3xl border border-slate-100 shadow-sm">
                 <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
@@ -401,7 +432,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
                 <p className="text-slate-500 max-w-md mx-auto mb-8">
                   We&apos;re currently expanding our network in {stateName}. Check out nearby cities or try a different search.
                 </p>
-                <Link 
+                <Link
                   href="/search"
                   className="inline-flex items-center gap-2 bg-wellness-600 text-white px-8 py-4 rounded-2xl font-black text-sm hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-200"
                 >
@@ -418,15 +449,34 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
           <div className="prose prose-slate max-w-none">
             <h2 className="text-4xl font-black text-slate-900 mb-8 tracking-tight">IV Therapy in {cityName}</h2>
             <div className="text-lg text-slate-600 leading-relaxed space-y-6">
-              <p>
-                IV therapy in {cityName} has grown significantly over the past few years, with {listings.length} clinics now serving {cityName} residents across {stateName}. This surge in popularity reflects a broader trend toward proactive wellness and rapid recovery solutions. Whether you are a busy professional in the heart of {cityName} or a local athlete looking to optimize performance, intravenous hydration offers a direct path to cellular replenishment.
-              </p>
-              <p>
-                The local landscape in {cityName} is diverse, featuring everything from high-end wellness boutiques to specialized medical clinics. Most providers in the area focus on a holistic approach, ensuring that each drip is tailored to the individual&apos;s needs. Common services found across {cityName} include {commonServicesText}. These treatments are designed to address a variety of concerns, from seasonal allergies and immune support to chronic fatigue and anti-aging protocols.
-              </p>
-              <p>
-                As {cityName} continues to embrace these advanced health services, the quality and accessibility of care have reached new heights. Patients can now choose between relaxing in-clinic environments or the convenience of mobile services that bring the treatment directly to their doorstep. The medical community here has set high standards for safety and efficacy, making it one of the premier locations for elective IV treatments in the region.
-              </p>
+              {cityIntro ? (
+                <>
+                  <p>{cityIntro.localContext}</p>
+                  <p>
+                    Popular treatments across {cityName} include {cityIntro.popularTreatments.join(', ')}. {cityIntro.pricing}
+                  </p>
+                  <p>
+                    Looking for a specific protocol? Browse our deep-dives on{' '}
+                    <Link href="/treatments/nad-plus-therapy" className="text-wellness-600 hover:text-wellness-700 font-bold">NAD+ therapy</Link>,{' '}
+                    <Link href="/treatments/hangover-recovery" className="text-wellness-600 hover:text-wellness-700 font-bold">hangover recovery</Link>,{' '}
+                    <Link href="/treatments/myers-cocktail" className="text-wellness-600 hover:text-wellness-700 font-bold">Myers Cocktail</Link>, and{' '}
+                    <Link href="/treatments/immune-support" className="text-wellness-600 hover:text-wellness-700 font-bold">immune support drips</Link> — or take the{' '}
+                    <Link href="/quiz" className="text-wellness-600 hover:text-wellness-700 font-bold">60-second drip quiz</Link> to find a match based on your goals.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p>
+                    IV therapy in {cityName} has grown significantly over the past few years, with {listings.length} clinics now serving {cityName} residents across {stateName}. This surge in popularity reflects a broader trend toward proactive wellness and rapid recovery solutions. Whether you are a busy professional in the heart of {cityName} or a local athlete looking to optimize performance, intravenous hydration offers a direct path to cellular replenishment.
+                  </p>
+                  <p>
+                    The local landscape in {cityName} is diverse, featuring everything from high-end wellness boutiques to specialized medical clinics. Most providers in the area focus on a holistic approach, ensuring that each drip is tailored to the individual&apos;s needs. Common services found across {cityName} include {commonServicesText}. These treatments are designed to address a variety of concerns, from seasonal allergies and immune support to chronic fatigue and anti-aging protocols.
+                  </p>
+                  <p>
+                    As {cityName} continues to embrace these advanced health services, the quality and accessibility of care have reached new heights. Patients can now choose between relaxing in-clinic environments or the convenience of mobile services that bring the treatment directly to their doorstep. The medical community here has set high standards for safety and efficacy, making it one of the premier locations for elective IV treatments in the region.
+                  </p>
+                </>
+              )}
             </div>
           </div>
 
@@ -499,6 +549,44 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
             <p className="mt-10 text-lg text-slate-600 leading-relaxed">
               The high demand for these specific treatments in {cityName} highlights the community&apos;s focus on targeted wellness. Whether it&apos;s the energy-boosting properties of NAD+ or the rapid rehydration of a recovery drip, {cityName} residents prioritize efficiency and quality in their health choices. Many local providers also offer custom blends, allowing you to fine-tune your infusion based on your unique physiological needs.
             </p>
+          </div>
+
+          {/* Browse Treatments — universal section links every city page to /treatments/[slug] */}
+          <div className="bg-gradient-to-br from-wellness-50 to-white p-10 md:p-14 rounded-[3rem] border border-wellness-100">
+            <h3 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">Browse IV Treatments Available in {cityName}</h3>
+            <p className="text-lg text-slate-600 mb-10 max-w-3xl">
+              Most {cityName} clinics offer these popular treatment protocols. Tap any drip to read what it does, who it&apos;s for, what it costs, and how to find a provider near you.
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { slug: 'nad-plus-therapy',  label: 'NAD+ Therapy' },
+                { slug: 'hangover-recovery', label: 'Hangover Recovery' },
+                { slug: 'myers-cocktail',    label: 'Myers Cocktail' },
+                { slug: 'immune-support',    label: 'Immune Support' },
+                { slug: 'beauty-glow',       label: 'Beauty Glow' },
+                { slug: 'hydration',         label: 'Hydration Drip' },
+                { slug: 'energy-boost',      label: 'Energy Boost' },
+                { slug: 'athletic-recovery', label: 'Athletic Recovery' },
+              ].map((t) => (
+                <Link
+                  key={t.slug}
+                  href={`/treatments/${t.slug}`}
+                  className="bg-white p-5 rounded-2xl border border-slate-100 hover:border-wellness-300 hover:shadow-md transition-all text-center"
+                >
+                  <span className="font-bold text-slate-900 text-sm">{t.label}</span>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-8 flex flex-wrap gap-3 items-center">
+              <span className="text-sm font-bold text-slate-500">Plus reference guides:</span>
+              <Link href="/guide/iv-therapy-cost-guide" className="text-sm font-bold text-wellness-600 hover:text-wellness-700">Cost guide</Link>
+              <span className="text-slate-300">·</span>
+              <Link href="/guide/how-to-choose-iv-therapy-clinic" className="text-sm font-bold text-wellness-600 hover:text-wellness-700">How to choose a clinic</Link>
+              <span className="text-slate-300">·</span>
+              <Link href="/guide/first-time-iv-therapy-what-to-expect" className="text-sm font-bold text-wellness-600 hover:text-wellness-700">First-time guide</Link>
+              <span className="text-slate-300">·</span>
+              <Link href="/guide/mobile-iv-therapy-vs-clinic" className="text-sm font-bold text-wellness-600 hover:text-wellness-700">Mobile vs in-clinic</Link>
+            </div>
           </div>
         </section>
 

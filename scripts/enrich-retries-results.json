@@ -1,0 +1,107 @@
+[
+  {
+    "id": "f74ec4c1-c6e5-408f-9f5c-f7aea84493bf",
+    "updated": true,
+    "fields": [
+      "description",
+      "specialties"
+    ],
+    "services": [
+      "Hangover Recovery",
+      "NAD+",
+      "Myers Cocktail",
+      "Beauty Glow",
+      "Immune Support",
+      "Hydration",
+      "B12",
+      "Vitamin C",
+      "Weight Loss",
+      "Migraine Relief",
+      "Skin / Aesthetics",
+      "Glutathione",
+      "Vitamin D"
+    ],
+    "phone": "+1 773-417-4556",
+    "address": null,
+    "description": "Revitalize IV Solutions and Medspa is proud to serve a diverse clientele drawn from numerous vibrant communities throughout the Chicago area, with clients visiting from Harwood Heights, Norridge, Norwood Park, Park Ridge, Niles, Rosemont, Schiller Park, Franklin Park, Edison Park, Union Ridge, Oriole Park, Belmont Heights, Belmont Terrace, Irving Woods, Dunning, Schorsch Village, Montclare, River Grove, Belmont Central, Belmont Cragin, Cragin, Portage Park, Elmwood Park, River Grove, Old Irving Park, and Jefferson Park. While we provide a variety of rejuvenating services, including Botox and IV Therapy, we would like to clarify that all our services are administered at our professional facility."
+  },
+  {
+    "id": "7bb76c17-8752-405c-9d9e-104f1664a47e",
+    "updated": true,
+    "fields": [
+      "description",
+      "specialties"
+    ],
+    "services": [
+      "Hangover Recovery",
+      "NAD+",
+      "Immune Support",
+      "Hydration",
+      "Recovery",
+      "Energy Boost",
+      "Anti-Aging",
+      "Mobile IV",
+      "Food Poisoning Relief",
+      "Wellness IV"
+    ],
+    "phone": "+1 555-555-5555",
+    "address": null,
+    "description": "Hangover IV Las Vegas is premier IV Therapy company specializing in a variety of health and wellness treatments. Our trained medical staff provide highly professional patient care. Our IV infusion blends are loaded with essential fluids, electrolytes, vitamins, amino acids, and antioxidants designed to promote overall body health. Go to our treatments page to learn more about the benefits and options that best meet your needs"
+  },
+  {
+    "id": "fc505255-30fa-4980-8fe2-98474689ae33",
+    "updated": true,
+    "fields": [
+      "description",
+      "specialties",
+      "address"
+    ],
+    "services": [
+      "Immune Support",
+      "Hydration",
+      "Recovery",
+      "B12",
+      "Weight Loss",
+      "Skin / Aesthetics",
+      "Vitamin D"
+    ],
+    "phone": "+1 818-906-4404",
+    "address": "2010 N Glenoaks Blvd, Burbank, CA 91504",
+    "description": "IV therapy offers a range of powerful health benefits by delivering vitamins, minerals, and hydration directly into the bloodstream for fast and effective results. It helps boost energy levels, improve hydration, strengthen the immune system, speed up recovery from illness or workouts, and even enhance skin health. Whether you're looking to combat fatigue, recover quicker, or support overall wellness, IV therapy provides a customizable, immediate solution."
+  },
+  {
+    "id": "8466a0aa-29f2-4e6e-94a6-5db3f2d36df0",
+    "skipped": true,
+    "reason": "HTTP 403"
+  },
+  {
+    "id": "b9dca761-41d5-4a79-abde-36afcc83ee07",
+    "updated": true,
+    "fields": [
+      "description",
+      "specialties"
+    ],
+    "services": [
+      "Hangover Recovery",
+      "NAD+",
+      "Myers Cocktail",
+      "Beauty Glow",
+      "Immune Support",
+      "Hydration",
+      "Recovery",
+      "Energy Boost",
+      "Jet Lag",
+      "B12",
+      "Vitamin C",
+      "Weight Loss",
+      "Anti-Aging",
+      "Skin / Aesthetics",
+      "Mobile IV",
+      "Glutathione",
+      "Wellness IV"
+    ],
+    "phone": "+1 702-506-3950",
+    "address": null,
+    "description": "Feel your best with IV Drip 2 U, the leading provider of mobile IV therapy in Las Vegas, NV. Book your IV treatment today! Whether it’s a hangover cure, rehydration, or a vitamin infusion like glutathione, B12, or the Myers Cocktail, we deliver wellness directly to your home or hotel room. Fast relief for nausea, dehydration, and more anywhere on the Las Vegas Strip or near the airport. Ready to recover?"
+  }
+]

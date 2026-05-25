@@ -1,0 +1,123 @@
+[
+  {
+    "name": "IV.CLINIC",
+    "city": "Montreal",
+    "state": "Quebec",
+    "country": "Canada",
+    "address": "1216 Stanley Street, 3rd Floor, Montreal, QC H3B 2S7",
+    "phone": "(438) 300-7484",
+    "website": "https://iv.clinic",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Ideal Body Clinic",
+    "city": "Montreal",
+    "state": "Quebec",
+    "country": "Canada",
+    "address": "6000 Avenue de Monkland, Montreal, QC H4A 1G8",
+    "phone": "(514) 998-0998",
+    "website": "https://vitaminboost.ca",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Drip Bar MTL",
+    "city": "Montreal",
+    "state": "Quebec",
+    "country": "Canada",
+    "address": "Westmount, Montreal, QC",
+    "phone": "(303) 893-0552",
+    "website": "https://www.dripbarmtl.com",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Zénith Santé",
+    "city": "Montreal",
+    "state": "Quebec",
+    "country": "Canada",
+    "address": "7895 Avenue Papineau, Suite 210, Montreal, QC H2E 2H4",
+    "phone": "(514) 374-9109",
+    "website": "https://zenithsante.com",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Mobile Mediq",
+    "city": "Montreal",
+    "state": "Quebec",
+    "country": "Canada",
+    "address": "Greater Montreal Area, Montreal, QC",
+    "phone": "(514) 543-2121",
+    "website": "https://www.mobilemediq.ca",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "RN Privée",
+    "city": "Montreal",
+    "state": "Quebec",
+    "country": "Canada",
+    "address": "Mobile clinic serving Greater Montreal, Montreal, QC",
+    "phone": null,
+    "website": "https://rnprivee.com",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "MyBest Clinic Montreal",
+    "city": "Montreal",
+    "state": "Quebec",
+    "country": "Canada",
+    "address": "407 Rue McGill, Suite 900, Montreal, QC H2Y 2G3",
+    "phone": "(833) 697-3848",
+    "website": "https://mybestclinic.com/location-montreal/",
+    "rating": 5.0,
+    "reviews": 5
+  },
+  {
+    "name": "Viva Wellness Drip Montreal",
+    "city": "Montreal",
+    "state": "Quebec",
+    "country": "Canada",
+    "address": "Mobile IV service, Montreal, QC",
+    "phone": null,
+    "website": "https://vivawellnessdrip.com/montreal/",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Wellness Mobile IV Montreal",
+    "city": "Montreal",
+    "state": "Quebec",
+    "country": "Canada",
+    "address": "Mobile IV service, Montreal, QC",
+    "phone": null,
+    "website": "https://wwellness.co/city/montreal/",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Drip Hydration Montreal",
+    "city": "Montreal",
+    "state": "Quebec",
+    "country": "Canada",
+    "address": "Mobile IV service, Montreal, QC",
+    "phone": "(888) 310-2630",
+    "website": "https://driphydration.com/coverage-areas/canada/montreal/",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "Clinique IV",
+    "city": "Montreal",
+    "state": "Quebec",
+    "country": "Canada",
+    "address": "Montreal, QC",
+    "phone": null,
+    "website": "https://cliniqueiv.com",
+    "rating": null,
+    "reviews": null
+  }
+]
