@@ -166,51 +166,51 @@ export function ContactPageClient({ providerCount }: ContactPageClientProps) {
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Your Name</label>
+                  <label className="text-sm font-bold text-slate-700 ml-1">Your Name</label>
                   <input
                     required
                     name="name"
                     type="text"
-                    className="w-full px-8 py-5 bg-slate-50 border-none rounded-[1.5rem] focus:outline-none focus:ring-2 focus:ring-wellness-600/10 focus:bg-white transition-all font-bold text-slate-900 placeholder:text-slate-300 shadow-inner"
-                    placeholder="John Wick"
+                    className="w-full px-5 py-4 bg-white border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-wellness-500 focus:ring-4 focus:ring-wellness-100 transition-all font-medium text-slate-900 placeholder:text-slate-400"
+                    placeholder="Your full name"
                   />
                 </div>
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Email Address</label>
+                  <label className="text-sm font-bold text-slate-700 ml-1">Email Address</label>
                   <input
                     required
                     name="email"
                     type="email"
-                    className="w-full px-8 py-5 bg-slate-50 border-none rounded-[1.5rem] focus:outline-none focus:ring-2 focus:ring-wellness-600/10 focus:bg-white transition-all font-bold text-slate-900 placeholder:text-slate-300 shadow-inner"
-                    placeholder="john@thecontinental.com"
+                    className="w-full px-5 py-4 bg-white border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-wellness-500 focus:ring-4 focus:ring-wellness-100 transition-all font-medium text-slate-900 placeholder:text-slate-400"
+                    placeholder="you@email.com"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Phone (Optional)</label>
+                  <label className="text-sm font-bold text-slate-700 ml-1">Phone <span className="text-slate-400 font-medium">(optional)</span></label>
                   <input
                     name="phone"
                     type="tel"
-                    className="w-full px-8 py-5 bg-slate-50 border-none rounded-[1.5rem] focus:outline-none focus:ring-2 focus:ring-wellness-600/10 focus:bg-white transition-all font-bold text-slate-900 placeholder:text-slate-300 shadow-inner"
+                    className="w-full px-5 py-4 bg-white border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-wellness-500 focus:ring-4 focus:ring-wellness-100 transition-all font-medium text-slate-900 placeholder:text-slate-400"
                     placeholder="+1 (555) 000-0000"
                   />
                 </div>
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">I&apos;m interested in...</label>
+                  <label className="text-sm font-bold text-slate-700 ml-1">I&apos;m interested in...</label>
                   <div className="relative">
                     <select
                       required
                       name="subject"
-                      className="w-full px-8 py-5 bg-slate-50 border-none rounded-[1.5rem] focus:outline-none focus:ring-2 focus:ring-wellness-600/10 focus:bg-white transition-all appearance-none font-bold text-slate-900 shadow-inner cursor-pointer"
+                      className="w-full px-5 py-4 bg-white border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-wellness-500 focus:ring-4 focus:ring-wellness-100 transition-all appearance-none font-medium text-slate-900 cursor-pointer pr-12"
                     >
                       <option value="General Inquiry">General Inquiry</option>
                       <option value="Clinic Listing">Listing my Clinic</option>
                       <option value="Partnership">Partnership Opportunities</option>
                       <option value="Press">Press & Media</option>
                     </select>
-                    <div className="absolute right-8 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                       <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
@@ -220,12 +220,12 @@ export function ContactPageClient({ providerCount }: ContactPageClientProps) {
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Your Message</label>
+                <label className="text-sm font-bold text-slate-700 ml-1">Your Message</label>
                 <textarea
                   required
                   name="message"
-                  rows={4}
-                  className="w-full px-8 py-6 bg-slate-50 border-none rounded-[2rem] focus:outline-none focus:ring-2 focus:ring-wellness-600/10 focus:bg-white transition-all resize-none font-bold text-slate-900 placeholder:text-slate-300 shadow-inner"
+                  rows={5}
+                  className="w-full px-5 py-4 bg-white border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-wellness-500 focus:ring-4 focus:ring-wellness-100 transition-all resize-none font-medium text-slate-900 placeholder:text-slate-400"
                   placeholder="Tell us what's on your mind..."
                 ></textarea>
               </div>
