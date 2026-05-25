@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ChevronRight, Home } from 'lucide-react';
+import { cn } from '../lib/utils';
 
 interface BreadcrumbItem {
   label: string;
@@ -9,9 +10,15 @@ interface BreadcrumbItem {
 
 interface BreadcrumbNavProps {
   items: BreadcrumbItem[];
+  /** Optional className applied to the wrapping <nav> — use for color overrides
+      on dark backgrounds (e.g., "text-white/70" inside the magazine hero). */
+  className?: string;
+  /** Color override for the active (last) item — defaults to slate-900.
+      Set to "text-white" when rendering on a dark background. */
+  activeClassName?: string;
 }
 
-export const BreadcrumbNav = ({ items }: BreadcrumbNavProps) => {
+export const BreadcrumbNav = ({ items, className, activeClassName }: BreadcrumbNavProps) => {
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -24,7 +31,10 @@ export const BreadcrumbNav = ({ items }: BreadcrumbNavProps) => {
   };
 
   return (
-    <nav className="flex items-center gap-2 text-xs font-bold text-slate-400 mb-8 overflow-x-auto no-scrollbar py-2">
+    <nav className={cn(
+      "flex items-center gap-2 text-xs font-bold text-slate-400 mb-8 overflow-x-auto no-scrollbar py-2",
+      className
+    )}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
@@ -41,7 +51,7 @@ export const BreadcrumbNav = ({ items }: BreadcrumbNavProps) => {
               {item.label}
             </Link>
           ) : (
-            <span className="text-slate-900 shrink-0">{item.label}</span>
+            <span className={cn("shrink-0", activeClassName ?? "text-slate-900")}>{item.label}</span>
           )}
         </React.Fragment>
       ))}

@@ -96,6 +96,12 @@ const TIMEZONE_MAP: Record<string, string> = {
 
 const DEFAULT_CLINIC_IMAGE = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg';
 
+// Beautiful default cover photo used as the magazine hero background for claimed
+// listings whose `image_url` is a logo (not a clinic interior photo). Stretches
+// edge-to-edge so the page feels premium regardless of what the clinic uploaded.
+const DEFAULT_HERO_BACKDROP =
+  'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-spa-reception-recliners.jpg';
+
 interface ProviderPageProps {
   params: Promise<{
     slug: string;
@@ -331,23 +337,106 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       
-      <main className="max-w-7xl mx-auto px-6 py-12">
-        {/* BREADCRUMB */}
-        <div className="mb-12">
-          <BreadcrumbNav 
-            items={[
-              { label: 'IV Therapy', href: '/search' },
-              { label: cityLabel, href: `/cities/${citySlug}` },
-              { label: provider.name }
-            ]} 
-          />
-        </div>
-
-        {provider.is_featured ? (
-          <div className="mb-12 bg-emerald-600 text-white py-4 px-8 rounded-3xl text-center font-black text-lg shadow-xl shadow-emerald-100 flex items-center justify-center gap-3">
-            <CheckCircle2 size={24} /> ✅ Verified & Claimed — This listing is managed by {displayName}
+      {/* MAGAZINE HERO — claimed listings only. Edge-to-edge cover photo with the
+          clinic logo as a small inset avatar and the clinic name in display type.
+          Solves the legacy "logo stretched across 384px" and "name wraps to 2 lines"
+          issues at the same time. */}
+      {provider.is_featured && (
+        <section className="relative w-full h-[60vh] min-h-[480px] overflow-hidden">
+          <div className="absolute inset-0">
+            <ResilientImage
+              src={DEFAULT_HERO_BACKDROP}
+              fallbackSrc="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2000&auto=format&fit=crop"
+              alt=""
+              fill
+              className="object-cover object-center"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-950/50 to-slate-950/85" />
           </div>
-        ) : (
+
+          <div className="relative h-full max-w-7xl mx-auto px-6 flex flex-col justify-end pb-12 md:pb-16">
+            <div className="mb-6">
+              <BreadcrumbNav
+                items={[
+                  { label: 'IV Therapy', href: '/search' },
+                  { label: cityLabel, href: `/cities/${citySlug}` },
+                  { label: provider.name }
+                ]}
+                className="!text-white/70 !mb-0"
+                activeClassName="text-white"
+              />
+            </div>
+
+            <div className="flex items-end gap-4 md:gap-6 mb-6">
+              {/* Logo as inset avatar — white background, ring, contains object so logos display cleanly */}
+              {provider.imageUrl && (
+                <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl md:rounded-3xl bg-white p-2 md:p-3 shadow-2xl ring-1 ring-white/30 shrink-0 flex items-center justify-center">
+                  <ResilientImage
+                    src={provider.imageUrl}
+                    fallbackSrc={DEFAULT_CLINIC_IMAGE}
+                    alt={`${provider.name} logo`}
+                    width={120}
+                    height={120}
+                    className="w-full h-full object-contain"
+                    fill={false}
+                  />
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="inline-flex items-center gap-1.5 bg-emerald-500/95 text-white text-[10px] font-black uppercase tracking-[0.15em] px-2.5 py-1 rounded-full mb-3 shadow-lg">
+                  <CheckCircle2 size={11} /> Verified Clinic
+                </div>
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.05] text-balance">
+                  {displayName}
+                </h1>
+              </div>
+            </div>
+
+            {/* Key facts row, overlaid on photo */}
+            <div className="flex flex-wrap gap-2 md:gap-3">
+              {provider.rating > 0 && provider.reviewCount > 0 && (
+                <div className="bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 shadow-md">
+                  <Star size={13} fill="currentColor" className="text-amber-500" />
+                  {provider.rating} · {provider.reviewCount} reviews
+                </div>
+              )}
+              <div className="bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 shadow-md">
+                <MapPin size={13} className="text-wellness-600" />
+                {provider.city}, {stateCode}
+              </div>
+              <div className="bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 shadow-md">
+                <span className={status.isOpen ? 'text-emerald-500' : 'text-amber-500'}>●</span>
+                {status.isOpen ? 'Open now' : 'Closed'}
+              </div>
+              {provider.price_range && (
+                <div className="bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 shadow-md">
+                  <span className="text-wellness-600">$</span>
+                  {provider.price_range}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <main className="max-w-7xl mx-auto px-6 py-12">
+        {/* BREADCRUMB — only show for unclaimed listings (claimed listings get the breadcrumb inside the hero) */}
+        {!provider.is_featured && (
+          <div className="mb-12">
+            <BreadcrumbNav
+              items={[
+                { label: 'IV Therapy', href: '/search' },
+                { label: cityLabel, href: `/cities/${citySlug}` },
+                { label: provider.name }
+              ]}
+            />
+          </div>
+        )}
+
+        {/* Verified-and-claimed confirmation banner suppressed for claimed listings —
+            the magazine hero above already shows the "Verified Clinic" pill prominently. */}
+        {!provider.is_featured && (
           <div className="mb-12 space-y-6">
             <ClaimListingTrigger
               provider={provider}
@@ -395,40 +484,23 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
           <div className="space-y-16">
             {/* HERO SECTION */}
             <section className="space-y-10">
-              <div className="flex flex-col md:flex-row gap-8 items-start">
-                <div>
-                  <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
-                    {displayName}
-                  </h1>
-                  
-                  {/* KEY FACTS ROW */}
-                  <div className="flex flex-wrap gap-2">
-                    {provider.is_featured && (
-                      provider.rating > 0 && provider.reviewCount > 0 ? (
-                        <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
-                          <span className="text-wellness-600">★</span> {provider.rating} · {provider.reviewCount} reviews
-                        </div>
-                      ) : (
-                        <div className="bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full text-[13px] font-black flex items-center gap-1.5 border border-emerald-100 uppercase tracking-wider">
-                          ✨ New Clinic · Be the first to review
-                        </div>
-                      )
-                    )}
-                    <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
-                      <span>📍</span> {provider.city}, {stateCode}
+              {/* H1 + key facts only render for UNCLAIMED listings — claimed
+                  listings get the magazine hero above with the same content
+                  in display type. */}
+              {!provider.is_featured && (
+                <div className="flex flex-col md:flex-row gap-8 items-start">
+                  <div>
+                    <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight text-balance max-w-3xl">
+                      {displayName}
+                    </h1>
+
+                    {/* KEY FACTS ROW */}
+                    <div className="flex flex-wrap gap-2">
+                      <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
+                        <span>📍</span> {provider.city}, {stateCode}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {provider.is_featured && (
-                <div className="relative w-full h-96 md:h-[28rem] rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-100 bg-slate-100">
-                  <ClinicImage
-                    name={provider.name}
-                    imageUrl={provider.imageUrl || DEFAULT_CLINIC_IMAGE}
-                    initials={' '}
-                    className="h-full w-full"
-                  />
                 </div>
               )}
 
@@ -481,12 +553,16 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 </div>
               )}
 
-                <div className="flex flex-wrap items-center gap-x-8 gap-y-4 text-base font-bold text-slate-500 mb-8">
-                  <div className="flex items-center gap-2">
-                    <MapPin size={20} className="text-wellness-600" />
-                    {provider.city}, {stateCode}
+                {/* Secondary city row only renders for unclaimed listings.
+                    Claimed listings get the city in the magazine hero badge row. */}
+                {!provider.is_featured && (
+                  <div className="flex flex-wrap items-center gap-x-8 gap-y-4 text-base font-bold text-slate-500 mb-8">
+                    <div className="flex items-center gap-2">
+                      <MapPin size={20} className="text-wellness-600" />
+                      {provider.city}, {stateCode}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* PHONE + WEBSITE ROW */}
                 {!provider.is_featured && (provider.phone || provider.website) && (
