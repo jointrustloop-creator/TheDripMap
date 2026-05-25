@@ -20,7 +20,7 @@ import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { BlogCard } from '../../../src/components/BlogCard';
-import { getBlogPostBySlug, getBlogPosts, slugify, getListingsByIds } from '../../../src/lib/data';
+import { getBlogPostBySlug, getBlogPosts, slugify, getListingsByIds, getAllCities } from '../../../src/lib/data';
 import { cn } from '../../../src/lib/utils';
 
 export const revalidate = 3600;
@@ -85,9 +85,21 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     .filter(p => p.slug !== post.slug && p.category === post.category)
     .slice(0, 2);
 
-  const relatedClinics = post.relatedClinics 
+  const relatedClinics = post.relatedClinics
     ? await getListingsByIds(post.relatedClinics)
     : [];
+
+  // Build a set of city slugs that actually have a /cities/<slug> page so
+  // the Related Locations chips don't link out to 404s for cities we wrote
+  // blog posts about but never created hub pages for.
+  const allCities = await getAllCities();
+  const validCitySlugs = new Set(allCities.map((c) => slugify(c.city)));
+  const cityLinkFor = (cityName: string): string => {
+    const slug = slugify(cityName);
+    return validCitySlugs.has(slug)
+      ? `/cities/${slug}`
+      : `/search?city=${encodeURIComponent(cityName)}`;
+  };
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -271,9 +283,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-6">Related Locations</h3>
                 <div className="flex flex-wrap gap-3">
                   {post.relatedCities.map((city, idx) => (
-                    <Link 
+                    <Link
                       key={idx}
-                      href={`/cities/${slugify(city)}`}
+                      href={cityLinkFor(city)}
                       className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-100 rounded-2xl text-sm font-bold text-slate-600 hover:border-wellness-600 hover:text-wellness-600 transition-all"
                     >
                       <MapPin size={14} /> {city}
