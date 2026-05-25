@@ -85,6 +85,15 @@ const nextConfig = {
         destination: '/providers/:slug',
         permanent: true,
       },
+      // SPECIFIC rule must come before the /iv-therapy/:state/:city catch-all
+      // below. Otherwise '/iv-therapy/treatment/<service>' gets interpreted as
+      // state=treatment, city=<service> and redirected to /cities/<service>
+      // which 404s. Land users on the real treatment page instead.
+      {
+        source: '/iv-therapy/treatment/:service',
+        destination: '/treatments/:service',
+        permanent: true,
+      },
       {
         source: '/iv-therapy/:state/:city',
         destination: '/cities/:city',
