@@ -25,6 +25,8 @@ import { SurveyState, OperatorProfile, Provider, City, TreatmentType } from '../
 import { getOperatorProfiles, getAllListings, getListingsByCity, slugify } from '../../../src/lib/data';
 import { ClinicImage } from '../../../src/components/ClinicImage';
 import { cn } from '../../../src/lib/utils';
+import { getSymptomById, hasSafetyFlag, SAFETY_FLAGS } from '../../../src/lib/symptom-treatments';
+import { ShieldAlert, Clock, DollarSign, CheckCircle2 } from 'lucide-react';
 
 export default function ResultsPage() {
   return (
@@ -112,18 +114,37 @@ function ResultsContent() {
     loadData();
   }, [searchParams]);
 
-  const surveyData: SurveyState = useMemo(() => ({
-    goal: searchParams.get('goal') || undefined,
-    city: (searchParams.get('city') as City) || undefined,
-    state: searchParams.get('state') || undefined,
-    lat: searchParams.get('lat') ? parseFloat(searchParams.get('lat')!) : undefined,
-    lng: searchParams.get('lng') ? parseFloat(searchParams.get('lng')!) : undefined,
-    country: searchParams.get('country') || undefined,
-    locationPreference: (searchParams.get('type') as TreatmentType) || undefined,
-    urgency: (searchParams.get('urgency') as 'ASAP' | 'Today' | 'This Week') || undefined,
-    budget: searchParams.get('budget') || undefined,
-    symptoms: searchParams.get('symptoms')?.split(',') || undefined,
-  }), [searchParams]);
+  const surveyData: SurveyState = useMemo(() => {
+    const symptomParam = searchParams.get('symptom') || searchParams.get('symptoms');
+    const safetyParam = searchParams.get('safety');
+    return {
+      goal: searchParams.get('goal') || undefined,
+      city: (searchParams.get('city') as City) || undefined,
+      state: searchParams.get('state') || undefined,
+      lat: searchParams.get('lat') ? parseFloat(searchParams.get('lat')!) : undefined,
+      lng: searchParams.get('lng') ? parseFloat(searchParams.get('lng')!) : undefined,
+      country: searchParams.get('country') || undefined,
+      locationPreference: (searchParams.get('type') as TreatmentType) || undefined,
+      urgency: (searchParams.get('urgency') as 'ASAP' | 'Today' | 'This Week') || undefined,
+      budget: searchParams.get('budget') || undefined,
+      symptoms: symptomParam ? symptomParam.split(',').filter(Boolean) : undefined,
+      medicalHistory: safetyParam && safetyParam !== 'none' ? [safetyParam] : undefined,
+    };
+  }, [searchParams]);
+
+  // Pull the recommended treatment for the visitor's chosen symptom.
+  // This is the source of the "Your recommended treatment" plan card.
+  const recommendation = useMemo(() => {
+    const sym = getSymptomById(surveyData.symptoms?.[0]);
+    return sym?.recommendedTreatment || null;
+  }, [surveyData.symptoms]);
+
+  const safetyTriggered = useMemo(() => hasSafetyFlag(surveyData.medicalHistory), [surveyData.medicalHistory]);
+  const safetyLabel = useMemo(() => {
+    const id = surveyData.medicalHistory?.[0];
+    if (!id) return null;
+    return SAFETY_FLAGS.find((f) => f.id === id)?.label || null;
+  }, [surveyData.medicalHistory]);
 
   const userLocation = useMemo(() => {
     if (surveyData.lat && surveyData.lng) {
@@ -380,13 +401,110 @@ function ResultsContent() {
         </div>
 
         <div className="space-y-20">
+          {/* SECTION 0 — PERSONALIZED PLAN (recommended treatment + safety callout) */}
+          {recommendation && (
+            <section className="space-y-8">
+              <div className="flex items-center gap-3">
+                <div className="h-px flex-1 bg-slate-100" />
+                <div className="flex items-center gap-2 text-wellness-600">
+                  <Sparkles size={16} />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">Your personalized plan</span>
+                </div>
+                <div className="h-px flex-1 bg-slate-100" />
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="bg-gradient-to-br from-wellness-50 via-white to-amber-50/40 rounded-[2.5rem] border-2 border-wellness-100 overflow-hidden shadow-xl"
+              >
+                <div className="p-8 md:p-12">
+                  <p className="text-xs font-black uppercase tracking-[0.25em] text-wellness-600 mb-3">
+                    Based on your answers, you likely want
+                  </p>
+                  <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">
+                    {recommendation.name}
+                  </h2>
+                  <p className="text-lg text-slate-700 leading-relaxed mb-6 max-w-3xl">
+                    <span className="font-bold text-slate-900">What it is:</span> {recommendation.what}
+                  </p>
+                  <p className="text-base text-slate-600 leading-relaxed mb-8 max-w-3xl">
+                    <span className="font-bold text-slate-900">Why this fits you:</span> {recommendation.why}
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-4 mb-8 max-w-md">
+                    <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
+                      <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5 mb-1.5">
+                        <DollarSign size={11} /> Typical cost
+                      </div>
+                      <div className="text-sm font-black text-slate-900 leading-tight">
+                        {recommendation.typicalCost}
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
+                      <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5 mb-1.5">
+                        <Clock size={11} /> Session length
+                      </div>
+                      <div className="text-sm font-black text-slate-900 leading-tight">
+                        {recommendation.duration}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-2xl border-2 border-slate-100 p-6 max-w-3xl">
+                    <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-700 mb-4 flex items-center gap-2">
+                      <CheckCircle2 size={14} className="text-wellness-600" />
+                      Ask the clinic before you book
+                    </p>
+                    <ul className="space-y-2.5">
+                      {recommendation.askBeforeBooking.map((q, i) => (
+                        <li key={i} className="flex items-start gap-3 text-sm text-slate-700 leading-relaxed">
+                          <span className="text-wellness-600 font-black shrink-0 mt-0.5">→</span>
+                          <span>{q}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Safety callout — only when visitor flagged a condition */}
+              {safetyTriggered && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="bg-amber-50 border-2 border-amber-200 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-start gap-5"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                    <ShieldAlert size={22} />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-black text-amber-900 mb-2 tracking-tight">
+                      Important — you flagged: {safetyLabel}
+                    </h3>
+                    <p className="text-sm text-amber-900 leading-relaxed mb-3">
+                      Talk to your primary doctor before any IV therapy session. Below, we&apos;ve prioritized clinics that have an MD, NP, or DO on the team — look for the &ldquo;MD oversight&rdquo; badge on the cards.
+                    </p>
+                    <p className="text-xs text-amber-800 font-bold">
+                      TheDripMap is a directory, not a medical provider. This isn&apos;t medical advice.
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </section>
+          )}
+
           {/* SECTION 1 — "BEST MATCH" */}
           <section className="space-y-8">
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-slate-100" />
               <div className="flex items-center gap-2 text-wellness-600">
                 <Sparkles size={16} className="animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Our #1 Recommendation: Best Match</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                  {recommendation ? 'Clinics that offer this protocol' : 'Our #1 Recommendation: Best Match'}
+                </span>
               </div>
               <div className="h-px flex-1 bg-slate-100" />
             </div>
@@ -417,6 +535,11 @@ function ResultsContent() {
                     )}
                     {topMatch.is_top_rated && (
                       <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg">⭐ Top Rated</span>
+                    )}
+                    {(topMatch as { hasMdOversight?: boolean }).hasMdOversight && (
+                      <span className="bg-amber-700 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1">
+                        <ShieldAlert size={10} /> MD oversight
+                      </span>
                     )}
                   </div>
                 </div>
@@ -453,9 +576,9 @@ function ResultsContent() {
                   </div>
 
                   <div className="bg-wellness-50 rounded-2xl p-6 mb-8 border border-wellness-100 relative">
-                    <div className="absolute -top-3 left-6 bg-wellness-600 text-white px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">Match Reason</div>
-                    <p className="text-wellness-900 font-medium leading-relaxed italic">
-                      &quot;{getMatchReason(topMatch)}&quot;
+                    <div className="absolute -top-3 left-6 bg-wellness-600 text-white px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">Why this match</div>
+                    <p className="text-wellness-900 font-medium leading-relaxed">
+                      {(topMatch as { matchReason?: string }).matchReason || getMatchReason(topMatch)}
                     </p>
                   </div>
 

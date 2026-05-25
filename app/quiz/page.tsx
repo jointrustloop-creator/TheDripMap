@@ -2,10 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  Zap, 
-  MapPin, 
-  ShieldCheck, 
+import {
+  Zap,
+  MapPin,
+  ShieldCheck,
   Activity,
   Heart,
   Sparkles,
@@ -19,7 +19,13 @@ import {
   Calendar,
   Building2,
   Home,
-  X
+  X,
+  Battery,
+  Plane,
+  Brain,
+  Droplet,
+  HelpCircle,
+  ShieldAlert,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SurveyState } from '../../src/types';
@@ -29,56 +35,67 @@ import { Logo } from '../../src/components/Logo';
 import { getUserLocation, getIPLocation } from '../../src/lib/geo';
 import { getAllCities, GTA_CITIES } from '../../src/lib/data';
 
+// 5-step quiz, restructured around solving a problem instead of collecting filter values.
+// Step 2 asks symptoms (plain language) instead of treatment names — visitors don't know
+// what NAD+ is, they know they feel wiped out. Step 3 is a safety pre-screen that boosts
+// clinics with MD/NP oversight when the visitor flags a condition.
 const STEPS = [
   {
     id: 'city',
-    question: "Where are you located?",
-    description: "We'll show you clinics in your area first. We try to auto-detect — confirm or edit below.",
-    type: 'location'
+    question: 'Where are you located?',
+    description: 'We\'ll find clinics nearest to you. Confirm or edit below — we try to auto-detect.',
+    type: 'location',
   },
   {
-    id: 'goal',
-    question: "What's your primary wellness goal today?",
-    description: "We'll match you with clinics specializing in your specific needs.",
+    id: 'symptoms',
+    question: 'Which best describes how you\'re feeling?',
+    description: 'Pick the one that fits best — we\'ll recommend a treatment, then match clinics that offer it.',
     options: [
-      { id: 'Energy Boost', label: 'Energy Boost', icon: <Zap size={24} />, desc: 'Fight fatigue and mental fog' },
-      { id: 'Immunity', label: 'Immune Support', icon: <ShieldCheck size={24} />, desc: 'Bolster your natural defenses' },
-      { id: 'Hangover', label: 'Hangover Relief', icon: <Heart size={24} />, desc: 'Rapid recovery and rehydration' },
-      { id: 'Beauty', label: 'Beauty & Glow', icon: <Sparkles size={24} />, desc: 'Skin, hair, and nail health' },
-      { id: 'Athletic', label: 'Athletic Recovery', icon: <Dumbbell size={24} />, desc: 'Muscle repair and hydration' },
-      { id: 'NAD+', label: 'NAD+ Therapy', icon: <Activity size={24} />, desc: 'Longevity and cellular repair' },
-    ]
+      { id: 'wiped-out', label: "I'm wiped out", icon: <Battery size={24} />, desc: 'Low energy, foggy, dragging' },
+      { id: 'fighting-cold', label: "Fighting a cold", icon: <ShieldCheck size={24} />, desc: 'Run-down, post-illness' },
+      { id: 'hungover', label: "I'm hungover", icon: <Heart size={24} />, desc: 'Need to feel human fast' },
+      { id: 'event-prep', label: 'Big event coming up', icon: <Sparkles size={24} />, desc: 'Wedding, photoshoot, vacation' },
+      { id: 'flying', label: 'Flying soon / just landed', icon: <Plane size={24} />, desc: 'Pre or post flight' },
+      { id: 'workout-recovery', label: 'Hard workout recovery', icon: <Dumbbell size={24} />, desc: 'Sore, depleted, training' },
+      { id: 'mental-sharp', label: 'Want to feel sharper', icon: <Brain size={24} />, desc: 'Focus, clarity, performance' },
+      { id: 'skin-goals', label: 'Skin & glow goals', icon: <Sparkles size={24} />, desc: 'Long-term skin clarity' },
+      { id: 'iron', label: 'Iron / anemia diagnosed', icon: <Droplet size={24} />, desc: 'Confirmed low iron or ferritin' },
+      { id: 'just-curious', label: "Not sure — show options", icon: <HelpCircle size={24} />, desc: 'Browsing, help me understand' },
+    ],
+  },
+  {
+    id: 'medicalHistory',
+    question: 'Before we match you — anything we should know?',
+    description: 'This helps us prioritize clinics with proper medical oversight for your case. Pick one — your data stays private.',
+    options: [
+      { id: 'none', label: 'None of these apply', icon: <CheckCircle2 size={24} />, desc: 'Healthy, no medications' },
+      { id: 'pregnant', label: 'Pregnant or breastfeeding', icon: <ShieldAlert size={24} />, desc: 'Show clinics with MD on-site' },
+      { id: 'kidney', label: 'Kidney condition', icon: <ShieldAlert size={24} />, desc: 'Affects fluid volume tolerance' },
+      { id: 'heart', label: 'Heart condition', icon: <ShieldAlert size={24} />, desc: 'Affects IV rate / volume' },
+      { id: 'blood-thinners', label: 'On blood thinners', icon: <ShieldAlert size={24} />, desc: 'Some additives interact' },
+      { id: 'diabetic', label: 'Diabetic', icon: <ShieldAlert size={24} />, desc: 'Some additives affect glucose' },
+    ],
   },
   {
     id: 'locationPreference',
-    question: "How would you like to receive treatment?",
-    description: "Choose between visiting a clinic or having a nurse come to you.",
+    question: 'How would you like to receive treatment?',
+    description: 'Visit a clinic, or have a licensed nurse come to you.',
     options: [
-      { id: 'In-Clinic', label: 'Visit a Clinic', icon: <Building2 size={24} />, desc: 'Relax in a professional medical lounge' },
-      { id: 'Mobile', label: 'Mobile IV', icon: <Home size={24} />, desc: 'Treatment at your home, office, or hotel' },
-      { id: 'Both', label: 'No Preference', icon: <MapPin size={24} />, desc: 'Show me all available options' },
-    ]
-  },
-  {
-    id: 'urgency',
-    question: "When do you need your treatment?",
-    description: "Some providers offer rapid 60-minute dispatch for mobile services.",
-    options: [
-      { id: 'ASAP', label: 'As Soon As Possible', icon: <Zap size={24} />, desc: 'Emergency or rapid relief needed' },
-      { id: 'Today', label: 'Later Today', icon: <Sun size={24} />, desc: 'Planning for a session today' },
-      { id: 'This Week', label: 'Sometime This Week', icon: <Calendar size={24} />, desc: 'Regular wellness maintenance' },
-    ]
+      { id: 'In-Clinic', label: 'Visit a Clinic', icon: <Building2 size={24} />, desc: 'Relax in a medical lounge' },
+      { id: 'Mobile', label: 'Mobile IV', icon: <Home size={24} />, desc: 'Home, office, hotel' },
+      { id: 'Both', label: 'No Preference', icon: <MapPin size={24} />, desc: 'Show me all options' },
+    ],
   },
   {
     id: 'budget',
-    question: "What's your budget for this session?",
-    description: "We'll find clinics that match your price range.",
+    question: 'What\'s your budget for this session?',
+    description: 'We\'ll match you with clinics in your price range. You can always upgrade in-clinic.',
     options: [
-      { id: 'Under $100', label: 'Under $100', icon: <DollarSign size={24} />, desc: 'Basic hydration and recovery' },
-      { id: '$100 – $200', label: '$100 – $200', icon: <DollarSign size={24} />, desc: 'Standard IV drip packages' },
-      { id: '$200 – $400', label: '$200 – $400', icon: <DollarSign size={24} />, desc: 'Premium formulas and add-ons' },
-      { id: '$400+', label: '$400+', icon: <DollarSign size={24} />, desc: 'Concierge and NAD+ protocols' },
-    ]
+      { id: 'Under $100', label: 'Under $100', icon: <DollarSign size={24} />, desc: 'Basic hydration' },
+      { id: '$100 – $200', label: '$100 – $200', icon: <DollarSign size={24} />, desc: 'Standard wellness drips' },
+      { id: '$200 – $400', label: '$200 – $400', icon: <DollarSign size={24} />, desc: 'Premium with add-ons' },
+      { id: '$400+', label: '$400+', icon: <DollarSign size={24} />, desc: 'Concierge / NAD+' },
+    ],
   },
 ];
 
@@ -161,9 +178,19 @@ export default function QuizPage() {
   }, []);
 
   const handleOptionSelect = (id: string, value: string) => {
-    const newData = { ...data, [id]: value };
+    // symptoms and medicalHistory are typed as string[] on SurveyState — wrap.
+    // medicalHistory 'none' means the visitor explicitly opted out; store an
+    // empty array so hasSafetyFlag() returns false.
+    let newData: SurveyState;
+    if (id === 'symptoms') {
+      newData = { ...data, symptoms: [value] };
+    } else if (id === 'medicalHistory') {
+      newData = { ...data, medicalHistory: value === 'none' ? [] : [value] };
+    } else {
+      newData = { ...data, [id]: value };
+    }
     setData(newData);
-    
+
     if (step < STEPS.length - 1) {
       setStep(step + 1);
     } else {
@@ -270,6 +297,10 @@ export default function QuizPage() {
         }
       }
 
+      // Carry the new symptom-based answers + optional safety flag through.
+      // We keep `goal` in the URL too for backwards compat with any old links.
+      if (finalData.symptoms?.[0]) query.set('symptom', finalData.symptoms[0]);
+      if (finalData.medicalHistory?.[0]) query.set('safety', finalData.medicalHistory[0]);
       if (finalData.goal) query.set('goal', finalData.goal);
       if (finalCity) query.set('city', finalCity);
       if (finalState) query.set('state', finalState);
@@ -277,7 +308,6 @@ export default function QuizPage() {
       if (finalData.lng) query.set('lng', finalData.lng.toString());
       if (finalCountry) query.set('country', finalCountry);
       if (finalData.locationPreference) query.set('type', finalData.locationPreference);
-      if (finalData.urgency) query.set('urgency', finalData.urgency);
       if (finalData.budget) query.set('budget', finalData.budget);
       
       router.push(`/quiz/results?${query.toString()}`);
@@ -465,31 +495,39 @@ export default function QuizPage() {
                 currentStep.options && currentStep.options.length > 4 ? "grid-cols-2 md:grid-cols-2" : "grid-cols-1 md:grid-cols-2"
               )}>
                 {currentStep.options ? (
-                  currentStep.options.map((option) => (
-                    <button
-                      key={option.id}
-                      onClick={() => handleOptionSelect(currentStep.id, option.id)}
-                      className={cn(
-                        "flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all group",
-                        data[currentStep.id as keyof SurveyState] === option.id 
-                          ? "border-wellness-600 bg-wellness-50 shadow-md" 
-                          : "border-slate-100 bg-white hover:border-wellness-200 hover:bg-slate-50/50"
-                      )}
-                    >
-                      <div className={cn(
-                        "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all",
-                        data[currentStep.id as keyof SurveyState] === option.id 
-                          ? "bg-wellness-600 text-white" 
-                          : "bg-slate-50 text-slate-400 group-hover:text-wellness-600"
-                      )}>
-                        {React.cloneElement(option.icon as React.ReactElement<IconProps>, { size: 18 })}
-                      </div>
-                      <div className="min-w-0">
-                        <h4 className="font-bold text-slate-900 text-sm mb-0.5 leading-none">{option.label}</h4>
-                        {option.desc && <p className="text-[10px] text-slate-500 truncate">{option.desc}</p>}
-                      </div>
-                    </button>
-                  ))
+                  currentStep.options.map((option) => {
+                    // Array-shaped fields (symptoms, medicalHistory) — check membership.
+                    // Scalar fields — direct equality.
+                    const stored = data[currentStep.id as keyof SurveyState];
+                    const isSelected = Array.isArray(stored)
+                      ? stored.includes(option.id)
+                      : stored === option.id;
+                    return (
+                      <button
+                        key={option.id}
+                        onClick={() => handleOptionSelect(currentStep.id, option.id)}
+                        className={cn(
+                          "flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all group",
+                          isSelected
+                            ? "border-wellness-600 bg-wellness-50 shadow-md"
+                            : "border-slate-100 bg-white hover:border-wellness-200 hover:bg-slate-50/50"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all",
+                          isSelected
+                            ? "bg-wellness-600 text-white"
+                            : "bg-slate-50 text-slate-400 group-hover:text-wellness-600"
+                        )}>
+                          {React.cloneElement(option.icon as React.ReactElement<IconProps>, { size: 18 })}
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-slate-900 text-sm mb-0.5 leading-none">{option.label}</h4>
+                          {option.desc && <p className="text-[10px] text-slate-500 truncate">{option.desc}</p>}
+                        </div>
+                      </button>
+                    );
+                  })
                 ) : currentStep.type === 'location' ? (
                   <div className="col-span-1 md:col-span-2 space-y-4 max-w-md mx-auto w-full">
                     <div className="relative">

@@ -1,4 +1,14 @@
 import { Provider, SurveyState, OperatorProfile } from '../types';
+import { getKeywordsForSymptom, hasSafetyFlag } from './symptom-treatments';
+
+export interface MatchedProvider extends Provider {
+  matchScore: number;
+  distance?: number;
+  /** One-liner explaining why this clinic surfaced for the visitor's answers */
+  matchReason?: string;
+  /** Visitor flagged a safety condition AND this clinic shows MD/NP oversight */
+  hasMdOversight?: boolean;
+}
 
 function getDistance(lat1: number, lng1: number, lat2: number, lng2: number) {
   const R = 3959; // Earth radius in miles
@@ -181,48 +191,50 @@ export function matchProviders(
     else if (p.reviewCount >= 50) score += 3;
     else if (p.reviewCount >= 10) score += 1;
 
-    // 2.3 Featured and Verified Bonuses
-    if (p.is_featured) score += 1000;
+    // 2.3 Featured and Verified Bonuses.
+    // Was +1000 — that pinned claimed clinics to the top regardless of fit.
+    // Quiz is supposed to recommend the best MATCH; +15 gives claimed clinics
+    // a fair tiebreaker among similar-quality clinics without burying a much
+    // better non-claimed match.
+    if (p.is_featured) score += 15;
     if (p.is_verified) score += 8;
 
-    // 3. User Goal (Specialties & Keywords)
-    if (answers.goal) {
-      const goal = answers.goal.toLowerCase();
-      const pSpecialties = (p.specialties || []).map(s => s.toLowerCase());
-      const pSubtypes = (p.subtypes || []).map(s => s.toLowerCase());
+    // 3. Symptom → Treatment keyword match.
+    // We use the visitor's chosen symptom (e.g. "fighting-cold") to look up
+    // a set of treatment-related keywords from symptom-treatments.ts and check
+    // whether this clinic mentions any of them in name/specialties/description.
+    let matchedSymptomKeyword = false;
+    const symptomId = answers.symptoms?.[0] || answers.goal;
+    if (symptomId) {
+      const keywords = getKeywordsForSymptom(symptomId);
+      const pSpecialties = (p.specialties || []).map((s) => (s || '').toLowerCase());
+      const pSubtypes = (p.subtypes || []).map((s) => (s || '').toLowerCase());
       const pName = p.name.toLowerCase();
       const pDesc = (p.description || '').toLowerCase();
-
-      // Define keyword mappings for goals
-      const goalKeywords: Record<string, string[]> = {
-        'hangover': ['hangover', 'hydration', 'recovery', 'rehydrate'],
-        'nad-plus': ['nad', 'nicotinamide', 'anti-aging', 'energy'],
-        'immune-support': ['immune', 'wellness', 'vitamin c', 'zinc', 'immunity', 'shield', 'defense', 'defender', 'glutathione'],
-        'beauty-glow': ['beauty', 'glow', 'skin', 'hair', 'nails', 'collagen', 'glutathione', 'skin glow'],
-        'weight-loss': ['weight', 'metabolism', 'fat', 'slim', 'semaglutide', 'tirzepatide', 'mic', 'lipo'],
-        'hydration': ['hydration', 'rehydrate', 'fluids', 'saline'],
-        'recovery': ['recovery', 'athletic', 'sport', 'muscle', 'performance'],
-        'myers-cocktail': ['myers', 'cocktail', 'multivitamin']
-      };
-
-      const keywords = goalKeywords[goal] || [goal];
-      
-      // Check specialties, subtypes, name, and description for keywords
-      const hasKeyword = keywords.some(kw => 
-        pSpecialties.some(s => s.includes(kw)) || 
-        pSubtypes.some(s => s.includes(kw)) ||
+      matchedSymptomKeyword = keywords.some((kw) =>
+        pSpecialties.some((s) => s.includes(kw)) ||
+        pSubtypes.some((s) => s.includes(kw)) ||
         pName.includes(kw) ||
         pDesc.includes(kw)
       );
+      if (matchedSymptomKeyword) score += 30;
+    }
 
-      if (hasKeyword) {
-        score += 30; // Significant boost for goal match
-      }
-      
-      // Also check for exact goal match in specialties
-      if (pSpecialties.some(s => s.includes(goal))) {
-        score += 10;
-      }
+    // 3b. Safety flag → MD oversight boost.
+    // If the visitor flagged a condition (pregnant, kidney, heart, blood
+    // thinners, diabetic), clinics with an MD/NP on record get a meaningful
+    // boost — both for safety and so we can show a "qualified for your case"
+    // label on the result card.
+    let hasMdOversight = false;
+    if (hasSafetyFlag(answers.medicalHistory)) {
+      const creds = (profile?.credentials || '').toLowerCase();
+      hasMdOversight =
+        (p.medical_team != null && p.medical_team.length > 0) ||
+        creds.includes('md') ||
+        creds.includes('np') ||
+        creds.includes('do') ||
+        creds.includes('physician');
+      if (hasMdOversight) score += 40;
     }
 
     // 4. Delivery Preference
@@ -244,8 +256,9 @@ export function matchProviders(
       // Bonus for profile completion
       score += 5;
 
-      // clinic primary_specialty matches patient goal
-      if (answers.goal && data.primarySpecialty && typeof data.primarySpecialty === 'string' && data.primarySpecialty.toLowerCase().includes(answers.goal.toLowerCase())) {
+      // clinic primary_specialty matches patient goal/symptom
+      const symptomOrGoal = answers.symptoms?.[0] || answers.goal;
+      if (symptomOrGoal && data.primarySpecialty && typeof data.primarySpecialty === 'string' && data.primarySpecialty.toLowerCase().includes(symptomOrGoal.toLowerCase())) {
         score += 20;
       }
 
@@ -265,11 +278,25 @@ export function matchProviders(
       }
     }
 
-    return { ...p, matchScore: score, distance };
+    // Compute a single human-readable "why this clinic showed up"
+    let matchReason: string | undefined;
+    if (hasMdOversight) {
+      matchReason = 'Has MD/NP oversight — fits your safety profile';
+    } else if (distance != null && distance < 5) {
+      matchReason = 'Closest clinic to you';
+    } else if (matchedSymptomKeyword) {
+      matchReason = 'Offers the protocol you\'re looking for';
+    } else if (isMobile && answers.locationPreference === 'Mobile') {
+      matchReason = 'Mobile — comes to you';
+    } else if (p.rating && p.rating >= 4.8) {
+      matchReason = `Top-rated in ${p.city}`;
+    }
+
+    return { ...p, matchScore: score, distance, matchReason, hasMdOversight };
   });
 
   // Deduplication Logic - 100% Unique result set
-  const uniqueMatches: (Provider & { matchScore: number; distance?: number })[] = [];
+  const uniqueMatches: MatchedProvider[] = [];
   const seenNames = new Set<string>();
   const seenIds = new Set<string>();
 
