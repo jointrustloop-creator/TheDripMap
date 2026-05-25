@@ -202,7 +202,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
   // Top-rated heuristic — there's no is_top_rated column. Define "top rated" as
   // rating >= 4.7 AND at least 20 reviews so we don't surface fluke 5-star/1-review listings.
   const isTopRated = (p: Provider): boolean => {
-    return (p.rating ?? 0) >= 4.7 && (p.reviewCount ?? p.reviews ?? 0) >= 20;
+    return (p.rating ?? 0) >= 4.7 && (p.reviewCount ?? 0) >= 20;
   };
 
   useEffect(() => {
