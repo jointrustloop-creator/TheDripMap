@@ -277,10 +277,14 @@ export async function getListingsByCity(city: string, state?: string) {
           // HARD FILTER: State must match if provided
           query = query.or(`state.ilike.${statePattern},state.ilike.${abbrPattern}`);
           
-          // Enforcement: Ensure we don't match cross-country if we have a state like KY
+          // Enforcement: Ensure we don't match cross-country if we have a state like KY.
+          // Providers table was normalized to 'United States' as the canonical US value;
+          // before normalization, .eq('country', 'US') silently mismatched 530 of 587 US
+          // providers, triggering the state-wide fallback and bloating city counts
+          // (e.g., Houston showed 37 Texas providers instead of 8 Houston ones).
           const isUSState = Object.values(STATE_MAP).includes(stateAbbr.toUpperCase()) && stateAbbr.toUpperCase() !== 'ON';
           if (isUSState) {
-            query = query.eq('country', 'US');
+            query = query.eq('country', 'United States');
           }
         }
       }
