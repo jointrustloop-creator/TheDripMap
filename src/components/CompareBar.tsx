@@ -23,6 +23,7 @@ export const CompareBar = () => {
         const { data } = await supabase
           .from('providers')
           .select('id, name, city, image_url, is_featured, rating, slug')
+          .neq('availability', false)
           .in('id', ids);
         if (!cancelled && data) {
           // Preserve selection order

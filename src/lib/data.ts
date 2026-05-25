@@ -241,6 +241,7 @@ export async function getListingsByCity(city: string, state?: string) {
       const { data: zipData, error: zipError } = await supabase
         .from('providers')
         .select('*')
+        .neq('availability', false)
         .ilike('address', `%${searchCity.substring(0, 5)}%`)
         .order('is_featured', { ascending: false })
         .order('rating', { ascending: false, nullsFirst: false })
@@ -253,7 +254,7 @@ export async function getListingsByCity(city: string, state?: string) {
 
     // 2. Standard Search
     const tryQuery = async (cityName: string, stateName?: string) => {
-      let query = supabase.from('providers').select('*');
+      let query = supabase.from('providers').select('*').neq('availability', false);
       
       const gtaCitiesLower = GTA_CITIES.map(c => c.toLowerCase());
       const isGTA = gtaCitiesLower.includes(cityName.toLowerCase()) || cityName.toLowerCase() === 'gta' || cityName.toLowerCase() === 'ontario';
@@ -352,8 +353,9 @@ export async function getListingsByState(state: string) {
     let query = supabase
       .from('providers')
       .select('*')
+      .neq('availability', false)
       .or(`state.ilike.${state},state.ilike.${stateAbbr}`);
-    
+
     if (isUSState) {
       query = query.ilike('country', '%United%');
     } else if (stateAbbr.toUpperCase() === 'ON' || state.toLowerCase() === 'ontario') {
@@ -735,6 +737,7 @@ export async function getListingsByService(service: string, limit: number = 4) {
     const { data, error } = await supabase
       .from('providers')
       .select('*')
+      .neq('availability', false)
       .or(filter)
       .order('is_featured', { ascending: false })
       .order('rating', { ascending: false, nullsFirst: false })
@@ -773,8 +776,8 @@ export async function searchListings(query: string, city?: string) {
   }
 
   try {
-    let q = supabase.from('providers').select('*');
-    
+    let q = supabase.from('providers').select('*').neq('availability', false);
+
     if (city && city !== 'All') {
       const gtaCitiesLower = GTA_CITIES.map(c => c.toLowerCase());
       const isGTA = gtaCitiesLower.includes(city.toLowerCase()) || city.toLowerCase() === 'gta' || city.toLowerCase() === 'ontario';
@@ -838,8 +841,9 @@ export async function getFeaturedListings(limit: number = 6, city?: string) {
     let q = supabase
       .from('providers')
       .select('*')
+      .neq('availability', false)
       .eq('is_featured', true);
-      
+
     if (city && city !== 'All') {
       q = q.ilike('city', `%${city}%`);
     }
@@ -1192,6 +1196,7 @@ export async function getAllListings() {
     const { data, error } = await supabase
       .from('providers')
       .select('*')
+      .neq('availability', false)
       .order('is_featured', { ascending: false })
       .order('rating', { ascending: false, nullsFirst: false })
       .limit(2000);
@@ -1210,6 +1215,7 @@ export async function getListingsByIds(ids: string[]) {
     const { data, error } = await supabase
       .from('providers')
       .select('*')
+      .neq('availability', false)
       .in('id', ids)
       .order('is_featured', { ascending: false })
       .order('rating', { ascending: false, nullsFirst: false });
@@ -1224,15 +1230,16 @@ export async function getListingsByIds(ids: string[]) {
 
 export async function getListingsByServiceAndCity(service: string, city: string, limit: number = 4) {
   if (!isSupabaseConfigured()) return [];
-  
+
   try {
     const filter = getServiceFilter(service);
     // Use a broader city match (ilike %city%) to handle "New York" vs "New York City"
     const cityPattern = `%${city}%`;
-    
+
     const response = await supabase
       .from('providers')
       .select('*')
+      .neq('availability', false)
       .ilike('city', cityPattern)
       .or(filter)
       .order('is_featured', { ascending: false })
@@ -1251,6 +1258,7 @@ export async function getListingsByServiceAndCity(service: string, city: string,
       const { data: fallbackData, error: fallbackError } = await supabase
         .from('providers')
         .select('*')
+        .neq('availability', false)
         .ilike('city', cityPattern)
         .or(broadFilter)
         .order('is_featured', { ascending: false })
@@ -1353,6 +1361,7 @@ export async function getSimilarClinics(currentSlug: string, city: string, state
     const { data: cityData, error: cityError } = await supabase
       .from('providers')
       .select('*')
+      .neq('availability', false)
       .eq('city', city)
       .neq('slug', currentSlug)
       .order('is_featured', { ascending: false })
@@ -1360,7 +1369,7 @@ export async function getSimilarClinics(currentSlug: string, city: string, state
       .limit(limit);
 
     if (cityError) throw cityError;
-    
+
     let results = (cityData || []).map(enrichProvider);
 
     // 2. If not enough in the city, find some in the same state
@@ -1369,6 +1378,7 @@ export async function getSimilarClinics(currentSlug: string, city: string, state
       const { data: stateData, error: stateError } = await supabase
         .from('providers')
         .select('*')
+        .neq('availability', false)
         .eq('state', state)
         .neq('city', city) // Don't pick up city clinics again
         .neq('slug', currentSlug)
