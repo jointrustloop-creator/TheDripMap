@@ -22,7 +22,7 @@ export const CompactCityGrid = ({ cities }: CompactCityGridProps) => {
             Browse IV Therapy by City
           </h2>
           <p className="text-xl text-slate-500 leading-relaxed">
-            Find top-rated clinics in {cities.length} cities across the United States
+            Find top-rated clinics in {cities.length} cities across the US and Canada
           </p>
         </div>
 

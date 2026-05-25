@@ -179,7 +179,7 @@ export default async function HomePage() {
               </div>
               <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[11px] font-black text-white/60 uppercase tracking-[0.2em] mt-4">
                 <span className="flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full">{stats.total} Verified Clinics</span>
-                <span className="flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full">{stats.cities} US Cities</span>
+                <span className="flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full">{stats.cities} US & Canadian Cities</span>
               </div>
             </div>
           </div>
