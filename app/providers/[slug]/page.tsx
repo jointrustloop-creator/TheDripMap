@@ -517,21 +517,26 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                     <p className="text-2xl md:text-3xl lg:text-[2rem] font-medium text-slate-900 leading-snug italic max-w-3xl mb-8 tracking-tight">
                       {profile.one_liner || profile.profile_data.oneLiner}
                     </p>
-                    {(profile.owner_name || profile.ownerName || profile.profile_data?.ownerName) && (
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center font-black text-sm shrink-0">
-                          {((profile.owner_name || profile.ownerName || profile.profile_data?.ownerName) as string).trim().charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <div className="text-sm font-black text-slate-900">
-                            — {profile.owner_name || profile.ownerName || profile.profile_data?.ownerName}
+                    {(() => {
+                      // OperatorProfile type doesn't declare ownerName inside profile_data, but
+                      // the actual DB row does carry it. Cast through unknown to access safely.
+                      const pdAny = profile.profile_data as unknown as { ownerName?: string };
+                      const ownerName = profile.owner_name || profile.ownerName || pdAny?.ownerName;
+                      if (!ownerName) return null;
+                      return (
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center font-black text-sm shrink-0">
+                            {ownerName.trim().charAt(0).toUpperCase()}
                           </div>
-                          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                            Owner, {displayName}
+                          <div>
+                            <div className="text-sm font-black text-slate-900">— {ownerName}</div>
+                            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                              Owner, {displayName}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      );
+                    })()}
                   </div>
                 </section>
               )}
