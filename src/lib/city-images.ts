@@ -7,9 +7,11 @@
 // (see getCityGradient below).
 
 export const CITY_PHOTOS: Record<string, string> = {
-  // Populated by scripts/curate-city-photos.js (sub-agent research).
-  // Initial empty — the gradient fallback covers every city until real
-  // photos are added.
+  // Photos are intentionally empty for now. A prior population attempt used
+  // Unsplash *page* IDs (e.g. "H60r6cRvWAM") instead of CDN *photo* IDs
+  // (which look like "1485871981521-5b1fd3805eee"), so every URL 404'd.
+  // The gradient fallback below covers all 305 cities until real photos
+  // are added via an Unsplash API key or hand-curated CDN URLs.
 };
 
 export function getCityPhoto(slug: string): string | null {
