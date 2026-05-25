@@ -2,11 +2,12 @@
 
 import React from 'react';
 import { motion } from 'motion/react';
-import { 
-  Building2, 
-  Map, 
-  Globe, 
-  CheckCircle2
+import {
+  Building2,
+  Map,
+  Globe,
+  Star,
+  CheckCircle2,
 } from 'lucide-react';
 
 interface TrustSignalsProps {
@@ -19,24 +20,36 @@ interface TrustSignalsProps {
 }
 
 export const TrustSignals = ({ stats: dynamicStats }: TrustSignalsProps) => {
+  // Use the real computed avg rating; fall back to a sensible default only if NaN
+  const ratingValue =
+    typeof dynamicStats?.avgRating === 'number' && !isNaN(dynamicStats.avgRating) && dynamicStats.avgRating > 0
+      ? dynamicStats.avgRating.toFixed(1)
+      : '4.9';
+
   const stats = [
-    { 
-      label: 'Clinics listed', 
-      value: dynamicStats?.totalListings?.toString() || '...', 
+    {
+      label: 'Clinics listed',
+      value: dynamicStats?.totalListings?.toString() || '...',
       icon: <Building2 className="text-wellness-600" size={24} />,
-      suffix: '+'
+      suffix: '+',
     },
-    { 
-      label: 'Cities covered', 
-      value: dynamicStats?.totalCities?.toString() || '...', 
+    {
+      label: 'Cities covered',
+      value: dynamicStats?.totalCities?.toString() || '...',
       icon: <Map className="text-wellness-600" size={24} />,
-      suffix: '+'
+      suffix: '+',
     },
-    { 
-      label: 'States represented', 
-      value: dynamicStats?.totalStates?.toString() || '...', 
+    {
+      label: 'States & provinces',
+      value: dynamicStats?.totalStates?.toString() || '...',
       icon: <Globe className="text-wellness-600" size={24} />,
-      suffix: '+'
+      suffix: '+',
+    },
+    {
+      label: 'Average clinic rating',
+      value: ratingValue,
+      icon: <Star className="text-amber-500" size={24} fill="currentColor" />,
+      suffix: '★',
     },
   ];
 

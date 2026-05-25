@@ -602,15 +602,17 @@ export async function getPopularCities() {
   // in the footer matches the count the user sees when they click through.
   // For major metros this is metro-inclusive (Houston includes Tomball/Cypress,
   // NYC includes outer boroughs, Toronto/GTA includes Mississauga/Oakville/etc).
+  // Curated by actual provider density. Chicago (5) dropped in favor of Las Vegas (15)
+  // which also has the highest hangover-IV search intent of any US city.
   const popular = [
-    { slug: 'toronto',     name: 'Toronto & GTA',  cityArg: 'Toronto',      stateArg: 'Ontario' },
     { slug: 'new-york',    name: 'New York',       cityArg: 'New York',     stateArg: 'New York' },
-    { slug: 'los-angeles', name: 'Los Angeles',    cityArg: 'Los Angeles',  stateArg: 'California' },
-    { slug: 'chicago',     name: 'Chicago',        cityArg: 'Chicago',      stateArg: 'Illinois' },
     { slug: 'houston',     name: 'Houston',        cityArg: 'Houston',      stateArg: 'Texas' },
     { slug: 'san-diego',   name: 'San Diego',      cityArg: 'San Diego',    stateArg: 'California' },
-    { slug: 'washington',  name: 'Washington DC',  cityArg: 'Washington',   stateArg: 'District of Columbia' },
     { slug: 'clearwater',  name: 'Clearwater',     cityArg: 'Clearwater',   stateArg: 'Florida' },
+    { slug: 'los-angeles', name: 'Los Angeles',    cityArg: 'Los Angeles',  stateArg: 'California' },
+    { slug: 'toronto',     name: 'Toronto & GTA',  cityArg: 'Toronto',      stateArg: 'Ontario' },
+    { slug: 'las-vegas',   name: 'Las Vegas',      cityArg: 'Las Vegas',    stateArg: 'Nevada' },
+    { slug: 'washington',  name: 'Washington DC',  cityArg: 'Washington',   stateArg: 'District of Columbia' },
   ];
 
   const results = await Promise.all(
@@ -938,7 +940,9 @@ export async function getSiteStats() {
     const citiesSet = new Set();
     const statesSet = new Set();
     let totalReviews = 0;
-    
+    let ratingSum = 0;
+    let ratingCount = 0;
+
     // For top cities/states logic
     const stateCounts: Record<string, number> = {};
     const cityCounts: Record<string, { city: string, state: string, count: number }> = {};
@@ -946,24 +950,34 @@ export async function getSiteStats() {
     allData.forEach(r => {
       const city = r.city?.trim();
       const state = r.state?.trim();
-      
+
       if (city && state) {
         citiesSet.add(`${city.toLowerCase()}-${state.toLowerCase()}`);
-        
+
         const cityKey = `${city}-${state}`;
         if (!cityCounts[cityKey]) {
           cityCounts[cityKey] = { city, state, count: 0 };
         }
         cityCounts[cityKey].count++;
       }
-      
+
       if (state) {
         statesSet.add(state.toLowerCase());
         stateCounts[state] = (stateCounts[state] || 0) + 1;
       }
-      
-      totalReviews += (r.reviews || 0);
+
+      // Number() cast — reviews + rating come back as strings sometimes
+      const reviewsNum = Number(r.reviews) || 0;
+      totalReviews += reviewsNum;
+
+      const ratingNum = Number(r.rating);
+      if (!Number.isNaN(ratingNum) && ratingNum > 0) {
+        ratingSum += ratingNum;
+        ratingCount += 1;
+      }
     });
+
+    const avgRating = ratingCount > 0 ? (ratingSum / ratingCount).toFixed(1) : '4.9';
 
     const topStates = Object.entries(stateCounts)
       .map(([name, count]) => ({
@@ -983,7 +997,7 @@ export async function getSiteStats() {
       total: total || fallback.total,
       cities: citiesSet.size || fallback.cities,
       states: statesSet.size || fallback.states,
-      avgRating: '4.9',
+      avgRating, // computed from real data above, not hardcoded
       totalReviews: totalReviews || fallback.totalReviews,
       topStates,
       topCities

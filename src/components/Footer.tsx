@@ -5,14 +5,14 @@ import { Logo } from './Logo';
 import { MedicalDisclaimer } from './MedicalDisclaimer';
 
 const POPULAR_CITIES_STATIC = [
-  { name: 'Toronto & GTA', slug: 'toronto' },
   { name: 'New York', slug: 'new-york' },
-  { name: 'Los Angeles', slug: 'los-angeles' },
-  { name: 'Chicago', slug: 'chicago' },
   { name: 'Houston', slug: 'houston' },
   { name: 'San Diego', slug: 'san-diego' },
-  { name: 'Washington DC', slug: 'washington' },
   { name: 'Clearwater', slug: 'clearwater' },
+  { name: 'Los Angeles', slug: 'los-angeles' },
+  { name: 'Toronto & GTA', slug: 'toronto' },
+  { name: 'Las Vegas', slug: 'las-vegas' },
+  { name: 'Washington DC', slug: 'washington' },
 ];
 
 export const Footer = () => {
