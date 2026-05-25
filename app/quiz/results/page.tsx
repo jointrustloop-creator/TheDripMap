@@ -485,19 +485,23 @@ function ResultsContent() {
                 <div className="h-px flex-1 bg-slate-100" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {otherMatches.map((provider, idx) => (
+                {otherMatches.map((provider) => {
+                  // Only claimed (is_featured) listings get the "Premium Option" badge
+                  // + green star/rating treatment. Unclaimed listings get neutral styling.
+                  const isPremium = provider.is_featured === true;
+                  return (
                   <div key={provider.id} className="relative group">
                     <div className="absolute -top-3 left-6 z-10">
                       <span className={cn(
                         "px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-md border",
-                        idx === 0 ? "bg-white text-slate-500 border-slate-100" : "bg-wellness-600 text-white border-wellness-500"
+                        isPremium ? "bg-wellness-600 text-white border-wellness-500" : "bg-white text-slate-500 border-slate-100"
                       )}>
-                        {idx === 0 ? "Alternative Option" : "Premium Option"}
+                        {isPremium ? "Premium Option" : "Alternative Option"}
                       </span>
                     </div>
                     <div className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden shadow-xl shadow-slate-200/50 flex flex-col h-full">
                       <div className="relative h-48">
-                        <ClinicImage 
+                        <ClinicImage
                           name={provider.name}
                           imageUrl={provider.imageUrl}
                         />
@@ -508,7 +512,10 @@ function ResultsContent() {
                         </div>
                       </div>
                       <div className="p-6 flex-1 flex flex-col">
-                        <div className="flex items-center gap-1 text-wellness-600 mb-2">
+                        <div className={cn(
+                          "flex items-center gap-1 mb-2",
+                          isPremium ? "text-wellness-600" : "text-slate-400"
+                        )}>
                           <Star size={14} fill="currentColor" />
                           <span className="text-sm font-bold">{provider.rating}</span>
                           <span className="text-xs text-slate-400 font-bold ml-1">({provider.reviewCount}) reviews</span>
@@ -538,7 +545,7 @@ function ResultsContent() {
                           >
                             Book now
                           </a>
-                          <Link 
+                          <Link
                             href={`/providers/${provider.slug || slugify(provider.name)}`}
                             className="flex-1 bg-white text-slate-900 border border-slate-200 py-3 rounded-xl text-xs font-bold hover:border-slate-900 transition-all text-center"
                           >
@@ -548,7 +555,8 @@ function ResultsContent() {
                       </div>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </section>
           )}
