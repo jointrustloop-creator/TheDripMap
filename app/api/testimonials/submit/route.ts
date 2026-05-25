@@ -43,31 +43,29 @@ export async function POST(req: Request) {
       );
     }
 
-    // Use service role so RLS doesn't block the insert and we can read the generated moderation_token back
+    // Generate id and moderation token in code so we don't need to read them back from the DB.
+    // Using the anon key means we don't depend on SUPABASE_SERVICE_ROLE_KEY being set in production.
+    // The RLS "anon insert testimonials" policy permits this insert.
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
     const newId = crypto.randomUUID();
     const moderationToken = crypto.randomBytes(24).toString('hex');
 
-    const { data: inserted, error: insertError } = await supabase
-      .from('testimonials')
-      .insert({
-        id: newId,
-        provider_id: providerId,
-        author_name: authorName.slice(0, 120),
-        author_email: authorEmail.slice(0, 240),
-        rating,
-        title,
-        body: body.slice(0, 4000),
-        visit_date: visitDate,
-        moderation_token: moderationToken,
-        status: 'pending',
-      })
-      .select('id, moderation_token')
-      .single();
+    const { error: insertError } = await supabase.from('testimonials').insert({
+      id: newId,
+      provider_id: providerId,
+      author_name: authorName.slice(0, 120),
+      author_email: authorEmail.slice(0, 240),
+      rating,
+      title,
+      body: body.slice(0, 4000),
+      visit_date: visitDate,
+      moderation_token: moderationToken,
+      status: 'pending',
+    });
 
     if (insertError) {
       console.error('Testimonial insert error:', insertError);
@@ -77,11 +75,11 @@ export async function POST(req: Request) {
       );
     }
 
-    if (process.env.RESEND_API_KEY && inserted?.moderation_token) {
+    if (process.env.RESEND_API_KEY) {
       try {
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thedripmap.com';
-        const approveUrl = `${siteUrl}/api/testimonials/moderate?id=${inserted.id}&token=${inserted.moderation_token}&action=approve`;
-        const rejectUrl = `${siteUrl}/api/testimonials/moderate?id=${inserted.id}&token=${inserted.moderation_token}&action=reject`;
+        const approveUrl = `${siteUrl}/api/testimonials/moderate?id=${newId}&token=${moderationToken}&action=approve`;
+        const rejectUrl = `${siteUrl}/api/testimonials/moderate?id=${newId}&token=${moderationToken}&action=reject`;
 
         const resend = new Resend(process.env.RESEND_API_KEY);
         await resend.emails.send({
