@@ -13,6 +13,7 @@ export const Navbar = () => {
   const navLinks = [
     { label: 'Explore Clinics', href: '/search' },
     { label: 'Symptoms', href: '/symptoms' },
+    { label: 'Guides', href: '/guide' },
     { label: 'Blog', href: '/blog' },
     { label: 'Contact', href: '/contact' },
   ];
