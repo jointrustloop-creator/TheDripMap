@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-// Fresh build trigger v3 - forcing image cache bust
+// Fresh build trigger v4 — 2026-05-25, forcing rebuild after stuck deploy pipeline
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
