@@ -180,11 +180,11 @@ export const RoiCalculator = ({ popularCities }: RoiCalculatorProps) => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
               <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5">
                 <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
-                  Monthly impressions
+                  Monthly searches
                 </div>
                 <div className="text-3xl font-black text-white">{numbers.monthlyImpr.toLocaleString()}</div>
                 <div className="text-[10px] text-slate-500 font-medium mt-1">
-                  Google searches for IV therapy in {pretty(city!)}
+                  Patients searching for IV therapy in {pretty(city!)}
                 </div>
               </div>
               <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5">
@@ -247,7 +247,7 @@ export const RoiCalculator = ({ popularCities }: RoiCalculatorProps) => {
             </div>
 
             <p className="text-[11px] text-slate-500 italic leading-relaxed max-w-2xl">
-              Estimates based on Google Search Console data for {pretty(city!)} (last 28 days),
+              Estimates based on live patient search demand for {pretty(city!)},
               industry-standard CTR for #1 organic ranking (~8.5%), and a conservative 3%
               click-to-booking conversion rate. Your actual results depend on listing
               completeness, reviews, and seasonal demand.

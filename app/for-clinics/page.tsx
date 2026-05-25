@@ -63,7 +63,7 @@ export default async function ForClinicsPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 text-center">
             <div>
               <div className="text-3xl md:text-4xl font-black text-wellness-400 mb-1">19,700</div>
-              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">monthly Google impressions</div>
+              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">monthly patient searches</div>
             </div>
             <div>
               <div className="text-3xl md:text-4xl font-black text-wellness-400 mb-1">{stats.total.toLocaleString()}</div>
@@ -75,11 +75,11 @@ export default async function ForClinicsPage() {
             </div>
             <div>
               <div className="text-3xl md:text-4xl font-black text-wellness-400 mb-1">+83%</div>
-              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">week-over-week impression growth</div>
+              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">week-over-week search growth</div>
             </div>
           </div>
           <p className="text-center text-xs text-slate-400 mt-6 font-medium italic">
-            Source: Google Search Console, last 28 days. Canadian searches convert at <span className="text-wellness-400 font-bold not-italic">12.5×</span> the US rate — we&apos;re building Canadian coverage fast.
+            Live patient demand across the US and Canada. Canadian markets are converting at <span className="text-wellness-400 font-bold not-italic">12.5×</span> the US rate — Canadian clinics, this is your moment.
           </p>
         </div>
 
