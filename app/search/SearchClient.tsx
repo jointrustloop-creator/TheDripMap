@@ -280,27 +280,29 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
         }
       }
 
-      // Apply Sorting
+      // Apply Sorting.
+      // Claimed (is_featured) listings are pinned to the top in every sort mode.
+      // The chosen sort acts as the tiebreaker among unclaimed listings (and among
+      // claimed listings, on the rare occasion there's more than one in view).
+      // This mirrors how Google/Yelp keep sponsored results pinned regardless of
+      // sort — and protects the value clinics buy when they claim a listing.
       const sorted = [...results];
-      if (sortBy === 'rating') {
-        sorted.sort((a, b) => b.rating - a.rating);
-      } else if (sortBy === 'reviews') {
-        sorted.sort((a, b) => b.reviewCount - a.reviewCount);
-      } else if (sortBy === 'distance' && userLocation) {
-        sorted.sort((a, b) => (a.distance || 999) - (b.distance || 999));
-      } else if (sortBy === 'value') {
-        sorted.sort((a, b) => {
-          const metricsA = calculateValueMetrics(a);
-          const metricsB = calculateValueMetrics(b);
-          return metricsB.score - metricsA.score;
-        });
-      } else {
-        sorted.sort((a, b) => {
-          if (a.is_featured && !b.is_featured) return -1;
-          if (!a.is_featured && b.is_featured) return 1;
-          return b.rating - a.rating;
-        });
-      }
+      const tiebreaker = (a: Provider, b: Provider): number => {
+        if (sortBy === 'rating') return (b.rating ?? 0) - (a.rating ?? 0);
+        if (sortBy === 'reviews') return (b.reviewCount ?? 0) - (a.reviewCount ?? 0);
+        if (sortBy === 'distance' && userLocation) {
+          return (a.distance ?? 999) - (b.distance ?? 999);
+        }
+        if (sortBy === 'value') {
+          return calculateValueMetrics(b).score - calculateValueMetrics(a).score;
+        }
+        // 'best' or anything else: rating
+        return (b.rating ?? 0) - (a.rating ?? 0);
+      };
+      sorted.sort((a, b) => {
+        if (a.is_featured !== b.is_featured) return a.is_featured ? -1 : 1;
+        return tiebreaker(a, b);
+      });
       
       setFilteredProviders(sorted);
       setIsLoading(false);
