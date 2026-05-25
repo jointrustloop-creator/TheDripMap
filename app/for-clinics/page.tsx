@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
+import { RoiCalculator } from '../../src/components/RoiCalculator';
 import { ShieldCheck, ArrowRight, BarChart, Users, Globe } from 'lucide-react';
 import { getSiteStats } from '../../src/lib/data';
 
@@ -96,6 +97,11 @@ export default async function ForClinicsPage() {
               <p className="text-slate-500 leading-relaxed">{item.desc}</p>
             </div>
           ))}
+        </div>
+
+        {/* ROI Calculator — concrete proof of expected return per city */}
+        <div className="mb-24">
+          <RoiCalculator popularCities={['Toronto', 'New York', 'Houston', 'San Francisco', 'Vancouver', 'Miami']} />
         </div>
 
         {/* Comparison Section */}

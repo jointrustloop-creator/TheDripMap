@@ -2,8 +2,8 @@
 import React, { useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  Sparkles, 
+import {
+  Sparkles,
   ArrowRight,
   MapPin,
   Star,
@@ -11,7 +11,11 @@ import {
   ChevronUp,
   Calendar,
   Target,
-  Activity
+  Activity,
+  Twitter,
+  Link as LinkIcon,
+  Camera,
+  Check
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { matchProviders } from '../../../src/lib/matching';
@@ -57,6 +61,7 @@ function ResultsContent() {
   const [isAccordionOpen, setIsAccordionOpen] = React.useState(false);
   const [isExactMatch, setIsExactMatch] = React.useState(true);
   const [isStateMatch, setIsStateMatch] = React.useState(true);
+  const [copied, setCopied] = React.useState(false);
 
   React.useEffect(() => {
     async function loadData() {
@@ -474,6 +479,66 @@ function ResultsContent() {
                 </div>
               </div>
             </motion.div>
+          </section>
+
+          {/* SHARE STRIP — viral loop. Encourage users to share their match. */}
+          <section>
+            <div className="bg-gradient-to-br from-wellness-50 via-white to-slate-50 border border-wellness-100 rounded-[2.5rem] p-6 md:p-8">
+              <div className="flex flex-col md:flex-row md:items-center gap-6 justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-wellness-600 mb-2">
+                    ✨ Share your match
+                  </div>
+                  <p className="text-slate-700 text-base font-medium leading-relaxed">
+                    Got matched with <span className="font-black text-slate-900">{topMatch.name}</span> for{' '}
+                    <span className="font-black text-wellness-700">
+                      {GOALS.find((g) => g.id === surveyData.goal)?.label || surveyData.goal || 'your wellness goal'}
+                    </span>
+                    . Tell a friend who&apos;s been putting off booking.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2 shrink-0">
+                  {(() => {
+                    const goalLabel = GOALS.find((g) => g.id === surveyData.goal)?.label || surveyData.goal || 'IV therapy';
+                    const tweetText = `Just got matched with ${topMatch.name} for ${goalLabel} via @thedripmap`;
+                    const url = 'https://www.thedripmap.com/quiz';
+                    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(url)}`;
+                    return (
+                      <>
+                        <a
+                          href={twitterUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl font-bold text-xs transition-colors"
+                        >
+                          <Twitter size={14} fill="currentColor" />
+                          <span>Tweet</span>
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (typeof window !== 'undefined' && navigator.clipboard) {
+                              navigator.clipboard.writeText(url);
+                              setCopied(true);
+                              setTimeout(() => setCopied(false), 2000);
+                            }
+                          }}
+                          className="inline-flex items-center gap-2 bg-white border border-slate-200 hover:border-slate-900 text-slate-900 px-4 py-2.5 rounded-xl font-bold text-xs transition-colors"
+                        >
+                          {copied ? <Check size={14} /> : <LinkIcon size={14} />}
+                          <span>{copied ? 'Copied!' : 'Copy link'}</span>
+                        </button>
+                        <div className="inline-flex items-center gap-2 bg-white border border-dashed border-slate-200 text-slate-500 px-4 py-2.5 rounded-xl font-bold text-xs">
+                          <Camera size={14} />
+                          <span className="hidden sm:inline">Screenshot to share</span>
+                          <span className="sm:hidden">Screenshot</span>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
           </section>
 
           {/* SECTION 2 — "ALTERNATIVE & PREMIUM OPTIONS" */}

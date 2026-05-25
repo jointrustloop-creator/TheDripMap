@@ -21,6 +21,7 @@ import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { ClinicImage } from '../../../src/components/ClinicImage';
 import { ResilientImage } from '../../../src/components/ResilientImage';
 import { ClaimListingTrigger } from '../../../src/components/ClaimListingTrigger';
+import { StickyClaimRail } from '../../../src/components/StickyClaimRail';
 import { 
   getListingBySlug, 
   slugify, 
@@ -1067,6 +1068,9 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
           </aside>
         </div>
       </main>
+
+      {/* Persistent claim CTA — desktop floating card + mobile bottom sheet. Unclaimed only. */}
+      {!provider.is_featured && <StickyClaimRail provider={provider} />}
 
       <Footer />
     </div>
