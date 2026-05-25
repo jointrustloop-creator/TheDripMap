@@ -23,13 +23,15 @@ import { ResilientImage } from '../../../src/components/ResilientImage';
 import { ClaimListingTrigger } from '../../../src/components/ClaimListingTrigger';
 import { StickyClaimRail } from '../../../src/components/StickyClaimRail';
 import { MessageClinicButton } from '../../../src/components/MessageClinicButton';
-import { 
-  getListingBySlug, 
-  slugify, 
-  getAllListings, 
+import { PatientTestimonials } from '../../../src/components/PatientTestimonials';
+import {
+  getListingBySlug,
+  slugify,
+  getAllListings,
   getStateFromProvider,
   getOperatorProfiles,
-  getSimilarClinics
+  getSimilarClinics,
+  getApprovedTestimonials
 } from '../../../src/lib/data';
 import { Provider } from '../../../src/types';
 import { cn } from '../../../src/lib/utils';
@@ -231,6 +233,9 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   const valueMetrics = calculateValueMetrics(provider);
   
   const similarClinics = await getSimilarClinics(slug, provider.city, stateCode);
+  const patientTestimonials = provider.is_featured
+    ? await getApprovedTestimonials(provider.id)
+    : [];
   const isCityMatch = similarClinics.every(c => c.city === provider.city);
   const similarTitle = isCityMatch && similarClinics.length >= 3 
     ? `Other IV therapy clinics in ${provider.city}` 
@@ -1026,6 +1031,11 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   </div>
                 )}
               </section>
+            )}
+
+            {/* PATIENT TESTIMONIALS — claimed clinics only */}
+            {provider.is_featured && (
+              <PatientTestimonials provider={provider} testimonials={patientTestimonials} />
             )}
 
             {/* FAQ SECTION */}

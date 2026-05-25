@@ -1310,6 +1310,41 @@ export async function getOperatorProfiles() {
   }
 }
 
+export type ApprovedTestimonial = {
+  id: string;
+  author_name: string;
+  rating: number;
+  title: string | null;
+  body: string;
+  visit_date: string | null;
+  approved_at: string | null;
+  created_at: string;
+};
+
+export async function getApprovedTestimonials(providerId: string, limit: number = 12): Promise<ApprovedTestimonial[]> {
+  if (!isSupabaseConfigured() || !providerId) return [];
+  try {
+    const { data, error } = await supabase
+      .from('testimonials')
+      .select('id, author_name, rating, title, body, visit_date, approved_at, created_at')
+      .eq('provider_id', providerId)
+      .eq('status', 'approved')
+      .order('approved_at', { ascending: false, nullsFirst: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      if (error.code === '42P01') return [];
+      console.error('Supabase error fetching testimonials:', error);
+      return [];
+    }
+    return (data || []) as ApprovedTestimonial[];
+  } catch (err) {
+    console.error('Error in getApprovedTestimonials:', err);
+    return [];
+  }
+}
+
 export async function getSimilarClinics(currentSlug: string, city: string, state: string, limit: number = 3) {
   if (!isSupabaseConfigured()) return [];
   
