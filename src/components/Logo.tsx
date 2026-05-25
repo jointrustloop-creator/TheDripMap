@@ -33,7 +33,7 @@ export const Logo = ({ className, iconOnly = false }: LogoProps) => {
         width={620}
         height={170}
         priority
-        className="h-12 w-auto"
+        className="h-14 md:h-16 w-auto"
       />
     </div>
   );
