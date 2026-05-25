@@ -16,10 +16,10 @@ import { MapTrigger } from '@/src/components/MapTrigger';
 import { FAQSection } from '@/src/components/FAQSection';
 import { NearbyCities } from '@/src/components/NearbyCities';
 
-// TEMPORARY: force-dynamic to bypass the Vercel edge cache that's stuck on
-// pre-import counts (4/8/7 for LA/Houston/SD). Will revert to revalidate=60
-// after a single fresh render populates each city page with current data.
-export const dynamic = 'force-dynamic';
+// Short revalidate so listings_count / new providers propagate within ~1 minute.
+// Reverted from a brief force-dynamic experiment that was never actually deployed
+// (Vercel build pipeline was stuck — see commit history around 2026-05-25).
+export const revalidate = 60;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
