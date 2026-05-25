@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
-import { ArrowRight, Clock } from 'lucide-react';
+import { ArrowRight, Clock, Zap, BookOpen, HelpCircle, MapPin } from 'lucide-react';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { BlogClientContent } from '../../src/components/BlogClientContent';
@@ -114,6 +114,86 @@ export default async function BlogPage() {
         )}
 
         <BlogClientContent initialPosts={restPosts} />
+
+        {/* Cross-link footer — keeps readers moving after they finish the index */}
+        <section className="mt-24 bg-white rounded-[3rem] border border-slate-100 shadow-sm p-10 md:p-14">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-wellness-600 mb-4">
+            Skip the reading
+          </p>
+          <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-10 tracking-tight">
+            Ready to find a clinic?
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            <Link
+              href="/treatments"
+              className="group bg-slate-50 hover:bg-wellness-50 rounded-[1.5rem] p-7 transition-all"
+            >
+              <div className="w-10 h-10 rounded-xl bg-white text-wellness-600 flex items-center justify-center mb-4 shadow-sm">
+                <Zap size={20} />
+              </div>
+              <h3 className="text-xl font-black text-slate-900 mb-2 tracking-tight">
+                Treatments
+              </h3>
+              <p className="text-sm text-slate-600 leading-relaxed mb-4">
+                NAD+, Myers Cocktail, Hangover, Beauty Glow and 6 more — full details and clinics that offer each protocol.
+              </p>
+              <span className="text-xs font-black text-wellness-600 uppercase tracking-widest group-hover:underline">
+                See protocols →
+              </span>
+            </Link>
+            <Link
+              href="/cities"
+              className="group bg-slate-50 hover:bg-wellness-50 rounded-[1.5rem] p-7 transition-all"
+            >
+              <div className="w-10 h-10 rounded-xl bg-white text-wellness-600 flex items-center justify-center mb-4 shadow-sm">
+                <MapPin size={20} />
+              </div>
+              <h3 className="text-xl font-black text-slate-900 mb-2 tracking-tight">
+                Browse by city
+              </h3>
+              <p className="text-sm text-slate-600 leading-relaxed mb-4">
+                300+ cities across the US and Canada with active IV therapy clinics. Find what&apos;s near you.
+              </p>
+              <span className="text-xs font-black text-wellness-600 uppercase tracking-widest group-hover:underline">
+                All cities →
+              </span>
+            </Link>
+            <Link
+              href="/guide"
+              className="group bg-slate-50 hover:bg-wellness-50 rounded-[1.5rem] p-7 transition-all"
+            >
+              <div className="w-10 h-10 rounded-xl bg-white text-wellness-600 flex items-center justify-center mb-4 shadow-sm">
+                <BookOpen size={20} />
+              </div>
+              <h3 className="text-xl font-black text-slate-900 mb-2 tracking-tight">
+                Read the guides
+              </h3>
+              <p className="text-sm text-slate-600 leading-relaxed mb-4">
+                Cost guide, how to choose a clinic, IV vs oral supplements, first-time tips, mobile vs clinic.
+              </p>
+              <span className="text-xs font-black text-wellness-600 uppercase tracking-widest group-hover:underline">
+                See guides →
+              </span>
+            </Link>
+            <Link
+              href="/quiz"
+              className="group bg-slate-900 hover:bg-slate-800 text-white rounded-[1.5rem] p-7 transition-all"
+            >
+              <div className="w-10 h-10 rounded-xl bg-wellness-600 text-white flex items-center justify-center mb-4 shadow-sm">
+                <HelpCircle size={20} />
+              </div>
+              <h3 className="text-xl font-black mb-2 tracking-tight">
+                Take the 60-sec quiz
+              </h3>
+              <p className="text-sm text-slate-300 leading-relaxed mb-4">
+                Pick your symptom — we&apos;ll recommend the right protocol and show clinics that offer it.
+              </p>
+              <span className="text-xs font-black text-wellness-300 uppercase tracking-widest">
+                Start quiz →
+              </span>
+            </Link>
+          </div>
+        </section>
       </main>
 
       <Footer />
