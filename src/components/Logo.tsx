@@ -1,6 +1,12 @@
 import React from 'react';
+import Image from 'next/image';
 import { Droplets } from 'lucide-react';
 import { cn } from '../lib/utils';
+
+// Official TheDripMap logo (on white background) hosted in Supabase storage.
+// Note: filename has a typo ("drimap" not "dripmap") — kept as-is to match the storage object.
+const LOGO_URL =
+  'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/thedrimaplogo-white.jpeg';
 
 interface LogoProps {
   className?: string;
@@ -8,27 +14,27 @@ interface LogoProps {
 }
 
 export const Logo = ({ className, iconOnly = false }: LogoProps) => {
-  return (
-    <div className={cn("flex items-center gap-2.5 group select-none", className)}>
-      <div className="relative flex items-center justify-center">
-        {/* $20k Logo Aesthetic: Clean, Minimalist, High-End Wellness */}
-        <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-xl shadow-slate-200 group-hover:scale-105 transition-all duration-500 ease-out">
+  // Icon-only fallback: keep the simple mark for tiny placements (favicons, mobile fold)
+  if (iconOnly) {
+    return (
+      <div className={cn('flex items-center select-none', className)}>
+        <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-xl shadow-slate-200">
           <Droplets size={20} className="text-wellness-400" />
         </div>
-        {/* Subtle accent dot for that premium "tech-wellness" feel */}
-        <div className="absolute -top-1 -right-1 w-3 h-3 bg-wellness-500 rounded-full border-2 border-white" />
       </div>
-      
-      {!iconOnly && (
-        <div className="flex flex-col leading-none">
-          <span className="text-xl font-black tracking-tighter text-slate-900 uppercase italic">
-            TheDrip<span className="text-wellness-600">Map</span>
-          </span>
-          <span className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-0.5">
-            IV Therapy Matching Platform
-          </span>
-        </div>
-      )}
+    );
+  }
+
+  return (
+    <div className={cn('flex items-center select-none', className)}>
+      <Image
+        src={LOGO_URL}
+        alt="TheDripMap — Your Guide to Feeling Better"
+        width={620}
+        height={170}
+        priority
+        className="h-12 w-auto"
+      />
     </div>
   );
 };

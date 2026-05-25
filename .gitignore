@@ -39,3 +39,8 @@ scripts/outreach-drafts.md
 # GSC raw exports (analytics data — don't commit)
 gsc-export/
 thedripmap.com-Performance-on-Search-*.zip
+
+# Local image working folders (uploaded to Supabase storage, no need in git)
+new images/
+_temp_*
+
