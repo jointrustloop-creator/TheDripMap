@@ -650,25 +650,85 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               </section>
             )}
 
-            {/* SERVICES SECTION */}
+            {/* SERVICES SECTION — restaurant-menu treatment for claimed listings,
+                pill chips for unclaimed. */}
             {provider.specialties && provider.specialties.length > 0 && (
               <section className="pt-8 border-t border-slate-100">
-                <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Services</h2>
-                <div className="flex flex-wrap gap-3">
-                  {[...new Set(provider.specialties)].map((service, idx) => (
-                    <span 
-                      key={idx} 
-                      className={cn(
-                        "px-6 py-3 rounded-2xl font-bold text-sm transition-all shadow-sm",
-                        provider.is_featured 
-                          ? "bg-emerald-50 border border-emerald-100 text-emerald-700 hover:bg-emerald-100" 
-                          : "bg-white border border-slate-100 text-slate-700 hover:border-wellness-200 hover:text-wellness-600"
-                      )}
-                    >
-                      {service}
-                    </span>
-                  ))}
-                </div>
+                {provider.is_featured ? (
+                  (() => {
+                    // Parse the floor of price_range like "$150-250" → 150.
+                    // Falls back to no price hint if format isn't parseable.
+                    const priceFloorMatch = (provider.price_range || '').match(/\$?(\d{2,4})/);
+                    const fromPrice = priceFloorMatch ? Number(priceFloorMatch[1]) : null;
+                    const uniqueSpecialties = [...new Set(provider.specialties)];
+                    return (
+                      <>
+                        <div className="flex items-end justify-between gap-4 mb-2">
+                          <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Drip Menu</h2>
+                          {fromPrice && (
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest hidden sm:inline">
+                              Pricing
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-slate-500 font-medium mb-8 max-w-2xl">
+                          The treatments {provider.name} offers. Custom blends and add-ons available — call to discuss.
+                        </p>
+
+                        <div className="bg-white border border-slate-200 rounded-[2rem] overflow-hidden shadow-sm">
+                          {uniqueSpecialties.map((service, idx) => (
+                            <div
+                              key={service}
+                              className={cn(
+                                'flex items-center gap-4 px-6 md:px-8 py-5 transition-colors hover:bg-slate-50',
+                                idx < uniqueSpecialties.length - 1 && 'border-b border-slate-100'
+                              )}
+                            >
+                              <div className="w-9 h-9 rounded-xl bg-wellness-50 text-wellness-600 flex items-center justify-center shrink-0">
+                                <Zap size={16} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="font-black text-slate-900 text-base leading-tight">{service}</div>
+                              </div>
+                              {fromPrice && (
+                                <div className="text-right shrink-0">
+                                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">from</span>
+                                  <div className="text-base font-black text-slate-900">${fromPrice}</div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+
+                        {provider.phone && (
+                          <div className="mt-6 flex items-center gap-3 text-sm text-slate-500">
+                            <span className="font-bold">Custom protocol or add-on?</span>
+                            <a
+                              href={`tel:${provider.phone}`}
+                              className="font-black text-wellness-600 hover:text-wellness-700 inline-flex items-center gap-1"
+                            >
+                              <Phone size={14} /> Call to discuss →
+                            </a>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()
+                ) : (
+                  <>
+                    <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Services</h2>
+                    <div className="flex flex-wrap gap-3">
+                      {[...new Set(provider.specialties)].map((service, idx) => (
+                        <span
+                          key={idx}
+                          className="px-6 py-3 rounded-2xl font-bold text-sm transition-all shadow-sm bg-white border border-slate-100 text-slate-700 hover:border-wellness-200 hover:text-wellness-600"
+                        >
+                          {service}
+                        </span>
+                      ))}
+                    </div>
+                  </>
+                )}
               </section>
             )}
 
