@@ -1,0 +1,233 @@
+[
+  {
+    "name": "Liquid Life Mobile IV Therapy",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "1310 Vine St, Los Angeles, CA 90028",
+    "phone": "(844) 573-4543",
+    "website": "https://www.liquidlifela.com",
+    "rating": null,
+    "reviews": 78
+  },
+  {
+    "name": "Mega Wellness Clinic",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "3030 W Olympic Blvd, Ste 116, Los Angeles, CA 90006",
+    "phone": "(213) 277-1439",
+    "website": "https://www.megawellnessclinic.com",
+    "rating": null,
+    "reviews": 29
+  },
+  {
+    "name": "IV Drip Lounge",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "9100 S Sepulveda Blvd, Ste 104, Los Angeles, CA 90045",
+    "phone": "(310) 670-9999",
+    "website": "https://www.ivdriplounge.com",
+    "rating": 4.7,
+    "reviews": 15
+  },
+  {
+    "name": "Hollywood Walk-in Clinic",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "6430 Selma Ave, Hollywood, CA 90028",
+    "phone": "(323) 848-4522",
+    "website": "https://hollywoodclinic.net",
+    "rating": null,
+    "reviews": 665
+  },
+  {
+    "name": "IV Healing Spa",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "1762 Westwood Blvd, Ste 315, Los Angeles, CA 90024",
+    "phone": "(424) 248-3321",
+    "website": "https://www.ivhealingspa.com",
+    "rating": null,
+    "reviews": null
+  },
+  {
+    "name": "The Hydration Room - Studio City",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "13033 Ventura Blvd, Ste F, Studio City, CA 91604",
+    "phone": "(818) 308-1017",
+    "website": "https://hydrationroom.com",
+    "rating": 4.9,
+    "reviews": 15
+  },
+  {
+    "name": "The Hydration Room - North Hollywood",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "6160 Laurel Canyon Blvd, Ste B140, North Hollywood, CA 91606",
+    "phone": "(818) 284-4659",
+    "website": "https://hydrationroom.com",
+    "rating": 4.9,
+    "reviews": null
+  },
+  {
+    "name": "Next Health - Studio City",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "12833 Ventura Blvd, Ste 161, Studio City, CA 91604",
+    "phone": "(310) 620-8372",
+    "website": "https://www.next-health.com/location/studio-city",
+    "rating": 5.0,
+    "reviews": 1295
+  },
+  {
+    "name": "Next Health - Century City",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "10250 Santa Monica Blvd, Ste 1440, Los Angeles, CA 90067",
+    "phone": "(310) 620-8373",
+    "website": "https://www.next-health.com/location/century-city",
+    "rating": 5.0,
+    "reviews": 1476
+  },
+  {
+    "name": "Angel Longevity Medical Center",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "12840 Riverside Dr, Ste 402, Studio City, CA 91607",
+    "phone": "(323) 900-5746",
+    "website": "https://angellongevity.com",
+    "rating": null,
+    "reviews": 118
+  },
+  {
+    "name": "Vitality Integrative Medicine",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "4849 Van Nuys Blvd, Ste 104, Sherman Oaks, CA 91403",
+    "phone": "(424) 278-4325",
+    "website": "https://vitalityintegrative.com",
+    "rating": null,
+    "reviews": 62
+  },
+  {
+    "name": "VitaminFusion",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "11908 Ventura Blvd, Studio City, CA 91604",
+    "phone": "(877) 848-2387",
+    "website": "https://vitaminfusion.com",
+    "rating": null,
+    "reviews": 27
+  },
+  {
+    "name": "Polaris Medical Aesthetics",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "928 S Western Ave, Ste 309, Los Angeles, CA 90006",
+    "phone": "(323) 744-3133",
+    "website": "https://polarisaesthetics.com",
+    "rating": 5.0,
+    "reviews": 17
+  },
+  {
+    "name": "modMD - Wilshire",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "5757 Wilshire Blvd, Ste 8, Los Angeles, CA 90036",
+    "phone": "(833) 663-6399",
+    "website": "https://www.modmd.com",
+    "rating": 4.4,
+    "reviews": null
+  },
+  {
+    "name": "modMD - Venice",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "208 Lincoln Blvd, Venice, CA 90291",
+    "phone": "(833) 663-6399",
+    "website": "https://www.modmd.com",
+    "rating": 4.4,
+    "reviews": 19
+  },
+  {
+    "name": "Refresh Med Spa LA",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "21021 Ventura Blvd, Ste 100-4, Woodland Hills, CA 91364",
+    "phone": "(818) 864-7546",
+    "website": "https://refreshmedspala.com",
+    "rating": 4.9,
+    "reviews": 181
+  },
+  {
+    "name": "Los Angeles Mobile IV Therapy",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "2256 Fox Hills Dr, Apt 3, Los Angeles, CA 90064",
+    "phone": "(323) 996-3542",
+    "website": "https://losangelesmobileiv.com",
+    "rating": 4.9,
+    "reviews": 35
+  },
+  {
+    "name": "Mobile IV Medics - Los Angeles",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "Los Angeles, CA 90012",
+    "phone": "(833) 483-7477",
+    "website": "https://mobileivmedics.com",
+    "rating": null,
+    "reviews": 101
+  },
+  {
+    "name": "InfuseWell",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "Los Angeles, CA 90028",
+    "phone": "(310) 254-9474",
+    "website": "https://www.infusewell.co",
+    "rating": null,
+    "reviews": 25
+  },
+  {
+    "name": "VIP Drips IV Therapy & Aesthetics",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "Valley Village, CA 91607",
+    "phone": "(310) 307-8998",
+    "website": "https://www.vipdripsivtherapy.com",
+    "rating": null,
+    "reviews": 10
+  },
+  {
+    "name": "Drip Hydration - Los Angeles",
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States",
+    "address": "Los Angeles, CA 90049",
+    "phone": "(323) 931-4084",
+    "website": "https://driphydration.com",
+    "rating": null,
+    "reviews": 132
+  }
+]
