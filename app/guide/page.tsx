@@ -1,7 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { BookOpen, ArrowRight, Sparkles, Activity, HelpCircle } from 'lucide-react';
+import { BookOpen, ArrowRight, Sparkles, Activity, HelpCircle, Zap } from 'lucide-react';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { BreadcrumbNav } from '../../src/components/BreadcrumbNav';
@@ -152,7 +152,25 @@ export default function GuidesIndexPage() {
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-10 tracking-tight">
             More ways to learn
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            <Link
+              href="/treatments"
+              className="group bg-slate-50 hover:bg-wellness-50 rounded-[1.5rem] p-7 transition-all"
+            >
+              <div className="w-10 h-10 rounded-xl bg-white text-wellness-600 flex items-center justify-center mb-4 shadow-sm">
+                <Zap size={20} />
+              </div>
+              <h3 className="text-xl font-black text-slate-900 mb-2 tracking-tight">
+                Treatments
+              </h3>
+              <p className="text-sm text-slate-600 leading-relaxed mb-4">
+                NAD+, Myers Cocktail, Hangover, Beauty Glow and 6 more — full
+                details, costs, and clinics that offer each protocol.
+              </p>
+              <span className="text-xs font-black text-wellness-600 uppercase tracking-widest group-hover:underline">
+                See protocols →
+              </span>
+            </Link>
             <Link
               href="/symptoms"
               className="group bg-slate-50 hover:bg-wellness-50 rounded-[1.5rem] p-7 transition-all"
