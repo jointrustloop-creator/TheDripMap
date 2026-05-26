@@ -70,9 +70,7 @@ export default function RootLayout({
     "url": siteUrl,
     "logo": `${siteUrl}/logo.png`,
     "sameAs": [
-      "https://facebook.com/thedripmap",
-      "https://instagram.com/thedripmap",
-      "https://twitter.com/thedripmap"
+      "https://www.instagram.com/thedripmap"
     ]
   };
 

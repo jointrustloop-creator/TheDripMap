@@ -108,9 +108,7 @@ export default async function HomePage() {
     "url": "https://www.thedripmap.com",
     "logo": "https://www.thedripmap.com/logo.png",
     "sameAs": [
-      "https://www.facebook.com/thedripmap",
-      "https://www.instagram.com/thedripmap",
-      "https://twitter.com/thedripmap"
+      "https://www.instagram.com/thedripmap"
     ]
   };
 

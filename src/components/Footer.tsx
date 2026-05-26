@@ -1,6 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Instagram } from 'lucide-react';
 import { Logo } from './Logo';
 import { MedicalDisclaimer } from './MedicalDisclaimer';
 
@@ -43,6 +44,15 @@ export const Footer = () => {
           <p className="text-slate-500 max-w-sm leading-relaxed">
             The IV therapy matching platform. We match you with the right clinic based on your specific health goals, location, and budget — in under 60 seconds.
           </p>
+          <a
+            href="https://www.instagram.com/thedripmap/"
+            target="_blank"
+            rel="me noopener noreferrer"
+            aria-label="TheDripMap on Instagram (@thedripmap)"
+            className="mt-5 inline-flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200 text-slate-400 hover:text-wellness-700 hover:border-wellness-200 hover:bg-wellness-50 transition-all"
+          >
+            <Instagram size={16} strokeWidth={2} />
+          </a>
         </div>
         <div>
           <h4 className="font-bold mb-6 text-sm uppercase tracking-wider text-slate-400">Services</h4>

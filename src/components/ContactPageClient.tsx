@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CheckCircle2, Send, Loader2, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Send, Loader2, ArrowRight, Instagram } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
 
@@ -113,17 +113,17 @@ export function ContactPageClient({ providerCount }: ContactPageClientProps) {
 
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4">Follow Along</p>
-                <div className="flex gap-3">
-                  {['Instagram', 'Twitter', 'LinkedIn'].map((platform) => (
-                    <div
-                      key={platform}
-                      className="w-10 h-10 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center text-slate-400 hover:text-wellness-600 hover:bg-wellness-50 transition-all cursor-pointer"
-                      title={platform}
-                    >
-                      <div className="w-1.5 h-1.5 bg-current rounded-full" />
-                    </div>
-                  ))}
-                </div>
+                <a
+                  href="https://www.instagram.com/thedripmap/"
+                  target="_blank"
+                  rel="me noopener noreferrer"
+                  aria-label="TheDripMap on Instagram (@thedripmap)"
+                  title="Follow @thedripmap on Instagram"
+                  className="inline-flex items-center gap-3 px-4 py-2.5 bg-slate-50 hover:bg-wellness-50 border border-slate-100 hover:border-wellness-200 rounded-xl text-slate-600 hover:text-wellness-700 transition-all group"
+                >
+                  <Instagram size={18} strokeWidth={2.25} />
+                  <span className="text-sm font-bold">@thedripmap</span>
+                </a>
               </div>
             </div>
           </div>
