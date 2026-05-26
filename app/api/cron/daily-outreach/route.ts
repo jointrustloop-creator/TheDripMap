@@ -103,7 +103,7 @@ export async function GET(req: Request) {
     const hasRating = p.rating && Number(p.reviews) > 0;
     const subject = `Your ${display} listing on TheDripMap`;
     const ratingLine = hasRating
-      ? `Your listing is live with your real Google rating of ${p.rating}★ from ${Number(p.reviews).toLocaleString()} patient reviews.`
+      ? `Your listing is live with your real Google rating of ${p.rating}★.`
       : `Your listing is live — but right now it's unclaimed, so visitors see a generic placeholder instead of your photos, hours, services, and description.`;
     const followLine = hasRating
       ? `Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.`
