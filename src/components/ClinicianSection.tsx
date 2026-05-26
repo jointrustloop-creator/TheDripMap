@@ -44,7 +44,7 @@ export const ClinicianSection = ({ stats }: ClinicianSectionProps) => {
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-5 tracking-tight leading-[1.05]">
               Own an IV Clinic? <br />
-              <span className="inline-block italic bg-gradient-to-br from-wellness-300 via-wellness-400 to-sky-300 bg-clip-text text-transparent pb-2">Grow with TheDripMap.</span>
+              <span className="inline-block italic bg-gradient-to-br from-wellness-300 via-wellness-400 to-sky-300 bg-clip-text text-transparent pb-3 pr-3">Grow with TheDripMap.</span>
             </h2>
             <p className="text-slate-300 text-base md:text-lg font-medium leading-relaxed max-w-md">
               Join {stats.totalListings}+ elite providers across {stats.totalCities} cities and start receiving high-intent patient referrals today.

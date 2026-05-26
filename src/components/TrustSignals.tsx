@@ -82,7 +82,7 @@ export const TrustSignals = ({ stats: dynamicStats }: TrustSignalsProps) => {
             <span className="h-px w-12 bg-wellness-500/40" />
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1] max-w-3xl mx-auto">
-            North America&apos;s largest <em className="not-italic bg-gradient-to-br from-wellness-600 to-wellness-800 bg-clip-text text-transparent italic inline-block pb-1">verified</em> IV therapy directory.
+            North America&apos;s largest <span className="inline-block italic bg-gradient-to-br from-wellness-600 to-wellness-800 bg-clip-text text-transparent pb-2 pr-2">verified</span> IV therapy directory.
           </h2>
         </motion.div>
 

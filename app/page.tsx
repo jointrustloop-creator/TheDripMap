@@ -1,10 +1,10 @@
 import { ResilientImage } from '../src/components/ResilientImage';
 import Link from 'next/link';
-import { 
-  Zap, 
-  Search, 
-  Droplets, 
-  ShieldCheck, 
+import {
+  Zap,
+  Search,
+  Droplets,
+  ShieldCheck,
   ArrowRight,
   Activity,
   Heart,
@@ -12,7 +12,13 @@ import {
   Dumbbell,
   Target,
   Clock,
-  MapPin
+  MapPin,
+  Wine,
+  Thermometer,
+  Brain,
+  Plane,
+  PartyPopper,
+  Pill,
 } from 'lucide-react';
 import { Navbar } from '../src/components/Navbar';
 import LiveStatsBar from '../src/components/LiveStatsBar';
@@ -261,43 +267,35 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Browse By Drip Type — DARK MODE FLIP, Apple Pro spotlight aesthetic */}
+      {/* Browse By Drip Type — refined dark, restrained */}
       <section className="py-28 md:py-36 px-6 relative overflow-hidden bg-slate-950">
-        {/* Mesh gradient — wellness + sky glows on deep slate */}
-        <div className="absolute top-0 -left-32 w-[600px] h-[600px] bg-wellness-600/30 rounded-full blur-[180px] pointer-events-none" />
-        <div className="absolute top-1/2 -right-32 w-[500px] h-[500px] bg-sky-500/25 rounded-full blur-[180px] pointer-events-none" />
-        <div className="absolute -bottom-40 left-1/3 w-[600px] h-[600px] bg-violet-500/20 rounded-full blur-[200px] pointer-events-none" />
-        {/* Subtle starfield/dot grid */}
-        <div className="absolute inset-0 opacity-[0.07] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+        {/* Single subtle wellness glow at top — no mesh chaos */}
+        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-wellness-600/15 rounded-full blur-[160px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-full mb-6">
-              <span className="w-1.5 h-1.5 bg-wellness-400 rounded-full animate-pulse" />
+              <span className="w-1.5 h-1.5 bg-wellness-400 rounded-full" />
               <span className="text-wellness-300 font-black text-[10px] uppercase tracking-[0.3em]">Drip Menu</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black mb-5 tracking-tight leading-[1.15]">
-              <span className="inline-block bg-gradient-to-br from-white via-white to-slate-400 bg-clip-text text-transparent pb-1">Browse By</span>
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black mb-5 tracking-tight leading-[1.2]">
+              <span className="inline-block text-white pb-1 pr-1">Browse By</span>
               <br />
-              <span className="inline-block bg-gradient-to-br from-wellness-300 via-wellness-400 to-sky-300 bg-clip-text text-transparent italic pb-3">Drip Type</span>
+              <span className="inline-block italic text-wellness-300 pb-3 pr-4">Drip Type</span>
             </h2>
-            <p className="text-xl text-slate-400 max-w-xl mx-auto leading-relaxed">Select a service to find specialized providers near you.</p>
+            <p className="text-lg md:text-xl text-slate-400 max-w-xl mx-auto leading-relaxed">Select a service to find specialized providers near you.</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {services.map((service, idx) => (
               <Link
                 key={idx}
                 href={`/treatments/${service.slug}`}
-                className="group relative bg-white/[0.04] hover:bg-white/[0.08] backdrop-blur-md p-8 rounded-[2rem] border border-white/10 hover:border-wellness-400/40 hover:shadow-[0_30px_60px_-15px_rgba(20,184,166,0.3)] hover:-translate-y-1 transition-all duration-500 text-center overflow-hidden"
+                className="group relative bg-slate-900/60 hover:bg-slate-900 backdrop-blur-md p-8 rounded-[1.75rem] border border-slate-800 hover:border-wellness-500/40 hover:-translate-y-0.5 transition-all duration-300 text-center"
               >
-                {/* Glow halo on hover */}
-                <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-40 h-40 bg-wellness-400/0 group-hover:bg-wellness-400/30 blur-3xl rounded-full transition-all duration-700 pointer-events-none" />
-                <div className="relative z-10">
-                  <div className="w-14 h-14 bg-gradient-to-br from-wellness-400/20 to-wellness-600/20 rounded-2xl flex items-center justify-center text-wellness-300 mx-auto mb-4 border border-wellness-400/20 group-hover:from-wellness-400/40 group-hover:to-wellness-600/40 group-hover:border-wellness-300/50 group-hover:text-white group-hover:scale-110 transition-all duration-500">
-                    {service.icon}
-                  </div>
-                  <span className="font-black text-white tracking-tight group-hover:text-wellness-200 transition-colors">{service.name}</span>
+                <div className="w-12 h-12 bg-slate-800/80 rounded-xl flex items-center justify-center text-wellness-300 mx-auto mb-4 group-hover:bg-wellness-500/10 group-hover:text-wellness-200 transition-all duration-300">
+                  {service.icon}
                 </div>
+                <span className="font-black text-white tracking-tight text-sm md:text-base group-hover:text-wellness-200 transition-colors">{service.name}</span>
               </Link>
             ))}
           </div>
@@ -319,9 +317,9 @@ export default async function HomePage() {
               <span className="text-amber-700 font-black text-[10px] uppercase tracking-[0.3em]">The Reading Room</span>
               <span className="h-px w-12 bg-amber-500/40" />
             </div>
-            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black text-slate-900 mb-5 tracking-tight leading-[1.1]">
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black text-slate-900 mb-5 tracking-tight leading-[1.15]">
               Before You{' '}
-              <span className="inline-block italic bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800 bg-clip-text text-transparent pb-2">Book</span>
+              <span className="inline-block italic bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800 bg-clip-text text-transparent pb-3 pr-3">Book</span>
             </h2>
             <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">Plain-English answers to the questions every first-time IV therapy patient asks.</p>
           </div>
@@ -380,7 +378,7 @@ export default async function HomePage() {
               <span className="text-slate-600 font-black text-[10px] uppercase tracking-[0.3em]">In The Wild</span>
             </div>
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.05] max-w-3xl mx-auto">
-              Real People. <em className="not-italic bg-gradient-to-br from-wellness-600 to-wellness-800 bg-clip-text text-transparent italic">Real Drips.</em>
+              Real People. <span className="inline-block italic bg-gradient-to-br from-wellness-600 to-wellness-800 bg-clip-text text-transparent pb-3 pr-2">Real Drips.</span>
             </h2>
           </div>
 
@@ -455,25 +453,27 @@ export default async function HomePage() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 mb-14">
             {[
-              { emoji: '🍷', label: 'Out too late last night',     drip: 'Hangover Recovery' },
-              { emoji: '🤧', label: 'Catching something nasty',     drip: 'Immune Support' },
-              { emoji: '😴', label: 'Brain fog all week',           drip: 'NAD+ / Energy' },
-              { emoji: '💪', label: 'Big workout or race coming',   drip: 'Athletic Recovery' },
-              { emoji: '👰', label: 'Wedding in a week',            drip: 'Beauty Glow' },
-              { emoji: '✈️', label: 'Just landed jet-lagged',       drip: 'Hydration + B-complex' },
-              { emoji: '🌡️', label: 'Bug or stomach flu',           drip: 'Hydration Drip' },
-              { emoji: '🎉', label: 'Vegas / bachelor weekend',     drip: 'Hangover + Recovery' },
+              { Icon: Wine,         label: 'Out too late last night',   drip: 'Hangover Recovery',   gradient: 'from-rose-400 to-rose-600',         shadow: 'shadow-rose-300/40' },
+              { Icon: Thermometer,  label: 'Catching something nasty',  drip: 'Immune Support',       gradient: 'from-orange-400 to-orange-600',     shadow: 'shadow-orange-300/40' },
+              { Icon: Brain,        label: 'Brain fog all week',        drip: 'NAD+ / Energy',        gradient: 'from-violet-400 to-violet-600',     shadow: 'shadow-violet-300/40' },
+              { Icon: Dumbbell,     label: 'Big workout or race coming',drip: 'Athletic Recovery',    gradient: 'from-wellness-400 to-wellness-600', shadow: 'shadow-wellness-300/40' },
+              { Icon: Sparkles,     label: 'Wedding in a week',         drip: 'Beauty Glow',          gradient: 'from-pink-400 to-fuchsia-500',      shadow: 'shadow-pink-300/40' },
+              { Icon: Plane,        label: 'Just landed jet-lagged',    drip: 'Hydration + B-complex',gradient: 'from-sky-400 to-sky-600',           shadow: 'shadow-sky-300/40' },
+              { Icon: Pill,         label: 'Bug or stomach flu',        drip: 'Hydration Drip',       gradient: 'from-emerald-400 to-emerald-600',   shadow: 'shadow-emerald-300/40' },
+              { Icon: PartyPopper,  label: 'Vegas / bachelor weekend',  drip: 'Hangover + Recovery',  gradient: 'from-amber-400 to-amber-600',       shadow: 'shadow-amber-300/40' },
             ].map((s) => (
               <Link
                 key={s.label}
                 href="/quiz"
-                className="group block bg-white rounded-[2rem] p-5 md:p-7 border border-slate-100 hover:border-wellness-300 hover:shadow-xl shadow-sm transition-all duration-300 hover:-translate-y-1"
+                className="group block bg-white rounded-[2rem] p-6 md:p-7 border border-slate-100 hover:border-wellness-300 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="text-3xl md:text-4xl mb-3 md:mb-4 leading-none" aria-hidden>{s.emoji}</div>
+                <div className={`w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br ${s.gradient} rounded-2xl flex items-center justify-center text-white shadow-lg ${s.shadow} mb-4 md:mb-5 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500`}>
+                  <s.Icon size={22} strokeWidth={2.5} />
+                </div>
                 <div className="font-black text-slate-900 text-sm md:text-base mb-2 md:mb-3 leading-tight tracking-tight">
                   {s.label}
                 </div>
-                <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-wellness-600">
+                <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-wellness-700">
                   <span>{s.drip}</span>
                   <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
                 </div>
@@ -514,7 +514,7 @@ export default async function HomePage() {
               <span className="text-sky-700 font-black text-[10px] uppercase tracking-[0.3em]">North America Coverage</span>
             </div>
             <h2 className="text-4xl sm:text-5xl md:text-7xl font-black text-slate-900 mb-5 tracking-tight leading-[1.05]">
-              Popular <em className="not-italic bg-gradient-to-br from-sky-600 via-sky-700 to-wellness-700 bg-clip-text text-transparent italic inline-block pb-2">Cities</em>
+              Popular <span className="inline-block italic bg-gradient-to-br from-sky-600 via-sky-700 to-wellness-700 bg-clip-text text-transparent pb-3 pr-3">Cities</span>
             </h2>
             <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto">Find the best local IV therapy providers and mobile services in your area.</p>
           </div>
@@ -582,7 +582,7 @@ export default async function HomePage() {
                 <span className="h-px w-10 bg-wellness-500/40" />
               </div>
               <h2 className="text-4xl sm:text-5xl md:text-7xl font-black text-slate-900 mb-5 tracking-tight leading-[1.05]">
-                Latest from the <em className="not-italic bg-gradient-to-br from-wellness-600 to-wellness-800 bg-clip-text text-transparent italic inline-block pb-2">Blog</em>
+                Latest from the <span className="inline-block italic bg-gradient-to-br from-wellness-600 to-wellness-800 bg-clip-text text-transparent pb-3 pr-3">Blog</span>
               </h2>
               <p className="text-lg md:text-xl text-slate-600 leading-relaxed">
                 Expert guides on IV therapy, wellness protocols, and local health insights.

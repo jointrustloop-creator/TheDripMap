@@ -77,7 +77,7 @@ export const HowItWorks = ({ totalListings = 1042 }: { totalListings?: number })
           </div>
           <h2 className="text-4xl sm:text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight leading-[1.05]">
             Your Path to{' '}
-            <span className="inline-block italic bg-gradient-to-br from-wellness-500 via-wellness-700 to-wellness-900 bg-clip-text text-transparent pb-2">Optimal</span>{' '}
+            <span className="inline-block italic bg-gradient-to-br from-wellness-500 via-wellness-700 to-wellness-900 bg-clip-text text-transparent pb-3 pr-3">Optimal</span>{' '}
             Wellness
           </h2>
           <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
@@ -147,7 +147,7 @@ export const HowItWorks = ({ totalListings = 1042 }: { totalListings?: number })
                   <span className="w-1.5 h-1.5 bg-wellness-400 rounded-full animate-pulse" />
                   <span className="text-wellness-300 font-black text-[10px] uppercase tracking-[0.3em]">Ready When You Are</span>
                 </div>
-                <h3 className="text-3xl md:text-4xl font-black text-white mb-4 tracking-tight leading-[1.1]">Ready to find your <em className="not-italic bg-gradient-to-br from-wellness-300 to-sky-300 bg-clip-text text-transparent italic">perfect drip?</em></h3>
+                <h3 className="text-3xl md:text-4xl font-black text-white mb-4 tracking-tight leading-[1.15]">Ready to find your <span className="inline-block italic bg-gradient-to-br from-wellness-300 to-sky-300 bg-clip-text text-transparent pb-2 pr-2">perfect drip?</span></h3>
                 <p className="text-slate-400 text-base md:text-lg max-w-md leading-relaxed">{totalListings}+ clinics ready to match with you. Find yours in 60 seconds.</p>
               </div>
               <Link
