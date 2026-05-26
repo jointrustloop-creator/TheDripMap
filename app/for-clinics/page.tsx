@@ -99,6 +99,28 @@ export default async function ForClinicsPage() {
           ))}
         </div>
 
+        {/* Featured-upgrade nudge — between claim-this-listing and the audit tool.
+            Keep it short — the deep pitch lives at /for-clinics/upgrade. */}
+        <div className="mb-16 bg-gradient-to-br from-amber-50 via-white to-rose-50/60 border-2 border-amber-200 rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center gap-6 shadow-lg">
+          <div className="flex-1">
+            <div className="inline-flex items-center gap-2 bg-amber-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3">
+              <span>✦</span> Already claimed?
+            </div>
+            <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 tracking-tight leading-tight">
+              Get top placement with a Featured listing — $99/mo.
+            </h3>
+            <p className="text-slate-600 text-sm md:text-base leading-relaxed">
+              Pin above every other clinic on city + treatment pages. Custom hero, direct-booking CTAs, patient testimonials, no contract.
+            </p>
+          </div>
+          <a
+            href="/for-clinics/upgrade"
+            className="shrink-0 bg-amber-500 hover:bg-amber-400 text-slate-900 px-7 py-4 rounded-2xl font-black text-base transition-all shadow-xl shadow-amber-200/50 whitespace-nowrap"
+          >
+            See Featured benefits →
+          </a>
+        </div>
+
         {/* Listing audit — clinic owner types their name, sees their actual listing vs claimed,
             plus top competitors in their city. Replaces a tepid ROI calculator with a personal,
             actionable conversion tool. */}

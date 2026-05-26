@@ -1,18 +1,19 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { Mail, Phone, MapPin, MessageSquare, UserCheck, Heart, Send, Download, Search } from 'lucide-react';
+import { Mail, Phone, MapPin, MessageSquare, UserCheck, Heart, Send, Download, Search, Sparkles } from 'lucide-react';
 import type { LeadRow } from '../../app/admin/leads/page';
 
 const TAB_LABELS: Record<LeadRow['source'], { label: string; icon: React.ReactNode }> = {
-  contact: { label: 'Contact form', icon: <Mail size={14} /> },
-  'message-clinic': { label: 'Message clinic', icon: <MessageSquare size={14} /> },
-  subscribe: { label: 'Subscribers', icon: <Send size={14} /> },
+  upgrade: { label: 'Upgrade requests', icon: <Sparkles size={14} /> },
   claim: { label: 'Claim requests', icon: <UserCheck size={14} /> },
+  'message-clinic': { label: 'Message clinic', icon: <MessageSquare size={14} /> },
+  contact: { label: 'Contact form', icon: <Mail size={14} /> },
+  subscribe: { label: 'Subscribers', icon: <Send size={14} /> },
   testimonial: { label: 'Testimonials', icon: <Heart size={14} /> },
 };
 
-const TABS: Array<'all' | LeadRow['source']> = ['all', 'contact', 'message-clinic', 'subscribe', 'claim', 'testimonial'];
+const TABS: Array<'all' | LeadRow['source']> = ['all', 'upgrade', 'claim', 'message-clinic', 'contact', 'subscribe', 'testimonial'];
 
 interface Props {
   initialLeads: LeadRow[];
@@ -135,6 +136,7 @@ function LeadCard({ lead }: { lead: LeadRow }) {
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-2 flex-wrap">
           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+            lead.source === 'upgrade' ? 'bg-amber-100 text-amber-800 border-amber-200 ring-2 ring-amber-200' :
             lead.source === 'claim' ? 'bg-amber-50 text-amber-700 border-amber-100' :
             lead.source === 'testimonial' ? 'bg-rose-50 text-rose-700 border-rose-100' :
             lead.source === 'message-clinic' ? 'bg-wellness-50 text-wellness-700 border-wellness-100' :
