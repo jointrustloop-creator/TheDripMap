@@ -43,7 +43,7 @@ export const metadata: Metadata = {
 };
 
 const TREATMENTS = [
-  { name: 'NAD+ Plus',      slug: 'nad-plus',       icon: Activity,    category: 'Energy & Longevity', image: 'iv-therapy-nad-iv-bag-closeup.jpg' },
+  { name: 'NAD+ Plus',      slug: 'nad-plus',       icon: Activity,    category: 'Energy & Longevity', image: 'iv-therapy-clinical-medical-setting.jpg' },
   { name: 'Hangover',       slug: 'hangover',       icon: Heart,       category: 'Recovery',           image: 'iv-therapy-hangover.jpg' },
   { name: 'Immune Support', slug: 'immune-support', icon: ShieldCheck, category: 'Wellness',           image: 'iv-therapy-immunity.jpg' },
   { name: 'Beauty Glow',    slug: 'beauty-glow',    icon: Sparkles,    category: 'Beauty',             image: 'iv-therapy-skin-glow.jpg' },
