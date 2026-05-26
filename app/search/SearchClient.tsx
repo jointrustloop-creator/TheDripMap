@@ -1,11 +1,12 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { 
-  Search, 
-  Filter, 
+import {
+  Search,
+  Filter,
   Zap,
-  CheckCircle2
+  CheckCircle2,
+  MapPin,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Provider, City, TreatmentType, ListingStats } from '../../src/types';
