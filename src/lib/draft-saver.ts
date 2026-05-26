@@ -110,6 +110,73 @@ export async function countBySubject(folder: string, subjectContains: string): P
 }
 
 /**
+ * Delete ALL messages from a Gmail folder. For inbox cleanup or draft purging.
+ * Returns count deleted.
+ */
+export async function deleteAllFromFolder(folder: string): Promise<number> {
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!user || !pass) throw new Error('SMTP_USER and SMTP_PASS env vars required');
+
+  const client = new ImapFlow({
+    host: 'imap.gmail.com',
+    port: 993,
+    secure: true,
+    auth: { user, pass },
+    logger: false,
+  });
+
+  let deleted = 0;
+  await client.connect();
+  try {
+    const mb = await client.mailboxOpen(folder);
+    if (mb.exists > 0) {
+      // '1:*' = all messages
+      await client.messageFlagsAdd('1:*', ['\\Deleted']);
+      deleted = mb.exists;
+      // For [Gmail]/Trash, expunge happens automatically. For other folders Gmail
+      // moves to Trash on \\Deleted (which is what we want).
+    }
+  } finally {
+    await client.logout();
+  }
+  return deleted;
+}
+
+/**
+ * Create a Gmail label (= IMAP folder). Idempotent — won't error if it exists.
+ */
+export async function createLabel(name: string): Promise<{ created: boolean }> {
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!user || !pass) throw new Error('SMTP_USER and SMTP_PASS env vars required');
+
+  const client = new ImapFlow({
+    host: 'imap.gmail.com',
+    port: 993,
+    secure: true,
+    auth: { user, pass },
+    logger: false,
+  });
+
+  let created = false;
+  await client.connect();
+  try {
+    try {
+      await client.mailboxCreate(name);
+      created = true;
+    } catch (err: unknown) {
+      // Already exists → that's fine
+      const msg = err instanceof Error ? err.message : String(err);
+      if (!/exists|already/i.test(msg)) throw err;
+    }
+  } finally {
+    await client.logout();
+  }
+  return { created };
+}
+
+/**
  * List recipient email addresses (To: header) from messages in `folder`
  * whose Subject contains `subjectContains`. Used to identify which clinics
  * have already been emailed so we can sync provider.outreach_sent in DB.

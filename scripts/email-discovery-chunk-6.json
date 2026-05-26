@@ -1,0 +1,191 @@
+[
+  {
+    "slug": "the-cure-iv-san-francisco",
+    "name": "The Cure IV",
+    "website": "https://thecureiv.com/",
+    "rating": "4.8",
+    "reviews": "150",
+    "city": "San Francisco",
+    "state": "California"
+  },
+  {
+    "slug": "mind-body-medical-spa-milwaukee",
+    "name": "Mind & Body Medical Spa",
+    "website": "http://www.mindandbodyaestheticcenter.com/",
+    "rating": "4.8",
+    "reviews": "15",
+    "city": "Milwaukee",
+    "state": "Wisconsin"
+  },
+  {
+    "slug": "luminance-regenerative-beauty-wellness-san-jose",
+    "name": "LUMINANCE REGENERATIVE BEAUTY & WELLNESS",
+    "website": "https://www.myluminance.com/",
+    "rating": "4.8",
+    "reviews": "148",
+    "city": "San Jose",
+    "state": "California"
+  },
+  {
+    "slug": "ava-wellness-and-rejuvenation-center-san-jose",
+    "name": "Ava Wellness and Rejuvenation Center",
+    "website": "https://theavaspa.com/",
+    "rating": "4.8",
+    "reviews": "141",
+    "city": "San Jose",
+    "state": "California"
+  },
+  {
+    "slug": "the-iv-health-centre-vancouver",
+    "name": "The IV Health Centre",
+    "website": "https://theiv.ca",
+    "rating": "4.8",
+    "reviews": "120",
+    "city": "Vancouver",
+    "state": "British Columbia"
+  },
+  {
+    "slug": "timeless-beauty-medspa-springfield",
+    "name": "Timeless Beauty MedSpa",
+    "website": "http://www.timelessbeautyspringfield.com/",
+    "rating": "4.8",
+    "reviews": "12",
+    "city": "Springfield",
+    "state": "Illinois"
+  },
+  {
+    "slug": "ithrivemd-san-diego",
+    "name": "iThriveMD",
+    "website": "https://www.ithrivemd.com",
+    "rating": "4.8",
+    "reviews": "101",
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "kalologie-medspa-santa-monica",
+    "name": "Kalologie Medspa Santa Monica",
+    "website": "https://kalologie.com",
+    "rating": "4.7",
+    "reviews": "44",
+    "city": "Santa Monica",
+    "state": "California"
+  },
+  {
+    "slug": "drip-refresh-mobile-iv-therapy-san-francisco-san-francisco",
+    "name": "Drip Refresh Mobile IV Therapy - San Francisco",
+    "website": "https://sanfranciscomobileiv.com/",
+    "rating": "4.7",
+    "reviews": "29",
+    "city": "San Francisco",
+    "state": "California"
+  },
+  {
+    "slug": "innovative-medical-center-fresno",
+    "name": "Innovative Medical Center",
+    "website": "http://imcfresno.com/",
+    "rating": "4.7",
+    "reviews": "266",
+    "city": "Fresno",
+    "state": "California"
+  },
+  {
+    "slug": "iv-therapy-la-glendale",
+    "name": "IV Therapy LA",
+    "website": "http://www.ivtla.com/",
+    "rating": "4.7",
+    "reviews": "19",
+    "city": "Glendale",
+    "state": "California"
+  },
+  {
+    "slug": "iv-drip-lounge-los-angeles",
+    "name": "IV Drip Lounge",
+    "website": "https://www.ivdriplounge.com",
+    "rating": "4.7",
+    "reviews": "15",
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "optimum-wellness-integrated-clinic-edmonton",
+    "name": "Optimum Wellness Integrated Clinic",
+    "website": "https://optimumwellnessclinic.ca/",
+    "rating": "4.7",
+    "reviews": "118",
+    "city": "Edmonton",
+    "state": "Alberta"
+  },
+  {
+    "slug": "restore-hyper-wellness-river-oaks-houston",
+    "name": "Restore Hyper Wellness - River Oaks",
+    "website": "https://www.restore.com/locations/tx-houston-river-oaks-tx007",
+    "rating": "4.6",
+    "reviews": "55",
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "h2o-health-brookfield",
+    "name": "H2O Health",
+    "website": "https://healthhydrationoasis.com/",
+    "rating": "4.6",
+    "reviews": "36",
+    "city": "Brookfield",
+    "state": "Wisconsin"
+  },
+  {
+    "slug": "livv-natural-san-diego",
+    "name": "LIVV Natural",
+    "website": "https://livvnatural.com",
+    "rating": "4.6",
+    "reviews": "167",
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "electra-health-vancouver",
+    "name": "Electra Health",
+    "website": "https://electrahealth.ca",
+    "rating": "4.6",
+    "reviews": "148",
+    "city": "Vancouver",
+    "state": "British Columbia"
+  },
+  {
+    "slug": "valley-natural-health-fresno-fresno",
+    "name": "Valley Natural Health - Fresno",
+    "website": "http://valleynh.com/",
+    "rating": "4.6",
+    "reviews": "104",
+    "city": "Fresno",
+    "state": "California"
+  },
+  {
+    "slug": "asap-ivs-san-diego",
+    "name": "ASAP IVs",
+    "website": "https://www.asapivs.com",
+    "rating": "4.5",
+    "reviews": "790",
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "vancouver-laser-and-skin-care-centre-vancouver",
+    "name": "Vancouver Laser & Skin Care Centre",
+    "website": "https://www.vancouverlaser.com",
+    "rating": "4.5",
+    "reviews": "61",
+    "city": "Vancouver",
+    "state": "British Columbia"
+  },
+  {
+    "slug": "drip-hydration-san-diego-san-diego",
+    "name": "Drip Hydration San Diego",
+    "website": "https://driphydration.com",
+    "rating": "4.5",
+    "reviews": "31",
+    "city": "San Diego",
+    "state": "California"
+  }
+]

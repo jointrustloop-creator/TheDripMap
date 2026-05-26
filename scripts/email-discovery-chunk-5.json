@@ -1,0 +1,191 @@
+[
+  {
+    "slug": "skin-logic-ottawa-ottawa",
+    "name": "Skin Logic Ottawa",
+    "website": "https://skinlogicottawa.com",
+    "rating": "4.9",
+    "reviews": "120",
+    "city": "Ottawa",
+    "state": "Ontario"
+  },
+  {
+    "slug": "restore-hyper-wellness-west-university-houston",
+    "name": "Restore Hyper Wellness - West University",
+    "website": "https://www.restore.com/locations/tx-houston-west-university-tx012",
+    "rating": "4.9",
+    "reviews": "109",
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "mobile-iv-drip-las-vegas-las-vegas",
+    "name": "Mobile IV Drip Las Vegas",
+    "website": "https://mobileivdrip.com/",
+    "rating": "4.9",
+    "reviews": "107",
+    "city": "Las Vegas",
+    "state": "Nevada"
+  },
+  {
+    "slug": "pure-health-palm-springs-palm-springs",
+    "name": "Pure Health- Palm Springs",
+    "website": "http://purehealthmedicine.com/",
+    "rating": "4.9",
+    "reviews": "104",
+    "city": "Palm Springs",
+    "state": "California"
+  },
+  {
+    "slug": "mint-integrative-health-vancouver",
+    "name": "Mint Integrative Health",
+    "website": "https://mintintegrative.com",
+    "rating": "4.8",
+    "reviews": "95",
+    "city": "Vancouver",
+    "state": "British Columbia"
+  },
+  {
+    "slug": "prime-iv-hydration-wellness-summerlin-las-vegas-las-vegas",
+    "name": "Prime IV Hydration & Wellness - Summerlin (Las Vegas)",
+    "website": "https://primeivhydration.com/locations/nevada/las-vegas-nv/",
+    "rating": "4.8",
+    "reviews": "69",
+    "city": "Las Vegas",
+    "state": "Nevada"
+  },
+  {
+    "slug": "neumed-modern-urgent-care-iv-therapy-houston-heights-houston",
+    "name": "NeuMed Modern Urgent Care + IV Therapy - Houston Heights",
+    "website": "https://neumed.com/locations/houston-heights/",
+    "rating": "4.8",
+    "reviews": "689",
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "crossroads-naturopathic-wellness-clinic-vancouver",
+    "name": "Crossroads Naturopathic Wellness Clinic",
+    "website": "https://crossroadsnaturopathic.com",
+    "rating": "4.8",
+    "reviews": "65",
+    "city": "Vancouver",
+    "state": "British Columbia"
+  },
+  {
+    "slug": "prime-iv-hydration-wellness-las-vegas-town-square-las-vegas",
+    "name": "Prime IV Hydration & Wellness - Las Vegas - Town Square",
+    "website": "https://primeivhydration.com/",
+    "rating": "4.8",
+    "reviews": "61",
+    "city": "Las Vegas",
+    "state": "Nevada"
+  },
+  {
+    "slug": "reviv-miami-brickell-miami",
+    "name": "REVIV Miami Brickell",
+    "website": "https://go.revivme.com/miami-brickell",
+    "rating": "4.8",
+    "reviews": "54",
+    "city": "Miami",
+    "state": "FL"
+  },
+  {
+    "slug": "san-diego-mobile-iv-therapy-san-diego",
+    "name": "San Diego Mobile IV Therapy",
+    "website": "https://sandiegomobileiv.com",
+    "rating": "4.8",
+    "reviews": "52",
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "biohackr-health-san-francisco",
+    "name": "Biohackr Health",
+    "website": "https://www.biohackr.health/",
+    "rating": "4.8",
+    "reviews": "51",
+    "city": "San Francisco",
+    "state": "California"
+  },
+  {
+    "slug": "glendale-whole-health-glendale",
+    "name": "Glendale Whole Health",
+    "website": "http://www.glendalewholehealth.com/",
+    "rating": "4.8",
+    "reviews": "50",
+    "city": "Glendale",
+    "state": "California"
+  },
+  {
+    "slug": "tlc-medspa-houston-houston",
+    "name": "TLC MedSpa Houston",
+    "website": "https://tlcmedspahouston.com",
+    "rating": "4.8",
+    "reviews": "33",
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "green-bay-integrative-health-green-bay",
+    "name": "Green Bay Integrative Health",
+    "website": "http://www.greenbayintegrativehealth.com/",
+    "rating": "4.8",
+    "reviews": "31",
+    "city": "Green Bay",
+    "state": "Wisconsin"
+  },
+  {
+    "slug": "prime-iv-hydration-wellness-las-vegas-centennial-hills-nv-las-vegas",
+    "name": "Prime IV Hydration & Wellness (Las Vegas-Centennial Hills, NV)",
+    "website": "https://primeivhydration.com/locations/nevada/centennialhills-89149/",
+    "rating": "4.8",
+    "reviews": "26",
+    "city": "Las Vegas",
+    "state": "Nevada"
+  },
+  {
+    "slug": "the-hydro-drip-bar-san-diego",
+    "name": "The Hydro Drip Bar",
+    "website": "https://thehydrodripbar.com",
+    "rating": "4.8",
+    "reviews": "23",
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "8-west-clinic-vancouver",
+    "name": "8 West Clinic",
+    "website": "https://www.8west.ca",
+    "rating": "4.8",
+    "reviews": "210",
+    "city": "Vancouver",
+    "state": "British Columbia"
+  },
+  {
+    "slug": "cns-infusions-revivedoc-chicago",
+    "name": "CNS Infusions - RevIVeDoc",
+    "website": "https://www.cns-center.com/iv-vitamin-therapy",
+    "rating": "4.8",
+    "reviews": "193",
+    "city": "Chicago",
+    "state": "Illinois"
+  },
+  {
+    "slug": "iv-nutrition-brookfield",
+    "name": "IV Nutrition",
+    "website": "https://ivnutrition.com/locations/milwaukee-brookfield-wi/",
+    "rating": "4.8",
+    "reviews": "189",
+    "city": "Brookfield",
+    "state": "Wisconsin"
+  },
+  {
+    "slug": "recharge-medical-san-francisco",
+    "name": "Recharge Medical",
+    "website": "https://recharge.clinic/",
+    "rating": "4.8",
+    "reviews": "151",
+    "city": "San Francisco",
+    "state": "California"
+  }
+]

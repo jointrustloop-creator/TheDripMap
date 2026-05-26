@@ -1,0 +1,191 @@
+[
+  {
+    "slug": "hangover-iv-las-vegas",
+    "name": "Hangover IV",
+    "website": "https://www.thehangoveriv.com/",
+    "rating": "5.0",
+    "reviews": "78",
+    "city": "Las Vegas",
+    "state": "Nevada"
+  },
+  {
+    "slug": "wellness-club-365-glendale",
+    "name": "Wellness Club 365",
+    "website": "http://www.wellnessclub365.com/",
+    "rating": "5.0",
+    "reviews": "68",
+    "city": "Glendale",
+    "state": "California"
+  },
+  {
+    "slug": "revive-therapy-aesthetics-morgan-hill",
+    "name": "Revive Therapy & Aesthetics",
+    "website": "https://www.revivetherapyandaesthetics.com/",
+    "rating": "5.0",
+    "reviews": "6",
+    "city": "Morgan Hill",
+    "state": "California"
+  },
+  {
+    "slug": "dove-hydration-wellness-milwaukee",
+    "name": "Dove Hydration & Wellness",
+    "website": "http://www.dovehydrationandwellness.com/",
+    "rating": "5.0",
+    "reviews": "6",
+    "city": "Milwaukee",
+    "state": "Wisconsin"
+  },
+  {
+    "slug": "replenish-360-a-division-of-pdre-llc-iv-hydration-therapy-and-wellness-services-palm-desert",
+    "name": "Replenish 360, A Division of PDRE LLC - IV Hydration Therapy and Wellness Services",
+    "website": "http://www.yourcprmd.com/replenish360",
+    "rating": "5.0",
+    "reviews": "43",
+    "city": "Palm Desert",
+    "state": "California"
+  },
+  {
+    "slug": "las-vegas-mobile-iv-therapy-las-vegas",
+    "name": "Las Vegas Mobile IV Therapy",
+    "website": "https://mobileivtherapylasvegas.com/",
+    "rating": "5.0",
+    "reviews": "390",
+    "city": "Las Vegas",
+    "state": "Nevada"
+  },
+  {
+    "slug": "abundant-life-wellness-center-milwaukee",
+    "name": "Abundant Life Wellness Center",
+    "website": "https://abundantlifewi.com/1",
+    "rating": "5.0",
+    "reviews": "38",
+    "city": "Milwaukee",
+    "state": "Wisconsin"
+  },
+  {
+    "slug": "anara-wellness-fresno",
+    "name": "Anara Wellness",
+    "website": "https://anarawellness.com/",
+    "rating": "5.0",
+    "reviews": "34",
+    "city": "Fresno",
+    "state": "California"
+  },
+  {
+    "slug": "area-hydration-aesthetics-palm-desert",
+    "name": "Area Hydration & Aesthetics",
+    "website": "https://www.areahydrationaa.com/",
+    "rating": "5.0",
+    "reviews": "34",
+    "city": "Palm Desert",
+    "state": "California"
+  },
+  {
+    "slug": "quik-drip-mobile-iv-peoria",
+    "name": "Quik Drip Mobile IV",
+    "website": "https://www.quikdripmobileiv.com/",
+    "rating": "5.0",
+    "reviews": "33",
+    "city": "Peoria",
+    "state": "Arizona"
+  },
+  {
+    "slug": "dorner-hydration-therapy-green-bay",
+    "name": "Dorner Hydration Therapy",
+    "website": "http://dornerht.com/",
+    "rating": "5.0",
+    "reviews": "33",
+    "city": "Green Bay",
+    "state": "Wisconsin"
+  },
+  {
+    "slug": "metro-infusion-center-springfield",
+    "name": "Metro Infusion Center",
+    "website": "https://metroinfusioncenter.com/",
+    "rating": "5.0",
+    "reviews": "3",
+    "city": "Springfield",
+    "state": "Illinois"
+  },
+  {
+    "slug": "beauty-within-medspa-morgan-hill-morgan-hill",
+    "name": "Beauty Within Medspa - Morgan Hill",
+    "website": "https://beautywithinmedspa.com/",
+    "rating": "5.0",
+    "reviews": "28",
+    "city": "Morgan Hill",
+    "state": "California"
+  },
+  {
+    "slug": "pure-infusion-suites-of-fresno-fresno",
+    "name": "Pure Infusion Suites of Fresno",
+    "website": "https://pureinfusionsuites.com/locations/fresno/",
+    "rating": "5.0",
+    "reviews": "26",
+    "city": "Fresno",
+    "state": "California"
+  },
+  {
+    "slug": "nextdrip-mobile-iv-therapy-of-glendale-glendale",
+    "name": "NEXTDRIP Mobile IV Therapy of Glendale",
+    "website": "https://www.nextdrip.com/locations/glendale/",
+    "rating": "5.0",
+    "reviews": "26",
+    "city": "Glendale",
+    "state": "California"
+  },
+  {
+    "slug": "optimal-medical-group-fresno",
+    "name": "Optimal Medical Group",
+    "website": "https://www.omgwellnessmd.com/",
+    "rating": "5.0",
+    "reviews": "232",
+    "city": "Fresno",
+    "state": "California"
+  },
+  {
+    "slug": "replenish-360-a-division-of-pdre-llc-iv-hydration-therapy-and-wellness-services-iv-hydration-iv-ther",
+    "name": "Replenish 360, A Division of PDRE LLC - IV Hydration Therapy and Wellness Services - IV Hydration - IV Therapy - IV Drip",
+    "website": "http://yourcprmd.com/replenish360/",
+    "rating": "5.0",
+    "reviews": "223",
+    "city": "Palm Desert",
+    "state": "California"
+  },
+  {
+    "slug": "regen-and-rejuvenate-san-jose",
+    "name": "Regen and Rejuvenate",
+    "website": "https://www.regenandrejuvenate.com/",
+    "rating": "5.0",
+    "reviews": "22",
+    "city": "San Jose",
+    "state": "California"
+  },
+  {
+    "slug": "iv-pros-iv-therapy-glendale",
+    "name": "IV Pros IV Therapy",
+    "website": "http://iv-pros.com/",
+    "rating": "5.0",
+    "reviews": "179",
+    "city": "Glendale",
+    "state": "California"
+  },
+  {
+    "slug": "optimize-u-fresno-hormone-recovery-fresno",
+    "name": "Optimize U - Fresno | Hormone & Recovery",
+    "website": "https://optimizeucenters.com/locations/fresno-california/",
+    "rating": "5.0",
+    "reviews": "17",
+    "city": "Fresno",
+    "state": "California"
+  },
+  {
+    "slug": "lasting-balance-aesthetics-and-wellness-springfield",
+    "name": "Lasting Balance Aesthetics and Wellness",
+    "website": "https://www.lasting-balance.com/",
+    "rating": "5.0",
+    "reviews": "17",
+    "city": "Springfield",
+    "state": "Illinois"
+  }
+]

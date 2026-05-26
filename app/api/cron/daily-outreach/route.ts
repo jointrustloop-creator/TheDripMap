@@ -4,8 +4,8 @@ import { sendMail } from '../../../../src/lib/mailer';
 
 const SITE_URL = 'https://www.thedripmap.com';
 const DAILY_TARGET = 19;
-const MIN_RATING = 4.7;
-const MIN_REVIEWS = 50;
+const MIN_RATING = 4.5;
+const MIN_REVIEWS = 10;
 
 export const maxDuration = 120;
 

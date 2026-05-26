@@ -1,0 +1,191 @@
+[
+  {
+    "slug": "acupoint-wellness-centre-vancouver",
+    "name": "Acupoint Wellness Centre",
+    "website": "https://acupoint.ca",
+    "rating": "4.9",
+    "reviews": "40",
+    "city": "Vancouver",
+    "state": "British Columbia"
+  },
+  {
+    "slug": "desert-bloom-medical-aesthetics-wellness-palm-desert",
+    "name": "Desert Bloom Medical Aesthetics & Wellness",
+    "website": "https://desertbloombeauty.com/",
+    "rating": "4.9",
+    "reviews": "39",
+    "city": "Palm Desert",
+    "state": "California"
+  },
+  {
+    "slug": "los-angeles-mobile-iv-therapy-los-angeles",
+    "name": "Los Angeles Mobile IV Therapy",
+    "website": "https://losangelesmobileiv.com",
+    "rating": "4.9",
+    "reviews": "35",
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "via-natural-medicine-winnipeg",
+    "name": "Via Natural Medicine",
+    "website": "https://vianatural.ca",
+    "rating": "4.9",
+    "reviews": "32",
+    "city": "Winnipeg",
+    "state": "Manitoba"
+  },
+  {
+    "slug": "push-iv-hydration-las-vegas-las-vegas",
+    "name": "Push IV Hydration Las Vegas",
+    "website": "https://pushiv.com/",
+    "rating": "4.9",
+    "reviews": "294",
+    "city": "Las Vegas",
+    "state": "Nevada"
+  },
+  {
+    "slug": "restore-hyper-wellness-palm-desert",
+    "name": "Restore Hyper Wellness",
+    "website": "http://www.restore.com/locations/ca-palm-desert-ca156",
+    "rating": "4.9",
+    "reviews": "271",
+    "city": "Palm Desert",
+    "state": "California"
+  },
+  {
+    "slug": "revived-personalized-wellness-houston",
+    "name": "Revived Personalized Wellness",
+    "website": "https://www.myrevived.com",
+    "rating": "4.9",
+    "reviews": "256",
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "prime-iv-hydration-wellness-las-vegas-lake-mead-buffalo-las-vegas",
+    "name": "Prime IV Hydration & Wellness - Las Vegas - Lake Mead & Buffalo",
+    "website": "https://primeivhydration.com/locations/nevada/las-vegas-89128/",
+    "rating": "4.9",
+    "reviews": "250",
+    "city": "Las Vegas",
+    "state": "Nevada"
+  },
+  {
+    "slug": "icryo-west-university-houston",
+    "name": "iCRYO West University",
+    "website": "https://icryo.com/location/houston-tx-west-university/",
+    "rating": "4.9",
+    "reviews": "226",
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "drip-refresh-mobile-iv-therapy-san-jose-san-jose",
+    "name": "Drip Refresh Mobile IV Therapy - San Jose",
+    "website": "https://driprefreshmobileiv.com/mobile-iv-therapy-san-jose/",
+    "rating": "4.9",
+    "reviews": "22",
+    "city": "San Jose",
+    "state": "California"
+  },
+  {
+    "slug": "fortify-wellness-winnipeg",
+    "name": "Fortify Wellness",
+    "website": "https://thisisfortify.com",
+    "rating": "4.9",
+    "reviews": "210",
+    "city": "Winnipeg",
+    "state": "Manitoba"
+  },
+  {
+    "slug": "b12-love-marinacow-hollow-san-francisco",
+    "name": "B12 LOVE | Marina/Cow Hollow",
+    "website": "https://www.b12love.com/",
+    "rating": "4.9",
+    "reviews": "191",
+    "city": "San Francisco",
+    "state": "California"
+  },
+  {
+    "slug": "regenerate-me-iv-planet-hollywood-mobile-hangover-iv-nad-las-vegas",
+    "name": "Regenerate Me IV - Planet Hollywood | Mobile Hangover IV | NAD+",
+    "website": "https://regenerateme.com/planet-hollywood/",
+    "rating": "4.9",
+    "reviews": "181",
+    "city": "Las Vegas",
+    "state": "Nevada"
+  },
+  {
+    "slug": "refresh-med-spa-la-los-angeles",
+    "name": "Refresh Med Spa LA",
+    "website": "https://refreshmedspala.com",
+    "rating": "4.9",
+    "reviews": "181",
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "renewme-iv-therapy-medspa-los-angeles",
+    "name": "RenewMe IV Therapy + MedSpa",
+    "website": "https://renewmespa.com",
+    "rating": "4.9",
+    "reviews": "171",
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "striver-iv-vitamin-infusion-chicago",
+    "name": "Striver IV Vitamin Infusion",
+    "website": "https://www.fresha.com/a/striver-iv-vitamin-infusion-chicago-5400-n-milwaukee-ave-w4znb35n%23buy-section",
+    "rating": "4.9",
+    "reviews": "150",
+    "city": "Chicago",
+    "state": "Illinois"
+  },
+  {
+    "slug": "the-hydration-room-studio-city-los-angeles",
+    "name": "The Hydration Room - Studio City",
+    "website": "https://hydrationroom.com",
+    "rating": "4.9",
+    "reviews": "15",
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "visage-clinical-beauty-winnipeg",
+    "name": "Visage Clinical Beauty",
+    "website": "https://visagebeauty.ca",
+    "rating": "4.9",
+    "reviews": "148",
+    "city": "Winnipeg",
+    "state": "Manitoba"
+  },
+  {
+    "slug": "nexgen-health-san-jose",
+    "name": "NexGen Health",
+    "website": "https://www.mynexgenhealth.com/",
+    "rating": "4.9",
+    "reviews": "141",
+    "city": "San Jose",
+    "state": "California"
+  },
+  {
+    "slug": "prime-iv-hydration-wellness-chicago-logan-square-il-chicago",
+    "name": "Prime IV Hydration & Wellness (Chicago-Logan Square, IL)",
+    "website": "https://primeivhydration.com/locations/illinois/chicago-il-60647/",
+    "rating": "4.9",
+    "reviews": "128",
+    "city": "Chicago",
+    "state": "Illinois"
+  },
+  {
+    "slug": "h2o-health-milwaukee",
+    "name": "H2O Health",
+    "website": "https://healthhydrationoasis.com/",
+    "rating": "4.9",
+    "reviews": "122",
+    "city": "Milwaukee",
+    "state": "Wisconsin"
+  }
+]
