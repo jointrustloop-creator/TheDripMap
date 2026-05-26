@@ -112,6 +112,9 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
   const [sortBy, setSortBy] = useState<'best' | 'rating' | 'reviews' | 'distance' | 'value'>('best');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filteredProviders, setFilteredProviders] = useState<Provider[]>(initialProviders);
+  // True when the user's combination of filters produced zero results and we
+  // auto-broadened to nationwide top-rated. Drives the amber "broadened" banner.
+  const [isBroadened, setIsBroadened] = useState(false);
   const [cities, setCities] = useState(initialCities);
   const [siteStats, setSiteStats] = useState<ListingStats | null>(initialStats);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
@@ -236,6 +239,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
       
       if (!hasSearch && !hasChips && sortBy === 'best') {
         setFilteredProviders(initialProviders);
+        setIsBroadened(false);
         return;
       }
 
@@ -303,8 +307,22 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
         if (a.is_featured !== b.is_featured) return a.is_featured ? -1 : 1;
         return tiebreaker(a, b);
       });
-      
-      setFilteredProviders(sorted);
+
+      // Hard floor: if the user's filter combo produced 0 results and there
+      // is a city filter active, drop the city and retry — better to show
+      // top-rated nationwide options than a dead-end empty state.
+      if (sorted.length === 0 && selectedCity !== 'All' && selectedCity !== '') {
+        const broadened = await searchListings(searchQuery, 'All');
+        const fallback = broadened.slice().sort((a, b) => {
+          if (a.is_featured !== b.is_featured) return a.is_featured ? -1 : 1;
+          return (b.rating ?? 0) - (a.rating ?? 0);
+        }).slice(0, 24);
+        setFilteredProviders(fallback);
+        setIsBroadened(fallback.length > 0);
+      } else {
+        setFilteredProviders(sorted);
+        setIsBroadened(false);
+      }
       setIsLoading(false);
     };
 
@@ -491,17 +509,40 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
               <p className="text-slate-500 font-bold">Searching clinics...</p>
             </div>
           ) : filteredProviders.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProviders.map((provider) => (
-                <div key={provider.id} className={cn(provider.is_featured ? "md:col-span-2 lg:col-span-3" : "")}>
-                  {provider.is_featured ? (
-                    <ProviderCardFeatured provider={provider} isPrimary={true} />
-                  ) : (
-                    <ProviderCard provider={provider} />
-                  )}
+            <>
+              {isBroadened && (
+                <div className="mb-8 bg-amber-50 border-2 border-amber-200 rounded-3xl p-5 flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                    <MapPin size={18} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-black text-amber-900 mb-1">
+                      No matches for your filters in {selectedCity} — showing top-rated nationwide.
+                    </p>
+                    <p className="text-xs text-amber-800 font-medium leading-relaxed">
+                      Adjust the city, clear a chip, or pick a different sort to narrow down.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => { setSelectedCity('All'); setIsBroadened(false); }}
+                    className="text-xs font-black text-amber-900 uppercase tracking-widest hover:underline whitespace-nowrap"
+                  >
+                    Clear city →
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredProviders.map((provider) => (
+                  <div key={provider.id} className={cn(provider.is_featured ? "md:col-span-2 lg:col-span-3" : "")}>
+                    {provider.is_featured ? (
+                      <ProviderCardFeatured provider={provider} isPrimary={true} />
+                    ) : (
+                      <ProviderCard provider={provider} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
           ) : (
             <div className="text-center py-32 bg-white rounded-[3rem] border border-slate-100 shadow-xl">
               <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mx-auto mb-6">
