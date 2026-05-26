@@ -20,10 +20,20 @@
 3. GET GOOGLE TO TRUST US — consistent content, fresh data, internal links
 
 ## Weekly non-negotiables
-- Monday: 10 outreach emails sent
+- Monday: 10 outreach emails sent — AUTOMATED (see Daily outreach below)
 - Tuesday: Check Search Console impressions vs last week
 - Wednesday: Add new providers or content
 - Friday: Review any claim requests or inbound emails
+
+## Daily outreach — AUTOMATED
+- Vercel Cron `/api/cron/daily-outreach` runs every day at 13:00 UTC (9am Eastern)
+- Sends up to 19 emails/day to highest-rated unclaimed clinics with email-on-file
+- Skips any clinic where providers.outreach_sent = true (no double sends, ever)
+- Sends a daily summary report email to info@thedripmap.com after each run
+- Template + sender: Deborah Triandafilou, info@thedripmap.com, via Workspace SMTP
+- Pause: remove the cron entry in vercel.json or disable in Vercel dashboard
+- Re-send to a specific clinic: `UPDATE providers SET outreach_sent=false WHERE slug='...'`
+- Mark a bouncing email: `UPDATE providers SET email_bounced=true WHERE email='...'` (cron will skip)
 
 ## Outreach priority order
 1. Mechelle — info@bluecypressky.com — Blue Cypress Georgetown KY — SEND TOMORROW

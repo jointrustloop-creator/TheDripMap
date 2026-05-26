@@ -108,6 +108,11 @@ info@thedripmap.com`;
       });
 
       if (mailResult.ok) {
+        // Mark sent in DB so we never re-email this clinic
+        await supabase
+          .from('providers')
+          .update({ outreach_sent: true, outreach_sent_at: new Date().toISOString() })
+          .eq('slug', p.slug);
         // Clear matching draft so Gmail doesn't double-state
         let draftDeleted = 0;
         try {

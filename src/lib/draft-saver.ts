@@ -110,6 +110,48 @@ export async function countBySubject(folder: string, subjectContains: string): P
 }
 
 /**
+ * List recipient email addresses (To: header) from messages in `folder`
+ * whose Subject contains `subjectContains`. Used to identify which clinics
+ * have already been emailed so we can sync provider.outreach_sent in DB.
+ */
+export async function listRecipientsBySubject(
+  folder: string,
+  subjectContains: string
+): Promise<string[]> {
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!user || !pass) throw new Error('SMTP_USER and SMTP_PASS env vars required');
+
+  const client = new ImapFlow({
+    host: 'imap.gmail.com',
+    port: 993,
+    secure: true,
+    auth: { user, pass },
+    logger: false,
+  });
+
+  const recipients: string[] = [];
+  await client.connect();
+  try {
+    await client.mailboxOpen(folder);
+    const uids = (await client.search({ subject: subjectContains })) as number[];
+    if (uids && uids.length > 0) {
+      for await (const msg of client.fetch(uids, { envelope: true }, { uid: true })) {
+        const to = msg.envelope?.to;
+        if (to && to.length > 0) {
+          for (const addr of to) {
+            if (addr.address) recipients.push(addr.address.toLowerCase());
+          }
+        }
+      }
+    }
+  } finally {
+    await client.logout();
+  }
+  return recipients;
+}
+
+/**
  * Delete drafts in [Gmail]/Drafts whose Subject contains `subjectContains`.
  * Used to clear stale outreach drafts before re-queueing with updated copy.
  * Returns count deleted.
