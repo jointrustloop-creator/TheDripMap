@@ -24,6 +24,7 @@ import { ClaimListingTrigger } from '../../../src/components/ClaimListingTrigger
 import { StickyClaimRail } from '../../../src/components/StickyClaimRail';
 import { MessageClinicButton } from '../../../src/components/MessageClinicButton';
 import { PatientTestimonials } from '../../../src/components/PatientTestimonials';
+import { ClaimAutoOpener } from '../../../src/components/ClaimAutoOpener';
 import {
   getListingBySlug,
   slugify,
@@ -1384,6 +1385,9 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
 
       {/* Persistent claim CTA — desktop floating card + mobile bottom sheet. Unclaimed only. */}
       {!provider.is_featured && <StickyClaimRail provider={provider} />}
+
+      {/* Auto-open claim modal when URL has ?claim=1 (outreach email link). Unclaimed only. */}
+      {!provider.is_featured && <ClaimAutoOpener provider={provider} />}
 
       <Footer />
     </div>
