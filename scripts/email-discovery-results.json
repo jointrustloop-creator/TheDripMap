@@ -1,15 +1,5 @@
 [
   {
-    "slug": "hangover-iv-las-vegas",
-    "email": "mymail@mailservice.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "wellness-club-365-glendale",
-    "email": "user@domain.com",
-    "source": "homepage"
-  },
-  {
     "slug": "revive-therapy-aesthetics-morgan-hill",
     "email": null,
     "source": "site_dead"
@@ -22,7 +12,7 @@
   {
     "slug": "replenish-360-a-division-of-pdre-llc-iv-hydration-therapy-and-wellness-services-palm-desert",
     "email": null,
-    "source": "site_dead"
+    "source": "no_email_found"
   },
   {
     "slug": "las-vegas-mobile-iv-therapy-las-vegas",
@@ -35,42 +25,17 @@
     "source": "no_email_found"
   },
   {
-    "slug": "anara-wellness-fresno",
-    "email": "info@strivepharmacy.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "area-hydration-aesthetics-palm-desert",
-    "email": "info@areahydrationaa.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "quik-drip-mobile-iv-peoria",
-    "email": "admin@quikdripmobileiv.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "dorner-hydration-therapy-green-bay",
-    "email": "amy@dornerht.com",
-    "source": "homepage"
-  },
-  {
     "slug": "metro-infusion-center-springfield",
     "email": null,
     "source": "no_email_found"
   },
   {
-    "slug": "beauty-within-medspa-morgan-hill-morgan-hill",
-    "email": "info@beautywithinmedspa.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "pure-infusion-suites-of-fresno-fresno",
+    "slug": "nextdrip-mobile-iv-therapy-of-glendale-glendale",
     "email": null,
     "source": "no_email_found"
   },
   {
-    "slug": "nextdrip-mobile-iv-therapy-of-glendale-glendale",
+    "slug": "pure-infusion-suites-of-fresno-fresno",
     "email": null,
     "source": "no_email_found"
   },
@@ -82,17 +47,7 @@
   {
     "slug": "replenish-360-a-division-of-pdre-llc-iv-hydration-therapy-and-wellness-services-iv-hydration-iv-ther",
     "email": null,
-    "source": "site_dead"
-  },
-  {
-    "slug": "regen-and-rejuvenate-san-jose",
-    "email": "user@domain.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "iv-pros-iv-therapy-glendale",
-    "email": "admin@iv-pros.com",
-    "source": "homepage"
+    "source": "no_email_found"
   },
   {
     "slug": "optimize-u-fresno-hormone-recovery-fresno",
@@ -100,24 +55,9 @@
     "source": "no_email_found"
   },
   {
-    "slug": "lasting-balance-aesthetics-and-wellness-springfield",
-    "email": "user@domain.com",
-    "source": "homepage"
-  },
-  {
     "slug": "drip-hydration-mobile-iv-therapy-las-vegas-las-vegas",
     "email": null,
     "source": "no_email_found"
-  },
-  {
-    "slug": "my-wellness-lounge-glendale",
-    "email": "user@domain.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "iv-injections-sf-enovone-san-francisco",
-    "email": "support@enov.one",
-    "source": "contact_page"
   },
   {
     "slug": "inspire-wellness-new-green-bay",
@@ -125,34 +65,14 @@
     "source": "no_email_found"
   },
   {
-    "slug": "redefine-healthcare-springfield",
-    "email": "info@redefinehc.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "mixt-iv-spa-los-alamitos",
-    "email": "info@mixtivspa.com",
-    "source": "homepage"
-  },
-  {
     "slug": "the-iv-club-las-vegas",
     "email": null,
     "source": "site_dead"
   },
   {
-    "slug": "savage-serenity-medspa-fresno",
-    "email": "info@savageserenityspa.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "joydevie-infusions-green-bay",
-    "email": "info@joydevie.com",
-    "source": "homepage"
-  },
-  {
     "slug": "the-infusion-center-palm-springs",
     "email": null,
-    "source": "site_dead"
+    "source": "no_email_found"
   },
   {
     "slug": "infusion-for-health-fresno-fresno",
@@ -165,8 +85,28 @@
     "source": "no_email_found"
   },
   {
-    "slug": "lux-wellness-ca-iv-drip-sacramento",
-    "email": "luxwellnessca@gmail.com",
+    "slug": "hydrafit-wellness-san-jose",
+    "email": "hydrafitwellness@gmail.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "vip-wellness-san-francisco",
+    "email": null,
+    "source": "site_dead"
+  },
+  {
+    "slug": "nextdrip-mobile-iv-therapy-of-coachella-palm-desert",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "clarus-medical-aesthetics-san-francisco",
+    "email": "info@clarus-health.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "b12-love-embarcadero-center-san-francisco",
+    "email": "support@b12love.com",
     "source": "homepage"
   },
   {
@@ -175,109 +115,34 @@
     "source": "site_dead"
   },
   {
-    "slug": "skinnovate-vancouver",
-    "email": "hello@skinnovate.ca",
-    "source": "contact_page"
-  },
-  {
-    "slug": "nova-naturopathic-clinic-calgary",
-    "email": "admin@novaclinic.ca",
-    "source": "homepage"
-  },
-  {
     "slug": "dr-sharon-aesthetics-wellness-and-iv-drip-bar-houston",
     "email": null,
     "source": "no_email_found"
   },
   {
-    "slug": "prime-medical-services-winnipeg",
-    "email": "admin@primemedicalsvc.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "live-hydration-spa-kirby-houston",
-    "email": "compliance@livehydrationspa.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "the-nature-doctors-winnipeg",
-    "email": "info@thenaturedoctors.ca",
-    "source": "homepage"
-  },
-  {
     "slug": "polaris-medical-aesthetics-los-angeles",
     "email": null,
-    "source": "site_dead"
-  },
-  {
-    "slug": "elevaterx-medical-aesthetics-ottawa",
-    "email": "info@elevaterx.ca",
-    "source": "homepage"
-  },
-  {
-    "slug": "next-health-century-city-los-angeles",
-    "email": "info@next-health.com",
-    "source": "homepage"
+    "source": "no_email_found"
   },
   {
     "slug": "the-dripbar-houston-heights-houston",
     "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "skin-suite-laser-and-medical-aesthetics-winnipeg",
+    "email": null,
     "source": "site_dead"
   },
   {
-    "slug": "zipdrip-mobile-iv-therapy-vancouver",
-    "email": "info@zipdrip.ca",
-    "source": "homepage"
-  },
-  {
-    "slug": "enhance-aesthetics-and-laser-winnipeg",
-    "email": "info@enhanceaesthetics.ca",
-    "source": "homepage"
-  },
-  {
-    "slug": "rejuv-medical-san-francisco",
-    "email": "info@rejuvsf.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "iv-vitamin-therapy-clinic-las-vegas",
-    "email": "example@mysite.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "promethean-clinic-vancouver",
-    "email": "john@doe.com",
-    "source": "contact_page"
-  },
-  {
-    "slug": "dripp-iv-therapy-long-beach",
-    "email": "info@drippiv.com",
-    "source": "contact_page"
-  },
-  {
-    "slug": "limelight-wellness-centre-vancouver",
-    "email": "info@limelightwellness.ca",
-    "source": "contact_page"
-  },
-  {
-    "slug": "elixr-iv-therapy-miami",
-    "email": "elixr@elixrme.com",
-    "source": "contact_page"
-  },
-  {
-    "slug": "the-vie-co-glendale",
-    "email": "contact@thevieco.com",
+    "slug": "skin-shop-medspa-houston",
+    "email": "info@skinshopmedspa.com",
     "source": "homepage"
   },
   {
     "slug": "infuse-wellness-center-santa-monica",
     "email": null,
-    "source": "site_dead"
-  },
-  {
-    "slug": "i-vie-infusions-fresno",
-    "email": "wellness@ivieinfusions.com",
-    "source": "homepage"
+    "source": "no_email_found"
   },
   {
     "slug": "ivy-en-rose-medical-spa-san-francisco",
@@ -285,74 +150,14 @@
     "source": "no_email_found"
   },
   {
-    "slug": "eterna-wellness-vancouver",
-    "email": "info@eternawellness.ca",
-    "source": "homepage"
-  },
-  {
-    "slug": "latelier-medical-aesthetics-winnipeg",
-    "email": "example@mysite.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "tyrian-healthcare-aesthetic-regenerative-medicine-peoria",
-    "email": "info@tyrianhcs.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "newu-hydration-lounge-san-jose",
-    "email": "info@newuhydrationlounge.com",
-    "source": "homepage"
-  },
-  {
     "slug": "the-dripbar-austin-the-domain",
     "email": null,
-    "source": "site_dead"
-  },
-  {
-    "slug": "luminary-health-and-longevity-clinic-vancouver",
-    "email": "office@luminaryhealth.ca",
-    "source": "homepage"
-  },
-  {
-    "slug": "acupoint-wellness-centre-vancouver",
-    "email": "info@acupoint.ca",
-    "source": "homepage"
-  },
-  {
-    "slug": "desert-bloom-medical-aesthetics-wellness-palm-desert",
-    "email": "hello@desertbloombeauty.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "los-angeles-mobile-iv-therapy-los-angeles",
-    "email": "lamobileiv@gmail.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "via-natural-medicine-winnipeg",
-    "email": "welcome@vianatural.ca",
-    "source": "homepage"
+    "source": "no_email_found"
   },
   {
     "slug": "push-iv-hydration-las-vegas-las-vegas",
     "email": null,
     "source": "no_email_found"
-  },
-  {
-    "slug": "restore-hyper-wellness-palm-desert",
-    "email": "frontdeskca156@restore.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "revived-personalized-wellness-houston",
-    "email": "info@myrevived.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "prime-iv-hydration-wellness-las-vegas-lake-mead-buffalo-las-vegas",
-    "email": "primeivlakemead@primeivhydration.com",
-    "source": "homepage"
   },
   {
     "slug": "icryo-west-university-houston",
@@ -365,29 +170,9 @@
     "source": "site_dead"
   },
   {
-    "slug": "fortify-wellness-winnipeg",
-    "email": "hello@thisisfortify.com",
-    "source": "contact_page"
-  },
-  {
-    "slug": "b12-love-marinacow-hollow-san-francisco",
-    "email": "support@b12love.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "regenerate-me-iv-planet-hollywood-mobile-hangover-iv-nad-las-vegas",
-    "email": "info@regenerateme.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "refresh-med-spa-la-los-angeles",
-    "email": "info@refreshmedspala.com",
-    "source": "homepage"
-  },
-  {
     "slug": "renewme-iv-therapy-medspa-los-angeles",
     "email": null,
-    "source": "site_dead"
+    "source": "no_email_found"
   },
   {
     "slug": "striver-iv-vitamin-infusion-chicago",
@@ -402,7 +187,7 @@
   {
     "slug": "visage-clinical-beauty-winnipeg",
     "email": null,
-    "source": "site_dead"
+    "source": "no_email_found"
   },
   {
     "slug": "nexgen-health-san-jose",
@@ -410,54 +195,14 @@
     "source": "no_email_found"
   },
   {
-    "slug": "prime-iv-hydration-wellness-chicago-logan-square-il-chicago",
-    "email": "logansquare@primeivhydration.com",
-    "source": "homepage"
+    "slug": "the-hydration-room-north-hollywood-los-angeles",
+    "email": null,
+    "source": "no_email_found"
   },
   {
-    "slug": "h2o-health-milwaukee",
-    "email": "info@h2omke.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "skin-logic-ottawa-ottawa",
-    "email": "onboarding.india@growth99.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "restore-hyper-wellness-west-university-houston",
-    "email": "frontdesktx012@restore.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "mobile-iv-drip-las-vegas-las-vegas",
-    "email": "bookings@mobileivdrip.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "pure-health-palm-springs-palm-springs",
-    "email": "info@purehealthmedicine.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "mint-integrative-health-vancouver",
-    "email": "info@mintintegrative.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "prime-iv-hydration-wellness-summerlin-las-vegas-las-vegas",
-    "email": "lasvegas@primeivhydration.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "neumed-modern-urgent-care-iv-therapy-houston-heights-houston",
-    "email": "info@neumed.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "crossroads-naturopathic-wellness-clinic-vancouver",
-    "email": "reception@crossroadsnd.com",
-    "source": "homepage"
+    "slug": "smart-medicine-sf-vinh-ngo-md-san-francisco",
+    "email": null,
+    "source": "no_email_found"
   },
   {
     "slug": "prime-iv-hydration-wellness-las-vegas-town-square-las-vegas",
@@ -480,11 +225,6 @@
     "source": "site_dead"
   },
   {
-    "slug": "glendale-whole-health-glendale",
-    "email": "info@glendalewholehealth.com",
-    "source": "homepage"
-  },
-  {
     "slug": "tlc-medspa-houston-houston",
     "email": null,
     "source": "no_email_found"
@@ -492,27 +232,7 @@
   {
     "slug": "green-bay-integrative-health-green-bay",
     "email": null,
-    "source": "site_dead"
-  },
-  {
-    "slug": "prime-iv-hydration-wellness-las-vegas-centennial-hills-nv-las-vegas",
-    "email": "centennialhills@primeivhydration.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "the-hydro-drip-bar-san-diego",
-    "email": "info@thehydrodripbar.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "8-west-clinic-vancouver",
-    "email": "info@8west.ca",
-    "source": "homepage"
-  },
-  {
-    "slug": "cns-infusions-revivedoc-chicago",
-    "email": "info@therevivedoc.com",
-    "source": "homepage"
+    "source": "no_email_found"
   },
   {
     "slug": "iv-nutrition-brookfield",
@@ -520,19 +240,9 @@
     "source": "no_email_found"
   },
   {
-    "slug": "recharge-medical-san-francisco",
-    "email": "rechargeadmin@ddphealth.com",
-    "source": "homepage"
-  },
-  {
     "slug": "the-cure-iv-san-francisco",
     "email": null,
     "source": "no_email_found"
-  },
-  {
-    "slug": "mind-body-medical-spa-milwaukee",
-    "email": "dgarzon@bestcarepeds.com",
-    "source": "homepage"
   },
   {
     "slug": "luminance-regenerative-beauty-wellness-san-jose",
@@ -540,24 +250,24 @@
     "source": "no_email_found"
   },
   {
-    "slug": "ava-wellness-and-rejuvenation-center-san-jose",
-    "email": "ava@avarejuvenation.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "the-iv-health-centre-vancouver",
-    "email": "info@theiv.ca",
-    "source": "homepage"
-  },
-  {
-    "slug": "timeless-beauty-medspa-springfield",
-    "email": "support@timelessbeautyspringfield.com",
-    "source": "contact_page"
-  },
-  {
     "slug": "ithrivemd-san-diego",
     "email": null,
     "source": "no_email_found"
+  },
+  {
+    "slug": "neumed-modern-urgent-care-iv-therapy-montrose-houston",
+    "email": "info@neumed.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "eternia-medspa-san-francisco",
+    "email": "info@eterniamedspa.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "neumed-modern-urgent-care-iv-therapy-washington-ave-houston",
+    "email": "washington@neumed.com",
+    "source": "homepage"
   },
   {
     "slug": "kalologie-medspa-santa-monica",
@@ -565,59 +275,14 @@
     "source": "no_email_found"
   },
   {
-    "slug": "drip-refresh-mobile-iv-therapy-san-francisco-san-francisco",
-    "email": "driprefreshmobileiv@gmail.com",
-    "source": "homepage"
-  },
-  {
     "slug": "innovative-medical-center-fresno",
     "email": null,
     "source": "no_email_found"
   },
   {
-    "slug": "iv-therapy-la-glendale",
-    "email": "ivtherapyla@gmail.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "iv-drip-lounge-los-angeles",
-    "email": "laxivdrip@gmail.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "optimum-wellness-integrated-clinic-edmonton",
-    "email": "info@optimumwellnessclinic.ca",
-    "source": "homepage"
-  },
-  {
-    "slug": "restore-hyper-wellness-river-oaks-houston",
-    "email": "frontdesktx007@restore.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "h2o-health-brookfield",
-    "email": "info@h2omke.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "livv-natural-san-diego",
-    "email": "livv@livvnatural.com",
-    "source": "homepage"
-  },
-  {
-    "slug": "electra-health-vancouver",
-    "email": "reception@electrahealth.ca",
-    "source": "homepage"
-  },
-  {
     "slug": "valley-natural-health-fresno-fresno",
     "email": null,
     "source": "no_email_found"
-  },
-  {
-    "slug": "asap-ivs-san-diego",
-    "email": "taylor@asapivs.com",
-    "source": "homepage"
   },
   {
     "slug": "vancouver-laser-and-skin-care-centre-vancouver",
@@ -626,6 +291,1001 @@
   },
   {
     "slug": "drip-hydration-san-diego-san-diego",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "serenity-aesthetics-wellness-san-francisco",
+    "email": "info@serenitymedspa.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "modmd-venice-los-angeles",
+    "email": "jobs@modmd.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "modmd-wilshire-los-angeles",
+    "email": "jobs@modmd.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "nutrichem-compounding-pharmacy-and-clinic-ottawa",
+    "email": "info@nutrichem.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "ottawa-integrative-health-centre-ottawa",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "infusion-for-health-glendale-glendale",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "aesthetica-med-spa-of-san-diego-san-diego",
+    "email": "aestheticamedspasd@gmail.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "alcheme-health-san-diego",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "aesthetic-envy-sacramento",
+    "email": "info@aestheticenvy.com",
+    "source": "contact_page"
+  },
+  {
+    "slug": "the-laser-cafe-medical-spa-san-diego",
+    "email": "info@thelasercafe.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "liquid-life-mobile-iv-therapy-los-angeles",
+    "email": "info@liquidlifela.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "vida-flo-nashville",
+    "email": "nashville@govidaflo.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "inner-gate-health-wellness-ankeny-portland",
+    "email": "info@innergatepdx.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "hollywood-walk-in-clinic-los-angeles",
+    "email": "info@hollywoodclinic.net",
+    "source": "homepage"
+  },
+  {
+    "slug": "vitality-integrative-medicine-los-angeles",
+    "email": "vitalityintegrativemedicine@gmail.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "beeson-wellness-center-portland",
+    "email": "info@beesonwellness.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "prfct-san-diego",
+    "email": "feelgood@helloprfct.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "koi-wellbeing-la-jolla-san-diego",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "joy-wellness-partners-san-diego",
+    "email": "info@joywellnesspartners.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "intravenous-solutions-nashville",
+    "email": "example@email.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "inner-gate-health-wellness-hollywood-portland",
+    "email": "info@innergatepdx.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "hydrate-medical-charlotte",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "b-medical-spa-and-wellness-center-san-diego",
+    "email": "info@bmedspa.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "hydrate-me-medspa-columbus",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "mega-wellness-clinic-los-angeles",
+    "email": "megawellnessclinic@gmail.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "drip-iv-therapy-san-diego-san-diego",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "vitaminfusion-los-angeles",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "iv-bars-of-houston-heights-houston",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "infusewell-los-angeles",
+    "email": "book@infusewell.co",
+    "source": "contact_page"
+  },
+  {
+    "slug": "resilience-integrative-wellness-san-diego",
+    "email": null,
+    "source": "site_dead"
+  },
+  {
+    "slug": "fika-infusion-wellness-millcreek-salt-lake-city",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "memorial-primary-and-urgent-care-houston",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "saffron-and-sage-san-diego",
+    "email": "service@saffronsageliving.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "zia-iv-infusion-and-injection-lounge-edmonton",
+    "email": "info@ziaiv.ca",
+    "source": "homepage"
+  },
+  {
+    "slug": "portland-clinic-of-holistic-health-portland",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "hydrate-iv-bar-washington-park-denver",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "restore-hyper-wellness-easton-columbus",
+    "email": "frontdeskoh001@restore.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "humble-hydration-wellness-sacramento",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "entrust-urgent-care-iv-infusion-houston",
+    "email": "info@entrustcare.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "hydrate-iv-bar-highlands-square-denver",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "drip-hydration-los-angeles-los-angeles",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "cameron-wellness-and-spa-salt-lake-city",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "angel-longevity-medical-center-los-angeles",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "regenerative-wellness-san-diego-san-diego",
+    "email": "info.regenwellness@gmail.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "hydrate-medical-ballantyne-charlotte",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "vitality-iv-bar-indianapolis",
+    "email": null,
+    "source": "site_dead"
+  },
+  {
+    "slug": "mobile-iv-medics-los-angeles-los-angeles",
+    "email": null,
+    "source": "site_dead"
+  },
+  {
+    "slug": "vip-drips-iv-therapy-and-aesthetics-los-angeles",
+    "email": "wecare@vipdripsivtherapy.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "simply-wellness-salt-lake-city",
+    "email": "inquiry@simplywellness.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "salt-city-iv-salt-lake-city",
+    "email": "lindsay.slciv@gmail.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "the-vitamin-bar-mobile-iv-salt-lake-city",
+    "email": "slc@thevitaminbariv.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "drip-hydration-salt-lake-city",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "iv-glow-bar-los-angeles",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "drip-iv-therapy-mobile-los-angeles",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "kalologie-medspa-hollywood-los-angeles",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "next-health-west-hollywood",
+    "email": "info@next-health.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "luxbae-medical-spa-west-hollywood",
+    "email": "info@luxbae.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "me-losangeles-aesthetics-west-hollywood",
+    "email": "me@melosangeles.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "iv-vitamin-therapy-beverly-hills",
+    "email": "info@ivvitamintherapy.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "beverly-hills-aesthetic-medics",
+    "email": "info@bhaestheticmedics.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "kanodia-medspa-beverly-hills",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-cure-iv-beverly-hills",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "kao-aesthetics-santa-monica",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "hydration-room-culver-city",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "infuse-wellness-center-culver-city",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "infusion-for-health-burbank",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "revival-oasis-burbank",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "hydration-room-pasadena",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "la-rserve-aesthetics-new-york",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "iv-alabama-mobile-iv-huntsville",
+    "email": "info@flaremd.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "infused-iv-the-woodlands",
+    "email": null,
+    "source": "site_dead"
+  },
+  {
+    "slug": "innerbloom-iv-hydration-and-wellness-spa-dunedin",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "arise-infusion-therapy-services-washington",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "restore-hydration-wellness-fredericksburg",
+    "email": null,
+    "source": "site_dead"
+  },
+  {
+    "slug": "medix-infusion-tomball-tomball",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "method-wellness-north-little-rock",
+    "email": "support@methodwellnessar.com",
+    "source": "contact_page"
+  },
+  {
+    "slug": "optimal-vitality-pleasanton",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "rehydration-station-lexington",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "revive-with-b-altamont",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-dripbar-andover-andover",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-dripbar-bedford-bedford",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-dripbar-beverly-beverly",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-dripbar-brooksville-brooksville",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-dripbar-cranford-cranford",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-dripbar-foxboro-foxborough",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-dripbar-gahanna-new-albany-gahanna",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-dripbar-greenville-greenville",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-dripbar-winchester-winchester",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-dripbar-dc-georgetown-washington",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-dripbar-reston-reston",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-dripbar-rochester-hills-rochester-hills",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "fyxson-medical-aesthetics-oakville",
+    "email": "info@fyxsonmedical.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "the-dripbar-largo-iv-vitamin-therapy-and-peptide-wellness-services-largo",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "oakville-naturopathic-wellness-centre-oakville",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "iv-drip-therapy-near-me-mississauga",
+    "email": "info@newmclinic.com",
+    "source": "contact_page"
+  },
+  {
+    "slug": "element-wellness-omaha",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "upper-room-clinic-oakville",
+    "email": "hello@upperroomclinic.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "iv-healing-spa-los-angeles",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "soglow-iv-san-mateo",
+    "email": "info@soglowiv.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "aafiyat-aesthetics-mississauga",
+    "email": "info@aafiyataesthetics.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "the-dripbar-times-square-at-alter-native-wellness-new-york",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "purebalance-wellness-mississauga",
+    "email": "info@mypurebalance.ca",
+    "source": "contact_page"
+  },
+  {
+    "slug": "advanced-womens-health-clinic-mississauga",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "lyfemedica-wellness-clinic-oakville",
+    "email": "info@lyfemedica.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "the-pur-glow-medical-spa-oakville",
+    "email": "info@thepurglow.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "the-dripbar-magnolia-magnolia",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "prime-iv-hydration-and-wellness-west-university-houston",
+    "email": "westuniversity@primeivhydration.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "restore-hyper-wellness-tanglewood-houston",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-dripbar-midlothian-midlothian",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "river-oaks-galleria-med-spa-houston",
+    "email": "info@rogmedspa.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "cls-health-houston-galleria-infusion-center-houston",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-dripbar-troy-troy",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "koi-wellbeing-sorrento-valley-san-diego",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "mission-valley-medical-infusion-center-san-diego",
+    "email": "info@missionvalleyiv.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "ah-clinics-san-diego",
+    "email": "info@ah-clinics.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "revitalize-wellness-pb-san-diego",
+    "email": "revitalizewellnesspb@gmail.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "body-blu-san-diego",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "thrive-drip-spa-memorial-green-houston",
+    "email": "info@thrivedripspa.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "river-oaks-drip-spa-houston",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-dripbar-montclair-montclair",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "hydration-room-santa-monica",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "iv-and-wellness-lounge-long-beach",
+    "email": "user@domain.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "relive-health-memorial-houston",
+    "email": "memorial.services@relivehealth.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "parfaire-medical-aesthetics-pasadena",
+    "email": "reception@parfaire.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "hydration-room-long-beach-belmont-shore",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "liquivida-lounge-brickell-miami",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "essence-wellness-clinic-marda-loop-calgary",
+    "email": "mardaloop@essencewellness.ca",
+    "source": "homepage"
+  },
+  {
+    "slug": "trumed-naturopath-clinic-edmonton",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "drip-back-to-life-medical-corporation-livermore",
+    "email": "user@domain.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "lyfemedica-wellness-clinic-ottawa-ottawa",
+    "email": "info@lyfemedica.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "viva-wellness-drip-montreal-montreal",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "onus-iv-hydration-bar-highlands-denver",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "dripme-iv-hydration-wellness-cleveland",
+    "email": "info@mysite.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "prime-iv-hydration-wellness-cherry-creek-denver",
+    "email": "cherrycreek@primeivhydration.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "heritage-regenerative-medicine-charlotte",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "infusion-for-health-san-jose-san-jose",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "sacramento-mobile-iv-therapy",
+    "email": "sacramentomobileiv@gmail.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "sacramento-functional-medicine",
+    "email": "drgodby@sacnd.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "the-clinic-yyc-calgary",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-drip-wellness-group-calgary",
+    "email": "shalene@thedripwellnessgroup.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "feel-good-iv-therapy-calgary",
+    "email": "info@feelgoodivtherapy.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "action-health-calgary",
+    "email": "grantcummingsdc@gmail.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "neurvana-naturopathic-medicine-calgary",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "best-skin-beauty-clinic-calgary",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "evolve-chiropractic-and-wellness-calgary",
+    "email": "fancybox_loading@2x.gif",
+    "source": "homepage"
+  },
+  {
+    "slug": "core-health-centre-calgary",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "marda-loop-naturopathic-and-wellness-clinic-calgary",
+    "email": "patientcare@mardaloopwellness.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "anara-infusion-and-wellness-calgary",
+    "email": "zenaida@anarainfusion.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "the-centre-for-health-innovation-ottawa",
+    "email": "info@thechi.ca",
+    "source": "homepage"
+  },
+  {
+    "slug": "revivelife-clinic-ottawa",
+    "email": "info@revivelife.ca",
+    "source": "homepage"
+  },
+  {
+    "slug": "revive-u-mobile-iv-wellness-clinic-ottawa",
+    "email": "user@domain.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "elysian-wellness-centre-hunt-club-ottawa",
+    "email": "info@ewcentre.com",
+    "source": "contact_page"
+  },
+  {
+    "slug": "elixir-beauty-clinic-ottawa",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "pure-medical-cosmetics-ottawa",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "iv-clinic-montreal",
+    "email": "info@stagheaddesigns.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "ideal-body-clinic-montreal",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "drip-bar-mtl-montreal",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "z-nith-sant-montreal",
+    "email": "info@zenithsante.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "mobile-mediq-montreal",
+    "email": "info@mobilemediq.ca",
+    "source": "homepage"
+  },
+  {
+    "slug": "rn-priv-e-montreal",
+    "email": "info@rnprivee.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "wellness-mobile-iv-montreal-montreal",
+    "email": null,
+    "source": "site_dead"
+  },
+  {
+    "slug": "drip-hydration-montreal-montreal",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "clinique-iv-montreal",
+    "email": "info@cliniqueiv.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "vitadrip-iv-edmonton",
+    "email": "info@vitadripiv.ca",
+    "source": "homepage"
+  },
+  {
+    "slug": "emerald-medical-and-wellness-centre-edmonton",
+    "email": "info@emeraldwellness.ca",
+    "source": "homepage"
+  },
+  {
+    "slug": "bliss-medispa-and-integrated-wellness-edmonton",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "hydro-oasis-wellness-edmonton",
+    "email": "info@hydrooasiswellness.com",
+    "source": "contact_page"
+  },
+  {
+    "slug": "vitapoke-infusion-lounge-poke-beauty-edmonton",
+    "email": "info@pokebeauty.ca",
+    "source": "homepage"
+  },
+  {
+    "slug": "tonic-iv-edmonton",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "viva-wellness-drip-edmonton-edmonton",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "feel-irie-medical-services-edmonton",
+    "email": "feeliriemedicalservices@gmail.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "theradrip-mobile-iv-therapy-winnipeg",
+    "email": "admin@theradrip.ca",
+    "source": "homepage"
+  },
+  {
+    "slug": "centre-for-natural-pain-solutions-winnipeg",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "winnipeg-clinic-infusion-centre-winnipeg",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-gray-clinic-winnipeg",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "everliv-iv-therapy-miami",
+    "email": "user@domain.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "key-basis-iv-wellness-miami",
+    "email": "info@keybasisiv.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "drip-wellness-iv-miami",
+    "email": "info@dripwellnessiv.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "ivitamin-south-congress-austin",
+    "email": "soco@ivitaminatx.com",
+    "source": "contact_page"
+  },
+  {
+    "slug": "ivitamin-north-austin",
+    "email": "soco@ivitaminatx.com",
+    "source": "contact_page"
+  },
+  {
+    "slug": "fluid-revival-mobile-iv-austin",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "restore-hyper-wellness-south-lamar-austin",
+    "email": "frontdesktx024@restore.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "liquid-wellness-iv-hydration-austin",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "awaken-iv-therapy-denver",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "vida-flo-fifth-broadway-nashville",
+    "email": "nashville@govidaflo.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "the-dripbar-nashville",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-drip-lab-mobile-iv-nashville",
+    "email": "info@thedriplabtn.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "glo-iv-spa-charlotte",
+    "email": "welless@gloivspa.com",
+    "source": "contact_page"
+  },
+  {
+    "slug": "restore-hyper-wellness-southpark-charlotte",
+    "email": "frontdesknc002@restore.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "drip-iv-wellness-medspa-charlotte",
+    "email": "hello@dripivspa.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "vitality-iv-bar-broad-ripple-indianapolis",
+    "email": null,
+    "source": "site_dead"
+  },
+  {
+    "slug": "green-iv-indianapolis",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "indiana-mobile-iv-indianapolis",
+    "email": "contact@ivnurses.org",
+    "source": "homepage"
+  },
+  {
+    "slug": "holistic-family-wellness-indianapolis",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "prime-iv-hydration-wellness-gahanna-columbus",
+    "email": "gahanna@primeivhydration.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "revive-614-mobile-iv-columbus",
+    "email": null,
+    "source": "no_email_found"
+  },
+  {
+    "slug": "the-confidence-lab-columbus",
+    "email": "info@myconfidencelab.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "dr-heather-friedman-nd-the-heal-house-portland",
+    "email": "user@domain.com",
+    "source": "homepage"
+  },
+  {
+    "slug": "ortho-rejuv-wellness-and-aesthetics-portland",
     "email": null,
     "source": "no_email_found"
   }

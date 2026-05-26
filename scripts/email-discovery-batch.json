@@ -1,23 +1,5 @@
 [
   {
-    "slug": "hangover-iv-las-vegas",
-    "name": "Hangover IV",
-    "website": "https://www.thehangoveriv.com/",
-    "rating": "5.0",
-    "reviews": "78",
-    "city": "Las Vegas",
-    "state": "Nevada"
-  },
-  {
-    "slug": "wellness-club-365-glendale",
-    "name": "Wellness Club 365",
-    "website": "http://www.wellnessclub365.com/",
-    "rating": "5.0",
-    "reviews": "68",
-    "city": "Glendale",
-    "state": "California"
-  },
-  {
     "slug": "revive-therapy-aesthetics-morgan-hill",
     "name": "Revive Therapy & Aesthetics",
     "website": "https://www.revivetherapyandaesthetics.com/",
@@ -63,42 +45,6 @@
     "state": "Wisconsin"
   },
   {
-    "slug": "anara-wellness-fresno",
-    "name": "Anara Wellness",
-    "website": "https://anarawellness.com/",
-    "rating": "5.0",
-    "reviews": "34",
-    "city": "Fresno",
-    "state": "California"
-  },
-  {
-    "slug": "area-hydration-aesthetics-palm-desert",
-    "name": "Area Hydration & Aesthetics",
-    "website": "https://www.areahydrationaa.com/",
-    "rating": "5.0",
-    "reviews": "34",
-    "city": "Palm Desert",
-    "state": "California"
-  },
-  {
-    "slug": "quik-drip-mobile-iv-peoria",
-    "name": "Quik Drip Mobile IV",
-    "website": "https://www.quikdripmobileiv.com/",
-    "rating": "5.0",
-    "reviews": "33",
-    "city": "Peoria",
-    "state": "Arizona"
-  },
-  {
-    "slug": "dorner-hydration-therapy-green-bay",
-    "name": "Dorner Hydration Therapy",
-    "website": "http://dornerht.com/",
-    "rating": "5.0",
-    "reviews": "33",
-    "city": "Green Bay",
-    "state": "Wisconsin"
-  },
-  {
     "slug": "metro-infusion-center-springfield",
     "name": "Metro Infusion Center",
     "website": "https://metroinfusioncenter.com/",
@@ -108,12 +54,12 @@
     "state": "Illinois"
   },
   {
-    "slug": "beauty-within-medspa-morgan-hill-morgan-hill",
-    "name": "Beauty Within Medspa - Morgan Hill",
-    "website": "https://beautywithinmedspa.com/",
+    "slug": "nextdrip-mobile-iv-therapy-of-glendale-glendale",
+    "name": "NEXTDRIP Mobile IV Therapy of Glendale",
+    "website": "https://www.nextdrip.com/locations/glendale/",
     "rating": "5.0",
-    "reviews": "28",
-    "city": "Morgan Hill",
+    "reviews": "26",
+    "city": "Glendale",
     "state": "California"
   },
   {
@@ -123,15 +69,6 @@
     "rating": "5.0",
     "reviews": "26",
     "city": "Fresno",
-    "state": "California"
-  },
-  {
-    "slug": "nextdrip-mobile-iv-therapy-of-glendale-glendale",
-    "name": "NEXTDRIP Mobile IV Therapy of Glendale",
-    "website": "https://www.nextdrip.com/locations/glendale/",
-    "rating": "5.0",
-    "reviews": "26",
-    "city": "Glendale",
     "state": "California"
   },
   {
@@ -153,24 +90,6 @@
     "state": "California"
   },
   {
-    "slug": "regen-and-rejuvenate-san-jose",
-    "name": "Regen and Rejuvenate",
-    "website": "https://www.regenandrejuvenate.com/",
-    "rating": "5.0",
-    "reviews": "22",
-    "city": "San Jose",
-    "state": "California"
-  },
-  {
-    "slug": "iv-pros-iv-therapy-glendale",
-    "name": "IV Pros IV Therapy",
-    "website": "http://iv-pros.com/",
-    "rating": "5.0",
-    "reviews": "179",
-    "city": "Glendale",
-    "state": "California"
-  },
-  {
     "slug": "optimize-u-fresno-hormone-recovery-fresno",
     "name": "Optimize U - Fresno | Hormone & Recovery",
     "website": "https://optimizeucenters.com/locations/fresno-california/",
@@ -178,15 +97,6 @@
     "reviews": "17",
     "city": "Fresno",
     "state": "California"
-  },
-  {
-    "slug": "lasting-balance-aesthetics-and-wellness-springfield",
-    "name": "Lasting Balance Aesthetics and Wellness",
-    "website": "https://www.lasting-balance.com/",
-    "rating": "5.0",
-    "reviews": "17",
-    "city": "Springfield",
-    "state": "Illinois"
   },
   {
     "slug": "drip-hydration-mobile-iv-therapy-las-vegas-las-vegas",
@@ -198,24 +108,6 @@
     "state": "Nevada"
   },
   {
-    "slug": "my-wellness-lounge-glendale",
-    "name": "My Wellness Lounge",
-    "website": "http://www.mywellnesslounge.net/",
-    "rating": "5.0",
-    "reviews": "14",
-    "city": "Glendale",
-    "state": "California"
-  },
-  {
-    "slug": "iv-injections-sf-enovone-san-francisco",
-    "name": "IV Injections SF - enov.one",
-    "website": "https://enov.one/",
-    "rating": "5.0",
-    "reviews": "14",
-    "city": "San Francisco",
-    "state": "California"
-  },
-  {
     "slug": "inspire-wellness-new-green-bay",
     "name": "Inspire Wellness NEW",
     "website": "https://inspirewellnessnew.com/",
@@ -225,24 +117,6 @@
     "state": "Wisconsin"
   },
   {
-    "slug": "redefine-healthcare-springfield",
-    "name": "Redefine HealthCare",
-    "website": "https://redefinehc.com/",
-    "rating": "5.0",
-    "reviews": "13",
-    "city": "Springfield",
-    "state": "Illinois"
-  },
-  {
-    "slug": "mixt-iv-spa-los-alamitos",
-    "name": "MIXT IV Spa",
-    "website": "https://mixtivspa.com/",
-    "rating": "5.0",
-    "reviews": "13",
-    "city": "Los Alamitos",
-    "state": "California"
-  },
-  {
     "slug": "the-iv-club-las-vegas",
     "name": "The IV Club",
     "website": "https://theivclublv.com/",
@@ -250,24 +124,6 @@
     "reviews": "12",
     "city": "Las Vegas",
     "state": "Nevada"
-  },
-  {
-    "slug": "savage-serenity-medspa-fresno",
-    "name": "Savage Serenity MedSpa",
-    "website": "https://savageserenityspa.com/",
-    "rating": "5.0",
-    "reviews": "116",
-    "city": "Fresno",
-    "state": "California"
-  },
-  {
-    "slug": "joydevie-infusions-green-bay",
-    "name": "JoyDeVie Infusions",
-    "website": "https://joydevie.com/",
-    "rating": "5.0",
-    "reviews": "11",
-    "city": "Green Bay",
-    "state": "Wisconsin"
   },
   {
     "slug": "the-infusion-center-palm-springs",
@@ -297,13 +153,49 @@
     "state": "Illinois"
   },
   {
-    "slug": "lux-wellness-ca-iv-drip-sacramento",
-    "name": "LUX Wellness CA - IV Drip",
-    "website": "https://luxwellnessca.com",
-    "rating": "5",
-    "reviews": "52",
-    "city": "Sacramento",
-    "state": "CA"
+    "slug": "hydrafit-wellness-san-jose",
+    "name": "HydraFit+ Wellness",
+    "website": "https://hydrafitwellness.com/",
+    "rating": "5.0",
+    "reviews": "1",
+    "city": "San Jose",
+    "state": "California"
+  },
+  {
+    "slug": "vip-wellness-san-francisco",
+    "name": "VIP Wellness",
+    "website": "http://thevipwellness.com/",
+    "rating": "5.0",
+    "reviews": "1",
+    "city": "San Francisco",
+    "state": "California"
+  },
+  {
+    "slug": "nextdrip-mobile-iv-therapy-of-coachella-palm-desert",
+    "name": "NextDrip Mobile IV Therapy of Coachella",
+    "website": "https://www.nextdrip.com/locations/coachella/",
+    "rating": "5.0",
+    "reviews": "1",
+    "city": "Palm Desert",
+    "state": "California"
+  },
+  {
+    "slug": "clarus-medical-aesthetics-san-francisco",
+    "name": "Clarus Medical Aesthetics",
+    "website": "https://clarus-aesthetics.com/",
+    "rating": "5.0",
+    "reviews": null,
+    "city": "San Francisco",
+    "state": "California"
+  },
+  {
+    "slug": "b12-love-embarcadero-center-san-francisco",
+    "name": "B12 LOVE | Embarcadero Center",
+    "website": "https://www.b12love.com/",
+    "rating": "5.0",
+    "reviews": null,
+    "city": "San Francisco",
+    "state": "California"
   },
   {
     "slug": "mybest-clinic-montreal-montreal",
@@ -315,24 +207,6 @@
     "state": "Quebec"
   },
   {
-    "slug": "skinnovate-vancouver",
-    "name": "Skinnovate",
-    "website": "https://skinnovate.ca",
-    "rating": "5",
-    "reviews": "38",
-    "city": "Vancouver",
-    "state": "British Columbia"
-  },
-  {
-    "slug": "nova-naturopathic-clinic-calgary",
-    "name": "Nova Naturopathic Clinic",
-    "website": "https://www.novaclinic.ca",
-    "rating": "5",
-    "reviews": "34",
-    "city": "Calgary",
-    "state": "Alberta"
-  },
-  {
     "slug": "dr-sharon-aesthetics-wellness-and-iv-drip-bar-houston",
     "name": "Dr. Sharon Aesthetics Wellness & IV Drip Bar",
     "website": "https://drsharonaesthetics.com",
@@ -342,56 +216,11 @@
     "state": "Texas"
   },
   {
-    "slug": "prime-medical-services-winnipeg",
-    "name": "Prime Medical Services",
-    "website": "https://www.primemedicalsvc.com",
-    "rating": "5",
-    "reviews": "207",
-    "city": "Winnipeg",
-    "state": "Manitoba"
-  },
-  {
-    "slug": "live-hydration-spa-kirby-houston",
-    "name": "LIVE Hydration Spa - Kirby",
-    "website": "https://locations.livehydrationspa.com/tx/houston/kirby.html",
-    "rating": "5",
-    "reviews": "20",
-    "city": "Houston",
-    "state": "Texas"
-  },
-  {
-    "slug": "the-nature-doctors-winnipeg",
-    "name": "The Nature Doctors",
-    "website": "https://www.thenaturedoctors.ca",
-    "rating": "5",
-    "reviews": "17",
-    "city": "Winnipeg",
-    "state": "Manitoba"
-  },
-  {
     "slug": "polaris-medical-aesthetics-los-angeles",
     "name": "Polaris Medical Aesthetics",
     "website": "https://polarisaesthetics.com",
     "rating": "5",
     "reviews": "17",
-    "city": "Los Angeles",
-    "state": "California"
-  },
-  {
-    "slug": "elevaterx-medical-aesthetics-ottawa",
-    "name": "ElevateRx Medical Aesthetics",
-    "website": "https://www.elevaterx.ca",
-    "rating": "5",
-    "reviews": "154",
-    "city": "Ottawa",
-    "state": "Ontario"
-  },
-  {
-    "slug": "next-health-century-city-los-angeles",
-    "name": "Next Health - Century City",
-    "website": "https://www.next-health.com/location/century-city",
-    "rating": "5",
-    "reviews": "1476",
     "city": "Los Angeles",
     "state": "California"
   },
@@ -405,85 +234,22 @@
     "state": "Texas"
   },
   {
-    "slug": "zipdrip-mobile-iv-therapy-vancouver",
-    "name": "ZipDrip Mobile IV Therapy",
-    "website": "https://zipdrip.ca",
+    "slug": "skin-suite-laser-and-medical-aesthetics-winnipeg",
+    "name": "Skin Suite Laser & Medical Aesthetics",
+    "website": "https://www.skinsuitewpg.ca",
     "rating": "5",
-    "reviews": "110",
-    "city": "Vancouver",
-    "state": "British Columbia"
-  },
-  {
-    "slug": "enhance-aesthetics-and-laser-winnipeg",
-    "name": "Enhance Aesthetics and Laser",
-    "website": "https://www.enhanceaesthetics.ca",
-    "rating": "5",
-    "reviews": "107",
+    "reviews": null,
     "city": "Winnipeg",
     "state": "Manitoba"
   },
   {
-    "slug": "rejuv-medical-san-francisco",
-    "name": "REJUV Medical",
-    "website": "https://rejuvsf.com/",
-    "rating": "4.9",
-    "reviews": "92",
-    "city": "San Francisco",
-    "state": "California"
-  },
-  {
-    "slug": "iv-vitamin-therapy-clinic-las-vegas",
-    "name": "IV Vitamin Therapy Clinic",
-    "website": "http://myvitamintherapy.com/",
-    "rating": "4.9",
-    "reviews": "88",
-    "city": "Las Vegas",
-    "state": "Nevada"
-  },
-  {
-    "slug": "promethean-clinic-vancouver",
-    "name": "Promethean Clinic",
-    "website": "https://prometheanclinic.ca",
-    "rating": "4.9",
-    "reviews": "85",
-    "city": "Vancouver",
-    "state": "British Columbia"
-  },
-  {
-    "slug": "dripp-iv-therapy-long-beach",
-    "name": "Dripp IV Therapy",
-    "website": "https://www.drippiv.com",
-    "rating": "4.9",
-    "reviews": "80",
-    "city": "Long Beach",
-    "state": "California"
-  },
-  {
-    "slug": "limelight-wellness-centre-vancouver",
-    "name": "Limelight Wellness Centre",
-    "website": "https://limelightwellness.ca",
-    "rating": "4.9",
-    "reviews": "76",
-    "city": "Vancouver",
-    "state": "British Columbia"
-  },
-  {
-    "slug": "elixr-iv-therapy-miami",
-    "name": "ELIXR IV Therapy",
-    "website": "https://www.elixrme.com",
-    "rating": "4.9",
-    "reviews": "69",
-    "city": "Miami",
-    "state": "FL"
-  },
-  {
-    "slug": "the-vie-co-glendale",
-    "name": "The Vie Co.",
-    "website": "https://www.thevieco.com/",
-    "rating": "4.9",
-    "reviews": "65",
-    "city": "Glendale",
-    "state": "California"
+    "slug": "skin-shop-medspa-houston",
+    "name": "Skin Shop medSpa",
+    "website": "https://www.skinshopmedspa.com",
+    "rating": "5",
+    "reviews": null,
+    "city": "Houston",
+    "state": "Texas"
   },
   {
     "slug": "infuse-wellness-center-santa-monica",
@@ -492,15 +258,6 @@
     "rating": "4.9",
     "reviews": "64",
     "city": "Santa Monica",
-    "state": "California"
-  },
-  {
-    "slug": "i-vie-infusions-fresno",
-    "name": "I Vie Infusions",
-    "website": "https://ivieinfusions.com/",
-    "rating": "4.9",
-    "reviews": "57",
-    "city": "Fresno",
     "state": "California"
   },
   {
@@ -513,42 +270,6 @@
     "state": "California"
   },
   {
-    "slug": "eterna-wellness-vancouver",
-    "name": "Eterna Wellness",
-    "website": "https://eternawellness.ca",
-    "rating": "4.9",
-    "reviews": "55",
-    "city": "Vancouver",
-    "state": "British Columbia"
-  },
-  {
-    "slug": "latelier-medical-aesthetics-winnipeg",
-    "name": "L'atelier Medical Aesthetics",
-    "website": "https://www.ateliermedicalaesthetics.com",
-    "rating": "4.9",
-    "reviews": "49",
-    "city": "Winnipeg",
-    "state": "Manitoba"
-  },
-  {
-    "slug": "tyrian-healthcare-aesthetic-regenerative-medicine-peoria",
-    "name": "Tyrian HealthCare - Aesthetic & Regenerative Medicine",
-    "website": "https://www.tyrianhcs.com/",
-    "rating": "4.9",
-    "reviews": "47",
-    "city": "Peoria",
-    "state": "Illinois"
-  },
-  {
-    "slug": "newu-hydration-lounge-san-jose",
-    "name": "NewU Hydration Lounge",
-    "website": "https://newuhydrationlounge.com/",
-    "rating": "4.9",
-    "reviews": "45",
-    "city": "San Jose",
-    "state": "California"
-  },
-  {
     "slug": "the-dripbar-austin-the-domain",
     "name": "The DRIPBaR Austin The Domain",
     "website": "https://thedripbar.com/austin-the-domain",
@@ -558,83 +279,11 @@
     "state": "TX"
   },
   {
-    "slug": "luminary-health-and-longevity-clinic-vancouver",
-    "name": "Luminary Health and Longevity Clinic",
-    "website": "https://luminaryhealth.ca",
-    "rating": "4.9",
-    "reviews": "42",
-    "city": "Vancouver",
-    "state": "British Columbia"
-  },
-  {
-    "slug": "acupoint-wellness-centre-vancouver",
-    "name": "Acupoint Wellness Centre",
-    "website": "https://acupoint.ca",
-    "rating": "4.9",
-    "reviews": "40",
-    "city": "Vancouver",
-    "state": "British Columbia"
-  },
-  {
-    "slug": "desert-bloom-medical-aesthetics-wellness-palm-desert",
-    "name": "Desert Bloom Medical Aesthetics & Wellness",
-    "website": "https://desertbloombeauty.com/",
-    "rating": "4.9",
-    "reviews": "39",
-    "city": "Palm Desert",
-    "state": "California"
-  },
-  {
-    "slug": "los-angeles-mobile-iv-therapy-los-angeles",
-    "name": "Los Angeles Mobile IV Therapy",
-    "website": "https://losangelesmobileiv.com",
-    "rating": "4.9",
-    "reviews": "35",
-    "city": "Los Angeles",
-    "state": "California"
-  },
-  {
-    "slug": "via-natural-medicine-winnipeg",
-    "name": "Via Natural Medicine",
-    "website": "https://vianatural.ca",
-    "rating": "4.9",
-    "reviews": "32",
-    "city": "Winnipeg",
-    "state": "Manitoba"
-  },
-  {
     "slug": "push-iv-hydration-las-vegas-las-vegas",
     "name": "Push IV Hydration Las Vegas",
     "website": "https://pushiv.com/",
     "rating": "4.9",
     "reviews": "294",
-    "city": "Las Vegas",
-    "state": "Nevada"
-  },
-  {
-    "slug": "restore-hyper-wellness-palm-desert",
-    "name": "Restore Hyper Wellness",
-    "website": "http://www.restore.com/locations/ca-palm-desert-ca156",
-    "rating": "4.9",
-    "reviews": "271",
-    "city": "Palm Desert",
-    "state": "California"
-  },
-  {
-    "slug": "revived-personalized-wellness-houston",
-    "name": "Revived Personalized Wellness",
-    "website": "https://www.myrevived.com",
-    "rating": "4.9",
-    "reviews": "256",
-    "city": "Houston",
-    "state": "Texas"
-  },
-  {
-    "slug": "prime-iv-hydration-wellness-las-vegas-lake-mead-buffalo-las-vegas",
-    "name": "Prime IV Hydration & Wellness - Las Vegas - Lake Mead & Buffalo",
-    "website": "https://primeivhydration.com/locations/nevada/las-vegas-89128/",
-    "rating": "4.9",
-    "reviews": "250",
     "city": "Las Vegas",
     "state": "Nevada"
   },
@@ -654,42 +303,6 @@
     "rating": "4.9",
     "reviews": "22",
     "city": "San Jose",
-    "state": "California"
-  },
-  {
-    "slug": "fortify-wellness-winnipeg",
-    "name": "Fortify Wellness",
-    "website": "https://thisisfortify.com",
-    "rating": "4.9",
-    "reviews": "210",
-    "city": "Winnipeg",
-    "state": "Manitoba"
-  },
-  {
-    "slug": "b12-love-marinacow-hollow-san-francisco",
-    "name": "B12 LOVE | Marina/Cow Hollow",
-    "website": "https://www.b12love.com/",
-    "rating": "4.9",
-    "reviews": "191",
-    "city": "San Francisco",
-    "state": "California"
-  },
-  {
-    "slug": "regenerate-me-iv-planet-hollywood-mobile-hangover-iv-nad-las-vegas",
-    "name": "Regenerate Me IV - Planet Hollywood | Mobile Hangover IV | NAD+",
-    "website": "https://regenerateme.com/planet-hollywood/",
-    "rating": "4.9",
-    "reviews": "181",
-    "city": "Las Vegas",
-    "state": "Nevada"
-  },
-  {
-    "slug": "refresh-med-spa-la-los-angeles",
-    "name": "Refresh Med Spa LA",
-    "website": "https://refreshmedspala.com",
-    "rating": "4.9",
-    "reviews": "181",
-    "city": "Los Angeles",
     "state": "California"
   },
   {
@@ -738,94 +351,22 @@
     "state": "California"
   },
   {
-    "slug": "prime-iv-hydration-wellness-chicago-logan-square-il-chicago",
-    "name": "Prime IV Hydration & Wellness (Chicago-Logan Square, IL)",
-    "website": "https://primeivhydration.com/locations/illinois/chicago-il-60647/",
+    "slug": "the-hydration-room-north-hollywood-los-angeles",
+    "name": "The Hydration Room - North Hollywood",
+    "website": "https://hydrationroom.com",
     "rating": "4.9",
-    "reviews": "128",
-    "city": "Chicago",
-    "state": "Illinois"
-  },
-  {
-    "slug": "h2o-health-milwaukee",
-    "name": "H2O Health",
-    "website": "https://healthhydrationoasis.com/",
-    "rating": "4.9",
-    "reviews": "122",
-    "city": "Milwaukee",
-    "state": "Wisconsin"
-  },
-  {
-    "slug": "skin-logic-ottawa-ottawa",
-    "name": "Skin Logic Ottawa",
-    "website": "https://skinlogicottawa.com",
-    "rating": "4.9",
-    "reviews": "120",
-    "city": "Ottawa",
-    "state": "Ontario"
-  },
-  {
-    "slug": "restore-hyper-wellness-west-university-houston",
-    "name": "Restore Hyper Wellness - West University",
-    "website": "https://www.restore.com/locations/tx-houston-west-university-tx012",
-    "rating": "4.9",
-    "reviews": "109",
-    "city": "Houston",
-    "state": "Texas"
-  },
-  {
-    "slug": "mobile-iv-drip-las-vegas-las-vegas",
-    "name": "Mobile IV Drip Las Vegas",
-    "website": "https://mobileivdrip.com/",
-    "rating": "4.9",
-    "reviews": "107",
-    "city": "Las Vegas",
-    "state": "Nevada"
-  },
-  {
-    "slug": "pure-health-palm-springs-palm-springs",
-    "name": "Pure Health- Palm Springs",
-    "website": "http://purehealthmedicine.com/",
-    "rating": "4.9",
-    "reviews": "104",
-    "city": "Palm Springs",
+    "reviews": null,
+    "city": "Los Angeles",
     "state": "California"
   },
   {
-    "slug": "mint-integrative-health-vancouver",
-    "name": "Mint Integrative Health",
-    "website": "https://mintintegrative.com",
-    "rating": "4.8",
-    "reviews": "95",
-    "city": "Vancouver",
-    "state": "British Columbia"
-  },
-  {
-    "slug": "prime-iv-hydration-wellness-summerlin-las-vegas-las-vegas",
-    "name": "Prime IV Hydration & Wellness - Summerlin (Las Vegas)",
-    "website": "https://primeivhydration.com/locations/nevada/las-vegas-nv/",
-    "rating": "4.8",
-    "reviews": "69",
-    "city": "Las Vegas",
-    "state": "Nevada"
-  },
-  {
-    "slug": "neumed-modern-urgent-care-iv-therapy-houston-heights-houston",
-    "name": "NeuMed Modern Urgent Care + IV Therapy - Houston Heights",
-    "website": "https://neumed.com/locations/houston-heights/",
-    "rating": "4.8",
-    "reviews": "689",
-    "city": "Houston",
-    "state": "Texas"
-  },
-  {
-    "slug": "crossroads-naturopathic-wellness-clinic-vancouver",
-    "name": "Crossroads Naturopathic Wellness Clinic",
-    "website": "https://crossroadsnaturopathic.com",
-    "rating": "4.8",
-    "reviews": "65",
-    "city": "Vancouver",
-    "state": "British Columbia"
+    "slug": "smart-medicine-sf-vinh-ngo-md-san-francisco",
+    "name": "Smart Medicine SF: Vinh Ngo, MD",
+    "website": "https://smartmedsf.com/",
+    "rating": "4.9",
+    "reviews": null,
+    "city": "San Francisco",
+    "state": "California"
   },
   {
     "slug": "prime-iv-hydration-wellness-las-vegas-town-square-las-vegas",
@@ -864,15 +405,6 @@
     "state": "California"
   },
   {
-    "slug": "glendale-whole-health-glendale",
-    "name": "Glendale Whole Health",
-    "website": "http://www.glendalewholehealth.com/",
-    "rating": "4.8",
-    "reviews": "50",
-    "city": "Glendale",
-    "state": "California"
-  },
-  {
     "slug": "tlc-medspa-houston-houston",
     "name": "TLC MedSpa Houston",
     "website": "https://tlcmedspahouston.com",
@@ -891,42 +423,6 @@
     "state": "Wisconsin"
   },
   {
-    "slug": "prime-iv-hydration-wellness-las-vegas-centennial-hills-nv-las-vegas",
-    "name": "Prime IV Hydration & Wellness (Las Vegas-Centennial Hills, NV)",
-    "website": "https://primeivhydration.com/locations/nevada/centennialhills-89149/",
-    "rating": "4.8",
-    "reviews": "26",
-    "city": "Las Vegas",
-    "state": "Nevada"
-  },
-  {
-    "slug": "the-hydro-drip-bar-san-diego",
-    "name": "The Hydro Drip Bar",
-    "website": "https://thehydrodripbar.com",
-    "rating": "4.8",
-    "reviews": "23",
-    "city": "San Diego",
-    "state": "California"
-  },
-  {
-    "slug": "8-west-clinic-vancouver",
-    "name": "8 West Clinic",
-    "website": "https://www.8west.ca",
-    "rating": "4.8",
-    "reviews": "210",
-    "city": "Vancouver",
-    "state": "British Columbia"
-  },
-  {
-    "slug": "cns-infusions-revivedoc-chicago",
-    "name": "CNS Infusions - RevIVeDoc",
-    "website": "https://www.cns-center.com/iv-vitamin-therapy",
-    "rating": "4.8",
-    "reviews": "193",
-    "city": "Chicago",
-    "state": "Illinois"
-  },
-  {
     "slug": "iv-nutrition-brookfield",
     "name": "IV Nutrition",
     "website": "https://ivnutrition.com/locations/milwaukee-brookfield-wi/",
@@ -934,15 +430,6 @@
     "reviews": "189",
     "city": "Brookfield",
     "state": "Wisconsin"
-  },
-  {
-    "slug": "recharge-medical-san-francisco",
-    "name": "Recharge Medical",
-    "website": "https://recharge.clinic/",
-    "rating": "4.8",
-    "reviews": "151",
-    "city": "San Francisco",
-    "state": "California"
   },
   {
     "slug": "the-cure-iv-san-francisco",
@@ -954,15 +441,6 @@
     "state": "California"
   },
   {
-    "slug": "mind-body-medical-spa-milwaukee",
-    "name": "Mind & Body Medical Spa",
-    "website": "http://www.mindandbodyaestheticcenter.com/",
-    "rating": "4.8",
-    "reviews": "15",
-    "city": "Milwaukee",
-    "state": "Wisconsin"
-  },
-  {
     "slug": "luminance-regenerative-beauty-wellness-san-jose",
     "name": "LUMINANCE REGENERATIVE BEAUTY & WELLNESS",
     "website": "https://www.myluminance.com/",
@@ -970,33 +448,6 @@
     "reviews": "148",
     "city": "San Jose",
     "state": "California"
-  },
-  {
-    "slug": "ava-wellness-and-rejuvenation-center-san-jose",
-    "name": "Ava Wellness and Rejuvenation Center",
-    "website": "https://theavaspa.com/",
-    "rating": "4.8",
-    "reviews": "141",
-    "city": "San Jose",
-    "state": "California"
-  },
-  {
-    "slug": "the-iv-health-centre-vancouver",
-    "name": "The IV Health Centre",
-    "website": "https://theiv.ca",
-    "rating": "4.8",
-    "reviews": "120",
-    "city": "Vancouver",
-    "state": "British Columbia"
-  },
-  {
-    "slug": "timeless-beauty-medspa-springfield",
-    "name": "Timeless Beauty MedSpa",
-    "website": "http://www.timelessbeautyspringfield.com/",
-    "rating": "4.8",
-    "reviews": "12",
-    "city": "Springfield",
-    "state": "Illinois"
   },
   {
     "slug": "ithrivemd-san-diego",
@@ -1008,21 +459,39 @@
     "state": "California"
   },
   {
+    "slug": "neumed-modern-urgent-care-iv-therapy-montrose-houston",
+    "name": "NeuMed Modern Urgent Care + IV Therapy - Montrose",
+    "website": "https://neumed.com/locations/montrose/",
+    "rating": "4.8",
+    "reviews": null,
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "eternia-medspa-san-francisco",
+    "name": "Eternia Medspa",
+    "website": "https://eterniamedspa.com/",
+    "rating": "4.8",
+    "reviews": null,
+    "city": "San Francisco",
+    "state": "California"
+  },
+  {
+    "slug": "neumed-modern-urgent-care-iv-therapy-washington-ave-houston",
+    "name": "NeuMed Modern Urgent Care + IV Therapy - Washington Ave",
+    "website": "https://neumed.com/locations/washington-ave/",
+    "rating": "4.8",
+    "reviews": null,
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
     "slug": "kalologie-medspa-santa-monica",
     "name": "Kalologie Medspa Santa Monica",
     "website": "https://kalologie.com",
     "rating": "4.7",
     "reviews": "44",
     "city": "Santa Monica",
-    "state": "California"
-  },
-  {
-    "slug": "drip-refresh-mobile-iv-therapy-san-francisco-san-francisco",
-    "name": "Drip Refresh Mobile IV Therapy - San Francisco",
-    "website": "https://sanfranciscomobileiv.com/",
-    "rating": "4.7",
-    "reviews": "29",
-    "city": "San Francisco",
     "state": "California"
   },
   {
@@ -1035,84 +504,12 @@
     "state": "California"
   },
   {
-    "slug": "iv-therapy-la-glendale",
-    "name": "IV Therapy LA",
-    "website": "http://www.ivtla.com/",
-    "rating": "4.7",
-    "reviews": "19",
-    "city": "Glendale",
-    "state": "California"
-  },
-  {
-    "slug": "iv-drip-lounge-los-angeles",
-    "name": "IV Drip Lounge",
-    "website": "https://www.ivdriplounge.com",
-    "rating": "4.7",
-    "reviews": "15",
-    "city": "Los Angeles",
-    "state": "California"
-  },
-  {
-    "slug": "optimum-wellness-integrated-clinic-edmonton",
-    "name": "Optimum Wellness Integrated Clinic",
-    "website": "https://optimumwellnessclinic.ca/",
-    "rating": "4.7",
-    "reviews": "118",
-    "city": "Edmonton",
-    "state": "Alberta"
-  },
-  {
-    "slug": "restore-hyper-wellness-river-oaks-houston",
-    "name": "Restore Hyper Wellness - River Oaks",
-    "website": "https://www.restore.com/locations/tx-houston-river-oaks-tx007",
-    "rating": "4.6",
-    "reviews": "55",
-    "city": "Houston",
-    "state": "Texas"
-  },
-  {
-    "slug": "h2o-health-brookfield",
-    "name": "H2O Health",
-    "website": "https://healthhydrationoasis.com/",
-    "rating": "4.6",
-    "reviews": "36",
-    "city": "Brookfield",
-    "state": "Wisconsin"
-  },
-  {
-    "slug": "livv-natural-san-diego",
-    "name": "LIVV Natural",
-    "website": "https://livvnatural.com",
-    "rating": "4.6",
-    "reviews": "167",
-    "city": "San Diego",
-    "state": "California"
-  },
-  {
-    "slug": "electra-health-vancouver",
-    "name": "Electra Health",
-    "website": "https://electrahealth.ca",
-    "rating": "4.6",
-    "reviews": "148",
-    "city": "Vancouver",
-    "state": "British Columbia"
-  },
-  {
     "slug": "valley-natural-health-fresno-fresno",
     "name": "Valley Natural Health - Fresno",
     "website": "http://valleynh.com/",
     "rating": "4.6",
     "reviews": "104",
     "city": "Fresno",
-    "state": "California"
-  },
-  {
-    "slug": "asap-ivs-san-diego",
-    "name": "ASAP IVs",
-    "website": "https://www.asapivs.com",
-    "rating": "4.5",
-    "reviews": "790",
-    "city": "San Diego",
     "state": "California"
   },
   {
@@ -1132,5 +529,1796 @@
     "reviews": "31",
     "city": "San Diego",
     "state": "California"
+  },
+  {
+    "slug": "serenity-aesthetics-wellness-san-francisco",
+    "name": "Serenity Aesthetics & Wellness",
+    "website": "https://serenitymedspa.com/",
+    "rating": "4.5",
+    "reviews": null,
+    "city": "San Francisco",
+    "state": "California"
+  },
+  {
+    "slug": "modmd-venice-los-angeles",
+    "name": "modMD - Venice",
+    "website": "https://www.modmd.com",
+    "rating": "4.4",
+    "reviews": "19",
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "modmd-wilshire-los-angeles",
+    "name": "modMD - Wilshire",
+    "website": "https://www.modmd.com",
+    "rating": "4.4",
+    "reviews": null,
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "nutrichem-compounding-pharmacy-and-clinic-ottawa",
+    "name": "NutriChem Compounding Pharmacy & Clinic",
+    "website": "https://nutrichem.com",
+    "rating": "4.3",
+    "reviews": "115",
+    "city": "Ottawa",
+    "state": "Ontario"
+  },
+  {
+    "slug": "ottawa-integrative-health-centre-ottawa",
+    "name": "Ottawa Integrative Health Centre",
+    "website": "https://www.oihc.ca",
+    "rating": "4.2",
+    "reviews": null,
+    "city": "Ottawa",
+    "state": "Ontario"
+  },
+  {
+    "slug": "infusion-for-health-glendale-glendale",
+    "name": "Infusion for Health - Glendale",
+    "website": "https://infusionforhealth.com/locations/glendale/",
+    "rating": "3.9",
+    "reviews": "8",
+    "city": "Glendale",
+    "state": "California"
+  },
+  {
+    "slug": "aesthetica-med-spa-of-san-diego-san-diego",
+    "name": "Aesthetica Med Spa of San Diego",
+    "website": "https://aestheticamedspasd.com",
+    "rating": null,
+    "reviews": "95",
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "alcheme-health-san-diego",
+    "name": "ALCHEME Health",
+    "website": "https://www.alchemehealth.com",
+    "rating": null,
+    "reviews": "92",
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "aesthetic-envy-sacramento",
+    "name": "Aesthetic Envy",
+    "website": "https://www.aestheticenvy.com",
+    "rating": null,
+    "reviews": "87",
+    "city": "Sacramento",
+    "state": "CA"
+  },
+  {
+    "slug": "the-laser-cafe-medical-spa-san-diego",
+    "name": "The Laser Cafe Medical Spa",
+    "website": "https://www.thelasercafe.com",
+    "rating": null,
+    "reviews": "845",
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "liquid-life-mobile-iv-therapy-los-angeles",
+    "name": "Liquid Life Mobile IV Therapy",
+    "website": "https://www.liquidlifela.com",
+    "rating": null,
+    "reviews": "78",
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "vida-flo-nashville",
+    "name": "Vida-Flo Nashville",
+    "website": "https://govidaflo.com/nashville",
+    "rating": null,
+    "reviews": "77",
+    "city": "Nashville",
+    "state": "TN"
+  },
+  {
+    "slug": "inner-gate-health-wellness-ankeny-portland",
+    "name": "Inner Gate Health & Wellness - Ankeny",
+    "website": "https://innergatepdx.com",
+    "rating": null,
+    "reviews": "73",
+    "city": "Portland",
+    "state": "OR"
+  },
+  {
+    "slug": "hollywood-walk-in-clinic-los-angeles",
+    "name": "Hollywood Walk-in Clinic",
+    "website": "https://hollywoodclinic.net",
+    "rating": null,
+    "reviews": "665",
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "vitality-integrative-medicine-los-angeles",
+    "name": "Vitality Integrative Medicine",
+    "website": "https://vitalityintegrative.com",
+    "rating": null,
+    "reviews": "62",
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "beeson-wellness-center-portland",
+    "name": "Beeson Wellness Center",
+    "website": "https://beesonwellness.com",
+    "rating": null,
+    "reviews": "56",
+    "city": "Portland",
+    "state": "OR"
+  },
+  {
+    "slug": "prfct-san-diego",
+    "name": "PRFCT",
+    "website": "https://helloprfct.com",
+    "rating": null,
+    "reviews": "54",
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "koi-wellbeing-la-jolla-san-diego",
+    "name": "KOI Wellbeing La Jolla",
+    "website": "https://koiwellbeing.com",
+    "rating": null,
+    "reviews": "49",
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "joy-wellness-partners-san-diego",
+    "name": "Joy Wellness Partners",
+    "website": "https://joywellnesspartners.com",
+    "rating": null,
+    "reviews": "46",
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "intravenous-solutions-nashville",
+    "name": "IntraVenous Solutions",
+    "website": "https://www.ivsolns.com",
+    "rating": null,
+    "reviews": "38",
+    "city": "Nashville",
+    "state": "TN"
+  },
+  {
+    "slug": "inner-gate-health-wellness-hollywood-portland",
+    "name": "Inner Gate Health & Wellness - Hollywood",
+    "website": "https://innergatepdx.com",
+    "rating": null,
+    "reviews": "35",
+    "city": "Portland",
+    "state": "OR"
+  },
+  {
+    "slug": "hydrate-medical-charlotte",
+    "name": "Hydrate Medical",
+    "website": "https://charlotte.hydratemedical.com",
+    "rating": null,
+    "reviews": "34",
+    "city": "Charlotte",
+    "state": "NC"
+  },
+  {
+    "slug": "b-medical-spa-and-wellness-center-san-diego",
+    "name": "B Medical Spa and Wellness Center",
+    "website": "https://bmedspa.com",
+    "rating": null,
+    "reviews": "339",
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "hydrate-me-medspa-columbus",
+    "name": "Hydrate Me MedSpa",
+    "website": "https://hydratememedspa.com",
+    "rating": null,
+    "reviews": "30",
+    "city": "Columbus",
+    "state": "OH"
+  },
+  {
+    "slug": "mega-wellness-clinic-los-angeles",
+    "name": "Mega Wellness Clinic",
+    "website": "https://www.megawellnessclinic.com",
+    "rating": null,
+    "reviews": "29",
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "drip-iv-therapy-san-diego-san-diego",
+    "name": "Drip IV Therapy San Diego",
+    "website": "https://dripivtherapy.com",
+    "rating": null,
+    "reviews": "28",
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "vitaminfusion-los-angeles",
+    "name": "VitaminFusion",
+    "website": "https://vitaminfusion.com",
+    "rating": null,
+    "reviews": "27",
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "iv-bars-of-houston-heights-houston",
+    "name": "iV Bars of Houston Heights",
+    "website": "https://ivbars.com/location/houston-heights-texas/",
+    "rating": null,
+    "reviews": "26",
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "infusewell-los-angeles",
+    "name": "InfuseWell",
+    "website": "https://www.infusewell.co",
+    "rating": null,
+    "reviews": "25",
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "resilience-integrative-wellness-san-diego",
+    "name": "Resilience Integrative Wellness",
+    "website": "https://resilienceintegrative.com",
+    "rating": null,
+    "reviews": "24",
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "fika-infusion-wellness-millcreek-salt-lake-city",
+    "name": "FIKA Infusion + Wellness - Millcreek",
+    "website": "https://fikainfusion.com/salt-lake-city",
+    "rating": null,
+    "reviews": "22",
+    "city": "Salt Lake City",
+    "state": "UT"
+  },
+  {
+    "slug": "memorial-primary-and-urgent-care-houston",
+    "name": "Memorial Primary and Urgent Care",
+    "website": "https://www.urgentcarememorial.com",
+    "rating": null,
+    "reviews": "22",
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "saffron-and-sage-san-diego",
+    "name": "Saffron & Sage",
+    "website": "https://www.saffronsageliving.com",
+    "rating": null,
+    "reviews": "210",
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "zia-iv-infusion-and-injection-lounge-edmonton",
+    "name": "Zia IV Infusion & Injection Lounge",
+    "website": "https://www.ziaiv.ca/",
+    "rating": null,
+    "reviews": "20",
+    "city": "Edmonton",
+    "state": "Alberta"
+  },
+  {
+    "slug": "portland-clinic-of-holistic-health-portland",
+    "name": "Portland Clinic of Holistic Health",
+    "website": "https://www.holistichealthpc.com",
+    "rating": null,
+    "reviews": "19",
+    "city": "Portland",
+    "state": "OR"
+  },
+  {
+    "slug": "hydrate-iv-bar-washington-park-denver",
+    "name": "Hydrate IV Bar - Washington Park",
+    "website": "https://hydrateivbar.com",
+    "rating": null,
+    "reviews": "183",
+    "city": "Denver",
+    "state": "CO"
+  },
+  {
+    "slug": "restore-hyper-wellness-easton-columbus",
+    "name": "Restore Hyper Wellness - Easton",
+    "website": "https://www.restore.com/locations/oh-columbus-oh001",
+    "rating": null,
+    "reviews": "18",
+    "city": "Columbus",
+    "state": "OH"
+  },
+  {
+    "slug": "humble-hydration-wellness-sacramento",
+    "name": "Humble Hydration & Wellness",
+    "website": "https://humblehydration.com",
+    "rating": null,
+    "reviews": "16",
+    "city": "Sacramento",
+    "state": "CA"
+  },
+  {
+    "slug": "entrust-urgent-care-iv-infusion-houston",
+    "name": "enTrust Urgent Care + IV Infusion",
+    "website": "https://entrustcare.com",
+    "rating": null,
+    "reviews": "148",
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "hydrate-iv-bar-highlands-square-denver",
+    "name": "Hydrate IV Bar - Highlands Square",
+    "website": "https://hydrateivbar.com/locations/highlands-square",
+    "rating": null,
+    "reviews": "137",
+    "city": "Denver",
+    "state": "CO"
+  },
+  {
+    "slug": "drip-hydration-los-angeles-los-angeles",
+    "name": "Drip Hydration - Los Angeles",
+    "website": "https://driphydration.com",
+    "rating": null,
+    "reviews": "132",
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "cameron-wellness-and-spa-salt-lake-city",
+    "name": "Cameron Wellness and Spa",
+    "website": "https://cameronwellnessandspa.com",
+    "rating": null,
+    "reviews": "12",
+    "city": "Salt Lake City",
+    "state": "UT"
+  },
+  {
+    "slug": "angel-longevity-medical-center-los-angeles",
+    "name": "Angel Longevity Medical Center",
+    "website": "https://angellongevity.com",
+    "rating": null,
+    "reviews": "118",
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "regenerative-wellness-san-diego-san-diego",
+    "name": "Regenerative Wellness San Diego",
+    "website": "https://www.regenwellnessca.com",
+    "rating": null,
+    "reviews": "110",
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "hydrate-medical-ballantyne-charlotte",
+    "name": "Hydrate Medical Ballantyne",
+    "website": "https://hydratemedical.com",
+    "rating": null,
+    "reviews": "11",
+    "city": "Charlotte",
+    "state": "NC"
+  },
+  {
+    "slug": "vitality-iv-bar-indianapolis",
+    "name": "Vitality IV Bar",
+    "website": "https://trupath7.bar-z.com/301/location/vitality-iv-bar",
+    "rating": null,
+    "reviews": "11",
+    "city": "Indianapolis",
+    "state": "IN"
+  },
+  {
+    "slug": "mobile-iv-medics-los-angeles-los-angeles",
+    "name": "Mobile IV Medics - Los Angeles",
+    "website": "https://mobileivmedics.com",
+    "rating": null,
+    "reviews": "101",
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "vip-drips-iv-therapy-and-aesthetics-los-angeles",
+    "name": "VIP Drips IV Therapy & Aesthetics",
+    "website": "https://www.vipdripsivtherapy.com",
+    "rating": null,
+    "reviews": "10",
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "simply-wellness-salt-lake-city",
+    "name": "Simply Wellness",
+    "website": "https://simplywellness.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Salt Lake City",
+    "state": "UT"
+  },
+  {
+    "slug": "salt-city-iv-salt-lake-city",
+    "name": "Salt City IV",
+    "website": "https://saltcityiv.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Salt Lake City",
+    "state": "UT"
+  },
+  {
+    "slug": "the-vitamin-bar-mobile-iv-salt-lake-city",
+    "name": "The Vitamin Bar Mobile IV",
+    "website": "https://www.thevitaminbariv.com/salt-lake-city-iv-therapy",
+    "rating": null,
+    "reviews": null,
+    "city": "Salt Lake City",
+    "state": "UT"
+  },
+  {
+    "slug": "drip-hydration-salt-lake-city",
+    "name": "Drip Hydration Salt Lake City",
+    "website": "https://driphydration.com/coverage-areas/salt-lake-city",
+    "rating": null,
+    "reviews": null,
+    "city": "Salt Lake City",
+    "state": "UT"
+  },
+  {
+    "slug": "iv-glow-bar-los-angeles",
+    "name": "IV Glow Bar",
+    "website": "https://ivglowbar.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "drip-iv-therapy-mobile-los-angeles",
+    "name": "Drip IV Therapy + Mobile",
+    "website": "https://dripivtherapy.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "kalologie-medspa-hollywood-los-angeles",
+    "name": "Kalologie Medspa Hollywood",
+    "website": "https://kalologie.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "next-health-west-hollywood",
+    "name": "Next Health West Hollywood",
+    "website": "https://www.next-health.com/location/west-hollywood",
+    "rating": null,
+    "reviews": null,
+    "city": "West Hollywood",
+    "state": "California"
+  },
+  {
+    "slug": "luxbae-medical-spa-west-hollywood",
+    "name": "Luxbae Medical Spa",
+    "website": "https://luxbae.com",
+    "rating": null,
+    "reviews": null,
+    "city": "West Hollywood",
+    "state": "California"
+  },
+  {
+    "slug": "me-losangeles-aesthetics-west-hollywood",
+    "name": "me.losangeles Aesthetics",
+    "website": "https://www.melosangeles.com",
+    "rating": null,
+    "reviews": null,
+    "city": "West Hollywood",
+    "state": "California"
+  },
+  {
+    "slug": "iv-vitamin-therapy-beverly-hills",
+    "name": "IV Vitamin Therapy",
+    "website": "https://ivvitamintherapy.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Beverly Hills",
+    "state": "California"
+  },
+  {
+    "slug": "beverly-hills-aesthetic-medics",
+    "name": "Beverly Hills Aesthetic Medics",
+    "website": "https://www.bhaestheticmedics.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Beverly Hills",
+    "state": "California"
+  },
+  {
+    "slug": "kanodia-medspa-beverly-hills",
+    "name": "Kanodia Medspa",
+    "website": "https://www.kanodiamedspa.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Beverly Hills",
+    "state": "California"
+  },
+  {
+    "slug": "the-cure-iv-beverly-hills",
+    "name": "The Cure IV",
+    "website": "https://www.thecureiv.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Beverly Hills",
+    "state": "California"
+  },
+  {
+    "slug": "kao-aesthetics-santa-monica",
+    "name": "KAO Aesthetics",
+    "website": "https://www.kaoaesthetics.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Santa Monica",
+    "state": "California"
+  },
+  {
+    "slug": "hydration-room-culver-city",
+    "name": "Hydration Room Culver City",
+    "website": "https://hydrationroom.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Culver City",
+    "state": "California"
+  },
+  {
+    "slug": "infuse-wellness-center-culver-city",
+    "name": "Infuse Wellness Center Culver City",
+    "website": "https://www.infusewellness.net/iv-im-therapy-culver-city-ca/",
+    "rating": null,
+    "reviews": null,
+    "city": "Culver City",
+    "state": "California"
+  },
+  {
+    "slug": "infusion-for-health-burbank",
+    "name": "Infusion For Health Burbank",
+    "website": "https://infusionforhealth.com/locations/southern-california/burbank-ca/",
+    "rating": null,
+    "reviews": null,
+    "city": "Burbank",
+    "state": "California"
+  },
+  {
+    "slug": "revival-oasis-burbank",
+    "name": "Revival Oasis Burbank",
+    "website": "https://revivaloasis.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Burbank",
+    "state": "California"
+  },
+  {
+    "slug": "hydration-room-pasadena",
+    "name": "Hydration Room Pasadena",
+    "website": "https://hydrationroom.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Pasadena",
+    "state": "California"
+  },
+  {
+    "slug": "la-rserve-aesthetics-new-york",
+    "name": "La Réserve Aesthetics",
+    "website": "http://skinrejuvenationnewyork.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "New York",
+    "state": "New York"
+  },
+  {
+    "slug": "iv-alabama-mobile-iv-huntsville",
+    "name": "IV Alabama | Mobile IV",
+    "website": "https://flaremd.com/huntsville-iv-therapy/",
+    "rating": null,
+    "reviews": null,
+    "city": "Huntsville",
+    "state": "Alabama"
+  },
+  {
+    "slug": "infused-iv-the-woodlands",
+    "name": "Infused IV",
+    "website": "https://www.facebook.com/share/f38kfBWyTrrLsQJB/",
+    "rating": null,
+    "reviews": null,
+    "city": "The Woodlands",
+    "state": "Texas"
+  },
+  {
+    "slug": "innerbloom-iv-hydration-and-wellness-spa-dunedin",
+    "name": "InnerBloom IV Hydration and Wellness Spa",
+    "website": "https://innerbloomdunedin.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Dunedin",
+    "state": "Florida"
+  },
+  {
+    "slug": "arise-infusion-therapy-services-washington",
+    "name": "Arise Infusion Therapy Services",
+    "website": "https://ariseinfusion.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Washington",
+    "state": "District Of Columbia"
+  },
+  {
+    "slug": "restore-hydration-wellness-fredericksburg",
+    "name": "Restore Hydration & Wellness",
+    "website": "https://www.facebook.com/share/18BFBb1Szf/",
+    "rating": null,
+    "reviews": null,
+    "city": "Fredericksburg",
+    "state": "Virginia"
+  },
+  {
+    "slug": "medix-infusion-tomball-tomball",
+    "name": "Medix Infusion - Tomball",
+    "website": "https://locations.medixinfusion.com/tomball-bb59f5aec2a0",
+    "rating": null,
+    "reviews": null,
+    "city": "Tomball",
+    "state": "Texas"
+  },
+  {
+    "slug": "method-wellness-north-little-rock",
+    "name": "Method Wellness",
+    "website": "https://www.methodwellnessar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "North Little Rock",
+    "state": "Arkansas"
+  },
+  {
+    "slug": "optimal-vitality-pleasanton",
+    "name": "Optimal Vitality",
+    "website": "https://optimalvitality.health/",
+    "rating": null,
+    "reviews": null,
+    "city": "Pleasanton",
+    "state": "California"
+  },
+  {
+    "slug": "rehydration-station-lexington",
+    "name": "Rehydration Station",
+    "website": "https://rehydrationstation.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Lexington",
+    "state": "Kentucky"
+  },
+  {
+    "slug": "revive-with-b-altamont",
+    "name": "RevIVe with B",
+    "website": "https://www.revivewithb.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Altamont",
+    "state": "Illinois"
+  },
+  {
+    "slug": "the-dripbar-andover-andover",
+    "name": "The DRIPBaR Andover",
+    "website": "https://ivdripandover.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Andover",
+    "state": "Massachusetts"
+  },
+  {
+    "slug": "the-dripbar-bedford-bedford",
+    "name": "The DRIPBaR Bedford",
+    "website": "https://ivdripbedford.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Bedford",
+    "state": "Massachusetts"
+  },
+  {
+    "slug": "the-dripbar-beverly-beverly",
+    "name": "The DRIPBaR Beverly",
+    "website": "https://beverly.thedripbar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Beverly",
+    "state": "Massachusetts"
+  },
+  {
+    "slug": "the-dripbar-brooksville-brooksville",
+    "name": "The DRIPBaR Brooksville",
+    "website": "https://brooksville-fl.thedripbar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Brooksville",
+    "state": "Florida"
+  },
+  {
+    "slug": "the-dripbar-cranford-cranford",
+    "name": "The DRIPBaR Cranford",
+    "website": "https://cranford-nj.thedripbar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Cranford",
+    "state": "New Jersey"
+  },
+  {
+    "slug": "the-dripbar-foxboro-foxborough",
+    "name": "The DRIPBaR Foxboro",
+    "website": "https://foxboro.thedripbar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Foxborough",
+    "state": "Massachusetts"
+  },
+  {
+    "slug": "the-dripbar-gahanna-new-albany-gahanna",
+    "name": "The DRIPBaR Gahanna - New Albany",
+    "website": "https://gahanna.thedripbar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Gahanna",
+    "state": "Ohio"
+  },
+  {
+    "slug": "the-dripbar-greenville-greenville",
+    "name": "The DRIPBaR Greenville",
+    "website": "https://greenville.thedripbar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Greenville",
+    "state": "South Carolina"
+  },
+  {
+    "slug": "the-dripbar-winchester-winchester",
+    "name": "The DRIPBaR Winchester",
+    "website": "https://winchester.thedripbar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Winchester",
+    "state": "Virginia"
+  },
+  {
+    "slug": "the-dripbar-dc-georgetown-washington",
+    "name": "The DRIPBaR D.C. - Georgetown",
+    "website": "https://dc.thedripbar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Washington",
+    "state": "District Of Columbia"
+  },
+  {
+    "slug": "the-dripbar-reston-reston",
+    "name": "The DRIPBaR Reston",
+    "website": "https://reston.thedripbar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Reston",
+    "state": "Virginia"
+  },
+  {
+    "slug": "the-dripbar-rochester-hills-rochester-hills",
+    "name": "The DRIPBaR Rochester Hills",
+    "website": "https://rochester-hills.thedripbar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Rochester Hills",
+    "state": "Michigan"
+  },
+  {
+    "slug": "fyxson-medical-aesthetics-oakville",
+    "name": "Fyxson Medical Aesthetics",
+    "website": "https://fyxsonmedical.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Oakville",
+    "state": "ON"
+  },
+  {
+    "slug": "the-dripbar-largo-iv-vitamin-therapy-and-peptide-wellness-services-largo",
+    "name": "The DRIPBaR Largo- IV Vitamin Therapy and Peptide Wellness Services",
+    "website": "https://largo.thedripbar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Largo",
+    "state": "Florida"
+  },
+  {
+    "slug": "oakville-naturopathic-wellness-centre-oakville",
+    "name": "Oakville Naturopathic Wellness Centre",
+    "website": "https://onwc.ca",
+    "rating": null,
+    "reviews": null,
+    "city": "Oakville",
+    "state": "ON"
+  },
+  {
+    "slug": "iv-drip-therapy-near-me-mississauga",
+    "name": "IV Drip Therapy Near Me",
+    "website": "https://ivdriptherapynearme.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Mississauga",
+    "state": "ON"
+  },
+  {
+    "slug": "element-wellness-omaha",
+    "name": "Element Wellness",
+    "website": "http://www.elementwellness.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Omaha",
+    "state": "Nebraska"
+  },
+  {
+    "slug": "upper-room-clinic-oakville",
+    "name": "Upper Room Clinic Oakville",
+    "website": "https://upperroomclinic.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Oakville",
+    "state": "ON"
+  },
+  {
+    "slug": "iv-healing-spa-los-angeles",
+    "name": "IV Healing Spa",
+    "website": "https://www.ivhealingspa.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Los Angeles",
+    "state": "California"
+  },
+  {
+    "slug": "soglow-iv-san-mateo",
+    "name": "SoGlow IV",
+    "website": "https://soglowiv.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "San Mateo",
+    "state": "California"
+  },
+  {
+    "slug": "aafiyat-aesthetics-mississauga",
+    "name": "Aafiyat Aesthetics",
+    "website": "https://aafiyataesthetics.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Mississauga",
+    "state": "ON"
+  },
+  {
+    "slug": "the-dripbar-times-square-at-alter-native-wellness-new-york",
+    "name": "The DRIPBaR Times Square at Alter Native Wellness",
+    "website": "https://times-square-nyc.thedripbar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "New York",
+    "state": "New York"
+  },
+  {
+    "slug": "purebalance-wellness-mississauga",
+    "name": "pureBalance Wellness",
+    "website": "https://www.mypurebalance.ca",
+    "rating": null,
+    "reviews": null,
+    "city": "Mississauga",
+    "state": "ON"
+  },
+  {
+    "slug": "advanced-womens-health-clinic-mississauga",
+    "name": "Advanced Women's Health Clinic",
+    "website": "https://www.advancedwomenshealth.ca",
+    "rating": null,
+    "reviews": null,
+    "city": "Mississauga",
+    "state": "ON"
+  },
+  {
+    "slug": "lyfemedica-wellness-clinic-oakville",
+    "name": "LyfeMedica Wellness Clinic",
+    "website": "https://lyfemedica.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Oakville",
+    "state": "ON"
+  },
+  {
+    "slug": "the-pur-glow-medical-spa-oakville",
+    "name": "The Pur Glow Medical Spa",
+    "website": "https://www.thepurglow.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Oakville",
+    "state": "ON"
+  },
+  {
+    "slug": "the-dripbar-magnolia-magnolia",
+    "name": "The DRIPBaR Magnolia",
+    "website": "https://magnolia-1488-commons.thedripbar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Magnolia",
+    "state": "Texas"
+  },
+  {
+    "slug": "prime-iv-hydration-and-wellness-west-university-houston",
+    "name": "Prime IV Hydration & Wellness - West University",
+    "website": "https://primeivhydration.com/locations/texas/west-university-houston-77005/",
+    "rating": null,
+    "reviews": null,
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "restore-hyper-wellness-tanglewood-houston",
+    "name": "Restore Hyper Wellness - Tanglewood",
+    "website": "https://www.restore.com/locations/",
+    "rating": null,
+    "reviews": null,
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "the-dripbar-midlothian-midlothian",
+    "name": "The DRIPBaR Midlothian",
+    "website": "http://midlothian-va.thedripbar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Midlothian",
+    "state": "Virginia"
+  },
+  {
+    "slug": "river-oaks-galleria-med-spa-houston",
+    "name": "River Oaks Galleria Med Spa",
+    "website": "https://rogmedspa.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "cls-health-houston-galleria-infusion-center-houston",
+    "name": "CLS Health - Houston Galleria Infusion Center",
+    "website": "https://cls.health/locations/infusion-center-houston-galleria",
+    "rating": null,
+    "reviews": null,
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "the-dripbar-troy-troy",
+    "name": "The DRIPBaR Troy",
+    "website": "https://troy-mi.thedripbar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Troy",
+    "state": "Michigan"
+  },
+  {
+    "slug": "koi-wellbeing-sorrento-valley-san-diego",
+    "name": "KOI Wellbeing Sorrento Valley",
+    "website": "https://koiwellbeing.com",
+    "rating": null,
+    "reviews": null,
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "mission-valley-medical-infusion-center-san-diego",
+    "name": "Mission Valley Medical Infusion Center",
+    "website": "https://www.missionvalleyiv.com",
+    "rating": null,
+    "reviews": null,
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "ah-clinics-san-diego",
+    "name": "AH Clinics",
+    "website": "https://ah-clinics.com",
+    "rating": null,
+    "reviews": null,
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "revitalize-wellness-pb-san-diego",
+    "name": "Revitalize Wellness PB",
+    "website": "https://www.revitalizewellnesspb.com",
+    "rating": null,
+    "reviews": null,
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "body-blu-san-diego",
+    "name": "Body Blu",
+    "website": "https://bodyblu.com",
+    "rating": null,
+    "reviews": null,
+    "city": "San Diego",
+    "state": "California"
+  },
+  {
+    "slug": "thrive-drip-spa-memorial-green-houston",
+    "name": "ThrIVe Drip Spa - Memorial Green",
+    "website": "https://thrivedripspa.com/memorial-green/",
+    "rating": null,
+    "reviews": null,
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "river-oaks-drip-spa-houston",
+    "name": "River Oaks Drip Spa",
+    "website": "https://riveroaksdripspa.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "the-dripbar-montclair-montclair",
+    "name": "The DRIPBaR Montclair",
+    "website": "https://montclair-nj.thedripbar.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Montclair",
+    "state": "New Jersey"
+  },
+  {
+    "slug": "hydration-room-santa-monica",
+    "name": "Hydration Room Santa Monica",
+    "website": "https://hydrationroom.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Santa Monica",
+    "state": "California"
+  },
+  {
+    "slug": "iv-and-wellness-lounge-long-beach",
+    "name": "IV & Wellness Lounge",
+    "website": "https://www.ivandwellnesslounge.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Long Beach",
+    "state": "California"
+  },
+  {
+    "slug": "relive-health-memorial-houston",
+    "name": "Relive Health - Memorial",
+    "website": "https://relivehealth.com/memorial-houston-tx/",
+    "rating": null,
+    "reviews": null,
+    "city": "Houston",
+    "state": "Texas"
+  },
+  {
+    "slug": "parfaire-medical-aesthetics-pasadena",
+    "name": "Parfaire Medical Aesthetics",
+    "website": "https://www.parfaire.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Pasadena",
+    "state": "California"
+  },
+  {
+    "slug": "hydration-room-long-beach-belmont-shore",
+    "name": "Hydration Room Long Beach Belmont Shore",
+    "website": "https://hydrationroom.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Long Beach",
+    "state": "California"
+  },
+  {
+    "slug": "liquivida-lounge-brickell-miami",
+    "name": "Liquivida Lounge Brickell",
+    "website": "https://www.liquivida.com/brickell",
+    "rating": null,
+    "reviews": null,
+    "city": "Miami",
+    "state": "FL"
+  },
+  {
+    "slug": "essence-wellness-clinic-marda-loop-calgary",
+    "name": "Essence Wellness Clinic - Marda Loop",
+    "website": "https://www.essencewellness.ca",
+    "rating": null,
+    "reviews": null,
+    "city": "Calgary",
+    "state": "Alberta"
+  },
+  {
+    "slug": "trumed-naturopath-clinic-edmonton",
+    "name": "TruMed Naturopath Clinic",
+    "website": "https://www.trumed.ca/",
+    "rating": null,
+    "reviews": null,
+    "city": "Edmonton",
+    "state": "Alberta"
+  },
+  {
+    "slug": "drip-back-to-life-medical-corporation-livermore",
+    "name": "Drip Back to Life Medical Corporation",
+    "website": "https://dripbacktolife.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Livermore",
+    "state": "California"
+  },
+  {
+    "slug": "lyfemedica-wellness-clinic-ottawa-ottawa",
+    "name": "LyfeMedica Wellness Clinic - Ottawa",
+    "website": "https://lyfemedica.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Ottawa",
+    "state": "Ontario"
+  },
+  {
+    "slug": "viva-wellness-drip-montreal-montreal",
+    "name": "Viva Wellness Drip Montreal",
+    "website": "https://vivawellnessdrip.com/montreal/",
+    "rating": null,
+    "reviews": null,
+    "city": "Montreal",
+    "state": "Quebec"
+  },
+  {
+    "slug": "onus-iv-hydration-bar-highlands-denver",
+    "name": "Onus iV Hydration Bar - Highlands",
+    "website": "https://www.onusiv.com/locations/highlands",
+    "rating": null,
+    "reviews": null,
+    "city": "Denver",
+    "state": "CO"
+  },
+  {
+    "slug": "dripme-iv-hydration-wellness-cleveland",
+    "name": "Dripme IV Hydration & Wellness",
+    "website": "https://www.dripmeivhydration.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Cleveland",
+    "state": "Alabama"
+  },
+  {
+    "slug": "prime-iv-hydration-wellness-cherry-creek-denver",
+    "name": "Prime IV Hydration & Wellness - Cherry Creek",
+    "website": "https://primeivhydration.com/locations/colorado/cherry-creek-denver-co",
+    "rating": null,
+    "reviews": null,
+    "city": "Denver",
+    "state": "CO"
+  },
+  {
+    "slug": "heritage-regenerative-medicine-charlotte",
+    "name": "Heritage Regenerative Medicine",
+    "website": "https://heritageregen.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Charlotte",
+    "state": "NC"
+  },
+  {
+    "slug": "infusion-for-health-san-jose-san-jose",
+    "name": "Infusion for Health- San Jose",
+    "website": "https://infusionforhealth.com/locations/northern-california/san-jose-ca/",
+    "rating": null,
+    "reviews": null,
+    "city": "San Jose",
+    "state": "California"
+  },
+  {
+    "slug": "sacramento-mobile-iv-therapy",
+    "name": "Sacramento Mobile IV Therapy",
+    "website": "https://sacramentomobileiv.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Sacramento",
+    "state": "CA"
+  },
+  {
+    "slug": "sacramento-functional-medicine",
+    "name": "Sacramento Functional Medicine",
+    "website": "https://sacramentofunctionalmedicine.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Sacramento",
+    "state": "CA"
+  },
+  {
+    "slug": "the-clinic-yyc-calgary",
+    "name": "The Clinic YYC",
+    "website": "https://theclinicyyc.ca",
+    "rating": null,
+    "reviews": null,
+    "city": "Calgary",
+    "state": "Alberta"
+  },
+  {
+    "slug": "the-drip-wellness-group-calgary",
+    "name": "The Drip Wellness Group",
+    "website": "https://thedripwellnessgroup.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Calgary",
+    "state": "Alberta"
+  },
+  {
+    "slug": "feel-good-iv-therapy-calgary",
+    "name": "Feel Good IV Therapy",
+    "website": "https://www.feelgoodivtherapy.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Calgary",
+    "state": "Alberta"
+  },
+  {
+    "slug": "action-health-calgary",
+    "name": "Action Health",
+    "website": "https://www.actionhealth.ca",
+    "rating": null,
+    "reviews": null,
+    "city": "Calgary",
+    "state": "Alberta"
+  },
+  {
+    "slug": "neurvana-naturopathic-medicine-calgary",
+    "name": "Neurvana Naturopathic Medicine",
+    "website": "https://neurvanahealth.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Calgary",
+    "state": "Alberta"
+  },
+  {
+    "slug": "best-skin-beauty-clinic-calgary",
+    "name": "Best Skin Beauty Clinic",
+    "website": "https://www.bestskinclinic.ca",
+    "rating": null,
+    "reviews": null,
+    "city": "Calgary",
+    "state": "Alberta"
+  },
+  {
+    "slug": "evolve-chiropractic-and-wellness-calgary",
+    "name": "Evolve Chiropractic & Wellness",
+    "website": "https://www.evolvechiro.ca",
+    "rating": null,
+    "reviews": null,
+    "city": "Calgary",
+    "state": "Alberta"
+  },
+  {
+    "slug": "core-health-centre-calgary",
+    "name": "Core Health Centre",
+    "website": "https://www.mycorehealth.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Calgary",
+    "state": "Alberta"
+  },
+  {
+    "slug": "marda-loop-naturopathic-and-wellness-clinic-calgary",
+    "name": "Marda Loop Naturopathic and Wellness Clinic",
+    "website": "https://mardaloopwellness.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Calgary",
+    "state": "Alberta"
+  },
+  {
+    "slug": "anara-infusion-and-wellness-calgary",
+    "name": "Anara Infusion & Wellness",
+    "website": "https://anarainfusion.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Calgary",
+    "state": "Alberta"
+  },
+  {
+    "slug": "the-centre-for-health-innovation-ottawa",
+    "name": "The Centre for Health Innovation",
+    "website": "https://thechi.ca",
+    "rating": null,
+    "reviews": null,
+    "city": "Ottawa",
+    "state": "Ontario"
+  },
+  {
+    "slug": "revivelife-clinic-ottawa",
+    "name": "Revivelife Clinic",
+    "website": "https://revivelifeclinic.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Ottawa",
+    "state": "Ontario"
+  },
+  {
+    "slug": "revive-u-mobile-iv-wellness-clinic-ottawa",
+    "name": "RevIVe U Mobile IV Wellness Clinic",
+    "website": "https://www.reviveu.ca",
+    "rating": null,
+    "reviews": null,
+    "city": "Ottawa",
+    "state": "Ontario"
+  },
+  {
+    "slug": "elysian-wellness-centre-hunt-club-ottawa",
+    "name": "Elysian Wellness Centre - Hunt Club",
+    "website": "https://elysianwellnesscentre.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Ottawa",
+    "state": "Ontario"
+  },
+  {
+    "slug": "elixir-beauty-clinic-ottawa",
+    "name": "Elixir Beauty Clinic",
+    "website": "https://elixirbeautyottawa.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Ottawa",
+    "state": "Ontario"
+  },
+  {
+    "slug": "pure-medical-cosmetics-ottawa",
+    "name": "Pure Medical Cosmetics",
+    "website": "https://www.puremedicalcosmetics.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Ottawa",
+    "state": "Ontario"
+  },
+  {
+    "slug": "iv-clinic-montreal",
+    "name": "IV.CLINIC",
+    "website": "https://iv.clinic",
+    "rating": null,
+    "reviews": null,
+    "city": "Montreal",
+    "state": "Quebec"
+  },
+  {
+    "slug": "ideal-body-clinic-montreal",
+    "name": "Ideal Body Clinic",
+    "website": "https://vitaminboost.ca",
+    "rating": null,
+    "reviews": null,
+    "city": "Montreal",
+    "state": "Quebec"
+  },
+  {
+    "slug": "drip-bar-mtl-montreal",
+    "name": "Drip Bar MTL",
+    "website": "https://www.dripbarmtl.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Montreal",
+    "state": "Quebec"
+  },
+  {
+    "slug": "z-nith-sant-montreal",
+    "name": "Zénith Santé",
+    "website": "https://zenithsante.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Montreal",
+    "state": "Quebec"
+  },
+  {
+    "slug": "mobile-mediq-montreal",
+    "name": "Mobile Mediq",
+    "website": "https://www.mobilemediq.ca",
+    "rating": null,
+    "reviews": null,
+    "city": "Montreal",
+    "state": "Quebec"
+  },
+  {
+    "slug": "rn-priv-e-montreal",
+    "name": "RN Privée",
+    "website": "https://rnprivee.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Montreal",
+    "state": "Quebec"
+  },
+  {
+    "slug": "wellness-mobile-iv-montreal-montreal",
+    "name": "Wellness Mobile IV Montreal",
+    "website": "https://wwellness.co/city/montreal/",
+    "rating": null,
+    "reviews": null,
+    "city": "Montreal",
+    "state": "Quebec"
+  },
+  {
+    "slug": "drip-hydration-montreal-montreal",
+    "name": "Drip Hydration Montreal",
+    "website": "https://driphydration.com/coverage-areas/canada/montreal/",
+    "rating": null,
+    "reviews": null,
+    "city": "Montreal",
+    "state": "Quebec"
+  },
+  {
+    "slug": "clinique-iv-montreal",
+    "name": "Clinique IV",
+    "website": "https://cliniqueiv.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Montreal",
+    "state": "Quebec"
+  },
+  {
+    "slug": "vitadrip-iv-edmonton",
+    "name": "VitaDrip IV",
+    "website": "https://www.vitadripiv.ca/",
+    "rating": null,
+    "reviews": null,
+    "city": "Edmonton",
+    "state": "Alberta"
+  },
+  {
+    "slug": "emerald-medical-and-wellness-centre-edmonton",
+    "name": "Emerald Medical and Wellness Centre",
+    "website": "https://emeraldwellness.ca/iv-therapy-edmonton",
+    "rating": null,
+    "reviews": null,
+    "city": "Edmonton",
+    "state": "Alberta"
+  },
+  {
+    "slug": "bliss-medispa-and-integrated-wellness-edmonton",
+    "name": "Bliss MediSpa & Integrated Wellness",
+    "website": "https://www.blissmedispa.ca/wellness-edmonton/iv-nutrient-therapy/",
+    "rating": null,
+    "reviews": null,
+    "city": "Edmonton",
+    "state": "Alberta"
+  },
+  {
+    "slug": "hydro-oasis-wellness-edmonton",
+    "name": "Hydro Oasis Wellness",
+    "website": "https://www.hydrooasiswellness.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Edmonton",
+    "state": "Alberta"
+  },
+  {
+    "slug": "vitapoke-infusion-lounge-poke-beauty-edmonton",
+    "name": "VitaPoke Infusion Lounge (Poke Beauty)",
+    "website": "https://www.pokebeauty.ca/services/iv-therapy",
+    "rating": null,
+    "reviews": null,
+    "city": "Edmonton",
+    "state": "Alberta"
+  },
+  {
+    "slug": "tonic-iv-edmonton",
+    "name": "Tonic IV",
+    "website": "https://toniciv.ca/",
+    "rating": null,
+    "reviews": null,
+    "city": "Edmonton",
+    "state": "Alberta"
+  },
+  {
+    "slug": "viva-wellness-drip-edmonton-edmonton",
+    "name": "Viva Wellness Drip Edmonton",
+    "website": "https://edmonton.vivawellnessdrip.com/",
+    "rating": null,
+    "reviews": null,
+    "city": "Edmonton",
+    "state": "Alberta"
+  },
+  {
+    "slug": "feel-irie-medical-services-edmonton",
+    "name": "Feel Irie Medical Services",
+    "website": "https://www.feeliriemedicalservices.ca/iv-drip",
+    "rating": null,
+    "reviews": null,
+    "city": "Edmonton",
+    "state": "Alberta"
+  },
+  {
+    "slug": "theradrip-mobile-iv-therapy-winnipeg",
+    "name": "Theradrip Mobile IV Therapy",
+    "website": "https://www.theradrip.ca",
+    "rating": null,
+    "reviews": null,
+    "city": "Winnipeg",
+    "state": "Manitoba"
+  },
+  {
+    "slug": "centre-for-natural-pain-solutions-winnipeg",
+    "name": "Centre for Natural Pain Solutions",
+    "website": "https://cfnps.ca",
+    "rating": null,
+    "reviews": null,
+    "city": "Winnipeg",
+    "state": "Manitoba"
+  },
+  {
+    "slug": "winnipeg-clinic-infusion-centre-winnipeg",
+    "name": "Winnipeg Clinic Infusion Centre",
+    "website": "https://www.winnipegclinic.com/infusion-centre",
+    "rating": null,
+    "reviews": null,
+    "city": "Winnipeg",
+    "state": "Manitoba"
+  },
+  {
+    "slug": "the-gray-clinic-winnipeg",
+    "name": "The Gray Clinic",
+    "website": "https://www.thegrayclinic.ca",
+    "rating": null,
+    "reviews": null,
+    "city": "Winnipeg",
+    "state": "Manitoba"
+  },
+  {
+    "slug": "everliv-iv-therapy-miami",
+    "name": "EverLiv IV Therapy",
+    "website": "https://www.everlivmia.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Miami",
+    "state": "FL"
+  },
+  {
+    "slug": "key-basis-iv-wellness-miami",
+    "name": "Key Basis IV & Wellness",
+    "website": "https://www.keybasisiv.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Miami",
+    "state": "FL"
+  },
+  {
+    "slug": "drip-wellness-iv-miami",
+    "name": "Drip Wellness IV",
+    "website": "https://www.dripwellnessiv.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Miami",
+    "state": "FL"
+  },
+  {
+    "slug": "ivitamin-south-congress-austin",
+    "name": "IVitamin South Congress",
+    "website": "https://ivitamintherapy.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Austin",
+    "state": "TX"
+  },
+  {
+    "slug": "ivitamin-north-austin",
+    "name": "IVitamin North",
+    "website": "https://ivitamintherapy.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Austin",
+    "state": "TX"
+  },
+  {
+    "slug": "fluid-revival-mobile-iv-austin",
+    "name": "Fluid Revival Mobile IV",
+    "website": "https://fluidrevival.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Austin",
+    "state": "TX"
+  },
+  {
+    "slug": "restore-hyper-wellness-south-lamar-austin",
+    "name": "Restore Hyper Wellness - South Lamar",
+    "website": "https://www.restore.com/locations/tx-austin-south-lamar-tx024",
+    "rating": null,
+    "reviews": null,
+    "city": "Austin",
+    "state": "TX"
+  },
+  {
+    "slug": "liquid-wellness-iv-hydration-austin",
+    "name": "Liquid Wellness & IV Hydration",
+    "website": "https://liquidmobileiv.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Austin",
+    "state": "TX"
+  },
+  {
+    "slug": "awaken-iv-therapy-denver",
+    "name": "Awaken IV Therapy",
+    "website": "https://awakeniv.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Denver",
+    "state": "CO"
+  },
+  {
+    "slug": "vida-flo-fifth-broadway-nashville",
+    "name": "Vida-Flo Fifth + Broadway",
+    "website": "https://govidaflo.com/nashville",
+    "rating": null,
+    "reviews": null,
+    "city": "Nashville",
+    "state": "TN"
+  },
+  {
+    "slug": "the-dripbar-nashville",
+    "name": "The DRIPBaR Nashville",
+    "website": "https://thedripbar.com/nashville",
+    "rating": null,
+    "reviews": null,
+    "city": "Nashville",
+    "state": "TN"
+  },
+  {
+    "slug": "the-drip-lab-mobile-iv-nashville",
+    "name": "The Drip Lab Mobile IV",
+    "website": "https://thedriplabtn.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Nashville",
+    "state": "TN"
+  },
+  {
+    "slug": "glo-iv-spa-charlotte",
+    "name": "GLO IV Spa",
+    "website": "https://www.gloivspa.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Charlotte",
+    "state": "NC"
+  },
+  {
+    "slug": "restore-hyper-wellness-southpark-charlotte",
+    "name": "Restore Hyper Wellness - Southpark",
+    "website": "https://www.restore.com/locations/nc-charlotte-southpark-nc002",
+    "rating": null,
+    "reviews": null,
+    "city": "Charlotte",
+    "state": "NC"
+  },
+  {
+    "slug": "drip-iv-wellness-medspa-charlotte",
+    "name": "Drip IV Wellness & MedSpa",
+    "website": "https://www.dripivspa.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Charlotte",
+    "state": "NC"
+  },
+  {
+    "slug": "vitality-iv-bar-broad-ripple-indianapolis",
+    "name": "Vitality IV Bar - Broad Ripple",
+    "website": "https://trupath7.bar-z.com/301/location/vitality-iv-bar",
+    "rating": null,
+    "reviews": null,
+    "city": "Indianapolis",
+    "state": "IN"
+  },
+  {
+    "slug": "green-iv-indianapolis",
+    "name": "Green IV",
+    "website": "https://greeniv.org",
+    "rating": null,
+    "reviews": null,
+    "city": "Indianapolis",
+    "state": "IN"
+  },
+  {
+    "slug": "indiana-mobile-iv-indianapolis",
+    "name": "Indiana Mobile IV",
+    "website": "https://www.indianamobileiv.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Indianapolis",
+    "state": "IN"
+  },
+  {
+    "slug": "holistic-family-wellness-indianapolis",
+    "name": "Holistic Family Wellness",
+    "website": "https://holisticwellnessindiana.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Indianapolis",
+    "state": "IN"
+  },
+  {
+    "slug": "prime-iv-hydration-wellness-gahanna-columbus",
+    "name": "Prime IV Hydration & Wellness - Gahanna",
+    "website": "https://primeivhydration.com/locations/ohio/columbus-oh-43230",
+    "rating": null,
+    "reviews": null,
+    "city": "Columbus",
+    "state": "OH"
+  },
+  {
+    "slug": "revive-614-mobile-iv-columbus",
+    "name": "Revive 614 Mobile IV",
+    "website": "https://www.revive614.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Columbus",
+    "state": "OH"
+  },
+  {
+    "slug": "the-confidence-lab-columbus",
+    "name": "The Confidence Lab",
+    "website": "https://www.myconfidencelab.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Columbus",
+    "state": "OH"
+  },
+  {
+    "slug": "dr-heather-friedman-nd-the-heal-house-portland",
+    "name": "Dr. Heather Friedman ND - The Heal House",
+    "website": "https://www.drheatherfriedman.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Portland",
+    "state": "OR"
+  },
+  {
+    "slug": "ortho-rejuv-wellness-and-aesthetics-portland",
+    "name": "Ortho-Rejuv Wellness and Aesthetics",
+    "website": "https://ortho-rejuv.com",
+    "rating": null,
+    "reviews": null,
+    "city": "Portland",
+    "state": "OR"
   }
 ]
