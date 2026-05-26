@@ -61,20 +61,27 @@ export async function GET(req: Request) {
     .eq('is_featured', false)
     .neq('outreach_sent', true)
     .neq('email_bounced', true)
-    .gte('rating', MIN_RATING)
+    .or(`rating.gte.${MIN_RATING},rating.is.null`)
     .not('email', 'is', null)
-    .order('rating', { ascending: false })
+    .neq('email', '')
+    .order('rating', { ascending: false, nullsFirst: false })
     .limit(DAILY_TARGET * 10);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Rank by rating × log10(reviews + 1), stable on slug.
+  // Rank by rating × log10(reviews + 1). Null-rating clinics sort last (score=0)
+  // but are still eligible — they just get sent after the rated ones.
   const score = (p: ProviderRow) =>
     (Number(p.rating) || 0) * Math.log10((Number(p.reviews) || 0) + 1);
   const ranked = (data as ProviderRow[])
-    .filter((p) => p.rating && p.reviews && Number(p.reviews) >= MIN_REVIEWS && p.email)
+    .filter(
+      (p) =>
+        p.email &&
+        // Include if it meets the threshold OR has no rating data at all
+        (!p.rating || (Number(p.reviews) >= MIN_REVIEWS && Number(p.rating) >= MIN_RATING))
+    )
     .sort((a, b) => {
       const s = score(b) - score(a);
       return s !== 0 ? s : a.slug.localeCompare(b.slug);
@@ -93,13 +100,19 @@ export async function GET(req: Request) {
     const display = cleanName(p.name);
     const listingUrl = `${SITE_URL}/providers/${p.slug}`;
     const claimUrl = `${listingUrl}?claim=1`;
-    const reviews = Number(p.reviews).toLocaleString();
+    const hasRating = p.rating && Number(p.reviews) > 0;
     const subject = `Your ${display} listing on TheDripMap`;
+    const ratingLine = hasRating
+      ? `Your listing is live with your real Google rating of ${p.rating}★ from ${Number(p.reviews).toLocaleString()} patient reviews.`
+      : `Your listing is live — but right now it's unclaimed, so visitors see a generic placeholder instead of your photos, hours, services, and description.`;
+    const followLine = hasRating
+      ? `Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.`
+      : `Claiming is free and takes 2 minutes — you control your description, hours, services, and photos so prospective patients see your clinic at its best.`;
     const text = `Hi ${display} team,
 
-We added ${display} to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of ${p.rating}★ from ${reviews} patient reviews.
+We added ${display} to TheDripMap — North America's directory for IV therapy clinics. ${ratingLine}
 
-Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
+${followLine}
 
 Claim your listing here:
 ${claimUrl}
