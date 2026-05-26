@@ -81,6 +81,35 @@ export async function saveDrafts(payloads: DraftPayload[]): Promise<DraftResult[
 }
 
 /**
+ * Count messages in a Gmail folder whose Subject contains `subjectContains`.
+ * Used to verify outreach state (how many drafts left, how many sent).
+ */
+export async function countBySubject(folder: string, subjectContains: string): Promise<number> {
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!user || !pass) throw new Error('SMTP_USER and SMTP_PASS env vars required');
+
+  const client = new ImapFlow({
+    host: 'imap.gmail.com',
+    port: 993,
+    secure: true,
+    auth: { user, pass },
+    logger: false,
+  });
+
+  let count = 0;
+  await client.connect();
+  try {
+    await client.mailboxOpen(folder);
+    const uids = (await client.search({ subject: subjectContains })) as number[];
+    count = uids?.length || 0;
+  } finally {
+    await client.logout();
+  }
+  return count;
+}
+
+/**
  * Delete drafts in [Gmail]/Drafts whose Subject contains `subjectContains`.
  * Used to clear stale outreach drafts before re-queueing with updated copy.
  * Returns count deleted.
