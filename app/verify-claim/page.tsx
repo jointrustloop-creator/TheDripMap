@@ -53,7 +53,21 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
   }
   if (!claim) return { status: 'error', reason: 'not_found' };
   if (claim.status === 'verified') return { status: 'error', reason: 'already_verified' };
-  if (new Date(claim.expires_at) < new Date()) return { status: 'error', reason: 'expired' };
+  if (new Date(claim.expires_at) < new Date()) {
+    // Look up the provider so the expired-link page can offer a one-click
+    // "Request a new verification link" deep-link back to their claim modal.
+    const { data: prov } = await supabase
+      .from('providers')
+      .select('slug, name')
+      .eq('id', claim.listing_id)
+      .maybeSingle();
+    return {
+      status: 'error',
+      reason: 'expired',
+      providerSlug: prov?.slug || null,
+      clinicName: prov?.name,
+    };
+  }
 
   const { data: provider, error: provErr } = await supabase
     .from('providers')
@@ -72,7 +86,7 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
 
   const { error: updProvErr } = await supabase
     .from('providers')
-    .update({ is_claimed: true })
+    .update({ is_claimed: true, is_featured: true })
     .eq('id', provider.id);
 
   if (updProvErr) {
@@ -149,17 +163,32 @@ export default async function VerifyClaimPage({ searchParams }: VerifyClaimPageP
               <CheckCircle2 size={40} />
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight">
-              Claim verified!
+              Your listing is now live! 🎉
             </h1>
-            <p className="text-lg text-slate-500 leading-relaxed mb-10 max-w-xl mx-auto">
-              Your listing for <span className="font-bold text-slate-900">{outcome.clinicName}</span> is claimed. Our team will review and activate your profile within 24 hours.
+            <p className="text-lg text-slate-600 leading-relaxed mb-4 max-w-xl mx-auto">
+              Your listing for <span className="font-bold text-slate-900">{outcome.clinicName}</span> is now live on TheDripMap. Patients can find you right now
+              {outcome.providerSlug && (
+                <>
+                  {' '}at{' '}
+                  <a
+                    href={`${SITE_URL}/providers/${outcome.providerSlug}`}
+                    className="text-wellness-700 font-bold underline decoration-wellness-300/40 decoration-2 underline-offset-4 hover:decoration-wellness-600 break-all"
+                  >
+                    thedripmap.com/providers/{outcome.providerSlug}
+                  </a>
+                </>
+              )}
+              .
+            </p>
+            <p className="text-base text-slate-500 leading-relaxed mb-10 max-w-xl mx-auto">
+              To add your photos, services, hours and description — just reply to your verification email and we will update everything for you personally.
             </p>
             {outcome.providerSlug && (
               <Link
                 href={`/providers/${outcome.providerSlug}`}
-                className="inline-flex items-center gap-3 bg-wellness-600 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-wellness-700 transition-all shadow-xl"
+                className="inline-flex items-center gap-3 bg-wellness-600 hover:bg-wellness-700 text-white px-10 py-5 rounded-2xl font-black text-lg transition-all shadow-xl"
               >
-                View your listing <ArrowRight size={20} />
+                View Your Live Listing <ArrowRight size={20} />
               </Link>
             )}
           </div>
@@ -182,12 +211,29 @@ export default async function VerifyClaimPage({ searchParams }: VerifyClaimPageP
               {outcome.reason === 'expired' && 'This verification link is older than 7 days and is no longer valid. Submit a new claim request to get a fresh link.'}
               {outcome.reason === 'server_error' && 'Something went wrong on our end. Please try again in a few minutes or email info@thedripmap.com.'}
             </p>
-            <Link
-              href="/search"
-              className="inline-flex items-center gap-3 bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-slate-800 transition-all shadow-xl"
-            >
-              Browse clinics <ArrowRight size={20} />
-            </Link>
+            {outcome.reason === 'expired' && outcome.providerSlug ? (
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link
+                  href={`/providers/${outcome.providerSlug}?claim=1`}
+                  className="inline-flex items-center gap-3 bg-wellness-600 hover:bg-wellness-700 text-white px-10 py-5 rounded-2xl font-black text-lg transition-all shadow-xl"
+                >
+                  Request a new verification link <ArrowRight size={20} />
+                </Link>
+                <Link
+                  href="/search"
+                  className="inline-flex items-center gap-3 bg-white border border-slate-200 hover:border-slate-300 text-slate-700 px-8 py-5 rounded-2xl font-black text-base transition-all"
+                >
+                  Browse clinics
+                </Link>
+              </div>
+            ) : (
+              <Link
+                href="/search"
+                className="inline-flex items-center gap-3 bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-slate-800 transition-all shadow-xl"
+              >
+                Browse clinics <ArrowRight size={20} />
+              </Link>
+            )}
           </div>
         )}
       </main>
