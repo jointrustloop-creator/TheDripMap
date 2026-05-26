@@ -36,7 +36,7 @@ Report in 5 bullets."
 - Outreach emails sent today: check outreach_sent_at = today
 - Total claimed listings: check is_featured = true count
 - Pipeline remaining: count where outreach_sent is null
-- Open rate: we cannot track this without paid Resend plan
+- Open rate: not tracked — Workspace SMTP doesn't support open tracking without custom pixel injection, and we are not adding that
 
 ## When a clinic replies to outreach
 1. Reply within 2 hours if possible
