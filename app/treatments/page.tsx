@@ -1,6 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Activity, Heart, ShieldCheck, Sparkles, Dumbbell, Droplets, Zap,
   ArrowRight, BookOpen, MapPin, HelpCircle,
@@ -9,6 +10,9 @@ import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { BreadcrumbNav } from '../../src/components/BreadcrumbNav';
 import { getTreatmentContent } from '../../src/lib/treatment-content';
+
+const STORAGE_BASE =
+  'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/';
 
 const SITE_URL = 'https://www.thedripmap.com';
 
@@ -39,16 +43,16 @@ export const metadata: Metadata = {
 };
 
 const TREATMENTS = [
-  { name: 'NAD+ Plus',      slug: 'nad-plus',       icon: Activity,    category: 'Energy & Longevity' },
-  { name: 'Hangover',       slug: 'hangover',       icon: Heart,       category: 'Recovery' },
-  { name: 'Immune Support', slug: 'immune-support', icon: ShieldCheck, category: 'Wellness' },
-  { name: 'Beauty Glow',    slug: 'beauty-glow',    icon: Sparkles,    category: 'Beauty' },
-  { name: 'Weight Loss',    slug: 'weight-loss',    icon: Activity,    category: 'Metabolic' },
-  { name: 'Hydration',      slug: 'hydration',      icon: Droplets,    category: 'Foundational' },
-  { name: 'Recovery',       slug: 'recovery',       icon: Dumbbell,    category: 'Athletic' },
-  { name: 'Myers Cocktail', slug: 'myers-cocktail', icon: Zap,         category: 'Foundational' },
-  { name: 'Jet Lag',        slug: 'jet-lag',        icon: Droplets,    category: 'Travel' },
-  { name: 'Energy Boost',   slug: 'energy-boost',   icon: Zap,         category: 'Energy & Longevity' },
+  { name: 'NAD+ Plus',      slug: 'nad-plus',       icon: Activity,    category: 'Energy & Longevity', image: 'iv-therapy-nad-iv-bag-closeup.jpg' },
+  { name: 'Hangover',       slug: 'hangover',       icon: Heart,       category: 'Recovery',           image: 'iv-therapy-hangover.jpg' },
+  { name: 'Immune Support', slug: 'immune-support', icon: ShieldCheck, category: 'Wellness',           image: 'iv-therapy-immunity.jpg' },
+  { name: 'Beauty Glow',    slug: 'beauty-glow',    icon: Sparkles,    category: 'Beauty',             image: 'iv-therapy-skin-glow.jpg' },
+  { name: 'Weight Loss',    slug: 'weight-loss',    icon: Activity,    category: 'Metabolic',          image: 'iv-therapy-weight-loss.jpg' },
+  { name: 'Hydration',      slug: 'hydration',      icon: Droplets,    category: 'Foundational',       image: 'iv-therapy-dehydration.jpg' },
+  { name: 'Recovery',       slug: 'recovery',       icon: Dumbbell,    category: 'Athletic',           image: 'iv-therapy-sports-recovery.jpg' },
+  { name: 'Myers Cocktail', slug: 'myers-cocktail', icon: Zap,         category: 'Foundational',       image: 'iv-therapy-vitamin-drip-citrus.jpg' },
+  { name: 'Jet Lag',        slug: 'jet-lag',        icon: Droplets,    category: 'Travel',             image: 'iv-therapy-jet-lag.jpg' },
+  { name: 'Energy Boost',   slug: 'energy-boost',   icon: Zap,         category: 'Energy & Longevity', image: 'iv-therapy-fatigue.jpg' },
 ];
 
 // First sentence (or first ~180 chars) of each treatment's description.
@@ -108,7 +112,7 @@ export default function TreatmentsIndexPage() {
           </p>
         </section>
 
-        {/* Treatment grid */}
+        {/* Treatment grid — image-bg cards (mirrors the /cities pattern) */}
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
           {TREATMENTS.map((t) => {
             const Icon = t.icon;
@@ -116,28 +120,46 @@ export default function TreatmentsIndexPage() {
               <Link
                 key={t.slug}
                 href={`/treatments/${t.slug}`}
-                className="group bg-white border-2 border-slate-100 rounded-[2rem] p-7 md:p-8 hover:border-wellness-300 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+                className="group relative overflow-hidden rounded-[2rem] shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 aspect-[4/5] flex flex-col"
               >
-                <div className="flex items-start justify-between mb-5">
-                  <div className="w-12 h-12 rounded-2xl bg-wellness-50 text-wellness-600 flex items-center justify-center shrink-0 group-hover:bg-wellness-600 group-hover:text-white transition-colors">
-                    <Icon size={22} />
+                {/* Background image with zoom-on-hover */}
+                <Image
+                  src={STORAGE_BASE + t.image}
+                  alt={`${t.name} IV therapy`}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover group-hover:scale-110 transition-transform duration-[1500ms] ease-out"
+                />
+                {/* Dark gradient overlay for legibility */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/55 to-slate-950/15" />
+                {/* Wellness-tint hover wash */}
+                <div className="absolute inset-0 bg-gradient-to-br from-wellness-600/0 to-wellness-600/0 group-hover:from-wellness-600/30 group-hover:to-transparent transition-all duration-500" />
+
+                {/* Top-left: icon + category chip */}
+                <div className="absolute top-5 left-5 right-5 z-10 flex items-start justify-between gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-white/95 backdrop-blur-md text-wellness-600 flex items-center justify-center shadow-lg shrink-0">
+                    <Icon size={18} />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-50 px-2.5 py-1 rounded-full">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] bg-slate-950/40 backdrop-blur-md text-white px-2.5 py-1 rounded-full">
                     {t.category}
                   </span>
                 </div>
-                <h2 className="text-2xl font-black text-slate-900 mb-3 tracking-tight leading-tight">
-                  {t.name}
-                </h2>
-                <p className="text-sm text-slate-600 leading-relaxed flex-1">
-                  {getTreatmentPreview(t.name)}
-                </p>
-                <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-xs font-black text-wellness-600 uppercase tracking-widest">
-                    See clinics & details
-                  </span>
-                  <div className="w-9 h-9 rounded-full bg-wellness-50 group-hover:bg-wellness-600 flex items-center justify-center text-wellness-600 group-hover:text-white group-hover:translate-x-1 transition-all">
-                    <ArrowRight size={16} />
+
+                {/* Bottom: name + preview + CTA */}
+                <div className="absolute inset-x-0 bottom-0 p-6 md:p-7 z-10 flex flex-col gap-3">
+                  <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight leading-[0.95] drop-shadow-lg">
+                    {t.name}
+                  </h2>
+                  <p className="text-sm text-white/85 leading-relaxed line-clamp-3 drop-shadow">
+                    {getTreatmentPreview(t.name)}
+                  </p>
+                  <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/20">
+                    <span className="text-white font-black text-xs uppercase tracking-widest">
+                      See clinics
+                    </span>
+                    <div className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-wellness-600 group-hover:translate-x-1 transition-all">
+                      <ArrowRight size={16} />
+                    </div>
                   </div>
                 </div>
               </Link>
