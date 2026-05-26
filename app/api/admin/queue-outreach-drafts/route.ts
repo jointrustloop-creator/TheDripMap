@@ -97,8 +97,10 @@ Your page shows your real Google rating of ${p.rating}★ from ${reviews} patien
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: ${claimUrl}
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com`,
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com`,
     };
   });
 

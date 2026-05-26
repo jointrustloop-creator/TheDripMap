@@ -32,8 +32,10 @@ Your page shows your real Google rating of 5★ from 1,476 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/next-health-century-city-los-angeles?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -56,8 +58,10 @@ Your page shows your real Google rating of 5★ from 1,295 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/next-health-studio-city-los-angeles?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -80,8 +84,10 @@ Your page shows your real Google rating of 5.0★ from 923 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/ivme-wellness-aesthetics-milwaukee-historic-third-ward-milwaukee?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -104,8 +110,10 @@ Your page shows your real Google rating of 4.9★ from 812 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/thrive-drip-spa-memorial-houston?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -128,8 +136,10 @@ Your page shows your real Google rating of 4.8★ from 689 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/neumed-modern-urgent-care-iv-therapy-houston-heights-houston?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -152,8 +162,10 @@ Your page shows your real Google rating of 5.0★ from 449 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/dripology-santa-monica?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -176,8 +188,10 @@ Your page shows your real Google rating of 4.7★ from 639 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/cienega-medical-west-hollywood?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -200,8 +214,10 @@ Your page shows your real Google rating of 4.9★ from 458 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/restore-hyper-wellness-santa-monica?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -224,8 +240,10 @@ Your page shows your real Google rating of 4.9★ from 449 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/the-dripbar-austin-the-domain?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -248,8 +266,10 @@ Your page shows your real Google rating of 5.0★ from 390 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/las-vegas-mobile-iv-therapy-las-vegas?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -272,8 +292,10 @@ Your page shows your real Google rating of 5.0★ from 347 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/the-beauty-lounge-of-peoria-peoria?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -296,8 +318,10 @@ Your page shows your real Google rating of 5.0★ from 335 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/the-luminary-aesthetics-self-care-bar-peoria?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -320,8 +344,10 @@ Your page shows your real Google rating of 5.0★ from 322 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/beyouty-medical-spa-los-alamitos?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -344,8 +370,10 @@ Your page shows your real Google rating of 4.9★ from 344 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/refined-image-ottawa-ottawa?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -368,8 +396,10 @@ Your page shows your real Google rating of 4.9★ from 299 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/reviv-las-vegas-cosmopolitan-iv-hydration-mobile-hangover-therapy-nad-injections-las-vegas?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -392,8 +422,10 @@ Your page shows your real Google rating of 4.9★ from 294 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/push-iv-hydration-las-vegas-las-vegas?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -416,8 +448,10 @@ Your page shows your real Google rating of 4.9★ from 274 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/somerset-health-and-wellness-centre-ottawa?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -440,8 +474,10 @@ Your page shows your real Google rating of 4.9★ from 271 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/restore-hyper-wellness-palm-desert?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -464,8 +500,10 @@ Your page shows your real Google rating of 5★ from 238 patient reviews — but
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/twin-rivers-iv-wellness-lounge-denver?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
 
@@ -488,7 +526,9 @@ Your page shows your real Google rating of 4.8★ from 294 patient reviews — b
 Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/reset-iv-las-vegas?claim=1
 
 Warmly,
-Hubert
-TheDripMap · info@thedripmap.com
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+https://www.thedripmap.com
 
 ---
