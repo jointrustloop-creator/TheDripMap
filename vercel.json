@@ -1,13 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [
-    {
-      "path": "/api/cron/daily-outreach",
-      "schedule": "0 13 * * *"
-    },
-    {
-      "path": "/api/cron/followup-outreach",
-      "schedule": "0 14 * * *"
-    }
-  ]
+  "_paused_crons_until_claim_flow_verified": "Both outreach crons are paused — DO NOT re-enable until the claim flow is end-to-end verified per scripts/CLAIM_FLOW.md. Original crons: /api/cron/daily-outreach at 0 13 * * *, /api/cron/followup-outreach at 0 14 * * *",
+  "crons": []
 }
