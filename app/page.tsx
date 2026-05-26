@@ -152,36 +152,36 @@ export default async function HomePage() {
             className="object-cover object-center"
             priority
           />
-          {/* Light scrim — keeps the people in the photo visible. Mobile gets
-              slightly more white so the headline survives portrait crops. */}
-          <div className="absolute inset-0 bg-white/40 md:bg-white/25" />
-          <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/10 to-white/50" />
+          {/* Medium scrim — photo stays clearly visible, text stays crisp.
+              Mobile slightly darker because portrait crops eat lighter zones. */}
+          <div className="absolute inset-0 bg-slate-900/40 md:bg-slate-900/30" />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/10 via-transparent to-slate-900/35" />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10 w-full">
           <div className="text-center max-w-5xl mx-auto mb-20">
-            <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight leading-[1.1] [text-shadow:0_2px_24px_rgba(255,255,255,0.95)]">
+            <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight leading-[1.1] [text-shadow:0_2px_18px_rgba(0,0,0,0.55)]">
               Get Matched to the Right <br />
-              <span className="text-wellness-700 relative">
+              <span className="text-wellness-300 relative">
                 IV Therapy Clinic in 30 Seconds.
-                <span className="absolute -inset-1 bg-white/60 blur-2xl -z-10 rounded-full" />
+                <span className="absolute -inset-1 bg-wellness-400/25 blur-2xl -z-10 rounded-full" />
               </span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-slate-800 mb-10 font-semibold tracking-tight max-w-3xl mx-auto leading-relaxed [text-shadow:0_1px_12px_rgba(255,255,255,0.95)]">
+            <p className="text-xl md:text-2xl text-slate-100 mb-10 font-semibold tracking-tight max-w-3xl mx-auto leading-relaxed [text-shadow:0_1px_10px_rgba(0,0,0,0.55)]">
               Not all IV therapy is the same — we match you based on your exact needs, location, and budget.
             </p>
 
             <QuickMatch />
 
             <div className="mt-10 flex flex-col items-center gap-2">
-              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[14px] font-bold text-slate-900 [text-shadow:0_1px_10px_rgba(255,255,255,0.9)]">
-                <span className="flex items-center gap-1.5"><span className="text-wellness-700 font-bold">✓</span> Trusted by patients nationwide</span>
-                <span className="flex items-center gap-1.5"><span className="text-wellness-700 font-bold">✓</span> Clinical grade provider match</span>
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[14px] font-bold text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.55)]">
+                <span className="flex items-center gap-1.5"><span className="text-wellness-300 font-bold">✓</span> Trusted by patients nationwide</span>
+                <span className="flex items-center gap-1.5"><span className="text-wellness-300 font-bold">✓</span> Clinical grade provider match</span>
               </div>
-              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[11px] font-black text-slate-800 uppercase tracking-[0.2em] mt-4">
-                <span className="flex items-center gap-1.5 px-3 py-1 bg-white/85 backdrop-blur-sm rounded-full shadow-sm">{stats.total} Verified Clinics</span>
-                <span className="flex items-center gap-1.5 px-3 py-1 bg-white/85 backdrop-blur-sm rounded-full shadow-sm">{stats.cities} US & Canadian Cities</span>
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[11px] font-black text-white uppercase tracking-[0.2em] mt-4">
+                <span className="flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full border border-white/20">{stats.total} Verified Clinics</span>
+                <span className="flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full border border-white/20">{stats.cities} US & Canadian Cities</span>
               </div>
             </div>
           </div>
