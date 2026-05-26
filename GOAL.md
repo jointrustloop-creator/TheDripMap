@@ -35,6 +35,15 @@
 - Re-send to a specific clinic: `UPDATE providers SET outreach_sent=false WHERE slug='...'`
 - Mark a bouncing email: `UPDATE providers SET email_bounced=true WHERE email='...'` (cron will skip)
 
+## Follow-up outreach — AUTOMATED (compounds conversion ~2x)
+- Vercel Cron `/api/cron/followup-outreach` runs every day at 14:00 UTC (10am Eastern, 1h after first cron)
+- Sends up to 15 follow-ups/day to clinics emailed 7+ days ago that did not claim
+- Skips: claimed clinics, bounced emails, already-followed-up clinics
+- Different subject + body that explicitly references "following up on my note last week"
+- Sends a daily follow-up summary to info@thedripmap.com
+- Requires columns: providers.followup_sent (bool), providers.followup_sent_at (timestamptz)
+  (Migration SQL: scripts/add-followup-columns.sql — must be run once in Supabase)
+
 ## Outreach priority order
 1. Mechelle — info@bluecypressky.com — Blue Cypress Georgetown KY — SEND TOMORROW
 2. Eva — info@signaturebeautylounge.ca — Signature Beauty Lounge Toronto — SEND TOMORROW
