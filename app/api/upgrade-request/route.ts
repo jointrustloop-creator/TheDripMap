@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { Resend } from 'resend';
+import { sendMail } from '../../../src/lib/mailer';
 
 export async function POST(req: Request) {
   try {
@@ -51,15 +51,12 @@ ${notes ? `Notes: ${notes}` : ''}`;
       );
     }
 
-    if (process.env.RESEND_API_KEY) {
-      try {
-        const resend = new Resend(process.env.RESEND_API_KEY);
-        await resend.emails.send({
-          from: 'TheDripMap <notifications@thedripmap.com>',
-          to: 'info@thedripmap.com',
-          replyTo: email,
-          subject: `🚀 Upgrade request: ${clinicName}`,
-          text: `New Featured-upgrade request from a clinic.
+    await sendMail({
+      from: 'TheDripMap <info@thedripmap.com>',
+      to: 'info@thedripmap.com',
+      replyTo: email,
+      subject: `🚀 Upgrade request: ${clinicName}`,
+      text: `New Featured-upgrade request from a clinic.
 
 Clinic: ${clinicName}
 Owner name: ${name}
@@ -75,11 +72,7 @@ Reply directly to this email to reach them.
 
 Manage all leads: https://www.thedripmap.com/admin/leads
 `,
-        });
-      } catch (emailErr) {
-        console.error('upgrade-request email error:', emailErr);
-      }
-    }
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -2,11 +2,11 @@ import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
-import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { slugify } from '../../src/lib/data';
+import { sendMail } from '../../src/lib/mailer';
 
 export const dynamic = 'force-dynamic';
 
@@ -89,18 +89,15 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
     console.error('verify-claim: claim update error', updClaimErr);
   }
 
-  if (process.env.RESEND_API_KEY) {
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    const providerSlug = provider.slug || slugify(provider.name);
-    const listingUrl = `${SITE_URL}/providers/${providerSlug}`;
+  const providerSlug = provider.slug || slugify(provider.name);
+  const listingUrl = `${SITE_URL}/providers/${providerSlug}`;
 
-    try {
-      await resend.emails.send({
-        from: 'TheDripMap <notifications@thedripmap.com>',
-        to: claim.email,
-        replyTo: 'info@thedripmap.com',
-        subject: `Your claim for ${provider.name} is verified`,
-        text: `Hi ${claim.owner_name || 'there'},
+  await sendMail({
+    from: 'TheDripMap <info@thedripmap.com>',
+    to: claim.email,
+    replyTo: 'info@thedripmap.com',
+    subject: `Your claim for ${provider.name} is verified`,
+    text: `Hi ${claim.owner_name || 'there'},
 
 Your claim for ${provider.name} on TheDripMap has been verified.
 
@@ -110,18 +107,14 @@ View your listing: ${listingUrl}
 
 — The TheDripMap Team
 `,
-      });
-    } catch (e) {
-      console.error('verify-claim: owner confirmation email error', e);
-    }
+  });
 
-    try {
-      await resend.emails.send({
-        from: 'TheDripMap <notifications@thedripmap.com>',
-        to: 'info@thedripmap.com',
-        replyTo: claim.email,
-        subject: `Claim VERIFIED: ${provider.name}`,
-        text: `A clinic claim has been verified.
+  await sendMail({
+    from: 'TheDripMap <info@thedripmap.com>',
+    to: 'info@thedripmap.com',
+    replyTo: claim.email,
+    subject: `Claim VERIFIED: ${provider.name}`,
+    text: `A clinic claim has been verified.
 
 Clinic: ${provider.name}
 Owner name: ${claim.owner_name || 'Not provided'}
@@ -133,11 +126,7 @@ Public listing: ${listingUrl}
 
 Next step: review and set is_featured = true if approved.
 `,
-      });
-    } catch (e) {
-      console.error('verify-claim: operator confirmation email error', e);
-    }
-  }
+  });
 
   return {
     status: 'success',

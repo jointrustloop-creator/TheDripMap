@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { sendMail } from '../../../src/lib/mailer';
 
 const SUPABASE_PROJECT_REF = 'qaqzwfnjajyejehmdvuw';
 const SITE_URL = 'https://www.thedripmap.com';
@@ -22,18 +22,14 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Email is required' }, { status: 400 });
       }
 
-      if (process.env.RESEND_API_KEY) {
-        const resend = new Resend(process.env.RESEND_API_KEY);
-
-        if (token) {
-          const verifyUrl = `${SITE_URL}/verify-claim?token=${encodeURIComponent(token)}`;
-          try {
-            await resend.emails.send({
-              from: 'TheDripMap <notifications@thedripmap.com>',
-              to: email,
-              replyTo: 'info@thedripmap.com',
-              subject: `Verify your claim for ${clinicName || 'your clinic'} on TheDripMap`,
-              text: `Hi ${ownerName || 'there'},
+      if (token) {
+        const verifyUrl = `${SITE_URL}/verify-claim?token=${encodeURIComponent(token)}`;
+        await sendMail({
+          from: 'TheDripMap <info@thedripmap.com>',
+          to: email,
+          replyTo: 'info@thedripmap.com',
+          subject: `Verify your claim for ${clinicName || 'your clinic'} on TheDripMap`,
+          text: `Hi ${ownerName || 'there'},
 
 Thanks for submitting a claim for ${clinicName || 'your clinic'} on TheDripMap.
 
@@ -45,21 +41,17 @@ If you didn't submit this claim, you can safely ignore this email.
 
 — The TheDripMap Team
 `,
-            });
-          } catch (emailErr) {
-            console.error('Resend owner verification email error:', emailErr);
-          }
-        }
+        });
+      }
 
-        try {
-          const publicUrl = providerSlug ? `${SITE_URL}/providers/${providerSlug}` : '(no slug)';
-          const supabaseUrl = `https://supabase.com/dashboard/project/${SUPABASE_PROJECT_REF}/editor`;
-          await resend.emails.send({
-            from: 'TheDripMap <notifications@thedripmap.com>',
-            to: 'info@thedripmap.com',
-            replyTo: email,
-            subject: `New clinic claim: ${clinicName || 'Unknown'}`,
-            text: `New clinic claim request
+      const publicUrl = providerSlug ? `${SITE_URL}/providers/${providerSlug}` : '(no slug)';
+      const supabaseUrl = `https://supabase.com/dashboard/project/${SUPABASE_PROJECT_REF}/editor`;
+      await sendMail({
+        from: 'TheDripMap <info@thedripmap.com>',
+        to: 'info@thedripmap.com',
+        replyTo: email,
+        subject: `New clinic claim: ${clinicName || 'Unknown'}`,
+        text: `New clinic claim request
 
 Clinic: ${clinicName || 'Unknown'}
 Owner name: ${ownerName || 'Not provided'}
@@ -73,11 +65,7 @@ Manage in Supabase: ${supabaseUrl}
 
 Status: pending verification (owner must click the link in their verification email)
 `,
-          });
-        } catch (emailErr) {
-          console.error('Resend operator notification error:', emailErr);
-        }
-      }
+      });
 
       const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
       const CHAT_ID = process.env.TELEGRAM_CHAT_ID;

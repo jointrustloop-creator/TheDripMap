@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { Resend } from 'resend';
+import { sendMail } from '../../../src/lib/mailer';
 
 export async function POST(req: Request) {
   try {
@@ -31,19 +31,12 @@ export async function POST(req: Request) {
       console.error('Supabase insert error:', insertError);
     }
 
-    if (process.env.RESEND_API_KEY) {
-      try {
-        const resend = new Resend(process.env.RESEND_API_KEY);
-        await resend.emails.send({
-          from: 'TheDripMap <notifications@thedripmap.com>',
-          to: 'info@thedripmap.com',
-          subject: `New email subscriber from ${source}`,
-          text: `Email: ${email}\nSource: ${source}${city ? `\nCity: ${city}` : ''}\n`,
-        });
-      } catch (emailErr) {
-        console.error('Resend error:', emailErr);
-      }
-    }
+    await sendMail({
+      from: 'TheDripMap <info@thedripmap.com>',
+      to: 'info@thedripmap.com',
+      subject: `New email subscriber from ${source}`,
+      text: `Email: ${email}\nSource: ${source}${city ? `\nCity: ${city}` : ''}\n`,
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

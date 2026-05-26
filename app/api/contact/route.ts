@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { Resend } from 'resend';
+import { sendMail } from '../../../src/lib/mailer';
 
 export async function POST(req: Request) {
   try {
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       phone: data.phone || null,
       message: `Subject: ${data.subject}\n\n${data.message}`,
       listing_id: null,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     });
 
     if (error) {
@@ -25,15 +25,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
-    if (process.env.RESEND_API_KEY) {
-      try {
-        const resend = new Resend(process.env.RESEND_API_KEY);
-        const result = await resend.emails.send({
-          from: 'TheDripMap <notifications@thedripmap.com>',
-          to: 'info@thedripmap.com',
-          replyTo: data.email,
-          subject: `New contact form: ${data.subject || 'No subject'}`,
-          text: `New contact form submission
+    const mailResult = await sendMail({
+      from: 'TheDripMap <info@thedripmap.com>',
+      to: 'info@thedripmap.com',
+      replyTo: data.email,
+      subject: `New contact form: ${data.subject || 'No subject'}`,
+      text: `New contact form submission
 
 Name: ${data.name || 'Not provided'}
 Email: ${data.email || 'Not provided'}
@@ -43,29 +40,9 @@ Subject: ${data.subject || 'No subject'}
 Message:
 ${data.message || '(empty)'}
 `,
-        });
-        if (result?.error) {
-          console.error('Resend returned error:', result.error);
-          return NextResponse.json({
-            success: true,
-            debug_resend_response: result,
-          });
-        }
-        return NextResponse.json({ success: true, debug_resend_response: result });
-      } catch (emailErr) {
-        console.error('Resend email error:', emailErr);
-        return NextResponse.json({
-          success: true,
-          debug_email_error: String(emailErr),
-          debug_email_error_detail: emailErr instanceof Error
-            ? { message: emailErr.message, name: emailErr.name }
-            : emailErr,
-        });
-      }
-    }
+    });
 
-    return NextResponse.json({ success: true, debug_note: 'RESEND_API_KEY not set in env' });
-
+    return NextResponse.json({ success: true, mail: mailResult });
   } catch (error) {
     console.error('Contact form error:', error);
     return NextResponse.json({ success: false }, { status: 500 });

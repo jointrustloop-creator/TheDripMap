@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { Resend } from 'resend';
 import crypto from 'crypto';
+import { sendMail } from '../../../../src/lib/mailer';
 
 export async function POST(req: Request) {
   try {
@@ -75,19 +75,16 @@ export async function POST(req: Request) {
       );
     }
 
-    if (process.env.RESEND_API_KEY) {
-      try {
-        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thedripmap.com';
-        const approveUrl = `${siteUrl}/api/testimonials/moderate?id=${newId}&token=${moderationToken}&action=approve`;
-        const rejectUrl = `${siteUrl}/api/testimonials/moderate?id=${newId}&token=${moderationToken}&action=reject`;
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thedripmap.com';
+    const approveUrl = `${siteUrl}/api/testimonials/moderate?id=${newId}&token=${moderationToken}&action=approve`;
+    const rejectUrl = `${siteUrl}/api/testimonials/moderate?id=${newId}&token=${moderationToken}&action=reject`;
 
-        const resend = new Resend(process.env.RESEND_API_KEY);
-        await resend.emails.send({
-          from: 'TheDripMap <notifications@thedripmap.com>',
-          to: 'info@thedripmap.com',
-          replyTo: authorEmail,
-          subject: `Testimonial pending: ${providerName} (${rating}/5)`,
-          text: `New testimonial pending review.
+    await sendMail({
+      from: 'TheDripMap <info@thedripmap.com>',
+      to: 'info@thedripmap.com',
+      replyTo: authorEmail,
+      subject: `Testimonial pending: ${providerName} (${rating}/5)`,
+      text: `New testimonial pending review.
 
 Clinic: ${providerName}
 Listing: ${siteUrl}/providers/${providerSlug}
@@ -106,11 +103,7 @@ REJECT   →  ${rejectUrl}
 
 (Both links are one-click and require no login. They expire when the moderation token is invalidated.)
 `,
-        });
-      } catch (emailErr) {
-        console.error('Resend testimonial email error:', emailErr);
-      }
-    }
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
