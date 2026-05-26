@@ -79,6 +79,12 @@ export default async function AdminTestimonialsPage() {
             <span className="text-xs font-black uppercase tracking-widest text-slate-400">
               Admin / Testimonials
             </span>
+            <Link
+              href="/admin/leads"
+              className="text-xs font-bold text-slate-500 hover:text-wellness-600"
+            >
+              All leads →
+            </Link>
           </div>
           <form action="/api/admin/logout" method="POST">
             <button className="text-xs font-bold text-slate-500 hover:text-rose-600">
