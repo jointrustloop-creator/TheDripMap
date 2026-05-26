@@ -4,10 +4,12 @@ Generated 2026-05-26 · sorted by rating × log(reviews)
 
 ## How to use this file
 
-1. **Find each clinic's email** if not listed (Google their website + look for contact / about page, or use a Hunter.io / Apollo lookup).
-2. **Send from info@thedripmap.com** — paste subject + body below for each clinic.
-3. **The claim link auto-opens the claim modal** thanks to the ?claim=1 query param — owner clicks, modal pops up, takes 2 minutes.
-4. **Tone is intentionally warm + brief** — no paid pitch, no hard sell. The Featured upgrade nudge already lives on their listing post-claim.
+1. **Send from info@thedripmap.com** — paste subject + body below for each clinic.
+2. **The claim link auto-opens the claim modal** thanks to ?claim=1 — owner clicks, modal pops up, 2-minute claim flow.
+3. **Tone is intentionally warm + brief** — no paid pitch, no hard sell. The Featured upgrade nudge already lives on their listing post-claim.
+4. **For the 6 clinics without an email** — call the phone number, or send via their website contact form.
+
+**Email coverage:** 14 / 20 have an email on file. The other 6 have phone/website only.
 
 ---
 
@@ -15,7 +17,7 @@ Generated 2026-05-26 · sorted by rating × log(reviews)
 
 - **Rating:** 5★ × 1,476 reviews
 - **Listing:** https://www.thedripmap.com/providers/next-health-century-city-los-angeles
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: https://www.next-health.com/location/century-city
+- **To:** ⚠️ NO EMAIL — call (310) 620-8373 or use https://www.next-health.com/location/century-city
 
 ---
 
@@ -39,7 +41,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 5★ × 1,295 reviews
 - **Listing:** https://www.thedripmap.com/providers/next-health-studio-city-los-angeles
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: https://www.next-health.com/location/studio-city
+- **To:** info@next-health.com
 
 ---
 
@@ -63,7 +65,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 5.0★ × 923 reviews
 - **Listing:** https://www.thedripmap.com/providers/ivme-wellness-aesthetics-milwaukee-historic-third-ward-milwaukee
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: https://ivmenow.com/locations/milwaukee-wi/
+- **To:** info@ivmenow.com
 
 ---
 
@@ -87,7 +89,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 4.9★ × 812 reviews
 - **Listing:** https://www.thedripmap.com/providers/thrive-drip-spa-memorial-houston
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: https://thrivedripspa.com/memorial-green/
+- **To:** info@thrivedripspa.com
 
 ---
 
@@ -111,7 +113,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 4.8★ × 689 reviews
 - **Listing:** https://www.thedripmap.com/providers/neumed-modern-urgent-care-iv-therapy-houston-heights-houston
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: https://neumed.com/locations/houston-heights/
+- **To:** ⚠️ NO EMAIL — call (832) 879-2450 or use https://neumed.com/locations/houston-heights/
 
 ---
 
@@ -135,7 +137,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 5.0★ × 449 reviews
 - **Listing:** https://www.thedripmap.com/providers/dripology-santa-monica
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: https://dripology.co
+- **To:** info@dripology.co
 
 ---
 
@@ -159,7 +161,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 4.7★ × 639 reviews
 - **Listing:** https://www.thedripmap.com/providers/cienega-medical-west-hollywood
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: https://cienegaspa.com
+- **To:** info@cienegaspa.com
 
 ---
 
@@ -183,7 +185,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 4.9★ × 458 reviews
 - **Listing:** https://www.thedripmap.com/providers/restore-hyper-wellness-santa-monica
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: https://www.restore.com/locations/ca-santa-monica-ca025
+- **To:** info@restore.com
 
 ---
 
@@ -207,7 +209,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 4.9★ × 449 reviews
 - **Listing:** https://www.thedripmap.com/providers/the-dripbar-austin-the-domain
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: https://thedripbar.com/austin-the-domain
+- **To:** ⚠️ NO EMAIL — call (512) 649-8323 or use https://thedripbar.com/austin-the-domain
 
 ---
 
@@ -231,7 +233,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 5.0★ × 390 reviews
 - **Listing:** https://www.thedripmap.com/providers/las-vegas-mobile-iv-therapy-las-vegas
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: https://mobileivtherapylasvegas.com/
+- **To:** ⚠️ NO EMAIL — call +1 725-217-4236 or use https://mobileivtherapylasvegas.com/
 
 ---
 
@@ -279,7 +281,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 5.0★ × 335 reviews
 - **Listing:** https://www.thedripmap.com/providers/the-luminary-aesthetics-self-care-bar-peoria
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: http://www.theluminaryaesthetics.com/
+- **To:** hello@theluminaryaesthetics.com
 
 ---
 
@@ -303,7 +305,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 5.0★ × 322 reviews
 - **Listing:** https://www.thedripmap.com/providers/beyouty-medical-spa-los-alamitos
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: https://www.beyoutymedspa.com/
+- **To:** beyoutymedspa@gmail.com
 
 ---
 
@@ -327,7 +329,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 4.9★ × 344 reviews
 - **Listing:** https://www.thedripmap.com/providers/refined-image-ottawa-ottawa
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: https://refinedimageottawa.com
+- **To:** info@refinedimageottawa.com
 
 ---
 
@@ -351,7 +353,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 4.9★ × 299 reviews
 - **Listing:** https://www.thedripmap.com/providers/reviv-las-vegas-cosmopolitan-iv-hydration-mobile-hangover-therapy-nad-injections-las-vegas
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: http://www.revivme.com/
+- **To:** lasvegasthecosmopolitan@revivme.com
 
 ---
 
@@ -375,7 +377,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 4.9★ × 294 reviews
 - **Listing:** https://www.thedripmap.com/providers/push-iv-hydration-las-vegas-las-vegas
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: https://pushiv.com/
+- **To:** ⚠️ NO EMAIL — call +1 702-478-3369 or use https://pushiv.com/
 
 ---
 
@@ -399,7 +401,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 4.9★ × 274 reviews
 - **Listing:** https://www.thedripmap.com/providers/somerset-health-and-wellness-centre-ottawa
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: https://somersethealth.ca
+- **To:** info@somersethealth.ca
 
 ---
 
@@ -423,7 +425,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 4.9★ × 271 reviews
 - **Listing:** https://www.thedripmap.com/providers/restore-hyper-wellness-palm-desert
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: http://www.restore.com/locations/ca-palm-desert-ca156%3Futm_source%3Dgmb%26utm_medium%3DYext%26y_source%3D1_NTg0NDQ0MDEtNzE1LWxvY2F0aW9uLndlYnNpdGU%253D
+- **To:** ⚠️ NO EMAIL — call +1 760-505-3000 or use http://www.restore.com/locations/ca-palm-desert-ca156%3Futm_source%3Dgmb%26utm_medium%3DYext%26y_source%3D1_NTg0NDQ0MDEtNzE1LWxvY2F0aW9uLndlYnNpdGU%253D
 
 ---
 
@@ -447,7 +449,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 5★ × 238 reviews
 - **Listing:** https://www.thedripmap.com/providers/twin-rivers-iv-wellness-lounge-denver
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: https://twinriversiv.com
+- **To:** info@twinriversiv.com
 
 ---
 
@@ -471,7 +473,7 @@ TheDripMap · info@thedripmap.com
 
 - **Rating:** 4.8★ × 294 reviews
 - **Listing:** https://www.thedripmap.com/providers/reset-iv-las-vegas
-- **To:** ⚠️ NO EMAIL ON FILE — find via website: http://www.resetiv.com/
+- **To:** customercare@resetiv.com
 
 ---
 

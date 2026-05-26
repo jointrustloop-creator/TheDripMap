@@ -1,0 +1,154 @@
+[
+  {
+    "rank": 1,
+    "name": "Next Health - Century City",
+    "slug": "next-health-century-city-los-angeles",
+    "city": "Los Angeles",
+    "state": "California",
+    "website": "https://www.next-health.com/location/century-city"
+  },
+  {
+    "rank": 2,
+    "name": "Next Health - Studio City",
+    "slug": "next-health-studio-city-los-angeles",
+    "city": "Los Angeles",
+    "state": "California",
+    "website": "https://www.next-health.com/location/studio-city"
+  },
+  {
+    "rank": 3,
+    "name": "IVme Wellness + Aesthetics Milwaukee Historic Third Ward",
+    "slug": "ivme-wellness-aesthetics-milwaukee-historic-third-ward-milwaukee",
+    "city": "Milwaukee",
+    "state": "Wisconsin",
+    "website": "https://ivmenow.com/locations/milwaukee-wi/"
+  },
+  {
+    "rank": 4,
+    "name": "ThrIVe Drip Spa - Memorial",
+    "slug": "thrive-drip-spa-memorial-houston",
+    "city": "Houston",
+    "state": "Texas",
+    "website": "https://thrivedripspa.com/memorial-green/"
+  },
+  {
+    "rank": 5,
+    "name": "NeuMed Modern Urgent Care + IV Therapy - Houston Heights",
+    "slug": "neumed-modern-urgent-care-iv-therapy-houston-heights-houston",
+    "city": "Houston",
+    "state": "Texas",
+    "website": "https://neumed.com/locations/houston-heights/"
+  },
+  {
+    "rank": 6,
+    "name": "Dripology Santa Monica",
+    "slug": "dripology-santa-monica",
+    "city": "Santa Monica",
+    "state": "California",
+    "website": "https://dripology.co"
+  },
+  {
+    "rank": 7,
+    "name": "Cienega Medical",
+    "slug": "cienega-medical-west-hollywood",
+    "city": "West Hollywood",
+    "state": "California",
+    "website": "https://cienegaspa.com"
+  },
+  {
+    "rank": 8,
+    "name": "Restore Hyper Wellness Santa Monica",
+    "slug": "restore-hyper-wellness-santa-monica",
+    "city": "Santa Monica",
+    "state": "California",
+    "website": "https://www.restore.com/locations/ca-santa-monica-ca025"
+  },
+  {
+    "rank": 9,
+    "name": "The DRIPBaR Austin The Domain",
+    "slug": "the-dripbar-austin-the-domain",
+    "city": "Austin",
+    "state": "TX",
+    "website": "https://thedripbar.com/austin-the-domain"
+  },
+  {
+    "rank": 10,
+    "name": "Las Vegas Mobile IV Therapy",
+    "slug": "las-vegas-mobile-iv-therapy-las-vegas",
+    "city": "Las Vegas",
+    "state": "Nevada",
+    "website": "https://mobileivtherapylasvegas.com/"
+  },
+  {
+    "rank": 11,
+    "name": "The Luminary Aesthetics + Self Care Bar",
+    "slug": "the-luminary-aesthetics-self-care-bar-peoria",
+    "city": "Peoria",
+    "state": "Illinois",
+    "website": "http://www.theluminaryaesthetics.com/"
+  },
+  {
+    "rank": 12,
+    "name": "BeYouty Medical Spa",
+    "slug": "beyouty-medical-spa-los-alamitos",
+    "city": "Los Alamitos",
+    "state": "California",
+    "website": "https://www.beyoutymedspa.com/"
+  },
+  {
+    "rank": 13,
+    "name": "Refined Image Ottawa",
+    "slug": "refined-image-ottawa-ottawa",
+    "city": "Ottawa",
+    "state": "Ontario",
+    "website": "https://refinedimageottawa.com"
+  },
+  {
+    "rank": 14,
+    "name": "REVIV Las Vegas Cosmopolitan - IV Hydration | Mobile Hangover Therapy | NAD+ Injections",
+    "slug": "reviv-las-vegas-cosmopolitan-iv-hydration-mobile-hangover-therapy-nad-injections-las-vegas",
+    "city": "Las Vegas",
+    "state": "Nevada",
+    "website": "http://www.revivme.com/"
+  },
+  {
+    "rank": 15,
+    "name": "Push IV Hydration Las Vegas",
+    "slug": "push-iv-hydration-las-vegas-las-vegas",
+    "city": "Las Vegas",
+    "state": "Nevada",
+    "website": "https://pushiv.com/"
+  },
+  {
+    "rank": 16,
+    "name": "Somerset Health & Wellness Centre",
+    "slug": "somerset-health-and-wellness-centre-ottawa",
+    "city": "Ottawa",
+    "state": "Ontario",
+    "website": "https://somersethealth.ca"
+  },
+  {
+    "rank": 17,
+    "name": "Restore Hyper Wellness",
+    "slug": "restore-hyper-wellness-palm-desert",
+    "city": "Palm Desert",
+    "state": "California",
+    "website": "http://www.restore.com/locations/ca-palm-desert-ca156%3Futm_source%3Dgmb%26utm_medium%3DYext%26y_source%3D1_NTg0NDQ0MDEtNzE1LWxvY2F0aW9uLndlYnNpdGU%253D"
+  },
+  {
+    "rank": 18,
+    "name": "Twin Rivers IV & Wellness Lounge",
+    "slug": "twin-rivers-iv-wellness-lounge-denver",
+    "city": "Denver",
+    "state": "CO",
+    "website": "https://twinriversiv.com"
+  },
+  {
+    "rank": 19,
+    "name": "Reset IV",
+    "slug": "reset-iv-las-vegas",
+    "city": "Las Vegas",
+    "state": "Nevada",
+    "website": "http://www.resetiv.com/"
+  }
+]
