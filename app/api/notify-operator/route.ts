@@ -29,7 +29,7 @@ export async function POST(req: Request) {
           const verifyUrl = `${SITE_URL}/verify-claim?token=${encodeURIComponent(token)}`;
           try {
             await resend.emails.send({
-              from: 'TheDripMap <info@thedripmap.com>',
+              from: 'TheDripMap <notifications@thedripmap.com>',
               to: email,
               replyTo: 'info@thedripmap.com',
               subject: `Verify your claim for ${clinicName || 'your clinic'} on TheDripMap`,

@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       try {
         const resend = new Resend(process.env.RESEND_API_KEY);
         await resend.emails.send({
-          from: 'TheDripMap <info@thedripmap.com>',
+          from: 'TheDripMap <notifications@thedripmap.com>',
           to: 'info@thedripmap.com',
           subject: `New email subscriber from ${source}`,
           text: `Email: ${email}\nSource: ${source}${city ? `\nCity: ${city}` : ''}\n`,

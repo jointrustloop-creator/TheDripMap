@@ -47,7 +47,7 @@ export async function POST(req: Request) {
           : 'https://www.thedripmap.com';
 
         const result = await resend.emails.send({
-          from: 'TheDripMap <info@thedripmap.com>',
+          from: 'TheDripMap <notifications@thedripmap.com>',
           to: 'info@thedripmap.com',
           replyTo: data.email,
           subject: `New patient lead: ${data.clinicName}`,

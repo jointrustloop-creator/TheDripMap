@@ -96,7 +96,7 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
 
     try {
       await resend.emails.send({
-        from: 'TheDripMap <info@thedripmap.com>',
+        from: 'TheDripMap <notifications@thedripmap.com>',
         to: claim.email,
         replyTo: 'info@thedripmap.com',
         subject: `Your claim for ${provider.name} is verified`,
@@ -117,7 +117,7 @@ View your listing: ${listingUrl}
 
     try {
       await resend.emails.send({
-        from: 'TheDripMap <info@thedripmap.com>',
+        from: 'TheDripMap <notifications@thedripmap.com>',
         to: 'info@thedripmap.com',
         replyTo: claim.email,
         subject: `Claim VERIFIED: ${provider.name}`,

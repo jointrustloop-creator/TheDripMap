@@ -83,7 +83,7 @@ export async function POST(req: Request) {
 
         const resend = new Resend(process.env.RESEND_API_KEY);
         await resend.emails.send({
-          from: 'TheDripMap <info@thedripmap.com>',
+          from: 'TheDripMap <notifications@thedripmap.com>',
           to: 'info@thedripmap.com',
           replyTo: authorEmail,
           subject: `Testimonial pending: ${providerName} (${rating}/5)`,
