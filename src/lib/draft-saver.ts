@@ -110,8 +110,15 @@ export async function countBySubject(folder: string, subjectContains: string): P
 }
 
 /**
- * Delete ALL messages from a Gmail folder. For inbox cleanup or draft purging.
- * Returns count deleted.
+ * Move ALL messages from a Gmail folder to Trash. Permanent purge (will auto-
+ * delete after 30 days). Used for inbox cleanup + draft purging.
+ *
+ * Note: We use messageMove → [Gmail]/Trash instead of just flagging \\Deleted,
+ * because Gmail's IMAP behavior for the Drafts folder soft-flags but does NOT
+ * always auto-expunge — leaving them as visible-but-marked-deleted forever.
+ * Moving to Trash is the only reliable IMAP-level permanent purge.
+ *
+ * Returns count moved.
  */
 export async function deleteAllFromFolder(folder: string): Promise<number> {
   const user = process.env.SMTP_USER;
@@ -126,21 +133,19 @@ export async function deleteAllFromFolder(folder: string): Promise<number> {
     logger: false,
   });
 
-  let deleted = 0;
+  let moved = 0;
   await client.connect();
   try {
     const mb = await client.mailboxOpen(folder);
     if (mb.exists > 0) {
-      // '1:*' = all messages
-      await client.messageFlagsAdd('1:*', ['\\Deleted']);
-      deleted = mb.exists;
-      // For [Gmail]/Trash, expunge happens automatically. For other folders Gmail
-      // moves to Trash on \\Deleted (which is what we want).
+      // Move all messages in the folder to Trash.
+      await client.messageMove('1:*', '[Gmail]/Trash');
+      moved = mb.exists;
     }
   } finally {
     await client.logout();
   }
-  return deleted;
+  return moved;
 }
 
 /**
