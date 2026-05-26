@@ -152,36 +152,36 @@ export default async function HomePage() {
             className="object-cover object-center"
             priority
           />
-          {/* Stronger overlay on mobile portrait so the white headline stays readable
-              even when the hero image gets aggressively cropped */}
-          <div className="absolute inset-0 bg-slate-950/75 md:bg-slate-950/60" />
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-transparent to-slate-950/60" />
+          {/* Light scrim — keeps the people in the photo visible. Mobile gets
+              slightly more white so the headline survives portrait crops. */}
+          <div className="absolute inset-0 bg-white/40 md:bg-white/25" />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/10 to-white/50" />
         </div>
-        
+
         <div className="max-w-7xl mx-auto relative z-10 w-full">
           <div className="text-center max-w-5xl mx-auto mb-20">
-            <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight leading-[1.1] drop-shadow-xl">
+            <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight leading-[1.1] [text-shadow:0_2px_24px_rgba(255,255,255,0.95)]">
               Get Matched to the Right <br />
-              <span className="text-wellness-400 relative">
+              <span className="text-wellness-700 relative">
                 IV Therapy Clinic in 30 Seconds.
-                <span className="absolute -inset-1 bg-wellness-400/20 blur-2xl -z-10 rounded-full" />
+                <span className="absolute -inset-1 bg-white/60 blur-2xl -z-10 rounded-full" />
               </span>
             </h1>
-            
-            <p className="text-xl md:text-2xl text-slate-200 mb-10 font-medium tracking-tight max-w-3xl mx-auto leading-relaxed">
+
+            <p className="text-xl md:text-2xl text-slate-800 mb-10 font-semibold tracking-tight max-w-3xl mx-auto leading-relaxed [text-shadow:0_1px_12px_rgba(255,255,255,0.95)]">
               Not all IV therapy is the same — we match you based on your exact needs, location, and budget.
             </p>
 
             <QuickMatch />
-            
+
             <div className="mt-10 flex flex-col items-center gap-2">
-              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[14px] font-bold text-slate-100">
-                <span className="flex items-center gap-1.5"><span className="text-wellness-400 font-bold">✓</span> Trusted by patients nationwide</span>
-                <span className="flex items-center gap-1.5"><span className="text-wellness-400 font-bold">✓</span> Clinical grade provider match</span>
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[14px] font-bold text-slate-900 [text-shadow:0_1px_10px_rgba(255,255,255,0.9)]">
+                <span className="flex items-center gap-1.5"><span className="text-wellness-700 font-bold">✓</span> Trusted by patients nationwide</span>
+                <span className="flex items-center gap-1.5"><span className="text-wellness-700 font-bold">✓</span> Clinical grade provider match</span>
               </div>
-              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[11px] font-black text-white/60 uppercase tracking-[0.2em] mt-4">
-                <span className="flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full">{stats.total} Verified Clinics</span>
-                <span className="flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full">{stats.cities} US & Canadian Cities</span>
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[11px] font-black text-slate-800 uppercase tracking-[0.2em] mt-4">
+                <span className="flex items-center gap-1.5 px-3 py-1 bg-white/85 backdrop-blur-sm rounded-full shadow-sm">{stats.total} Verified Clinics</span>
+                <span className="flex items-center gap-1.5 px-3 py-1 bg-white/85 backdrop-blur-sm rounded-full shadow-sm">{stats.cities} US & Canadian Cities</span>
               </div>
             </div>
           </div>
