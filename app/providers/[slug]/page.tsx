@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -1386,8 +1386,14 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
       {/* Persistent claim CTA — desktop floating card + mobile bottom sheet. Unclaimed only. */}
       {!provider.is_featured && <StickyClaimRail provider={provider} />}
 
-      {/* Auto-open claim modal when URL has ?claim=1 (outreach email link). Unclaimed only. */}
-      {!provider.is_featured && <ClaimAutoOpener provider={provider} />}
+      {/* Auto-open claim modal when URL has ?claim=1 (outreach email link). Unclaimed only.
+          Wrapped in Suspense because ClaimAutoOpener uses useSearchParams() —
+          Next.js requires that to be Suspense-bounded for static prerender to succeed. */}
+      {!provider.is_featured && (
+        <Suspense fallback={null}>
+          <ClaimAutoOpener provider={provider} />
+        </Suspense>
+      )}
 
       <Footer />
     </div>
