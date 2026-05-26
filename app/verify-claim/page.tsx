@@ -13,6 +13,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Verify Your Claim | TheDripMap',
   robots: { index: false, follow: false },
+  other: { 'x-verify-claim-version': 'v3-service-role-debug' },
 };
 
 const SITE_URL = 'https://www.thedripmap.com';
@@ -31,6 +32,8 @@ type Outcome =
     };
 
 async function processClaim(token: string | undefined): Promise<Outcome> {
+  // VERIFY-CLAIM-VERSION: v3-service-role-debug
+  console.log('[verify-claim v3] starting processClaim with token present:', !!token);
   if (!token) return { status: 'error', reason: 'missing_token' };
 
   // Use SERVICE_ROLE_KEY here, not anon — verify-claim is a server component
@@ -39,6 +42,7 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
   // the server. This is the same pattern the daily-outreach cron uses.
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  console.log('[verify-claim v3] supabaseUrl set:', !!supabaseUrl, 'serviceKey set:', !!supabaseKey, 'keyLength:', supabaseKey?.length || 0);
   if (!supabaseUrl || !supabaseKey) {
     console.error('Supabase env missing in verify-claim — need NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY');
     return { status: 'error', reason: 'server_error' };
@@ -50,6 +54,7 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
     .select('id, listing_id, email, owner_name, owner_phone, expires_at, status')
     .eq('token', token)
     .maybeSingle();
+  console.log('[verify-claim v3] claim_requests SELECT result:', { found: !!claim, error: claimErr?.message, tokenLength: token.length });
 
   if (claimErr) {
     console.error('verify-claim: claim lookup error', claimErr);
