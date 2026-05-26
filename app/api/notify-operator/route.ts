@@ -55,7 +55,7 @@ If you didn't submit this claim, you can safely ignore this email.
           const publicUrl = providerSlug ? `${SITE_URL}/providers/${providerSlug}` : '(no slug)';
           const supabaseUrl = `https://supabase.com/dashboard/project/${SUPABASE_PROJECT_REF}/editor`;
           await resend.emails.send({
-            from: 'TheDripMap <info@thedripmap.com>',
+            from: 'TheDripMap <notifications@thedripmap.com>',
             to: 'info@thedripmap.com',
             replyTo: email,
             subject: `New clinic claim: ${clinicName || 'Unknown'}`,
