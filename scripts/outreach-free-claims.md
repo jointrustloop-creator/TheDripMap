@@ -5,9 +5,8 @@ Generated 2026-05-26 · sorted by rating × log(reviews)
 ## How to use this file
 
 1. **Send from info@thedripmap.com** — paste subject + body below for each clinic.
-2. **The claim link auto-opens the claim modal** thanks to ?claim=1 — owner clicks, modal pops up, 2-minute claim flow.
-3. **Tone is intentionally warm + brief** — no paid pitch, no hard sell. The Featured upgrade nudge already lives on their listing post-claim.
-4. **For the 6 clinics without an email** — call the phone number, or send via their website contact form.
+2. **Claim link auto-opens the claim modal** thanks to ?claim=1 — owner clicks, modal pops up, 2-minute claim.
+3. **For the 6 clinics without an email** — call the phone number, or send via their website contact form.
 
 **Email coverage:** 14 / 20 have an email on file. The other 6 have phone/website only.
 
@@ -23,19 +22,19 @@ Generated 2026-05-26 · sorted by rating × log(reviews)
 
 **Subject:** Your Next Health listing on TheDripMap
 
-Hi there,
+Hi Next Health team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added Next Health to our directory and your listing is now live: https://www.thedripmap.com/providers/next-health-century-city-los-angeles
+We added Next Health to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 5★ from 1,476 patient reviews.
 
-Your page shows your real Google rating of 5★ from 1,476 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/next-health-century-city-los-angeles?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/next-health-century-city-los-angeles?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -49,19 +48,19 @@ https://www.thedripmap.com
 
 **Subject:** Your Next Health listing on TheDripMap
 
-Hi there,
+Hi Next Health team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added Next Health to our directory and your listing is now live: https://www.thedripmap.com/providers/next-health-studio-city-los-angeles
+We added Next Health to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 5★ from 1,295 patient reviews.
 
-Your page shows your real Google rating of 5★ from 1,295 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/next-health-studio-city-los-angeles?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/next-health-studio-city-los-angeles?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -75,19 +74,19 @@ https://www.thedripmap.com
 
 **Subject:** Your IVme Wellness + Aesthetics Milwaukee Historic Third Ward listing on TheDripMap
 
-Hi there,
+Hi IVme Wellness + Aesthetics Milwaukee Historic Third Ward team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added IVme Wellness + Aesthetics Milwaukee Historic Third Ward to our directory and your listing is now live: https://www.thedripmap.com/providers/ivme-wellness-aesthetics-milwaukee-historic-third-ward-milwaukee
+We added IVme Wellness + Aesthetics Milwaukee Historic Third Ward to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 5.0★ from 923 patient reviews.
 
-Your page shows your real Google rating of 5.0★ from 923 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/ivme-wellness-aesthetics-milwaukee-historic-third-ward-milwaukee?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/ivme-wellness-aesthetics-milwaukee-historic-third-ward-milwaukee?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -101,19 +100,19 @@ https://www.thedripmap.com
 
 **Subject:** Your ThrIVe Drip Spa listing on TheDripMap
 
-Hi there,
+Hi ThrIVe Drip Spa team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added ThrIVe Drip Spa to our directory and your listing is now live: https://www.thedripmap.com/providers/thrive-drip-spa-memorial-houston
+We added ThrIVe Drip Spa to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 4.9★ from 812 patient reviews.
 
-Your page shows your real Google rating of 4.9★ from 812 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/thrive-drip-spa-memorial-houston?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/thrive-drip-spa-memorial-houston?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -127,19 +126,19 @@ https://www.thedripmap.com
 
 **Subject:** Your NeuMed Modern Urgent Care + listing on TheDripMap
 
-Hi there,
+Hi NeuMed Modern Urgent Care + team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added NeuMed Modern Urgent Care + to our directory and your listing is now live: https://www.thedripmap.com/providers/neumed-modern-urgent-care-iv-therapy-houston-heights-houston
+We added NeuMed Modern Urgent Care + to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 4.8★ from 689 patient reviews.
 
-Your page shows your real Google rating of 4.8★ from 689 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/neumed-modern-urgent-care-iv-therapy-houston-heights-houston?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/neumed-modern-urgent-care-iv-therapy-houston-heights-houston?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -153,19 +152,19 @@ https://www.thedripmap.com
 
 **Subject:** Your Dripology Santa Monica listing on TheDripMap
 
-Hi there,
+Hi Dripology Santa Monica team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added Dripology Santa Monica to our directory and your listing is now live: https://www.thedripmap.com/providers/dripology-santa-monica
+We added Dripology Santa Monica to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 5.0★ from 449 patient reviews.
 
-Your page shows your real Google rating of 5.0★ from 449 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/dripology-santa-monica?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/dripology-santa-monica?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -179,19 +178,19 @@ https://www.thedripmap.com
 
 **Subject:** Your Cienega Medical listing on TheDripMap
 
-Hi there,
+Hi Cienega Medical team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added Cienega Medical to our directory and your listing is now live: https://www.thedripmap.com/providers/cienega-medical-west-hollywood
+We added Cienega Medical to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 4.7★ from 639 patient reviews.
 
-Your page shows your real Google rating of 4.7★ from 639 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/cienega-medical-west-hollywood?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/cienega-medical-west-hollywood?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -205,19 +204,19 @@ https://www.thedripmap.com
 
 **Subject:** Your Restore Hyper Wellness Santa Monica listing on TheDripMap
 
-Hi there,
+Hi Restore Hyper Wellness Santa Monica team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added Restore Hyper Wellness Santa Monica to our directory and your listing is now live: https://www.thedripmap.com/providers/restore-hyper-wellness-santa-monica
+We added Restore Hyper Wellness Santa Monica to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 4.9★ from 458 patient reviews.
 
-Your page shows your real Google rating of 4.9★ from 458 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/restore-hyper-wellness-santa-monica?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/restore-hyper-wellness-santa-monica?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -231,19 +230,19 @@ https://www.thedripmap.com
 
 **Subject:** Your The DRIPBaR Austin The Domain listing on TheDripMap
 
-Hi there,
+Hi The DRIPBaR Austin The Domain team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added The DRIPBaR Austin The Domain to our directory and your listing is now live: https://www.thedripmap.com/providers/the-dripbar-austin-the-domain
+We added The DRIPBaR Austin The Domain to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 4.9★ from 449 patient reviews.
 
-Your page shows your real Google rating of 4.9★ from 449 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/the-dripbar-austin-the-domain?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/the-dripbar-austin-the-domain?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -257,19 +256,19 @@ https://www.thedripmap.com
 
 **Subject:** Your Las Vegas Mobile listing on TheDripMap
 
-Hi there,
+Hi Las Vegas Mobile team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added Las Vegas Mobile to our directory and your listing is now live: https://www.thedripmap.com/providers/las-vegas-mobile-iv-therapy-las-vegas
+We added Las Vegas Mobile to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 5.0★ from 390 patient reviews.
 
-Your page shows your real Google rating of 5.0★ from 390 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/las-vegas-mobile-iv-therapy-las-vegas?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/las-vegas-mobile-iv-therapy-las-vegas?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -283,19 +282,19 @@ https://www.thedripmap.com
 
 **Subject:** Your The Beauty Lounge Of Peoria listing on TheDripMap
 
-Hi there,
+Hi The Beauty Lounge Of Peoria team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added The Beauty Lounge Of Peoria to our directory and your listing is now live: https://www.thedripmap.com/providers/the-beauty-lounge-of-peoria-peoria
+We added The Beauty Lounge Of Peoria to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 5.0★ from 347 patient reviews.
 
-Your page shows your real Google rating of 5.0★ from 347 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/the-beauty-lounge-of-peoria-peoria?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/the-beauty-lounge-of-peoria-peoria?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -309,19 +308,19 @@ https://www.thedripmap.com
 
 **Subject:** Your The Luminary Aesthetics + Self Care Bar listing on TheDripMap
 
-Hi there,
+Hi The Luminary Aesthetics + Self Care Bar team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added The Luminary Aesthetics + Self Care Bar to our directory and your listing is now live: https://www.thedripmap.com/providers/the-luminary-aesthetics-self-care-bar-peoria
+We added The Luminary Aesthetics + Self Care Bar to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 5.0★ from 335 patient reviews.
 
-Your page shows your real Google rating of 5.0★ from 335 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/the-luminary-aesthetics-self-care-bar-peoria?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/the-luminary-aesthetics-self-care-bar-peoria?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -335,19 +334,19 @@ https://www.thedripmap.com
 
 **Subject:** Your BeYouty Medical Spa listing on TheDripMap
 
-Hi there,
+Hi BeYouty Medical Spa team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added BeYouty Medical Spa to our directory and your listing is now live: https://www.thedripmap.com/providers/beyouty-medical-spa-los-alamitos
+We added BeYouty Medical Spa to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 5.0★ from 322 patient reviews.
 
-Your page shows your real Google rating of 5.0★ from 322 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/beyouty-medical-spa-los-alamitos?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/beyouty-medical-spa-los-alamitos?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -361,19 +360,19 @@ https://www.thedripmap.com
 
 **Subject:** Your Refined Image Ottawa listing on TheDripMap
 
-Hi there,
+Hi Refined Image Ottawa team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added Refined Image Ottawa to our directory and your listing is now live: https://www.thedripmap.com/providers/refined-image-ottawa-ottawa
+We added Refined Image Ottawa to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 4.9★ from 344 patient reviews.
 
-Your page shows your real Google rating of 4.9★ from 344 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/refined-image-ottawa-ottawa?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/refined-image-ottawa-ottawa?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -387,19 +386,19 @@ https://www.thedripmap.com
 
 **Subject:** Your REVIV Las Vegas Cosmopolitan listing on TheDripMap
 
-Hi there,
+Hi REVIV Las Vegas Cosmopolitan team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added REVIV Las Vegas Cosmopolitan to our directory and your listing is now live: https://www.thedripmap.com/providers/reviv-las-vegas-cosmopolitan-iv-hydration-mobile-hangover-therapy-nad-injections-las-vegas
+We added REVIV Las Vegas Cosmopolitan to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 4.9★ from 299 patient reviews.
 
-Your page shows your real Google rating of 4.9★ from 299 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/reviv-las-vegas-cosmopolitan-iv-hydration-mobile-hangover-therapy-nad-injections-las-vegas?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/reviv-las-vegas-cosmopolitan-iv-hydration-mobile-hangover-therapy-nad-injections-las-vegas?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -413,19 +412,19 @@ https://www.thedripmap.com
 
 **Subject:** Your Push listing on TheDripMap
 
-Hi there,
+Hi Push team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added Push to our directory and your listing is now live: https://www.thedripmap.com/providers/push-iv-hydration-las-vegas-las-vegas
+We added Push to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 4.9★ from 294 patient reviews.
 
-Your page shows your real Google rating of 4.9★ from 294 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/push-iv-hydration-las-vegas-las-vegas?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/push-iv-hydration-las-vegas-las-vegas?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -439,19 +438,19 @@ https://www.thedripmap.com
 
 **Subject:** Your Somerset Health & Wellness Centre listing on TheDripMap
 
-Hi there,
+Hi Somerset Health & Wellness Centre team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added Somerset Health & Wellness Centre to our directory and your listing is now live: https://www.thedripmap.com/providers/somerset-health-and-wellness-centre-ottawa
+We added Somerset Health & Wellness Centre to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 4.9★ from 274 patient reviews.
 
-Your page shows your real Google rating of 4.9★ from 274 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/somerset-health-and-wellness-centre-ottawa?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/somerset-health-and-wellness-centre-ottawa?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -465,19 +464,19 @@ https://www.thedripmap.com
 
 **Subject:** Your Restore Hyper Wellness listing on TheDripMap
 
-Hi there,
+Hi Restore Hyper Wellness team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added Restore Hyper Wellness to our directory and your listing is now live: https://www.thedripmap.com/providers/restore-hyper-wellness-palm-desert
+We added Restore Hyper Wellness to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 4.9★ from 271 patient reviews.
 
-Your page shows your real Google rating of 4.9★ from 271 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/restore-hyper-wellness-palm-desert?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/restore-hyper-wellness-palm-desert?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -491,19 +490,19 @@ https://www.thedripmap.com
 
 **Subject:** Your Twin Rivers IV & Wellness Lounge listing on TheDripMap
 
-Hi there,
+Hi Twin Rivers IV & Wellness Lounge team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added Twin Rivers IV & Wellness Lounge to our directory and your listing is now live: https://www.thedripmap.com/providers/twin-rivers-iv-wellness-lounge-denver
+We added Twin Rivers IV & Wellness Lounge to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 5★ from 238 patient reviews.
 
-Your page shows your real Google rating of 5★ from 238 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/twin-rivers-iv-wellness-lounge-denver?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/twin-rivers-iv-wellness-lounge-denver?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---
 
@@ -517,18 +516,18 @@ https://www.thedripmap.com
 
 **Subject:** Your Reset IV listing on TheDripMap
 
-Hi there,
+Hi Reset IV team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added Reset IV to our directory and your listing is now live: https://www.thedripmap.com/providers/reset-iv-las-vegas
+We added Reset IV to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of 4.8★ from 294 patient reviews.
 
-Your page shows your real Google rating of 4.8★ from 294 patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: https://www.thedripmap.com/providers/reset-iv-las-vegas?claim=1
+Claim your listing here:
+https://www.thedripmap.com/providers/reset-iv-las-vegas?claim=1
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-https://www.thedripmap.com
 
 ---

@@ -79,3 +79,41 @@ export async function saveDrafts(payloads: DraftPayload[]): Promise<DraftResult[
 
   return results;
 }
+
+/**
+ * Delete drafts in [Gmail]/Drafts whose Subject contains `subjectContains`.
+ * Used to clear stale outreach drafts before re-queueing with updated copy.
+ * Returns count deleted.
+ */
+export async function deleteDraftsBySubject(subjectContains: string): Promise<number> {
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!user || !pass) {
+    throw new Error('SMTP_USER and SMTP_PASS env vars required');
+  }
+
+  const client = new ImapFlow({
+    host: 'imap.gmail.com',
+    port: 993,
+    secure: true,
+    auth: { user, pass },
+    logger: false,
+  });
+
+  let deleted = 0;
+  await client.connect();
+  try {
+    await client.mailboxOpen('[Gmail]/Drafts');
+    // ImapFlow search: find UIDs of messages whose subject matches
+    const uids = (await client.search({ subject: subjectContains })) as number[];
+    if (uids && uids.length > 0) {
+      // \\Deleted + expunge actually removes from Drafts (Gmail-specific behavior)
+      await client.messageFlagsAdd(uids, ['\\Deleted'], { uid: true });
+      // Gmail auto-expunges \\Deleted on close for [Gmail]/Drafts
+      deleted = uids.length;
+    }
+  } finally {
+    await client.logout();
+  }
+  return deleted;
+}

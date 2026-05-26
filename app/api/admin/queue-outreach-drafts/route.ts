@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { isAdminRequest } from '../../../../src/lib/admin-auth';
-import { saveDrafts, type DraftPayload } from '../../../../src/lib/draft-saver';
+import { saveDrafts, deleteDraftsBySubject, type DraftPayload } from '../../../../src/lib/draft-saver';
 
 const SITE_URL = 'https://www.thedripmap.com';
 
@@ -23,10 +23,12 @@ interface ProviderRow {
   email: string | null;
 }
 
-// POST /api/admin/queue-outreach-drafts?limit=20
+// POST /api/admin/queue-outreach-drafts?limit=20&replace=1
 // Admin-only. Reads top-N unclaimed clinics by rating × log(reviews),
 // generates a free-claim outreach email for each, saves to Drafts in
 // info@thedripmap.com Gmail. Returns count + per-clinic result.
+// With ?replace=1, first deletes any existing drafts whose Subject
+// contains "listing on TheDripMap" so you don't end up with duplicates.
 export async function POST(req: Request) {
   if (!(await isAdminRequest())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -36,6 +38,7 @@ export async function POST(req: Request) {
   const limit = Math.min(Number(searchParams.get('limit')) || 20, 50);
   const minReviews = Number(searchParams.get('minReviews')) || 50;
   const minRating = Number(searchParams.get('minRating')) || 4.7;
+  const replace = searchParams.get('replace') === '1';
 
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
     return NextResponse.json(
@@ -88,26 +91,33 @@ export async function POST(req: Request) {
       to: p.email!,
       replyTo: 'info@thedripmap.com',
       subject: `Your ${display} listing on TheDripMap`,
-      text: `Hi there,
+      text: `Hi ${display} team,
 
-I run TheDripMap (https://www.thedripmap.com) — North America's directory for IV therapy clinics. We added ${display} to our directory and your listing is now live: ${listingUrl}
+We added ${display} to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of ${p.rating}★ from ${reviews} patient reviews.
 
-Your page shows your real Google rating of ${p.rating}★ from ${reviews} patient reviews — but right now it's an unclaimed listing, which means anyone visiting sees a generic placeholder instead of your clinic's photos, hours, services, or one-line pitch.
+Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
-Claiming is completely free and takes about 2 minutes. Once claimed you control everything on the page — description, drip menu, photos, contact CTAs. Direct link to claim: ${claimUrl}
+Claim your listing here:
+${claimUrl}
 
 Warmly,
 Deborah Triandafilou
 TheDripMap
-info@thedripmap.com
-https://www.thedripmap.com`,
+info@thedripmap.com`,
     };
   });
 
   try {
+    let deleted = 0;
+    if (replace) {
+      // Clear any prior outreach drafts to avoid duplicates after a template change.
+      deleted = await deleteDraftsBySubject('listing on TheDripMap');
+    }
     const results = await saveDrafts(payloads);
     return NextResponse.json({
       ok: true,
+      replaced: replace,
+      deleted,
       drafted: results.filter((r) => r.ok).length,
       failed: results.filter((r) => !r.ok).length,
       results,
