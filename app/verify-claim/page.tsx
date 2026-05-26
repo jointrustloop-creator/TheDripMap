@@ -11,9 +11,8 @@ import { sendMail } from '../../src/lib/mailer';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Verify Your Claim | TheDripMap',
+  title: 'Verify Your Claim — v4 DEPLOY MARKER | TheDripMap',
   robots: { index: false, follow: false },
-  other: { 'x-verify-claim-version': 'v3-service-role-debug' },
 };
 
 const SITE_URL = 'https://www.thedripmap.com';
