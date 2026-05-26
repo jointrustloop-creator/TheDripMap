@@ -10,7 +10,7 @@ import { Footer } from '@/src/components/Footer';
 import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
 import { QuizCTA } from '@/src/components/QuizCTA';
 import { ListingController } from '@/src/components/ListingController';
-import { getCityBySlug, getListingsByCity, getAllCities } from '@/src/lib/data';
+import { getCityBySlug, getListingsByCity, getAllCities, getListingsByState, getFeaturedListings } from '@/src/lib/data';
 import { getCityIntro } from '@/src/lib/city-intros';
 import { MapTrigger } from '@/src/components/MapTrigger';
 import { FAQSection } from '@/src/components/FAQSection';
@@ -146,7 +146,47 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   }
 
   // Fetch actual listings for display
-  const listings = await getListingsByCity(cityData.name, cityData.state || '');
+  let listings = await getListingsByCity(cityData.name, cityData.state || '');
+  const exactCityCount = listings.length;
+
+  // Tiered fallback so a small/empty city never shows 0 cards:
+  // 1) widen to state-level top-rated
+  // 2) if still under 3, broaden to nationwide featured/top-rated
+  // The page passes a "broadened" flag down so the UI can communicate the
+  // expansion (banner) instead of silently swapping providers.
+  let isBroadened = false;
+  let broadenedScope: 'state' | 'national' | null = null;
+  if (exactCityCount < 3 && cityData.state) {
+    const stateListings = await getListingsByState(cityData.state);
+    const existingIds = new Set(listings.map(p => p.id));
+    for (const p of stateListings) {
+      if (listings.length >= 24) break;
+      if (!existingIds.has(p.id)) {
+        listings.push(p);
+        existingIds.add(p.id);
+      }
+    }
+    if (listings.length > exactCityCount) {
+      isBroadened = true;
+      broadenedScope = 'state';
+    }
+  }
+  if (listings.length < 3) {
+    const featured = await getFeaturedListings(24);
+    const existingIds = new Set(listings.map(p => p.id));
+    for (const p of featured) {
+      if (listings.length >= 24) break;
+      if (!existingIds.has(p.id)) {
+        listings.push(p);
+        existingIds.add(p.id);
+      }
+    }
+    if (listings.length > exactCityCount) {
+      isBroadened = true;
+      broadenedScope = broadenedScope === 'state' ? 'state' : 'national';
+    }
+  }
+
   const count = listings.length;
 
   // Fetch nearby cities in the same state
@@ -232,10 +272,29 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
 
         {/* 4. Verified Providers listings grid */}
         {listings.length > 0 && (
-          <ListingController 
-            initialProviders={listings} 
-            cityName={cityData.name} 
-          />
+          <>
+            {isBroadened && (
+              <div className="mb-8 bg-amber-50 border-2 border-amber-200 rounded-3xl p-5 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                  <MapPin size={18} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-black text-amber-900 mb-1">
+                    {exactCityCount === 0
+                      ? `No clinics in ${cityData.name} yet — showing top-rated ${broadenedScope === 'state' ? `in ${cityData.state}` : 'nearby'}.`
+                      : `Only ${exactCityCount} clinic${exactCityCount === 1 ? '' : 's'} in ${cityData.name} — adding more from ${broadenedScope === 'state' ? cityData.state : 'nearby'} so you have options.`}
+                  </p>
+                  <p className="text-xs text-amber-800 font-medium leading-relaxed">
+                    Mobile IV providers in some listings will travel — check the clinic page for service area.
+                  </p>
+                </div>
+              </div>
+            )}
+            <ListingController
+              initialProviders={listings}
+              cityName={cityData.name}
+            />
+          </>
         )}
 
         {/* 5. Match quiz CTA block */}
