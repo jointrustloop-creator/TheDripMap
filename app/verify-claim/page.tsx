@@ -33,10 +33,14 @@ type Outcome =
 async function processClaim(token: string | undefined): Promise<Outcome> {
   if (!token) return { status: 'error', reason: 'missing_token' };
 
+  // Use SERVICE_ROLE_KEY here, not anon — verify-claim is a server component
+  // (force-dynamic) and needs to bypass RLS to SELECT claim_requests by token
+  // and UPDATE providers.is_claimed/is_featured. The service key never leaves
+  // the server. This is the same pattern the daily-outreach cron uses.
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!supabaseUrl || !supabaseKey) {
-    console.error('Supabase env missing in verify-claim');
+    console.error('Supabase env missing in verify-claim — need NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY');
     return { status: 'error', reason: 'server_error' };
   }
   const supabase = createClient(supabaseUrl, supabaseKey);
