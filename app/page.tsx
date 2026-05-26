@@ -160,9 +160,9 @@ export default async function HomePage() {
 
         <div className="max-w-7xl mx-auto relative z-10 w-full">
           <div className="text-center max-w-5xl mx-auto mb-20">
-            <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight leading-[1.1] [text-shadow:0_2px_18px_rgba(0,0,0,0.55)]">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-white mb-6 tracking-tight leading-[1.1] [text-shadow:0_2px_18px_rgba(0,0,0,0.55)]">
               Get Matched to the Right <br />
-              <span className="text-wellness-300 relative">
+              <span className="text-wellness-300 relative inline-block">
                 IV Therapy Clinic in 30 Seconds.
                 <span className="absolute -inset-1 bg-wellness-400/25 blur-2xl -z-10 rounded-full" />
               </span>
@@ -203,7 +203,7 @@ export default async function HomePage() {
               <span className="text-wellness-700 font-black text-[10px] uppercase tracking-[0.3em]">How It Works</span>
             </div>
           </div>
-          <h2 className="text-4xl md:text-6xl font-black text-slate-900 text-center mb-16 tracking-tight leading-[1.05] max-w-4xl mx-auto">The Smarter Way to Find IV Therapy Clinics</h2>
+          <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-slate-900 text-center mb-16 tracking-tight leading-[1.1] max-w-4xl mx-auto">The Smarter Way to Find IV Therapy Clinics</h2>
 
           {/* Smart Match hero card — embossed, layered shadow, top accent line */}
           <div className="max-w-3xl mx-auto mb-12">
@@ -276,10 +276,10 @@ export default async function HomePage() {
               <span className="w-1.5 h-1.5 bg-wellness-400 rounded-full animate-pulse" />
               <span className="text-wellness-300 font-black text-[10px] uppercase tracking-[0.3em]">Drip Menu</span>
             </div>
-            <h2 className="text-5xl md:text-7xl font-black mb-5 tracking-tight leading-[1.05]">
-              <span className="bg-gradient-to-br from-white via-white to-slate-400 bg-clip-text text-transparent">Browse By</span>
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black mb-5 tracking-tight leading-[1.15]">
+              <span className="inline-block bg-gradient-to-br from-white via-white to-slate-400 bg-clip-text text-transparent pb-1">Browse By</span>
               <br />
-              <span className="bg-gradient-to-br from-wellness-300 via-wellness-400 to-sky-300 bg-clip-text text-transparent italic">Drip Type</span>
+              <span className="inline-block bg-gradient-to-br from-wellness-300 via-wellness-400 to-sky-300 bg-clip-text text-transparent italic pb-3">Drip Type</span>
             </h2>
             <p className="text-xl text-slate-400 max-w-xl mx-auto leading-relaxed">Select a service to find specialized providers near you.</p>
           </div>
@@ -319,8 +319,9 @@ export default async function HomePage() {
               <span className="text-amber-700 font-black text-[10px] uppercase tracking-[0.3em]">The Reading Room</span>
               <span className="h-px w-12 bg-amber-500/40" />
             </div>
-            <h2 className="text-5xl md:text-7xl font-black text-slate-900 mb-5 tracking-tight leading-[1.02]">
-              Before You <em className="not-italic bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800 bg-clip-text text-transparent italic" style={{ fontStyle: 'italic' }}>Book</em>
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black text-slate-900 mb-5 tracking-tight leading-[1.1]">
+              Before You{' '}
+              <span className="inline-block italic bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800 bg-clip-text text-transparent pb-2">Book</span>
             </h2>
             <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">Plain-English answers to the questions every first-time IV therapy patient asks.</p>
           </div>
@@ -340,7 +341,7 @@ export default async function HomePage() {
                 {/* Top thin gold accent rule */}
                 <div className="absolute top-0 left-10 right-10 h-px bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
                 {/* Decorative serif number */}
-                <div className="font-serif text-[6rem] md:text-[7rem] leading-none font-black text-amber-200/70 group-hover:text-amber-300 absolute -top-2 -right-2 select-none transition-colors duration-500" aria-hidden>
+                <div className="font-serif text-[4.5rem] md:text-[7rem] leading-none font-black text-amber-200/70 group-hover:text-amber-300 absolute top-4 right-6 md:-top-2 md:-right-2 select-none transition-colors duration-500 pointer-events-none" aria-hidden>
                   {g.num}
                 </div>
                 <div className="relative z-10">
@@ -367,38 +368,61 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Social Proof Images */}
-      <section className="py-24 px-6 bg-gradient-to-b from-white via-slate-100/60 to-white overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="relative h-[400px] md:h-[600px] rounded-[3rem] overflow-hidden shadow-2xl">
-              <ResilientImage 
-                src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-two-women.jpg"
-                fallbackSrc="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1920&auto=format&fit=crop"
-                alt="Friends receiving IV therapy"
-                fill
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-10 left-10 text-white">
-                <span className="font-bold text-sm uppercase tracking-widest text-wellness-400 mb-2 block">Relatable Experience</span>
-                <h3 className="text-3xl font-black tracking-tight">IV Therapy is Better with Friends</h3>
-              </div>
+      {/* Social Proof Images — editorial dual-feature */}
+      <section className="py-28 md:py-36 px-6 relative overflow-hidden bg-gradient-to-b from-white via-slate-50 to-white">
+        {/* Soft ambient blob */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-wellness-100/30 rounded-full blur-[200px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white border border-slate-200/70 rounded-full mb-6 shadow-sm">
+              <span className="w-1.5 h-1.5 bg-wellness-500 rounded-full" />
+              <span className="text-slate-600 font-black text-[10px] uppercase tracking-[0.3em]">In The Wild</span>
             </div>
-            <div className="relative h-[400px] md:h-[600px] rounded-[3rem] overflow-hidden shadow-2xl">
-              <ResilientImage 
-                src="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-man-lounge.jpg"
-                fallbackSrc="https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=1920&auto=format&fit=crop"
-                alt="Man relaxing during IV therapy"
-                fill
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-10 left-10 text-white">
-                <span className="font-bold text-sm uppercase tracking-widest text-wellness-400 mb-2 block">Recovery Focused</span>
-                <h3 className="text-3xl font-black tracking-tight">Expert Local Clinics</h3>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.05] max-w-3xl mx-auto">
+              Real People. <em className="not-italic bg-gradient-to-br from-wellness-600 to-wellness-800 bg-clip-text text-transparent italic">Real Drips.</em>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            {[
+              {
+                num: '01',
+                eyebrow: 'Relatable Experience',
+                title: 'IV Therapy is Better with Friends',
+                src: 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-two-women.jpg',
+                fallback: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1920&auto=format&fit=crop',
+                alt: 'Friends receiving IV therapy',
+              },
+              {
+                num: '02',
+                eyebrow: 'Recovery Focused',
+                title: 'Expert Local Clinics',
+                src: 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-man-lounge.jpg',
+                fallback: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=1920&auto=format&fit=crop',
+                alt: 'Man relaxing during IV therapy',
+              },
+            ].map((card) => (
+              <div key={card.num} className="group relative h-[420px] md:h-[600px] rounded-[2.5rem] md:rounded-[3rem] overflow-hidden shadow-[0_30px_60px_-25px_rgba(15,23,42,0.4)] hover:shadow-[0_40px_80px_-25px_rgba(15,23,42,0.55)] hover:-translate-y-1 transition-all duration-700">
+                <ResilientImage
+                  src={card.src}
+                  fallbackSrc={card.fallback}
+                  alt={card.alt}
+                  fill
+                  className="object-cover scale-105 group-hover:scale-110 transition-transform duration-[1500ms]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent" />
+                {/* Top-right number badge */}
+                <div className="absolute top-8 right-8 w-14 h-14 bg-white/15 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center text-white font-black text-sm tracking-wider">
+                  {card.num}
+                </div>
+                {/* Bottom caption block */}
+                <div className="absolute bottom-0 left-0 right-0 p-8 md:p-10 text-white">
+                  <span className="font-black text-[10px] uppercase tracking-[0.3em] text-wellness-300 mb-3 block">{card.eyebrow}</span>
+                  <h3 className="text-2xl md:text-4xl font-black tracking-tight leading-[1.1] [text-shadow:0_2px_12px_rgba(0,0,0,0.4)]">{card.title}</h3>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -474,40 +498,62 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Popular Cities Section */}
-      <section className="py-24 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
+      {/* Popular Cities — light mesh, map-coverage feel */}
+      <section className="py-28 md:py-36 px-6 relative overflow-hidden bg-gradient-to-br from-sky-50/40 via-white to-wellness-50/40">
+        {/* Map-coverage ambient orbs — distributed across the section */}
+        <div className="absolute top-10 left-10 w-[400px] h-[400px] bg-sky-200/40 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute top-1/2 right-20 w-[450px] h-[450px] bg-rose-100/40 rounded-full blur-[160px] pointer-events-none" />
+        <div className="absolute -bottom-20 left-1/3 w-[500px] h-[500px] bg-wellness-100/40 rounded-full blur-[160px] pointer-events-none" />
+        {/* Decorative pin-dot pattern */}
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #0f172a 1.5px, transparent 1.5px)', backgroundSize: '40px 40px' }} />
+
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-5xl md:text-6xl font-black text-slate-900 mb-4 tracking-tight">Popular Cities</h2>
-            <p className="text-xl text-slate-500">Find the best local IV therapy providers and mobile services in your area.</p>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/80 backdrop-blur-md border border-sky-200/70 rounded-full mb-6 shadow-sm">
+              <MapPin size={12} className="text-sky-600" />
+              <span className="text-sky-700 font-black text-[10px] uppercase tracking-[0.3em]">North America Coverage</span>
+            </div>
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black text-slate-900 mb-5 tracking-tight leading-[1.05]">
+              Popular <em className="not-italic bg-gradient-to-br from-sky-600 via-sky-700 to-wellness-700 bg-clip-text text-transparent italic inline-block pb-2">Cities</em>
+            </h2>
+            <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto">Find the best local IV therapy providers and mobile services in your area.</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
             {popularCities.map((city, idx) => (
               <Link
                 key={idx}
                 href={`/cities/${city.slug}`}
-                className="p-8 rounded-[2rem] border transition-all text-center group flex flex-col items-center justify-center min-h-[160px] bg-white border-slate-100 hover:border-wellness-200 hover:shadow-xl"
+                className="group relative p-8 rounded-[2rem] bg-white/80 backdrop-blur-md border border-white shadow-[0_20px_40px_-20px_rgba(15,23,42,0.12)] hover:shadow-[0_30px_60px_-20px_rgba(2,132,199,0.25)] hover:-translate-y-1 transition-all duration-500 text-center flex flex-col items-center justify-center min-h-[180px] overflow-hidden"
               >
-                <div className="w-10 h-10 bg-wellness-50 rounded-xl flex items-center justify-center text-wellness-600 mb-4 group-hover:scale-110 transition-transform">
-                  <MapPin size={20} />
+                {/* Hover glow */}
+                <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-40 h-40 bg-sky-300/0 group-hover:bg-sky-300/40 blur-3xl rounded-full transition-all duration-700 pointer-events-none" />
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-sky-400 to-sky-600 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg shadow-sky-300/40 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500">
+                    <MapPin size={22} strokeWidth={2.5} />
+                  </div>
+                  <span className="font-black tracking-tight text-slate-900 text-base md:text-lg group-hover:text-sky-700 transition-colors leading-tight">
+                    {city.name}
+                  </span>
+                  {city.count ? (
+                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-2">
+                      {city.count} {city.name.includes('Toronto') ? 'providers' : 'clinics'}
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-2">View Clinics</span>
+                  )}
                 </div>
-                <span className="font-black tracking-tight text-slate-900 group-hover:text-wellness-600 transition-colors">
-                  {city.name}
-                </span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">
-                  {city.count ? `${city.count} verified ${city.name.includes('Toronto') ? 'providers' : 'clinics'}` : 'View Clinics'}
-                </span>
               </Link>
             ))}
           </div>
 
-          {/* Centered standalone CTA — pulled out of the grid so it doesn't compete with city cards */}
-          <div className="flex justify-center mt-12">
+          {/* CTA */}
+          <div className="flex justify-center mt-14">
             <Link
               href="/cities"
-              className="inline-flex items-center gap-3 bg-slate-900 hover:bg-slate-800 text-white px-10 py-5 rounded-2xl font-black text-base transition-all shadow-xl hover:scale-[1.02] active:scale-[0.99]"
+              className="group inline-flex items-center gap-3 bg-gradient-to-br from-slate-900 to-slate-700 hover:from-sky-700 hover:to-wellness-700 text-white px-10 py-5 rounded-2xl font-black text-base transition-all shadow-[0_20px_40px_-15px_rgba(15,23,42,0.5)] hover:shadow-[0_25px_50px_-15px_rgba(2,132,199,0.5)] hover:-translate-y-0.5"
             >
-              Browse All {stats.cities}+ Cities <ArrowRight size={18} />
+              Browse All {stats.cities}+ Cities <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
@@ -521,24 +567,35 @@ export default async function HomePage() {
         avgRating: parseFloat(stats.avgRating)
       }} />
 
-      {/* Blog Preview */}
-      <section className="py-24 px-6 bg-slate-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+      {/* Blog Preview — editorial newsstand */}
+      <section className="py-28 md:py-36 px-6 relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50">
+        {/* Subtle wellness accent orb */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-wellness-100/30 rounded-full blur-[180px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-sky-100/30 rounded-full blur-[160px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
             <div className="max-w-2xl">
-              <h2 className="text-5xl md:text-6xl font-black text-slate-900 mb-4 tracking-tight">Latest from the Blog</h2>
-              <p className="text-xl text-slate-500 leading-relaxed">
+              <div className="inline-flex items-center gap-3 mb-6">
+                <span className="h-px w-10 bg-wellness-500/40" />
+                <span className="text-wellness-700 font-black text-[10px] uppercase tracking-[0.3em]">The Press</span>
+                <span className="h-px w-10 bg-wellness-500/40" />
+              </div>
+              <h2 className="text-4xl sm:text-5xl md:text-7xl font-black text-slate-900 mb-5 tracking-tight leading-[1.05]">
+                Latest from the <em className="not-italic bg-gradient-to-br from-wellness-600 to-wellness-800 bg-clip-text text-transparent italic inline-block pb-2">Blog</em>
+              </h2>
+              <p className="text-lg md:text-xl text-slate-600 leading-relaxed">
                 Expert guides on IV therapy, wellness protocols, and local health insights.
               </p>
             </div>
-            <Link 
+            <Link
               href="/blog"
-              className="flex items-center gap-2 text-wellness-600 font-bold hover:text-wellness-700 transition-colors"
+              className="group inline-flex items-center gap-2 bg-white border border-slate-200 hover:border-wellness-300 hover:text-wellness-700 text-slate-700 px-6 py-3 rounded-2xl font-black text-sm transition-all shadow-sm hover:shadow-md self-start md:self-auto"
             >
-              View All Articles <ArrowRight size={20} />
+              View All Articles <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {latestPosts.map((post, idx) => (
               <BlogCard key={idx} post={post} />
             ))}
