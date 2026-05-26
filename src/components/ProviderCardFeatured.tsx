@@ -142,15 +142,23 @@ export const ProviderCardFeatured = ({
             </div>
           )}
 
-          {/* Top-right: Rating chip */}
+          {/* Top-right: Rating chip — full pill for claimed (TheDripMap-trusted),
+              muted "Google rating" label for unclaimed so we're honest about source */}
           {provider.rating > 0 && (
             <div className="absolute top-4 right-4 z-10">
-              <div className="bg-white/95 backdrop-blur-md text-slate-900 px-3 py-1.5 rounded-full text-[11px] font-black shadow-lg flex items-center gap-1.5 border border-white">
-                <StarIcon size={11} className="text-amber-500" fill="currentColor" />
-                {provider.rating}
-                <span className="text-slate-400 font-bold">·</span>
-                <span className="text-slate-500">{provider.reviewCount || 0}</span>
-              </div>
+              {provider.is_featured ? (
+                <div className="bg-white/95 backdrop-blur-md text-slate-900 px-3 py-1.5 rounded-full text-[11px] font-black shadow-lg flex items-center gap-1.5 border border-white">
+                  <StarIcon size={11} className="text-amber-500" fill="currentColor" />
+                  {provider.rating}
+                  <span className="text-slate-400 font-bold">·</span>
+                  <span className="text-slate-500">{provider.reviewCount || 0}</span>
+                </div>
+              ) : (
+                <div className="bg-white/85 backdrop-blur-md text-slate-500 px-2.5 py-1 rounded-full text-[10px] font-bold shadow-md flex items-center gap-1 border border-white/80">
+                  <StarIcon size={9} className="text-amber-400" fill="currentColor" />
+                  {provider.rating} Google rating
+                </div>
+              )}
             </div>
           )}
 

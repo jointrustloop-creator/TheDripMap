@@ -34,13 +34,18 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
 
   const getInitials = (name: string) => {
     if (!name) return 'IV';
-    let words = name.trim().split(/\s+/);
+    // Drop tokens that aren't real words ("-", "+", "&", "#", "/" etc.) so
+    // "Next Health - Century City" produces "NH", not "N-".
+    let words = name
+      .trim()
+      .split(/\s+/)
+      .filter((w) => /^[a-zA-Z]/.test(w));
     if (words.length > 1 && ['the', 'a', 'an'].includes(words[0].toLowerCase())) {
       words = words.slice(1);
     }
     const first = words[0]?.[0] || '';
     const second = words[1]?.[0] || '';
-    return (first + second).toUpperCase().slice(0, 2);
+    return (first + second).toUpperCase().slice(0, 2) || 'IV';
   };
   const initials = getInitials(provider.name);
 
