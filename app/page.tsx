@@ -189,8 +189,11 @@ export default async function HomePage() {
       </section>
 
       {/* Trust & Path Section */}
-      <section className="py-24 px-6 bg-white relative -mt-20 z-20">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-24 px-6 bg-white relative -mt-20 z-20 overflow-hidden">
+        {/* Ambient wellness + sky glow orbs — connects visually to hero, warms up the section */}
+        <div className="absolute top-40 -left-40 w-[600px] h-[600px] bg-wellness-100/40 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute -bottom-32 -right-40 w-[500px] h-[500px] bg-sky-100/40 rounded-full blur-[140px] pointer-events-none" />
+        <div className="max-w-7xl mx-auto relative z-10">
           <h2 className="text-4xl md:text-5xl font-black text-slate-900 text-center mb-16 tracking-tight">The Smarter Way to Find IV Therapy Clinics</h2>
 
           {/* Single primary CTA — Smart Match. Browse Directory demoted to a secondary
@@ -252,8 +255,10 @@ export default async function HomePage() {
       </section>
 
       {/* Browse By Drip Type */}
-      <section className="py-24 px-6 bg-slate-50">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-24 px-6 bg-gradient-to-br from-slate-50 via-white to-wellness-50/30 relative overflow-hidden">
+        {/* Subtle dot grid pattern for "directory tile" texture */}
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #0f172a 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-5xl md:text-6xl font-black text-slate-900 mb-4 tracking-tight">Browse By Drip Type</h2>
             <p className="text-xl text-slate-500">Select a service to find specialized providers near you.</p>
@@ -276,16 +281,23 @@ export default async function HomePage() {
       </section>
 
       {/* Helpful Guides — internal-link buildout to /guide/* */}
-      <section className="py-24 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-24 px-6 bg-[#FAFAF7] relative overflow-hidden">
+        {/* Editorial warm-cream personality — magazine/reference vibe */}
+        <div className="absolute -top-32 -right-40 w-[500px] h-[500px] bg-amber-100/40 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute -bottom-20 -left-32 w-[400px] h-[400px] bg-wellness-100/30 rounded-full blur-[140px] pointer-events-none" />
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-amber-200 rounded-full mb-6 shadow-sm">
+              <span className="w-1.5 h-1.5 bg-amber-500 rounded-full" />
+              <span className="text-amber-700 font-black text-[11px] uppercase tracking-[0.25em]">Reference Library</span>
+            </div>
             <h2 className="text-5xl md:text-6xl font-black text-slate-900 mb-4 tracking-tight">Before You Book</h2>
             <p className="text-xl text-slate-500 max-w-2xl mx-auto">Plain-English answers to the questions every first-time IV therapy patient asks.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Link
               href="/guide/iv-therapy-cost-guide"
-              className="group bg-gradient-to-br from-slate-50 to-white p-10 rounded-[2rem] border border-slate-100 hover:border-wellness-300 hover:shadow-xl transition-all"
+              className="group bg-white p-10 rounded-[2rem] border border-slate-200/70 hover:border-wellness-300 shadow-sm hover:shadow-xl transition-all"
             >
               <div className="text-xs font-black uppercase tracking-[0.2em] text-wellness-600 mb-3">Reference Guide</div>
               <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tight group-hover:text-wellness-600 transition-colors">IV Therapy Cost Guide</h3>
@@ -293,7 +305,7 @@ export default async function HomePage() {
             </Link>
             <Link
               href="/guide/how-to-choose-iv-therapy-clinic"
-              className="group bg-gradient-to-br from-slate-50 to-white p-10 rounded-[2rem] border border-slate-100 hover:border-wellness-300 hover:shadow-xl transition-all"
+              className="group bg-white p-10 rounded-[2rem] border border-slate-200/70 hover:border-wellness-300 shadow-sm hover:shadow-xl transition-all"
             >
               <div className="text-xs font-black uppercase tracking-[0.2em] text-wellness-600 mb-3">Reference Guide</div>
               <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tight group-hover:text-wellness-600 transition-colors">How to Choose a Clinic</h3>
@@ -301,7 +313,7 @@ export default async function HomePage() {
             </Link>
             <Link
               href="/guide/first-time-iv-therapy-what-to-expect"
-              className="group bg-gradient-to-br from-slate-50 to-white p-10 rounded-[2rem] border border-slate-100 hover:border-wellness-300 hover:shadow-xl transition-all"
+              className="group bg-white p-10 rounded-[2rem] border border-slate-200/70 hover:border-wellness-300 shadow-sm hover:shadow-xl transition-all"
             >
               <div className="text-xs font-black uppercase tracking-[0.2em] text-wellness-600 mb-3">Reference Guide</div>
               <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tight group-hover:text-wellness-600 transition-colors">First-Time IV Therapy</h3>
@@ -318,7 +330,7 @@ export default async function HomePage() {
       </section>
 
       {/* Social Proof Images */}
-      <section className="py-24 px-6 bg-white overflow-hidden">
+      <section className="py-24 px-6 bg-gradient-to-b from-white via-slate-100/60 to-white overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="relative h-[400px] md:h-[600px] rounded-[3rem] overflow-hidden shadow-2xl">
