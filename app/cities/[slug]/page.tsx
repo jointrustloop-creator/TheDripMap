@@ -232,19 +232,18 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           <ArrowRight size={16} className="text-slate-400 group-hover:text-wellness-600 group-hover:translate-x-1 transition-all shrink-0" />
         </Link>
 
-        {/* 1. H1 — verb-led for stronger intent match */}
+        {/* 1. H1 + subheading — clean and simple */}
         <section className="mt-4 mb-8">
           <h1 className="text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-            Find IV Therapy in {cityData.name} <span className="text-slate-300">·</span> <span className="text-wellness-600">Compare {count} {count === 1 ? 'Clinic' : 'Clinics'}</span>
+            IV Therapy in {cityData.name}
           </h1>
+          <p className="text-lg md:text-xl text-slate-500 font-medium mt-3">
+            Compare {count} {count === 1 ? 'clinic' : 'clinics'} — in-clinic and mobile
+          </p>
         </section>
 
-        {/* 2. Stats bar (verified providers count, quick map view) */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-          <div className="inline-flex items-center gap-2 bg-wellness-50 text-wellness-700 px-4 py-1.5 rounded-full text-sm font-bold border border-wellness-100 shadow-sm">
-            <MapPin size={16} />
-            <span>{count} providers in {cityData.name}</span>
-          </div>
+        {/* 2. Quick map view trigger */}
+        <div className="flex justify-end mb-8">
           <MapTrigger />
         </div>
 

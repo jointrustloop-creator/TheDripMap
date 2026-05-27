@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface QuizCTAProps {
   className?: string;
@@ -22,10 +22,6 @@ export function QuizCTA({
 
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full text-white text-xs font-black uppercase tracking-widest mb-6">
-              <Sparkles size={14} className="text-emerald-300" />
-              Free Clinic Matching
-            </div>
             <h2 className="text-3xl md:text-5xl font-black text-white mb-5 leading-tight tracking-tight">
               {title}
             </h2>
