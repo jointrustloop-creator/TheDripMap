@@ -22,6 +22,20 @@ const DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
+// Only show a photo for clinics with a genuine clinic image. Unclaimed listings
+// have blog/unsplash URLs misassigned in bulk — never trust those. Claimed
+// clinics with legacy /blog-images/ logos are kept because those files are real.
+const isRealClinicImage = (provider: Provider): boolean => {
+  const url = provider.imageUrl || provider.image_url || '';
+  if (!url) return false;
+  if (url.includes('unsplash.com')) return false;
+  if (url.includes('/blog-images/') && !provider.is_featured) return false;
+  return true;
+};
+
+const initialsOf = (name: string): string =>
+  name.split(/\s+/).slice(0, 2).map(w => w[0] || '').join('').toUpperCase() || 'IV';
+
 // Custom pulse icon for providers
 const createPulseIcon = (isFeatured: boolean) => L.divIcon({
   className: 'custom-div-icon',
@@ -89,26 +103,33 @@ export default function ListingMap({ providers }: ListingMapProps) {
         >
           <Popup className="custom-popup">
             <div className="p-1 min-w-[200px]">
-              <div className="aspect-video relative rounded-lg overflow-hidden mb-2">
-                {(provider.imageUrl || provider.image_url) ? (
-                  <Image 
+              {isRealClinicImage(provider) ? (
+                <div className="aspect-video relative rounded-lg overflow-hidden mb-2 bg-slate-50">
+                  <Image
                     src={provider.imageUrl || provider.image_url!}
                     alt={provider.name}
                     fill
                     className="object-cover"
                     referrerPolicy="no-referrer"
                   />
-                ) : (
-                  <div className="w-full h-full bg-wellness-50 flex items-center justify-center">
-                    <span className="text-wellness-600 text-xs font-bold">IV</span>
-                  </div>
-                )}
-                {provider.is_featured && (
-                  <div className="absolute top-1 left-1 bg-amber-400 text-[8px] font-black uppercase px-2 py-0.5 rounded text-slate-900">
-                    Featured
-                  </div>
-                )}
-              </div>
+                  {provider.is_featured && (
+                    <div className="absolute top-1 left-1 bg-amber-400 text-[8px] font-black uppercase px-2 py-0.5 rounded text-slate-900">
+                      Featured
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="h-16 w-full mb-2 rounded-lg overflow-hidden bg-gradient-to-br from-wellness-100 via-white to-emerald-50 flex items-center justify-center border border-wellness-100/60 relative">
+                  <span className="text-lg font-black text-wellness-700 tracking-tight">
+                    {initialsOf(provider.name)}
+                  </span>
+                  {provider.is_featured && (
+                    <div className="absolute top-1 left-1 bg-amber-400 text-[8px] font-black uppercase px-2 py-0.5 rounded text-slate-900">
+                      Featured
+                    </div>
+                  )}
+                </div>
+              )}
               <h3 className="font-bold text-slate-900 leading-tight mb-1">{provider.name}</h3>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-wellness-600 font-bold text-xs">⭐ {provider.rating}</span>

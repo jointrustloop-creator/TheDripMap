@@ -21,6 +21,21 @@ interface MapboxListingMapProps {
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
 
+// Filter out misleading stock photos / blog hero images. Unclaimed listings
+// got blog/unsplash URLs misassigned to them in bulk imports — those should
+// never display. Claimed clinics with legacy /blog-images/ logos are trusted
+// because we placed those files there deliberately.
+const isRealClinicImage = (provider: Provider): boolean => {
+  const url = provider.imageUrl || provider.image_url || '';
+  if (!url) return false;
+  if (url.includes('unsplash.com')) return false;
+  if (url.includes('/blog-images/') && !provider.is_featured) return false;
+  return true;
+};
+
+const initialsOf = (name: string): string =>
+  name.split(/\s+/).slice(0, 2).map(w => w[0] || '').join('').toUpperCase() || 'IV';
+
 export const MapboxListingMap = ({ providers, hoveredProviderId, onMarkerClick, bare = false }: MapboxListingMapProps) => {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
 
@@ -99,9 +114,9 @@ export const MapboxListingMap = ({ providers, hoveredProviderId, onMarkerClick, 
             offset={20}
             maxWidth="240px"
           >
-            <div className="p-1 max-w-[200px]">
-              {(selectedProvider.imageUrl || selectedProvider.image_url) && (
-                <div className="relative h-24 w-full mb-2 rounded-lg overflow-hidden">
+            <div className="p-1 max-w-[220px]">
+              {isRealClinicImage(selectedProvider) ? (
+                <div className="relative h-24 w-full mb-2 rounded-lg overflow-hidden bg-slate-50">
                   <Image
                     src={selectedProvider.imageUrl || selectedProvider.image_url!}
                     alt={selectedProvider.name}
@@ -109,23 +124,44 @@ export const MapboxListingMap = ({ providers, hoveredProviderId, onMarkerClick, 
                     className="object-cover"
                   />
                 </div>
+              ) : (
+                <div className="h-16 w-full mb-2 rounded-lg overflow-hidden bg-gradient-to-br from-wellness-100 via-white to-emerald-50 flex items-center justify-center border border-wellness-100/60">
+                  <span className="text-xl font-black text-wellness-700 tracking-tight">
+                    {initialsOf(selectedProvider.name)}
+                  </span>
+                </div>
               )}
-              <h4 className="font-bold text-sm text-slate-900 line-clamp-1 mb-1">{selectedProvider.name}</h4>
+              <h4 className="font-black text-sm text-slate-900 line-clamp-2 mb-1.5 leading-snug">{selectedProvider.name}</h4>
               <div className="flex items-center gap-1 mb-2">
                 <Star size={12} className="text-amber-400 fill-amber-400" />
-                <span className="text-[10px] font-bold text-slate-600">{selectedProvider.rating} ({selectedProvider.reviewCount || 0})</span>
+                <span className="text-[10px] font-bold text-slate-600">
+                  {selectedProvider.rating} ({selectedProvider.reviewCount || 0})
+                </span>
               </div>
+              {selectedProvider.specialties && selectedProvider.specialties.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {selectedProvider.specialties.slice(0, 2).map((s) => (
+                    <span
+                      key={s}
+                      className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-wellness-50 text-wellness-700 border border-wellness-100"
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              )}
               <div className="flex gap-2">
                 <Link
                   href={`/providers/${selectedSlug}`}
                   className="flex-1 bg-wellness-600 text-white text-[10px] font-bold py-1.5 rounded text-center hover:bg-wellness-700 transition-colors"
                 >
-                  Profile
+                  View profile
                 </Link>
                 {selectedProvider.phone && (
                   <a
                     href={`tel:${selectedProvider.phone}`}
                     className="bg-slate-100 text-slate-600 p-1.5 rounded hover:bg-slate-200 transition-colors"
+                    aria-label="Call clinic"
                   >
                     <Phone size={12} />
                   </a>
