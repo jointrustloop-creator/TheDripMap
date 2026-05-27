@@ -99,28 +99,6 @@ export default async function ForClinicsPage() {
           ))}
         </div>
 
-        {/* Featured-upgrade nudge — between claim-this-listing and the audit tool.
-            Keep it short — the deep pitch lives at /for-clinics/upgrade. */}
-        <div className="mb-16 bg-gradient-to-br from-amber-50 via-white to-rose-50/60 border-2 border-amber-200 rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center gap-6 shadow-lg">
-          <div className="flex-1">
-            <div className="inline-flex items-center gap-2 bg-amber-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3">
-              <span>✦</span> Already claimed?
-            </div>
-            <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 tracking-tight leading-tight">
-              Get top placement with a Featured listing — $99/mo.
-            </h3>
-            <p className="text-slate-600 text-sm md:text-base leading-relaxed">
-              Pin above every other clinic on city + treatment pages. Custom hero, direct-booking CTAs, patient testimonials, no contract.
-            </p>
-          </div>
-          <a
-            href="/for-clinics/upgrade"
-            className="shrink-0 bg-amber-500 hover:bg-amber-400 text-slate-900 px-7 py-4 rounded-2xl font-black text-base transition-all shadow-xl shadow-amber-200/50 whitespace-nowrap"
-          >
-            See Featured benefits →
-          </a>
-        </div>
-
         {/* Listing audit — clinic owner types their name, sees their actual listing vs claimed,
             plus top competitors in their city. Replaces a tepid ROI calculator with a personal,
             actionable conversion tool. */}
@@ -237,107 +215,19 @@ export default async function ForClinicsPage() {
           </div>
         </div>
 
-        {/* Pricing Section */}
-        <div className="mb-32">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Simple, Growth-Focused Pricing</h2>
-            <p className="text-slate-500 text-lg">Choose the right tier to amplify your clinic&apos;s visibility and connect with more patients.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Free Tier */}
-            <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] flex flex-col shadow-sm">
-              <div className="mb-8">
-                <h3 className="text-xl font-black text-slate-900 mb-2">Free</h3>
-                <p className="text-slate-500 text-sm">Basic online presence</p>
-              </div>
-              <div className="mb-8">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-slate-900">$0</span>
-                  <span className="text-slate-400 font-bold text-sm">/mo</span>
-                </div>
-                <p className="text-xs text-slate-400 mt-1 font-bold italic">Free forever</p>
-              </div>
-              <div className="space-y-4 mb-10 flex-1">
-                {[
-                  'Listed in directory',
-                  'Phone and website shown',
-                  'Appears in search results'
-                ].map(feature => (
-                  <div key={feature} className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center shrink-0 border border-slate-100">
-                      <span className="text-[10px]">✓</span>
-                    </div>
-                    <span className="text-sm text-slate-600 font-medium">{feature}</span>
-                  </div>
-                ))}
-              </div>
-              <Link 
-                href="/for-clinics/setup"
-                className="w-full py-4 text-center border-2 border-slate-100 text-slate-900 rounded-2xl font-bold hover:bg-slate-50 transition-all"
-              >
-                Get Started
-              </Link>
-            </div>
-
-            {/* Featured Tier */}
-            <div className="bg-white border-4 border-wellness-100 p-8 rounded-[2.5rem] flex flex-col shadow-2xl shadow-wellness-100/30 relative transform lg:-translate-y-4">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-wellness-600 text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
-                Most Popular
-              </div>
-              <div className="mb-8">
-                <h3 className="text-xl font-black text-slate-900 mb-2">Featured</h3>
-                <p className="text-slate-500 text-sm">Everything in Free, plus:</p>
-              </div>
-              <div className="mb-8">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-slate-900">$99</span>
-                  <span className="text-slate-400 font-bold text-sm">/mo</span>
-                </div>
-                <p className="text-xs text-slate-400 mt-1 font-bold">Billed monthly</p>
-              </div>
-              <div className="space-y-4 mb-10 flex-1">
-                {[
-                  'Priority placement in city results',
-                  'Verified green badge',
-                  'Custom description and photos',
-                  'Book Appointment button',
-                  'Patient analytics dashboard'
-                ].map(feature => (
-                  <div key={feature} className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-wellness-50 text-wellness-600 flex items-center justify-center shrink-0 border border-wellness-100">
-                      <span className="text-[10px] font-bold">✓</span>
-                    </div>
-                    <span className="text-sm text-slate-700 font-bold">{feature}</span>
-                  </div>
-                ))}
-              </div>
-              <Link 
-                href="/for-clinics/setup?plan=featured"
-                className="w-full py-4 text-center bg-wellness-600 text-white rounded-2xl font-black shadow-lg shadow-wellness-100 hover:bg-wellness-700 transition-all"
-              >
-                Go Featured
-              </Link>
-            </div>
-
-            {/* Premium tier hidden until we have a paying customer (per GOAL.md:
-                "Do NOT build payment infrastructure until a clinic asks to pay"). */}
-          </div>
-        </div>
-
         <div className="bg-[#0F6E56] text-white rounded-[4rem] p-12 md:p-20 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-1/2 h-full bg-black/5 skew-x-12 translate-x-1/4" />
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">Ready to claim your listing?</h2>
               <p className="text-lg text-emerald-50 mb-10 leading-relaxed font-medium">
-                It&apos;s free. Takes 2 minutes. Patients in your city are searching right now.
+                It takes 2 minutes and it&apos;s completely free.
               </p>
-              <Link 
+              <Link
                 href="/for-clinics/setup"
                 className="inline-flex bg-white text-[#0F6E56] px-10 py-5 rounded-2xl font-black text-lg hover:bg-emerald-50 transition-all items-center gap-2 group shadow-xl shadow-black/20"
               >
-                Claim My Free Listing <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                Claim Your Free Listing <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
             <div className="space-y-6">

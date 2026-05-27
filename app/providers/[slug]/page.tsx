@@ -1362,35 +1362,6 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                     </div>
                   )}
 
-                  {/* CLAIMED CLINIC: Featured upgrade nudge.
-                      Phrased "Owner of X?" so patients ignore it but the actual
-                      clinic owner spots it instantly when they check their page. */}
-                  {provider.is_featured && (
-                    <div className="pt-4 border-t border-slate-100">
-                      <Link
-                        href="/for-clinics/upgrade"
-                        className="block bg-gradient-to-br from-amber-50 to-rose-50 border border-amber-200 rounded-2xl p-4 hover:border-amber-400 transition-all group"
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0">
-                            <Star size={14} fill="currentColor" />
-                          </div>
-                          <div className="min-w-0">
-                            <div className="text-[10px] font-black uppercase tracking-widest text-amber-700 mb-1">
-                              Owner of {displayName}?
-                            </div>
-                            <div className="text-sm font-black text-slate-900 leading-tight mb-1">
-                              Upgrade to Featured — $99/mo
-                            </div>
-                            <div className="text-[11px] text-slate-600 font-medium leading-snug">
-                              Top placement, custom hero, direct CTAs. <span className="text-amber-700 font-black group-hover:underline">See benefits →</span>
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                  )}
-
                   {/* UNCLAIMED CTA — sidebar variant */}
                   {!provider.is_featured && (
                     <div className="pt-4 border-t border-slate-100">
