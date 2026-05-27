@@ -66,7 +66,7 @@ export function ContactPageClient({ providerCount }: ContactPageClientProps) {
   }
 
   return (
-    <main className="max-w-6xl mx-auto px-6 py-20">
+    <main className="max-w-6xl mx-auto px-6 py-20 pb-40">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
