@@ -486,7 +486,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
 
                   <div className="bg-wellness-50 rounded-3xl p-6 flex flex-col justify-center">
                     <h4 className="text-lg font-black text-wellness-900 mb-2">Get exactly what you need.</h4>
-                    <p className="text-sm text-wellness-700 mb-6 leading-relaxed">Not all IV therapy is the same. Our match quiz finds the perfect provider based on your exact goals in 30 seconds.</p>
+                    <p className="text-sm text-wellness-700 mb-6 leading-relaxed">Not all IV therapy is the same. Our match quiz finds the perfect provider based on your exact goals in 60 seconds.</p>
                     <button 
                       onClick={() => router.push('/quiz')}
                       className="bg-wellness-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-100 flex items-center justify-center gap-2"

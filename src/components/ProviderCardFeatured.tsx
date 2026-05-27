@@ -73,20 +73,27 @@ function deriveDripMenu(provider: Provider) {
   return realPriced.slice(0, 3);
 }
 
+const initialsOf = (name: string): string =>
+  name.split(/\s+/).slice(0, 2).map((w) => w[0] || '').join('').toUpperCase() || 'IV';
+
+// Trust an image URL only if it's not a known-bad source. Claimed clinics may
+// have logos legitimately stored under /blog-images/, so trust those.
+const hasRealClinicImage = (provider: Provider): boolean => {
+  const url = provider.imageUrl || provider.image_url || '';
+  if (!url) return false;
+  if (url.includes('unsplash.com')) return false;
+  if (url.includes('/blog-images/') && !provider.is_featured) return false;
+  if (url.includes('placeholder') || url.includes('picsum')) return false;
+  return true;
+};
+
 export const ProviderCardFeatured = ({
   provider,
   operatorProfile,
   isPrimary = true,
 }: ProviderCardFeaturedProps) => {
   const slug = provider.slug || slugify(provider.name);
-
-  const isRealPhoto =
-    provider.imageUrl &&
-    !provider.imageUrl.includes('placeholder') &&
-    !provider.imageUrl.includes('default') &&
-    !provider.imageUrl.includes('picsum');
-  const DEFAULT_CLINIC_IMAGE =
-    'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg';
+  const hasImage = hasRealClinicImage(provider);
 
   // Real, derived signals only — no fabricated prices.
   const credentialLine = deriveCredentialLine(provider);
@@ -117,53 +124,28 @@ export const ProviderCardFeatured = ({
           )}
         >
           <Link href={`/providers/${slug}`} className="block h-full relative">
-            {/* Subtle gradient bg so logos breathe and don't get cropped/stretched.
-                Photos display naturally; logos stay contained at max ~60% of frame. */}
             <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-wellness-50/40" />
-            <div className="absolute inset-0 flex items-center justify-center p-8 md:p-12">
-              <ResilientImage
-                src={provider.imageUrl || DEFAULT_CLINIC_IMAGE}
-                alt={`${provider.name} IV therapy clinic in ${provider.city}`}
-                width={400}
-                height={400}
-                className={cn(
-                  'max-h-[60%] max-w-[60%] w-auto h-auto object-contain group-hover:scale-105 transition-transform duration-700',
-                  !isRealPhoto && 'opacity-70'
-                )}
-                fallbackSrc="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/clinic-logo-placeholder.png"
-              />
-            </div>
-          </Link>
-
-          {/* Top-left: Verified pill */}
-          {provider.is_featured && (
-            <div className="absolute top-4 left-4 z-10">
-              <div className="bg-white/95 backdrop-blur-md text-emerald-700 px-3 py-1.5 rounded-full text-[10px] font-black tracking-[0.2em] uppercase shadow-lg flex items-center gap-1.5 border border-white">
-                <CheckCircle2 size={11} className="text-emerald-600" />
-                Verified
+            {hasImage ? (
+              <div className="absolute inset-0 flex items-center justify-center p-8 md:p-12">
+                <ResilientImage
+                  src={provider.imageUrl || provider.image_url!}
+                  alt={`${provider.name} IV therapy clinic in ${provider.city}`}
+                  width={400}
+                  height={400}
+                  className="max-h-[60%] max-w-[60%] w-auto h-auto object-contain group-hover:scale-105 transition-transform duration-700"
+                  fallbackSrc=""
+                />
               </div>
-            </div>
-          )}
-
-          {/* Top-right: Rating chip — full pill for claimed (TheDripMap-trusted),
-              muted "Google rating" label for unclaimed so we're honest about source */}
-          {provider.rating > 0 && (
-            <div className="absolute top-4 right-4 z-10">
-              {provider.is_featured ? (
-                <div className="bg-white/95 backdrop-blur-md text-slate-900 px-3 py-1.5 rounded-full text-[11px] font-black shadow-lg flex items-center gap-1.5 border border-white">
-                  <StarIcon size={11} className="text-amber-500" fill="currentColor" />
-                  {provider.rating}
-                  <span className="text-slate-400 font-bold">·</span>
-                  <span className="text-slate-500">{provider.reviewCount || 0}</span>
-                </div>
-              ) : (
-                <div className="bg-white/85 backdrop-blur-md text-slate-500 px-2.5 py-1 rounded-full text-[10px] font-bold shadow-md flex items-center gap-1 border border-white/80">
-                  <StarIcon size={9} className="text-amber-400" fill="currentColor" />
-                  {provider.rating} Google rating
-                </div>
-              )}
-            </div>
-          )}
+            ) : (
+              // No real photo — render the gradient + clinic initials. Guaranteed
+              // to always display something clean; no broken-image alt text.
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-5xl md:text-6xl font-black text-wellness-700/80 tracking-tight">
+                  {initialsOf(provider.name)}
+                </span>
+              </div>
+            )}
+          </Link>
 
           {/* Bottom-left: optional distance chip */}
           {provider.distance !== undefined && (
@@ -180,25 +162,50 @@ export const ProviderCardFeatured = ({
             isPrimary ? 'p-8 md:p-10' : 'p-6'
           )}
         >
-          {/* Title + Location */}
+          {/* Title + Location + inline VERIFIED + rating */}
           <div className="mb-5">
-            <Link href={`/providers/${slug}`} className="block">
-              <h3
-                className={cn(
-                  'font-black text-slate-900 group-hover:text-wellness-700 transition-colors leading-[1.1] tracking-tight',
-                  isPrimary ? 'text-2xl md:text-3xl mb-2' : 'text-xl mb-1.5'
-                )}
-              >
-                {provider.name}
-              </h3>
-            </Link>
-            <div className="flex items-center gap-1.5 text-sm text-slate-500 font-semibold">
-              <MapPin size={13} className="text-slate-400" />
-              <span>
-                {provider.address && provider.address.length < 60
-                  ? provider.address.split(',').slice(0, 2).join(',')
-                  : `${provider.city}${provider.state ? `, ${provider.state}` : ''}`}
-              </span>
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <Link href={`/providers/${slug}`} className="block min-w-0 flex-1">
+                <h3
+                  className={cn(
+                    'font-black text-slate-900 group-hover:text-wellness-700 transition-colors leading-[1.1] tracking-tight',
+                    isPrimary ? 'text-2xl md:text-3xl' : 'text-xl'
+                  )}
+                >
+                  <span>{provider.name}</span>
+                  {provider.is_featured && (
+                    <span className="inline-flex items-center gap-1 align-middle ml-2 bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full text-[10px] font-black tracking-[0.18em] uppercase border border-emerald-100 whitespace-nowrap">
+                      <CheckCircle2 size={10} className="text-emerald-600" />
+                      Verified
+                    </span>
+                  )}
+                </h3>
+              </Link>
+            </div>
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-1.5 text-sm text-slate-500 font-semibold">
+                <MapPin size={13} className="text-slate-400" />
+                <span>
+                  {provider.address && provider.address.length < 60
+                    ? provider.address.split(',').slice(0, 2).join(',')
+                    : `${provider.city}${provider.state ? `, ${provider.state}` : ''}`}
+                </span>
+              </div>
+              {provider.rating > 0 && (
+                provider.is_featured ? (
+                  <div className="flex items-center gap-1.5 text-sm font-black text-slate-900">
+                    <StarIcon size={14} className="text-amber-500" fill="currentColor" />
+                    {provider.rating}
+                    <span className="text-slate-300 font-bold">·</span>
+                    <span className="text-slate-500 font-bold">{provider.reviewCount || 0}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-xs font-bold text-slate-500">
+                    <StarIcon size={11} className="text-amber-400" fill="currentColor" />
+                    {provider.rating} <span className="text-slate-400">Google rating</span>
+                  </div>
+                )
+              )}
             </div>
           </div>
 

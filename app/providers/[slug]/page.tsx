@@ -619,18 +619,11 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               })()}
 
               {provider.is_featured && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {/* Info Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex flex-col gap-4">
                     <div className="bg-white p-6 h-full rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center">
                       <div className="text-slate-400 font-bold text-xs uppercase mb-1">Price Range</div>
                       <div className="text-xl font-black text-slate-900">{provider.price_range || provider.priceRange || 'Competitive'}</div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-4">
-                    <div className="bg-white p-6 h-full rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center">
-                      <div className="text-slate-400 font-bold text-xs uppercase mb-1">Administered By</div>
-                      <div className="text-xl font-black text-slate-900 line-clamp-1">{profile?.profile_data?.administerType || 'Medical Professionals'}</div>
                     </div>
                   </div>
                   <div className="flex flex-col gap-4">
@@ -643,18 +636,17 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                     </div>
                   </div>
 
-                  {/* Contact Buttons (filling space if featured) */}
-                  <div className="md:col-span-2 lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                  <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                     {provider.phone && (
-                      <a 
+                      <a
                         href={`tel:${provider.phone}`}
-                        className="flex items-center justify-center gap-3 bg-slate-900 text-white px-8 py-5 rounded-[2rem] font-black text-xl hover:bg-slate-800 transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+                        className="flex items-center justify-center gap-3 bg-wellness-600 text-white px-8 py-5 rounded-[2rem] font-black text-xl hover:bg-wellness-700 transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98]"
                       >
                         📞 Call Now
                       </a>
                     )}
                     {provider.website && (
-                      <a 
+                      <a
                         href={provider.website}
                         target="_blank"
                         rel="noopener noreferrer"

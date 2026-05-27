@@ -298,10 +298,10 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
         )}
 
         {/* 5. Match quiz CTA block */}
-        <QuizCTA 
+        <QuizCTA
           className="mb-24"
-          title={`Looking for specific results in ${cityData.name}?`}
-          subtitle={`Not all IV protocols are equal. We match you based on your exact wellness goals and the specific offerings of verified ${cityData.name} clinics.`}
+          title="Not sure which clinic is right for you?"
+          subtitle={`Answer 5 quick questions and we'll match you to the best IV therapy clinic in ${cityData.name}.`}
         />
 
         {/* 6. SEO content (all the written content about IV therapy in the city) */}
