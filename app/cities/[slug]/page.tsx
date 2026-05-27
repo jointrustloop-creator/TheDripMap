@@ -10,7 +10,7 @@ import { Footer } from '@/src/components/Footer';
 import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
 import { QuizCTA } from '@/src/components/QuizCTA';
 import { ListingController } from '@/src/components/ListingController';
-import { getCityBySlug, getListingsByCity, getAllCities, getListingsByState, getFeaturedListings } from '@/src/lib/data';
+import { getCityBySlug, getListingsByCity, getAllCities, getListingsByState, getFeaturedListings, getBlogPostBySlug } from '@/src/lib/data';
 import { getCityIntro } from '@/src/lib/city-intros';
 import { MapTrigger } from '@/src/components/MapTrigger';
 import { FAQSection } from '@/src/components/FAQSection';
@@ -189,6 +189,12 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
 
   const count = listings.length;
 
+  // If a "best-iv-therapy-{city}-2026" blog post exists, surface it as a
+  // contextual CTA. Internal link from city page → blog post pushes PageRank
+  // to the blog post and helps it rank for "best IV therapy {city}" queries.
+  const cityGuideSlug = `best-iv-therapy-${slug}-2026`;
+  const cityGuidePost = await getBlogPostBySlug(cityGuideSlug);
+
   // Fetch nearby cities in the same state
   const allCities = await getAllCities();
   const nearbyCities = allCities
@@ -240,6 +246,15 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           <p className="text-lg md:text-xl text-slate-500 font-medium mt-3">
             Compare {count} {count === 1 ? 'clinic' : 'clinics'} — in-clinic and mobile
           </p>
+          {cityGuidePost && (
+            <Link
+              href={`/blog/${cityGuideSlug}`}
+              className="inline-flex items-center gap-2 mt-5 text-sm font-black text-wellness-700 hover:text-wellness-800 group"
+            >
+              📖 Read our 2026 guide to the best IV therapy in {cityData.name}
+              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+          )}
         </section>
 
         {/* 2. Quick map view trigger */}

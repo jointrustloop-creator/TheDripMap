@@ -154,6 +154,71 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     ]
   };
 
+  // ItemList JSON-LD — only meaningful for City Guides where related_clinics
+  // is the actual list of clinics being recommended. Google uses this for
+  // rich list-style results on "best X in Y" queries.
+  const itemListJsonLd =
+    post.category === 'City Guides' && relatedClinics.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          "name": post.title,
+          "itemListOrder": "https://schema.org/ItemListOrderDescending",
+          "numberOfItems": relatedClinics.length,
+          "itemListElement": relatedClinics.map((c, i) => ({
+            "@type": "ListItem",
+            "position": i + 1,
+            "item": {
+              "@type": "MedicalBusiness",
+              "name": c.name,
+              "url": `https://www.thedripmap.com/providers/${c.slug || slugify(c.name)}`,
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": c.city,
+                "addressRegion": c.state,
+              },
+              ...(c.rating > 0 && {
+                "aggregateRating": {
+                  "@type": "AggregateRating",
+                  "ratingValue": c.rating,
+                  "reviewCount": c.reviewCount || 0,
+                },
+              }),
+            },
+          })),
+        }
+      : null;
+
+  // FAQPage JSON-LD — parse Q/A pairs out of the enriched FAQ markdown block.
+  // Pattern: "### Question?\n\nAnswer paragraph" within the FAQ section.
+  const faqJsonLd = (() => {
+    const content = String(post.content || '');
+    const faqStartMatch = content.match(/##\s+Frequently asked questions[\s\S]*?$/m);
+    if (!faqStartMatch) return null;
+    const faqBlock = faqStartMatch[0];
+    const qaPattern = /###\s+([^\n]+)\n+([\s\S]+?)(?=\n###\s+|\n##\s+|<!--|$)/g;
+    const qas = [];
+    let m;
+    while ((m = qaPattern.exec(faqBlock)) !== null) {
+      const q = m[1].trim();
+      const a = m[2].trim().replace(/\n+/g, ' ');
+      if (q && a) qas.push({ q, a });
+    }
+    if (qas.length === 0) return null;
+    return {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": qas.map(({ q, a }) => ({
+        "@type": "Question",
+        "name": q,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": a,
+        },
+      })),
+    };
+  })();
+
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
@@ -166,6 +231,18 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
+      {itemListJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+        />
+      )}
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
 
       <main className="max-w-7xl mx-auto px-6 py-12">
         <BreadcrumbNav 
