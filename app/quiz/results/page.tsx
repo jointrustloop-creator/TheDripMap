@@ -15,7 +15,9 @@ import {
   Twitter,
   Link as LinkIcon,
   Camera,
-  Check
+  Check,
+  Download,
+  Instagram,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { matchProviders } from '../../../src/lib/matching';
@@ -26,6 +28,7 @@ import { getOperatorProfiles, getAllListings, getListingsByCity, slugify } from 
 import { ClinicImage } from '../../../src/components/ClinicImage';
 import { cn } from '../../../src/lib/utils';
 import { getSymptomById, hasSafetyFlag, SAFETY_FLAGS } from '../../../src/lib/symptom-treatments';
+import { pickArchetype } from '../../../src/lib/quiz-archetype';
 import { ShieldAlert, Clock, DollarSign, CheckCircle2 } from 'lucide-react';
 
 export default function ResultsPage() {
@@ -138,6 +141,11 @@ function ResultsContent() {
     const sym = getSymptomById(surveyData.symptoms?.[0]);
     return sym?.recommendedTreatment || null;
   }, [surveyData.symptoms]);
+
+  const archetype = useMemo(() =>
+    pickArchetype({ goal: surveyData.goal, symptoms: surveyData.symptoms }),
+    [surveyData.goal, surveyData.symptoms]
+  );
 
   const safetyTriggered = useMemo(() => hasSafetyFlag(surveyData.medicalHistory), [surveyData.medicalHistory]);
   const safetyLabel = useMemo(() => {
@@ -495,6 +503,84 @@ function ResultsContent() {
               )}
             </section>
           )}
+
+          {/* SECTION 0 — "YOUR DRIP TYPE" archetype hero w/ shareable card */}
+          <section>
+            <div className={cn(
+              "relative rounded-[2.5rem] overflow-hidden p-8 md:p-12 text-white shadow-[0_30px_60px_-25px_rgba(15,23,42,0.4)] bg-gradient-to-br",
+              archetype.gradient.tailwind
+            )}>
+              {/* Decorative glow */}
+              <div className="absolute -top-20 -right-20 w-80 h-80 bg-white/15 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-black/15 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-8 md:gap-12">
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-white/80 mb-3">
+                    Your Drip Type
+                  </div>
+                  <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-[1.05] mb-5 [text-shadow:0_4px_18px_rgba(0,0,0,0.25)]">
+                    <span className="block text-2xl md:text-3xl italic font-medium opacity-85 mb-1">The</span>
+                    {archetype.shortName}
+                  </h2>
+                  <p className="text-base md:text-lg text-white/90 leading-relaxed italic font-medium max-w-md whitespace-pre-line">
+                    {`"${archetype.quote}"`}
+                  </p>
+                </div>
+
+                {/* Right column: share card preview + 3 buttons */}
+                <div className="shrink-0 w-full md:w-72 flex flex-col items-center md:items-end gap-4">
+                  <div className="text-[10px] font-black uppercase tracking-[0.25em] text-white/75 self-center md:self-end">
+                    Share your type
+                  </div>
+                  <div className="flex flex-wrap gap-2 justify-center md:justify-end w-full">
+                    <a
+                      href={`/api/quiz-card/${archetype.slug}`}
+                      download={`drip-type-${archetype.slug}.png`}
+                      className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/30 text-white px-4 py-2.5 rounded-xl font-black text-xs transition-all"
+                    >
+                      <Download size={14} />
+                      <span>Download</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          const res = await fetch(`/api/quiz-card/${archetype.slug}`);
+                          const blob = await res.blob();
+                          const file = new File([blob], `drip-type-${archetype.slug}.png`, { type: 'image/png' });
+                          if (typeof navigator !== 'undefined' && (navigator as Navigator & { canShare?: (data: ShareData) => boolean }).canShare?.({ files: [file] })) {
+                            await navigator.share({ files: [file], title: `I'm ${archetype.name} on TheDripMap` });
+                          } else {
+                            // Fallback: open the PNG in a new tab so the user can save then upload to IG manually
+                            window.open(`/api/quiz-card/${archetype.slug}`, '_blank');
+                          }
+                        } catch {
+                          window.open(`/api/quiz-card/${archetype.slug}`, '_blank');
+                        }
+                      }}
+                      className="inline-flex items-center gap-2 bg-white text-slate-900 hover:bg-white/90 px-4 py-2.5 rounded-xl font-black text-xs transition-all shadow-lg"
+                    >
+                      <Instagram size={14} />
+                      <span>Story</span>
+                    </button>
+                    <a
+                      href={(() => {
+                        const text = `I'm ${archetype.name} on TheDripMap 💧 What's your IV drip type? Take the 60-second quiz →`;
+                        return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent('https://www.thedripmap.com/quiz')}`;
+                      })()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/30 text-white px-4 py-2.5 rounded-xl font-black text-xs transition-all"
+                    >
+                      <Twitter size={14} fill="currentColor" />
+                      <span>Tweet</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
 
           {/* SECTION 1 — "BEST MATCH" */}
           <section className="space-y-8">
