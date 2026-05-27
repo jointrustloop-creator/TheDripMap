@@ -29,9 +29,6 @@ npm-debug.log*
 # TypeScript build cache
 *.tsbuildinfo
 
-# Working notes (often contains pasted secrets / scratch content)
-Claude.md
-
 # Research / staging data (delete after import or move out of repo)
 scripts/la-clinics-import.json
 scripts/outreach-drafts.md
