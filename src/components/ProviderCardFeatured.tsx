@@ -116,20 +116,23 @@ export const ProviderCardFeatured = ({
             isPrimary ? 'md:w-96 h-72 md:h-auto md:min-h-[420px]' : 'h-56'
           )}
         >
-          <Link href={`/providers/${slug}`} className="block h-full">
-            <ResilientImage
-              src={provider.imageUrl || DEFAULT_CLINIC_IMAGE}
-              alt={`${provider.name} IV therapy clinic in ${provider.city}`}
-              fill
-              className={cn(
-                'object-cover group-hover:scale-105 transition-transform duration-700',
-                !isRealPhoto && 'opacity-70'
-              )}
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              fallbackSrc="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/clinic-logo-placeholder.png"
-            />
-            {/* Bottom gradient for text legibility on top of photo */}
-            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-slate-950/60 via-slate-950/20 to-transparent" />
+          <Link href={`/providers/${slug}`} className="block h-full relative">
+            {/* Subtle gradient bg so logos breathe and don't get cropped/stretched.
+                Photos display naturally; logos stay contained at max ~60% of frame. */}
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-wellness-50/40" />
+            <div className="absolute inset-0 flex items-center justify-center p-8 md:p-12">
+              <ResilientImage
+                src={provider.imageUrl || DEFAULT_CLINIC_IMAGE}
+                alt={`${provider.name} IV therapy clinic in ${provider.city}`}
+                width={400}
+                height={400}
+                className={cn(
+                  'max-h-[60%] max-w-[60%] w-auto h-auto object-contain group-hover:scale-105 transition-transform duration-700',
+                  !isRealPhoto && 'opacity-70'
+                )}
+                fallbackSrc="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/clinic-logo-placeholder.png"
+              />
+            </div>
           </Link>
 
           {/* Top-left: Verified pill */}

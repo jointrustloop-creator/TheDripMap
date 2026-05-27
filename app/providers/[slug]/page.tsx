@@ -13,7 +13,8 @@ import {
   User,
   CheckCircle2,
   ExternalLink,
-  Phone
+  Phone,
+  Droplets,
 } from 'lucide-react';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
@@ -370,19 +371,29 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
           clinic logo as a small inset avatar and the clinic name in display type.
           Solves the legacy "logo stretched across 384px" and "name wraps to 2 lines"
           issues at the same time. */}
-      {provider.is_featured && (
-        <section className="relative w-full h-[60vh] min-h-[480px] overflow-hidden">
-          <div className="absolute inset-0">
-            <ResilientImage
-              src={DEFAULT_HERO_BACKDROP}
-              fallbackSrc="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2000&auto=format&fit=crop"
-              alt=""
-              fill
-              className="object-cover object-center"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-950/50 to-slate-950/85" />
-          </div>
+      {provider.is_featured && (() => {
+        // Deterministic gradient per clinic — feels unique without using stock photo.
+        // 6 dark-base gradients with tinted accents; pick from slug hash.
+        const HERO_GRADIENTS = [
+          'from-slate-900 via-wellness-800 to-emerald-950',
+          'from-slate-900 via-sky-800 to-cyan-950',
+          'from-slate-900 via-violet-800 to-indigo-950',
+          'from-slate-900 via-rose-800 to-pink-950',
+          'from-slate-900 via-amber-800 to-orange-950',
+          'from-slate-900 via-teal-800 to-cyan-950',
+        ];
+        let h = 0;
+        const seed = provider.slug || provider.name;
+        for (let i = 0; i < seed.length; i++) h = ((h << 5) - h + seed.charCodeAt(i)) | 0;
+        const gradient = HERO_GRADIENTS[Math.abs(h) % HERO_GRADIENTS.length];
+        return (
+        <section className={cn('relative w-full h-[60vh] min-h-[480px] overflow-hidden bg-gradient-to-br', gradient)}>
+          {/* Decorative orbs for depth without stock photo */}
+          <div className="absolute -top-32 -right-32 w-[600px] h-[600px] bg-white/10 rounded-full blur-[160px] pointer-events-none" />
+          <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] bg-black/30 rounded-full blur-[160px] pointer-events-none" />
+          {/* Subtle dot grid texture */}
+          <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/20 to-slate-950/60" />
 
           <div className="relative h-full max-w-7xl mx-auto px-6 flex flex-col justify-end pb-12 md:pb-16">
             <div className="mb-6">
@@ -447,7 +458,8 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
             </div>
           </div>
         </section>
-      )}
+        );
+      })()}
 
       <main className="max-w-7xl mx-auto px-6 py-12">
         {/* BREADCRUMB — only show for unclaimed listings (claimed listings get the breadcrumb inside the hero) */}
@@ -753,16 +765,28 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               <section className="pt-8 border-t border-slate-100">
                 {provider.is_featured ? (
                   (() => {
-                    // Parse the floor of price_range like "$150-250" → 150.
-                    // Falls back to no price hint if format isn't parseable.
-                    const priceFloorMatch = (provider.price_range || '').match(/\$?(\d{2,4})/);
-                    const fromPrice = priceFloorMatch ? Number(priceFloorMatch[1]) : null;
-                    const uniqueSpecialties = [...new Set(provider.specialties)];
+                    // Use real per-service prices from provider.services if populated.
+                    // Never extrapolate a "from $150" floor from price_range tier — that
+                    // shows the same fake price next to every drip and looks dishonest.
+                    type ServiceItem = { name: string; price?: string | null; description?: string | null };
+                    const realServices: ServiceItem[] = ((provider as { services?: ServiceItem[] }).services || [])
+                      .filter((sv): sv is ServiceItem =>
+                        !!sv && typeof sv.name === 'string' && !!sv.name &&
+                        typeof sv.price === 'string' && !!sv.price &&
+                        !/call|tbd|contact|inquire/i.test(sv.price)
+                      );
+                    const useStructured = realServices.length > 0;
+                    const items: { name: string; price: string | null }[] = useStructured
+                      ? realServices.map((sv) => ({
+                          name: sv.name,
+                          price: (sv.price || '').startsWith('$') ? (sv.price || '') : `$${sv.price}`,
+                        }))
+                      : [...new Set(provider.specialties)].map((s) => ({ name: s, price: null }));
                     return (
                       <>
                         <div className="flex items-end justify-between gap-4 mb-2">
                           <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Drip Menu</h2>
-                          {fromPrice && (
+                          {useStructured && (
                             <span className="text-xs font-bold text-slate-400 uppercase tracking-widest hidden sm:inline">
                               Pricing
                             </span>
@@ -773,28 +797,38 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                         </p>
 
                         <div className="bg-white border border-slate-200 rounded-[2rem] overflow-hidden shadow-sm">
-                          {uniqueSpecialties.map((service, idx) => (
+                          {items.map((item, idx) => (
                             <div
-                              key={service}
+                              key={item.name + idx}
                               className={cn(
                                 'flex items-center gap-4 px-6 md:px-8 py-5 transition-colors hover:bg-slate-50',
-                                idx < uniqueSpecialties.length - 1 && 'border-b border-slate-100'
+                                idx < items.length - 1 && 'border-b border-slate-100'
                               )}
                             >
                               <div className="w-9 h-9 rounded-xl bg-wellness-50 text-wellness-600 flex items-center justify-center shrink-0">
-                                <Zap size={16} />
+                                <Droplets size={16} />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="font-black text-slate-900 text-base leading-tight">{service}</div>
+                                <div className="font-black text-slate-900 text-base leading-tight">{item.name}</div>
                               </div>
-                              {fromPrice && (
+                              {item.price && (
                                 <div className="text-right shrink-0">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">from</span>
-                                  <div className="text-base font-black text-slate-900">${fromPrice}</div>
+                                  <div className="text-base font-black text-slate-900">{item.price}</div>
                                 </div>
                               )}
                             </div>
                           ))}
+                          {!useStructured && provider.phone && (
+                            <div className="px-6 md:px-8 py-4 bg-slate-50 border-t border-slate-100 text-center">
+                              <span className="text-sm font-bold text-slate-500">
+                                Prices vary by treatment.{' '}
+                                <a href={`tel:${provider.phone}`} className="text-wellness-700 hover:underline">
+                                  Call {provider.name} for current pricing
+                                </a>.
+                              </span>
+                            </div>
+                          )}
                         </div>
 
                         {provider.phone && (

@@ -119,7 +119,7 @@ export const SubmitTestimonialModal = ({ provider, isOpen, onClose }: SubmitTest
                 <>
                   <div className="px-6 md:px-8 pt-6 pb-4 border-b border-slate-100 flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-11 h-11 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center shrink-0">
+                      <div className="w-11 h-11 bg-wellness-50 text-wellness-700 rounded-2xl flex items-center justify-center shrink-0">
                         <Heart size={20} />
                       </div>
                       <div className="min-w-0">

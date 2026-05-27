@@ -32,8 +32,8 @@ export function PatientTestimonials({ provider, testimonials }: PatientTestimoni
     // Empty state — soft prompt for the first testimonial
     return (
       <section className="pt-12 border-t border-slate-100">
-        <div className="bg-gradient-to-br from-amber-50 via-white to-wellness-50 rounded-[2.5rem] border border-amber-100 p-8 md:p-12 text-center">
-          <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-white shadow-sm flex items-center justify-center text-amber-500">
+        <div className="bg-gradient-to-br from-wellness-50 via-white to-emerald-50 rounded-[2.5rem] border border-wellness-100 p-8 md:p-12 text-center">
+          <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-white shadow-sm flex items-center justify-center text-wellness-600">
             <Heart size={26} fill="currentColor" />
           </div>
           <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-3 tracking-tight">
@@ -55,7 +55,7 @@ export function PatientTestimonials({ provider, testimonials }: PatientTestimoni
     <section className="pt-12 border-t border-slate-100">
       <div className="flex items-end justify-between gap-6 mb-8 flex-wrap">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-amber-600 mb-2">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-wellness-700 mb-2">
             Patient testimonials
           </p>
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
