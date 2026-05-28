@@ -233,9 +233,9 @@ export const SeoAuditTool = () => {
                     <div className="flex items-center justify-between gap-3">
                       <span className="font-bold text-slate-800 text-sm">{c.label}</span>
                       <span className={`text-xs font-black tabular-nums shrink-0 ${
-                        c.status === 'pass' ? 'text-emerald-600' : c.status === 'warn' ? 'text-amber-600' : 'text-rose-500'
+                        c.counted === false ? 'text-slate-400' : c.status === 'pass' ? 'text-emerald-600' : c.status === 'warn' ? 'text-amber-600' : 'text-rose-500'
                       }`}>
-                        {c.earned}/{c.max}
+                        {c.counted === false ? 'Not measured' : `${c.earned}/${c.max}`}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{c.detail}</p>

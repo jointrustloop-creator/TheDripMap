@@ -25,7 +25,8 @@ function buildReportText(email: string, r: AuditResult): string {
   lines.push('');
   lines.push('SCORECARD');
   for (const c of r.checks) {
-    lines.push(`  ${STATUS_ICON[c.status] || ''} ${c.label} — ${c.earned}/${c.max}`);
+    const scoreText = c.counted === false ? 'not measured' : `${c.earned}/${c.max}`;
+    lines.push(`  ${STATUS_ICON[c.status] || ''} ${c.label} — ${scoreText}`);
     lines.push(`        ${c.detail}`);
   }
   lines.push('');

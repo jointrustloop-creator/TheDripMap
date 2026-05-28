@@ -28,6 +28,10 @@ export interface AuditCheck {
   earned: number;
   max: number;
   detail: string;
+  /** false when the check couldn't be measured (e.g. PageSpeed didn't
+      respond). Excluded from the score denominator so we neither fake a
+      number nor unfairly penalize for something we couldn't test. */
+  counted?: boolean;
 }
 
 export interface AuditResult {
@@ -145,20 +149,6 @@ async function getPageSpeed(url: string): Promise<number | null> {
   }
 }
 
-// Rough mobile-performance estimate from page weight + render-blocking assets,
-// used only when PageSpeed Insights doesn't respond in time.
-function estimateSpeed(html: string): number {
-  const sizeKb = html.length / 1024;
-  const scripts = (html.match(/<script\b/gi) || []).length;
-  const styles = (html.match(/<link[^>]+stylesheet/gi) || []).length;
-  let score = 0.9;
-  if (sizeKb > 150) score -= 0.1;
-  if (sizeKb > 400) score -= 0.15;
-  score -= Math.min(0.25, scripts * 0.015);
-  score -= Math.min(0.1, styles * 0.02);
-  return Math.max(0.4, Math.min(0.85, score));
-}
-
 interface ProviderMatch {
   id: string;
   name: string;
@@ -257,21 +247,23 @@ export async function POST(req: Request) {
   };
 
   // --- Check 4: Page speed ---
+  // Only ever report a REAL Google PageSpeed (Lighthouse) score. If PSI doesn't
+  // respond, we don't fabricate an estimate — the check is marked "not measured"
+  // (counted: false) and excluded from the score so we neither fake a number nor
+  // unfairly penalize the clinic.
   const psi = await psiPromise;
-  const speedScore = psi != null ? psi : reachable ? estimateSpeed(html) : 0;
-  const speedEarned = Math.round(speedScore * WEIGHTS.speed);
-  const speed100 = Math.round(speedScore * 100);
+  const speedMeasured = psi != null;
+  const speed100 = speedMeasured ? Math.round(psi * 100) : 0;
   const speedCheck: AuditCheck = {
     key: 'speed',
     label: 'Page speed (mobile)',
     max: WEIGHTS.speed,
-    earned: speedEarned,
-    status: !reachable ? 'warn' : speedScore >= 0.75 ? 'pass' : speedScore >= 0.5 ? 'warn' : 'fail',
-    detail: !reachable
-      ? UNREACHABLE
-      : psi != null
-        ? `Google PageSpeed score: ${speed100}/100 on mobile.`
-        : `Estimated mobile speed: ~${speed100}/100 (live PageSpeed test timed out).`,
+    earned: speedMeasured ? Math.round(psi * WEIGHTS.speed) : 0,
+    counted: speedMeasured,
+    status: !speedMeasured ? 'warn' : psi >= 0.75 ? 'pass' : psi >= 0.5 ? 'warn' : 'fail',
+    detail: speedMeasured
+      ? `Google PageSpeed score: ${speed100}/100 on mobile.`
+      : "We couldn't get a live Google PageSpeed score right now, so this wasn't counted in your score.",
   };
 
   // --- Check 5: Title + meta description ---
@@ -385,7 +377,14 @@ export async function POST(req: Request) {
     compCheck,
   ];
 
-  const score = Math.max(0, Math.min(100, checks.reduce((s, c) => s + c.earned, 0)));
+  // Score over the checks we could actually measure. Normally every check is
+  // counted and the denominator is 100; when a check is "not measured" (e.g.
+  // PageSpeed didn't respond) it's dropped from both sides and the score is
+  // rescaled, so an unmeasurable check never silently costs points.
+  const counted = checks.filter((c) => c.counted !== false);
+  const earnedSum = counted.reduce((s, c) => s + c.earned, 0);
+  const maxSum = counted.reduce((s, c) => s + c.max, 0) || 100;
+  const score = Math.max(0, Math.min(100, Math.round((earnedSum / maxSum) * 100)));
   const grade: AuditResult['grade'] =
     score >= 85 ? 'excellent' : score >= 70 ? 'good' : score >= 50 ? 'needs-work' : 'poor';
 
@@ -402,6 +401,7 @@ export async function POST(req: Request) {
     https: 'Install an SSL certificate so your site loads securely over HTTPS',
   };
   const topFixes = checks
+    .filter((c) => c.counted !== false)
     .map((c) => ({ key: c.key, gain: c.max - c.earned }))
     .filter((f) => f.gain > 0)
     .sort((a, b) => b.gain - a.gain)
