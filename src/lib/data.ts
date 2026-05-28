@@ -723,6 +723,10 @@ function getServiceFilter(service: string): string {
     return "name.ilike.%jet%,description.ilike.%jet%,description.ilike.%travel%,description.ilike.%fatigue%,description.ilike.%energy%,name.ilike.%travel%,subtypes.cs.{\"Travel\"},subtypes.cs.{\"Energy\"},subtypes.cs.{\"Recovery\"},specialties.ilike.%jet%,specialties.ilike.%travel%,specialties.ilike.%energy%,subtypes.ilike.%travel%,subtypes.ilike.%energy%,description.ilike.%hydration%,name.ilike.%wellness%";
   }
   
+  if (s.includes('peptide')) {
+    return "name.ilike.%peptide%,description.ilike.%peptide%,category.ilike.%peptide%,specialties.cs.{\"Peptide Therapy\"},description.ilike.%semaglutide%,description.ilike.%tirzepatide%,description.ilike.%sermorelin%,description.ilike.%BPC-157%,description.ilike.%GLP-1%";
+  }
+
   // Default fallback
   const coreKeyword = service.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '');
   return `name.ilike.%${coreKeyword}%,category.ilike.%${coreKeyword}%,description.ilike.%${coreKeyword}%`;

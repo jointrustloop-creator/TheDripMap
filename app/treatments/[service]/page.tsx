@@ -37,6 +37,7 @@ const SERVICES = [
   { name: 'Myers Cocktail', slug: 'myers-cocktail', icon: <Zap size={24} />,          aliases: [] },
   { name: 'Jet Lag',        slug: 'jet-lag',        icon: <Droplets size={24} />,     aliases: [] },
   { name: 'Energy Boost',   slug: 'energy-boost',   icon: <Zap size={24} />,          aliases: [] },
+  { name: 'Peptide Therapy', slug: 'peptide-therapy', icon: <Sparkles size={24} />,    aliases: ['peptides', 'peptide'] },
 ];
 
 export default function ServicePage({ params }: { params: Promise<{ service: string }> }) {
