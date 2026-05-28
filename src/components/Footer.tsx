@@ -87,6 +87,7 @@ export const Footer = () => {
             <li><Link href="/treatments/hydration" className="hover:text-wellness-600 transition-colors">Hydration Drips</Link></li>
             <li><Link href="/search?type=Mobile" className="hover:text-wellness-600 transition-colors">Mobile IV</Link></li>
             <li><Link href="/treatments/hangover" className="hover:text-wellness-600 transition-colors">Hangover Relief</Link></li>
+            <li><Link href="/treatments/peptide-therapy" className="hover:text-wellness-600 transition-colors">Peptide Therapy</Link></li>
           </ul>
         </div>
         <div>
