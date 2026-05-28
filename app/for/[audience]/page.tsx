@@ -93,17 +93,26 @@ export default async function AudiencePage({ params }: PageProps) {
                 </h1>
                 <p className="text-lg text-slate-500 leading-relaxed mb-8 max-w-xl">{a.heroSub}</p>
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <a href="#clinics" className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-2xl font-black text-white text-sm" style={{ backgroundColor: EMERALD }}>
-                    <MapPin size={17} /> Find a clinic near me
-                  </a>
-                  <Link href="/quiz" className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-2xl font-black text-sm text-slate-900 bg-white border border-slate-200 hover:border-slate-300 transition-all">
-                    Take the 60-sec quiz <ArrowRight size={16} />
+                  {a.primaryCta ? (
+                    <Link href={a.primaryCta.href} className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-2xl font-black text-white text-sm" style={{ backgroundColor: EMERALD }}>
+                      {a.primaryCta.label} <ArrowRight size={16} />
+                    </Link>
+                  ) : (
+                    <a href="#clinics" className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-2xl font-black text-white text-sm" style={{ backgroundColor: EMERALD }}>
+                      <MapPin size={17} /> Find a clinic near me
+                    </a>
+                  )}
+                  <Link href={a.secondaryCta?.href || '/quiz'} className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-2xl font-black text-sm text-slate-900 bg-white border border-slate-200 hover:border-slate-300 transition-all">
+                    {a.secondaryCta?.label || 'Take the 60-sec quiz'} <ArrowRight size={16} />
                   </Link>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-7 text-sm font-bold text-slate-500">
-                  <span className="flex items-center gap-1.5"><Check size={15} className="text-emerald-600" strokeWidth={3} /> 770+ clinics listed</span>
-                  <span className="flex items-center gap-1.5"><ShieldCheck size={15} className="text-emerald-600" /> MD-led options</span>
-                  <span className="flex items-center gap-1.5"><Check size={15} className="text-emerald-600" strokeWidth={3} /> Mobile &amp; in-clinic</span>
+                  {(a.trustChips || ['770+ clinics listed', 'MD-led options', 'Mobile & in-clinic']).map((chip, i) => (
+                    <span key={chip} className="flex items-center gap-1.5">
+                      {i === 1 ? <ShieldCheck size={15} className="text-emerald-600" /> : <Check size={15} className="text-emerald-600" strokeWidth={3} />}
+                      {chip}
+                    </span>
+                  ))}
                 </div>
               </div>
               <div className="relative">
@@ -173,6 +182,7 @@ export default async function AudiencePage({ params }: PageProps) {
         )}
 
         {/* ===== TOP CLINICS (live from DB) ===== */}
+        {!a.hideClinics && (
         <section id="clinics" className="bg-[#F8F7F3] py-16 md:py-20 scroll-mt-20">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-10">
@@ -219,6 +229,7 @@ export default async function AudiencePage({ params }: PageProps) {
             </div>
           </div>
         </section>
+        )}
 
         {/* ===== RELATED / CROSS-LINKS ===== */}
         {(a.relatedDeepDive || a.guidesHref) && (
@@ -253,9 +264,27 @@ export default async function AudiencePage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* ===== QUIZ CTA ===== */}
+        {/* ===== BOTTOM CTA ===== */}
         <div className="max-w-7xl mx-auto px-6 pb-20">
-          <QuizCTA title={a.quizTitle} subtitle={a.quizSubtitle} />
+          {a.bottomCta ? (
+            <section>
+              <div className="bg-[#0F6E56] rounded-[3rem] p-8 md:p-16 relative overflow-hidden text-center md:text-left">
+                <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-400/20 rounded-full blur-3xl" />
+                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
+                  <div className="max-w-2xl">
+                    <h2 className="text-3xl md:text-5xl font-black text-white mb-5 leading-tight tracking-tight">{a.bottomCta.title}</h2>
+                    <p className="text-lg md:text-xl text-emerald-50 leading-relaxed font-medium">{a.bottomCta.subtitle}</p>
+                  </div>
+                  <Link href={a.bottomCta.href} className="group shrink-0 bg-white text-[#0F6E56] px-10 py-5 rounded-2xl font-black text-lg md:text-xl hover:bg-emerald-50 transition-all shadow-2xl shadow-black/20 flex items-center gap-3 active:scale-95">
+                    {a.bottomCta.buttonLabel}
+                    <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+              </div>
+            </section>
+          ) : (
+            <QuizCTA title={a.quizTitle} subtitle={a.quizSubtitle} />
+          )}
         </div>
       </main>
       <Footer />

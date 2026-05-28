@@ -3,6 +3,7 @@ import { getAllListings, getBlogPosts, getAllCities, slugify } from '../src/lib/
 import { USE_CASES } from '../src/lib/use-cases';
 import { STATES } from '../src/lib/states';
 import { GUIDES } from '../src/lib/guides';
+import { AUDIENCES } from '../src/lib/audiences';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const rawBaseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thedripmap.com';
@@ -47,6 +48,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.85,
   }));
 
+  const audienceRoutes = AUDIENCES.map((a) => ({
+    url: `${baseUrl}/for/${a.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.75,
+  }));
+
   const guideRoutes = GUIDES.map((g) => ({
     url: `${baseUrl}/guide/${g.slug}`,
     lastModified: new Date(),
@@ -72,5 +80,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticRoutes, ...symptomRoutes, ...stateRoutes, ...guideRoutes, ...cityRoutes, ...providerRoutes, ...blogRoutes];
+  return [...staticRoutes, ...audienceRoutes, ...symptomRoutes, ...stateRoutes, ...guideRoutes, ...cityRoutes, ...providerRoutes, ...blogRoutes];
 }

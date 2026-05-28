@@ -88,6 +88,12 @@ const nextConfig = {
         destination: '/providers/:slug*',
         permanent: true,
       },
+      // "Who We Serve" clinic-owners entry → existing /for-clinics page.
+      {
+        source: '/for/clinic-owners',
+        destination: '/for-clinics',
+        permanent: true,
+      },
       // SPECIFIC rule must come before the /iv-therapy/:state/:city catch-all
       // below. Otherwise '/iv-therapy/treatment/<service>' gets interpreted as
       // state=treatment, city=<service> and redirected to /cities/<service>

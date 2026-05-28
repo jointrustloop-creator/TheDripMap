@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Zap, Menu, X } from 'lucide-react';
+import { Zap, Menu, X, ChevronDown } from 'lucide-react';
 import { Logo } from './Logo';
 import { LocationIndicator } from './LocationIndicator';
 import { motion, AnimatePresence } from 'motion/react';
@@ -16,6 +16,17 @@ export const Navbar = () => {
     { label: 'Guides', href: '/guide' },
     { label: 'Blog', href: '/blog' },
     { label: 'Contact', href: '/contact' },
+  ];
+
+  const whoWeServe = [
+    { label: 'Patients & Wellness Seekers', href: '/for/patients' },
+    { label: 'Hangover Recovery', href: '/for/hangover-recovery' },
+    { label: 'Athletes & Performance', href: '/for/athletes' },
+    { label: 'Business Travelers', href: '/for/business-travelers' },
+    { label: 'Seniors & Longevity', href: '/for/seniors' },
+    { label: 'Brides & Wedding Parties', href: '/for/weddings' },
+    { label: 'Mobile IV Nurses & Practitioners', href: '/for/practitioners' },
+    { label: 'Clinic Owners', href: '/for-clinics' },
   ];
 
   return (
@@ -32,13 +43,38 @@ export const Navbar = () => {
           <div className="hidden md:flex items-center gap-5 lg:gap-6 text-sm font-bold text-slate-700">
             <LocationIndicator />
             {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="hover:text-wellness-600 transition-colors whitespace-nowrap"
-              >
-                {link.label}
-              </Link>
+              <React.Fragment key={link.href}>
+                <Link
+                  href={link.href}
+                  className="hover:text-wellness-600 transition-colors whitespace-nowrap"
+                >
+                  {link.label}
+                </Link>
+                {link.href === '/treatments' && (
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      className="flex items-center gap-1 hover:text-wellness-600 transition-colors whitespace-nowrap"
+                    >
+                      Who We Serve
+                      <ChevronDown size={14} className="group-hover:rotate-180 transition-transform" />
+                    </button>
+                    <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-150 z-50">
+                      <div className="bg-white rounded-2xl shadow-2xl shadow-slate-300/40 border border-slate-100 p-2 w-72">
+                        {whoWeServe.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className="block px-4 py-2.5 rounded-xl text-sm font-bold text-slate-700 hover:bg-wellness-50 hover:text-wellness-700 transition-colors"
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </React.Fragment>
             ))}
             <Link
               href="/for-clinics"
@@ -79,14 +115,32 @@ export const Navbar = () => {
           >
             <div className="flex flex-col p-6 gap-4">
               {navLinks.map((link) => (
-                <Link 
-                  key={link.href} 
-                  href={link.href} 
-                  onClick={() => setIsMenuOpen(false)}
-                  className="text-lg font-bold text-slate-900 hover:text-wellness-600 transition-colors py-2"
-                >
-                  {link.label}
-                </Link>
+                <React.Fragment key={link.href}>
+                  <Link
+                    href={link.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-lg font-bold text-slate-900 hover:text-wellness-600 transition-colors py-2"
+                  >
+                    {link.label}
+                  </Link>
+                  {link.href === '/treatments' && (
+                    <div className="border-l-2 border-slate-100 pl-4 -mt-1 flex flex-col gap-2">
+                      <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 pt-1">
+                        Who We Serve
+                      </span>
+                      {whoWeServe.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setIsMenuOpen(false)}
+                          className="text-base font-bold text-slate-600 hover:text-wellness-600 transition-colors py-1"
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </React.Fragment>
               ))}
               <Link
                 href="/for-clinics"
