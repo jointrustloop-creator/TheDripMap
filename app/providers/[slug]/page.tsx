@@ -634,12 +634,14 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
 
               {provider.is_featured && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="flex flex-col gap-4">
-                    <div className="bg-white p-6 h-full rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center">
-                      <div className="text-slate-400 font-bold text-xs uppercase mb-1">Price Range</div>
-                      <div className="text-xl font-black text-slate-900">{provider.price_range || provider.priceRange || 'Competitive'}</div>
+                  {(provider.price_range || provider.priceRange) && (
+                    <div className="flex flex-col gap-4">
+                      <div className="bg-white p-6 h-full rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                        <div className="text-slate-400 font-bold text-xs uppercase mb-1">Price Range</div>
+                        <div className="text-xl font-black text-slate-900">{provider.price_range || provider.priceRange}</div>
+                      </div>
                     </div>
-                  </div>
+                  )}
                   <div className="flex flex-col gap-4">
                     <div className="bg-white p-6 h-full rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center">
                       <div className="text-slate-400 font-bold text-xs uppercase mb-1">Availability</div>
