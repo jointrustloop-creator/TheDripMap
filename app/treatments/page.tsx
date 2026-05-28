@@ -53,6 +53,7 @@ const TREATMENTS = [
   { name: 'Myers Cocktail', slug: 'myers-cocktail', icon: Zap,         category: 'Foundational',       image: 'iv-therapy-vitamin-drip-citrus.jpg' },
   { name: 'Jet Lag',        slug: 'jet-lag',        icon: Droplets,    category: 'Travel',             image: 'iv-therapy-jet-lag.jpg' },
   { name: 'Energy Boost',   slug: 'energy-boost',   icon: Zap,         category: 'Energy & Longevity', image: 'iv-therapy-fatigue.jpg' },
+  { name: 'Peptide Therapy', slug: 'peptide-therapy', icon: Sparkles,  category: 'Advanced',           image: 'iv-therapy-weight-loss.jpg' },
 ];
 
 // First sentence (or first ~180 chars) of each treatment's description.

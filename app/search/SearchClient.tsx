@@ -35,6 +35,7 @@ const GOAL_KEYWORDS: Record<string, string[]> = {
   'Hangover': ['hangover', 'hydration', 'recovery', 'rehydrate', 'detox', 'cleanse', 'saline', 'fluids'],
   'Hydration': ['hydration', 'rehydrate', 'fluids', 'saline', 'electrolyte', 'quench'],
   'JetLag': ['jet', 'lag', 'travel', 'fatigue', 'energy', 'recovery', 'timezone', 'flight', 'international'],
+  'Peptide': ['peptide', 'semaglutide', 'tirzepatide', 'sermorelin', 'bpc-157', 'glp-1', 'ozempic', 'wegovy', 'mounjaro', 'cjc-1295', 'ipamorelin', 'tb-500'],
 };
 
 export default function SearchClient({ initialProviders, cities: initialCities, initialStats, totalCount }: SearchClientProps) {
@@ -72,6 +73,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
       'Weight Loss': 'WeightLoss',
       'Immune Support': 'Immune',
       'Jet Lag': 'JetLag',
+      'Peptide Therapy': 'Peptide',
     };
     
     if (specialty) {
@@ -132,6 +134,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
     { id: 'Hangover', label: 'Hangover' },
     { id: 'Hydration', label: 'Hydration' },
     { id: 'JetLag', label: 'Jet Lag' },
+    { id: 'Peptide', label: 'Peptide Therapy' },
     { id: 'Open', label: 'Open Now' },
     { id: 'TopRated', label: 'Top Rated' },
   ];
