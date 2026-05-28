@@ -28,12 +28,12 @@ export const ClinicianSection = ({ stats }: ClinicianSectionProps) => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 rounded-[2.5rem] md:rounded-[3rem] p-10 md:p-16 relative overflow-hidden border border-slate-800/50 shadow-[0_40px_80px_-30px_rgba(15,23,42,0.6)] flex flex-col lg:flex-row items-center justify-between gap-12"
+          className="bg-gradient-to-br from-[#0A3D2B] via-[#06281C] to-[#0A3D2B] rounded-[2.5rem] md:rounded-[3rem] p-10 md:p-16 relative overflow-hidden border border-emerald-900/40 shadow-[0_40px_80px_-30px_rgba(6,40,28,0.6)] flex flex-col lg:flex-row items-center justify-between gap-12"
         >
-          {/* Layered mesh glow */}
+          {/* Layered mesh glow — on-brand emerald tones */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-wellness-500/25 rounded-full blur-[140px] -mr-32 -mt-32 pointer-events-none" />
-          <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-sky-500/15 rounded-full blur-[140px] pointer-events-none" />
-          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-violet-500/15 rounded-full blur-[140px] pointer-events-none" />
+          <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-emerald-400/15 rounded-full blur-[140px] pointer-events-none" />
+          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-wellness-600/20 rounded-full blur-[140px] pointer-events-none" />
           {/* Subtle starfield dot grid */}
           <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 

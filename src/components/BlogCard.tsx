@@ -17,6 +17,9 @@ import { cn } from '../lib/utils';
 interface BlogCardProps {
   post: BlogPost;
   className?: string;
+  /** Position in a list — offsets the gradient pick so two same-category
+      cards sitting next to each other don't land on the identical shade. */
+  index?: number;
 }
 
 // Themes per category. Multiple gradients per theme so 20 posts in one
@@ -81,10 +84,10 @@ function hashSlug(slug: string): number {
   return Math.abs(h);
 }
 
-export const BlogCard = ({ post, className }: BlogCardProps) => {
+export const BlogCard = ({ post, className, index = 0 }: BlogCardProps) => {
   const theme = (THEMES[post.category as keyof typeof THEMES] ?? THEMES.default) as typeof THEMES['default'];
   const hash = hashSlug(post.slug);
-  const gradient = theme.gradients[hash % theme.gradients.length];
+  const gradient = theme.gradients[(hash + index) % theme.gradients.length];
   const Icon = theme.Icon;
   // Slight rotation + position offset per slug so the anchor icon doesn't sit identically
   const iconRotation = (hash % 7) - 3; // -3 to +3 degrees
