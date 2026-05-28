@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Instagram } from 'lucide-react';
+import { Instagram, Facebook, Linkedin, Twitter } from 'lucide-react';
 import { Logo } from './Logo';
 import { MedicalDisclaimer } from './MedicalDisclaimer';
 
@@ -35,24 +35,47 @@ export const Footer = () => {
   }, []);
 
   return (
-    <footer className="bg-white border-t border-slate-200 py-12 px-6 mt-20">
+    <footer className="bg-white border-t-2 border-[#0F6E56] py-12 px-6 mt-20">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
         <div className="lg:col-span-2 flex flex-col items-start text-left">
           <Link href="/" className="inline-flex mb-6 self-start">
             <Logo />
           </Link>
-          <p className="text-slate-500 max-w-sm leading-relaxed">
+          <p className="text-[15px] text-slate-500 max-w-sm leading-relaxed">
             The IV therapy matching platform. We match you with the right clinic based on your specific health goals, location, and budget — in under 60 seconds.
           </p>
-          <a
-            href="https://www.instagram.com/thedripmap/"
-            target="_blank"
-            rel="me noopener noreferrer"
-            aria-label="TheDripMap on Instagram (@thedripmap)"
-            className="mt-5 inline-flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200 text-slate-400 hover:text-wellness-700 hover:border-wellness-200 hover:bg-wellness-50 transition-all"
-          >
-            <Instagram size={16} strokeWidth={2} />
-          </a>
+          <div className="mt-5 flex items-center gap-2">
+            <a
+              href="https://www.instagram.com/thedripmap/"
+              target="_blank"
+              rel="me noopener noreferrer"
+              aria-label="TheDripMap on Instagram (@thedripmap)"
+              className="inline-flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200 text-slate-400 hover:text-wellness-700 hover:border-wellness-200 hover:bg-wellness-50 transition-all"
+            >
+              <Instagram size={16} strokeWidth={2} />
+            </a>
+            <a
+              href="#"
+              aria-label="TheDripMap on Facebook"
+              className="inline-flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200 text-slate-400 hover:text-wellness-700 hover:border-wellness-200 hover:bg-wellness-50 transition-all"
+            >
+              <Facebook size={16} strokeWidth={2} />
+            </a>
+            <a
+              href="#"
+              aria-label="TheDripMap on LinkedIn"
+              className="inline-flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200 text-slate-400 hover:text-wellness-700 hover:border-wellness-200 hover:bg-wellness-50 transition-all"
+            >
+              <Linkedin size={16} strokeWidth={2} />
+            </a>
+            <a
+              href="#"
+              aria-label="TheDripMap on X (Twitter)"
+              className="inline-flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200 text-slate-400 hover:text-wellness-700 hover:border-wellness-200 hover:bg-wellness-50 transition-all"
+            >
+              <Twitter size={16} strokeWidth={2} />
+            </a>
+          </div>
         </div>
         <div>
           <h4 className="font-bold mb-6 text-sm uppercase tracking-wider text-slate-400">Services</h4>
@@ -78,7 +101,7 @@ export const Footer = () => {
                   {city.name}
                 </Link>
                 {city.count !== undefined && city.count > 0 && (
-                  <span className="text-[10px] bg-slate-50 text-slate-400 px-1.5 py-0.5 rounded-full font-bold group-hover:bg-wellness-50 group-hover:text-wellness-600 transition-colors">
+                  <span className="text-[10px] bg-slate-50 text-[#0F6E56] px-1.5 py-0.5 rounded-full font-bold group-hover:bg-wellness-50 group-hover:text-wellness-700 transition-colors">
                     {city.count}
                   </span>
                 )}
