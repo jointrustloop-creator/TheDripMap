@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { supabase } from '../../src/lib/supabase';
+import { supabase, fetchAllRows } from '../../src/lib/supabase';
 import { enrichProvider, getListingStats, deduplicateListings, getCitiesWithListings } from '../../src/lib/data';
 import { Suspense } from 'react';
 import SearchClient from './SearchClient';
@@ -35,12 +35,16 @@ export async function generateMetadata(): Promise<Metadata> {
 export const revalidate = 3600;
 
 export default async function SearchPage() {
-  // SSR the default list of clinics for SEO and initial view
-  const { data } = await supabase
-    .from('providers')
-    .select('*')
-    .order('is_featured', { ascending: false })
-    .order('rating', { ascending: false, nullsFirst: false });
+  // SSR the default list of clinics for SEO and initial view.
+  // PostgREST's gateway caps responses at 1,000 rows; we have >1,000
+  // providers, so we paginate via fetchAllRows() to get everything.
+  const data = await fetchAllRows(() =>
+    supabase
+      .from('providers')
+      .select('*')
+      .order('is_featured', { ascending: false })
+      .order('rating', { ascending: false, nullsFirst: false })
+  );
 
   const { count: totalCount } = await supabase
     .from('providers')

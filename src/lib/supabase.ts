@@ -80,6 +80,43 @@ export const supabase = new Proxy({} as SupabaseClient, {
 });
 
 /**
+ * Page through a Supabase query past the gateway's hard 1,000-row cap.
+ *
+ * PostgREST (Supabase's API layer) enforces a max-rows ceiling — even when
+ * the JS client requests `.limit(2000)`, the gateway returns at most 1,000
+ * rows. To fetch a full result set we must call .range(start, end) in
+ * 1,000-row windows until the response is short.
+ *
+ * Usage:
+ *   const all = await fetchAllRows(() =>
+ *     supabase.from('providers').select('*').eq('availability', true)
+ *       .order('rating', { ascending: false })
+ *   );
+ *
+ * The factory function is called once per page so each call gets a fresh
+ * query builder.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const fetchAllRows = async <T = any>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  buildQuery: () => any,
+  pageSize = 1000,
+): Promise<T[]> => {
+  const all: T[] = [];
+  let from = 0;
+  // Cap pagination at 20 pages (20,000 rows) as a safety guard.
+  for (let page = 0; page < 20; page++) {
+    const { data, error } = await buildQuery().range(from, from + pageSize - 1);
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    all.push(...(data as T[]));
+    if (data.length < pageSize) break;
+    from += pageSize;
+  }
+  return all;
+};
+
+/**
  * Helper to get the service role client (server-side only).
  */
 export const getServiceSupabase = () => {

@@ -1,5 +1,5 @@
 import { Provider, BlogPost, OperatorProfile, ListingStats } from '../types';
-import { supabase, isSupabaseConfigured } from './supabase';
+import { supabase, isSupabaseConfigured, fetchAllRows } from './supabase';
 import { MOCK_BLOG_POSTS, MOCK_LISTINGS, MOCK_CITIES } from './mock-data';
 import { htmlToMarkdown, containsHtml } from './blog-utils';
 
@@ -1191,17 +1191,20 @@ export async function getAllUseCases() {
 
 export async function getAllListings() {
   if (!isSupabaseConfigured()) return MOCK_LISTINGS.map(enrichProvider);
-  
-  try {
-    const { data, error } = await supabase
-      .from('providers')
-      .select('*')
-      .neq('availability', false)
-      .order('is_featured', { ascending: false })
-      .order('rating', { ascending: false, nullsFirst: false })
-      .limit(2000);
 
-    if (error) throw error;
+  try {
+    // PostgREST gateway caps single responses at 1,000 rows regardless
+    // of the .limit() value sent. We paginate via fetchAllRows() so the
+    // sitemap, search index, and any other consumer gets every provider.
+    const data = await fetchAllRows(() =>
+      supabase
+        .from('providers')
+        .select('*')
+        .neq('availability', false)
+        .order('is_featured', { ascending: false })
+        .order('rating', { ascending: false, nullsFirst: false })
+    );
+
     const results = data && data.length > 0 ? data : MOCK_LISTINGS;
     return results.map(enrichProvider);
   } catch {
