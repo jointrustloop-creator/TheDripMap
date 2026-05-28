@@ -112,19 +112,24 @@ export default async function HomePage() {
       {/* ─────────────────────────────────────────────────────────────
           1. HERO — light, airy, single emerald accent
           ───────────────────────────────────────────────────────────── */}
-      <section className="relative bg-gradient-to-b from-[#F4F6F4] via-[#FBFCFB] to-white text-slate-900 overflow-hidden">
-        {/* Soft emerald glow up top — barely there, just warmth */}
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[1100px] h-[800px] bg-[#0F6E56]/[0.07] rounded-full blur-[170px] pointer-events-none" />
-        {/* Faint dot grid, masked to fade at the edges */}
-        <div
-          className="absolute inset-0 opacity-[0.5] pointer-events-none"
-          style={{
-            backgroundImage: 'radial-gradient(circle, rgba(15,110,86,0.10) 1px, transparent 1px)',
-            backgroundSize: '34px 34px',
-            maskImage: 'radial-gradient(ellipse 80% 60% at 50% 35%, black, transparent 75%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 35%, black, transparent 75%)',
-          }}
-        />
+      <section className="relative bg-gradient-to-b from-[#F4F6F4] via-[#FBFCFB] to-white text-slate-900">
+        {/* Decorative background, clipped to the hero. Kept in its own
+            overflow-hidden layer so the section itself does NOT clip the
+            QuickMatch dropdowns (which open downward past the hero edge). */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Soft emerald glow up top — barely there, just warmth */}
+          <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[1100px] h-[800px] bg-[#0F6E56]/[0.07] rounded-full blur-[170px]" />
+          {/* Faint dot grid, masked to fade at the edges */}
+          <div
+            className="absolute inset-0 opacity-[0.5]"
+            style={{
+              backgroundImage: 'radial-gradient(circle, rgba(15,110,86,0.10) 1px, transparent 1px)',
+              backgroundSize: '34px 34px',
+              maskImage: 'radial-gradient(ellipse 80% 60% at 50% 35%, black, transparent 75%)',
+              WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 35%, black, transparent 75%)',
+            }}
+          />
+        </div>
 
         <div className="max-w-6xl mx-auto px-6 pt-28 pb-20 md:pt-32 md:pb-24 relative">
           {/* Eyebrow */}

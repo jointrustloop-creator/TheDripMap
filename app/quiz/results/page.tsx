@@ -55,6 +55,8 @@ const GOALS = [
   { id: 'hydration', label: 'Rapid Hydration' },
   { id: 'recovery', label: 'Athletic Recovery' },
   { id: 'myers-cocktail', label: 'Myers Cocktail' },
+  { id: 'jet-lag', label: 'Jet Lag & Travel' },
+  { id: 'peptide-therapy', label: 'Peptide Therapy' },
 ];
 
 function ResultsContent() {
@@ -238,7 +240,9 @@ function ResultsContent() {
         'weight-loss': ['weight', 'metabolism', 'fat'],
         'hydration': ['hydration', 'fluids'],
         'recovery': ['recovery', 'athletic', 'sport'],
-        'myers-cocktail': ['myers', 'cocktail']
+        'myers-cocktail': ['myers', 'cocktail'],
+        'jet-lag': ['jet', 'travel', 'fatigue', 'energy'],
+        'peptide-therapy': ['peptide', 'semaglutide', 'tirzepatide', 'sermorelin', 'glp-1']
       };
       
       const keywords = goalKeywords[goalLower] || [goalLower];

@@ -13,7 +13,9 @@ import {
   Activity,
   Droplets,
   Dumbbell,
-  Navigation
+  Navigation,
+  Plane,
+  FlaskConical
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
@@ -28,6 +30,8 @@ const GOALS = [
   { id: 'hydration', label: 'Rapid Hydration', icon: <Droplets size={18} /> },
   { id: 'recovery', label: 'Athletic Recovery', icon: <Dumbbell size={18} /> },
   { id: 'myers-cocktail', label: 'Myers Cocktail', icon: <Target size={18} /> },
+  { id: 'jet-lag', label: 'Jet Lag & Travel', icon: <Plane size={18} /> },
+  { id: 'peptide-therapy', label: 'Peptide Therapy', icon: <FlaskConical size={18} /> },
 ];
 
 // Popular metros with the strongest directory inventory — shown in the
@@ -193,7 +197,7 @@ export function QuickMatch() {
                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                className="absolute top-full left-0 right-0 mt-4 bg-white rounded-3xl shadow-2xl border border-slate-100 p-3 z-50 grid grid-cols-1 sm:grid-cols-2 gap-1 overflow-hidden"
+                className="absolute top-full left-0 right-0 mt-4 bg-white rounded-3xl shadow-2xl border border-slate-100 p-3 z-50 grid grid-cols-1 sm:grid-cols-2 gap-1 max-h-[70vh] overflow-y-auto"
               >
                 {GOALS.map((g) => (
                   <button
