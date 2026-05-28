@@ -10,7 +10,7 @@ export const metadata = { robots: { index: false, follow: false } };
 
 export interface LeadRow {
   id: string;
-  source: 'contact' | 'message-clinic' | 'subscribe' | 'claim' | 'testimonial' | 'upgrade';
+  source: 'contact' | 'message-clinic' | 'subscribe' | 'claim' | 'testimonial' | 'upgrade' | 'seo-audit';
   email: string;
   name: string;
   message: string;
@@ -73,6 +73,7 @@ export default async function AdminLeadsPage() {
     if (msg.startsWith('[Lead for ')) source = 'message-clinic';
     else if (msg.startsWith('[SUBSCRIBE]')) source = 'subscribe';
     else if (msg.startsWith('[UPGRADE REQUEST]')) source = 'upgrade';
+    else if (msg.startsWith('[SEO AUDIT]')) source = 'seo-audit';
     all.push({
       id: r.id,
       source,
@@ -143,6 +144,7 @@ export default async function AdminLeadsPage() {
     claim: all.filter((l) => l.source === 'claim').length,
     testimonial: all.filter((l) => l.source === 'testimonial').length,
     upgrade: all.filter((l) => l.source === 'upgrade').length,
+    'seo-audit': all.filter((l) => l.source === 'seo-audit').length,
   };
 
   return (
