@@ -93,7 +93,9 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     title,
     description,
     alternates: {
-      canonical: `https://www.thedripmap.com/cities/${slug}`,
+      // Point at the resolved city's canonical slug so case/variant URLs
+      // (e.g. /cities/New-York) dedupe to the one true /cities/new-york.
+      canonical: `https://www.thedripmap.com/cities/${cityData?.slug || slug}`,
     },
     openGraph: {
       title,

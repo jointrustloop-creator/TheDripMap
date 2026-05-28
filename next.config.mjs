@@ -80,9 +80,12 @@ const nextConfig = {
         destination: 'https://www.thedripmap.com/:path*',
         permanent: true,
       },
+      // Singular /provider/* → plural /providers/*. Catch-all (:slug*) so it
+      // covers nested paths too, fixing ~459 legacy 404s Google crawled at the
+      // old singular path.
       {
-        source: '/provider/:slug',
-        destination: '/providers/:slug',
+        source: '/provider/:slug*',
+        destination: '/providers/:slug*',
         permanent: true,
       },
       // SPECIFIC rule must come before the /iv-therapy/:state/:city catch-all

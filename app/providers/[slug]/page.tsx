@@ -139,6 +139,14 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
 
   const topSpecialties = provider.specialties?.slice(0, 3).join(', ') || 'hydration, NAD+, immune support';
 
+  // Canonicalize to the provider's TRUE slug, not the requested URL slug.
+  // getListingBySlug() fuzzy-matches, so several URL variants can resolve to
+  // the same provider — pointing every variant's canonical at the one true
+  // slug is what tells Google they're the same page (fixes duplicate-canonical
+  // flags in Search Console).
+  const canonicalSlug = provider.slug || slugify(provider.name);
+  const canonicalUrl = `https://www.thedripmap.com/providers/${canonicalSlug}`;
+
   const title = `${displayName} — IV Therapy in ${provider.city}, ${provider.state} | Reviews & Booking | TheDripMap`;
   const description = provider.reviewCount > 0
     ? `Read reviews for ${displayName} in ${provider.city}, ${provider.state}. ${provider.rating} stars, ${provider.reviewCount} reviews. IV therapy treatments include ${topSpecialties}. Book your session today.`
@@ -148,7 +156,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     title,
     description,
     alternates: {
-      canonical: `https://www.thedripmap.com/providers/${slug}`,
+      canonical: canonicalUrl,
     },
     robots: {
       index: true,
@@ -161,7 +169,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     openGraph: {
       title,
       description,
-      url: `https://www.thedripmap.com/providers/${slug}`,
+      url: canonicalUrl,
       type: 'website',
       images: [
         {
