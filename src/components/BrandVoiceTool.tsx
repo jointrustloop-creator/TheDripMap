@@ -64,6 +64,11 @@ export const BrandVoiceTool = () => {
   const [sentMsg, setSentMsg] = useState<string | null>(null);
   const [claimedListing, setClaimedListing] = useState<{ name: string; slug: string | null; city: string | null } | null>(null);
 
+  const [applyEmail, setApplyEmail] = useState('');
+  const [applySending, setApplySending] = useState(false);
+  const [applyMsg, setApplyMsg] = useState<string | null>(null);
+  const [applyDone, setApplyDone] = useState(false);
+
   const toggleTreatment = (t: string) => {
     setTreatments((prev) => prev.includes(t) ? prev.filter((x) => x !== t) : prev.length >= 3 ? prev : [...prev, t]);
   };
@@ -112,6 +117,26 @@ export const BrandVoiceTool = () => {
       setSentMsg('Could not send. Please try again.');
     } finally {
       setSending(false);
+    }
+  };
+
+  const applyToListing = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!result || !listing?.slug) return;
+    setApplySending(true); setApplyMsg(null);
+    try {
+      const res = await fetch('/api/brand-voice/apply', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: listing.slug, email: applyEmail, listingDescription: result.listingDescription }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setApplyMsg(data.error || 'Could not start the apply request. Please try again.'); return; }
+      setApplyDone(true);
+      setApplyMsg(`Almost done — check ${data.email || 'your inbox'} for a one-click link to publish this to your listing. It expires in 1 hour.`);
+    } catch {
+      setApplyMsg('Could not reach the server. Please try again.');
+    } finally {
+      setApplySending(false);
     }
   };
 
@@ -235,10 +260,22 @@ export const BrandVoiceTool = () => {
                   <span className="text-[11px] font-black uppercase tracking-[0.12em] text-emerald-200">Your verified listing</span>
                 </div>
                 <h3 className="text-xl font-black mb-2">{listing.name}{listing.city ? ` · ${listing.city}` : ''}</h3>
-                <p className="text-emerald-50/80 text-sm leading-relaxed mb-4">Apply this copy to your TheDripMap listing. You&apos;ll confirm your claimed email, then your description is updated.</p>
-                <Link href={claimHref} className="inline-flex items-center gap-2 bg-white text-[#0A3D2B] px-6 py-3 rounded-xl font-black text-sm">
-                  Apply to your listing <ArrowRight size={16} />
-                </Link>
+                <p className="text-emerald-50/80 text-sm leading-relaxed mb-4">Publish this copy straight to your listing description. Enter the email you claimed with — we&apos;ll send a one-click confirmation link, then your listing updates automatically.</p>
+                {!applyDone && (
+                  <form onSubmit={applyToListing} className="flex flex-col sm:flex-row gap-3">
+                    <input
+                      type="email" required value={applyEmail} onChange={(e) => setApplyEmail(e.target.value)}
+                      placeholder="Your claimed email"
+                      className="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-emerald-200/50 font-semibold focus:outline-none focus:border-emerald-300"
+                    />
+                    <button type="submit" disabled={applySending}
+                      className="inline-flex items-center justify-center gap-2 bg-white text-[#0A3D2B] px-6 py-3 rounded-xl font-black text-sm disabled:opacity-60 whitespace-nowrap">
+                      {applySending ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
+                      Apply to my listing
+                    </button>
+                  </form>
+                )}
+                {applyMsg && <p className="text-sm font-semibold text-emerald-200 mt-3">{applyMsg}</p>}
               </div>
             )}
             {listing?.found && !listing.claimed && (
