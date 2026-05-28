@@ -1037,7 +1037,11 @@ export async function getBlogPosts() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return (data as any[]).map(post => {
           let content = post.content || post.body || post.markdown || '';
-          
+
+          // Strip any HTML comments (e.g. leftover content-injection markers like
+          // <!-- PHASE2_DEPTH_END -->) so they never leak into the rendered post.
+          content = content.replace(/<!--[\s\S]*?-->/g, '');
+
           // Self-heal: convert to markdown if HTML is detected
           if (containsHtml(content)) {
             content = htmlToMarkdown(content);
@@ -1095,12 +1099,16 @@ export async function getBlogPostBySlug(slug: string) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const post = data as any;
           let content = post.content || post.body || post.markdown || '';
-          
+
+          // Strip any HTML comments (e.g. leftover content-injection markers like
+          // <!-- PHASE2_DEPTH_END -->) so they never leak into the rendered post.
+          content = content.replace(/<!--[\s\S]*?-->/g, '');
+
           // Self-heal: convert to markdown if HTML is detected
           if (containsHtml(content)) {
             content = htmlToMarkdown(content);
           }
-          
+
           const author = post.author || post.author_name || 'TheDripMap Team';
 
           return {
