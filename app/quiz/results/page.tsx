@@ -313,6 +313,16 @@ function ResultsContent() {
     return `${provider.city}${provider.state ? `, ${provider.state}` : ''}`;
   };
 
+  // Delivery-only label — never repeats the city (the best-match card already
+  // prints city, state). Fixes the "Toronto, ON · Toronto, ON" duplication.
+  const deliveryLabel = (provider: Provider) => {
+    const profile = operatorProfiles.find(op => op.clinicId === provider.id);
+    const isMobile = provider.type === 'Mobile' || profile?.profile_data?.mobileService;
+    if (isMobile) return "Comes to you";
+    if (provider.distance !== undefined) return `${provider.distance.toFixed(1)} mi away`;
+    return "In-clinic";
+  };
+
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
@@ -595,22 +605,19 @@ function ResultsContent() {
               <div className="h-px flex-1 bg-slate-100" />
             </div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white rounded-[2.5rem] border-2 border-wellness-100 overflow-hidden shadow-2xl shadow-wellness-100/50 group relative"
+              className="bg-white rounded-[2.5rem] border border-wellness-100 overflow-hidden shadow-[0_30px_60px_-25px_rgba(15,110,86,0.25)] group relative"
             >
-              <div className="absolute -top-4 -right-4 bg-amber-400 text-white p-4 rounded-full shadow-xl z-10 rotate-12 group-hover:rotate-0 transition-transform duration-500 hidden lg:block">
-                <Sparkles size={24} />
-              </div>
-
               <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr]">
-                <div className="relative h-64 lg:h-full overflow-hidden bg-slate-50">
-                  <ClinicImage 
+                <div className="relative h-64 lg:h-full min-h-[300px] overflow-hidden bg-slate-50">
+                  <ClinicImage
                     name={topMatch.name}
                     imageUrl={topMatch.imageUrl}
-                    className="group-hover:scale-105 transition-transform duration-700 h-full w-full object-cover"
+                    contain={topMatch.is_featured === true}
+                    className="group-hover:scale-[1.03] transition-transform duration-700 h-full w-full object-cover"
                   />
                   <div className="absolute top-6 left-6 flex flex-wrap gap-2">
                     {topMatch.availability && (
@@ -619,41 +626,44 @@ function ResultsContent() {
                     {(topMatch.type === 'Mobile' || operatorProfiles.find(op => op.clinicId === topMatch.id)?.profile_data?.mobileService) && (
                       <span className="bg-wellness-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg">Mobile IV</span>
                     )}
-                    {topMatch.is_top_rated && (
-                      <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg">⭐ Top Rated</span>
-                    )}
                     {(topMatch as { hasMdOversight?: boolean }).hasMdOversight && (
-                      <span className="bg-amber-700 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1">
+                      <span className="bg-slate-900 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1">
                         <ShieldAlert size={10} /> MD oversight
                       </span>
                     )}
                   </div>
                 </div>
                 <div className="p-8 lg:p-10 flex flex-col justify-center">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="flex">
-                      {[...Array(5)].map((_, i) => (
-                        <Star 
-                          key={i} 
-                          size={16} 
-                          fill={i < Math.floor(topMatch.rating) ? "currentColor" : "none"} 
-                          className={i < Math.floor(topMatch.rating) ? "text-amber-400" : "text-slate-200"} 
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm font-bold text-slate-400">({topMatch.reviewCount} reviews)</span>
-                  </div>
-                  <h2 className="text-3xl lg:text-4xl font-black text-slate-900 mb-2 tracking-tight leading-tight">
-                    {topMatch.name}
-                  </h2>
-                  <div className="flex items-center gap-2 text-slate-500 font-bold mb-6">
-                    <MapPin size={16} className="text-wellness-600" />
-                    <span>{topMatch.city}{topMatch.state ? `, ${topMatch.state}` : ''} · {formatDistance(topMatch)}</span>
-                    <span className="mx-2 text-slate-200">|</span>
-                    <span className="text-wellness-600">{topMatch.price_range || topMatch.priceRange || '$$'}</span>
+                  {/* Calm top-match label (replaces the gaudy floating amber badge) */}
+                  <div className="inline-flex items-center gap-1.5 self-start bg-wellness-50 text-wellness-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.18em] border border-wellness-100 mb-5">
+                    <Star size={11} fill="currentColor" /> Your top match
                   </div>
 
-                  <div className="flex flex-wrap gap-2 mb-8">
+                  <h2 className="text-3xl lg:text-4xl font-black text-slate-900 mb-3 tracking-tight leading-tight">
+                    {topMatch.name}
+                  </h2>
+
+                  {/* Rating + location + delivery — city shown ONCE */}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mb-6">
+                    {topMatch.rating > 0 && (
+                      <span className="inline-flex items-center gap-1.5 text-sm font-black text-slate-900">
+                        <Star size={15} fill="currentColor" className="text-amber-400" />
+                        {topMatch.rating}
+                        <span className="text-slate-400 font-bold">({topMatch.reviewCount})</span>
+                      </span>
+                    )}
+                    <span className="text-slate-300">·</span>
+                    <span className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-500">
+                      <MapPin size={14} className="text-wellness-600" />
+                      {topMatch.city}{topMatch.state ? `, ${topMatch.state}` : ''}
+                    </span>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-slate-50 border border-slate-100 text-[11px] font-black uppercase tracking-wide text-slate-500">
+                      {deliveryLabel(topMatch)}
+                    </span>
+                    <span className="text-sm font-black text-wellness-600">{topMatch.price_range || topMatch.priceRange || '$$'}</span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mb-7">
                     {topMatch.specialties.slice(0, 3).map(s => (
                       <span key={s} className="bg-slate-50 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold border border-slate-100">
                         {s}
@@ -668,21 +678,23 @@ function ResultsContent() {
                     </p>
                   </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4">
-                    <a 
-                      href={topMatch.website || '#'} 
-                      target="_blank" 
+                  {/* One strong CTA; profile is a quiet secondary link */}
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <a
+                      href={topMatch.website || '#'}
+                      target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 bg-wellness-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-wellness-700 transition-all text-center shadow-lg shadow-wellness-200 flex items-center justify-center gap-2"
+                      className="bg-wellness-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-wellness-700 transition-all text-center shadow-lg shadow-wellness-200 flex items-center justify-center gap-2"
                     >
                       <Calendar size={18} />
                       Book Appointment
                     </a>
-                    <Link 
+                    <Link
                       href={`/providers/${topMatch.slug || slugify(topMatch.name)}`}
-                      className="flex-1 bg-white text-slate-900 border-2 border-slate-100 px-8 py-4 rounded-2xl font-bold hover:border-slate-900 transition-all text-center"
+                      className="inline-flex items-center justify-center gap-1.5 text-slate-500 hover:text-wellness-700 font-bold text-sm transition-colors group/link"
                     >
-                      View Full Profile
+                      View full profile
+                      <ArrowRight size={15} className="group-hover/link:translate-x-1 transition-transform" />
                     </Link>
                   </div>
                 </div>
@@ -774,14 +786,15 @@ function ResultsContent() {
                       </span>
                     </div>
                     <div className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden shadow-xl shadow-slate-200/50 flex flex-col h-full">
-                      <div className="relative h-48">
+                      <div className="relative h-48 overflow-hidden bg-slate-50">
                         <ClinicImage
                           name={provider.name}
                           imageUrl={provider.imageUrl}
+                          contain={provider.is_featured === true}
                         />
-                        <div className="absolute top-4 left-4 pt-4">
+                        <div className="absolute top-4 left-4">
                           <span className="bg-white/90 backdrop-blur-md text-slate-900 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm">
-                            {formatDistance(provider)}
+                            {deliveryLabel(provider)}
                           </span>
                         </div>
                       </div>

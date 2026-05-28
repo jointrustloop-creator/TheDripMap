@@ -278,18 +278,27 @@ export function matchProviders(
       }
     }
 
-    // Compute a single human-readable "why this clinic showed up"
+    // Compute a single, SPECIFIC "why this clinic showed up" line built from
+    // the clinic's real specialties + concrete qualifiers — never a generic
+    // "offers the protocol you're looking for" string.
     let matchReason: string | undefined;
-    if (hasMdOversight) {
-      matchReason = 'Has MD/NP oversight — fits your safety profile';
-    } else if (distance != null && distance < 5) {
-      matchReason = 'Closest clinic to you';
-    } else if (matchedSymptomKeyword) {
-      matchReason = 'Offers the protocol you\'re looking for';
+    const topSpecs = (p.specialties || []).filter(Boolean).slice(0, 2);
+    const mdSuffix = hasMdOversight ? ', with MD-led oversight' : '';
+
+    if (topSpecs.length === 2) {
+      matchReason = `Specializes in ${topSpecs[0]} and ${topSpecs[1]} protocols${mdSuffix}`;
+    } else if (topSpecs.length === 1) {
+      matchReason = `Specializes in ${topSpecs[0]} protocols${mdSuffix}`;
+    } else if (hasMdOversight) {
+      matchReason = 'MD/NP oversight on staff — fits your safety profile';
     } else if (isMobile && answers.locationPreference === 'Mobile') {
-      matchReason = 'Mobile — comes to you';
+      matchReason = 'Mobile clinic that comes to you';
+    } else if (distance != null && distance < 5) {
+      matchReason = 'One of the closest clinics to your location';
     } else if (p.rating && p.rating >= 4.8) {
-      matchReason = `Top-rated in ${p.city}`;
+      matchReason = `Top-rated in ${p.city} — ${p.rating}★ from ${p.reviewCount || 0} reviews`;
+    } else {
+      matchReason = `A strong IV therapy match in ${p.city}`;
     }
 
     return { ...p, matchScore: score, distance, matchReason, hasMdOversight };
