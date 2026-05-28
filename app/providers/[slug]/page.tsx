@@ -878,12 +878,19 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   <h3 className="text-2xl font-black text-slate-900 mb-2">This listing is unclaimed</h3>
                   <p className="text-slate-500 font-bold mb-8 text-lg">Claim it free to add photos and update your clinic story</p>
 
-                  <ClaimListingTrigger 
+                  <ClaimListingTrigger
                     provider={provider}
                     className="inline-flex items-center gap-2 bg-wellness-600 text-white px-8 py-4 rounded-2xl font-black text-lg hover:bg-wellness-700 transition-all shadow-lg"
                   >
                     Claim This Listing Free <ArrowRight size={20} />
                   </ClaimListingTrigger>
+
+                  <p className="mt-6 text-sm text-slate-500 font-medium">
+                    Want to see how your clinic ranks on Google?{' '}
+                    <Link href="/tools/seo-audit" className="text-wellness-700 font-bold hover:underline">
+                      Run a free SEO audit →
+                    </Link>
+                  </p>
                 </div>
               </section>
             )}

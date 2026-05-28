@@ -58,6 +58,23 @@ export default async function ForClinicsPage() {
           </p>
         </div>
 
+        {/* SEO audit CTA — run the free audit before diving in */}
+        <Link
+          href="/tools/seo-audit"
+          className="group flex flex-col sm:flex-row items-center gap-5 bg-white border-2 border-wellness-600 rounded-3xl p-6 md:p-7 mb-12 max-w-3xl mx-auto shadow-sm hover:shadow-xl hover:shadow-wellness-100/60 transition-all"
+        >
+          <div className="w-12 h-12 rounded-2xl bg-wellness-50 flex items-center justify-center shrink-0 text-wellness-600">
+            <BarChart size={24} />
+          </div>
+          <div className="flex-1 text-center sm:text-left">
+            <div className="font-black text-slate-900 text-lg">Not sure how your clinic ranks?</div>
+            <div className="text-slate-500 text-sm">Run a free SEO audit first — see your score in 60 seconds.</div>
+          </div>
+          <span className="inline-flex items-center gap-2 font-black text-sm text-wellness-700 shrink-0">
+            Run free audit <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+          </span>
+        </Link>
+
         {/* Real-numbers stat strip — concrete proof that traffic is real */}
         <div className="bg-slate-900 text-white rounded-[2rem] py-8 px-6 md:px-12 mb-20">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 text-center">

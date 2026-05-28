@@ -36,7 +36,7 @@ export const Footer = () => {
 
   return (
     <footer className="bg-white border-t-2 border-[#0F6E56] py-12 px-6 mt-20">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12">
         <div className="lg:col-span-2 flex flex-col items-start text-left">
           <Link href="/" className="inline-flex mb-6 self-start">
             <Logo />
@@ -123,6 +123,15 @@ export const Footer = () => {
             <li><Link href="/symptoms" className="hover:text-wellness-600 transition-colors">Symptoms Hub</Link></li>
             <li><Link href="/for-clinics" className="hover:text-wellness-600 transition-colors">For Clinics</Link></li>
             <li><Link href="/contact" className="hover:text-wellness-600 transition-colors">Contact</Link></li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="font-bold mb-6 text-sm uppercase tracking-wider text-slate-400">Resources</h4>
+          <ul className="space-y-4 text-slate-600 text-sm">
+            <li><Link href="/resources" className="hover:text-wellness-600 transition-colors">Patient Resources</Link></li>
+            <li><Link href="/resources/clinic-owners" className="hover:text-wellness-600 transition-colors">For Clinic Owners</Link></li>
+            <li><Link href="/tools/seo-audit" className="hover:text-wellness-600 transition-colors">Free SEO Audit</Link></li>
+            <li><Link href="/blog/iv-therapy-safety-side-effects-guide" className="hover:text-wellness-600 transition-colors">Safety Compliance</Link></li>
           </ul>
         </div>
       </div>
