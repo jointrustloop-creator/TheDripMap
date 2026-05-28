@@ -9,6 +9,12 @@ export interface TreatmentContent {
   sessionDuration: string;
   alternateName?: string;
   relevantSpecialty?: string;
+  /** Ideal candidates / situations for this treatment. */
+  whoItsFor?: string;
+  /** Honest safety note: common side effects + who should check with a doctor first. */
+  safety?: string;
+  /** Per-treatment FAQs (powers the FAQ section + FAQPage schema). */
+  faqs?: { question: string; answer: string }[];
 }
 
 export const TREATMENT_CONTENT: Record<string, TreatmentContent> = {
@@ -33,6 +39,15 @@ Hangover IV therapy is most effective when administered within 4 to 8 hours of w
     sessionDuration: '30-60 minutes',
     alternateName: 'Hangover Recovery IV',
     relevantSpecialty: 'Emergency Medicine',
+    whoItsFor: `This drip is aimed at adults dealing with significant hangover symptoms — especially dehydration and nausea — who want faster relief than oral remedies provide, or who simply can't keep fluids down. It's reasonable for the occasional rough morning, but it isn't a fix for regular heavy drinking; if you find yourself needing it often, that's worth a conversation with your doctor.`,
+    safety: `Side effects are usually mild — bruising or discomfort at the IV site, lightheadedness, or minor reactions to add-on medications. There's no large-scale evidence that an IV "cures" a hangover, and severe symptoms can sometimes mask alcohol poisoning, which needs medical care rather than a drip. People with kidney disease, heart failure, high blood pressure, or who are pregnant should be cleared first, and a licensed clinician should screen you and check any add-ons for allergies and interactions.`,
+    faqs: [
+      { question: 'Does a hangover IV actually cure a hangover?', answer: 'No drip cures a hangover, and there is no large-scale evidence one does. It can speed relief of specific symptoms — especially dehydration and nausea — but rest, water, electrolytes and time also work. The only true prevention is drinking less.' },
+      { question: 'How fast does it work?', answer: 'Many people feel better within an hour, mostly from rapid rehydration plus any anti-nausea or anti-inflammatory add-on. Results vary with how severe the hangover is.' },
+      { question: 'Is it better than just drinking water and resting?', answer: 'It is faster and bypasses an upset stomach, but for a typical hangover, oral fluids, electrolytes and over-the-counter remedies can reach similar results more cheaply. The IV\'s main edge is speed and convenience.' },
+      { question: 'Is a hangover IV safe?', answer: 'For most healthy adults under medical supervision, yes, with mild side effects. People with kidney, heart or blood-pressure conditions or who are pregnant should be screened first — and severe symptoms warrant a doctor, not a drip.' },
+      { question: 'Can I get one regularly?', answer: 'Frequent use is not advisable and may signal it is time to cut back on alcohol. If you need hangover relief often, it is worth discussing your drinking with a healthcare provider.' },
+    ],
   },
 
   'NAD+ Plus': {
@@ -56,6 +71,15 @@ NAD+ is one of the more researched IV interventions, but it remains an emerging 
     sessionDuration: '2-4 hours (longer for high doses)',
     alternateName: 'NAD+ Therapy',
     relevantSpecialty: 'Anti-Aging Medicine',
+    whoItsFor: `NAD+ IV therapy may appeal to adults dealing with age-related fatigue, burnout or brain fog who have realistic expectations about still-emerging evidence, as well as people in supervised recovery settings where intensive protocols are used. It suits those who can commit to a series and who understand it is a wellness adjunct, not a treatment for any diagnosed condition. Anyone considering it should first rule out an underlying medical cause for their symptoms.`,
+    safety: `NAD+ is generally well tolerated, but side effects track closely with infusion speed: going too fast commonly causes flushing, nausea, cramping and a temporary chest-tightness sensation (typically muscular rather than cardiac) that eases when the drip is slowed — which is why infusions run long. People who are pregnant or breastfeeding, have significant heart conditions, or take multiple medications should be cautious, and a licensed clinician should screen you before a first infusion.`,
+    faqs: [
+      { question: 'Does NAD+ IV therapy actually work?', answer: 'Many people report more energy and clearer thinking, but the human evidence is still limited and mostly from small studies. The biology is plausible, yet the general-wellness benefits are not firmly proven. It is best viewed as an emerging therapy approached with realistic expectations.' },
+      { question: 'Why does a NAD+ drip take so long?', answer: 'NAD+ must be infused slowly because rapid administration triggers flushing, nausea and chest tightness. Stretching it to 2–4 hours keeps the experience comfortable. The long duration is a safety feature, not just a sign of a higher dose.' },
+      { question: 'Is NAD+ IV safe?', answer: 'Generally yes under qualified supervision, with most side effects mild and tied to infusion speed. A clinician should review your history first. Pregnancy, heart conditions, or taking many medications all warrant extra caution.' },
+      { question: 'How many sessions do I need?', answer: 'Most clinics recommend a series rather than one visit, since effects tend to build gradually. The number depends on your goals and protocol — discuss a realistic plan with the clinic.' },
+      { question: 'Can NAD+ reverse aging?', answer: 'No. NAD+ is involved in cellular-repair pathways, but there is no proof that infusions reverse aging in humans. Claims to that effect currently outpace the evidence.' },
+    ],
   },
 
   'Immune Support': {
@@ -79,6 +103,15 @@ While robust clinical evidence varies by indication, the underlying nutrients ha
     sessionDuration: '30-45 minutes',
     alternateName: 'Immunity IV',
     relevantSpecialty: 'Preventive Medicine',
+    whoItsFor: `This IV may appeal to generally healthy adults wanting antioxidant and immune support — particularly during cold-and-flu season or stressful stretches — who have first been screened by a clinician. It is not right for everyone: candidates should be cleared for kidney health and G6PD status before high-dose vitamin C. People after everyday immune maintenance can often meet their needs through diet, so treat this as an optional wellness add-on.`,
+    safety: `High-dose IV vitamin C has specific, important contraindications. It must be avoided in people with G6PD deficiency, where it can trigger dangerous red-blood-cell breakdown, so G6PD screening is essential; it should also be avoided with significant kidney impairment or a history of calcium-oxalate kidney stones. Mild effects can include nausea, a warm or metallic sensation, and lightheadedness. A licensed clinician must check kidney function, G6PD status and history before the first infusion.`,
+    faqs: [
+      { question: 'Why get vitamin C by IV instead of a pill?', answer: 'Oral absorption is capped by a saturable gut transporter, so blood levels plateau even at high doses. IV bypasses that limit and reaches far higher concentrations — the main reason clinics use IV for high-dose vitamin C.' },
+      { question: 'Does an immune IV prevent colds or flu?', answer: 'There is no strong proof it prevents infection in healthy people. The ingredients support immune function, but evidence for this specific combination preventing or shortening illness is limited. Treat it as supportive wellness care, not protection.' },
+      { question: 'Who should NOT get high-dose vitamin C?', answer: 'People with G6PD deficiency must avoid it because it can trigger dangerous red-blood-cell breakdown. Those with kidney disease or a history of calcium-oxalate kidney stones should also avoid it. Screening for these before treatment is essential.' },
+      { question: 'Can you have too much vitamin C?', answer: 'Yes. Beyond what your body needs, excess offers no added benefit, and very high doses can raise oxalate and stress the kidneys. That is why medical supervision and dosing limits matter.' },
+      { question: 'What does the glutathione add?', answer: 'Glutathione is the body\'s main intracellular antioxidant, added for antioxidant and detoxification support. Evidence for IV glutathione\'s wellness benefits is still emerging, but it is generally well tolerated under supervision.' },
+    ],
   },
 
   'Beauty Glow': {
@@ -102,6 +135,15 @@ Results are typically gradual and cumulative. Most clients receive a series of 6
     sessionDuration: '45-60 minutes',
     alternateName: 'Glow IV',
     relevantSpecialty: 'Aesthetic Medicine',
+    whoItsFor: `Beauty Glow IVs are most commonly chosen by adults seeking a cosmetic boost — often before weddings, photoshoots or events — or antioxidant and skin-tone support as part of a broader skincare routine. They suit people who understand the effects are gradual, cumulative and not guaranteed, and who pursue it as an optional wellness experience rather than a medical treatment for a skin condition.`,
+    safety: `Mild effects can include a cooling or metallic sensation during the infusion, bruising at the IV site, and rarely lightheadedness. More importantly, IV glutathione specifically has been linked in case reports to rare but serious events — including liver and kidney injury and severe skin reactions — and there is no standardized dosing, so a licensed clinician should screen every client. People who are pregnant or breastfeeding, or who have liver, kidney or asthma conditions, should be especially cautious and consult their physician first.`,
+    faqs: [
+      { question: 'Does a Beauty Glow IV actually lighten skin?', answer: 'The evidence is weak and inconsistent. A 2025 systematic review found IV glutathione\'s skin-lightening effect unclear, with no robust human trials, and it is not approved for this use. Any effect tends to be subtle and temporary, so it should not be relied on as a skin-lightening treatment.' },
+      { question: 'How long does the glow last?', answer: 'After a single session, many people report a brief glow lasting a few days to a couple of weeks. Clinics typically recommend a series for more sustained effects, though results vary by person and are not guaranteed.' },
+      { question: 'Is IV glutathione safer than oral or topical?', answer: 'Not necessarily. Oral and topical forms have milder effects and milder risks, while the IV route has been associated with rare but serious adverse events. A clinician should weigh the trade-offs with you first.' },
+      { question: 'Will the biotin grow my hair faster?', answer: 'Probably not unless you are biotin-deficient. Research shows little benefit from extra biotin for hair and nails in people with normal levels, even though biotin is biochemically involved in keratin production.' },
+      { question: 'Can I just take supplements instead?', answer: 'Oral glutathione absorbs poorly, which is part of the IV appeal, but oral options carry far lower risk, and vitamin C and biotin are inexpensive over the counter. Ask a clinician whether an IV adds meaningful value for your goals.' },
+    ],
   },
 
   'Weight Loss': {
@@ -125,6 +167,15 @@ Most clients use weight-loss IVs as part of a 6-to-12-week protocol, often paire
     sessionDuration: '30-45 minutes',
     alternateName: 'Skinny Drip',
     relevantSpecialty: 'Preventive Medicine',
+    whoItsFor: `This drip is best suited to adults already committed to a structured weight-management plan — a sustainable calorie deficit, activity and clinician guidance — who want supplemental metabolic and energy support, or who are nutrient-depleted from dieting. It is not appropriate for anyone expecting it to drive weight loss on its own, and it is not a substitute for evidence-based options like GLP-1 medications, which require separate medical evaluation.`,
+    safety: `Side effects are generally mild — soreness or bruising at the IV site, a warm flush, transient nausea, or an unusual taste. Because the formulation is not FDA-approved for weight loss and dosing is not standardized, a licensed clinician should screen each client, review medications and set realistic expectations before treatment. People who are pregnant or breastfeeding, or who have liver, kidney or cardiovascular conditions, should consult a doctor first.`,
+    faqs: [
+      { question: 'Is a weight-loss IV the same as Ozempic or semaglutide?', answer: 'No. Semaglutide and tirzepatide are FDA-approved GLP-1 prescription medications with strong trial evidence for weight loss. MIC / lipotropic IVs are nutrient-based, work by a different mechanism, and are not FDA-approved for weight loss.' },
+      { question: 'Will MIC injections make me lose weight on their own?', answer: 'There is insufficient evidence that they cause weight loss by themselves. They are best viewed as a supportive adjunct to a calorie deficit and exercise, not a standalone solution.' },
+      { question: 'Do lipotropic ingredients actually burn fat?', answer: 'They play roles in how the liver and cells handle fats, but no large human trials show the combined formula directly burns fat. Any benefit appears modest and depends on overall lifestyle changes.' },
+      { question: 'How fast will I see results?', answer: 'Most people use a series over several weeks and some report an energy boost within hours, but visible weight changes are gradual and driven mainly by diet and activity, not the drip.' },
+      { question: 'Are MIC shots safe?', answer: 'They are generally well tolerated, with mild effects like injection-site soreness or occasional nausea. A clinician should screen you first, especially if you are pregnant, breastfeeding, or have liver, kidney or heart conditions.' },
+    ],
   },
 
   'Hydration': {
@@ -148,6 +199,15 @@ Many providers offer hydration as a "build your own" base — you choose a litre
     sessionDuration: '30-45 minutes',
     alternateName: 'IV Fluids',
     relevantSpecialty: 'Emergency Medicine',
+    whoItsFor: `Ideal candidates are people recovering from dehydration due to heat, intense activity, travel, mild illness or a night of poor fluid intake — especially anyone who struggles to rehydrate by mouth. It is a reasonable convenience reset for healthy adults too, though those who are already well-hydrated are unlikely to gain much beyond what a glass of water provides.`,
+    safety: `Hydration IVs are very safe, with the most common side effects being minor — bruising, discomfort or mild swelling at the insertion site. The more important consideration is fluid and electrolyte overload: people with congestive heart failure, kidney disease, uncontrolled high blood pressure, or who are pregnant should be cautious, as their bodies may not handle the extra volume well. A licensed clinician should screen you and run the infusion under sterile, supervised conditions.`,
+    faqs: [
+      { question: 'Is an IV better than just drinking water?', answer: 'For genuinely dehydrated people, or those who cannot keep fluids down, an IV rehydrates faster and more reliably. For healthy, mildly dehydrated people, drinking water and oral electrolytes works nearly as well for far less cost.' },
+      { question: 'How long does the hydration last?', answer: 'Your body retains the fluid and rebalances over the following hours, and the kidneys excrete any excess. The hydration "boost" is temporary and depends on your overall fluid intake and activity afterward.' },
+      { question: 'How often can I get a hydration IV?', answer: 'Occasional use is fine for most healthy people, but routine IV hydration is not medically necessary. A clinician can advise based on your health and reasons for use.' },
+      { question: 'Does it hurt?', answer: 'You will feel a brief pinch when the catheter is inserted, and sometimes a cool sensation as the fluid flows in. Most people find it mild and easy to tolerate.' },
+      { question: 'Is it safe for everyone?', answer: 'It is safe for most healthy adults, but people with heart, kidney or blood-pressure conditions, or who are pregnant, should be screened by a clinician first to avoid fluid overload.' },
+    ],
   },
 
   'Recovery': {
@@ -171,6 +231,15 @@ This drip is popular with marathoners, CrossFit athletes, cyclists, professional
     sessionDuration: '45-60 minutes',
     alternateName: 'Athletic Recovery IV',
     relevantSpecialty: 'Sports Medicine',
+    whoItsFor: `This drip appeals to athletes, endurance competitors and active people recovering from intense training or events with heavy sweating and fluid loss — particularly when significantly dehydrated. Competitive athletes subject to anti-doping rules should confirm that infusion volumes comply with regulations, and most recreational exercisers can recover well with oral hydration and nutrition alone.`,
+    safety: `Side effects are typically mild — IV-site bruising, lightheadedness, or a warm sensation from magnesium. The more serious risks are fluid overload and electrolyte imbalance, so people with kidney disease, heart conditions or high blood pressure, and those who are pregnant, should get clinician clearance first. Athletes should also be aware of anti-doping infusion-volume limits (e.g. WADA). A licensed clinician should screen and supervise each infusion.`,
+    faqs: [
+      { question: 'Does a recovery IV really speed up recovery?', answer: 'Rehydration and electrolyte replacement genuinely help after heavy sweating, but claims of dramatically "faster recovery" come mostly from marketing and are not well proven. For most athletes, oral hydration and nutrition recover the body comparably.' },
+      { question: 'Is it allowed for competitive athletes?', answer: 'Many anti-doping bodies such as WADA restrict IV infusions above certain volumes except for legitimate medical care. Competitive athletes should verify compliance with their sport\'s rules before getting one.' },
+      { question: 'Will it help with muscle soreness?', answer: 'Amino acids and antioxidants play real roles in muscle repair and managing oxidative stress, and some people report less soreness. However, the evidence that IV delivery beats oral nutrition for soreness is mixed.' },
+      { question: 'Is it safe?', answer: 'It is generally safe for healthy adults under medical supervision, with mild side effects. People with kidney, heart or blood-pressure conditions or who are pregnant should be screened first due to fluid-overload risk.' },
+      { question: 'How often should an athlete get one?', answer: 'There is no standardized schedule; occasional use after significant exertion is reasonable for most. A clinician should guide frequency, and routine reliance is not necessary when oral hydration and nutrition suffice.' },
+    ],
   },
 
   'Myers Cocktail': {
@@ -194,6 +263,15 @@ A small but growing body of clinical research has examined the Myers Cocktail's 
     sessionDuration: '15-30 minutes',
     alternateName: 'Myers IV',
     relevantSpecialty: 'Preventive Medicine',
+    whoItsFor: `The best candidates are people with confirmed or likely nutrient deficiencies, malabsorption conditions, or who tolerate oral supplements poorly — plus generally healthy people seeking an energy or wellness boost, provided they understand the evidence for benefit in healthy individuals is limited. Anyone with a chronic condition should view it as a complement to, not a replacement for, proper medical care.`,
+    safety: `The Myers' Cocktail is generally well tolerated, but side effects can include a warm flush (especially from magnesium), a metallic or vitamin taste, lightheadedness, and IV-site discomfort. Rapid magnesium infusion can cause a drop in blood pressure, so it is pushed slowly. People with kidney disease, heart conditions, pregnancy, or G6PD deficiency (for the vitamin C) need clinician clearance first.`,
+    faqs: [
+      { question: 'Does a Myers\' Cocktail actually work?', answer: 'It can genuinely help people with nutrient deficiencies or malabsorption. For healthy people without a deficiency, rigorous evidence is limited and reported benefits may partly reflect hydration and placebo. It is not proven to treat any serious illness.' },
+      { question: 'How often should I get one?', answer: 'There is no standardized schedule — some clinics suggest monthly, others as needed. Frequency should be guided by a clinician based on your health and labs, rather than a fixed routine.' },
+      { question: 'Is it safe?', answer: 'For most healthy adults under medical supervision, yes, with mostly mild side effects. People with kidney, heart or blood-pressure conditions, pregnancy, or G6PD deficiency need clearance first.' },
+      { question: 'Why not just take vitamins by mouth?', answer: 'Oral supplements are sufficient for most people. The IV route mainly helps those with poor absorption or who do not tolerate pills; for everyone else, the advantage over oral intake is modest.' },
+      { question: 'What does it feel like during the infusion?', answer: 'Many people feel a warm flush and briefly taste vitamins — both normal and harmless. The magnesium is infused slowly to keep you comfortable.' },
+    ],
   },
 
   'Jet Lag': {
@@ -217,6 +295,15 @@ This IV is especially popular in destination cities — Las Vegas, Miami, New Yo
     sessionDuration: '30-45 minutes',
     alternateName: 'Travel Recovery IV',
     relevantSpecialty: 'Preventive Medicine',
+    whoItsFor: `It appeals to business travelers, tourists and anyone landing after a multi-time-zone flight who wants to feel functional quickly rather than losing the first day or two to recovery — most useful for people who arrive notably dehydrated or run-down. Travelers who already hydrate well, sleep adequately and manage light exposure may not notice a dramatic difference and can lean on those free strategies instead.`,
+    safety: `Common effects are mild — bruising at the site, brief coolness as fluids infuse, or lightheadedness. People with heart, kidney or blood-pressure conditions need caution because IV fluid loading affects fluid balance, and anyone pregnant, breastfeeding or taking sedating medication should discuss the melatonin and magnesium with a doctor first. As with any IV, a licensed clinician should screen each traveler and place the line under sterile technique.`,
+    faqs: [
+      { question: 'Does an IV actually cure jet lag?', answer: 'No. It can rapidly rehydrate you and may help you feel better faster, but jet lag is mainly a circadian (body-clock) issue. The strongest evidence-based fixes are hydration, light exposure, sleep timing and sometimes melatonin.' },
+      { question: 'When should I get the drip relative to my flight?', answer: 'Most people schedule it within about 24 hours of landing for the biggest comfort benefit. Some clinics also offer a pre-departure hydration session.' },
+      { question: 'Is the IV better than just drinking water?', answer: 'It rehydrates faster and more completely than oral fluids, which is its clearest advantage. For a healthy traveler who hydrates and sleeps well, the added benefit over water and good habits may be modest.' },
+      { question: 'Does the melatonin add-on help me adjust faster?', answer: 'Melatonin has reasonable evidence for shifting the body clock and aiding sleep on a new schedule. As an add-on it can support circadian adjustment, but timing and dose matter, so ask the clinician.' },
+      { question: 'Is it safe to get an IV right after a long flight?', answer: 'For most healthy adults, yes, with mild risks like bruising at the site. People with heart, kidney or blood-pressure conditions, or who are pregnant or breastfeeding, should be screened by a clinician first.' },
+    ],
   },
 
   'Energy Boost': {
@@ -240,6 +327,15 @@ This drip is popular with busy professionals, parents, frequent travellers, and 
     sessionDuration: '20-40 minutes',
     alternateName: 'B12 Energy IV',
     relevantSpecialty: 'Preventive Medicine',
+    whoItsFor: `This IV is most clearly beneficial for people with a confirmed B12 deficiency or a condition that impairs absorption (Crohn's, celiac, pernicious anemia, or after GI surgery), where IV or injected B12 is standard care. It may also appeal to healthy adults wanting a hydration-and-vitamin pick-me-up for fatigue or jet lag — provided they understand the benefit may be modest and partly due to fluids. Persistent fatigue warrants a medical workup to find the underlying cause.`,
+    safety: `Energy/B-complex IVs are among the safer IV therapies, with serious side effects rarely reported. Mild, temporary effects can include a warm flush, a vitamin taste during infusion, and IV-site discomfort. Magnesium (if included) can briefly lower blood pressure if pushed quickly, and people with kidney or heart conditions should be cautious about the mineral and fluid load. A licensed clinician should review your history and medications first.`,
+    faqs: [
+      { question: 'Will a B12 or energy IV boost my energy if my levels are normal?', answer: 'Probably not in any lasting way. Major health institutions note that if your B12 is already normal, injections are unlikely to increase energy, and much of the lift may come from hydration or placebo. The clear benefit is correcting an actual deficiency.' },
+      { question: 'How is this different from taking B vitamins as a pill?', answer: 'IV delivery bypasses the gut, which matters if you have absorption problems like Crohn\'s or pernicious anemia. For healthy people who absorb normally, oral supplements are usually enough and far cheaper — the body excretes excess water-soluble B vitamins.' },
+      { question: 'Is it safe?', answer: 'It has a long safety record and serious side effects are rare. Mild flushing or a vitamin taste can occur. People with kidney or heart conditions should be screened first.' },
+      { question: 'How often can I get an energy IV?', answer: 'There is no universal schedule; clinics often suggest periodic sessions, but frequent infusions in healthy people add little proven benefit. Persistent fatigue warrants a medical workup instead.' },
+      { question: 'How long does it take?', answer: 'Most energy/B-complex IVs run about 20–40 minutes, and you can resume normal activities right away. Some people notice a same-day lift, though effects are typically short-term.' },
+    ],
   },
 };
 

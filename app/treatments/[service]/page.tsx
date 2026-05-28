@@ -224,20 +224,29 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
     }
   }
 
-  const faqs = [
-    {
-      question: `What is ${service.name} IV therapy?`,
-      answer: `${service.name} IV therapy is a specialized intravenous treatment designed to deliver vitamins, minerals, and other nutrients directly into the bloodstream for maximum absorption and rapid results.`
-    },
-    {
-      question: `How long does a ${service.name} drip session take?`,
-      answer: `A typical ${service.name} IV session lasts between 45 to 60 minutes, during which you can relax in a comfortable lounge or your own home.`
-    },
-    {
-      question: `How much does ${service.name} IV therapy cost?`,
-      answer: `Prices for ${service.name} IV therapy usually range from $175 to $350, depending on the specific ingredients and the provider's location.`
-    }
-  ];
+  // Prefer the treatment's own researched FAQs; fall back to a sensible generic
+  // set (kept accurate — uses the real session duration + cost range) only if a
+  // treatment has none defined.
+  const faqs = content?.faqs && content.faqs.length > 0
+    ? content.faqs
+    : [
+        {
+          question: `What is ${service.name} IV therapy?`,
+          answer: `${service.name} IV therapy is a specialized intravenous treatment designed to deliver vitamins, minerals, and other nutrients directly into the bloodstream for higher absorption than oral supplements.`,
+        },
+        {
+          question: `How long does a ${service.name} drip session take?`,
+          answer: content
+            ? `A typical ${service.name} IV session lasts ${content.sessionDuration}, during which you can relax in a comfortable lounge or your own home.`
+            : `A typical ${service.name} IV session lasts 45 to 60 minutes.`,
+        },
+        {
+          question: `How much does ${service.name} IV therapy cost?`,
+          answer: content
+            ? `${service.name} IV therapy typically costs ${content.costRange}. ${content.costContext}`
+            : `Prices usually range from $150 to $350 depending on ingredients and the provider's location.`,
+        },
+      ];
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -522,6 +531,24 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
                 <p className="text-base text-slate-600 leading-relaxed">{content.costContext}</p>
               </div>
             </section>
+
+            {/* Who it's for + Safety */}
+            {(content.whoItsFor || content.safety) && (
+              <section className="mb-24 grid grid-cols-1 md:grid-cols-2 gap-8">
+                {content.whoItsFor && (
+                  <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm p-10">
+                    <h3 className="text-2xl font-black tracking-tight text-slate-900 mb-4">Who it&apos;s for</h3>
+                    <p className="text-base text-slate-600 leading-relaxed">{content.whoItsFor}</p>
+                  </div>
+                )}
+                {content.safety && (
+                  <div className="bg-amber-50 border border-amber-100 rounded-[3rem] p-10">
+                    <h3 className="text-2xl font-black tracking-tight text-amber-900 mb-4">Safety &amp; considerations</h3>
+                    <p className="text-base text-amber-900/80 leading-relaxed">{content.safety}</p>
+                  </div>
+                )}
+              </section>
+            )}
           </>
         ) : (
           // Fallback for any treatment without dedicated content (shouldn't happen for canonical slugs)
