@@ -33,6 +33,7 @@ export const Navbar = () => {
     { label: 'For Patients', href: '/resources' },
     { label: 'For Clinic Owners', href: '/resources/clinic-owners' },
     { label: 'Free SEO Audit', href: '/tools/seo-audit' },
+    { label: 'AI Copy Generator', href: '/tools/brand-voice' },
   ];
 
   return (

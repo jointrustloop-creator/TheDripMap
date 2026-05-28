@@ -76,6 +76,31 @@ export default async function ClinicOwnerResourcesPage() {
               </div>
             </Link>
 
+            {/* Card 1b — FEATURED: AI Brand Voice Generator */}
+            <Link
+              href="/tools/brand-voice"
+              className="group md:col-span-2 relative bg-white rounded-3xl border-2 border-[#0F6E56] p-8 md:p-10 shadow-sm hover:shadow-xl hover:shadow-emerald-200/40 hover:-translate-y-1 transition-all duration-300 flex flex-col md:flex-row md:items-center gap-6"
+            >
+              <span className="absolute top-6 right-6 text-[10px] font-black uppercase tracking-[0.12em] text-[#0F6E56] bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
+                AI-Powered
+              </span>
+              <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center shrink-0">
+                <Sparkles size={26} style={{ color: EMERALD }} />
+              </div>
+              <div className="flex-1">
+                <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 mb-2">AI Brand Voice Generator</div>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-2 group-hover:text-[#0F6E56] transition-colors">
+                  Your whole marketing copy kit, in 30 seconds
+                </h2>
+                <p className="text-slate-500 leading-relaxed max-w-xl">
+                  Answer five questions and get a listing description, Google &amp; Instagram bios, captions, a welcome email, a hero headline, and a tagline — then publish it to your listing.
+                </p>
+              </div>
+              <div className="inline-flex items-center gap-2 text-sm font-black text-[#0F6E56] shrink-0">
+                Generate copy <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
             {/* Card 2 — Safety Compliance Checklist */}
             <Link
               href="/blog/iv-therapy-safety-side-effects-guide"

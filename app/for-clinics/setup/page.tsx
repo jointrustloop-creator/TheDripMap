@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   ShieldCheck, 
@@ -52,6 +52,23 @@ function SetupContent() {
     founderStatement: '',
     practitionerPhotoUrl: ''
   });
+
+  // Prefill from the Brand Voice generator (copy stashed in sessionStorage).
+  useEffect(() => {
+    if (searchParams.get('prefill') !== 'brandvoice') return;
+    try {
+      const raw = sessionStorage.getItem('tdm_brandvoice_prefill');
+      if (!raw) return;
+      const p = JSON.parse(raw);
+      setFormData((fd) => ({
+        ...fd,
+        clinicName: fd.clinicName || p.clinicName || '',
+        oneLiner: fd.oneLiner || p.oneLiner || '',
+        founderStatement: fd.founderStatement || p.founderStatement || '',
+      }));
+      sessionStorage.removeItem('tdm_brandvoice_prefill');
+    } catch { /* ignore */ }
+  }, [searchParams]);
 
   const specialties = [
     'Hangover recovery',

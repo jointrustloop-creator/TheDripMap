@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { Mail, Phone, MapPin, MessageSquare, UserCheck, Heart, Send, Download, Search, Sparkles, Gauge } from 'lucide-react';
+import { Mail, Phone, MapPin, MessageSquare, UserCheck, Heart, Send, Download, Search, Sparkles, Gauge, Wand2 } from 'lucide-react';
 import type { LeadRow } from '../../app/admin/leads/page';
 
 const TAB_LABELS: Record<LeadRow['source'], { label: string; icon: React.ReactNode }> = {
@@ -12,9 +12,10 @@ const TAB_LABELS: Record<LeadRow['source'], { label: string; icon: React.ReactNo
   subscribe: { label: 'Subscribers', icon: <Send size={14} /> },
   testimonial: { label: 'Testimonials', icon: <Heart size={14} /> },
   'seo-audit': { label: 'SEO audits', icon: <Gauge size={14} /> },
+  'brand-voice': { label: 'Brand voice', icon: <Wand2 size={14} /> },
 };
 
-const TABS: Array<'all' | LeadRow['source']> = ['all', 'upgrade', 'claim', 'seo-audit', 'message-clinic', 'contact', 'subscribe', 'testimonial'];
+const TABS: Array<'all' | LeadRow['source']> = ['all', 'upgrade', 'claim', 'seo-audit', 'brand-voice', 'message-clinic', 'contact', 'subscribe', 'testimonial'];
 
 interface Props {
   initialLeads: LeadRow[];
@@ -143,6 +144,7 @@ function LeadCard({ lead }: { lead: LeadRow }) {
             lead.source === 'message-clinic' ? 'bg-wellness-50 text-wellness-700 border-wellness-100' :
             lead.source === 'subscribe' ? 'bg-violet-50 text-violet-700 border-violet-100' :
             lead.source === 'seo-audit' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+            lead.source === 'brand-voice' ? 'bg-teal-50 text-teal-700 border-teal-100' :
             'bg-slate-100 text-slate-700 border-slate-200'
           }`}>
             {meta.icon} {meta.label}
