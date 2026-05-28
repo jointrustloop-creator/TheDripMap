@@ -30,18 +30,35 @@ const GOALS = [
   { id: 'myers-cocktail', label: 'Myers Cocktail', icon: <Target size={18} /> },
 ];
 
+// Popular metros with the strongest directory inventory — shown in the
+// location picker so users can choose from a visible list rather than
+// having to know exactly what to type. Free typing still works.
+const POPULAR_LOCATIONS = [
+  'New York, NY', 'Los Angeles, CA', 'Chicago, IL', 'Houston, TX',
+  'Miami, FL', 'San Diego, CA', 'Atlanta, GA', 'Dallas, TX',
+  'Phoenix, AZ', 'Boston, MA', 'Philadelphia, PA', 'Las Vegas, NV',
+  'San Francisco, CA', 'Washington, DC', 'Seattle, WA', 'Denver, CO',
+  'Tampa, FL', 'Toronto, ON', 'Vancouver, BC', 'Calgary, AB',
+  'Montreal, QC', 'Ottawa, ON', 'Edmonton, AB',
+];
+
 export function QuickMatch() {
   const router = useRouter();
   const [goal, setGoal] = useState<{ id: string, label: string } | null>(null);
   const [location, setLocation] = useState('');
   const [isGoalOpen, setIsGoalOpen] = useState(false);
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isDetecting, setIsDetecting] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const locationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsGoalOpen(false);
+      }
+      if (locationRef.current && !locationRef.current.contains(event.target as Node)) {
+        setIsLocationOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -147,7 +164,7 @@ export function QuickMatch() {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <div className="bg-white p-2 md:p-3 rounded-[2rem] md:rounded-full shadow-2xl border border-slate-100 flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-0">
+      <div className="bg-white p-2 md:p-3 rounded-[2rem] md:rounded-full shadow-[0_30px_60px_-20px_rgba(15,23,42,0.22),0_10px_24px_-12px_rgba(15,23,42,0.12)] ring-1 ring-slate-200/80 flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-0">
         
         {/* Goal Selector */}
         <div className="relative flex-1" ref={dropdownRef}>
@@ -209,39 +226,93 @@ export function QuickMatch() {
         {/* Divider */}
         <div className="hidden md:block w-px h-12 bg-slate-100 mx-2" />
 
-        {/* Location Input */}
-        <div className="flex-1 flex items-center gap-4 px-6 py-4 md:py-3 hover:bg-slate-50 rounded-2xl md:rounded-none transition-colors group">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
-            <MapPin size={20} />
-          </div>
-          <div className="flex-1">
-            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">My location is</div>
-            <input 
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleMatch()}
-              placeholder="City, State or Zip"
-              className="w-full bg-transparent font-bold text-slate-900 placeholder:text-slate-400 outline-none"
+        {/* Location combobox — type freely OR choose from the visible list */}
+        <div className="relative flex-1" ref={locationRef}>
+          <div className="flex items-center gap-4 px-6 py-4 md:py-3 hover:bg-slate-50 rounded-2xl md:rounded-none transition-colors group">
+            <div className="w-10 h-10 rounded-xl bg-[#0F6E56]/10 flex items-center justify-center text-[#0F6E56] group-hover:scale-110 transition-transform shrink-0">
+              <MapPin size={20} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">My location is</div>
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => { setLocation(e.target.value); setIsLocationOpen(true); }}
+                onFocus={() => setIsLocationOpen(true)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { setIsLocationOpen(false); handleMatch(); } }}
+                placeholder="Choose your city"
+                className="w-full bg-transparent font-bold text-slate-900 placeholder:text-slate-400 outline-none"
+              />
+            </div>
+            <ChevronDown
+              size={18}
+              className={cn('text-slate-300 transition-transform shrink-0 hidden md:block', isLocationOpen && 'rotate-180')}
             />
+            <button
+              onClick={handleDetectLocation}
+              disabled={isDetecting}
+              className={cn(
+                'p-2 rounded-xl hover:bg-white transition-all text-slate-400 hover:text-[#0F6E56] shrink-0',
+                isDetecting && 'animate-pulse text-[#0F6E56]'
+              )}
+              title="Detect my location"
+            >
+              <Navigation size={18} />
+            </button>
           </div>
-          <button 
-            onClick={handleDetectLocation}
-            disabled={isDetecting}
-            className={cn(
-              "p-2 rounded-xl hover:bg-white transition-all text-slate-400 hover:text-blue-600",
-              isDetecting && "animate-pulse text-blue-600"
+
+          <AnimatePresence>
+            {isLocationOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.97 }}
+                className="absolute top-full left-0 right-0 mt-4 bg-white rounded-3xl shadow-2xl border border-slate-100 p-2 z-50 max-h-72 overflow-y-auto"
+              >
+                <button
+                  onClick={() => { handleDetectLocation(); setIsLocationOpen(false); }}
+                  className="w-full flex items-center gap-3 p-3 rounded-2xl text-left hover:bg-[#0F6E56]/5 text-[#0F6E56] transition-colors mb-1"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-[#0F6E56]/10 flex items-center justify-center shrink-0">
+                    <Navigation size={15} />
+                  </div>
+                  <span className="font-bold text-sm">Use my current location</span>
+                </button>
+                <div className="h-px bg-slate-100 mx-3 my-1" />
+                {POPULAR_LOCATIONS
+                  .filter((c) => !location.trim() || c.toLowerCase().includes(location.trim().toLowerCase()))
+                  .map((city) => (
+                    <button
+                      key={city}
+                      onClick={() => { setLocation(city); setIsLocationOpen(false); }}
+                      className={cn(
+                        'w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-colors',
+                        location === city ? 'bg-[#0F6E56] text-white' : 'hover:bg-slate-50 text-slate-700'
+                      )}
+                    >
+                      <div className={cn(
+                        'w-8 h-8 rounded-lg flex items-center justify-center shrink-0',
+                        location === city ? 'bg-white/20' : 'bg-slate-100 text-slate-400'
+                      )}>
+                        <MapPin size={15} />
+                      </div>
+                      <span className="font-bold text-sm">{city}</span>
+                    </button>
+                  ))}
+                {POPULAR_LOCATIONS.filter((c) => !location.trim() || c.toLowerCase().includes(location.trim().toLowerCase())).length === 0 && (
+                  <div className="px-4 py-3 text-sm text-slate-400 font-medium">
+                    Press Enter to search &ldquo;{location}&rdquo;
+                  </div>
+                )}
+              </motion.div>
             )}
-            title="Detect my location"
-          >
-            <Navigation size={18} />
-          </button>
+          </AnimatePresence>
         </div>
 
-        {/* Action Button */}
-        <button 
+        {/* Action Button — brand emerald for maximum visibility */}
+        <button
           onClick={handleMatch}
-          className="md:ml-2 bg-wellness-600 text-white px-8 py-5 md:py-4 rounded-2xl md:rounded-full font-black text-lg hover:bg-wellness-700 transition-all shadow-xl shadow-wellness-100 flex items-center justify-center gap-3 group active:scale-95"
+          className="md:ml-2 bg-[#0F6E56] text-white px-8 py-5 md:py-4 rounded-2xl md:rounded-full font-black text-lg hover:bg-[#0A5742] transition-all shadow-[0_12px_28px_-8px_rgba(15,110,86,0.55)] flex items-center justify-center gap-3 group active:scale-95 shrink-0"
         >
           <span>Find My Match</span>
           <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />

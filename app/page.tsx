@@ -110,43 +110,52 @@ export default async function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
 
       {/* ─────────────────────────────────────────────────────────────
-          1. HERO — deep ink, restrained type, single emerald accent
+          1. HERO — light, airy, single emerald accent
           ───────────────────────────────────────────────────────────── */}
-      <section className="relative bg-[#0A0B0D] text-white overflow-hidden">
-        {/* One subtle emerald glow. No mesh, no noise. */}
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-[#0F6E56]/12 rounded-full blur-[180px] pointer-events-none" />
-        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
+      <section className="relative bg-gradient-to-b from-[#F4F6F4] via-[#FBFCFB] to-white text-slate-900 overflow-hidden">
+        {/* Soft emerald glow up top — barely there, just warmth */}
+        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[1100px] h-[800px] bg-[#0F6E56]/[0.07] rounded-full blur-[170px] pointer-events-none" />
+        {/* Faint dot grid, masked to fade at the edges */}
+        <div
+          className="absolute inset-0 opacity-[0.5] pointer-events-none"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(15,110,86,0.10) 1px, transparent 1px)',
+            backgroundSize: '34px 34px',
+            maskImage: 'radial-gradient(ellipse 80% 60% at 50% 35%, black, transparent 75%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 35%, black, transparent 75%)',
+          }}
+        />
 
-        <div className="max-w-6xl mx-auto px-6 pt-40 pb-32 md:pt-48 md:pb-40 relative">
+        <div className="max-w-6xl mx-auto px-6 pt-36 pb-28 md:pt-44 md:pb-32 relative">
           {/* Eyebrow */}
           <div className="flex items-center gap-3 mb-10 justify-center">
             <span className="h-px w-8 bg-[#0F6E56]" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-white/60">North America's IV Therapy Directory</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-slate-500">North America's IV Therapy Directory</span>
             <span className="h-px w-8 bg-[#0F6E56]" />
           </div>
 
-          {/* Hero headline — quiet but commanding */}
-          <h1 className="text-center font-black tracking-[-0.03em] leading-[0.95] text-[clamp(2.75rem,7.5vw,6.5rem)] mb-8">
+          {/* Hero headline — dark ink with emerald serif italic accent */}
+          <h1 className="text-center font-black tracking-[-0.03em] leading-[0.95] text-[clamp(2.75rem,7.5vw,6.5rem)] mb-8 text-slate-900">
             Find the right<br />
-            <span className="font-serif italic font-normal text-[#7ED3B8] tracking-[-0.02em]">IV therapy clinic.</span>
+            <span className="font-serif italic font-normal text-[#0F6E56] tracking-[-0.02em]">IV therapy clinic.</span>
           </h1>
 
-          <p className="text-center text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-16 leading-relaxed font-light">
+          <p className="text-center text-lg md:text-xl text-slate-500 max-w-2xl mx-auto mb-14 leading-relaxed font-light">
             Compare {stats.total.toLocaleString()}+ verified clinics across {stats.cities}+ cities. Match by treatment, location, and budget in under a minute.
           </p>
 
-          {/* QuickMatch — wrapped to fit the dark hero */}
-          <div className="max-w-2xl mx-auto mb-16">
+          {/* QuickMatch — full width so the city picker + button breathe */}
+          <div className="max-w-4xl mx-auto mb-14">
             <QuickMatch />
           </div>
 
-          {/* Trust row — typographic, no badges or icons */}
-          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-[11px] font-bold uppercase tracking-[0.25em] text-white/40">
-            <span><span className="text-white">{stats.total.toLocaleString()}</span> &nbsp;Verified Clinics</span>
-            <span className="hidden md:inline">·</span>
-            <span><span className="text-white">{stats.cities}</span> &nbsp;Cities</span>
-            <span className="hidden md:inline">·</span>
-            <span><span className="text-white">{stats.states}</span> &nbsp;States &amp; Provinces</span>
+          {/* Trust row — typographic */}
+          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400">
+            <span><span className="text-slate-900">{stats.total.toLocaleString()}</span> &nbsp;Verified Clinics</span>
+            <span className="hidden md:inline text-slate-300">·</span>
+            <span><span className="text-slate-900">{stats.cities}</span> &nbsp;Cities</span>
+            <span className="hidden md:inline text-slate-300">·</span>
+            <span><span className="text-slate-900">{stats.states}</span> &nbsp;States &amp; Provinces</span>
           </div>
         </div>
       </section>
