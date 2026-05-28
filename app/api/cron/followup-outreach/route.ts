@@ -6,7 +6,7 @@ const SITE_URL = 'https://www.thedripmap.com';
 const DAILY_TARGET = 15;
 const FOLLOWUP_DAYS = 7;
 
-export const maxDuration = 120;
+export const maxDuration = 30;
 
 function cleanName(n: string): string {
   return n
@@ -57,6 +57,22 @@ export async function GET(req: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
+  // Staggered sending: fires every 2 min during the 10am-ET window
+  // (vercel.json: "*/2 14 * * *") and sends ONE follow-up per invocation —
+  // a natural ~30-minute drip rather than a 15-email burst. Daily cap is
+  // enforced by counting today's follow-ups already sent.
+  const startOfDay = new Date();
+  startOfDay.setUTCHours(0, 0, 0, 0);
+  const { count: sentTodayCount } = await supabase
+    .from('providers')
+    .select('id', { count: 'exact', head: true })
+    .gte('followup_sent_at', startOfDay.toISOString());
+  const sentToday = sentTodayCount || 0;
+
+  if (sentToday >= DAILY_TARGET) {
+    return NextResponse.json({ ok: true, skipped: 'daily target reached', sentToday });
+  }
+
   const cutoff = new Date(Date.now() - FOLLOWUP_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
   const { data, error } = await supabase
@@ -87,19 +103,16 @@ export async function GET(req: Request) {
     })
     .slice(0, DAILY_TARGET);
 
-  const results: Array<{
-    slug: string;
-    name: string;
-    email: string;
-    sent: boolean;
-    error?: string;
-  }> = [];
+  if (ranked.length === 0) {
+    return NextResponse.json({ ok: true, skipped: 'no eligible follow-ups remaining', sentToday });
+  }
 
-  for (const p of ranked) {
-    const display = cleanName(p.name);
-    const claimUrl = `${SITE_URL}/providers/${p.slug}?claim=1`;
-    const subject = `Following up — your ${display} listing on TheDripMap`;
-    const text = `Hi ${display} team,
+  // Send exactly ONE follow-up this invocation — the highest-ranked eligible.
+  const p = ranked[0];
+  const display = cleanName(p.name);
+  const claimUrl = `${SITE_URL}/providers/${p.slug}?claim=1`;
+  const subject = `Following up — your ${display} listing on TheDripMap`;
+  const text = `Hi ${display} team,
 
 Following up on the note I sent last week about claiming your free listing on TheDripMap — I know inboxes can be busy.
 
@@ -114,76 +127,74 @@ Deborah Triandafilou
 TheDripMap
 info@thedripmap.com`;
 
-    try {
-      const mail = await sendMail({
-        from: 'TheDripMap <info@thedripmap.com>',
-        to: p.email!,
-        replyTo: 'info@thedripmap.com',
-        subject,
-        text,
-      });
-
-      if (mail.ok) {
-        await supabase
-          .from('providers')
-          .update({ followup_sent: true, followup_sent_at: new Date().toISOString() })
-          .eq('slug', p.slug);
-        results.push({ slug: p.slug, name: display, email: p.email!, sent: true });
-      } else {
-        results.push({
-          slug: p.slug,
-          name: display,
-          email: p.email!,
-          sent: false,
-          error: mail.error,
-        });
-      }
-    } catch (err) {
-      results.push({
-        slug: p.slug,
-        name: display,
-        email: p.email!,
-        sent: false,
-        error: err instanceof Error ? err.message : String(err),
-      });
-    }
+  let mailOk = false;
+  let mailError: string | undefined;
+  try {
+    const mail = await sendMail({
+      from: 'TheDripMap <info@thedripmap.com>',
+      to: p.email!,
+      replyTo: 'info@thedripmap.com',
+      subject,
+      text,
+    });
+    mailOk = mail.ok;
+    mailError = mail.error;
+  } catch (err) {
+    mailError = err instanceof Error ? err.message : String(err);
   }
 
-  const sentCount = results.filter((r) => r.sent).length;
-  const failedCount = results.filter((r) => !r.sent).length;
+  // On failure, DON'T mark sent — the next 2-minute run retries this clinic.
+  if (!mailOk) {
+    return NextResponse.json({ ok: false, sent: false, slug: p.slug, error: mailError });
+  }
+
+  await supabase
+    .from('providers')
+    .update({ followup_sent: true, followup_sent_at: new Date().toISOString() })
+    .eq('slug', p.slug);
+
+  const newSentToday = sentToday + 1;
+  const batchDone = newSentToday >= DAILY_TARGET || ranked.length <= 1;
   const today = new Date().toISOString().slice(0, 10);
 
-  const reportLines = [
-    `Daily FOLLOW-UP outreach report — ${today}`,
-    '',
-    `Sent: ${sentCount}`,
-    `Failed: ${failedCount}`,
-    `Eligible follow-up pool: ${data!.length}`,
-    '',
-    'Recipients:',
-    ...results.map(
-      (r) =>
-        `${r.sent ? '✓' : '✗'} ${r.name} — ${r.email}${r.error ? ` — ${r.error}` : ''}`
-    ),
-  ];
-
-  try {
-    await sendMail({
-      from: 'TheDripMap <info@thedripmap.com>',
-      to: 'info@thedripmap.com',
-      subject: `[TheDripMap] Daily follow-up report — ${today} — ${sentCount} sent`,
-      text: reportLines.join('\n'),
-    });
-  } catch (err) {
-    console.error('followup report email failed:', err);
+  let reportSent = false;
+  if (batchDone) {
+    const { data: todaySends } = await supabase
+      .from('providers')
+      .select('name, slug, email, followup_sent_at')
+      .gte('followup_sent_at', startOfDay.toISOString())
+      .order('followup_sent_at', { ascending: true });
+    const sends = todaySends || [];
+    const reportLines = [
+      `Daily FOLLOW-UP outreach report — ${today}`,
+      '',
+      `Sent today: ${sends.length}`,
+      `Stopped because: ${newSentToday >= DAILY_TARGET ? 'daily target reached' : 'eligible pool exhausted'}`,
+      '',
+      'Recipients (in send order):',
+      ...sends.map((r) => `✓ ${cleanName(r.name)} — ${r.email}`),
+    ];
+    try {
+      await sendMail({
+        from: 'TheDripMap <info@thedripmap.com>',
+        to: 'info@thedripmap.com',
+        subject: `[TheDripMap] Daily follow-up report — ${today} — ${sends.length} sent`,
+        text: reportLines.join('\n'),
+      });
+      reportSent = true;
+    } catch (err) {
+      console.error('followup report email failed:', err);
+    }
   }
 
   return NextResponse.json({
     ok: true,
     date: today,
-    sentCount,
-    failedCount,
-    poolSize: data!.length,
-    results,
+    sent: true,
+    slug: p.slug,
+    name: display,
+    sentToday: newSentToday,
+    batchDone,
+    reportSent,
   });
 }

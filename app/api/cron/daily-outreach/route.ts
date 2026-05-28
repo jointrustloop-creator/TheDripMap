@@ -7,7 +7,7 @@ const DAILY_TARGET = 19;
 const MIN_RATING = 4.5;
 const MIN_REVIEWS = 10;
 
-export const maxDuration = 120;
+export const maxDuration = 30;
 
 function cleanName(n: string): string {
   return n
@@ -53,6 +53,26 @@ export async function GET(req: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
+  // Staggered sending: this cron fires every 2 minutes during the 9am-ET
+  // window (vercel.json: "*/2 13 * * *") and sends exactly ONE email per
+  // invocation. That produces a natural ~38-minute drip (one every 2 min)
+  // instead of a 19-email burst — lower spam-folder risk — without ever
+  // approaching Vercel's function timeout.
+  //
+  // The daily cap is enforced by counting today's sends: once DAILY_TARGET
+  // is reached, later invocations in the window no-op.
+  const startOfDay = new Date();
+  startOfDay.setUTCHours(0, 0, 0, 0);
+  const { count: sentTodayCount } = await supabase
+    .from('providers')
+    .select('id', { count: 'exact', head: true })
+    .gte('outreach_sent_at', startOfDay.toISOString());
+  const sentToday = sentTodayCount || 0;
+
+  if (sentToday >= DAILY_TARGET) {
+    return NextResponse.json({ ok: true, skipped: 'daily target reached', sentToday });
+  }
+
   // Pull a pool 5x the target so we can rank and filter.
   const { data, error } = await supabase
     .from('providers')
@@ -88,27 +108,26 @@ export async function GET(req: Request) {
     })
     .slice(0, DAILY_TARGET);
 
-  const results: Array<{
-    slug: string;
-    name: string;
-    email: string;
-    sent: boolean;
-    error?: string;
-  }> = [];
+  // Nothing eligible left — the pool is exhausted (report already sent on
+  // the run that drained it). No-op.
+  if (ranked.length === 0) {
+    return NextResponse.json({ ok: true, skipped: 'no eligible clinics remaining', sentToday });
+  }
 
-  for (const p of ranked) {
-    const display = cleanName(p.name);
-    const listingUrl = `${SITE_URL}/providers/${p.slug}`;
-    const claimUrl = `${listingUrl}?claim=1`;
-    const hasRating = p.rating && Number(p.reviews) > 0;
-    const subject = `Your ${display} listing on TheDripMap`;
-    const ratingLine = hasRating
-      ? `Your listing is live with your real Google rating of ${p.rating}★.`
-      : `Your listing is live — but right now it's unclaimed, so visitors see a generic placeholder instead of your photos, hours, services, and description.`;
-    const followLine = hasRating
-      ? `Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.`
-      : `Claiming is free and takes 2 minutes — you control your description, hours, services, and photos so prospective patients see your clinic at its best.`;
-    const text = `Hi ${display} team,
+  // Send exactly ONE email this invocation — the highest-ranked unsent clinic.
+  const p = ranked[0];
+  const display = cleanName(p.name);
+  const listingUrl = `${SITE_URL}/providers/${p.slug}`;
+  const claimUrl = `${listingUrl}?claim=1`;
+  const hasRating = p.rating && Number(p.reviews) > 0;
+  const subject = `Your ${display} listing on TheDripMap`;
+  const ratingLine = hasRating
+    ? `Your listing is live with your real Google rating of ${p.rating}★.`
+    : `Your listing is live — but right now it's unclaimed, so visitors see a generic placeholder instead of your photos, hours, services, and description.`;
+  const followLine = hasRating
+    ? `Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.`
+    : `Claiming is free and takes 2 minutes — you control your description, hours, services, and photos so prospective patients see your clinic at its best.`;
+  const text = `Hi ${display} team,
 
 We added ${display} to TheDripMap — North America's directory for IV therapy clinics. ${ratingLine}
 
@@ -122,79 +141,79 @@ Deborah Triandafilou
 TheDripMap
 info@thedripmap.com`;
 
-    try {
-      const mail = await sendMail({
-        from: 'TheDripMap <info@thedripmap.com>',
-        to: p.email!,
-        replyTo: 'info@thedripmap.com',
-        subject,
-        text,
-      });
-
-      if (mail.ok) {
-        await supabase
-          .from('providers')
-          .update({ outreach_sent: true, outreach_sent_at: new Date().toISOString() })
-          .eq('slug', p.slug);
-        results.push({ slug: p.slug, name: display, email: p.email!, sent: true });
-      } else {
-        results.push({
-          slug: p.slug,
-          name: display,
-          email: p.email!,
-          sent: false,
-          error: mail.error,
-        });
-      }
-    } catch (err) {
-      results.push({
-        slug: p.slug,
-        name: display,
-        email: p.email!,
-        sent: false,
-        error: err instanceof Error ? err.message : String(err),
-      });
-    }
+  let mailOk = false;
+  let mailError: string | undefined;
+  try {
+    const mail = await sendMail({
+      from: 'TheDripMap <info@thedripmap.com>',
+      to: p.email!,
+      replyTo: 'info@thedripmap.com',
+      subject,
+      text,
+    });
+    mailOk = mail.ok;
+    mailError = mail.error;
+  } catch (err) {
+    mailError = err instanceof Error ? err.message : String(err);
   }
 
-  const sentCount = results.filter((r) => r.sent).length;
-  const failedCount = results.filter((r) => !r.sent).length;
+  // On failure, DON'T mark sent — the next 2-minute run retries this clinic.
+  if (!mailOk) {
+    return NextResponse.json({ ok: false, sent: false, slug: p.slug, error: mailError });
+  }
+
+  await supabase
+    .from('providers')
+    .update({ outreach_sent: true, outreach_sent_at: new Date().toISOString() })
+    .eq('slug', p.slug);
+
+  // Decide whether today's batch is complete. Only the run that sends the
+  // final email trips this (the daily cap is hit, or no eligible remain),
+  // so the report fires exactly once per day.
+  const newSentToday = sentToday + 1;
+  const batchDone = newSentToday >= DAILY_TARGET || ranked.length <= 1;
   const today = new Date().toISOString().slice(0, 10);
 
-  // Email daily report to operator.
-  const reportLines = [
-    `Daily outreach report — ${today}`,
-    '',
-    `Sent: ${sentCount}`,
-    `Failed: ${failedCount}`,
-    `Pool size (eligible after filter): ${ranked.length}`,
-    '',
-    'Recipients:',
-    ...results.map(
-      (r) =>
-        `${r.sent ? '✓' : '✗'} ${r.name} — ${r.email}${r.error ? ` — ${r.error}` : ''}`
-    ),
-    '',
-    `View all listings: ${SITE_URL}/admin`,
-  ];
-
-  try {
-    await sendMail({
-      from: 'TheDripMap <info@thedripmap.com>',
-      to: 'info@thedripmap.com',
-      subject: `[TheDripMap] Daily outreach report — ${today} — ${sentCount} sent`,
-      text: reportLines.join('\n'),
-    });
-  } catch (err) {
-    console.error('daily report email failed:', err);
+  let reportSent = false;
+  if (batchDone) {
+    const { data: todaySends } = await supabase
+      .from('providers')
+      .select('name, slug, email, outreach_sent_at')
+      .gte('outreach_sent_at', startOfDay.toISOString())
+      .order('outreach_sent_at', { ascending: true });
+    const sends = todaySends || [];
+    const reportLines = [
+      `Daily outreach report — ${today}`,
+      '',
+      `Sent today: ${sends.length}`,
+      `Stopped because: ${newSentToday >= DAILY_TARGET ? 'daily target reached' : 'eligible pool exhausted'}`,
+      '',
+      'Recipients (in send order):',
+      ...sends.map((r) => `✓ ${cleanName(r.name)} — ${r.email}`),
+      '',
+      `View all listings: ${SITE_URL}/admin`,
+    ];
+    try {
+      await sendMail({
+        from: 'TheDripMap <info@thedripmap.com>',
+        to: 'info@thedripmap.com',
+        subject: `[TheDripMap] Daily outreach report — ${today} — ${sends.length} sent`,
+        text: reportLines.join('\n'),
+      });
+      reportSent = true;
+    } catch (err) {
+      console.error('daily report email failed:', err);
+    }
   }
 
   return NextResponse.json({
     ok: true,
     date: today,
-    sentCount,
-    failedCount,
-    poolSize: ranked.length,
-    results,
+    sent: true,
+    slug: p.slug,
+    name: display,
+    sentToday: newSentToday,
+    batchDone,
+    reportSent,
   });
 }
