@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { Droplets, ShieldCheck, BookOpen, CreditCard, Map, ArrowRight, ArrowUpRight, Sparkles } from 'lucide-react';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
-import { getSiteStats } from '../../src/lib/data';
 
 const EMERALD = '#0F6E56';
 
@@ -22,17 +21,14 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', title, description, images: ['https://www.thedripmap.com/og-image.png'] },
 };
 
-export default async function ResourcesPage() {
-  const stats = await getSiteStats();
-  const total = stats.total ? `${stats.total.toLocaleString()}+` : '1,030+';
-
+export default function ResourcesPage() {
   const cards = [
     {
       icon: Droplets,
       label: 'IV Therapy Cost Calculator',
       cardTitle: 'What will it cost?',
-      desc: `See real price ranges by city and treatment type from ${total} clinics.`,
-      href: '/search',
+      desc: 'See real, sourced price ranges by treatment — Myers’, NAD+, hangover and more.',
+      href: '/resources/cost-calculator',
       badge: 'Free tool',
     },
     {

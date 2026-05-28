@@ -101,7 +101,7 @@ export default async function ClinicOwnerResourcesPage() {
 
             {/* Card 3 — New Patient Acquisition Guide */}
             <Link
-              href="/for-clinics"
+              href="/resources/patient-acquisition"
               className="group relative bg-white rounded-3xl border border-slate-200/70 p-7 md:p-8 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1 hover:border-emerald-200 transition-all duration-300 flex flex-col"
             >
               <span className="absolute top-6 right-6 text-[10px] font-black uppercase tracking-[0.12em] text-slate-500 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-full">
