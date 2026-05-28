@@ -19,6 +19,7 @@ import {
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
+import { ProviderCredentialBlock } from '../../../src/components/ProviderCredentialBlock';
 import { ClinicImage } from '../../../src/components/ClinicImage';
 import { ResilientImage } from '../../../src/components/ResilientImage';
 import { ClaimListingTrigger } from '../../../src/components/ClaimListingTrigger';
@@ -588,6 +589,11 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   </div>
                 </section>
               )}
+
+              {/* TRUST & CREDENTIALS — the #1 trust signal patients want.
+                  Verified WHO + credential checklist + safety badge for claimed
+                  clinics; "not verified" warning + claim CTA for unclaimed. */}
+              <ProviderCredentialBlock provider={provider} profile={profile} />
 
               {/* {CLINIC} AT A GLANCE — survey-driven facts as compact icon cards.
                   Only the cards with actual data render; nothing is faked. */}
