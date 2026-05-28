@@ -130,7 +130,7 @@ export default async function HomePage() {
           {/* Eyebrow */}
           <div className="flex items-center gap-3 mb-6 justify-center">
             <span className="h-px w-8 bg-[#0F6E56]" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56]">North America's IV Therapy Directory</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56]">North America's IV Therapy Platform</span>
             <span className="h-px w-8 bg-[#0F6E56]" />
           </div>
 
@@ -141,7 +141,7 @@ export default async function HomePage() {
           </h1>
 
           <p className="text-center text-[20px] text-slate-500 max-w-[560px] mx-auto mb-8 leading-relaxed font-light">
-            Compare {stats.total.toLocaleString()}+ verified clinics across {stats.cities}+ cities. Match by treatment, location, and budget in under a minute.
+            {stats.total.toLocaleString()}+ verified clinics across {stats.cities}+ cities. Find the right one for you in under 60 seconds.
           </p>
 
           {/* QuickMatch — full width so the city picker + button breathe */}
