@@ -21,6 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/for-clinics`,            priority: 0.7, changeFrequency: 'monthly', lastModified: new Date() },
     { url: `${baseUrl}/resources`,                    priority: 0.7, changeFrequency: 'monthly', lastModified: new Date() },
     { url: `${baseUrl}/resources/cost-calculator`,    priority: 0.75, changeFrequency: 'monthly', lastModified: new Date() },
+    { url: `${baseUrl}/resources/safety-checker`,     priority: 0.7, changeFrequency: 'monthly', lastModified: new Date() },
     { url: `${baseUrl}/resources/clinic-owners`,      priority: 0.6, changeFrequency: 'monthly', lastModified: new Date() },
     { url: `${baseUrl}/resources/patient-acquisition`,priority: 0.65, changeFrequency: 'monthly', lastModified: new Date() },
     { url: `${baseUrl}/tools/seo-audit`,              priority: 0.6, changeFrequency: 'monthly', lastModified: new Date() },

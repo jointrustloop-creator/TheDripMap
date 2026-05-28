@@ -36,7 +36,7 @@ export default function ResourcesPage() {
       label: 'Safety Checker',
       cardTitle: 'Is this clinic verified?',
       desc: 'Enter any clinic name and see their TheDripMap verification status instantly.',
-      href: '/search',
+      href: '/resources/safety-checker',
       badge: 'Free tool',
     },
     {
