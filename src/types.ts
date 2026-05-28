@@ -126,6 +126,9 @@ export interface SurveyState {
   lifestyle?: string;
   medicalHistory?: string[];
   urgency?: 'ASAP' | 'Today' | 'This Week';
+  firstTime?: string;
+  hsaFsa?: string;
+  priceTransparency?: string;
 }
 
 export interface OperatorProfile {

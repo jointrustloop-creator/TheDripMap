@@ -40,12 +40,17 @@ function SetupContent() {
     environment: '',
     waitTime: '',
     administerType: '',
+    medicalDirectorName: '',
+    medicalDirectorCredentials: '',
+    yearsInPractice: '',
     typicalPatientAge: [] as string[],
     primaryReasons: [] as string[],
     priceRange: '',
     walkInsWelcome: false,
     mobileService: false,
-    oneLiner: ''
+    oneLiner: '',
+    founderStatement: '',
+    practitionerPhotoUrl: ''
   });
 
   const specialties = [
@@ -413,8 +418,8 @@ function SetupContent() {
                         key={a}
                         onClick={() => setFormData({...formData, administerType: a})}
                         className={`p-4 rounded-2xl border text-left font-bold transition-all ${
-                          formData.administerType === a 
-                            ? 'border-wellness-600 bg-wellness-50 text-wellness-700' 
+                          formData.administerType === a
+                            ? 'border-wellness-600 bg-wellness-50 text-wellness-700'
                             : 'border-slate-100 hover:border-slate-200 text-slate-600'
                         }`}
                       >
@@ -422,6 +427,45 @@ function SetupContent() {
                       </button>
                     ))}
                   </div>
+                </div>
+
+                {/* Medical director — the #1 trust signal patients want.
+                    Shown on the listing's verified credential block. */}
+                <div className="grid grid-cols-1 sm:grid-cols-[1fr_140px] gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                      <Stethoscope size={16} /> Medical Director Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.medicalDirectorName}
+                      onChange={e => setFormData({ ...formData, medicalDirectorName: e.target.value })}
+                      placeholder="e.g. Dr. Jane Smith"
+                      className="w-full p-4 rounded-2xl border border-slate-200 focus:border-wellness-600 focus:ring-2 focus:ring-wellness-100 outline-none transition-all"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Credentials</label>
+                    <input
+                      type="text"
+                      value={formData.medicalDirectorCredentials}
+                      onChange={e => setFormData({ ...formData, medicalDirectorCredentials: e.target.value })}
+                      placeholder="MD, DO, NP…"
+                      className="w-full p-4 rounded-2xl border border-slate-200 focus:border-wellness-600 focus:ring-2 focus:ring-wellness-100 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Years in Practice <span className="font-medium text-slate-400">(optional)</span></label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={formData.yearsInPractice}
+                    onChange={e => setFormData({ ...formData, yearsInPractice: e.target.value })}
+                    placeholder="e.g. 8"
+                    className="w-full sm:w-40 p-4 rounded-2xl border border-slate-200 focus:border-wellness-600 focus:ring-2 focus:ring-wellness-100 outline-none transition-all"
+                  />
                 </div>
               </div>
             </motion.div>
@@ -570,6 +614,35 @@ function SetupContent() {
                   <div className="text-right text-xs font-bold text-slate-400">
                     {formData.oneLiner.length} / 100 characters
                   </div>
+                </div>
+
+                {/* Founder statement — the Psychology Today trust wedge: a
+                    first-person "why I started this" shown on the credential block. */}
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Why You Started This Clinic <span className="font-medium text-slate-400">(builds patient trust)</span></label>
+                  <textarea
+                    maxLength={400}
+                    value={formData.founderStatement}
+                    onChange={e => setFormData({ ...formData, founderStatement: e.target.value })}
+                    placeholder="A few sentences in your own voice — why you opened, your clinical philosophy, what patients can expect."
+                    className="w-full p-4 h-28 rounded-2xl border border-slate-200 focus:border-wellness-600 focus:ring-2 focus:ring-wellness-100 outline-none transition-all resize-none"
+                  />
+                  <div className="text-right text-xs font-bold text-slate-400">
+                    {formData.founderStatement.length} / 400 characters
+                  </div>
+                </div>
+
+                {/* Practitioner photo — paste a hosted image URL (full upload is a fast-follow). */}
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Practitioner / Medical Director Photo URL <span className="font-medium text-slate-400">(optional)</span></label>
+                  <input
+                    type="url"
+                    value={formData.practitionerPhotoUrl}
+                    onChange={e => setFormData({ ...formData, practitionerPhotoUrl: e.target.value })}
+                    placeholder="https://…/your-photo.jpg"
+                    className="w-full p-4 rounded-2xl border border-slate-200 focus:border-wellness-600 focus:ring-2 focus:ring-wellness-100 outline-none transition-all"
+                  />
+                  <p className="text-xs text-slate-400">A warm headshot of your lead practitioner significantly increases patient trust and bookings.</p>
                 </div>
 
                 <div className="bg-wellness-50 p-6 rounded-3xl border border-wellness-100">

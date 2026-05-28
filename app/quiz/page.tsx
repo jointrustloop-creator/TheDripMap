@@ -74,6 +74,17 @@ const STEPS = [
       { id: 'heart', label: 'Heart condition', icon: <ShieldAlert size={24} />, desc: 'Affects IV rate / volume' },
       { id: 'blood-thinners', label: 'On blood thinners', icon: <ShieldAlert size={24} />, desc: 'Some additives interact' },
       { id: 'diabetic', label: 'Diabetic', icon: <ShieldAlert size={24} />, desc: 'Some additives affect glucose' },
+      { id: 'g6pd', label: 'G6PD deficiency', icon: <ShieldAlert size={24} />, desc: 'Affects high-dose vitamin C safety' },
+    ],
+  },
+  {
+    id: 'firstTime',
+    question: 'Is this your first time with IV therapy?',
+    description: 'First-timers get a quick safety walkthrough and what to ask before booking.',
+    options: [
+      { id: 'first-time', label: "Yes, my first time", icon: <Sparkles size={24} />, desc: "We'll walk you through it" },
+      { id: 'a-few', label: "I've done it a few times", icon: <Activity size={24} />, desc: 'Comfortable with the basics' },
+      { id: 'regular', label: "I'm a regular", icon: <Heart size={24} />, desc: 'Just show me the best match' },
     ],
   },
   {
@@ -95,6 +106,26 @@ const STEPS = [
       { id: '$100 – $200', label: '$100 – $200', icon: <DollarSign size={24} />, desc: 'Standard wellness drips' },
       { id: '$200 – $400', label: '$200 – $400', icon: <DollarSign size={24} />, desc: 'Premium with add-ons' },
       { id: '$400+', label: '$400+', icon: <DollarSign size={24} />, desc: 'Concierge / NAD+' },
+    ],
+  },
+  {
+    id: 'hsaFsa',
+    question: 'Do you want to pay with an HSA or FSA?',
+    description: 'Some clinics provide the paperwork to reimburse eligible treatments. We\'ll flag which ones.',
+    options: [
+      { id: 'yes', label: 'Yes, HSA/FSA eligible', icon: <ShieldCheck size={24} />, desc: 'Prioritize clinics that support it' },
+      { id: 'no', label: "No, I'll pay out of pocket", icon: <DollarSign size={24} />, desc: 'Not a factor for me' },
+      { id: 'unsure', label: 'Not sure', icon: <HelpCircle size={24} />, desc: 'Show me the options' },
+    ],
+  },
+  {
+    id: 'priceTransparency',
+    question: 'How important is upfront, transparent pricing?',
+    description: 'We surface clinics that publish real per-drip prices instead of "call for pricing".',
+    options: [
+      { id: 'must-have', label: 'Must-have', icon: <DollarSign size={24} />, desc: 'No surprises — prices upfront' },
+      { id: 'nice-to-have', label: 'Nice to have', icon: <CheckCircle2 size={24} />, desc: 'Prefer it, not a dealbreaker' },
+      { id: 'dont-care', label: "Doesn't matter", icon: <Sparkles size={24} />, desc: "I'll ask at the clinic" },
     ],
   },
 ];
@@ -309,7 +340,10 @@ export default function QuizPage() {
       if (finalCountry) query.set('country', finalCountry);
       if (finalData.locationPreference) query.set('type', finalData.locationPreference);
       if (finalData.budget) query.set('budget', finalData.budget);
-      
+      if (finalData.firstTime) query.set('firstTime', finalData.firstTime);
+      if (finalData.hsaFsa) query.set('hsaFsa', finalData.hsaFsa);
+      if (finalData.priceTransparency) query.set('priceTransparency', finalData.priceTransparency);
+
       router.push(`/quiz/results?${query.toString()}`);
     }, 2500);
   };
