@@ -13,9 +13,7 @@ export const Navbar = () => {
   const navLinks = [
     { label: 'Explore Clinics', href: '/search' },
     { label: 'Treatments', href: '/treatments' },
-    { label: 'Guides', href: '/guide' },
     { label: 'Blog', href: '/blog' },
-    { label: 'Contact', href: '/contact' },
   ];
 
   const whoWeServe = [
@@ -29,7 +27,9 @@ export const Navbar = () => {
     { label: 'Clinic Owners', href: '/for-clinics' },
   ];
 
+  // Guides leads, then a divider before the resource hubs/tools.
   const resources = [
+    { label: 'Guides', href: '/guide' },
     { label: 'For Patients', href: '/resources' },
     { label: 'For Clinic Owners', href: '/resources/clinic-owners' },
     { label: 'Free SEO Audit', href: '/tools/seo-audit' },
@@ -80,7 +80,7 @@ export const Navbar = () => {
                     </div>
                   </div>
                 )}
-                {link.href === '/guide' && (
+                {link.href === '/treatments' && (
                   <div className="relative group">
                     <button
                       type="button"
@@ -91,14 +91,16 @@ export const Navbar = () => {
                     </button>
                     <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-150 z-50">
                       <div className="bg-white rounded-2xl shadow-2xl shadow-slate-300/40 border border-slate-100 p-2 w-60">
-                        {resources.map((item) => (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            className="block px-4 py-2.5 rounded-xl text-sm font-bold text-slate-700 hover:bg-wellness-50 hover:text-wellness-700 transition-colors"
-                          >
-                            {item.label}
-                          </Link>
+                        {resources.map((item, i) => (
+                          <React.Fragment key={item.href}>
+                            <Link
+                              href={item.href}
+                              className="block px-4 py-2.5 rounded-xl text-sm font-bold text-slate-700 hover:bg-wellness-50 hover:text-wellness-700 transition-colors"
+                            >
+                              {item.label}
+                            </Link>
+                            {i === 0 && <div className="my-1 h-px bg-slate-100" />}
+                          </React.Fragment>
                         ))}
                       </div>
                     </div>
@@ -170,7 +172,7 @@ export const Navbar = () => {
                       ))}
                     </div>
                   )}
-                  {link.href === '/guide' && (
+                  {link.href === '/treatments' && (
                     <div className="border-l-2 border-slate-100 pl-4 -mt-1 flex flex-col gap-2">
                       <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 pt-1">
                         Resources
