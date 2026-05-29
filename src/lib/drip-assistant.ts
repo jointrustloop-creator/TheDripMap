@@ -301,6 +301,138 @@ async function providerOutcome(p: ProviderRow, sb: ReturnType<typeof getServiceS
   return { forModel, clinics: [clinic] };
 }
 
+// ── screen_patient ──────────────────────────────────────────────────
+// Structured safety triage that runs BEFORE the model recommends a treatment
+// with known contraindications. Never refuses help — only filters to safer
+// options (claimed/verified clinics with medical-director oversight) when an
+// answer flags a concern. The model accumulates the user's answers across
+// turns and re-calls this tool each time.
+
+type SafetyTier = 'green' | 'amber' | 'red';
+type SafetyFlag = 'pregnant' | 'kidney' | 'g6pd' | 'thinners';
+
+const SAFETY_MATRIX: Record<string, Record<SafetyFlag, SafetyTier>> = {
+  'Standard Hydration / Myers': { pregnant: 'green', kidney: 'amber', g6pd: 'green', thinners: 'green' },
+  'High-Dose Vitamin C':        { pregnant: 'amber', kidney: 'amber', g6pd: 'red',   thinners: 'green' },
+  'NAD+':                       { pregnant: 'amber', kidney: 'amber', g6pd: 'green', thinners: 'green' },
+  'GLP-1 Weight Loss':          { pregnant: 'red',   kidney: 'amber', g6pd: 'green', thinners: 'green' },
+  'Peptide Therapy':            { pregnant: 'red',   kidney: 'amber', g6pd: 'green', thinners: 'amber' },
+  'Iron Infusion':              { pregnant: 'green', kidney: 'amber', g6pd: 'green', thinners: 'amber' },
+  'Glutathione':                { pregnant: 'amber', kidney: 'green', g6pd: 'green', thinners: 'green' },
+};
+
+function normalizeTreatmentForSafety(name: string): keyof typeof SAFETY_MATRIX {
+  const t = (name || '').toLowerCase().trim();
+  if (/(glp-?1|semaglutide|ozempic|wegovy|mounjaro|tirzepatide)/.test(t)) return 'GLP-1 Weight Loss';
+  if (/peptide|bpc-?157|tb-?500|sermorelin|ipamorelin|cjc-?1295/.test(t)) return 'Peptide Therapy';
+  if (/high.?dose.?vit|ivc\b|^vit\.?\s*c$|vitamin\s*c\b/.test(t)) return 'High-Dose Vitamin C';
+  if (/glutathione|gsh/.test(t)) return 'Glutathione';
+  if (/iron|ferritin/.test(t)) return 'Iron Infusion';
+  if (/nad/.test(t)) return 'NAD+';
+  return 'Standard Hydration / Myers';
+}
+
+function maxSafetyTier(tiers: SafetyTier[]): SafetyTier {
+  if (tiers.includes('red')) return 'red';
+  if (tiers.includes('amber')) return 'amber';
+  return 'green';
+}
+
+const SCREEN_QUESTIONS: Record<SafetyFlag, string> = {
+  pregnant: 'Are you currently pregnant or breastfeeding?',
+  kidney: 'Do you have any kidney disease or reduced kidney function?',
+  g6pd: "Do you have G6PD deficiency? (No worries if you don't know — most people haven't been tested.)",
+  thinners: 'Are you currently taking any blood thinners (warfarin, Eliquis, Plavix, daily aspirin, etc.)?',
+};
+
+interface ScreenInput {
+  treatment_considering?: string;
+  pregnant_or_breastfeeding?: boolean | null;
+  kidney_disease?: boolean | null;
+  g6pd_deficiency?: boolean | null;
+  on_blood_thinners?: boolean | null;
+  prior_iv_therapy?: boolean | null;
+}
+
+function screenPatient(input: ScreenInput): ToolOutcome {
+  const treatment = normalizeTreatmentForSafety(input.treatment_considering || '');
+  const matrix = SAFETY_MATRIX[treatment];
+
+  // A flag is relevant for this treatment if its cell is amber or red. Green
+  // cells are skipped — no point asking about G6PD for plain hydration.
+  const relevant: Record<SafetyFlag, boolean> = {
+    pregnant: matrix.pregnant !== 'green',
+    kidney: matrix.kidney !== 'green',
+    g6pd: matrix.g6pd !== 'green',
+    thinners: matrix.thinners !== 'green',
+  };
+  const answers: Record<SafetyFlag, boolean | null | undefined> = {
+    pregnant: input.pregnant_or_breastfeeding,
+    kidney: input.kidney_disease,
+    g6pd: input.g6pd_deficiency,
+    thinners: input.on_blood_thinners,
+  };
+
+  const order: SafetyFlag[] = ['pregnant', 'kidney', 'g6pd', 'thinners'];
+  const pendingQuestions: string[] = order
+    .filter((f) => relevant[f] && answers[f] == null)
+    .map((f) => SCREEN_QUESTIONS[f]);
+
+  // Compute tier from "true" answers on relevant flags. False answers (user
+  // does NOT have the condition) don't contribute to the tier.
+  const tiers: SafetyTier[] = [];
+  const redFlags: string[] = [];
+  if (answers.pregnant === true && relevant.pregnant) {
+    tiers.push(matrix.pregnant);
+    if (matrix.pregnant === 'red') redFlags.push(`${treatment} is contraindicated in pregnancy/breastfeeding`);
+    else if (matrix.pregnant === 'amber') redFlags.push(`${treatment} requires medical-director oversight in pregnancy/breastfeeding`);
+  }
+  if (answers.kidney === true && relevant.kidney) {
+    tiers.push(matrix.kidney);
+    if (matrix.kidney === 'red') redFlags.push(`${treatment} is contraindicated with kidney disease`);
+    else if (matrix.kidney === 'amber') redFlags.push(`${treatment} requires kidney-function review before treatment`);
+  }
+  if (answers.g6pd === true && relevant.g6pd) {
+    tiers.push(matrix.g6pd);
+    if (matrix.g6pd === 'red') redFlags.push(`${treatment} is contraindicated with G6PD deficiency`);
+    else if (matrix.g6pd === 'amber') redFlags.push(`${treatment} requires extra screening with G6PD deficiency`);
+  }
+  if (answers.thinners === true && relevant.thinners) {
+    tiers.push(matrix.thinners);
+    if (matrix.thinners === 'red') redFlags.push(`${treatment} requires anticoagulation clearance before treatment`);
+    else if (matrix.thinners === 'amber') redFlags.push(`${treatment} needs the clinician to know about your blood thinner before treatment`);
+  }
+
+  const safetyTier: SafetyTier = tiers.length ? maxSafetyTier(tiers) : 'green';
+
+  let disclaimer = '';
+  if (safetyTier === 'red') {
+    disclaimer = `Based on what you've shared, ${treatment} has a serious safety consideration — ${redFlags[0]}. Please confirm with the clinic's medical director before booking.`;
+  } else if (safetyTier === 'amber') {
+    disclaimer = `Based on what you've shared, ${treatment} is generally safe with proper medical oversight. Please confirm with the clinic's medical director before booking — they'll want to know about: ${redFlags.join('; ')}.`;
+  }
+
+  const note = pendingQuestions.length > 0
+    ? "More screening questions still to ask. Ask the FIRST pending question conversationally — one at a time, with brief reassuring framing (not as a form). After the user answers, call screen_patient again with all known answers."
+    : safetyTier === 'green'
+      ? 'No safety concerns flagged. Proceed with the clinic search normally.'
+      : "Proceed with search_providers (pass verified_only=true so we route to MD-led claimed clinics). Include the disclaimer in your response. NEVER refuse to help — this tool only filters to safer options. If no verified clinic exists in the user's city, say so honestly and offer covered cities.";
+
+  return {
+    forModel: JSON.stringify({
+      treatment,
+      safetyTier,
+      redFlags,
+      disclaimer,
+      recommendedFilters: { verified_only: safetyTier !== 'green' },
+      stillSearchable: true,
+      pendingQuestions,
+      priorIVTherapy: input.prior_iv_therapy ?? null,
+      note,
+    }),
+  };
+}
+
 // ── get_treatment_info ──────────────────────────────────────────────
 function getTreatmentInfo(input: { treatment_name?: string; country?: string }): ToolOutcome {
   const name = (input.treatment_name || '').toLowerCase().trim();
@@ -424,6 +556,7 @@ export async function runTool(name: string, input: Record<string, unknown>): Pro
     case 'get_treatment_info': return getTreatmentInfo(input as never);
     case 'get_city_stats': return getCityStats(input as never);
     case 'book_appointment': return bookAppointment(input as never);
+    case 'screen_patient': return screenPatient(input as never);
     default: return { forModel: JSON.stringify({ error: `unknown tool ${name}` }) };
   }
 }
@@ -464,6 +597,22 @@ export const TOOL_SCHEMAS = [
     name: 'get_city_stats',
     description: 'Get how many clinics TheDripMap lists in a city and a typical price range.',
     input_schema: { type: 'object', properties: { city: { type: 'string' } }, required: ['city'] },
+  },
+  {
+    name: 'screen_patient',
+    description: "Run a structured safety screening BEFORE recommending a treatment with known contraindications: high-dose vitamin C, GLP-1/semaglutide/Ozempic/Wegovy/Mounjaro/Tirzepatide, NAD+, iron infusion, peptide therapy, or glutathione. Call with the treatment_considering plus any safety answers the user has given so far (omit unknown fields). The tool returns pendingQuestions (ask the next one conversationally — one at a time, NOT as a form) or a safetyTier of green/amber/red with a disclaimer. NEVER refuses help — only filters to safer clinics. For amber/red, pass verified_only=true to search_providers next and include the disclaimer.",
+    input_schema: {
+      type: 'object',
+      properties: {
+        treatment_considering: { type: 'string', description: 'The treatment the user is considering, e.g. "high-dose vitamin C", "GLP-1", "NAD+", "iron infusion"' },
+        pregnant_or_breastfeeding: { type: 'boolean', description: "true/false from the user; omit if not yet asked" },
+        kidney_disease: { type: 'boolean', description: 'true/false from the user; omit if not yet asked' },
+        g6pd_deficiency: { type: 'boolean', description: "true/false from the user; omit if not yet asked. If the user says they don't know, treat as false." },
+        on_blood_thinners: { type: 'boolean', description: 'true/false from the user; omit if not yet asked' },
+        prior_iv_therapy: { type: 'boolean', description: "true/false from the user; omit if not yet asked. Doesn't affect tier — used to soften tone for first-timers." },
+      },
+      required: ['treatment_considering'],
+    },
   },
   {
     name: 'book_appointment',
@@ -533,6 +682,13 @@ TOOLS:
 WHEN RESULTS ARE DISTANCE-RANKED: the nearest match is first; you can mention the distance in miles if helpful.
 
 CURRENCY: tools return "country" ("CA" or "US") and "currency" ("CAD" or "USD") on each clinic and on get_city_stats / get_treatment_info results. When discussing prices for a Canadian clinic or city, ALWAYS label the figure as CAD (e.g. "$150–$350 CAD"). When the user is in a Canadian city and asks about a treatment, pass country="Canada" to get_treatment_info so the costRange comes back labeled in CAD. Never quote a Canadian clinic's prices as USD or vice versa.
+
+SAFETY SCREENING — required for these treatments: high-dose vitamin C, GLP-1 / semaglutide / Ozempic / Wegovy / Mounjaro / Tirzepatide, NAD+, iron infusion, peptide therapy, glutathione. Before recommending one of these, call screen_patient with the treatment name. The tool will return either:
+  • pendingQuestions — ask the FIRST pending question conversationally (one at a time, with brief reassuring framing like "Quick safety check before I recommend a clinic — [question]". Never present all 5 as a form.) After the user answers, call screen_patient again with the accumulated answers.
+  • safetyTier=green — proceed normally with search_providers.
+  • safetyTier=amber — call search_providers with verified_only=true, then include the disclaimer in your response.
+  • safetyTier=red — call search_providers with verified_only=true, include the disclaimer prominently in your response. If no verified clinic exists in the user's city, honestly say so and offer covered cities. NEVER refuse to help.
+For plain hydration, Myers cocktail, hangover recovery, immune support, and other low-risk treatments, screening is NOT required — go straight to search_providers.
 
 HONESTY & SAFETY (critical):
 - NEVER invent clinic names, prices, hours, ratings, or verification status. Only state what the tools return. If a tool returns nothing, say so honestly and offer a covered city or the directory — never fabricate.
