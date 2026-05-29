@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageCircle, X, Send, ShieldCheck, Star, ArrowRight, Loader2, Mail, MapPin, Navigation } from 'lucide-react';
+import { X, Send, ShieldCheck, Star, ArrowRight, Loader2, Mail, MapPin, Navigation } from 'lucide-react';
 
 const EMERALD = '#0F6E56';
 
@@ -188,11 +188,39 @@ export const DripAssistant = () => {
   return (
     <>
       {!open && (
-        <button onClick={() => setOpen(true)} aria-label="Open Drip Assistant"
-          className="fixed bottom-5 right-5 z-[60] flex items-center gap-2 text-white pl-4 pr-5 py-3.5 rounded-full shadow-2xl shadow-emerald-900/30 hover:scale-105 active:scale-95 transition-transform"
-          style={{ backgroundColor: EMERALD }}>
-          <MessageCircle size={20} />
-          <span className="font-black text-sm">Drip Assistant</span>
+        <button
+          onClick={() => setOpen(true)}
+          aria-label="Open Drip Assistant"
+          className="group fixed bottom-5 right-5 z-[60] hover:scale-[1.07] active:scale-95 transition-transform"
+        >
+          {/* Hover label (desktop) */}
+          <span className="absolute right-full top-1/2 -translate-y-1/2 mr-3 whitespace-nowrap rounded-full bg-white px-3.5 py-2 text-xs font-black text-slate-700 shadow-xl border border-slate-100 opacity-0 translate-x-1 pointer-events-none transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0 hidden sm:block">
+            Chat with Drip Assistant
+          </span>
+          {/* Soft glow */}
+          <span className="absolute inset-2 rounded-full blur-lg opacity-40" style={{ backgroundColor: EMERALD }} />
+          {/* Drip-shaped launcher */}
+          <span className="drip-float relative block" style={{ filter: 'drop-shadow(0 12px 22px rgba(10,61,43,0.45))' }}>
+            <svg width="58" height="69" viewBox="0 0 64 76" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="dripGrad" x1="32" y1="4" x2="32" y2="70" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#1A8A68" />
+                  <stop offset="1" stopColor="#0A3D2B" />
+                </linearGradient>
+              </defs>
+              {/* droplet body */}
+              <path d="M32 4 C 32 4 54 30 56 46 A 24 24 0 1 1 8 46 C 10 30 32 4 32 4 Z" fill="url(#dripGrad)" />
+              {/* glossy highlight */}
+              <ellipse cx="22" cy="33" rx="4.5" ry="8" fill="#ffffff" opacity="0.18" transform="rotate(-20 22 33)" />
+              {/* chat bubble */}
+              <rect x="19" y="39" width="26" height="17" rx="5.5" fill="#ffffff" />
+              <path d="M25 54.5 L25 61 L31.5 54.5 Z" fill="#ffffff" />
+              <circle cx="26" cy="47.5" r="1.9" fill="#0F6E56" />
+              <circle cx="32" cy="47.5" r="1.9" fill="#0F6E56" />
+              <circle cx="38" cy="47.5" r="1.9" fill="#0F6E56" />
+            </svg>
+          </span>
+          <style>{`@keyframes dripFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}.drip-float{animation:dripFloat 3.2s ease-in-out infinite}@media (prefers-reduced-motion: reduce){.drip-float{animation:none}}`}</style>
         </button>
       )}
 
