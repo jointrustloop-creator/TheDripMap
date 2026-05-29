@@ -70,18 +70,23 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
     const loadData = async () => {
       setIsLoading(true);
       
-      // Check for city in session storage if not in URL
+      // Read the visitor's location from session storage: city (for the query)
+      // plus country + coordinates (to keep nearby clinics ranked first).
       let cityToUse = currentCity;
-      if (!cityToUse) {
+      let userCountry: string | null = null;
+      let userCoords: { lat: number; lng: number } | null = null;
+      try {
         const cached = sessionStorage.getItem('tdm_location');
         if (cached) {
-          try {
-            const parsed = JSON.parse(cached);
-            if (parsed.city) cityToUse = parsed.city;
-          } catch (e) {
-            console.error('Failed to parse cached location', e);
-          }
+          const parsed = JSON.parse(cached);
+          if (!cityToUse && parsed.city) cityToUse = parsed.city;
+          if (parsed.country) userCountry = parsed.country;
+          const lat = Number(parsed.latitude);
+          const lng = Number(parsed.longitude);
+          if (Number.isFinite(lat) && Number.isFinite(lng)) userCoords = { lat, lng };
         }
+      } catch (e) {
+        console.error('Failed to parse cached location', e);
       }
 
       const [serviceListings, hubs] = await Promise.all([
@@ -133,6 +138,43 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
           }
         });
         broadened = true;
+      }
+
+      // Geo-relevance re-rank: surface clinics closest to the visitor first, so a
+      // Toronto-area visitor never sees LA/Georgetown clinics above local ones.
+      // Distance leads (when coordinates are known); otherwise same-country wins.
+      if (userCountry || userCoords) {
+        const isCA = (c?: string | null) => !!c && /canada/i.test(c);
+        const isUS = (c?: string | null) => !!c && /(united states|^usa$|^us$)/i.test(c.trim());
+        const userIsCA = isCA(userCountry);
+        const userIsUS = isUS(userCountry);
+        const distKm = (aLat: number, aLng: number, bLat: number, bLng: number) => {
+          const R = 6371;
+          const dLat = ((bLat - aLat) * Math.PI) / 180;
+          const dLng = ((bLng - aLng) * Math.PI) / 180;
+          const s =
+            Math.sin(dLat / 2) ** 2 +
+            Math.cos((aLat * Math.PI) / 180) * Math.cos((bLat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+          return 2 * R * Math.asin(Math.sqrt(s));
+        };
+        const rank = (p: Provider) => {
+          let s = 0;
+          // Push other-country clinics far down (known-country only; unknown stays neutral).
+          if ((userIsCA || userIsUS) && p.country) {
+            const same = userIsCA ? isCA(p.country) : isUS(p.country);
+            if (!same) s += 100000;
+          }
+          const lat = p.latitude == null ? NaN : Number(p.latitude);
+          const lng = p.longitude == null ? NaN : Number(p.longitude);
+          if (userCoords && Number.isFinite(lat) && Number.isFinite(lng)) {
+            s += distKm(userCoords.lat, userCoords.lng, lat, lng);
+          } else {
+            s += 4000; // unknown distance: mid-pack, never ahead of a located nearby clinic
+          }
+          if (p.is_featured) s -= 5; // small tiebreaker among near-equidistant clinics
+          return s;
+        };
+        finalResults.sort((a, b) => rank(a) - rank(b));
       }
 
       setListings(finalResults);
