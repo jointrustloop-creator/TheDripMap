@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { X, Send, ShieldCheck, Star, ArrowRight, Loader2, Mail, MapPin, Navigation } from 'lucide-react';
+import { X, Send, ShieldCheck, Star, ArrowRight, Loader2, Mail, MapPin, Navigation, Calendar, Phone } from 'lucide-react';
 
 const EMERALD = '#0F6E56';
 
@@ -11,6 +11,8 @@ interface Clinic {
   name: string; slug: string | null; city: string | null; state: string | null;
   rating: number | null; reviews: number | null; verified: boolean; claimed: boolean; mobile: boolean;
   distanceMi?: number | null;
+  bookingUrl?: string | null;
+  phone?: string | null;
 }
 interface Coords { lat: number; lng: number }
 interface Msg { role: 'user' | 'assistant'; content: string; clinics?: Clinic[]; greeting?: boolean }
@@ -31,39 +33,76 @@ function slugify(name: string) {
   return name.toLowerCase().trim().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
+// Strip phone of non-digits for tel: links. Keep the user-facing label as-is.
+function telHref(phone: string): string {
+  const digits = phone.replace(/[^\d+]/g, '');
+  return `tel:${digits}`;
+}
+
 function ClinicMiniCard({ c }: { c: Clinic }) {
+  // BOOK NOW is only meaningful for claimed clinics that have given us a
+  // booking URL. CALL TO BOOK shows when a claimed clinic has a phone but no
+  // online booking. Unclaimed clinics get neither — they go to the listing.
+  const showBookOnline = c.claimed && !!c.bookingUrl;
+  const showCallToBook = c.claimed && !c.bookingUrl && !!c.phone;
+
   return (
-    <Link href={`/providers/${c.slug || slugify(c.name)}`} className="block bg-white rounded-2xl border border-slate-200 p-3 hover:border-emerald-300 transition-all">
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <div className="font-bold text-slate-900 text-sm truncate">{c.name}</div>
-          <div className="text-[11px] text-slate-400 truncate flex items-center gap-1">
-            <span>{c.city}{c.state ? `, ${c.state}` : ''}</span>
-            {c.distanceMi != null && (
-              <span className="text-[#0F6E56] font-bold whitespace-nowrap">· {c.distanceMi} mi</span>
-            )}
+    <div className="bg-white rounded-2xl border border-slate-200 p-3 hover:border-emerald-300 transition-all">
+      <Link href={`/providers/${c.slug || slugify(c.name)}`} className="block">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <div className="font-bold text-slate-900 text-sm truncate">{c.name}</div>
+            <div className="text-[11px] text-slate-400 truncate flex items-center gap-1">
+              <span>{c.city}{c.state ? `, ${c.state}` : ''}</span>
+              {c.distanceMi != null && (
+                <span className="text-[#0F6E56] font-bold whitespace-nowrap">· {c.distanceMi} mi</span>
+              )}
+            </div>
           </div>
-        </div>
-        {c.claimed && c.rating != null && c.rating > 0 && (
-          <span className="flex items-center gap-0.5 text-xs font-bold text-slate-700 shrink-0">
-            <Star size={11} fill="currentColor" className="text-amber-400" />{c.rating.toFixed(1)}
-          </span>
-        )}
-      </div>
-      <div className="flex items-center justify-between gap-2 mt-2">
-        <div className="flex flex-wrap gap-1">
-          {c.verified ? (
-            <span className="inline-flex items-center gap-0.5 text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100 px-1.5 py-0.5 rounded-full"><ShieldCheck size={9} /> Verified</span>
-          ) : c.claimed ? (
-            <span className="text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100 px-1.5 py-0.5 rounded-full">Claimed</span>
-          ) : (
-            <span className="text-[9px] font-black uppercase tracking-wider bg-slate-50 text-slate-500 border border-slate-100 px-1.5 py-0.5 rounded-full">Unclaimed</span>
+          {c.claimed && c.rating != null && c.rating > 0 && (
+            <span className="flex items-center gap-0.5 text-xs font-bold text-slate-700 shrink-0">
+              <Star size={11} fill="currentColor" className="text-amber-400" />{c.rating.toFixed(1)}
+            </span>
           )}
-          {c.mobile && <span className="text-[9px] font-black uppercase tracking-wider bg-sky-50 text-sky-700 border border-sky-100 px-1.5 py-0.5 rounded-full">Mobile</span>}
         </div>
-        <span className="inline-flex items-center gap-1 text-[11px] font-black text-[#0F6E56] shrink-0">View <ArrowRight size={11} /></span>
-      </div>
-    </Link>
+        <div className="flex items-center justify-between gap-2 mt-2">
+          <div className="flex flex-wrap gap-1">
+            {c.verified ? (
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100 px-1.5 py-0.5 rounded-full"><ShieldCheck size={9} /> Verified</span>
+            ) : c.claimed ? (
+              <span className="text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100 px-1.5 py-0.5 rounded-full">Claimed</span>
+            ) : (
+              <span className="text-[9px] font-black uppercase tracking-wider bg-slate-50 text-slate-500 border border-slate-100 px-1.5 py-0.5 rounded-full">Unclaimed</span>
+            )}
+            {c.mobile && <span className="text-[9px] font-black uppercase tracking-wider bg-sky-50 text-sky-700 border border-sky-100 px-1.5 py-0.5 rounded-full">Mobile</span>}
+          </div>
+          <span className="inline-flex items-center gap-1 text-[11px] font-black text-[#0F6E56] shrink-0">View <ArrowRight size={11} /></span>
+        </div>
+      </Link>
+      {(showBookOnline || showCallToBook) && (
+        <div className="mt-2.5 pt-2.5 border-t border-slate-100">
+          {showBookOnline ? (
+            <a
+              href={c.bookingUrl!}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full inline-flex items-center justify-center gap-1.5 py-2 rounded-xl font-black text-white text-xs uppercase tracking-wider shadow-sm hover:opacity-95 transition-opacity"
+              style={{ backgroundColor: EMERALD }}
+            >
+              <Calendar size={12} /> Book Now
+            </a>
+          ) : (
+            <a
+              href={telHref(c.phone!)}
+              className="w-full inline-flex items-center justify-center gap-1.5 py-2 rounded-xl font-black text-xs uppercase tracking-wider border-2 transition-colors hover:bg-emerald-50"
+              style={{ borderColor: EMERALD, color: EMERALD }}
+            >
+              <Phone size={12} /> Call to Book
+            </a>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 

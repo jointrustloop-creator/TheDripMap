@@ -23,6 +23,7 @@ export interface AssistantClinic {
   website: string | null;
   phone: string | null;
   distanceMi: number | null; // straight-line miles from the user, when known
+  bookingUrl?: string | null; // deep link to the clinic's online booking system (claimed clinics only)
 }
 
 export interface NearCoords { lat: number; lng: number }
@@ -100,6 +101,7 @@ interface ProviderRow {
   mobile_service: boolean | null; website: string | null; phone: string | null;
   description: string | null; working_hours: Record<string, unknown> | null; id: string;
   latitude?: number | string | null; longitude?: number | string | null;
+  online_booking_url?: string | null;
 }
 
 function toClinic(p: ProviderRow, verified: boolean, distanceMi: number | null = null): AssistantClinic {
@@ -110,6 +112,7 @@ function toClinic(p: ProviderRow, verified: boolean, distanceMi: number | null =
     verified, claimed: !!p.is_featured, mobile: isMobileProvider(p),
     website: p.website, phone: p.phone,
     distanceMi: distanceMi != null ? Math.round(distanceMi * 10) / 10 : null,
+    bookingUrl: p.online_booking_url || null,
   };
 }
 
@@ -149,7 +152,7 @@ async function searchProviders(input: {
 
   let q = sb
     .from('providers')
-    .select('id, name, slug, city, state, rating, reviews, is_featured, type, specialties, mobile_service, website, phone, description, working_hours, latitude, longitude')
+    .select('id, name, slug, city, state, rating, reviews, is_featured, type, specialties, mobile_service, website, phone, description, working_hours, latitude, longitude, online_booking_url')
     .neq('availability', false);
   if (hasCity) q = q.ilike('city', `%${input.city!.trim()}%`);
   if (input.verified_only) q = q.eq('is_featured', true);
@@ -248,6 +251,7 @@ async function searchProviders(input: {
         verified: c.verified, claimed: c.claimed, mobile: c.mobile, slug: c.slug,
         distanceMi: c.distanceMi,
         country, currency: currencyForCountry(country),
+        hasOnlineBooking: !!c.bookingUrl,
       };
     }),
   });
@@ -267,7 +271,7 @@ async function getProvider(input: { slug?: string }): Promise<ToolOutcome> {
     // Try a fuzzy name match so "is Refresh Med Spa verified?" works.
     const { data: alt } = await sb
       .from('providers')
-      .select('id, name, slug, city, state, rating, reviews, is_featured, type, specialties, mobile_service, website, phone, description, working_hours')
+      .select('id, name, slug, city, state, rating, reviews, is_featured, type, specialties, mobile_service, website, phone, description, working_hours, online_booking_url')
       .ilike('name', `%${input.slug.replace(/-/g, ' ')}%`)
       .order('is_featured', { ascending: false })
       .limit(1)
@@ -363,12 +367,63 @@ async function getCityStats(input: { city?: string }): Promise<ToolOutcome> {
   };
 }
 
+// ── book_appointment ───────────────────────────────────────────────
+// Returns the booking action for a specific clinic so the UI can render a
+// prominent "BOOK NOW" or "CALL TO BOOK" button on the matching mini-card.
+//
+// Decision logic:
+//   - online_booking_url present  -> recommend "book_online", button = "BOOK NOW"
+//   - online_booking_url missing  -> recommend "call", button = "CALL TO BOOK"
+//     (phone may also be null, in which case the UI should fall back to the
+//     clinic's own website link or a "Contact" CTA — the chat can suggest
+//     the user message us if neither exists).
+async function bookAppointment(input: { slug?: string }): Promise<ToolOutcome> {
+  if (!input.slug) return { forModel: JSON.stringify({ error: 'slug required' }) };
+  const sb = getServiceSupabase();
+  const { data: p } = await sb
+    .from('providers')
+    .select('id, name, slug, city, state, rating, reviews, is_featured, type, specialties, mobile_service, website, phone, description, working_hours, online_booking_url')
+    .eq('slug', input.slug)
+    .maybeSingle();
+
+  if (!p) {
+    return { forModel: JSON.stringify({ error: 'clinic not found', slug: input.slug }) };
+  }
+  const row = p as ProviderRow;
+  const hasBookingUrl = !!row.online_booking_url;
+  const recommendedAction: 'book_online' | 'call' = hasBookingUrl ? 'book_online' : 'call';
+  const buttonLabel = hasBookingUrl ? 'BOOK NOW' : 'CALL TO BOOK';
+
+  // Also produce a clinic card so the UI can pin a BOOK NOW button on it,
+  // even if the user's previous search didn't surface this exact clinic.
+  const clinic = toClinic(row, false);
+
+  return {
+    forModel: JSON.stringify({
+      hasBookingUrl,
+      bookingUrl: row.online_booking_url || null,
+      phone: row.phone || null,
+      clinicName: row.name,
+      slug: row.slug,
+      recommendedAction,
+      buttonLabel,
+      note: hasBookingUrl
+        ? 'A BOOK NOW button has been rendered on the clinic card. Tell the user briefly that they can book directly with one tap.'
+        : (row.phone
+          ? 'No online booking yet — a CALL TO BOOK button has been rendered. Tell the user to call the clinic; mention the phone number in your reply.'
+          : 'Neither online booking nor a phone is on file. Suggest they visit the clinic page or message TheDripMap for help.'),
+    }),
+    clinics: [clinic],
+  };
+}
+
 export async function runTool(name: string, input: Record<string, unknown>): Promise<ToolOutcome> {
   switch (name) {
     case 'search_providers': return searchProviders(input as never);
     case 'get_provider': return getProvider(input as never);
     case 'get_treatment_info': return getTreatmentInfo(input as never);
     case 'get_city_stats': return getCityStats(input as never);
+    case 'book_appointment': return bookAppointment(input as never);
     default: return { forModel: JSON.stringify({ error: `unknown tool ${name}` }) };
   }
 }
@@ -409,6 +464,17 @@ export const TOOL_SCHEMAS = [
     name: 'get_city_stats',
     description: 'Get how many clinics TheDripMap lists in a city and a typical price range.',
     input_schema: { type: 'object', properties: { city: { type: 'string' } }, required: ['city'] },
+  },
+  {
+    name: 'book_appointment',
+    description: 'Get the booking action for a specific clinic the user wants to book. Call this when the user says "book", "schedule", "appointment", or otherwise signals intent to book a specific clinic that has already been surfaced in chat. Returns either a bookable URL (renders a BOOK NOW button on the clinic card) or a phone number to call (renders a CALL TO BOOK button). Pass the clinic\'s slug.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        slug: { type: 'string', description: 'The clinic\'s slug from a previous search_providers result.' },
+      },
+      required: ['slug'],
+    },
   },
 ];
 
@@ -462,6 +528,7 @@ TOOLS:
 - get_provider — to check a specific clinic's verification/details by name or slug.
 - get_treatment_info — educational info about a treatment; answer accurately then offer to find a nearby clinic.
 - get_city_stats — "how many clinics in X" or city price questions.
+- book_appointment — when the user says "book", "schedule", or "appointment" for a specific clinic that's already in the conversation, call this with that clinic's slug. The UI renders a BOOK NOW or CALL TO BOOK button on the card; in your reply, briefly tell the user to tap the button (and mention the phone number when only call-to-book is available).
 
 WHEN RESULTS ARE DISTANCE-RANKED: the nearest match is first; you can mention the distance in miles if helpful.
 
