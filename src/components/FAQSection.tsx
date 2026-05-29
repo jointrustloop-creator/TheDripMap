@@ -1,7 +1,6 @@
 'use client';
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
 
 interface FAQ {
   question: string;
@@ -47,20 +46,18 @@ export const FAQSection = ({ faqs, title = "Frequently Asked Questions" }: FAQSe
                 <span className="font-bold text-slate-900">{faq.question}</span>
                 {openIndex === index ? <ChevronUp size={20} className="text-wellness-600" /> : <ChevronDown size={20} className="text-slate-400" />}
               </button>
-              <AnimatePresence>
-                {openIndex === index && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="p-6 pt-0 text-slate-600 leading-relaxed text-sm border-t border-slate-50">
-                      {faq.answer}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <div
+                className={`grid transition-all duration-300 ease-out ${
+                  openIndex === index ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                }`}
+                aria-hidden={openIndex !== index}
+              >
+                <div className="overflow-hidden">
+                  <div className="p-6 pt-0 text-slate-600 leading-relaxed text-sm border-t border-slate-50">
+                    {faq.answer}
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
         </div>

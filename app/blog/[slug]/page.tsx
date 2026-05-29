@@ -133,31 +133,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     }
   };
 
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "https://www.thedripmap.com"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Blog",
-        "item": "https://www.thedripmap.com/blog"
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": post.title,
-        "item": `https://www.thedripmap.com/blog/${slug}`
-      }
-    ]
-  };
-
   // ItemList JSON-LD — only meaningful for City Guides where related_clinics
   // is the actual list of clinics being recommended. Google uses this for
   // rich list-style results on "best X in Y" queries.
@@ -230,10 +205,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       {itemListJsonLd && (
         <script

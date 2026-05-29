@@ -186,15 +186,6 @@ export default async function TreatmentCityPage({ params }: PageProps) {
     },
   ];
 
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Treatments', item: `${SITE_URL}/treatments` },
-      { '@type': 'ListItem', position: 2, name: t.name, item: `${SITE_URL}/treatments/${t.slug === 'hangover-recovery' ? 'hangover' : t.slug === 'athletic-recovery' ? 'recovery' : t.slug === 'mobile-iv' ? 'hydration' : t.slug === 'vitamin-c' ? 'high-dose-vitamin-c' : t.slug}` },
-      { '@type': 'ListItem', position: 3, name: `${t.name} in ${cityLabel}`, item: canonical },
-    ],
-  };
   const itemListJsonLd = count > 0 ? {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -231,7 +222,6 @@ export default async function TreatmentCityPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       {itemListJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 

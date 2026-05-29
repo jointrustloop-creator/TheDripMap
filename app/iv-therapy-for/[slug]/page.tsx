@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title,
     description,
     alternates: {
-      canonical: `/iv-therapy-for/${slug}`,
+      canonical: `https://www.thedripmap.com/iv-therapy-for/${slug}`,
     },
     openGraph: {
       title,
@@ -65,32 +65,27 @@ export default async function UseCasePage({ params }: PageProps) {
   const IconComponent = (Icons as unknown as Record<string, LucideIcon>)[useCase.icon];
 
   const breadcrumbs = [
-    { label: 'Home', href: '/' },
     { label: 'IV Therapy For', href: '/iv-therapy-for' },
     { label: useCase.title, href: `/iv-therapy-for/${useCase.slug}` },
+  ];
+
+  const allFaqs = [
+    ...useCase.faqs,
+    { question: `How much does IV therapy for ${useCase.title.toLowerCase()} cost?`, answer: `Standard IV therapy sessions typically range from $150 to $350. Specialized treatments may cost more. Prices vary by clinic and city — check individual provider listings for exact pricing.` },
+    { question: `How soon will I feel better?`, answer: `Most people feel relief within 15 to 60 minutes of starting their IV treatment. Effects can last anywhere from a few hours to several days depending on the formula and your individual response.` },
+    { question: `Does insurance cover IV therapy?`, answer: `IV therapy is generally considered elective and is not covered by most insurance plans. Some HSA and FSA accounts may cover treatments with a medical necessity. Confirm with the clinic and your insurance provider.` },
   ];
 
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "mainEntity": useCase.faqs.map((faq) => ({
+    "mainEntity": allFaqs.map((faq) => ({
       "@type": "Question",
       "name": faq.question,
       "acceptedAnswer": {
         "@type": "Answer",
         "text": faq.answer,
       },
-    })),
-  };
-
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": breadcrumbs.map((crumb, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "name": crumb.label,
-      "item": `https://www.thedripmap.com${crumb.href}`,
     })),
   };
 
@@ -112,10 +107,6 @@ export default async function UseCasePage({ params }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       <script
         type="application/ld+json"
@@ -271,21 +262,7 @@ export default async function UseCasePage({ params }: PageProps) {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Common Questions About {useCase.title}</h2>
           <div className="space-y-6">
-            {[
-              ...useCase.faqs,
-              { 
-                question: `How much does ${useCase.title} IV therapy cost?`, 
-                answer: `The cost of IV therapy for ${useCase.title.toLowerCase()} typically ranges from $175 to $350, depending on the specific ingredients included in the drip and the provider's location. Many clinics offer package deals or memberships that can reduce the per-session cost.` 
-              },
-              { 
-                question: `How soon will I feel better after ${useCase.title} IV therapy?`, 
-                answer: `Many people report feeling a difference within 30 to 60 minutes of starting their session, as the fluids and nutrients are delivered directly into the bloodstream. However, for some conditions, the full benefits may be more noticeable over the following 24 to 48 hours.` 
-              },
-              { 
-                question: `Is ${useCase.title} IV therapy covered by insurance?`, 
-                answer: `In most cases, elective IV therapy for ${useCase.title.toLowerCase()} is considered a wellness treatment and is not covered by standard health insurance. However, some providers accept HSA (Health Savings Account) or FSA (Flexible Spending Account) payments. It's always best to check with both the clinic and your insurance provider.` 
-              }
-            ].map((faq, idx) => (
+            {allFaqs.map((faq, idx) => (
               <div key={idx} className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">
                 <h3 className="text-lg font-bold text-gray-900 mb-3">{faq.question}</h3>
                 <p className="text-gray-600 leading-relaxed">{faq.answer}</p>

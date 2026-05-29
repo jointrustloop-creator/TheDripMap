@@ -217,32 +217,6 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
   if (!service) notFound();
 
   const content = getTreatmentContent(service.name);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://thedripmap.com';
-  
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": siteUrl
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "IV Therapy",
-        "item": `${siteUrl}/search`
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": service.name,
-        "item": `${siteUrl}/treatments/${service.slug}`
-      }
-    ]
-  };
 
   const procedureJsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -300,42 +274,21 @@ export default function ServicePage({ params }: { params: Promise<{ service: str
         },
       ];
 
-  const faqJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": faqs.map(faq => ({
-      "@type": "Question",
-      "name": faq.question,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": faq.answer
-      }
-    }))
-  };
-
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
-      
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(procedureJsonLd) }}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-      />
       
       <main className="max-w-7xl mx-auto px-6 py-12">
-        <BreadcrumbNav 
+        <BreadcrumbNav
           items={[
-            { label: 'IV Therapy', href: '/search' },
-            { label: service.name }
-          ]} 
+            { label: 'Treatments', href: '/treatments' },
+            { label: service.name, href: `/treatments/${service.slug}` }
+          ]}
         />
 
         {/* Hero Section */}

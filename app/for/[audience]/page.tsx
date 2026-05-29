@@ -52,11 +52,7 @@ export default async function AudiencePage({ params }: PageProps) {
 
   const clinics = await getListingsByService(a.serviceTag, 6);
 
-  // BreadcrumbNav prepends its own "Home" crumb and emits BreadcrumbList JSON-LD,
-  // so we only pass the trailing crumbs. "Who We Serve" has no href yet (no /for
-  // index page), so it renders as plain text rather than a 404 link.
   const breadcrumbs = [
-    { label: 'Who We Serve' },
     { label: a.navLabel, href: `/for/${a.slug}` },
   ];
 

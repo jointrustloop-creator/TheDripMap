@@ -28,12 +28,12 @@ export async function generateMetadata({ params }: { params: Promise<{ service: 
     title,
     description,
     alternates: {
-      canonical: `${siteUrl}/treatments/${resolvedParams.service}`,
+      canonical: `${siteUrl}/treatments/${service ? service.slug : serviceSlug}`,
     },
     openGraph: {
       title,
       description,
-      url: `${siteUrl}/treatments/${resolvedParams.service}`,
+      url: `${siteUrl}/treatments/${service ? service.slug : serviceSlug}`,
       siteName: 'TheDripMap',
       type: 'website',
       images: [

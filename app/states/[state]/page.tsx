@@ -42,16 +42,6 @@ export default async function StatePage({ params }: StatePageProps) {
   const cityCount = cities.length;
   const topCityNames = cities.slice(0, 3).map((c) => c.city);
 
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
-      { '@type': 'ListItem', position: 2, name: 'States', item: `${SITE_URL}/states` },
-      { '@type': 'ListItem', position: 3, name: state.name, item: `${SITE_URL}/states/${state.slug}` },
-    ],
-  };
-
   const itemListJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -93,7 +83,6 @@ export default async function StatePage({ params }: StatePageProps) {
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageJsonLd) }} />
 

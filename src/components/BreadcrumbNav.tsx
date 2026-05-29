@@ -19,15 +19,26 @@ interface BreadcrumbNavProps {
 }
 
 export const BreadcrumbNav = ({ items, className, activeClassName }: BreadcrumbNavProps) => {
+  const SITE_URL = 'https://www.thedripmap.com';
+  const homeEntry = {
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Home",
+    "item": SITE_URL,
+  };
+  const itemEntries = items.map((item, index) => {
+    const entry: Record<string, unknown> = {
+      "@type": "ListItem",
+      "position": index + 2,
+      "name": item.label,
+    };
+    if (item.href) entry.item = `${SITE_URL}${item.href}`;
+    return entry;
+  });
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": items.map((item, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "name": item.label,
-      "item": item.href ? `https://www.thedripmap.com${item.href}` : undefined
-    }))
+    "itemListElement": [homeEntry, ...itemEntries],
   };
 
   return (

@@ -304,32 +304,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
     } : undefined
   };
 
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "https://www.thedripmap.com"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": cityLabel,
-        "item": `https://www.thedripmap.com/cities/${citySlug}`
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": provider.name,
-        "item": `https://www.thedripmap.com/providers/${slug}`
-      }
-    ]
-  };
-
-  const faqJsonLd = {
+  const faqJsonLd = provider.is_featured ? {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": [
@@ -360,24 +335,22 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
         }
       }
     ]
-  };
+  } : null;
 
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
-      
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(medicalBusinessJsonLd) }}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-      />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
       
       {/* MAGAZINE HERO — claimed listings only. Edge-to-edge cover photo with the
           clinic logo as a small inset avatar and the clinic name in display type.

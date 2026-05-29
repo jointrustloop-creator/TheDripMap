@@ -27,16 +27,6 @@ export default async function GuidePage({ params }: GuidePageProps) {
   const guide = getGuideBySlug(slug);
   if (!guide) notFound();
 
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
-      { '@type': 'ListItem', position: 2, name: 'Guides', item: `${SITE_URL}/guide` },
-      { '@type': 'ListItem', position: 3, name: guide.title, item: `${SITE_URL}/guide/${guide.slug}` },
-    ],
-  };
-
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -52,23 +42,11 @@ export default async function GuidePage({ params }: GuidePageProps) {
     mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/guide/${guide.slug}` },
   };
 
-  const faqJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: guide.faqs.map((f) => ({
-      '@type': 'Question',
-      name: f.question,
-      acceptedAnswer: { '@type': 'Answer', text: f.answer },
-    })),
-  };
-
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <main className="max-w-4xl mx-auto px-6 py-12">
         <BreadcrumbNav
