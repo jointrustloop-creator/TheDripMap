@@ -47,6 +47,23 @@ const SAFETY_FLAGS = [
   'verifiedLiabilityInsurance', 'verifiedStateBoard',
 ];
 
+// Canadian provinces (full names — match what's stored in providers.state).
+const CANADIAN_PROVINCES = new Set([
+  'Ontario', 'British Columbia', 'Alberta', 'Quebec', 'Manitoba',
+  'Nova Scotia', 'Saskatchewan', 'New Brunswick',
+  'Newfoundland and Labrador', 'Prince Edward Island',
+  'Northwest Territories', 'Nunavut', 'Yukon',
+]);
+function isCanadianState(state: string | null | undefined): boolean {
+  return !!state && CANADIAN_PROVINCES.has(state.trim());
+}
+function countryOfState(state: string | null | undefined): 'CA' | 'US' {
+  return isCanadianState(state) ? 'CA' : 'US';
+}
+function currencyForCountry(country: 'CA' | 'US'): 'CAD' | 'USD' {
+  return country === 'CA' ? 'CAD' : 'USD';
+}
+
 // Treatment term -> keywords matched against name/description/specialties.
 const TREATMENT_KEYWORDS: Record<string, string[]> = {
   hangover: ['hangover', 'rehydrate', 'recovery', 'detox'],
@@ -156,8 +173,16 @@ async function searchProviders(input: {
   }
   if (input.mobile_only) rows = rows.filter(isMobileProvider);
   if (input.open_now) {
+    // Strict: only include clinics whose hours we can confirm are open right
+    // now. Unparseable / missing hours are excluded rather than silently shown
+    // as open — the user asked for confirmed-open results.
     rows = rows.filter((p) => {
-      try { const s = getStatus(p.working_hours as never); return s?.isOpen !== false; } catch { return true; }
+      try {
+        const s = getStatus(p.working_hours as never);
+        return s?.isOpen === true;
+      } catch {
+        return false;
+      }
     });
   }
 
@@ -216,11 +241,15 @@ async function searchProviders(input: {
   const forModel = JSON.stringify({
     count: ranked.length,
     rankedBy: near ? 'distance' : 'relevance',
-    clinics: clinics.map((c) => ({
-      name: c.name, city: c.city, state: c.state, rating: c.rating, reviews: c.reviews,
-      verified: c.verified, claimed: c.claimed, mobile: c.mobile, slug: c.slug,
-      distanceMi: c.distanceMi,
-    })),
+    clinics: clinics.map((c) => {
+      const country = countryOfState(c.state);
+      return {
+        name: c.name, city: c.city, state: c.state, rating: c.rating, reviews: c.reviews,
+        verified: c.verified, claimed: c.claimed, mobile: c.mobile, slug: c.slug,
+        distanceMi: c.distanceMi,
+        country, currency: currencyForCountry(country),
+      };
+    }),
   });
   return { forModel, clinics };
 }
@@ -269,23 +298,28 @@ async function providerOutcome(p: ProviderRow, sb: ReturnType<typeof getServiceS
 }
 
 // ── get_treatment_info ──────────────────────────────────────────────
-function getTreatmentInfo(input: { treatment_name?: string }): ToolOutcome {
+function getTreatmentInfo(input: { treatment_name?: string; country?: string }): ToolOutcome {
   const name = (input.treatment_name || '').toLowerCase().trim();
   if (!name) return { forModel: JSON.stringify({ error: 'treatment_name required' }) };
+  const isCanada = (input.country || '').trim().toLowerCase() === 'canada';
+  const currency = isCanada ? 'CAD' : 'USD';
   const entry = Object.entries(TREATMENT_CONTENT).find(([key]) => {
     const k = key.toLowerCase();
     return k.includes(name) || name.includes(k) || name.includes(k.split(' ')[0]);
   });
   if (!entry) {
-    return { forModel: JSON.stringify({ found: false, note: 'No dedicated info for that exact treatment; answer from general knowledge with honest caveats and suggest the clinic confirm specifics.' }) };
+    return { forModel: JSON.stringify({ found: false, currency, note: 'No dedicated info for that exact treatment; answer from general knowledge with honest caveats and suggest the clinic confirm specifics.' }) };
   }
   const [key, c] = entry;
   return {
     forModel: JSON.stringify({
-      found: true, treatment: key,
+      found: true,
+      treatment: key,
       summary: c.description.split('\n\n')[0],
       howItWorks: c.howItWorks,
-      costRange: c.costRange,
+      costRange: `${c.costRange} ${currency}`,
+      currency,
+      currencyNote: isCanada ? 'Prices shown are typical Canadian-clinic CAD ranges.' : 'Prices shown are typical US-clinic USD ranges.',
       safety: c.safety || 'Always confirm suitability with a licensed clinician.',
       benefits: c.benefits.slice(0, 4),
     }),
@@ -296,12 +330,35 @@ function getTreatmentInfo(input: { treatment_name?: string }): ToolOutcome {
 async function getCityStats(input: { city?: string }): Promise<ToolOutcome> {
   if (!input.city) return { forModel: JSON.stringify({ error: 'city required' }) };
   const sb = getServiceSupabase();
+  // Detect country by the modal state of providers in this city so prices are
+  // labeled in the right currency (Canadian cities -> CAD, US cities -> USD).
+  const { data: states } = await sb
+    .from('providers')
+    .select('state')
+    .ilike('city', `%${input.city.trim()}%`)
+    .neq('availability', false)
+    .limit(100);
+  const stateCounts: Record<string, number> = {};
+  for (const r of (states as { state: string | null }[]) || []) {
+    const s = (r.state || '').trim();
+    if (s) stateCounts[s] = (stateCounts[s] || 0) + 1;
+  }
+  let modalState = '';
+  let max = 0;
+  for (const [k, n] of Object.entries(stateCounts)) if (n > max) { modalState = k; max = n; }
+  const country = countryOfState(modalState);
+  const currency = currencyForCountry(country);
+
   const { count: total } = await sb.from('providers').select('id', { count: 'exact', head: true }).ilike('city', `%${input.city.trim()}%`).neq('availability', false);
   const { count: verified } = await sb.from('providers').select('id', { count: 'exact', head: true }).ilike('city', `%${input.city.trim()}%`).eq('is_featured', true);
   return {
     forModel: JSON.stringify({
-      city: input.city, totalProviders: total || 0, claimedProviders: verified || 0,
-      typicalPriceRange: 'Most IV drips run about $100–$350 depending on the treatment; NAD+ and specialty drips cost more.',
+      city: input.city,
+      country: country === 'CA' ? 'Canada' : 'United States',
+      currency,
+      totalProviders: total || 0,
+      claimedProviders: verified || 0,
+      typicalPriceRange: `Most IV drips run about $100–$350 ${currency} depending on the treatment; NAD+ and specialty drips cost more.`,
     }),
   };
 }
@@ -338,8 +395,15 @@ export const TOOL_SCHEMAS = [
   },
   {
     name: 'get_treatment_info',
-    description: 'Get accurate educational info about an IV therapy treatment (what it is, how it works, cost, safety).',
-    input_schema: { type: 'object', properties: { treatment_name: { type: 'string' } }, required: ['treatment_name'] },
+    description: 'Get accurate educational info about an IV therapy treatment (what it is, how it works, cost, safety). Pass country="Canada" when the user is in a Canadian city so prices are labeled in CAD; defaults to USD otherwise.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        treatment_name: { type: 'string' },
+        country: { type: 'string', description: '"Canada" or "United States" — used to label the cost range in CAD vs USD. Defaults to USD.' },
+      },
+      required: ['treatment_name'],
+    },
   },
   {
     name: 'get_city_stats',
@@ -355,6 +419,7 @@ export interface AssistantConfig {
 export interface AssistantContext {
   city?: string | null; // user's detected/stated city
   hasCoords?: boolean; // true if the browser gave us precise coordinates
+  clinicCount?: number; // total available clinics in the directory (queried per request — never hardcoded)
 }
 
 export function buildSystemPrompt(config: AssistantConfig = {}, ctx: AssistantContext = {}): string {
@@ -368,7 +433,16 @@ export function buildSystemPrompt(config: AssistantConfig = {}, ctx: AssistantCo
     ? `USER LOCATION: precise GPS coordinates are available, so "near me" searches are automatically distance-ranked. You may proceed without asking for a city.`
     : `USER LOCATION: UNKNOWN. For any "find a clinic / near me" request you MUST first ask one short question — "What city are you in?" — and wait for the answer before searching. Never guess a city and never list clinics without a location.`;
 
-  return `You are "Drip Assistant", the chat concierge for TheDripMap — North America's IV therapy & peptide clinic directory (1,100+ listed clinics, with verified safety badges on claimed clinics).
+  // Directory size — injected per request from a live Supabase count so the
+  // assistant never claims an outdated number. If the count fetch failed at
+  // the call site, fall back to a neutral phrasing rather than guessing a
+  // figure (per "never hardcode this number" rule).
+  const sizePhrase =
+    typeof ctx.clinicCount === 'number' && ctx.clinicCount > 0
+      ? `${ctx.clinicCount.toLocaleString()}+ listed clinics`
+      : 'a large directory of IV therapy and peptide clinics';
+
+  return `You are "Drip Assistant", the chat concierge for TheDripMap — North America's IV therapy & peptide clinic directory (${sizePhrase}, with verified safety badges on claimed clinics).
 
 YOUR JOB: help patients find the right clinic right now, and answer IV therapy / peptide questions accurately. Finding a clinic is your PRIMARY job; education is secondary. End educational answers by offering to find a relevant clinic.
 
@@ -390,6 +464,8 @@ TOOLS:
 - get_city_stats — "how many clinics in X" or city price questions.
 
 WHEN RESULTS ARE DISTANCE-RANKED: the nearest match is first; you can mention the distance in miles if helpful.
+
+CURRENCY: tools return "country" ("CA" or "US") and "currency" ("CAD" or "USD") on each clinic and on get_city_stats / get_treatment_info results. When discussing prices for a Canadian clinic or city, ALWAYS label the figure as CAD (e.g. "$150–$350 CAD"). When the user is in a Canadian city and asks about a treatment, pass country="Canada" to get_treatment_info so the costRange comes back labeled in CAD. Never quote a Canadian clinic's prices as USD or vice versa.
 
 HONESTY & SAFETY (critical):
 - NEVER invent clinic names, prices, hours, ratings, or verification status. Only state what the tools return. If a tool returns nothing, say so honestly and offer a covered city or the directory — never fabricate.

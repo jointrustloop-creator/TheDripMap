@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { buildSystemPrompt, TOOL_SCHEMAS, runTool, type AssistantClinic } from '../../../src/lib/drip-assistant';
+import { getServiceSupabase } from '../../../src/lib/supabase';
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
@@ -56,7 +57,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Expected a user message.' }, { status: 400 });
   }
 
-  const system = buildSystemPrompt({}, { city: userCity, hasCoords: !!userCoords });
+  // Pull the live clinic count so the system prompt's "N+ listed clinics"
+  // phrasing stays accurate as inventory grows. Service-role count(*) on
+  // a small index is sub-30ms — cheap relative to the Anthropic call.
+  let clinicCount: number | undefined;
+  try {
+    const sb = getServiceSupabase();
+    const { count } = await sb
+      .from('providers')
+      .select('id', { count: 'exact', head: true })
+      .neq('availability', false);
+    if (typeof count === 'number') clinicCount = count;
+  } catch {
+    // Non-fatal — buildSystemPrompt falls back to neutral phrasing when count is absent.
+  }
+
+  const system = buildSystemPrompt({}, { city: userCity, hasCoords: !!userCoords, clinicCount });
   let lastClinics: AssistantClinic[] = [];
   let finalText = '';
 
