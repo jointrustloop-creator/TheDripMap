@@ -281,8 +281,8 @@ function ResultsContent() {
       clauses.push(`accepts walk-in appointments`);
     }
     
-    // 5. Rating (Always add as final clause if high)
-    if (provider.rating >= 4.5) {
+    // 5. Rating (only for verified/claimed listings — never cite reviews otherwise)
+    if (provider.is_featured && provider.rating >= 4.5) {
       clauses.push(`and has a ${provider.rating} star rating with ${provider.reviewCount} reviews`);
     }
 
@@ -649,14 +649,16 @@ function ResultsContent() {
 
                   {/* Rating + location + delivery — city shown ONCE */}
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mb-6">
-                    {topMatch.rating > 0 && (
-                      <span className="inline-flex items-center gap-1.5 text-sm font-black text-slate-900">
-                        <Star size={15} fill="currentColor" className="text-amber-400" />
-                        {topMatch.rating}
-                        <span className="text-slate-400 font-bold">({topMatch.reviewCount})</span>
-                      </span>
+                    {topMatch.is_featured && topMatch.rating > 0 && (
+                      <>
+                        <span className="inline-flex items-center gap-1.5 text-sm font-black text-slate-900">
+                          <Star size={15} fill="currentColor" className="text-amber-400" />
+                          {topMatch.rating}
+                          <span className="text-slate-400 font-bold">({topMatch.reviewCount})</span>
+                        </span>
+                        <span className="text-slate-300">·</span>
+                      </>
                     )}
-                    <span className="text-slate-300">·</span>
                     <span className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-500">
                       <MapPin size={14} className="text-wellness-600" />
                       {topMatch.city}{topMatch.state ? `, ${topMatch.state}` : ''}
@@ -803,14 +805,16 @@ function ResultsContent() {
                         </div>
                       </div>
                       <div className="p-6 flex-1 flex flex-col">
-                        <div className={cn(
-                          "flex items-center gap-1 mb-2",
-                          isPremium ? "text-wellness-600" : "text-slate-400"
-                        )}>
-                          <Star size={14} fill="currentColor" />
-                          <span className="text-sm font-bold">{provider.rating}</span>
-                          <span className="text-xs text-slate-400 font-bold ml-1">({provider.reviewCount}) reviews</span>
-                        </div>
+                        {provider.is_featured && provider.rating > 0 && (
+                          <div className={cn(
+                            "flex items-center gap-1 mb-2",
+                            isPremium ? "text-wellness-600" : "text-slate-400"
+                          )}>
+                            <Star size={14} fill="currentColor" />
+                            <span className="text-sm font-bold">{provider.rating}</span>
+                            <span className="text-xs text-slate-400 font-bold ml-1">({provider.reviewCount}) reviews</span>
+                          </div>
+                        )}
                         <h3 className="text-xl font-black text-slate-900 mb-1 line-clamp-1">{provider.name}</h3>
                         <p className="text-xs text-slate-500 font-bold mb-4">{provider.city}{provider.state ? `, ${provider.state}` : ''}</p>
                         

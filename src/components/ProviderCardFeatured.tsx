@@ -191,20 +191,13 @@ export const ProviderCardFeatured = ({
                     : `${provider.city}${provider.state ? `, ${provider.state}` : ''}`}
                 </span>
               </div>
-              {provider.rating > 0 && (
-                provider.is_featured ? (
-                  <div className="flex items-center gap-1.5 text-sm font-black text-slate-900">
-                    <StarIcon size={14} className="text-amber-500" fill="currentColor" />
-                    {provider.rating}
-                    <span className="text-slate-300 font-bold">·</span>
-                    <span className="text-slate-500 font-bold">{provider.reviewCount || 0}</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1 text-xs font-bold text-slate-500">
-                    <StarIcon size={11} className="text-amber-400" fill="currentColor" />
-                    {provider.rating} <span className="text-slate-400">Google rating</span>
-                  </div>
-                )
+              {provider.is_featured && provider.rating > 0 && (
+                <div className="flex items-center gap-1.5 text-sm font-black text-slate-900">
+                  <StarIcon size={14} className="text-amber-500" fill="currentColor" />
+                  {provider.rating}
+                  <span className="text-slate-300 font-bold">·</span>
+                  <span className="text-slate-500 font-bold">{provider.reviewCount || 0}</span>
+                </div>
               )}
             </div>
           </div>

@@ -32,7 +32,7 @@ function ClinicCard({ m, alt = false }: { m: SafetyMatch; alt?: boolean }) {
             {m.city}{m.state ? `, ${m.state}` : ''}
           </div>
         </div>
-        {m.rating != null && m.rating > 0 && (
+        {m.claimed && m.rating != null && m.rating > 0 && (
           <span className="flex items-center gap-1 text-sm font-bold text-slate-700 shrink-0">
             <Star size={13} fill="currentColor" className="text-amber-400" />
             {m.rating.toFixed(1)}

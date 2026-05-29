@@ -131,10 +131,12 @@ export default function ListingMap({ providers }: ListingMapProps) {
                 </div>
               )}
               <h3 className="font-bold text-slate-900 leading-tight mb-1">{provider.name}</h3>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-wellness-600 font-bold text-xs">⭐ {provider.rating}</span>
-                <span className="text-slate-400 text-[10px]">({provider.reviewCount})</span>
-              </div>
+              {provider.is_featured && provider.rating > 0 && (
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-wellness-600 font-bold text-xs">⭐ {provider.rating}</span>
+                  <span className="text-slate-400 text-[10px]">({provider.reviewCount})</span>
+                </div>
+              )}
               <p className="text-[10px] text-slate-500 line-clamp-2 mb-3">{provider.description}</p>
               <Link 
                 href={`/providers/${provider.slug || slugify(provider.name)}`}

@@ -149,7 +149,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   const canonicalUrl = `https://www.thedripmap.com/providers/${canonicalSlug}`;
 
   const title = `${displayName} — IV Therapy in ${provider.city}, ${provider.state} | Reviews & Booking | TheDripMap`;
-  const description = provider.reviewCount > 0
+  const description = provider.is_featured && provider.reviewCount > 0
     ? `Read reviews for ${displayName} in ${provider.city}, ${provider.state}. ${provider.rating} stars, ${provider.reviewCount} reviews. IV therapy treatments include ${topSpecialties}. Book your session today.`
     : `Find ${displayName} in ${provider.city}, ${provider.state}. IV therapy treatments include ${topSpecialties}. Compare prices and book your drip session today on TheDripMap.`;
 
@@ -248,10 +248,13 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
     ? await getApprovedTestimonials(provider.id)
     : [];
 
+  // Reviews & ratings are shown ONLY for claimed/verified listings. Unclaimed
+  // listings never display ratings, review counts, or testimonials anywhere.
+  const isVerified = provider.is_featured === true;
   // Blend Google rating with patient testimonials so a clinic with 0 Google reviews
   // but verified TheDripMap testimonials still shows a meaningful rating.
-  const googleRating = Number(provider.rating) || 0;
-  const googleCount = Number(provider.reviewCount) || 0;
+  const googleRating = isVerified ? Number(provider.rating) || 0 : 0;
+  const googleCount = isVerified ? Number(provider.reviewCount) || 0 : 0;
   const testimonialCount = patientTestimonials.length;
   const testimonialRatingSum = patientTestimonials.reduce(
     (sum, t) => sum + (Number(t.rating) || 0),
@@ -751,8 +754,10 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 </div>
               </section>
 
-            {/* ABOUT SECTION */}
-            <SmartSummary reviews={provider.reviews_data || []} clinicName={displayName} />
+            {/* ABOUT SECTION — review-derived summary only for verified listings */}
+            {isVerified && (
+              <SmartSummary reviews={provider.reviews_data || []} clinicName={displayName} />
+            )}
 
             {provider.description && provider.description.length > 30 && (
               <section className="pt-8 border-t border-slate-100">
@@ -1064,8 +1069,8 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               </section>
             )}
 
-            {/* REVIEWS SECTION */}
-            {provider.reviews_data && provider.reviews_data.length > 0 && (
+            {/* REVIEWS SECTION — verified/claimed listings only */}
+            {isVerified && provider.reviews_data && provider.reviews_data.length > 0 && (
               <section id="reviews" className="pt-8 border-t border-slate-100">
                 <div className="flex items-center justify-between mb-8">
                   <h2 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
@@ -1203,13 +1208,15 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                           )}
                         </div>
                         <h4 className="font-black text-slate-900 mb-2 line-clamp-1">{cDisplayName}</h4>
-                        <div className="flex items-center gap-1.5 mb-2">
-                          <div className="flex items-center text-wellness-600">
-                            <Star size={12} fill="currentColor" />
+                        {clinic.is_featured && clinic.rating > 0 && (
+                          <div className="flex items-center gap-1.5 mb-2">
+                            <div className="flex items-center text-wellness-600">
+                              <Star size={12} fill="currentColor" />
+                            </div>
+                            <span className="text-xs font-black text-slate-900">{clinic.rating}</span>
+                            <span className="text-xs font-bold text-slate-400">· {clinic.reviewCount} reviews</span>
                           </div>
-                          <span className="text-xs font-black text-slate-900">{clinic.rating}</span>
-                          <span className="text-xs font-bold text-slate-400">· {clinic.reviewCount} reviews</span>
-                        </div>
+                        )}
                         <div className="flex items-center gap-1 text-[11px] font-bold text-slate-500 mb-4">
                           <MapPin size={12} className="text-wellness-600" />
                           {clinic.city}, {cStateCode}

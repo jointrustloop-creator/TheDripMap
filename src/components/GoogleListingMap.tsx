@@ -73,12 +73,14 @@ const MarkerWithInfoWindow = ({ provider }: { provider: Provider }) => {
               </div>
             )}
             <h4 className="font-black text-sm text-slate-900 line-clamp-2 mb-1.5 leading-snug">{provider.name}</h4>
-            <div className="flex items-center gap-1 mb-2">
-              <Star size={12} className="text-amber-400 fill-amber-400" />
-              <span className="text-[10px] font-bold text-slate-600">
-                {provider.rating} ({provider.reviewCount || 0})
-              </span>
-            </div>
+            {provider.is_featured && provider.rating > 0 && (
+              <div className="flex items-center gap-1 mb-2">
+                <Star size={12} className="text-amber-400 fill-amber-400" />
+                <span className="text-[10px] font-bold text-slate-600">
+                  {provider.rating} ({provider.reviewCount || 0})
+                </span>
+              </div>
+            )}
             {provider.specialties && provider.specialties.length > 0 && (
               <div className="flex flex-wrap gap-1 mb-2">
                 {provider.specialties.slice(0, 2).map((s) => (

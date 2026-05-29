@@ -90,6 +90,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     ? await getListingsByIds(post.relatedClinics)
     : [];
 
+  // Only claimed/verified listings may be presented as "Featured" — unclaimed
+  // clinics are never shown as featured and never display ratings/reviews.
+  const featuredClinics = relatedClinics.filter((c) => c.is_featured === true);
+
   // Build a set of city slugs that actually have a /cities/<slug> page so
   // the Related Locations chips don't link out to 404s for cities we wrote
   // blog posts about but never created hub pages for.
@@ -177,7 +181,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 "addressLocality": c.city,
                 "addressRegion": c.state,
               },
-              ...(c.rating > 0 && {
+              ...(c.is_featured && c.rating > 0 && {
                 "aggregateRating": {
                   "@type": "AggregateRating",
                   "ratingValue": c.rating,
@@ -376,12 +380,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
           {/* Sidebar */}
           <aside className="lg:col-span-4 space-y-12">
-            {/* Related Clinics */}
-            {relatedClinics.length > 0 && (
+            {/* Featured Clinics — claimed/verified listings only */}
+            {featuredClinics.length > 0 && (
               <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl p-8">
                 <h3 className="text-xl font-black text-slate-900 mb-8 tracking-tight">Featured Clinics</h3>
                 <div className="space-y-6">
-                  {relatedClinics.map((clinic) => (
+                  {featuredClinics.map((clinic) => (
                     <Link 
                       key={clinic.id}
                       href={`/providers/${clinic.slug || slugify(clinic.name)}`}

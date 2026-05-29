@@ -122,7 +122,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Sear
           <RowLabel label="Rating" />
           {providers.map((p) => (
             <Cell key={p.id}>
-              {p.rating > 0 ? (
+              {p.is_featured && p.rating > 0 ? (
                 <div className="flex items-center gap-1.5">
                   <Star size={16} className="text-amber-500" fill="currentColor" />
                   <span className="text-2xl font-black text-slate-900">{p.rating}</span>
@@ -131,7 +131,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Sear
                   </span>
                 </div>
               ) : (
-                <span className="text-sm text-slate-400 font-medium">No reviews yet</span>
+                <span className="text-sm text-slate-400 font-medium">—</span>
               )}
             </Cell>
           ))}
@@ -365,13 +365,17 @@ function MobileCompareCard({ provider }: { provider: Provider }) {
               Rating
             </div>
             <div className="flex items-center gap-1 mt-1">
-              <Star size={14} className="text-amber-500" fill="currentColor" />
-              <span className="text-sm font-black text-slate-900">
-                {provider.rating || '—'}
-              </span>
-              <span className="text-[10px] font-bold text-slate-500">
-                ({provider.reviewCount || 0})
-              </span>
+              {provider.is_featured && provider.rating > 0 ? (
+                <>
+                  <Star size={14} className="text-amber-500" fill="currentColor" />
+                  <span className="text-sm font-black text-slate-900">{provider.rating}</span>
+                  <span className="text-[10px] font-bold text-slate-500">
+                    ({provider.reviewCount || 0})
+                  </span>
+                </>
+              ) : (
+                <span className="text-sm font-black text-slate-400">—</span>
+              )}
             </div>
           </div>
           <div className="bg-slate-50 rounded-xl p-3">
