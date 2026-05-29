@@ -3,6 +3,7 @@ import { Sparkles } from 'lucide-react';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { IvCostCalculator } from '../../../src/components/IvCostCalculator';
+import { BetaBadge } from '../../../src/components/BetaBadge';
 
 const EMERALD = '#0F6E56';
 const title = 'How Much Does IV Therapy Cost? Real Price Ranges by Treatment | TheDripMap';
@@ -30,7 +31,7 @@ export default function CostCalculatorPage() {
               <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56]">Free Cost Calculator</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-[#0A0B0D] tracking-tight leading-[1.05] mb-5">
-              What will IV therapy
+              What will IV therapy <BetaBadge className="-translate-y-1" />
               <span className="block font-serif italic font-normal" style={{ color: EMERALD }}>actually cost you?</span>
             </h1>
             <p className="text-[20px] text-slate-500 max-w-[560px] mx-auto leading-relaxed font-light">

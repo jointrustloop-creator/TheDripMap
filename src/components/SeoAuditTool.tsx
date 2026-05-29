@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import type { AuditResult, AuditCheck } from '../../app/api/seo-audit/route';
 import { AUDIT_CITY_SUGGESTIONS } from '../lib/city-search-data';
+import { BetaBadge } from './BetaBadge';
 
 const EMERALD = '#0F6E56';
 
@@ -142,7 +143,7 @@ export const SeoAuditTool = () => {
           </span>
         </div>
         <h1 className="text-4xl md:text-5xl font-black text-[#0A0B0D] tracking-tight leading-[1.05] mb-5">
-          How does your clinic rank
+          How does your clinic rank <BetaBadge className="ml-1 -translate-y-1" />
           <span className="block italic font-serif" style={{ color: EMERALD }}>online?</span>
         </h1>
         <p className="text-lg text-slate-500 leading-relaxed">

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { BarChart3, ClipboardCheck, Users, BadgeCheck, ArrowRight, Sparkles } from 'lucide-react';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
+import { BetaBadge } from '../../../src/components/BetaBadge';
 import { getSiteStats } from '../../../src/lib/data';
 
 const EMERALD = '#0F6E56';
@@ -63,7 +64,7 @@ export default async function ClinicOwnerResourcesPage() {
                 <BarChart3 size={26} style={{ color: EMERALD }} />
               </div>
               <div className="flex-1">
-                <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 mb-2">Free SEO Audit</div>
+                <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 mb-2 flex items-center gap-2">Free SEO Audit <BetaBadge /></div>
                 <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-2 group-hover:text-[#0F6E56] transition-colors">
                   How does your clinic rank?
                 </h2>
@@ -88,7 +89,7 @@ export default async function ClinicOwnerResourcesPage() {
                 <Sparkles size={26} style={{ color: EMERALD }} />
               </div>
               <div className="flex-1">
-                <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 mb-2">AI Brand Voice Generator</div>
+                <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 mb-2 flex items-center gap-2">AI Brand Voice Generator</div>
                 <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-2 group-hover:text-[#0F6E56] transition-colors">
                   Your whole marketing copy kit, in 30 seconds
                 </h2>

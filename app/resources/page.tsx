@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Droplets, ShieldCheck, BookOpen, CreditCard, Map, ArrowRight, ArrowUpRight, Sparkles } from 'lucide-react';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
+import { BetaBadge } from '../../src/components/BetaBadge';
 
 const EMERALD = '#0F6E56';
 
@@ -30,6 +31,7 @@ export default function ResourcesPage() {
       desc: 'See real, sourced price ranges by treatment — Myers’, NAD+, hangover and more.',
       href: '/resources/cost-calculator',
       badge: 'Free tool',
+      beta: true,
     },
     {
       icon: ShieldCheck,
@@ -106,7 +108,7 @@ export default function ResourcesPage() {
                   <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center mb-6">
                     <Icon size={22} style={{ color: EMERALD }} />
                   </div>
-                  <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 mb-2">{c.label}</div>
+                  <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 mb-2 flex items-center gap-2">{c.label}{'beta' in c && c.beta ? <BetaBadge /> : null}</div>
                   <h2 className="text-xl font-black text-slate-900 tracking-tight leading-snug mb-3 group-hover:text-[#0F6E56] transition-colors">
                     {c.cardTitle}
                   </h2>

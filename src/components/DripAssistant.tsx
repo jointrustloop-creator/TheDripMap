@@ -231,7 +231,15 @@ export const DripAssistant = () => {
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center"><ShieldCheck size={16} /></div>
               <div>
-                <div className="font-black text-sm leading-tight">Drip Assistant</div>
+                <div className="font-black text-sm leading-tight flex items-center gap-1.5">
+                  Drip Assistant
+                  <span
+                    title="This tool is in beta. Results may vary. Send feedback to info@thedripmap.com"
+                    className="inline-flex items-center rounded-full bg-white/20 text-white px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide leading-none"
+                  >
+                    BETA
+                  </span>
+                </div>
                 <div className="text-[10px] text-emerald-50/80 leading-tight">Find a clinic · ask anything</div>
               </div>
             </div>

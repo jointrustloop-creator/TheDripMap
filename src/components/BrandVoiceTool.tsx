@@ -84,7 +84,17 @@ export const BrandVoiceTool = () => {
         body: JSON.stringify({ clinicName, city, treatments, vibe, patient }),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error || 'Something went wrong. Please try again.'); return; }
+      if (!res.ok) {
+        // The API returns a 503 when the generator is unavailable (e.g. missing
+        // ANTHROPIC_API_KEY). Surface a friendly, on-brand message instead of a
+        // raw/blank error state.
+        if (res.status === 503) {
+          setError('Brand voice generation is temporarily unavailable. Please check back shortly or email info@thedripmap.com');
+        } else {
+          setError(data.error || 'Something went wrong. Please try again.');
+        }
+        return;
+      }
       setResult(data.result); setListing(data.listing);
       // Stash for the claim/setup prefill.
       try {
