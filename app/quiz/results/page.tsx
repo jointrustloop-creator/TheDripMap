@@ -88,6 +88,18 @@ function ResultsContent() {
           initialListings = locationListingsRes.value as Provider[];
         }
 
+        // Fallback: a city/state search that finds nothing must not dead-end. Load
+        // the full directory so the matcher can still surface the closest clinics by
+        // region / country / distance (e.g. a Bracebridge search shows nearby Ontario
+        // clinics instead of an empty page).
+        if (city && initialListings.length === 0) {
+          try {
+            initialListings = (await getAllListings()) as Provider[];
+          } catch {
+            /* keep empty — the empty-state UI will handle it */
+          }
+        }
+
         // Check if we found any exact city matches
         const cityOnlyMatches = initialListings.filter(p => {
           const pCity = p.city.toLowerCase().trim();

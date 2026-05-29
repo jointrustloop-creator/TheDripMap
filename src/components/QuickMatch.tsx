@@ -53,6 +53,10 @@ export function QuickMatch() {
   const [isGoalOpen, setIsGoalOpen] = useState(false);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isDetecting, setIsDetecting] = useState(false);
+  // Precise GPS coords + the location string they correspond to, so we only pass
+  // coordinates to the matcher when the chosen location is the detected one.
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [coordsFor, setCoordsFor] = useState<string>('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const locationRef = useRef<HTMLDivElement>(null);
 
@@ -112,7 +116,10 @@ export function QuickMatch() {
             const city = data.address.city || data.address.town || data.address.village || data.address.suburb;
             const state = data.address.state;
             if (city) {
-              setLocation(state ? `${city}, ${state}` : city);
+              const loc = state ? `${city}, ${state}` : city;
+              setLocation(loc);
+              setCoords({ lat: position.coords.latitude, lng: position.coords.longitude });
+              setCoordsFor(loc);
             }
           } catch (error) {
             console.error("Error detecting location:", error);
@@ -138,6 +145,12 @@ export function QuickMatch() {
       const [cityName, stateName] = location.split(',').map(s => s.trim());
       params.set('city', cityName);
       if (stateName) params.set('state', stateName);
+      // Pass precise coordinates only when they belong to the selected location,
+      // so results can be ranked by true distance (closest clinics first).
+      if (coords && coordsFor && location.trim() === coordsFor) {
+        params.set('lat', String(coords.lat));
+        params.set('lng', String(coords.lng));
+      }
       
       // Update global location state so the entire app stays in sync
       const gtaLower = GTA_CITIES.map(c => c.toLowerCase());

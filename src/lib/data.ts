@@ -267,14 +267,18 @@ export async function getListingsByCity(city: string, state?: string) {
         query = query.ilike('city', `%${cityName}%`);
         
         if (stateName) {
-          // Use mapping to get the abbreviation if a full name was provided
+          // Resolve BOTH the full name and the abbreviation so we match providers
+          // whether their state is stored as "Ontario" or "ON", regardless of which
+          // form the caller passed.
           const slugState = slugify(stateName);
-          const stateAbbr = STATE_MAP[slugState] || stateName;
-          
-          // Use actual names, not slugs, for the ilike search to match DB content
-          const statePattern = stateName.replace(/'/g, "''").trim();
+          let stateAbbr = STATE_MAP[slugState];
+          if (!stateAbbr && stateName.trim().length === 2) stateAbbr = stateName.trim().toUpperCase();
+          if (!stateAbbr) stateAbbr = stateName;
+          const stateFull = REVERSE_STATE_MAP[stateAbbr.toUpperCase()] || stateName;
+
+          const statePattern = stateFull.replace(/'/g, "''").trim();
           const abbrPattern = stateAbbr.replace(/'/g, "''").trim();
-          
+
           // HARD FILTER: State must match if provided
           query = query.or(`state.ilike.${statePattern},state.ilike.${abbrPattern}`);
           
@@ -346,15 +350,20 @@ export async function getListingsByState(state: string) {
   }
   
   try {
+    // Match providers whether their state is stored as a 2-letter code or a full
+    // name, and regardless of which form the caller passed (e.g. "ON" or "Ontario").
     const slugState = slugify(state);
-    const stateAbbr = STATE_MAP[slugState] || state;
+    let stateAbbr = STATE_MAP[slugState];
+    if (!stateAbbr && state.trim().length === 2) stateAbbr = state.trim().toUpperCase();
+    if (!stateAbbr) stateAbbr = state;
+    const stateFull = REVERSE_STATE_MAP[stateAbbr.toUpperCase()] || state;
     const isUSState = Object.values(STATE_MAP).includes(stateAbbr.toUpperCase()) && stateAbbr.toUpperCase() !== 'ON';
 
     let query = supabase
       .from('providers')
       .select('*')
       .neq('availability', false)
-      .or(`state.ilike.${state},state.ilike.${stateAbbr}`);
+      .or(`state.ilike.${stateFull},state.ilike.${stateAbbr}`);
 
     if (isUSState) {
       query = query.ilike('country', '%United%');
