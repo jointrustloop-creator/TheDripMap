@@ -5,18 +5,20 @@ import { getCitySearches } from '../../../src/lib/city-search-data';
 export const maxDuration = 30;
 export const dynamic = 'force-dynamic';
 
-// Scoring weights (must total 100). Tuned so that a clinic that is unclaimed
-// or not listed on TheDripMap scores low — 45 of the 100 points are tied to
-// the TheDripMap listing (15 listed + 30 completeness), creating real urgency
-// to claim. The remaining 55 measure genuine, verifiable website signals.
+// Scoring weights (must total 100). Every point measures a GENUINE, verifiable
+// on-site SEO signal that affects how the clinic ranks and converts on Google —
+// nothing here depends on being listed on TheDripMap. The directory listing is
+// surfaced separately as an optional opportunity, never as part of the score,
+// so the audit is honest and useful even to clinics that never join us.
 const WEIGHTS = {
   https: 10,
-  mobile: 10,
-  schema: 10,
-  speed: 15,
-  meta: 10,
-  listed: 15,
-  completeness: 30,
+  mobile: 15,
+  speed: 20,
+  meta: 15,
+  schema: 15,
+  headings: 10,
+  social: 8,
+  indexable: 7,
 };
 
 export type CheckStatus = 'pass' | 'warn' | 'fail';
@@ -299,6 +301,83 @@ export async function POST(req: Request) {
     detail: reachable ? metaParts.join(' | ') : UNREACHABLE,
   };
 
+  // --- Check: H1 heading ---
+  const h1Matches = html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/gi) || [];
+  const h1Count = h1Matches.length;
+  let headingsEarned = 0;
+  let headingsStatus: CheckStatus = 'fail';
+  let headingsDetail = 'No H1 heading found — search engines use your main heading to understand the page.';
+  if (h1Count === 1) {
+    headingsEarned = WEIGHTS.headings;
+    headingsStatus = 'pass';
+    headingsDetail = 'A single, clear H1 heading was found — good for SEO clarity.';
+  } else if (h1Count > 1) {
+    headingsEarned = Math.round(WEIGHTS.headings * 0.6);
+    headingsStatus = 'warn';
+    headingsDetail = `Found ${h1Count} H1 headings — ideally use exactly one main H1 per page.`;
+  }
+  const headingsCheck: AuditCheck = {
+    key: 'headings',
+    label: 'Page heading (H1)',
+    max: WEIGHTS.headings,
+    earned: reachable ? headingsEarned : 0,
+    status: reachable ? headingsStatus : 'warn',
+    detail: reachable ? headingsDetail : UNREACHABLE,
+  };
+
+  // --- Check: Social / Open Graph tags ---
+  const ogTitle = getMetaContent(html, ['og:title']);
+  const ogImage = getMetaContent(html, ['og:image']);
+  let socialEarned = 0;
+  let socialStatus: CheckStatus = 'fail';
+  let socialDetail = 'No Open Graph tags — links to your site show no preview image or title when shared.';
+  if (ogTitle && ogImage) {
+    socialEarned = WEIGHTS.social;
+    socialStatus = 'pass';
+    socialDetail = 'Open Graph title and image found — your links preview nicely when shared.';
+  } else if (ogTitle || ogImage) {
+    socialEarned = Math.round(WEIGHTS.social * 0.5);
+    socialStatus = 'warn';
+    socialDetail = 'Partial Open Graph tags — add both og:title and og:image for clean social previews.';
+  }
+  const socialCheck: AuditCheck = {
+    key: 'social',
+    label: 'Social preview tags',
+    max: WEIGHTS.social,
+    earned: reachable ? socialEarned : 0,
+    status: reachable ? socialStatus : 'warn',
+    detail: reachable ? socialDetail : UNREACHABLE,
+  };
+
+  // --- Check: Indexability (no noindex) + canonical ---
+  const robotsMeta = getMetaContent(html, ['robots']).toLowerCase();
+  const isNoindex = /noindex/.test(robotsMeta);
+  const hasCanonical = /<link[^>]+rel=["']canonical["']/i.test(html);
+  let indexEarned = 0;
+  let indexStatus: CheckStatus = 'fail';
+  let indexDetail = '';
+  if (isNoindex) {
+    indexEarned = 0;
+    indexStatus = 'fail';
+    indexDetail = 'Your homepage has a "noindex" tag — Google is being told not to list it at all. This is critical.';
+  } else if (hasCanonical) {
+    indexEarned = WEIGHTS.indexable;
+    indexStatus = 'pass';
+    indexDetail = 'Page is indexable and sets a canonical URL — clean signals for Google.';
+  } else {
+    indexEarned = Math.round(WEIGHTS.indexable * 0.6);
+    indexStatus = 'warn';
+    indexDetail = 'Page is indexable, but no canonical tag was found — add one to avoid duplicate-content issues.';
+  }
+  const indexCheck: AuditCheck = {
+    key: 'indexable',
+    label: 'Indexable by Google',
+    max: WEIGHTS.indexable,
+    earned: reachable ? indexEarned : 0,
+    status: reachable ? indexStatus : 'warn',
+    detail: reachable ? indexDetail : UNREACHABLE,
+  };
+
   // --- Listing lookup (powers checks 6 & 7 + city insight) ---
   const host = bareHost(site.finalUrl) || bareHost(url);
   let provider: ProviderMatch | null = null;
@@ -322,59 +401,18 @@ export async function POST(req: Request) {
   const listed = !!provider;
   const claimed = !!provider?.is_featured;
 
-  // --- Check 6: Listed on TheDripMap ---
-  const listedCheck: AuditCheck = {
-    key: 'listed',
-    label: 'Listed on TheDripMap',
-    max: WEIGHTS.listed,
-    earned: listed ? WEIGHTS.listed : 0,
-    status: listed ? 'pass' : 'fail',
-    detail: listed
-      ? `Found: "${provider!.name}" is in our directory.`
-      : 'Your clinic is not on TheDripMap yet - patients searching here can\'t find you.',
-  };
-
-  // --- Check 7: Listing completeness ---
-  let compEarned = 0;
-  const compParts: string[] = [];
-  if (provider) {
-    if (claimed) {
-      compEarned += 20;
-      compParts.push('claimed & verified');
-    } else {
-      compParts.push('UNCLAIMED - 20 pts locked');
-    }
-    const hasPhoto = !!provider.image_url;
-    const hasDesc = !!(provider.description && provider.description.length > 30);
-    const hasServices = !!(provider.specialties && provider.specialties.length >= 3);
-    if (hasPhoto) compEarned += 4;
-    else compParts.push('no custom photo');
-    if (hasDesc) compEarned += 3;
-    else compParts.push('weak description');
-    if (hasServices) compEarned += 3;
-    else compParts.push('thin services menu');
-  }
-  const compCheck: AuditCheck = {
-    key: 'completeness',
-    label: 'TheDripMap listing completeness',
-    max: WEIGHTS.completeness,
-    earned: compEarned,
-    status: compEarned >= 27 ? 'pass' : compEarned >= 12 ? 'warn' : 'fail',
-    detail: !listed
-      ? 'Not listed yet - claim a free listing to unlock these 30 points.'
-      : claimed
-        ? compParts.join(' | ')
-        : `Unclaimed listing. ${compParts.join(' | ')}. Claiming unlocks the rest.`,
-  };
-
+  // The TheDripMap listing is intentionally NOT a scored check — it's surfaced
+  // separately (result.listing) as an optional opportunity, so the score reflects
+  // only the clinic's genuine on-site SEO health.
   const checks: AuditCheck[] = [
     httpsCheck,
     mobileCheck,
-    schemaCheck,
     speedCheck,
     metaCheck,
-    listedCheck,
-    compCheck,
+    schemaCheck,
+    headingsCheck,
+    socialCheck,
+    indexCheck,
   ];
 
   // Score over the checks we could actually measure. Normally every check is
@@ -388,17 +426,16 @@ export async function POST(req: Request) {
   const grade: AuditResult['grade'] =
     score >= 85 ? 'excellent' : score >= 70 ? 'good' : score >= 50 ? 'needs-work' : 'poor';
 
-  // Top fixes: biggest point gaps, framed as actions.
+  // Top fixes: biggest point gaps, framed as concrete, genuine SEO actions.
   const FIX_COPY: Record<keyof typeof WEIGHTS, string> = {
-    completeness: claimed
-      ? 'Complete your TheDripMap profile — add photos, a full description, and your services menu'
-      : 'Claim your free TheDripMap listing — add photos, description, and services',
-    listed: 'Get listed on TheDripMap so patients searching your city can find you',
     speed: 'Improve mobile page speed — compress images and reduce render-blocking scripts',
-    schema: 'Add LocalBusiness JSON-LD schema so Google can show rich results',
-    meta: 'Add a strong page title and meta description to your homepage',
+    schema: 'Add LocalBusiness JSON-LD schema so Google can show rich results (hours, rating, address)',
+    meta: 'Write a strong homepage title (≤60 chars) and meta description (~150 chars)',
     mobile: 'Add a responsive viewport meta tag so your site works on phones',
     https: 'Install an SSL certificate so your site loads securely over HTTPS',
+    headings: 'Add one clear H1 heading that names your clinic and city',
+    social: 'Add Open Graph tags (og:title, og:image) so shared links show a preview',
+    indexable: 'Make sure the homepage is indexable (no noindex) and sets a canonical URL',
   };
   const topFixes = checks
     .filter((c) => c.counted !== false)

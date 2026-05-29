@@ -19,10 +19,10 @@ function scoreColor(score: number): string {
 
 function gradeLabel(grade: AuditResult['grade']): string {
   switch (grade) {
-    case 'excellent': return 'Excellent — you\'re ahead of most clinics';
-    case 'good': return 'Good — but leaving patients on the table';
-    case 'needs-work': return 'Needs work — patients are choosing competitors';
-    default: return 'Poor — you\'re nearly invisible online';
+    case 'excellent': return 'Excellent — a strong technical SEO foundation';
+    case 'good': return 'Good — a few fixable gaps to close';
+    case 'needs-work': return 'Needs work — several issues worth addressing';
+    default: return 'Poor — major technical SEO gaps to fix';
   }
 }
 
@@ -190,7 +190,7 @@ export const SeoAuditTool = () => {
         {error && <p className="text-sm font-semibold text-rose-600 mt-3 px-1">{error}</p>}
       </form>
       <p className="text-center text-xs text-slate-400 font-medium mb-4">
-        We check HTTPS, mobile-friendliness, page speed, structured data, page tags, and your TheDripMap listing.
+        We check HTTPS, mobile-friendliness, Google PageSpeed, structured data, title &amp; meta tags, your H1 heading, social preview tags, and indexability — all real ranking signals.
       </p>
 
       {loading && (
