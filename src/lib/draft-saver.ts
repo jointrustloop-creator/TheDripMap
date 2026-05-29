@@ -260,3 +260,57 @@ export async function deleteDraftsBySubject(subjectContains: string): Promise<nu
   }
   return deleted;
 }
+
+export interface UnsubscribeReply {
+  from: string; // sender email, lowercased
+  subject: string;
+  date: string | null;
+}
+
+/**
+ * Scan the INBOX for replies that ask to unsubscribe. Matches "unsubscribe" in
+ * the Subject OR anywhere in the message text, within the last `sinceDays` days.
+ * Returns the sender address + subject for each match so the caller can flag the
+ * matching provider as email_bounced. Read-only — does not modify the mailbox.
+ * (Idempotent at the caller level: re-running just re-flags the same providers.)
+ */
+export async function findUnsubscribeReplies(sinceDays = 3): Promise<UnsubscribeReply[]> {
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!user || !pass) throw new Error('SMTP_USER and SMTP_PASS env vars required');
+
+  const client = new ImapFlow({
+    host: 'imap.gmail.com',
+    port: 993,
+    secure: true,
+    auth: { user, pass },
+    logger: false,
+  });
+
+  const since = new Date(Date.now() - sinceDays * 24 * 60 * 60 * 1000);
+  const out: UnsubscribeReply[] = [];
+  await client.connect();
+  try {
+    await client.mailboxOpen('INBOX', { readOnly: true });
+    // since AND (subject contains "unsubscribe" OR body contains "unsubscribe")
+    const uids = (await client.search(
+      { since, or: [{ subject: 'unsubscribe' }, { body: 'unsubscribe' }] },
+      { uid: true }
+    )) as number[];
+    if (uids && uids.length > 0) {
+      for await (const msg of client.fetch(uids, { envelope: true }, { uid: true })) {
+        const fromAddr = msg.envelope?.from?.[0]?.address;
+        if (fromAddr) {
+          out.push({
+            from: fromAddr.toLowerCase(),
+            subject: msg.envelope?.subject || '',
+            date: msg.envelope?.date ? new Date(msg.envelope.date).toISOString() : null,
+          });
+        }
+      }
+    }
+  } finally {
+    await client.logout();
+  }
+  return out;
+}
