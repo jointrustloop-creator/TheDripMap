@@ -369,6 +369,294 @@ The regulatory landscape is changing fast. After the 2024–2025 GLP-1 shortages
       { question: 'How much does peptide therapy cost?', answer: 'It varies widely: FDA-approved GLP-1s run about $199–$499/month via manufacturer self-pay, growth-hormone stacks about $300–$600/month, and sermorelin about $96–$400/month. Wellness peptides are cash-pay.' },
     ],
   },
+
+  'Iron Infusion': {
+    description: `Iron infusion is a medical treatment that delivers iron directly into the bloodstream to correct iron-deficiency anemia — not a wellness drip, and not something to take "for energy" without documented low iron. It is reserved for people whose iron stores are confirmed low on bloodwork and who either cannot tolerate oral iron, do not absorb it (due to conditions like celiac disease, inflammatory bowel disease, or bariatric surgery), have ongoing blood loss that outpaces pills, or need their levels restored faster than oral iron allows. The modern agents — ferric carboxymaltose, iron sucrose, and ferric derisomaltose — let a clinician replace a large iron deficit in one or a few visits.
+
+Iron deficiency is the most common nutritional deficiency worldwide and a frequent cause of fatigue, breathlessness, and poor concentration. But fatigue has many causes, and "tired" is not a reason to get iron. Giving iron to someone who is not deficient is useless at best and harmful at worst, because the body has no efficient way to excrete excess iron. That is why a confirmed diagnosis — typically ferritin, transferrin saturation, and a complete blood count — must come before any infusion.
+
+Because it is a prescription medical therapy with a real (if small) risk of serious reactions, iron infusion belongs in a clinical setting equipped to recognize and treat an allergic reaction, supervised by trained staff. It is a legitimate, often life-changing treatment when used correctly — and inappropriate when used as a generic pick-me-up.`,
+    howItWorks: `Iron is bound within a carbohydrate shell in these formulations, which lets the body take it up gradually and refill the iron stores used to make hemoglobin — the oxygen-carrying protein in red blood cells. After bloodwork confirms deficiency and a clinician calculates your iron deficit, the dose is infused over anywhere from a few minutes to roughly an hour depending on the product, with monitoring during and for a period after the infusion. Hemoglobin and symptoms typically improve over the following weeks, not immediately.`,
+    benefits: [
+      'Corrects diagnosed iron-deficiency anemia when oral iron fails or is not tolerated',
+      'Replaces a large iron deficit in one or a few visits rather than months of pills',
+      'Bypasses the gut for people with malabsorption or poor oral-iron tolerance',
+      'Can relieve deficiency-related fatigue, breathlessness, and poor concentration over weeks',
+      'Often partly covered by insurance when medically necessary',
+    ],
+    whatToExpect: `Expect a clinical, monitored visit rather than a spa experience. After confirming your diagnosis and reviewing your history, staff start an IV and infuse the iron over several minutes to about an hour, watching for any reaction during the infusion and keeping you for a short observation period afterward. Some products are split across more than one visit. Mild reactions can occur, and a clinician should be present and equipped to manage them.`,
+    costRange: '$300 to $800',
+    costContext: `Price per infusion varies by which product is used and the total dose needed, with newer single-dose agents at the higher end. When the infusion is medically necessary and properly documented, it is often partly or fully covered by insurance, so out-of-pocket cost can be far lower than the cash price.`,
+    primaryIngredients: ['Ferric carboxymaltose', 'Iron sucrose', 'Ferric derisomaltose'],
+    sessionDuration: '15-60 minutes plus observation',
+    alternateName: 'IV Iron',
+    relevantSpecialty: 'Hematology',
+    whoItsFor: `This is for people with iron-deficiency anemia confirmed on bloodwork who cannot take, tolerate, or absorb oral iron, or who need faster correction than pills allow — for example those with malabsorption, heavy menstrual or GI blood loss, chronic kidney disease, or who are post-bariatric surgery. It is not for anyone seeking an energy boost without proven low iron: giving iron to a non-deficient person is inappropriate and potentially dangerous, since the body cannot easily remove excess iron.`,
+    safety: `Iron infusion carries real risks that set it apart from wellness drips. Serious allergic reactions including anaphylaxis are rare but possible, so it must be given where staff can recognize and treat a reaction. Some products can cause hypophosphatemia (a drop in blood phosphate) that may need monitoring, and skin staining at the IV site can occur if iron leaks out. More common, milder effects include headache, nausea, joint or muscle aches, and a transient flushing reaction. Anyone with a history of iron-infusion reactions, significant allergies, active infection, or who is pregnant must be assessed by a clinician first, and no one should receive iron without bloodwork confirming deficiency.`,
+    faqs: [
+      { question: 'Can I get an iron infusion just for energy?', answer: 'No. Iron should only be given when bloodwork confirms iron deficiency. Fatigue has many causes, and iron does not help — and may harm — people whose levels are normal, because the body cannot easily excrete excess iron.' },
+      { question: 'Is iron infusion safe?', answer: 'For appropriately selected patients in a properly equipped clinic, it is generally safe, but it carries a real risk of serious allergic reactions and other effects like a temporary drop in blood phosphate. That is why it must be supervised in a setting prepared to treat a reaction.' },
+      { question: 'Why not just take iron pills?', answer: 'Oral iron works for many people and is the first choice when it is tolerated and absorbed. Infusion is reserved for those who cannot tolerate pills, do not absorb them, have ongoing blood loss, or need faster correction than oral iron allows.' },
+      { question: 'How soon will I feel better?', answer: 'Improvement is gradual. Hemoglobin and symptoms such as fatigue or breathlessness typically improve over several weeks as your body uses the iron to build new red blood cells, not immediately after the infusion.' },
+      { question: 'Will insurance cover it?', answer: 'Often yes, when the infusion is medically necessary and properly documented with confirming bloodwork. Coverage and out-of-pocket cost depend on your plan and the product used, so check before booking.' },
+    ],
+  },
+
+  'Vitamin D': {
+    description: `Vitamin D injection delivers cholecalciferol (vitamin D3) into the muscle to correct a diagnosed deficiency. Because vitamin D is fat-soluble, it is given intramuscularly rather than by IV — it is not a water-based drip ingredient. The injection is most useful for people with a confirmed low blood level, malabsorption conditions such as celiac disease or a history of bariatric surgery, or significant lack of sun exposure, where reliably raising vitamin D through diet and sunlight alone is difficult.
+
+Vitamin D plays a central role in calcium absorption, bone health, and immune and muscle function, and deficiency is common — especially in northern climates, in people with darker skin, and in those who spend little time outdoors. For many people with mild deficiency, daily oral vitamin D works perfectly well and is inexpensive. The injectable form is mainly valuable when absorption is impaired or when adherence to daily pills is a genuine problem, allowing a clinician to deliver a larger dose at once.
+
+The key principle is that vitamin D should be dosed against a blood level, not given blindly. It is genuinely useful for correcting deficiency, but more is not better — and the right approach is to test, treat, and re-test rather than assume everyone needs a shot.`,
+    howItWorks: `Cholecalciferol is injected into a large muscle, from which it is absorbed and stored in body fat, then gradually converted by the liver and kidneys into the active hormone that drives calcium absorption and supports bone, immune, and muscle function. Because the body stores it, a single injection can raise blood levels over weeks. A clinician uses your baseline blood level to choose a dose and schedule, then rechecks to confirm you have reached — but not overshot — the target range.`,
+    benefits: [
+      'Corrects diagnosed vitamin D deficiency, supporting bone and muscle health',
+      'Useful when malabsorption (celiac, bariatric surgery) limits oral absorption',
+      'Helpful for people who cannot maintain a daily oral supplement routine',
+      'Supports calcium absorption and normal immune function',
+      'A single dose can raise levels over weeks because vitamin D is stored',
+    ],
+    whatToExpect: `This is a quick intramuscular injection, not an infusion — usually just a few minutes in the office. Ideally a recent vitamin D blood level guides the dose. You may feel brief soreness at the injection site afterward. Because levels rise gradually and vitamin D is stored, your clinician will often recommend a follow-up blood test to confirm you have reached the right range before repeating.`,
+    costRange: '$25 to $75',
+    costContext: `A single injection is inexpensive, with price driven mainly by the clinic and whether a consultation or lab work is bundled in. The blood test to guide dosing is a separate cost but is what makes the injection appropriate and safe.`,
+    primaryIngredients: ['Cholecalciferol (vitamin D3)'],
+    sessionDuration: '5-10 minutes',
+    alternateName: 'Vitamin D Injection',
+    relevantSpecialty: 'Preventive Medicine',
+    whoItsFor: `Good candidates are people with a confirmed low vitamin D level, those with malabsorption conditions, and people who struggle to keep up with daily oral supplements. It is less necessary for healthy people with normal levels, who can usually maintain them with modest sun exposure, diet, or inexpensive oral vitamin D. Anyone considering it should ideally have a blood level checked first rather than supplementing blindly.`,
+    safety: `Vitamin D injections are generally well tolerated, with the most common side effect being temporary soreness at the injection site. The main risk is over-correction: too much vitamin D can raise blood calcium (hypercalcemia), causing nausea, weakness, excessive thirst, and, over time, kidney problems — which is why dosing should be guided by a blood level rather than given indiscriminately. People with high calcium, kidney disease, certain granulomatous conditions (such as sarcoidosis), or who are pregnant should consult a clinician before treatment.`,
+    faqs: [
+      { question: 'Why is vitamin D injected instead of given by IV?', answer: 'Vitamin D is fat-soluble, so it is delivered as an intramuscular injection rather than mixed into a water-based IV drip. The muscle acts as a slow-release depot, and the body stores the vitamin in fat.' },
+      { question: 'Do I need a blood test before getting one?', answer: 'Ideally yes. Vitamin D should be dosed against a measured blood level so you correct a real deficiency without overshooting. Testing, treating, and re-testing is safer than blind supplementation.' },
+      { question: 'Is an injection better than taking pills?', answer: 'Not for most people. Daily oral vitamin D works well and costs little. The injection is mainly useful for malabsorption or when keeping up with daily pills is genuinely difficult.' },
+      { question: 'Can you get too much vitamin D?', answer: 'Yes. Over-correction can raise blood calcium and, over time, harm the kidneys. This is why dosing should be lab-guided and monitored rather than repeated automatically.' },
+      { question: 'How long does one injection last?', answer: 'Because vitamin D is stored in body fat, a single dose can raise levels for weeks. Your clinician may recommend a follow-up test to decide whether and when another dose is needed.' },
+    ],
+  },
+
+  'B12 Shot': {
+    description: `A B12 shot delivers vitamin B12 directly into the muscle, bypassing the digestive system. B12 is essential for red blood cell production, nerve function, and DNA synthesis, and a true deficiency can cause fatigue, numbness or tingling, memory problems, and a specific type of anemia. The injection is the standard, evidence-based treatment for people who are genuinely deficient — including those with pernicious anemia (an autoimmune condition that blocks B12 absorption), strict vegans and vegetarians who get little from diet, older adults whose stomach acid declines with age, and people on long-term acid-reducing or diabetes medications that impair absorption.
+
+Available forms include methylcobalamin, hydroxocobalamin, and cyanocobalamin; all can correct deficiency, and hydroxocobalamin tends to last longer between doses. For someone who is deficient, B12 injections are clearly beneficial and can resolve symptoms that oral supplements may not, particularly when absorption is the problem.
+
+B12 is also widely marketed as an energy and metabolism booster for people who are not deficient — and here the honest picture is different. If your B12 level is already normal, there is little evidence that extra B12 boosts energy, aids weight loss, or improves metabolism. Any lift some people feel is often modest and may reflect expectation. The clear, well-supported benefit is correcting an actual deficiency.`,
+    howItWorks: `B12 is injected into a muscle, from which it is absorbed steadily into the bloodstream, sidestepping the gut entirely — which matters for people who cannot absorb B12 from food or pills. Once circulating, it serves as a cofactor for the enzymes that build red blood cells, maintain the protective sheath around nerves, and synthesize DNA. In a deficient person, repleting B12 can reverse anemia and improve neurological symptoms over weeks; in someone with normal levels, the excess is simply excreted.`,
+    benefits: [
+      'Standard, effective treatment for diagnosed B12 deficiency and pernicious anemia',
+      'Bypasses the gut for people who cannot absorb oral B12',
+      'Useful for vegans, vegetarians, and older adults at higher deficiency risk',
+      'Can relieve deficiency-related fatigue, tingling, and brain fog over weeks',
+      'Quick, inexpensive, in-office injection',
+    ],
+    whatToExpect: `This is a fast intramuscular injection — typically a couple of minutes in the office, not an infusion. You may feel brief stinging at the injection site and mild soreness afterward. People being treated for a confirmed deficiency usually follow a schedule of repeated injections that a clinician sets based on their condition and follow-up bloodwork; one-off "energy" shots are common but offer little if your level is already normal.`,
+    costRange: '$20 to $60',
+    costContext: `A single shot is inexpensive, and many clinics offer multi-shot packages or memberships that lower the per-injection price. When B12 injections treat a documented deficiency, they may be covered by insurance; "energy boost" shots for people with normal levels are typically cash-pay.`,
+    primaryIngredients: ['Methylcobalamin', 'Hydroxocobalamin', 'Cyanocobalamin'],
+    sessionDuration: '5-10 minutes',
+    alternateName: 'Vitamin B12 Injection',
+    relevantSpecialty: 'Preventive Medicine',
+    whoItsFor: `B12 shots are clearly worthwhile for people with a confirmed deficiency or a condition that impairs absorption — pernicious anemia, strict plant-based diets, age-related low stomach acid, certain GI conditions or surgeries, or long-term use of acid-reducing or metformin medications. They are far less compelling for healthy people with normal levels who are simply seeking an energy lift, where the benefit is likely minimal. Persistent fatigue deserves a medical workup rather than assuming low B12.`,
+    safety: `B12 injections are among the safest treatments available, since the body excretes what it does not use. Side effects are usually limited to mild injection-site pain or redness, and rarely a temporary headache or nausea. True allergic reactions are uncommon but possible. People with certain conditions — for example a rare hereditary eye disorder (Leber's optic neuropathy) or known cobalt/B12 allergy — should consult a clinician first, and anyone with unexplained symptoms should be evaluated rather than self-treating, since masking a deficiency can delay diagnosis of its underlying cause.`,
+    faqs: [
+      { question: 'Will a B12 shot give me more energy if my levels are normal?', answer: 'Probably not in any meaningful way. The clear benefit of B12 is correcting a deficiency. If your level is already normal, there is little evidence that extra B12 increases energy, and any lift may reflect expectation.' },
+      { question: 'Who actually needs B12 injections?', answer: 'People with confirmed deficiency or impaired absorption — such as pernicious anemia, strict vegan diets, older adults, or those on long-term acid-reducing or diabetes medications. For them, injections are standard, effective care.' },
+      { question: 'Is the injection better than a pill?', answer: 'For people who absorb B12 normally, high-dose oral B12 often works fine and costs less. The injection mainly helps when absorption is the problem, because it bypasses the gut entirely.' },
+      { question: 'Is it safe?', answer: 'Very. B12 has an excellent safety record and the body excretes any excess, so side effects are usually limited to mild injection-site discomfort. Allergic reactions are rare but possible.' },
+      { question: 'How often would I get one?', answer: 'It depends on why you need it. People treating a deficiency follow a clinician-set schedule guided by bloodwork; occasional wellness shots have no fixed schedule and limited benefit if you are not deficient.' },
+    ],
+  },
+
+  'Glutathione': {
+    description: `Glutathione is the body's master antioxidant — a molecule produced naturally in the liver that neutralizes free radicals, supports detoxification pathways, and helps regenerate other antioxidants. Because oral glutathione is largely broken down in the digestive tract, clinics deliver it as an IV push or an intramuscular injection to raise circulating levels directly. It is offered both as a standalone treatment and as a popular add-on to other drips for general antioxidant and "detox" support.
+
+Glutathione is also heavily marketed for skin brightening or lightening, and this is where honesty matters most. The evidence that injectable glutathione reliably lightens or evens skin tone is weak and inconsistent, with no robust human trials, and it is not FDA-approved for that purpose. In fact, the FDA has specifically warned about injectable skin-whitening products, citing safety concerns and unproven claims. Any cosmetic effect tends to be subtle and temporary, and it should not be relied on as a skin-lightening treatment.
+
+For antioxidant support, glutathione is generally well tolerated under supervision, but it is not a proven therapy for any disease. It is best viewed as a wellness add-on with realistic, modest expectations rather than a treatment that delivers dramatic results.`,
+    howItWorks: `Glutathione is given as a slow IV push or an intramuscular injection so it reaches the bloodstream intact, since oral forms are mostly degraded before absorption. Once circulating, it is taken up by cells, where it neutralizes oxidative stress, supports liver detoxification enzymes, and helps recycle other antioxidants such as vitamins C and E. Its proposed effect on skin tone comes from inhibiting tyrosinase, the enzyme involved in melanin production — but this effect is not reliably demonstrated in people.`,
+    benefits: [
+      'Delivers the master antioxidant directly, bypassing poor oral absorption',
+      "Supports the body's natural detoxification and antioxidant defenses",
+      'Helps regenerate other antioxidants such as vitamins C and E',
+      'Popular, generally well-tolerated add-on to other IV drips',
+      'May offer subtle, temporary skin radiance for some — though this is unproven',
+    ],
+    whatToExpect: `A standalone glutathione push is quick — often around 15 to 30 minutes — while as an add-on it is given at the end of another infusion. You may notice a cooling or faintly metallic sensation as it goes in. Cosmetic claims aside, do not expect dramatic or reliable skin changes; any radiance some people report tends to be subtle and short-lived, and clinics often suggest a series, which raises both cost and cumulative risk.`,
+    costRange: '$50 to $150',
+    costContext: `As a standalone push, glutathione typically runs $50 to $150 depending on dose, while as an add-on to another drip it usually costs $25 to $75. High-dose protocols marketed for skin brightening sit at the upper end and are often sold as multi-session packages.`,
+    primaryIngredients: ['Reduced L-glutathione'],
+    sessionDuration: '15-30 minutes (or as an add-on)',
+    alternateName: 'Glutathione Push',
+    relevantSpecialty: 'Aesthetic Medicine',
+    whoItsFor: `Glutathione may appeal to healthy adults wanting antioxidant or "detox" support as an optional add-on, who understand the wellness evidence is still emerging and the effects modest. It is a poor fit for anyone expecting reliable skin lightening, since that use is unproven and not FDA-approved. People who are pregnant or breastfeeding, or who have liver, kidney, or asthma conditions, should be especially cautious and consult a physician first.`,
+    safety: `Mild effects can include a cooling or metallic sensation, bruising at the IV site, and occasionally lightheadedness. More importantly, injectable glutathione has been linked in case reports to rare but serious events — including liver and kidney injury and severe skin reactions such as Stevens-Johnson syndrome — and there is no standardized dosing, so risk is hard to predict. The FDA has warned specifically about injectable skin-whitening products. A licensed clinician should screen every client, and people who are pregnant, breastfeeding, or have liver, kidney, or asthma conditions should consult a physician before treatment.`,
+    faqs: [
+      { question: 'Does glutathione actually lighten skin?', answer: 'The evidence is weak and inconsistent, with no robust human trials, and it is not FDA-approved for skin lightening. Any effect tends to be subtle and temporary, so it should not be relied on for that purpose.' },
+      { question: 'Is injectable glutathione safe?', answer: 'It is generally well tolerated under supervision, but case reports link it to rare but serious events including liver and kidney injury and severe skin reactions. There is no standardized dosing, and the FDA has warned about injectable skin-whitening products.' },
+      { question: 'Why is it given by IV or injection instead of a pill?', answer: 'Oral glutathione is largely broken down in the gut before it can be absorbed, so clinics use IV or intramuscular delivery to raise blood levels. Oral and topical forms carry lower risk but milder effects.' },
+      { question: 'What does it actually do?', answer: "Glutathione is the body's main intracellular antioxidant and supports detoxification and recycling of other antioxidants. Beyond that, it is not a proven treatment for any disease, and wellness benefits remain an emerging area." },
+      { question: 'Can I just take it as a supplement?', answer: 'Oral glutathione absorbs poorly, which is part of why clinics inject it, though oral and topical options carry far lower risk. Ask a clinician whether the injectable form adds meaningful value for your goals.' },
+    ],
+  },
+
+  'Cold & Flu': {
+    description: `A Cold & Flu IV — sometimes called a "sick day drip" — is aimed at easing symptoms while you are actively ill, not at curing the illness itself. When a virus has you dehydrated, nauseated, achy, and depleted, the drip combines a litre of IV fluids with anti-nausea and anti-inflammatory medication options plus supportive vitamins to help you feel more comfortable and rehydrate quickly. It is the reactive counterpart to a prevention-focused immune drip: this one is for when you are already sick.
+
+A typical formulation includes IV fluids for rehydration, vitamin C and zinc for general support, B-complex vitamins, and optional medications such as ondansetron for nausea or ketorolac for aches and fever-related discomfort. For someone who cannot keep fluids or food down, rapid rehydration and anti-nausea relief can make a genuinely miserable day more bearable.
+
+It is important to be clear: this drip does not cure or shorten a viral cold or flu. Viruses run their course regardless, and no IV changes that. What the drip can do is relieve dehydration and specific symptoms while your immune system does its work — and it is no substitute for medical care when an illness is severe.`,
+    howItWorks: `Over roughly 30 to 45 minutes, a litre of IV fluids restores hydration lost to fever, sweating, vomiting, or poor intake, while optional anti-nausea and anti-inflammatory medications target the most distressing symptoms directly. Vitamin C, zinc, and B vitamins provide general nutritional support. Because the fluids and medications enter the bloodstream directly, relief from dehydration and nausea is often faster than oral remedies — but the underlying virus still has to run its course.`,
+    benefits: [
+      'Rapid rehydration when fever, vomiting, or poor intake leave you depleted',
+      'Optional anti-nausea medication for an upset, uncooperative stomach',
+      'Optional anti-inflammatory for aches and fever-related discomfort',
+      'Supportive vitamins and zinc while you recover',
+      'Faster symptom relief than oral remedies when you cannot keep things down',
+    ],
+    whatToExpect: `A 30 to 45 minute session in a clinic chair or, commonly for this category, at home so you do not have to leave bed. You may feel better — less nauseated, clearer-headed, less thirsty — by the time the bag finishes, largely from rehydration and any anti-nausea add-on. Remember it eases symptoms rather than ending the illness, and worsening symptoms warrant a doctor.`,
+    costRange: '$150 to $300',
+    costContext: `Base sick-day drips run $150 to $225, with anti-nausea medication, IV anti-inflammatory, or higher-dose vitamin C typically adding $25 to $50 per add-on. Mobile (in-home) service, popular when you are too sick to travel, usually carries a $50 to $100 premium.`,
+    primaryIngredients: ['1L IV fluids', 'Vitamin C', 'Zinc', 'B-complex vitamins', 'Optional: ondansetron, ketorolac'],
+    sessionDuration: '30-45 minutes',
+    alternateName: 'Sick Day Drip',
+    relevantSpecialty: 'Emergency Medicine',
+    whoItsFor: `This drip suits adults who are actively sick with a cold or flu and feeling dehydrated, nauseated, or run-down — especially those who struggle to keep fluids down and want faster symptom relief. It is not appropriate as a cure, nor as a replacement for medical evaluation when illness is severe. Anyone with a high or persistent fever, trouble breathing, chest pain, confusion, or symptoms that keep worsening needs a doctor or emergency care, not a drip.`,
+    safety: `Side effects are usually mild — bruising or discomfort at the IV site, lightheadedness, or minor reactions to add-on medications. The most important caution is that an IV can mask the warning signs of a serious infection: high fever, shortness of breath, chest pain, severe dehydration, or worsening illness needs medical care, not a wellness drip. People with kidney disease, heart failure, high blood pressure, or who are pregnant should be cleared first, and a licensed clinician should screen you and check any add-ons for allergies and interactions.`,
+    faqs: [
+      { question: 'Will a Cold & Flu IV cure my cold or shorten the flu?', answer: 'No. It does not cure or shorten a viral illness — viruses run their course regardless. The drip eases symptoms like dehydration and nausea while your immune system does the work.' },
+      { question: 'How is this different from an immune support drip?', answer: 'An immune support drip is generally used preventively or at the very first sign of illness, while a Cold & Flu drip is for when you are already actively sick and want symptom and hydration relief.' },
+      { question: 'When should I see a doctor instead of getting a drip?', answer: 'Seek medical care for a high or persistent fever, trouble breathing, chest pain, confusion, severe dehydration, or symptoms that keep worsening. A drip can mask these warning signs, so do not use it in place of evaluation.' },
+      { question: 'What actually makes me feel better during it?', answer: 'Most of the relief comes from rapid rehydration plus any anti-nausea or anti-inflammatory medication. The vitamins provide general support, but they are not what cures the infection.' },
+      { question: 'Is it safe while I am sick?', answer: 'For most healthy adults under medical supervision, yes, with mild side effects. People with kidney, heart, or blood-pressure conditions or who are pregnant should be screened first, and severe illness needs a doctor.' },
+    ],
+  },
+
+  'Migraine Relief': {
+    description: `A Migraine Relief IV — often called a "migraine cocktail" — is designed to abort or ease an active migraine or severe headache when oral medications are not working or cannot be kept down. Notably, this drip has more clinical grounding than most wellness infusions: emergency departments have used intravenous "migraine cocktails" for years, and components like IV magnesium and antiemetic (anti-nausea) medications have meaningful evidence for treating acute migraine. That makes it one of the more evidence-based offerings on a clinic menu — when delivered appropriately.
+
+A typical formulation combines IV magnesium, an anti-nausea medication such as ondansetron, an anti-inflammatory such as ketorolac (Toradol), B-complex vitamins, and fluids for hydration. Clinical migraine cocktails in medical settings may also use antiemetics like metoclopramide or prochlorperazine, which have a strong track record for acute migraine. Together these target the pain, nausea, and dehydration that define a bad attack.
+
+Because several of these are prescription medications, this is a clinical treatment that requires a clinician's involvement, not a routine vitamin drip. It is intended for known migraine or recurrent severe headache — and crucially, not for a brand-new, sudden, or "worst-ever" headache, which can signal a medical emergency.`,
+    howItWorks: `Over roughly 30 to 60 minutes, the IV delivers magnesium (which has evidence for calming migraine, particularly in some patients), an antiemetic to control the nausea and vomiting that accompany attacks, an anti-inflammatory such as ketorolac to reduce pain, and fluids to correct the dehydration that often worsens headache. Delivering these directly into the bloodstream works when an upset stomach makes oral medication ineffective, and many people experience relief during or shortly after the infusion.`,
+    benefits: [
+      'Targets an active migraine when oral medication fails or cannot be kept down',
+      'IV magnesium and antiemetics have real clinical evidence for acute migraine',
+      'Anti-inflammatory (such as ketorolac) addresses headache pain directly',
+      'Controls the nausea and vomiting that accompany severe attacks',
+      'Rehydration helps relieve a contributing factor to headache',
+    ],
+    whatToExpect: `Expect a clinical session of about 30 to 60 minutes, ideally in a calm, dim environment since light and sound worsen migraine. After a clinician reviews your history and confirms this is a familiar migraine pattern, the medications and fluids are infused while you rest. Many people feel meaningful relief during or shortly after the drip. Because prescription drugs are involved, a clinician must be part of the process.`,
+    costRange: '$150 to $350',
+    costContext: `Base migraine drips run $150 to $250, with additional prescription medications, higher magnesium doses, or anti-nausea add-ons bringing the total toward $300 to $350. Because the formulation includes prescription drugs requiring clinician oversight, pricing is typically higher than a plain vitamin drip.`,
+    primaryIngredients: ['IV magnesium', 'Ondansetron', 'Ketorolac (Toradol)', 'B-complex vitamins', 'IV fluids'],
+    sessionDuration: '30-60 minutes',
+    alternateName: 'Migraine Drip',
+    relevantSpecialty: 'Neurology',
+    whoItsFor: `This drip is for people with diagnosed migraine or recurrent severe headaches experiencing an active attack, particularly when oral medication has failed or nausea makes pills impossible. It is not for someone experiencing a first-ever, sudden, or unusually severe "worst headache of my life," which requires emergency evaluation, not a wellness drip. People who are pregnant, have kidney or heart conditions, stomach ulcers, or take blood thinners or other migraine medications must be screened first, since several components are prescription drugs with interactions.`,
+    safety: `Because this drip contains prescription medications, a clinician must screen you for allergies, interactions, and contraindications first. Common side effects include a warm flush or lowered blood pressure from magnesium, drowsiness, and IV-site discomfort; ketorolac is an anti-inflammatory that must be avoided with stomach ulcers, kidney disease, bleeding risk, or blood thinners, and some antiemetics can cause restlessness or, rarely, muscle reactions. Most importantly, a new, sudden, or "worst-ever" headache, or a headache with fever, stiff neck, weakness, confusion, or vision changes, is a potential medical emergency and needs urgent evaluation rather than an IV.`,
+    faqs: [
+      { question: 'Does a migraine IV really work?', answer: 'It has more clinical support than most wellness drips — IV magnesium and antiemetic medications have genuine evidence for acute migraine, and ER "migraine cocktails" use similar ingredients. Many people get meaningful relief, though results vary by person.' },
+      { question: 'Is this safe to use for any bad headache?', answer: 'No. A new, sudden, or "worst-ever" headache, or one with fever, stiff neck, weakness, confusion, or vision changes, can be a medical emergency and needs urgent evaluation — not a drip. This treatment is for known migraine or recurrent severe headache.' },
+      { question: 'Why is a clinician required?', answer: 'The formulation includes prescription medications such as anti-inflammatories and antiemetics, which carry real contraindications and interactions. A clinician must screen your history and confirm the drip is appropriate and safe for you.' },
+      { question: 'How fast does it relieve a migraine?', answer: 'Many people feel relief during or shortly after the 30 to 60 minute infusion, helped by delivering medication and fluids directly into the bloodstream when nausea makes pills ineffective. Response still varies between individuals.' },
+      { question: 'Who should not get one?', answer: 'People with stomach ulcers, kidney disease, bleeding risk, or on blood thinners may not be able to receive the anti-inflammatory component, and those who are pregnant or have heart conditions need careful screening. Always disclose your medications and history first.' },
+    ],
+  },
+
+  'GLP-1 Weight Loss': {
+    description: `GLP-1 weight loss therapy uses physician-prescribed medications — semaglutide (Ozempic, Wegovy) and tirzepatide (Mounjaro, Zepbound) — given as a once-weekly subcutaneous injection, not an IV drip. These are the most rigorously studied and effective medical weight-loss treatments available, with large clinical trials showing substantial, sustained weight loss when combined with diet and lifestyle changes. They work by mimicking gut hormones that regulate appetite and blood sugar, reducing hunger and helping people eat less.
+
+This is genuine prescription medicine, not a wellness add-on. It requires a medical evaluation, an appropriate clinical reason to treat, dose titration over weeks, and ongoing monitoring by a prescriber. It is also distinct from the MIC/lipotropic "Weight Loss" IV offered at many clinics: GLP-1s are FDA-approved drugs with strong evidence, while lipotropic IVs are nutrient-based and not FDA-approved for weight loss. The two should not be confused.
+
+A real-world caution concerns compounded versions. After the GLP-1 shortages were declared resolved in 2024–2025, routine compounding of semaglutide and tirzepatide became restricted, and some compounded or gray-market products carry quality, purity, and dosing concerns. Anyone pursuing GLP-1 therapy should verify the source and work with a legitimate prescriber and a licensed pharmacy.`,
+    howItWorks: `GLP-1 medications mimic glucagon-like peptide-1, a hormone the gut releases after eating. They act on appetite centers in the brain to increase fullness and reduce hunger, slow stomach emptying so you feel satisfied longer, and improve the body's blood-sugar handling (tirzepatide also acts on a second receptor, GIP). Delivered as a small weekly self-injection under the skin, the dose is typically started low and increased gradually to limit side effects while the medication takes effect over weeks to months.`,
+    benefits: [
+      'FDA-approved with strong trial evidence for substantial, sustained weight loss',
+      'Reduces appetite and hunger by mimicking natural gut hormones',
+      'Once-weekly self-injection rather than a daily routine',
+      'Also improves blood-sugar control (originally developed for type 2 diabetes)',
+      'Prescribed and monitored by a clinician, with dosing tailored to you',
+    ],
+    whatToExpect: `This is a program, not a one-time drip. It begins with a medical evaluation and often bloodwork, after which a prescriber starts you on a low dose that is gradually increased over weeks. You self-administer a small subcutaneous injection once a week at home, with periodic follow-up visits to monitor side effects, progress, and dosing. GI side effects like nausea are common, especially early on, and the medication works alongside diet and lifestyle changes over months.`,
+    costRange: '$200 to $500 per month',
+    costContext: `Monthly cost varies widely depending on whether you use a brand-name drug (through insurance or manufacturer self-pay programs) or a compounded version, and on your dose. Insurance coverage is inconsistent and often depends on diagnosis. Compounded products may be cheaper but carry quality and regulatory concerns, so source matters as much as price.`,
+    primaryIngredients: ['Semaglutide (Ozempic / Wegovy)', 'Tirzepatide (Mounjaro / Zepbound)'],
+    sessionDuration: 'Weekly self-injection + ongoing monitoring',
+    alternateName: 'Semaglutide & Tirzepatide',
+    relevantSpecialty: 'Endocrinology',
+    whoItsFor: `GLP-1 therapy is for adults who meet medical criteria for weight management and are evaluated and monitored by a prescriber — typically those with obesity or overweight plus a related condition, who can commit to ongoing treatment and lifestyle change. It is not appropriate for people who are pregnant or trying to conceive, those with a personal or family history of medullary thyroid carcinoma or MEN2 syndrome, a history of pancreatitis, or anyone seeking a quick fix without medical oversight. It should not be confused with nutrient-based weight-loss IVs.`,
+    safety: `These are prescription medications that require medical evaluation and ongoing monitoring. The most common side effects are gastrointestinal — nausea, vomiting, diarrhea, and constipation — usually worst when starting or increasing the dose. More serious considerations include pancreatitis, gallbladder problems, and a boxed warning about thyroid C-cell tumors seen in animal studies; they should not be used by anyone with a personal or family history of medullary thyroid carcinoma or MEN2, and they are not for use in pregnancy. Compounded versions carry additional quality and dosing concerns, so verify the source and use only a legitimate prescriber and licensed pharmacy.`,
+    faqs: [
+      { question: 'Is GLP-1 therapy an IV drip?', answer: 'No. Semaglutide and tirzepatide are given as a small once-weekly injection under the skin, which you self-administer at home — not as an IV infusion. They are also different from nutrient-based weight-loss IVs.' },
+      { question: 'How is this different from a weight-loss IV?', answer: 'GLP-1s are FDA-approved medications with strong trial evidence for weight loss, while MIC/lipotropic weight-loss IVs are nutrient-based and not FDA-approved for that purpose. The two work by entirely different mechanisms.' },
+      { question: 'What are the main side effects?', answer: 'Gastrointestinal effects like nausea, vomiting, diarrhea, and constipation are most common, especially when starting. Serious but less common concerns include pancreatitis, gallbladder problems, and a thyroid-tumor warning based on animal studies.' },
+      { question: 'Who should not take GLP-1 medications?', answer: 'They should be avoided by people who are pregnant or trying to conceive, anyone with a personal or family history of medullary thyroid carcinoma or MEN2 syndrome, and those with a history of pancreatitis. A clinician evaluation determines whether they are appropriate.' },
+      { question: 'Are compounded versions safe?', answer: 'They carry added concerns. After the shortages ended, routine compounding became restricted, and some compounded or gray-market products have quality, purity, and dosing issues. Verify the source and use only a legitimate prescriber and a licensed pharmacy.' },
+    ],
+  },
+
+  'Hormone Therapy': {
+    description: `Hormone therapy (TRT or HRT) is a clinician-prescribed treatment that replaces hormones the body is no longer producing in adequate amounts — testosterone for men with diagnosed low levels (andropause or hypogonadism), and estrogen and progesterone for women managing menopause, among other indications. It is delivered as intramuscular injections, implanted pellets, or topical creams and gels — not as an IV drip. When used appropriately for a genuine deficiency, it can meaningfully improve symptoms; when used casually, it carries real risks.
+
+A typical regimen depends on the person and goal: testosterone cypionate or enanthate for testosterone replacement, estradiol and progesterone for menopausal hormone therapy, and sometimes adjuncts such as anastrozole or hCG in specific situations. This is lab-driven, individualized medicine — the right hormone, dose, and route depend on bloodwork, symptoms, and a person's overall health profile.
+
+What hormone therapy is not is a quick wellness drip or an anti-aging shortcut. It requires a proper diagnosis, baseline and follow-up bloodwork, a prescriber, and ongoing monitoring for known risks. Used responsibly within that framework, it is a legitimate medical therapy; used without it, it can do harm.`,
+    howItWorks: `Replacement hormones are delivered through the route best suited to the person — an intramuscular injection every one to two weeks, a pellet implanted under the skin that releases hormone over months, or a daily cream or gel — to restore blood levels into a target range. The clinician uses baseline labs to choose the starting dose, then rechecks hormone levels and related markers and adjusts over time. The aim is to relieve deficiency symptoms while keeping levels and safety markers within a monitored range.`,
+    benefits: [
+      'Replaces a diagnosed hormone deficiency to relieve related symptoms',
+      'Can improve energy, mood, libido, and other deficiency symptoms when appropriate',
+      'Menopausal HRT can ease hot flashes, sleep, and other menopause symptoms',
+      'Multiple delivery options — injection, pellet, or topical — tailored to you',
+      'Lab-driven and individualized rather than one-size-fits-all',
+    ],
+    whatToExpect: `This is an ongoing medical program, not a single visit or drip. It starts with a consultation, symptom review, and baseline bloodwork, after which a prescriber designs a regimen. Injections are quick in-office or at-home administrations on a set schedule; pellets are placed during a brief office procedure every few months; creams are applied daily at home. Expect periodic follow-up labs and visits to monitor levels and safety markers and to adjust your dose over time.`,
+    costRange: '$100 to $400 per month',
+    costContext: `Monthly cost depends on the hormone, the delivery method (injections are generally cheaper; pellets carry a higher per-procedure cost), and the required lab monitoring. Consultations and follow-up bloodwork add to the total. Insurance may cover therapy for a documented medical deficiency, while purely elective optimization is often cash-pay.`,
+    primaryIngredients: ['Testosterone cypionate / enanthate', 'Estradiol', 'Progesterone', 'Sometimes anastrozole or hCG'],
+    sessionDuration: 'Ongoing program with periodic dosing',
+    alternateName: 'TRT / HRT',
+    relevantSpecialty: 'Endocrinology',
+    whoItsFor: `Hormone therapy is for people with a hormone deficiency confirmed by symptoms and bloodwork — men with diagnosed low testosterone, or women managing menopausal symptoms — who are evaluated and monitored by a prescriber. It is not appropriate as a casual anti-aging or performance shortcut, and certain people must avoid or carefully weigh it: those with hormone-sensitive cancers (such as prostate or certain breast cancers), uncontrolled cardiovascular disease, untreated sleep apnea, or who are pregnant. Men wishing to preserve fertility need a specific discussion, since testosterone can suppress sperm production.`,
+    safety: `This is a prescription, lab-driven therapy that requires diagnosis, baseline and follow-up bloodwork, and ongoing monitoring. Testosterone therapy needs monitoring of hematocrit (it can thicken the blood), prostate health, and cardiovascular risk factors, and it can reduce fertility. Menopausal hormone therapy carries its own risk profile, including considerations around blood clots and, depending on the regimen, breast and cardiovascular risk, which is why it must be individualized. People with hormone-sensitive cancers, significant cardiovascular disease, untreated sleep apnea, or who are pregnant should not start without careful specialist evaluation. A qualified prescriber must oversee the entire course.`,
+    faqs: [
+      { question: 'Is hormone therapy an IV drip?', answer: 'No. It is delivered as intramuscular injections, implanted pellets, or topical creams and gels, not by IV. It is also an ongoing program with monitoring rather than a one-time treatment.' },
+      { question: 'Do I need bloodwork before starting?', answer: 'Yes. Hormone therapy is lab-driven: a diagnosis and baseline bloodwork should confirm a genuine deficiency before treatment, and follow-up labs are used to adjust the dose and monitor safety.' },
+      { question: 'What needs to be monitored during treatment?', answer: 'For testosterone, clinicians monitor hematocrit, prostate health, and cardiovascular risk factors, among others; menopausal HRT has its own monitoring around clot, breast, and cardiovascular risk. Ongoing follow-up is part of doing it safely.' },
+      { question: 'Who should not use hormone therapy?', answer: 'People with hormone-sensitive cancers, uncontrolled cardiovascular disease, untreated sleep apnea, or who are pregnant should avoid it or proceed only after careful specialist evaluation. It is not a casual anti-aging shortcut.' },
+      { question: 'Will testosterone therapy affect fertility?', answer: "It can. Testosterone replacement often suppresses the body's own sperm production, so men who want to preserve fertility need a specific discussion with their prescriber about alternatives or adjuncts." },
+    ],
+  },
+
+  'High-Dose Vitamin C': {
+    description: `High-dose vitamin C (IVC) delivers concentrations of ascorbic acid far beyond what the gut can absorb from pills, given by IV for antioxidant and immune support. Because intestinal absorption of oral vitamin C is capped, IV is the only way to reach the high plasma levels some protocols aim for. It is used as a wellness and immune-support infusion, and is sometimes sought by people with cancer as a complementary, supportive therapy alongside conventional treatment.
+
+This is the area where honesty is non-negotiable. High-dose IV vitamin C is investigational — it is not a proven cancer treatment, and no one should make or believe any claim that it cures or treats cancer. Research into its role alongside conventional cancer care is ongoing and unsettled. If cancer is part of the conversation at all, it should be framed strictly as investigational and complementary, and discussed with your oncologist before considering it — never as a substitute for proven therapy.
+
+There are also specific, mandatory safety steps. High doses can be dangerous for people with certain conditions, so screening — especially for G6PD deficiency — is required before treatment, not optional. Used within proper medical limits and screening, IVC is generally well tolerated; used carelessly, it can cause serious harm.`,
+    howItWorks: `Over roughly 30 minutes to a couple of hours depending on dose, ascorbic acid is infused directly into the bloodstream, bypassing the gut's absorption ceiling to reach plasma levels impossible to achieve orally. At these concentrations vitamin C acts as a potent antioxidant and supports immune cell function; at very high pharmacologic levels it is also being studied for pro-oxidant effects in research settings. Kidney function and G6PD status determine whether high doses are safe, which is why screening precedes any infusion.`,
+    benefits: [
+      'Reaches plasma vitamin C levels impossible to achieve with oral doses',
+      'Provides high-dose antioxidant and immune support',
+      "Bypasses the gut's absorption ceiling for vitamin C",
+      'Generally well tolerated when proper screening and dose limits are followed',
+      'Studied as a complementary, supportive option — strictly alongside conventional care',
+    ],
+    whatToExpect: `Before a first high-dose infusion, expect required screening — including a G6PD test and a review of kidney health and stone history — without which the infusion should not proceed. The infusion itself runs from about 30 minutes for lower doses up to a couple of hours for very high doses, in a clinic chair. You may notice a warm or metallic sensation or mild lightheadedness. This is supportive wellness care, not a treatment for any disease.`,
+    costRange: '$100 to $250',
+    costContext: `Standard high-dose vitamin C sessions run $100 to $250, with very high-dose protocols and the required G6PD and kidney screening adding to the overall cost. Because this is not a proven medical treatment for disease, it is generally cash-pay and not covered by insurance.`,
+    primaryIngredients: ['High-dose ascorbic acid (vitamin C)', 'Saline carrier'],
+    sessionDuration: '30 minutes to 2 hours',
+    alternateName: 'IV Vitamin C (IVC)',
+    relevantSpecialty: 'Integrative Medicine',
+    whoItsFor: `IVC may appeal to adults seeking high-dose antioxidant or immune support who have been screened and cleared by a clinician, and occasionally to people exploring complementary support during cancer care — only ever in coordination with their oncologist and never in place of proven treatment. It is not appropriate for anyone with G6PD deficiency, significant kidney disease, or a history of oxalate kidney stones, and not for anyone hoping it will treat or cure a serious illness on its own.`,
+    safety: `High-dose IV vitamin C has mandatory safety requirements. G6PD deficiency screening is required before high doses, because giving it to someone with G6PD deficiency can trigger dangerous breakdown of red blood cells (hemolysis). It should also be avoided in people with significant kidney disease or a history of calcium-oxalate kidney stones, as high doses raise oxalate and stress the kidneys. On the regulatory side, IVC is investigational and not a proven cancer treatment — no cancer-cure claims should be made, and any cancer-related use must be discussed with an oncologist as complementary only. Milder effects include nausea, a warm or metallic sensation, and lightheadedness; a licensed clinician must screen kidney function and G6PD status first.`,
+    faqs: [
+      { question: 'Does high-dose vitamin C treat or cure cancer?', answer: 'No. It is investigational and not a proven cancer treatment, and no cancer-cure claims should be made. Any cancer-related use should be considered complementary only and discussed with your oncologist, never as a replacement for proven therapy.' },
+      { question: 'Why is G6PD screening required?', answer: 'People with G6PD deficiency can experience dangerous red-blood-cell breakdown (hemolysis) from high-dose vitamin C. Screening for it before treatment is mandatory, not optional, which is why it precedes any infusion.' },
+      { question: 'Who should not get high-dose IV vitamin C?', answer: 'People with G6PD deficiency, significant kidney disease, or a history of calcium-oxalate kidney stones should avoid it, since high doses raise oxalate and stress the kidneys. A clinician must confirm your kidney function and G6PD status first.' },
+      { question: 'Why give vitamin C by IV instead of a pill?', answer: 'Oral absorption is capped by the gut, so blood levels plateau even at high doses. IV bypasses that limit to reach concentrations impossible to achieve orally, which is the entire rationale for high-dose IVC.' },
+      { question: 'Is it safe?', answer: 'Within proper dose limits and after required screening, it is generally well tolerated, with mild effects like nausea or a warm sensation. Without G6PD and kidney screening, however, it can cause serious harm, so medical supervision is essential.' },
+    ],
+  },
 };
 
 export function getTreatmentContent(serviceName: string): TreatmentContent | undefined {

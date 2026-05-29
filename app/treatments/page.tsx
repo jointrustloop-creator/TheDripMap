@@ -54,6 +54,15 @@ const TREATMENTS = [
   { name: 'Jet Lag',        slug: 'jet-lag',        icon: Droplets,    category: 'Travel',             image: 'iv-therapy-jet-lag.jpg' },
   { name: 'Energy Boost',   slug: 'energy-boost',   icon: Zap,         category: 'Energy & Longevity', image: 'iv-therapy-fatigue.jpg' },
   { name: 'Peptide Therapy', slug: 'peptide-therapy', icon: Sparkles,  category: 'Advanced',           image: 'iv-therapy-weight-loss.jpg' },
+  { name: 'GLP-1 Weight Loss', slug: 'glp-1-weight-loss', icon: Activity, category: 'Metabolic',         image: 'iv-therapy-weight-loss.jpg' },
+  { name: 'Iron Infusion',  slug: 'iron-infusion',  icon: Droplets,    category: 'Medical',            image: 'iv-therapy-clinical-medical-setting.jpg' },
+  { name: 'Vitamin D',      slug: 'vitamin-d',      icon: Zap,         category: 'Nutrient',           image: 'iv-therapy-vitamin-drip-citrus.jpg' },
+  { name: 'B12 Shot',       slug: 'b12-shot',       icon: Zap,         category: 'Nutrient',           image: 'iv-therapy-fatigue.jpg' },
+  { name: 'Glutathione',    slug: 'glutathione',    icon: Sparkles,    category: 'Beauty',             image: 'iv-therapy-skin-glow.jpg' },
+  { name: 'High-Dose Vitamin C', slug: 'high-dose-vitamin-c', icon: ShieldCheck, category: 'Wellness',  image: 'iv-therapy-immunity.jpg' },
+  { name: 'Cold & Flu',     slug: 'cold-and-flu',   icon: ShieldCheck, category: 'Wellness',           image: 'iv-therapy-immunity.jpg' },
+  { name: 'Migraine Relief', slug: 'migraine-relief', icon: Activity,  category: 'Medical',            image: 'iv-therapy-clinical-medical-setting.jpg' },
+  { name: 'Hormone Therapy', slug: 'hormone-therapy', icon: Activity,  category: 'Advanced',           image: 'iv-therapy-clinical-medical-setting.jpg' },
 ];
 
 // First sentence (or first ~180 chars) of each treatment's description.
