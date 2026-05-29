@@ -8,6 +8,7 @@ const MODEL = 'claude-sonnet-4-20250514';
 const MAX_TOOL_ROUNDS = 5;
 
 interface InMsg { role: 'user' | 'assistant'; content: string }
+interface Coords { lat: number; lng: number }
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 async function callAnthropic(system: string, messages: any[]): Promise<any> {
@@ -30,7 +31,7 @@ async function callAnthropic(system: string, messages: any[]): Promise<any> {
 }
 
 export async function POST(req: Request) {
-  let body: { messages?: InMsg[] };
+  let body: { messages?: InMsg[]; userCity?: string; userCoords?: Coords };
   try {
     body = await req.json();
   } catch {
@@ -38,6 +39,13 @@ export async function POST(req: Request) {
   }
   const incoming = Array.isArray(body.messages) ? body.messages : [];
   if (incoming.length === 0) return NextResponse.json({ error: 'No messages.' }, { status: 400 });
+
+  // Location grounding — passed from the browser (geolocation and/or stated city).
+  const userCity = typeof body.userCity === 'string' && body.userCity.trim() ? body.userCity.trim().slice(0, 80) : null;
+  const userCoords =
+    body.userCoords && Number.isFinite(body.userCoords.lat) && Number.isFinite(body.userCoords.lng)
+      ? { lat: Number(body.userCoords.lat), lng: Number(body.userCoords.lng) }
+      : null;
 
   // Keep the last 12 turns, normalize to Anthropic format.
   const messages: any[] = incoming
@@ -48,7 +56,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Expected a user message.' }, { status: 400 });
   }
 
-  const system = buildSystemPrompt();
+  const system = buildSystemPrompt({}, { city: userCity, hasCoords: !!userCoords });
   let lastClinics: AssistantClinic[] = [];
   let finalText = '';
 
@@ -64,7 +72,16 @@ export async function POST(req: Request) {
         const roundClinics: AssistantClinic[] = [];
         const toolResults: any[] = [];
         for (const tu of toolUses) {
-          const outcome = await runTool(tu.name, (tu.input || {}) as Record<string, unknown>);
+          const toolInput = { ...((tu.input || {}) as Record<string, unknown>) };
+          // Apply the user's real location to clinic searches so "near me" works
+          // and the model can't accidentally search globally. If the model named a
+          // specific city, honor it; otherwise prefer precise coordinates (true
+          // distance ranking, incl. nearby suburbs) and fall back to the known city.
+          if (tu.name === 'search_providers' && !toolInput.city) {
+            if (userCoords) toolInput.near = userCoords;
+            else if (userCity) toolInput.city = userCity;
+          }
+          const outcome = await runTool(tu.name, toolInput);
           if (outcome.clinics?.length) roundClinics.push(...outcome.clinics);
           toolResults.push({ type: 'tool_result', tool_use_id: tu.id, content: outcome.forModel });
         }

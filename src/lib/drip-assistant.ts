@@ -22,6 +22,19 @@ export interface AssistantClinic {
   mobile: boolean;
   website: string | null;
   phone: string | null;
+  distanceMi: number | null; // straight-line miles from the user, when known
+}
+
+export interface NearCoords { lat: number; lng: number }
+
+function haversineMi(aLat: number, aLng: number, bLat: number, bLng: number): number {
+  const R = 3958.8; // Earth radius in miles
+  const dLat = ((bLat - aLat) * Math.PI) / 180;
+  const dLng = ((bLng - aLng) * Math.PI) / 180;
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((aLat * Math.PI) / 180) * Math.cos((bLat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
 }
 
 export interface ToolOutcome {
@@ -69,32 +82,64 @@ interface ProviderRow {
   is_featured: boolean | null; type: string | null; specialties: string[] | null;
   mobile_service: boolean | null; website: string | null; phone: string | null;
   description: string | null; working_hours: Record<string, unknown> | null; id: string;
+  latitude?: number | string | null; longitude?: number | string | null;
 }
 
-function toClinic(p: ProviderRow, verified: boolean): AssistantClinic {
+function toClinic(p: ProviderRow, verified: boolean, distanceMi: number | null = null): AssistantClinic {
   return {
     name: p.name, slug: p.slug, city: p.city, state: p.state,
     rating: p.rating != null ? Number(p.rating) : null,
     reviews: p.reviews != null ? Number(p.reviews) : null,
     verified, claimed: !!p.is_featured, mobile: isMobileProvider(p),
     website: p.website, phone: p.phone,
+    distanceMi: distanceMi != null ? Math.round(distanceMi * 10) / 10 : null,
   };
+}
+
+const NEAR_RADIUS_MI = 60; // "near me" search radius when only coordinates are known
+
+// Top covered cities — used to make honest "we don't have that area, try these" suggestions.
+async function topCoveredCities(sb: ReturnType<typeof getServiceSupabase>, limit = 6): Promise<string[]> {
+  const { data } = await sb.from('providers').select('city').neq('availability', false).not('city', 'is', null).limit(3000);
+  const counts: Record<string, number> = {};
+  for (const r of (data as { city: string | null }[]) || []) {
+    const k = (r.city || '').trim();
+    if (k) counts[k] = (counts[k] || 0) + 1;
+  }
+  return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, limit).map(([c]) => c);
 }
 
 // ── search_providers ────────────────────────────────────────────────
 async function searchProviders(input: {
   city?: string; treatment?: string; mobile_only?: boolean; open_now?: boolean; verified_only?: boolean;
+  near?: NearCoords;
 }): Promise<ToolOutcome> {
   const sb = getServiceSupabase();
+  const hasCity = !!(input.city && input.city.trim());
+  const near =
+    input.near && Number.isFinite(input.near.lat) && Number.isFinite(input.near.lng) ? input.near : null;
+
+  // CRITICAL: never return random global results. If we have neither a city nor
+  // coordinates, instruct the model to ask the user for their city first.
+  if (!hasCity && !near && !input.verified_only) {
+    return {
+      forModel: JSON.stringify({
+        needs_location: true,
+        note: 'No location is known yet. Ask the user what city they are in (one short question) before searching. Do NOT guess a city or list clinics.',
+      }),
+    };
+  }
+
   let q = sb
     .from('providers')
-    .select('id, name, slug, city, state, rating, reviews, is_featured, type, specialties, mobile_service, website, phone, description, working_hours')
-    .neq('availability', false)
+    .select('id, name, slug, city, state, rating, reviews, is_featured, type, specialties, mobile_service, website, phone, description, working_hours, latitude, longitude')
+    .neq('availability', false);
+  if (hasCity) q = q.ilike('city', `%${input.city!.trim()}%`);
+  if (input.verified_only) q = q.eq('is_featured', true);
+  q = q
     .order('is_featured', { ascending: false })
     .order('rating', { ascending: false, nullsFirst: false })
-    .limit(120);
-  if (input.city) q = q.ilike('city', `%${input.city.trim()}%`);
-  if (input.verified_only) q = q.eq('is_featured', true);
+    .limit(near && !hasCity ? 1500 : 200);
 
   const { data, error } = await q;
   if (error) return { forModel: JSON.stringify({ error: 'search failed' }) };
@@ -116,9 +161,48 @@ async function searchProviders(input: {
     });
   }
 
+  // Attach straight-line distance when coordinates are known, then rank.
+  const coordOf = (p: ProviderRow): [number, number] | null => {
+    const lat = p.latitude != null ? Number(p.latitude) : NaN;
+    const lng = p.longitude != null ? Number(p.longitude) : NaN;
+    return Number.isFinite(lat) && Number.isFinite(lng) ? [lat, lng] : null;
+  };
+  let ranked = rows.map((r) => {
+    const c = coordOf(r);
+    const dist = near && c ? haversineMi(near.lat, near.lng, c[0], c[1]) : null;
+    return { r, dist };
+  });
+
+  if (near) {
+    let inRange = ranked.filter((x) => x.dist != null);
+    // When the user only gave coordinates (no city), keep results within a sane radius.
+    if (!hasCity) inRange = inRange.filter((x) => (x.dist as number) <= NEAR_RADIUS_MI);
+    inRange.sort((a, b) => {
+      if (!!b.r.is_featured !== !!a.r.is_featured) return (b.r.is_featured ? 1 : 0) - (a.r.is_featured ? 1 : 0);
+      return (a.dist as number) - (b.dist as number);
+    });
+    // If nothing has coordinates / nothing in range, fall back to the unranked set
+    // (still city-scoped if a city was given) rather than showing nothing wrong.
+    ranked = inRange.length ? inRange : ranked.filter((x) => x.dist == null);
+  }
+
+  if (ranked.length === 0) {
+    const suggestedCities = await topCoveredCities(sb);
+    return {
+      forModel: JSON.stringify({
+        count: 0,
+        clinics: [],
+        note: hasCity
+          ? `No clinics found in "${input.city}". Tell the user honestly we don't list that area yet, and offer one of the covered cities below or browsing the full directory.`
+          : 'No clinics found near those coordinates. Ask for a city or suggest a covered city below.',
+        suggestedCities,
+      }),
+    };
+  }
+
   // verified = claimed + all 5 safety flags. Look up profiles for the top slice.
-  const top = rows.slice(0, 6);
-  const claimedIds = top.filter((p) => p.is_featured).map((p) => p.id);
+  const top = ranked.slice(0, 6);
+  const claimedIds = top.filter((x) => x.r.is_featured).map((x) => x.r.id);
   const verifiedSet = new Set<string>();
   if (claimedIds.length) {
     const { data: profs } = await sb.from('operator_profiles').select('clinic_id, profile_data').in('clinic_id', claimedIds);
@@ -128,14 +212,15 @@ async function searchProviders(input: {
     }
   }
 
-  const clinics = top.slice(0, 4).map((p) => toClinic(p, verifiedSet.has(p.id)));
+  const clinics = top.slice(0, 4).map((x) => toClinic(x.r, verifiedSet.has(x.r.id), x.dist));
   const forModel = JSON.stringify({
-    count: rows.length,
+    count: ranked.length,
+    rankedBy: near ? 'distance' : 'relevance',
     clinics: clinics.map((c) => ({
       name: c.name, city: c.city, state: c.state, rating: c.rating, reviews: c.reviews,
       verified: c.verified, claimed: c.claimed, mobile: c.mobile, slug: c.slug,
+      distanceMi: c.distanceMi,
     })),
-    note: clinics.length === 0 ? 'No matching clinics found in our directory for that search.' : undefined,
   });
   return { forModel, clinics };
 }
@@ -267,32 +352,50 @@ export interface AssistantConfig {
   clinicName?: string; // set for a white-labeled, single-clinic assistant
 }
 
-export function buildSystemPrompt(config: AssistantConfig = {}): string {
+export interface AssistantContext {
+  city?: string | null; // user's detected/stated city
+  hasCoords?: boolean; // true if the browser gave us precise coordinates
+}
+
+export function buildSystemPrompt(config: AssistantConfig = {}, ctx: AssistantContext = {}): string {
   if (config.clinicName) {
     return `You are the assistant for ${config.clinicName}, an IV therapy clinic. Answer questions about ${config.clinicName}'s treatments, hours, and booking, and help patients decide if a treatment is right for them. Be warm, expert, and trustworthy. Never invent prices, hours, or medical claims — if unsure, tell them to confirm directly with the clinic. Add a brief safety note for medical questions.`;
   }
-  return `You are "Drip Assistant", the chat guide for TheDripMap — North America's IV therapy & peptide clinic directory (1,030+ listed clinics, with verified safety badges on claimed clinics).
+
+  const locationLine = ctx.city
+    ? `USER LOCATION: ${ctx.city}${ctx.hasCoords ? ' (precise GPS coordinates available — searches are automatically distance-ranked from the user).' : ' (stated by the user).'} Use this for "near me" requests without asking again.`
+    : ctx.hasCoords
+    ? `USER LOCATION: precise GPS coordinates are available, so "near me" searches are automatically distance-ranked. You may proceed without asking for a city.`
+    : `USER LOCATION: UNKNOWN. For any "find a clinic / near me" request you MUST first ask one short question — "What city are you in?" — and wait for the answer before searching. Never guess a city and never list clinics without a location.`;
+
+  return `You are "Drip Assistant", the chat concierge for TheDripMap — North America's IV therapy & peptide clinic directory (1,100+ listed clinics, with verified safety badges on claimed clinics).
 
 YOUR JOB: help patients find the right clinic right now, and answer IV therapy / peptide questions accurately. Finding a clinic is your PRIMARY job; education is secondary. End educational answers by offering to find a relevant clinic.
 
 PERSONALITY: warm, knowledgeable, trustworthy — like a friend who happens to be a nurse. Never salesy.
 
-KEEP IT SHORT & INTERACTIVE (very important):
-- Every reply is 2-3 sentences MAX. Never write essays, long paragraphs, or long bullet lists — the user should never have to scroll to read your answer.
-- Be conversational and ask ONE short follow-up question whenever you need more to help — especially the user's city if they haven't given it. Prefer a quick question over a long explanation or a guess.
-- For treatment questions: give a 1-2 sentence answer, then ask if they'd like to see clinics near them.
+${locationLine}
 
-HOW TO WORK:
-- For "find me a clinic" requests, call search_providers with whatever the user gave (city, treatment, mobile, open now, verified). If they didn't give a city, ask for it.
-- To check a specific clinic's verification/details, call get_provider.
-- For treatment questions, call get_treatment_info, answer accurately, then offer to find a nearby clinic.
-- Use get_city_stats for "how many clinics in X" or price questions.
-- The UI shows clinic cards automatically from your search results — so don't paste long lists of links; briefly say why the top matches fit, then let the cards do the work.
+OPERATING LOOP — follow this on EVERY user message:
+1. UNDERSTAND: identify the intent (find a clinic / treatment question / check a specific clinic / pricing / booking-contact) and the details given (city, treatment, mobile vs in-clinic, open now, budget, urgency).
+2. CHECK LOCATION: if it's a clinic search and you don't know the user's city or coordinates, ask "What city are you in?" — ONE short question — and stop. Do not call search_providers without a location.
+3. GROUND: call the right tool. Never answer about specific clinics, prices, availability, ratings, or verification from memory — only from tool results.
+4. RESPOND: 2-3 sentences MAX. Say briefly why the top matches fit (e.g. "closest to you", "verified", "open now"); the UI renders the clinic cards, so don't paste links or long lists.
+5. NEXT STEP: end with a short, concrete next step or ONE follow-up question (e.g. offer to filter to mobile, verified-only, or open-now).
+
+TOOLS:
+- search_providers — any "find me a clinic" request. The user's location is applied automatically when known; pass treatment / mobile_only / open_now / verified_only when the user implies them. If it returns needs_location, ask for the city. If it returns count 0 with suggestedCities, tell the user honestly we don't list that area yet and offer those cities.
+- get_provider — to check a specific clinic's verification/details by name or slug.
+- get_treatment_info — educational info about a treatment; answer accurately then offer to find a nearby clinic.
+- get_city_stats — "how many clinics in X" or city price questions.
+
+WHEN RESULTS ARE DISTANCE-RANKED: the nearest match is first; you can mention the distance in miles if helpful.
 
 HONESTY & SAFETY (critical):
-- NEVER invent clinic names, prices, hours, ratings, or verification status. Only state what the tools return. If a tool returns nothing, say you couldn't find a match and suggest broadening the city or browsing the directory.
-- "Verified" means the clinic confirmed all 5 of our safety checks (medical director, licensed clinician, compounding pharmacy, liability insurance, state-board compliance). "Claimed" means the owner manages the listing.
-- For medical questions, give honest, balanced info, note where evidence is limited, and always recommend confirming suitability with a licensed clinician. You are not a doctor and do not give medical advice or diagnoses.
-- Always recommend patients confirm current pricing, hours, and treatment availability directly with the clinic.
+- NEVER invent clinic names, prices, hours, ratings, or verification status. Only state what the tools return. If a tool returns nothing, say so honestly and offer a covered city or the directory — never fabricate.
+- Ratings/reviews exist only for claimed/verified clinics; don't imply unclaimed clinics have ratings.
+- "Verified" = the clinic confirmed all 5 safety checks (medical director, licensed clinician, compounding pharmacy, liability insurance, state-board compliance). "Claimed" = the owner manages the listing.
+- For medical questions, give honest, balanced info, note where evidence is limited, and always recommend confirming suitability with a licensed clinician. You are not a doctor and don't give medical advice or diagnoses.
+- Always recommend patients confirm current pricing, hours, and availability directly with the clinic.
 - If you don't know, say so and point them to the clinic or info@thedripmap.com.`;
 }
