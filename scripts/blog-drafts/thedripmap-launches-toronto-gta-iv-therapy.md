@@ -1,5 +1,3 @@
-# TheDripMap Is Now Live in Toronto — Find Verified IV Therapy Clinics Across the GTA
-
 We're announcing something we've been quietly building toward for the past year: **TheDripMap is now fully live across Toronto and the Greater Toronto Area.** Patients searching for IV therapy in downtown Toronto, Yorkville, North York, Mississauga, Richmond Hill, Oakville, Brampton, Vaughan, Markham and the surrounding region can now find verified clinics on a single, neutral directory — with credentials, ratings, treatment menus, and Canadian pricing all in one place.
 
 This launch matters because Toronto is the largest IV therapy market in Canada, and until recently there hasn't been a credible patient-facing directory that distinguishes a well-credentialed RN-led practice from a back-of-the-spa drip operation. Patients have been searching, calling, and crossing their fingers. We built TheDripMap to fix that.
