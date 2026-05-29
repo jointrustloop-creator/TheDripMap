@@ -132,9 +132,9 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-6 pt-20 pb-16 md:pt-32 md:pb-24 relative">
           {/* Eyebrow */}
           <div className="flex items-center gap-3 mb-6 justify-center">
-            <span className="h-px w-8 bg-[#0F6E56]" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56]">North America's IV Therapy Platform</span>
-            <span className="h-px w-8 bg-[#0F6E56]" />
+            <span className="hidden md:block h-px w-8 bg-[#0F6E56]" />
+            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] text-center">North America's IV Therapy Platform</span>
+            <span className="hidden md:block h-px w-8 bg-[#0F6E56]" />
           </div>
 
           {/* Hero headline — dark ink with emerald serif italic accent */}
