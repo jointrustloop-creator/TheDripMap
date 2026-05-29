@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -95,10 +96,11 @@ export default async function HomePage() {
   ];
 
   const guides = [
-    { num: '01', label: 'Pricing',         title: 'What IV therapy actually costs',         href: '/guide/iv-therapy-cost-guide',                desc: 'Hangover, NAD+, Myers, recovery — real 2026 ranges across US and Canadian metros.' },
-    { num: '02', label: 'Quality Signals', title: 'How to choose a clinic',                 href: '/guide/how-to-choose-iv-therapy-clinic',      desc: 'The 7 things every reputable IV therapy clinic should have. Walk away if any are missing.' },
-    { num: '03', label: 'Walk-through',    title: 'Your first session, step by step',       href: '/guide/first-time-iv-therapy-what-to-expect', desc: 'Intake to needle to discharge. What to expect, what to ask, how to know it went well.' },
+    { num: '01', label: 'Pricing',         title: 'What IV therapy actually costs',         href: '/guide/iv-therapy-cost-guide',                desc: 'Hangover, NAD+, Myers, recovery — real 2026 ranges across US and Canadian metros.',                image: 'iv-therapy-vitamin-drip-citrus.jpg' },
+    { num: '02', label: 'Quality Signals', title: 'How to choose a clinic',                 href: '/guide/how-to-choose-iv-therapy-clinic',      desc: 'The 7 things every reputable IV therapy clinic should have. Walk away if any are missing.', image: 'iv-therapy-modern-clinic-recliners.jpg' },
+    { num: '03', label: 'Walk-through',    title: 'Your first session, step by step',       href: '/guide/first-time-iv-therapy-what-to-expect', desc: 'Intake to needle to discharge. What to expect, what to ask, how to know it went well.',     image: 'iv-therapy-nad-iv-bag-closeup.jpg' },
   ];
+  const GUIDE_IMG_BASE = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/';
 
   return (
     <div className="min-h-screen bg-white">
@@ -353,24 +355,40 @@ export default async function HomePage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-slate-100 border border-slate-100 rounded-3xl overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {guides.map((g) => (
               <Link
                 key={g.num}
                 href={g.href}
-                className="group bg-white hover:bg-[#F8F7F3] p-7 md:p-12 transition-colors relative flex flex-col"
+                className="group relative overflow-hidden rounded-3xl flex flex-col min-h-[420px] md:min-h-[480px] shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-500"
               >
-                <div className="font-serif italic text-4xl md:text-5xl text-[#0F6E56]/30 group-hover:text-[#0F6E56]/60 transition-colors mb-5 md:mb-8 font-normal">
-                  {g.num}
-                </div>
-                <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400 mb-3">{g.label}</div>
-                <h3 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight leading-[1.15] mb-4 group-hover:text-[#0F6E56] transition-colors">
-                  {g.title}
-                </h3>
-                <p className="text-slate-500 text-sm leading-relaxed mb-8 flex-1">{g.desc}</p>
-                <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#0F6E56]">
-                  <span>Read the guide</span>
-                  <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                <Image
+                  src={`${GUIDE_IMG_BASE}${g.image}`}
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-[1200ms] ease-out"
+                />
+                {/* Strong dark gradient anchored at the bottom so the editorial
+                    type stays legible no matter what the chosen image looks like. */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/65 to-slate-950/30" />
+                {/* Subtle emerald wash on hover — same on-brand accent the
+                    treatments index uses. */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0F6E56]/0 to-[#0F6E56]/0 group-hover:from-[#0F6E56]/25 group-hover:to-transparent transition-all duration-500" />
+
+                <div className="relative z-10 p-7 md:p-12 flex flex-col h-full">
+                  <div className="font-serif italic text-4xl md:text-5xl text-white/45 group-hover:text-[#7ED3B8] transition-colors mb-5 md:mb-8 font-normal">
+                    {g.num}
+                  </div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/70 mb-3">{g.label}</div>
+                  <h3 className="text-xl md:text-2xl font-black text-white tracking-tight leading-[1.15] mb-4 drop-shadow">
+                    {g.title}
+                  </h3>
+                  <p className="text-white/80 text-sm leading-relaxed mb-8 flex-1 drop-shadow">{g.desc}</p>
+                  <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#7ED3B8]">
+                    <span>Read the guide</span>
+                    <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </div>
               </Link>
             ))}
