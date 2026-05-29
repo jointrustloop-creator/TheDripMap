@@ -229,6 +229,16 @@ export default async function HomePage() {
               </Link>
             ))}
           </div>
+
+          <div className="text-center mt-10 md:mt-12">
+            <Link
+              href="/treatments"
+              className="inline-flex items-center gap-2 text-sm font-bold text-[#7ED3B8] hover:text-white transition-colors group"
+            >
+              <span className="border-b border-[#7ED3B8]/40 group-hover:border-white pb-0.5">See all 20 treatments</span>
+              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
         </div>
       </section>
 
