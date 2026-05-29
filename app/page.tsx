@@ -129,7 +129,7 @@ export default async function HomePage() {
           />
         </div>
 
-        <div className="max-w-6xl mx-auto px-6 pt-28 pb-20 md:pt-32 md:pb-24 relative">
+        <div className="max-w-6xl mx-auto px-6 pt-20 pb-16 md:pt-32 md:pb-24 relative">
           {/* Eyebrow */}
           <div className="flex items-center gap-3 mb-6 justify-center">
             <span className="h-px w-8 bg-[#0F6E56]" />
@@ -143,7 +143,7 @@ export default async function HomePage() {
             <span className="font-serif italic font-normal text-[#0F6E56] tracking-[-0.02em]">IV therapy clinic.</span>
           </h1>
 
-          <p className="text-center text-[20px] text-slate-500 max-w-[560px] mx-auto mb-8 leading-relaxed font-light">
+          <p className="text-center text-base md:text-[20px] text-slate-500 max-w-[560px] mx-auto mb-8 leading-relaxed font-light">
             {stats.total.toLocaleString()}+ verified clinics across {stats.cities}+ cities. Find the right one for you in under 60 seconds.
           </p>
 
@@ -153,7 +153,7 @@ export default async function HomePage() {
           </div>
 
           {/* Trust row — typographic */}
-          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400">
+          <div className="flex flex-wrap items-center justify-center gap-x-5 md:gap-x-10 gap-y-3 text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400">
             <span><span className="text-slate-900">{stats.total.toLocaleString()}</span> &nbsp;Verified Clinics</span>
             <span className="hidden md:inline text-slate-300">·</span>
             <span><span className="text-slate-900">{stats.cities}</span> &nbsp;Cities</span>
@@ -166,9 +166,9 @@ export default async function HomePage() {
       {/* ─────────────────────────────────────────────────────────────
           2. SMART MATCH CTA — white, one emerald focal point
           ───────────────────────────────────────────────────────────── */}
-      <section className="bg-white py-24 md:py-32 px-6">
+      <section className="bg-white py-20 md:py-32 px-6">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-14 md:mb-16">
             <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] mb-6 block">The Smart Match</span>
             <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1.05] text-[clamp(2rem,5vw,4rem)] max-w-3xl mx-auto">
               Skip the guesswork.<br />
@@ -197,11 +197,11 @@ export default async function HomePage() {
       {/* ─────────────────────────────────────────────────────────────
           3. DRIP MENU — deep ink, monochrome grid
           ───────────────────────────────────────────────────────────── */}
-      <section className="bg-[#0A0B0D] text-white py-32 md:py-44 px-6 relative overflow-hidden">
+      <section className="bg-[#0A0B0D] text-white py-20 md:py-44 px-6 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#0F6E56]/10 rounded-full blur-[180px] pointer-events-none" />
 
         <div className="max-w-6xl mx-auto relative">
-          <div className="mb-20 flex items-end justify-between gap-8 flex-wrap">
+          <div className="mb-12 md:mb-20 flex items-end justify-between gap-8 flex-wrap">
             <div>
               <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-white/40 mb-6 block">The Menu</span>
               <h2 className="font-black tracking-[-0.025em] leading-[1] text-[clamp(2rem,5vw,4rem)]">
@@ -235,9 +235,9 @@ export default async function HomePage() {
       {/* ─────────────────────────────────────────────────────────────
           4. SITUATION MATCHER — light, monochrome, type-led
           ───────────────────────────────────────────────────────────── */}
-      <section className="bg-white py-24 md:py-32 px-6">
+      <section className="bg-white py-20 md:py-32 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
+          <div className="text-center mb-14 md:mb-20">
             <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] mb-6 block">By Situation</span>
             <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1.05] text-[clamp(2rem,5vw,4rem)] max-w-3xl mx-auto">
               What are you<br />
@@ -253,7 +253,7 @@ export default async function HomePage() {
               <Link
                 key={s.label}
                 href="/quiz"
-                className="group bg-white hover:bg-[#F8F7F3] p-7 md:p-8 transition-colors relative"
+                className="group bg-white hover:bg-[#F8F7F3] p-5 md:p-8 transition-colors relative"
               >
                 <s.Icon size={20} className="text-[#0F6E56] mb-5" strokeWidth={1.75} />
                 <div className="font-bold text-slate-900 text-sm md:text-[15px] leading-tight tracking-tight mb-2">
@@ -281,9 +281,9 @@ export default async function HomePage() {
       {/* ─────────────────────────────────────────────────────────────
           5. CITIES — bone paper, editorial typography
           ───────────────────────────────────────────────────────────── */}
-      <section className="bg-[#F8F7F3] py-24 md:py-32 px-6 border-b border-[#0F6E56]/30">
+      <section className="bg-[#F8F7F3] py-20 md:py-32 px-6 border-b border-[#0F6E56]/30">
         <div className="max-w-6xl mx-auto">
-          <div className="mb-20 flex items-end justify-between gap-8 flex-wrap">
+          <div className="mb-14 md:mb-20 flex items-end justify-between gap-8 flex-wrap">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] mb-6 block">Cities</span>
               <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1] text-[clamp(2rem,5vw,4rem)]">
@@ -291,7 +291,7 @@ export default async function HomePage() {
                 <span className="font-serif italic font-normal text-[#0F6E56]">fully mapped.</span>
               </h2>
             </div>
-            <Link href="/cities" className="inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">
+            <Link href="/cities" className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">
               All {stats.cities}+ cities <ArrowUpRight size={16} />
             </Link>
           </div>
@@ -320,15 +320,22 @@ export default async function HomePage() {
               </Link>
             ))}
           </div>
+
+          {/* Mobile-only fallback for the All N+ cities link hidden in the header */}
+          <div className="text-center mt-10 md:hidden">
+            <Link href="/cities" className="inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">
+              All {stats.cities}+ cities <ArrowUpRight size={16} />
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
           6. GUIDES — light, editorial, restrained
           ───────────────────────────────────────────────────────────── */}
-      <section className="bg-white pt-24 md:pt-32 pb-14 md:pb-16 px-6">
+      <section className="bg-white pt-20 md:pt-32 pb-14 md:pb-16 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
+          <div className="text-center mb-14 md:mb-20">
             <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] mb-6 block">Before You Book</span>
             <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1.05] text-[clamp(2rem,5vw,4rem)] max-w-3xl mx-auto">
               The questions <span className="font-serif italic font-normal text-[#0F6E56]">everyone asks</span>,<br />
@@ -341,9 +348,9 @@ export default async function HomePage() {
               <Link
                 key={g.num}
                 href={g.href}
-                className="group bg-white hover:bg-[#F8F7F3] p-10 md:p-12 transition-colors relative flex flex-col"
+                className="group bg-white hover:bg-[#F8F7F3] p-7 md:p-12 transition-colors relative flex flex-col"
               >
-                <div className="font-serif italic text-5xl text-[#0F6E56]/30 group-hover:text-[#0F6E56]/60 transition-colors mb-8 font-normal">
+                <div className="font-serif italic text-4xl md:text-5xl text-[#0F6E56]/30 group-hover:text-[#0F6E56]/60 transition-colors mb-5 md:mb-8 font-normal">
                   {g.num}
                 </div>
                 <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400 mb-3">{g.label}</div>
@@ -371,16 +378,16 @@ export default async function HomePage() {
       {/* ─────────────────────────────────────────────────────────────
           7. BLOG — bone paper, editorial
           ───────────────────────────────────────────────────────────── */}
-      <section className="bg-[#F8F7F3] pt-14 md:pt-16 pb-24 md:pb-32 px-6">
+      <section className="bg-[#F8F7F3] pt-14 md:pt-16 pb-20 md:pb-32 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="mb-20 flex items-end justify-between gap-8 flex-wrap">
+          <div className="mb-14 md:mb-20 flex items-end justify-between gap-8 flex-wrap">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] mb-6 block">Latest</span>
               <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1] text-[clamp(2rem,5vw,4rem)]">
                 From the <span className="font-serif italic font-normal text-[#0F6E56]">journal.</span>
               </h2>
             </div>
-            <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">
+            <Link href="/blog" className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">
               All articles <ArrowUpRight size={16} />
             </Link>
           </div>
@@ -389,6 +396,12 @@ export default async function HomePage() {
             {latestPosts.map((post, idx) => (
               <BlogCard key={idx} post={post} index={idx} />
             ))}
+          </div>
+
+          <div className="text-center mt-10 md:hidden">
+            <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">
+              All articles <ArrowUpRight size={16} />
+            </Link>
           </div>
         </div>
       </section>
@@ -407,7 +420,7 @@ export default async function HomePage() {
       {/* ─────────────────────────────────────────────────────────────
           9. CLOSING CTA — single emerald moment, sparse copy
           ───────────────────────────────────────────────────────────── */}
-      <section className="bg-[#0F6E56] text-white py-24 md:py-36 px-6 relative overflow-hidden">
+      <section className="bg-[#0F6E56] text-white py-20 md:py-36 px-6 relative overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[800px] bg-white/5 rounded-full blur-[200px] pointer-events-none" />
         <div className="absolute inset-x-0 top-0 h-px bg-white/20" />
 
@@ -420,17 +433,17 @@ export default async function HomePage() {
           <p className="text-lg md:text-xl text-white/70 max-w-xl mx-auto mb-14 leading-relaxed font-light">
             Five questions. One match. The right drip, the right clinic, the first time.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4">
             <Link
               href="/quiz"
-              className="group inline-flex items-center gap-3 bg-white text-[#0F6E56] px-10 py-5 rounded-full font-bold text-base transition-all hover:bg-white/95 hover:-translate-y-0.5 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.3)]"
+              className="group inline-flex items-center justify-center gap-3 bg-white text-[#0F6E56] px-10 py-5 rounded-full font-bold text-base transition-all hover:bg-white/95 hover:-translate-y-0.5 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.3)]"
             >
               Get My Match Now
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               href="/search"
-              className="inline-flex items-center gap-2 text-white/80 hover:text-white px-6 py-3 rounded-full font-bold text-sm border border-white/20 hover:border-white/40 transition-colors"
+              className="inline-flex items-center justify-center gap-2 text-white/85 hover:text-white px-10 py-5 rounded-full font-bold text-base border border-white/25 hover:border-white/50 transition-colors"
             >
               Browse Clinics
             </Link>

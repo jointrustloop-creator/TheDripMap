@@ -48,11 +48,11 @@ export const TrustSignals = ({ stats: dynamicStats }: TrustSignalsProps) => {
         {items.map((it, idx) => (
           <div key={it.label} className={`text-center px-4 py-6 md:py-3 ${borders[idx]}`}>
             <div className="flex items-baseline justify-center gap-0.5">
-              <span className="text-5xl md:text-6xl font-black text-white tracking-tight tabular-nums">
+              <span className="text-4xl md:text-6xl font-black text-white tracking-tight tabular-nums">
                 {it.value}
               </span>
               {it.suffix && (
-                <span className="text-2xl md:text-3xl font-black text-emerald-300/80">{it.suffix}</span>
+                <span className="text-xl md:text-3xl font-black text-emerald-300/80">{it.suffix}</span>
               )}
             </div>
             <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-200/70">
