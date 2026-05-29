@@ -6,6 +6,7 @@ import { ErrorBoundary } from "../src/components/ErrorBoundary";
 import { ClaimListingProvider } from "../src/context/ClaimListingContext";
 import { EmailCapturePopup } from "../src/components/EmailCapturePopup";
 import { CompareBar } from "../src/components/CompareBar";
+import { DripAssistant } from "../src/components/DripAssistant";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -140,6 +141,7 @@ export default function RootLayout({
             {children}
             <CompareBar />
             <EmailCapturePopup />
+            <DripAssistant />
           </ClaimListingProvider>
         </ErrorBoundary>
       </body>
