@@ -138,8 +138,15 @@ export const Footer = () => {
       </div>
       <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-slate-100 flex flex-col items-center gap-8">
         <MedicalDisclaimer />
-        <div className="text-slate-400 text-sm">
-          © 2026 TheDripMap. All rights reserved.
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex items-center gap-5 text-sm text-slate-500">
+            <Link href="/privacy" className="hover:text-wellness-600 transition-colors">Privacy Policy</Link>
+            <span className="text-slate-300">·</span>
+            <Link href="/terms" className="hover:text-wellness-600 transition-colors">Terms of Service</Link>
+          </div>
+          <div className="text-slate-400 text-sm">
+            © 2026 TheDripMap. All rights reserved.
+          </div>
         </div>
       </div>
     </footer>

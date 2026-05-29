@@ -108,6 +108,17 @@ export async function GET(req: Request) {
   }
 
   // Send exactly ONE follow-up this invocation — the highest-ranked eligible.
+  //
+  // TODO (CAN-SPAM / CASL): the follow-up email below includes an unsubscribe
+  // notice ("reply with 'unsubscribe'..."), but there is currently NO inbound
+  // reply processor in the codebase to act on those replies. An inbound
+  // unsubscribe handler still needs to be built: it should read the
+  // info@thedripmap.com mailbox (IMAP via imapflow — see src/lib/draft-saver.ts),
+  // detect replies whose subject/body contains "unsubscribe", look up the
+  // matching provider by the reply's From address, and set
+  // providers.email_bounced = true so all future outreach + follow-ups skip
+  // them. Until that processor exists, unsubscribe requests must be honored
+  // manually.
   const p = ranked[0];
   const display = cleanName(p.name);
   const claimUrl = `${SITE_URL}/providers/${p.slug}?claim=1`;
@@ -125,7 +136,10 @@ If I'm reaching the wrong person, would you mind forwarding this to whoever hand
 Warmly,
 Deborah Triandafilou
 TheDripMap
-info@thedripmap.com`;
+info@thedripmap.com
+
+—
+To unsubscribe from TheDripMap outreach emails, reply with 'unsubscribe' in the subject line or email info@thedripmap.com`;
 
   let mailOk = false;
   let mailError: string | undefined;
