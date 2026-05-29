@@ -28,9 +28,11 @@ export const metadata: Metadata = {
     default: 'TheDripMap | Find Your Perfect IV Therapy Match',
   },
   description: 'Find and compare the best IV therapy clinics near you. Browse verified providers across hundreds of US cities or get matched in 60 seconds.',
-  alternates: {
-    canonical: 'https://www.thedripmap.com',
-  },
+  // NOTE: no global `alternates.canonical` here. A canonical set in the root
+  // layout is inherited by every child page that doesn't override it, which made
+  // pages without their own canonical declare the homepage as canonical — the
+  // exact cause of "Duplicate, Google chose different canonical". Each page now
+  // sets its own self-referencing canonical (the homepage sets its own in page.tsx).
   openGraph: {
     title: `${siteName} | Find Your Perfect IV Therapy Match`,
     description: `Find and compare the best IV therapy clinics near you.`,
