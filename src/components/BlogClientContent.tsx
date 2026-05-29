@@ -11,7 +11,8 @@ const CATEGORIES = [
   'Conditions & Symptoms',
   'City Guides',
   'Lifestyle & Wellness',
-  'Cost & Insurance'
+  'Cost & Insurance',
+  'Clinic Owner Resources'
 ];
 
 interface BlogClientContentProps {
