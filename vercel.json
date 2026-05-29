@@ -6,6 +6,14 @@
       "schedule": "0 12 * * *"
     },
     {
+      "path": "/api/cron/backlink-research",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/backlink-drafts",
+      "schedule": "30 13 * * *"
+    },
+    {
       "path": "/api/cron/daily-outreach",
       "schedule": "*/2 13 * * *"
     },
