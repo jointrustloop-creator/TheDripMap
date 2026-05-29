@@ -50,6 +50,8 @@ const MATRIX_TREATMENTS: MatrixTreatment[] = [
 const CANADA_CITIES = [
   'Toronto', 'Vancouver', 'Calgary', 'Ottawa',
   'Mississauga', 'Richmond Hill', 'North York', 'Oakville',
+  'Edmonton', 'Montreal', 'Quebec City', 'Winnipeg',
+  'Halifax', 'Victoria', 'Kelowna', 'Red Deer',
 ];
 
 const findTreatment = (slug: string) =>

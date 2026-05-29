@@ -92,7 +92,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'hydration', 'nad-plus', 'myers-cocktail', 'hangover-recovery', 'immune-support',
     'beauty-glow', 'athletic-recovery', 'mobile-iv', 'weight-loss', 'vitamin-c',
   ];
-  const CANADA_MATRIX_CITIES = ['Toronto', 'Vancouver', 'Calgary', 'Ottawa', 'Mississauga', 'Richmond Hill', 'North York', 'Oakville'];
+  const CANADA_MATRIX_CITIES = ['Toronto', 'Vancouver', 'Calgary', 'Ottawa', 'Mississauga', 'Richmond Hill', 'North York', 'Oakville', 'Edmonton', 'Montreal', 'Quebec City', 'Winnipeg', 'Halifax', 'Victoria', 'Kelowna', 'Red Deer'];
   const topUSMatrixCities = cities
     .filter((c) => c.count > 0 && c.city && !CANADA_MATRIX_CITIES.includes(c.city))
     .sort((a, b) => (b.count || 0) - (a.count || 0))
