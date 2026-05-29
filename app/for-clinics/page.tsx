@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { ClinicAudit } from '../../src/components/ClinicAudit';
-import { ShieldCheck, ArrowRight, BarChart, Users, Globe } from 'lucide-react';
-import { getSiteStats } from '../../src/lib/data';
+import { ArrowRight, BarChart, Users, Globe } from 'lucide-react';
+import { getSiteStats, getFeaturedListings, getListingsByCity, getAllListings } from '../../src/lib/data';
+import { ProviderCard } from '../../src/components/ProviderCard';
+import { Provider } from '../../src/types';
 
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getSiteStats();
@@ -43,7 +45,21 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ForClinicsPage() {
   const stats = await getSiteStats();
-  
+
+  // Use REAL listings so the comparison shows exactly how claimed vs unclaimed
+  // listings render on the site (never hardcoded clinic data).
+  const featured = await getFeaturedListings(3);
+  const claimedSample: Provider | null = (featured[0] as Provider) || null;
+  let unclaimedSample: Provider | null = null;
+  if (claimedSample) {
+    const cityList = await getListingsByCity(claimedSample.city);
+    unclaimedSample = (cityList.find((p) => !p.is_featured) as Provider) || null;
+  }
+  if (!unclaimedSample) {
+    const all = await getAllListings();
+    unclaimedSample = (all.find((p) => !p.is_featured) as Provider) || null;
+  }
+
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
@@ -130,86 +146,40 @@ export default async function ForClinicsPage() {
             <p className="text-slate-500">See the difference between a basic listing and a claimed, verified profile.</p>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Unclaimed */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            {/* Unclaimed — the real listing card for an unclaimed provider */}
             <div className="space-y-6">
               <div className="flex items-center gap-2 text-slate-400 font-bold uppercase tracking-widest text-[10px]">
                 <span className="w-2 h-2 bg-slate-300 rounded-full" /> Basic Listing (Unclaimed)
               </div>
-              <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 opacity-80 grayscale-[0.2] pointer-events-none">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-[#0F6E56]/10 rounded-2xl flex items-center justify-center text-[#0F6E56] font-black text-xl">
-                    WD
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-slate-900 mb-1">Wellness Drip NYC</h4>
-                    <div className="flex items-center gap-1 text-slate-400 text-xs font-bold">
-                      <span className="text-wellness-600">★★★★★</span> 4.9 (127 reviews)
-                    </div>
-                    <div className="text-[9px] text-slate-400 italic mt-0.5">Example listing shown for illustration only</div>
-                  </div>
+              {unclaimedSample ? (
+                <div className="max-w-sm mx-auto w-full">
+                  <ProviderCard provider={unclaimedSample} />
                 </div>
-                <div className="mb-4">
-                  <div className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Location</div>
-                  <div className="text-slate-600 text-sm font-medium">New York, NY</div>
-                </div>
-                <div className="flex gap-2 mb-8">
-                  {['IV Therapy', 'Wellness'].map(s => (
-                    <span key={s} className="bg-slate-50 text-slate-400 px-2 py-1 rounded-md text-[10px] font-bold border border-slate-100">{s}</span>
-                  ))}
-                </div>
-                <div className="w-full py-3 text-center text-slate-300 font-bold text-sm border-2 border-slate-50 rounded-xl">
-                  Claim this listing
-                </div>
-                <p className="mt-4 text-[10px] text-slate-400 italic text-center">
-                  Example listing shown for illustration purposes only
-                </p>
-              </div>
-              <p className="text-sm text-slate-400 font-medium italic text-center">
-                Missing clinical details, verified badges, and direct booking links.
+              ) : null}
+              <p className="text-sm text-slate-400 font-medium italic text-center max-w-sm mx-auto">
+                Greyed out, no photo, no ratings, and no booking — patients can&apos;t tell you apart from the rest.
               </p>
             </div>
 
-            {/* Claimed */}
+            {/* Claimed — the real listing card for a claimed/verified provider */}
             <div className="space-y-6">
               <div className="flex items-center gap-2 text-wellness-600 font-bold uppercase tracking-widest text-xs">
                 <span className="w-2 h-2 bg-wellness-600 rounded-full animate-pulse" /> Verified Profile (Claimed)
               </div>
-              <div className="bg-white p-8 rounded-[2.5rem] border-2 border-wellness-100 shadow-2xl shadow-wellness-100/30">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-wellness-600 rounded-2xl flex items-center justify-center text-white">
-                    <ShieldCheck size={32} />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-black text-slate-900">Wellness Drip NYC</h4>
-                      <div className="bg-emerald-500 text-white text-[8px] px-1.5 py-0.5 rounded-full font-black uppercase">Verified</div>
-                    </div>
-                    <div className="flex items-center gap-1 text-wellness-600">
-                      <BarChart size={12} />
-                      <span className="text-xs font-bold">Top 5% in New York</span>
-                    </div>
-                  </div>
+              {claimedSample ? (
+                <div className="max-w-sm mx-auto w-full">
+                  <ProviderCard provider={claimedSample} />
                 </div>
-                <div className="bg-wellness-50 p-4 rounded-xl mb-6 border border-wellness-100">
-                  <p className="text-xs text-wellness-900 font-bold italic leading-relaxed">
-                    &quot;Specializing in hangover recovery and energy boosts with 15-minute wait times.&quot;
-                  </p>
-                </div>
-                <div className="flex gap-2 mb-8">
-                  {['Hangover', 'Energy', 'NAD+'].map(s => (
-                    <span key={s} className="bg-slate-50 text-slate-600 px-2 py-1 rounded-md text-[10px] font-bold border border-slate-100">{s}</span>
-                  ))}
-                </div>
-                <button className="w-full bg-wellness-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-wellness-100">
-                  Book Appointment
-                </button>
-              </div>
-              <p className="text-sm text-wellness-700 font-bold text-center">
-                Includes custom messaging, verified status, and priority in search results.
+              ) : null}
+              <p className="text-sm text-wellness-700 font-bold text-center max-w-sm mx-auto">
+                Full color with your photo, the verified badge, your real rating, and a direct booking button.
               </p>
             </div>
           </div>
+          <p className="mt-8 text-center text-[11px] text-slate-400 font-medium italic">
+            Live examples pulled straight from the directory — this is exactly how the two listing types appear to patients.
+          </p>
         </div>
 
         {/* Social Proof Row */}
