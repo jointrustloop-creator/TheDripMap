@@ -249,4 +249,13 @@ Once your clinic or mobile unit is ready to serve clients, the next challenge is
 
 ---
 
-*Sources: financialmodelslab.com (IV Hydration Startup Costs & break-even), startupfinancialprojection.com (IV/Vitamin IV clinic CAPEX & profitability), calcix.net and bplanmaker.com (mobile IV startup guides 2026), ivtherapyacademy.com (IV therapy startup costs & comprehensive guide), wellnessmdgroup.com (med spa cost breakdown), medicaldirectorco.com & consentz.com (medical director / med spa retainer pricing), guardianmedicaldirection.com (MSO / CPOM compliance), lengealaw.com & cohenhealthcarelaw.com (MSO/MSA legal structure), cmfgroup.com, homewood.insure & ppibcorp.com (IV therapy liability insurance), payscale.com, ziprecruiter.com & erieri.com (RN wages 2026), mangomint.com, optimantra.com & softwarefinder.com (IV therapy EMR pricing), ivtherapymap.com & dripsnearme.com (2026 IV pricing by city), locumtele.org & nextech.com (licensing & state laws). All figures are industry estimates and ranges; verify with local professionals.*
+## Sources
+
+- Startup costs & financial models: [Financial Models Lab](https://financialmodelslab.com), [Startup Financial Projection](https://startupfinancialprojection.com), [Calcix](https://calcix.net), [BPlanMaker](https://bplanmaker.com), [IV Therapy Academy](https://ivtherapyacademy.com)
+- Medical director, MSO & CPOM compliance: [Medical Director Co.](https://medicaldirectorco.com), [Consentz](https://www.consentz.com), [Wellness MD Group](https://wellnessmdgroup.com), [Guardian Medical Direction](https://guardianmedicaldirection.com), [Lengea Law](https://lengealaw.com), [Cohen Healthcare Law](https://cohenhealthcarelaw.com)
+- IV therapy liability insurance: [CM&F Group](https://www.cmfgroup.com), [Homewood Insurance](https://homewood.insure), [PPIB](https://ppibcorp.com)
+- RN wages (2026): [PayScale](https://www.payscale.com), [ZipRecruiter](https://www.ziprecruiter.com), [ERI](https://www.erieri.com)
+- IV therapy EMR / software pricing: [Mangomint](https://www.mangomint.com), [OptiMantra](https://www.optimantra.com), [SoftwareFinder](https://softwarefinder.com)
+- 2026 IV pricing & licensing: [IV Therapy Map](https://ivtherapymap.com), [Drips Near Me](https://dripsnearme.com), [LocumTele](https://locumtele.org), [Nextech](https://www.nextech.com)
+
+*All figures are industry estimates and ranges and vary by city, state, and model — verify with local professionals before you commit.*

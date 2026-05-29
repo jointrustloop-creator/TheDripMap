@@ -120,4 +120,12 @@ Running a compliant, well-run IV clinic is hard work — make sure patients can 
 
 ---
 
-*Sources consulted for this article include the American Med Spa Association (AmSpa) guidance on IV therapy and good-faith exams; the Alabama State Board of Medical Examiners 2022 IV therapy declaratory ruling; coverage of Texas HB 3749 ("Jenifer's Law"); the North Carolina Board of Nursing position statement on IV therapy; and corporate-practice-of-medicine state guides from Permit Health, MedPath Compliance, Guardian Medical Direction, Nextech, and ByrdAdatto. Because regulations change frequently, always verify current requirements directly with your state medical board, state board of nursing, and a licensed healthcare attorney.*
+## Sources
+
+- [American Med Spa Association — IV therapy & good-faith exam guidance](https://www.americanmedspa.org)
+- [Alabama State Board of Medical Examiners](https://www.albme.gov) — 2022 IV therapy declaratory ruling
+- [Texas HB 3749 "Jenifer's Law" coverage — American Med Spa Association](https://www.americanmedspa.org/news/revised-texas-house-bill-3749-heads-to-governors-desk/)
+- [North Carolina Board of Nursing](https://www.ncbon.com) — IV therapy position statement
+- Corporate-practice-of-medicine & med-spa state guides: [Guardian Medical Direction](https://guardianmedicaldirection.com), [Nextech](https://www.nextech.com), [ByrdAdatto](https://byrdadatto.com), [Permit Health](https://permithealth.com)
+
+*Regulations change frequently — always verify current requirements directly with your state medical board, state board of nursing, and a licensed healthcare attorney. This article is education, not legal advice.*

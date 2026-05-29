@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { BarChart3, ClipboardCheck, Users, BadgeCheck, ArrowRight, Sparkles } from 'lucide-react';
+import { BarChart3, ClipboardCheck, Users, BadgeCheck, ArrowRight, Sparkles, BookOpen } from 'lucide-react';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BetaBadge } from '../../../src/components/BetaBadge';
@@ -22,6 +22,14 @@ export const metadata: Metadata = {
   },
   twitter: { card: 'summary_large_image', title, description, images: ['https://www.thedripmap.com/og-image.png'] },
 };
+
+const GUIDES = [
+  { slug: 'how-to-start-iv-therapy-business-2026', title: 'How to Start an IV Therapy Business in 2026', blurb: 'The complete guide for nurses and entrepreneurs — market data, business models, CPOM ownership rules, costs, licensing, and your first 20 patients.' },
+  { slug: 'how-much-does-it-cost-to-open-iv-therapy-clinic', title: 'How Much Does It Cost to Open an IV Therapy Clinic?', blurb: 'A real startup budget breakdown — mobile vs. fixed vs. hybrid, low/mid/high totals, ongoing costs, and an honest path to break-even.' },
+  { slug: 'iv-therapy-laws-by-state-2026', title: 'IV Therapy Laws by State (2026)', blurb: 'Ownership/CPOM rules, who can administer IVs, good-faith exams, and medical-director requirements — with a state-by-state table.' },
+  { slug: 'how-to-find-medical-director-iv-therapy-clinic', title: 'How to Find a Medical Director', blurb: 'What a medical director does, what to pay, where to find one, and the absentee-doctor arrangements that get clinics shut down.' },
+  { slug: 'how-to-get-patients-iv-therapy-clinic-without-ads', title: 'Get Patients Without Paid Ads', blurb: '8 organic strategies that actually work in 2026 — directory listings, local SEO, reviews, referrals, and more.' },
+];
 
 export default async function ClinicOwnerResourcesPage() {
   const stats = await getSiteStats();
@@ -170,6 +178,29 @@ export default async function ClinicOwnerResourcesPage() {
                 Claim now <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>
+          </div>
+        </section>
+
+        {/* GUIDES — the clinic-owner article series */}
+        <section className="max-w-5xl mx-auto px-6 pb-20 md:pb-24">
+          <div className="flex items-center gap-2 mb-6">
+            <BookOpen size={18} style={{ color: EMERALD }} />
+            <h2 className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">Guides for clinic owners</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {GUIDES.map((g) => (
+              <Link
+                key={g.slug}
+                href={`/blog/${g.slug}`}
+                className="group bg-white rounded-2xl border border-slate-200/70 p-6 shadow-sm hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-0.5 hover:border-emerald-200 transition-all flex flex-col"
+              >
+                <h3 className="text-lg font-black text-slate-900 leading-snug mb-2 group-hover:text-[#0F6E56] transition-colors">{g.title}</h3>
+                <p className="text-sm text-slate-500 leading-relaxed flex-1">{g.blurb}</p>
+                <div className="mt-4 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-[#0F6E56]">
+                  Read guide <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
+                </div>
+              </Link>
+            ))}
           </div>
         </section>
       </main>

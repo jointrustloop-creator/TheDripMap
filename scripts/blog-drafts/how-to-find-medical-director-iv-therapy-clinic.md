@@ -145,4 +145,18 @@ A medical director is not a compliance checkbox you buy as cheaply as possible. 
 
 Running a compliant, well-run IV therapy clinic? Make sure patients can find you. [Claim your free listing on TheDripMap](/for-clinics) and get your clinic in front of people searching for IV therapy in your area.
 
-*Sources: American Med Spa Association (AmSpa); California SB 351 (Foley & Lardner, Foley analysis); Texas HB 3749 "Jenifer's Law" (AmSpa, Nurse.org); Guardian Medical Direction (good-faith exams); Consentz and Holt Law (medical-director pricing); Nextech and Weitz Morgan (medical-director role and best practices); MedSpa Standards (Florida requirements). This is education, not legal advice — verify current rules with your state boards and a healthcare attorney.*
+## Sources
+
+- [Update to Laws Regarding IV Therapy in Medical Spas — American Med Spa Association](https://www.americanmedspa.org/news/update-to-laws-regarding-iv-therapy-in-medical-spas/)
+- [Revised Texas House Bill 3749 Heads to Governor's Desk — American Med Spa Association](https://www.americanmedspa.org/news/revised-texas-house-bill-3749-heads-to-governors-desk/)
+- [Texas Med Spas Face New Restrictions: "Jenifer's Law" — Nurse.org](https://nurse.org/news/texas-medspa-iv-regulations/)
+- [Good Faith Exams and Telemedicine Clearance Exams: 2026 Guide — Guardian Medical Direction](https://guardianmedicaldirection.com/news/good-faith-exams-telemedicine-clearance/)
+- [California SB 351 Signed — Foley & Lardner](https://www.foley.com/p/102lpwo/california-sb-351-signed-limits-on-private-equity-management-of-medical-practice/)
+- [How Much to Pay a Medical Director for a Med Spa: 2026 Guide — Consentz](https://www.consentz.com/how-much-to-pay-a-medical-director-for-a-med-spa/)
+- [How Much Should You Pay a Medical Director? — Holt Law](https://djholtlaw.com/how-much-should-you-pay-a-medical-director/)
+- [5 Tips on Hiring a Medical Director for Your Med Spa — Nextech](https://www.nextech.com/blog/how-to-find-a-med-spa-medical-director)
+- [The Role of Medical Directors in Med Spas — Weitz Morgan](https://www.weitzmorgan.com/post/the-role-of-medical-directors-in-med-spas-legal-requirements-and-best-practices)
+- [Who Can Own a Medical Spa: Unpacking MSOs — American Med Spa Association](https://americanmedspa.org/blog/who-can-own-a-medical-spa-unpacking-msos)
+- [Florida Med Spa Medical Director Requirements: 2026 Guide — MedSpa Standards](https://medspastandards.com/blog/florida-med-spa-medical-director-requirements)
+
+*This article is education, not legal or medical advice — verify current rules with your state medical and nursing boards and a healthcare attorney.*
