@@ -27,7 +27,27 @@ const SUGGESTIONS = [
   'How much does NAD+ cost?',
 ];
 
+const WHITELABEL_SUGGESTIONS = [
+  'What treatments do you offer?',
+  'How much is a Myers Cocktail?',
+  'Are you open this weekend?',
+  'How do I book?',
+  'Is NAD+ safe?',
+];
+
 const HIDDEN_PREFIXES = ['/for-clinics', '/resources/clinic-owners', '/tools', '/admin', '/dashboard', '/apply-copy', '/verify-claim'];
+
+// White-label mode is opt-in via a prop OR a global window flag injected by
+// the embed shim (public/clinic-agent.js). When set, every request to the API
+// includes the slug, and the chat header swaps to the clinic's branding.
+type WhitelabelProps = {
+  clinicSlug?: string; // overrides everything
+  clinicName?: string; // optional override of the header label
+  tagline?: string;    // optional subtitle in the header
+};
+declare global {
+  interface Window { __DRIPMAP_AGENT__?: WhitelabelProps }
+}
 
 function slugify(name: string) {
   return name.toLowerCase().trim().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -106,10 +126,27 @@ function ClinicMiniCard({ c }: { c: Clinic }) {
   );
 }
 
-export const DripAssistant = () => {
+export const DripAssistant = (props: WhitelabelProps = {}) => {
   const pathname = usePathname() || '';
+  // Resolve white-label config from props first, then from a window global
+  // (the embed shim injects this before mounting), then null. Stable across
+  // re-renders so the API URL doesn't change mid-conversation.
+  const [wl, setWl] = useState<WhitelabelProps>(props);
+  useEffect(() => {
+    if (!props.clinicSlug && typeof window !== 'undefined' && window.__DRIPMAP_AGENT__) {
+      setWl({ ...window.__DRIPMAP_AGENT__, ...props });
+    }
+  }, [props]);
+  const wlSlug = wl.clinicSlug || null;
+  const wlClinicName = wl.clinicName || null;
+  const wlTagline = wl.tagline || null;
+  const isWhitelabel = !!wlSlug;
+
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<Msg[]>([{ role: 'assistant', content: GREETING, greeting: true }]);
+  const initialGreeting = wlClinicName
+    ? `Hi! I'm the chat concierge for ${wlClinicName}. Ask me about treatments, prices, hours, or booking.`
+    : GREETING;
+  const [messages, setMessages] = useState<Msg[]>([{ role: 'assistant', content: initialGreeting, greeting: true }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [showMsgForm, setShowMsgForm] = useState(false);
@@ -157,12 +194,18 @@ export const DripAssistant = () => {
   };
 
   // On first open, offer to use precise location (only if we don't have it yet).
+  // Skip entirely in white-label mode — the chat scope is one clinic, so we
+  // don't need to distance-rank anything.
   useEffect(() => {
+    if (isWhitelabel) return;
     if (open && geoStatus === 'idle' && !userCoords && !userCity) requestLocation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  if (HIDDEN_PREFIXES.some((p) => pathname.startsWith(p))) return null;
+  // Public widget is hidden on internal/admin/tools pages. White-label mode
+  // overrides that — the embed page and the demo page render the widget
+  // explicitly even when their path is in HIDDEN_PREFIXES.
+  if (!isWhitelabel && HIDDEN_PREFIXES.some((p) => pathname.startsWith(p))) return null;
 
   const sendText = async (text: string) => {
     const t = text.trim();
@@ -175,7 +218,7 @@ export const DripAssistant = () => {
       const payload = next.filter((m) => !m.greeting).map((m) => ({ role: m.role, content: m.content }));
       const res = await fetch('/api/drip-assistant', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: payload, userCity, userCoords }),
+        body: JSON.stringify({ messages: payload, userCity, userCoords, clinicSlug: wlSlug }),
       });
       const data = await res.json();
       if (!res.ok) setMessages((m) => [...m, { role: 'assistant', content: data.error || 'Sorry, something went wrong. Please try again.' }]);
@@ -271,41 +314,45 @@ export const DripAssistant = () => {
               <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center"><ShieldCheck size={16} /></div>
               <div>
                 <div className="font-black text-sm leading-tight flex items-center gap-1.5">
-                  Drip Assistant
+                  {isWhitelabel && wlClinicName ? wlClinicName : 'Drip Assistant'}
                   <span
-                    title="This tool is in beta. Results may vary. Send feedback to info@thedripmap.com"
+                    title={isWhitelabel ? 'This chat is in beta. Results may vary.' : 'This tool is in beta. Results may vary. Send feedback to info@thedripmap.com'}
                     className="inline-flex items-center rounded-full bg-white/20 text-white px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide leading-none"
                   >
                     BETA
                   </span>
                 </div>
-                <div className="text-[10px] text-emerald-50/80 leading-tight">Find a clinic · ask anything</div>
+                <div className="text-[10px] text-emerald-50/80 leading-tight">
+                  {isWhitelabel ? (wlTagline || 'Treatments · prices · booking') : 'Find a clinic · ask anything'}
+                </div>
               </div>
             </div>
             <button onClick={() => setOpen(false)} aria-label="Close" className="p-1.5 rounded-lg hover:bg-white/15 transition-colors"><X size={18} /></button>
           </div>
 
-          {/* Location strip */}
-          <div className="flex items-center justify-between px-4 py-2 bg-white border-b border-slate-100 shrink-0">
-            {userCity ? (
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-600">
-                <MapPin size={12} className="text-[#0F6E56]" />
-                {userCity}{userCoords ? ' · nearby results' : ''}
-              </span>
-            ) : geoStatus === 'locating' ? (
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
-                <Loader2 size={12} className="animate-spin" /> finding your location…
-              </span>
-            ) : (
-              <span className="text-[11px] font-bold text-slate-400">Location not set</span>
-            )}
-            <button
-              onClick={requestLocation}
-              className="inline-flex items-center gap-1 text-[11px] font-black text-[#0F6E56] hover:underline"
-            >
-              <Navigation size={11} /> {userCity ? 'Update' : 'Use my location'}
-            </button>
-          </div>
+          {/* Location strip — directory mode only; irrelevant in single-clinic white-label */}
+          {!isWhitelabel && (
+            <div className="flex items-center justify-between px-4 py-2 bg-white border-b border-slate-100 shrink-0">
+              {userCity ? (
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-600">
+                  <MapPin size={12} className="text-[#0F6E56]" />
+                  {userCity}{userCoords ? ' · nearby results' : ''}
+                </span>
+              ) : geoStatus === 'locating' ? (
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
+                  <Loader2 size={12} className="animate-spin" /> finding your location…
+                </span>
+              ) : (
+                <span className="text-[11px] font-bold text-slate-400">Location not set</span>
+              )}
+              <button
+                onClick={requestLocation}
+                className="inline-flex items-center gap-1 text-[11px] font-black text-[#0F6E56] hover:underline"
+              >
+                <Navigation size={11} /> {userCity ? 'Update' : 'Use my location'}
+              </button>
+            </div>
+          )}
 
           {/* Messages */}
           <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-[#F8F7F3]">
@@ -327,7 +374,7 @@ export const DripAssistant = () => {
             {/* Suggested questions — shown before the conversation starts */}
             {onlyGreeting && !showMsgForm && !loading && (
               <div className="flex flex-wrap gap-2">
-                {SUGGESTIONS.map((s) => (
+                {(isWhitelabel ? WHITELABEL_SUGGESTIONS : SUGGESTIONS).map((s) => (
                   <button key={s} onClick={() => sendText(s)}
                     className="text-left text-xs font-bold text-[#0F6E56] bg-white border border-emerald-200 rounded-full px-3 py-1.5 hover:bg-emerald-50 transition-colors">
                     {s}

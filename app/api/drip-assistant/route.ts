@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { buildSystemPrompt, TOOL_SCHEMAS, runTool, type AssistantClinic } from '../../../src/lib/drip-assistant';
+import { buildSystemPrompt, TOOL_SCHEMAS, runTool, type AssistantClinic, type AssistantConfig } from '../../../src/lib/drip-assistant';
 import { getServiceSupabase } from '../../../src/lib/supabase';
+import { getWhitelabelConfig } from '../../../src/lib/whitelabel-configs';
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
@@ -31,8 +32,50 @@ async function callAnthropic(system: string, messages: any[]): Promise<any> {
   }
 }
 
+// Build a white-label AssistantConfig from a clinic slug. Reads the Supabase
+// row (for name/phone/booking) and overlays a per-clinic config from
+// src/lib/whitelabel-configs.ts (for treatments, menu, hours, copy tweaks).
+// Returns null if the slug doesn't map to anything — the caller falls back to
+// the public Drip Assistant. Synthetic slugs (e.g. the demo clinic) come from
+// the overlay alone — Supabase miss is fine.
+async function loadWhitelabelConfig(slug: string | null): Promise<AssistantConfig | null> {
+  if (!slug) return null;
+  const overlay = getWhitelabelConfig(slug);
+  let row: Record<string, unknown> | null = null;
+  try {
+    const sb = getServiceSupabase();
+    const { data } = await sb
+      .from('providers')
+      .select('name, slug, phone, online_booking_url, working_hours, state')
+      .eq('slug', slug)
+      .maybeSingle();
+    row = (data as Record<string, unknown>) || null;
+  } catch {
+    // If Supabase is unreachable, an overlay-only config still works.
+  }
+  if (!row && !overlay) return null;
+
+  const rowName = row?.name as string | undefined;
+  const rowPhone = row?.phone as string | undefined;
+  const rowBooking = row?.online_booking_url as string | undefined;
+  const rowState = row?.state as string | undefined;
+  const isCanada = rowState ? /Ontario|British Columbia|Alberta|Quebec|Manitoba|Nova Scotia|Saskatchewan|New Brunswick|Newfoundland|Prince Edward Island|Northwest Territories|Nunavut|Yukon/.test(rowState) : false;
+
+  return {
+    clinicName: overlay?.clinicName || rowName || 'Our Clinic',
+    clinicSlug: slug,
+    treatments: overlay?.treatments,
+    menu: overlay?.menu,
+    bookingUrl: overlay?.bookingUrl ?? rowBooking ?? null,
+    phone: overlay?.phone ?? rowPhone ?? null,
+    hours: overlay?.hours,
+    currency: isCanada ? 'CAD' : 'USD',
+    extraSystemPrompt: overlay?.extraSystemPrompt,
+  };
+}
+
 export async function POST(req: Request) {
-  let body: { messages?: InMsg[]; userCity?: string; userCoords?: Coords };
+  let body: { messages?: InMsg[]; userCity?: string; userCoords?: Coords; clinicSlug?: string };
   try {
     body = await req.json();
   } catch {
@@ -40,6 +83,15 @@ export async function POST(req: Request) {
   }
   const incoming = Array.isArray(body.messages) ? body.messages : [];
   if (incoming.length === 0) return NextResponse.json({ error: 'No messages.' }, { status: 400 });
+
+  // White-label mode: ?clinic=<slug> on the URL OR clinicSlug in the body OR
+  // an x-clinic-slug header. The widget passes whichever is cleanest.
+  const url = new URL(req.url);
+  const querySlug = url.searchParams.get('clinic');
+  const headerSlug = req.headers.get('x-clinic-slug');
+  const bodySlug = typeof body.clinicSlug === 'string' ? body.clinicSlug : null;
+  const clinicSlug = (querySlug || bodySlug || headerSlug || '').trim().slice(0, 120) || null;
+  const whitelabelConfig = clinicSlug ? await loadWhitelabelConfig(clinicSlug) : null;
 
   // Location grounding — passed from the browser (geolocation and/or stated city).
   const userCity = typeof body.userCity === 'string' && body.userCity.trim() ? body.userCity.trim().slice(0, 80) : null;
@@ -72,7 +124,7 @@ export async function POST(req: Request) {
     // Non-fatal — buildSystemPrompt falls back to neutral phrasing when count is absent.
   }
 
-  const system = buildSystemPrompt({}, { city: userCity, hasCoords: !!userCoords, clinicCount });
+  const system = buildSystemPrompt(whitelabelConfig || {}, { city: userCity, hasCoords: !!userCoords, clinicCount });
   let lastClinics: AssistantClinic[] = [];
   let finalText = '';
 
@@ -131,5 +183,17 @@ export async function POST(req: Request) {
     return true;
   }).slice(0, 4);
 
-  return NextResponse.json({ reply: finalText, clinics });
+  // In white-label mode, surface the clinic-pinned booking action so the widget
+  // can show a persistent BOOK NOW button even when the model hasn't surfaced a
+  // clinic card this turn.
+  const whitelabelMeta = whitelabelConfig
+    ? {
+        clinicName: whitelabelConfig.clinicName,
+        clinicSlug: whitelabelConfig.clinicSlug,
+        bookingUrl: whitelabelConfig.bookingUrl || null,
+        phone: whitelabelConfig.phone || null,
+      }
+    : null;
+
+  return NextResponse.json({ reply: finalText, clinics, whitelabel: whitelabelMeta });
 }

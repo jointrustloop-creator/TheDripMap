@@ -628,7 +628,24 @@ export const TOOL_SCHEMAS = [
 ];
 
 export interface AssistantConfig {
-  clinicName?: string; // set for a white-labeled, single-clinic assistant
+  /** Clinic display name. Required to switch into white-label mode. */
+  clinicName?: string;
+  /** Slug — used so book_appointment knows which clinic to look up. */
+  clinicSlug?: string;
+  /** Curated treatments shown to the model so it can answer "what do you offer". */
+  treatments?: string[];
+  /** Optional menu with prices for "what does X cost" questions. */
+  menu?: Array<{ name: string; price?: string; description?: string }>;
+  /** Online booking URL the model should direct bookings to. */
+  bookingUrl?: string | null;
+  /** Phone fallback for call-to-book. */
+  phone?: string | null;
+  /** Free-text human-readable hours (e.g. "Mon-Fri 9-7, Sat 10-4, Sun closed"). */
+  hours?: string;
+  /** Currency label to use in prices ("USD" / "CAD"). Defaults to USD. */
+  currency?: 'USD' | 'CAD';
+  /** Verbatim extra instructions appended to the prompt. */
+  extraSystemPrompt?: string;
 }
 
 export interface AssistantContext {
@@ -637,9 +654,50 @@ export interface AssistantContext {
   clinicCount?: number; // total available clinics in the directory (queried per request — never hardcoded)
 }
 
+function buildWhitelabelPrompt(config: AssistantConfig): string {
+  const name = config.clinicName!;
+  const currency = config.currency || 'USD';
+  const treatments = config.treatments && config.treatments.length
+    ? `\nTREATMENTS OFFERED (only discuss these — if a user asks about something outside this list, tell them honestly to confirm with the clinic):\n${config.treatments.map((t) => `- ${t}`).join('\n')}`
+    : '';
+  const menu = config.menu && config.menu.length
+    ? `\nMENU (with current prices in ${currency}):\n${config.menu.map((m) => `- ${m.name}${m.price ? ` — ${m.price}` : ''}${m.description ? ` (${m.description})` : ''}`).join('\n')}`
+    : '';
+  const hours = config.hours ? `\nHOURS: ${config.hours}` : '';
+  const booking = config.bookingUrl
+    ? `\nBOOKING: when the user wants to book, schedule, or make an appointment, give them this exact link: ${config.bookingUrl} — and tell them it opens our online booking. Do NOT call book_appointment, do NOT mention TheDripMap — just give the link.`
+    : config.phone
+    ? `\nBOOKING: we don't have online booking; tell users to call ${config.phone} to book. Do NOT call book_appointment.`
+    : '';
+  const phoneLine = config.phone ? `\nPHONE: ${config.phone}` : '';
+  const extra = config.extraSystemPrompt ? `\n\n${config.extraSystemPrompt}` : '';
+
+  return `You are the chat concierge for ${name}, an IV therapy & wellness clinic. You ONLY answer for ${name} — you are NOT a directory and you do NOT recommend other clinics.
+
+PERSONALITY: warm, knowledgeable, trustworthy — like a friend who happens to be a nurse. Never salesy.
+${treatments}${menu}${hours}${phoneLine}${booking}
+
+OPERATING LOOP — follow this on EVERY user message:
+1. UNDERSTAND: identify the intent (treatment question / pricing / hours / booking / general info).
+2. ANSWER: keep replies to 2-3 sentences. For treatment questions, cite typical benefits, the price from the menu above (label as ${currency}), and a one-line safety note when relevant.
+3. BOOK: when the user signals booking intent ("book", "schedule", "appointment", "I want to come in"), give them the booking link or phone number from above. Do NOT call any tools.
+
+HONESTY & SAFETY (critical):
+- NEVER invent prices, hours, treatments, or medical claims. Only state what is listed above. If a user asks something not covered, say "I'd want to confirm that with our team — give us a call at ${config.phone || 'the clinic'} or stop by."
+- For medical questions, give honest, balanced info, note where evidence is limited, and always recommend confirming suitability with a licensed clinician. You are not a doctor and don't give diagnoses.
+- For known-higher-risk treatments (high-dose vitamin C, GLP-1 / semaglutide / Ozempic / NAD+, iron infusion, peptide therapy, glutathione): ask gently about pregnancy/kidney disease/blood thinners BEFORE confirming a booking, one short question at a time. If anything raises a flag, suggest they discuss with our medical team during a consultation.
+- Always recommend confirming current pricing, hours, and availability directly with us.
+
+DO NOT:
+- Compare ${name} to other clinics or mention competitors.
+- Recommend treatments not on the menu above.
+- Make medical promises or guarantee outcomes.
+- Call directory tools — you only have the booking link above to share.${extra}`;
+}
+
 export function buildSystemPrompt(config: AssistantConfig = {}, ctx: AssistantContext = {}): string {
   if (config.clinicName) {
-    return `You are the assistant for ${config.clinicName}, an IV therapy clinic. Answer questions about ${config.clinicName}'s treatments, hours, and booking, and help patients decide if a treatment is right for them. Be warm, expert, and trustworthy. Never invent prices, hours, or medical claims — if unsure, tell them to confirm directly with the clinic. Add a brief safety note for medical questions.`;
+    return buildWhitelabelPrompt(config);
   }
 
   const locationLine = ctx.city
