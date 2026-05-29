@@ -7,6 +7,7 @@ import { cn } from '../lib/utils';
 
 const CATEGORIES = [
   'All',
+  'News',
   'Treatment Guides',
   'Conditions & Symptoms',
   'City Guides',
