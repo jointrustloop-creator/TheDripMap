@@ -86,5 +86,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticRoutes, ...audienceRoutes, ...symptomRoutes, ...stateRoutes, ...guideRoutes, ...cityRoutes, ...providerRoutes, ...blogRoutes];
+  // Treatment x city matrix: 10 treatments × (Canada-first + top US cities by
+  // provider count). Canada is our uncontested lane so it leads.
+  const MATRIX_TREATMENT_SLUGS = [
+    'hydration', 'nad-plus', 'myers-cocktail', 'hangover-recovery', 'immune-support',
+    'beauty-glow', 'athletic-recovery', 'mobile-iv', 'weight-loss', 'vitamin-c',
+  ];
+  const CANADA_MATRIX_CITIES = ['Toronto', 'Vancouver', 'Calgary', 'Ottawa', 'Mississauga', 'Richmond Hill', 'North York', 'Oakville'];
+  const topUSMatrixCities = cities
+    .filter((c) => c.count > 0 && c.city && !CANADA_MATRIX_CITIES.includes(c.city))
+    .sort((a, b) => (b.count || 0) - (a.count || 0))
+    .slice(0, 20)
+    .map((c) => c.city);
+  const matrixCities = [...CANADA_MATRIX_CITIES, ...topUSMatrixCities];
+  const matrixRoutes: MetadataRoute.Sitemap = [];
+  for (const t of MATRIX_TREATMENT_SLUGS) {
+    for (const city of matrixCities) {
+      matrixRoutes.push({
+        url: `${baseUrl}/iv-therapy/${t}/${slugify(city)}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
+      });
+    }
+  }
+
+  return [...staticRoutes, ...audienceRoutes, ...symptomRoutes, ...stateRoutes, ...guideRoutes, ...cityRoutes, ...providerRoutes, ...blogRoutes, ...matrixRoutes];
 }

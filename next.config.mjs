@@ -103,11 +103,10 @@ const nextConfig = {
         destination: '/treatments/:service',
         permanent: true,
       },
-      {
-        source: '/iv-therapy/:state/:city',
-        destination: '/cities/:city',
-        permanent: true,
-      },
+      // NOTE: the former '/iv-therapy/:state/:city' -> '/cities/:city' redirect was
+      // removed so the treatment x city matrix can own '/iv-therapy/[treatment]/[city]'.
+      // Legacy /iv-therapy/{state}/{city} URLs are handled inside that route (a
+      // non-treatment first segment that is a US state redirects to /cities/{city}).
       {
         source: '/iv-therapy/:city',
         destination: '/cities/:city',
