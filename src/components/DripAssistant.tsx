@@ -201,23 +201,23 @@ export const DripAssistant = () => {
           <span className="absolute inset-2 rounded-full blur-lg opacity-40" style={{ backgroundColor: EMERALD }} />
           {/* Drip-shaped launcher */}
           <span className="drip-float relative block" style={{ filter: 'drop-shadow(0 12px 22px rgba(10,61,43,0.45))' }}>
-            <svg width="58" height="69" viewBox="0 0 64 76" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="58" height="72" viewBox="0 0 64 80" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
-                <linearGradient id="dripGrad" x1="32" y1="6" x2="32" y2="72" gradientUnits="userSpaceOnUse">
+                <linearGradient id="dripGrad" x1="32" y1="6" x2="32" y2="76" gradientUnits="userSpaceOnUse">
                   <stop stopColor="#1A8A68" />
                   <stop offset="1" stopColor="#0A3D2B" />
                 </linearGradient>
               </defs>
-              {/* droplet body — inverted (bulb up, point down) */}
-              <path d="M32 72 C 32 72 10 46 8 30 A 24 24 0 1 1 56 30 C 54 46 32 72 32 72 Z" fill="url(#dripGrad)" />
+              {/* map pin (points down) — matches TheDripMap logo mark */}
+              <path d="M32 76 C 32 76 9 47 8 30 A 24 24 0 1 1 56 30 C 55 47 32 76 32 76 Z" fill="url(#dripGrad)" />
               {/* glossy highlight */}
-              <ellipse cx="22" cy="20" rx="4.5" ry="8" fill="#ffffff" opacity="0.18" transform="rotate(-20 22 20)" />
-              {/* chat bubble (kept upright) */}
-              <rect x="19" y="21" width="26" height="17" rx="5.5" fill="#ffffff" />
-              <path d="M25 36.5 L25 43 L31.5 36.5 Z" fill="#ffffff" />
-              <circle cx="26" cy="29.5" r="1.9" fill="#0F6E56" />
-              <circle cx="32" cy="29.5" r="1.9" fill="#0F6E56" />
-              <circle cx="38" cy="29.5" r="1.9" fill="#0F6E56" />
+              <ellipse cx="21" cy="20" rx="4" ry="7" fill="#ffffff" opacity="0.16" transform="rotate(-20 21 20)" />
+              {/* IV bag: hanger cap, bag body, green fluid, drip tube + drop */}
+              <rect x="29.5" y="11" width="5" height="3" rx="1" fill="#ffffff" />
+              <rect x="23" y="14.5" width="18" height="23" rx="4.5" fill="#ffffff" />
+              <rect x="25.5" y="25" width="13" height="10.5" rx="3" fill="#6CBE45" />
+              <rect x="31" y="37.5" width="2" height="5" fill="#ffffff" />
+              <circle cx="32" cy="45" r="2.1" fill="#ffffff" />
             </svg>
           </span>
           <style>{`@keyframes dripFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}.drip-float{animation:dripFloat 3.2s ease-in-out infinite}@media (prefers-reduced-motion: reduce){.drip-float{animation:none}}`}</style>
