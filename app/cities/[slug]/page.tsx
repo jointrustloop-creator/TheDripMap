@@ -78,12 +78,32 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     return { title: 'City Not Found' };
   }
 
-  // Per-city override (city-intros.ts) takes highest priority for specific high-traffic SEO pages.
+  // Unified city title format — applies to every city page so the SERP feels
+  // consistent and patient-friendly. Per-city description overrides still win
+  // (city-intros.ts can shape the meta description for high-traffic pages),
+  // but the title itself is locked to "IV Therapy in {City}, {State} ({Year}) |
+  // {N} Verified Clinics" — highest-ROI traffic format per the playbook.
+  //
+  // Many cities rows have no state populated; when that's the case, derive the
+  // modal state from the actual listings so the format renders consistently.
   const intro = getCityIntro(slug);
-  const title =
-    intro?.metaTitle ||
-    cityData?.meta_title?.replace('{count}', String(count)) ||
-    `IV Therapy in ${name} — ${count} Top-Rated Clinics Near You | TheDripMap`;
+  const titleYear = new Date().getUTCFullYear();
+  let resolvedState = state;
+  if (!resolvedState && listings.length > 0) {
+    const tally = new Map<string, number>();
+    for (const l of listings) {
+      const s = (l as { state?: string }).state;
+      if (s) tally.set(s, (tally.get(s) || 0) + 1);
+    }
+    let best = '';
+    let bestN = 0;
+    for (const [k, n] of tally) {
+      if (n > bestN) { best = k; bestN = n; }
+    }
+    resolvedState = best;
+  }
+  const cityStateLabel = resolvedState ? `${name}, ${resolvedState}` : name;
+  const title = `IV Therapy in ${cityStateLabel} (${titleYear}) | ${count} Verified Clinics`;
   const description =
     intro?.metaDescription ||
     cityData?.meta_description?.replace('{count}', String(count)) ||
