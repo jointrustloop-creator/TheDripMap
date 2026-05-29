@@ -203,21 +203,21 @@ export const DripAssistant = () => {
           <span className="drip-float relative block" style={{ filter: 'drop-shadow(0 12px 22px rgba(10,61,43,0.45))' }}>
             <svg width="58" height="69" viewBox="0 0 64 76" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
-                <linearGradient id="dripGrad" x1="32" y1="4" x2="32" y2="70" gradientUnits="userSpaceOnUse">
+                <linearGradient id="dripGrad" x1="32" y1="6" x2="32" y2="72" gradientUnits="userSpaceOnUse">
                   <stop stopColor="#1A8A68" />
                   <stop offset="1" stopColor="#0A3D2B" />
                 </linearGradient>
               </defs>
-              {/* droplet body */}
-              <path d="M32 4 C 32 4 54 30 56 46 A 24 24 0 1 1 8 46 C 10 30 32 4 32 4 Z" fill="url(#dripGrad)" />
+              {/* droplet body — inverted (bulb up, point down) */}
+              <path d="M32 72 C 32 72 10 46 8 30 A 24 24 0 1 1 56 30 C 54 46 32 72 32 72 Z" fill="url(#dripGrad)" />
               {/* glossy highlight */}
-              <ellipse cx="22" cy="33" rx="4.5" ry="8" fill="#ffffff" opacity="0.18" transform="rotate(-20 22 33)" />
-              {/* chat bubble */}
-              <rect x="19" y="39" width="26" height="17" rx="5.5" fill="#ffffff" />
-              <path d="M25 54.5 L25 61 L31.5 54.5 Z" fill="#ffffff" />
-              <circle cx="26" cy="47.5" r="1.9" fill="#0F6E56" />
-              <circle cx="32" cy="47.5" r="1.9" fill="#0F6E56" />
-              <circle cx="38" cy="47.5" r="1.9" fill="#0F6E56" />
+              <ellipse cx="22" cy="20" rx="4.5" ry="8" fill="#ffffff" opacity="0.18" transform="rotate(-20 22 20)" />
+              {/* chat bubble (kept upright) */}
+              <rect x="19" y="21" width="26" height="17" rx="5.5" fill="#ffffff" />
+              <path d="M25 36.5 L25 43 L31.5 36.5 Z" fill="#ffffff" />
+              <circle cx="26" cy="29.5" r="1.9" fill="#0F6E56" />
+              <circle cx="32" cy="29.5" r="1.9" fill="#0F6E56" />
+              <circle cx="38" cy="29.5" r="1.9" fill="#0F6E56" />
             </svg>
           </span>
           <style>{`@keyframes dripFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}.drip-float{animation:dripFloat 3.2s ease-in-out infinite}@media (prefers-reduced-motion: reduce){.drip-float{animation:none}}`}</style>
