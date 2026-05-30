@@ -73,16 +73,21 @@ export default async function HomePage() {
   const websiteJsonLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'TheDripMap', url: 'https://www.thedripmap.com', potentialAction: { '@type': 'SearchAction', target: 'https://www.thedripmap.com/search?q={search_term_string}', 'query-input': 'required name=search_term_string' } };
   const organizationJsonLd = { '@context': 'https://schema.org', '@type': 'Organization', name: 'TheDripMap', url: 'https://www.thedripmap.com', logo: 'https://www.thedripmap.com/logo.png', sameAs: ['https://www.instagram.com/thedripmap'] };
 
+  // Product-card data for the dark drip menu. Each card shows an actual IV-bag
+  // / drip product photo (Supabase blog-images) with name, one-line "what it
+  // does" tagline, category chip, and typical price band — Weedmaps-style
+  // product shelf rather than the previous icon-tile grid.
   const services = [
-    { name: 'Hydration',       slug: 'hydration',       Icon: Droplets },
-    { name: 'NAD+',            slug: 'nad-plus',        Icon: Activity },
-    { name: 'Myers Cocktail',  slug: 'myers-cocktail',  Icon: Zap },
-    { name: 'Hangover',        slug: 'hangover',        Icon: Heart },
-    { name: 'Immune Support',  slug: 'immune-support',  Icon: ShieldCheck },
-    { name: 'Beauty Glow',     slug: 'beauty-glow',     Icon: Sparkles },
-    { name: 'Recovery',        slug: 'recovery',        Icon: Dumbbell },
-    { name: 'Weight Loss',     slug: 'weight-loss',     Icon: Activity },
+    { name: 'Hydration',      slug: 'hydration',      Icon: Droplets,    image: 'iv-therapy-dehydration.jpg',         tagline: 'Rapid rehydration',          category: 'Foundational',  priceFrom: 100 },
+    { name: 'NAD+',           slug: 'nad-plus',       Icon: Activity,    image: 'iv-therapy-nad-iv-bag-closeup.jpg',  tagline: 'Cellular energy + clarity',  category: 'Longevity',     priceFrom: 400 },
+    { name: 'Myers Cocktail', slug: 'myers-cocktail', Icon: Zap,         image: 'iv-therapy-vitamin-drip-citrus.jpg', tagline: 'The original wellness drip', category: 'Foundational',  priceFrom: 150 },
+    { name: 'Hangover',       slug: 'hangover',       Icon: Heart,       image: 'iv-therapy-hangover.jpg',            tagline: 'Reset after a rough night',  category: 'Recovery',      priceFrom: 150 },
+    { name: 'Immune Support', slug: 'immune-support', Icon: ShieldCheck, image: 'iv-therapy-immunity.jpg',            tagline: 'Vitamin C + zinc boost',     category: 'Wellness',      priceFrom: 150 },
+    { name: 'Beauty Glow',    slug: 'beauty-glow',    Icon: Sparkles,    image: 'iv-therapy-skin-glow.jpg',           tagline: 'Glutathione for skin',       category: 'Beauty',        priceFrom: 200 },
+    { name: 'Recovery',       slug: 'recovery',       Icon: Dumbbell,    image: 'iv-therapy-sports-recovery.jpg',     tagline: 'Amino acids + rebuild',      category: 'Athletic',      priceFrom: 175 },
+    { name: 'Weight Loss',    slug: 'weight-loss',    Icon: Activity,    image: 'iv-therapy-weight-loss.jpg',         tagline: 'MIC + lipo + metabolism',    category: 'Metabolic',     priceFrom: 175 },
   ];
+  const DRIP_IMG_BASE = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/';
 
   const situations = [
     { Icon: Wine,        label: 'Out too late last night',    drip: 'Hangover Recovery' },
@@ -216,17 +221,40 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/10 border border-white/10 rounded-3xl overflow-hidden">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {services.map((s) => (
               <Link
                 key={s.slug}
                 href={`/treatments/${s.slug}`}
-                className="group bg-[#0A0B0D] hover:bg-[#13151A] p-8 md:p-10 transition-colors relative"
+                className="group relative overflow-hidden rounded-3xl bg-white flex flex-col shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
               >
-                <s.Icon size={22} className="text-[#7ED3B8] mb-6" strokeWidth={1.75} />
-                <div className="font-bold text-base tracking-tight">{s.name}</div>
-                <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ArrowUpRight size={16} className="text-white/60" />
+                {/* Product image — 3:4 aspect so the IV bag photo dominates the
+                    card the way a Weedmaps product photo does. Zoom on hover. */}
+                <div className="relative aspect-[4/5] bg-[#F4F6F4] overflow-hidden">
+                  <Image
+                    src={`${DRIP_IMG_BASE}${s.image}`}
+                    alt={`${s.name} IV drip`}
+                    fill
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-out"
+                  />
+                  {/* Category chip — pinned top-left, on-brand emerald */}
+                  <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-sm text-[10px] font-black uppercase tracking-[0.18em] text-[#0F6E56] shadow-sm">
+                    {s.category}
+                  </span>
+                  {/* Subtle "view product" arrow that wakes up on hover */}
+                  <span className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#0A0B0D]/70 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:translate-x-0 translate-x-1 transition-all">
+                    <ArrowUpRight size={14} />
+                  </span>
+                </div>
+                {/* Card foot — name + tagline + price */}
+                <div className="px-4 md:px-5 py-4 md:py-5 flex flex-col gap-1.5">
+                  <div className="font-black text-slate-900 text-base md:text-lg tracking-tight">{s.name}</div>
+                  <div className="text-[12px] md:text-[13px] text-slate-500 leading-snug font-medium">{s.tagline}</div>
+                  <div className="mt-1 flex items-baseline gap-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">From</span>
+                    <span className="text-base font-black text-[#0F6E56] tracking-tight">${s.priceFrom}</span>
+                  </div>
                 </div>
               </Link>
             ))}
