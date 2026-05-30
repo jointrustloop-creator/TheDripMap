@@ -18,6 +18,7 @@ export interface MailPayload {
   replyTo?: string;
   subject: string;
   text: string;
+  html?: string; // Optional HTML body (text is still required as fallback).
 }
 
 export interface MailResult {
@@ -55,6 +56,7 @@ export async function sendMail(payload: MailPayload): Promise<MailResult> {
         replyTo: payload.replyTo,
         subject: payload.subject,
         text: payload.text,
+        ...(payload.html ? { html: payload.html } : {}),
       });
       return { ok: true, provider: 'smtp', id: info.messageId };
     } catch (err) {
@@ -73,6 +75,7 @@ export async function sendMail(payload: MailPayload): Promise<MailResult> {
         ...(payload.replyTo ? { replyTo: payload.replyTo } : {}),
         subject: payload.subject,
         text: payload.text,
+        ...(payload.html ? { html: payload.html } : {}),
       });
       if (result?.error) {
         return { ok: false, provider: 'resend', error: result.error.message };
