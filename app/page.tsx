@@ -582,8 +582,8 @@ export default async function HomePage() {
           <div className="text-center mb-14 md:mb-20">
             <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] mb-6 block">Before You Book</span>
             <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1.05] text-[clamp(2rem,5vw,4rem)] max-w-3xl mx-auto">
-              The questions <span className="font-serif italic font-normal text-[#0F6E56]">everyone asks</span>,<br />
-              answered plainly.
+              The big questions,<br />
+              <span className="font-serif italic font-normal text-[#0F6E56]">answered plainly.</span>
             </h2>
           </div>
 
