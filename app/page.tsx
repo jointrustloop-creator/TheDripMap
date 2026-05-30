@@ -230,25 +230,26 @@ export default async function HomePage() {
             {/* Editorial copy + trust pillars */}
             <div className="lg:col-span-6 order-1 lg:order-2 lg:pl-4">
               <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#0F6E56] mb-5 md:mb-6 block">
-                The Standard
+                The Safety Verified Badge
               </span>
               <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1.02] text-[clamp(2rem,4.5vw,3.75rem)] mb-6 md:mb-7">
-                Vetted before<br />
-                <span className="font-serif italic font-normal text-[#0F6E56]">they're shown.</span>
+                Earned,<br />
+                <span className="font-serif italic font-normal text-[#0F6E56]">never bought.</span>
               </h2>
               <p className="text-base md:text-lg text-slate-500 leading-relaxed font-light max-w-xl mb-8 md:mb-10">
-                We confirm credentials with the state medical board, we verify bag-compounding with the
-                503B pharmacy, and we check the clinician on file — before a clinic earns a Safety
-                Verified badge. No paid placements. No bought reviews.
+                When a clinic carries the Safety Verified badge, it has answered our safety
+                questionnaire in writing — who oversees care, who performs your insert, where its IV
+                solutions come from, and whether an intake is required before treatment. We don't
+                take a cent for placement, and we never buy or sell reviews.
               </p>
 
               {/* Trust pillars — refined row, NOT a SaaS feature grid. */}
               <div className="grid grid-cols-2 gap-3 md:gap-4 max-w-2xl">
                 {[
-                  { Icon: Stethoscope, label: 'Medical director verified',  detail: 'License confirmed with state board' },
-                  { Icon: UserCheck,   label: 'Licensed clinician inserts', detail: 'RN, NP, or PA — never a "tech"' },
-                  { Icon: FlaskConical,label: '503B pharmacy compounding',  detail: 'No grey-market bags or vials' },
-                  { Icon: Check,       label: 'Good-faith exam required',   detail: 'Real intake before any infusion' },
+                  { Icon: Stethoscope, label: 'Medical director on file',         detail: 'Clinic confirms a licensed physician oversees care' },
+                  { Icon: UserCheck,   label: 'Licensed clinicians — not techs',  detail: 'Clinic confirms an RN or NP performs every insert' },
+                  { Icon: FlaskConical,label: 'Pharmacy-sourced solutions',       detail: 'Clinic confirms a licensed compounding pharmacy — no grey-market' },
+                  { Icon: Check,       label: 'Intake before infusion',           detail: 'Clinic confirms a clinical assessment before treatment' },
                 ].map(({ Icon, label, detail }) => (
                   <div
                     key={label}
@@ -264,6 +265,9 @@ export default async function HomePage() {
                   </div>
                 ))}
               </div>
+              <p className="mt-5 md:mt-6 text-[11px] md:text-[12px] text-slate-500/80 leading-relaxed max-w-xl">
+                Safety Verified reflects each clinic's written answers to our questionnaire, not an independent medical audit. Always confirm credentials directly with your provider.
+              </p>
             </div>
           </div>
         </div>
