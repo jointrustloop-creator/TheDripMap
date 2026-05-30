@@ -55,22 +55,22 @@ function isEligibleEmail(email: string | null | undefined): boolean {
 
 function buildSingleLocationBody(p: ProviderRow): string {
   const display = cleanName(p.name);
-  const listingUrl = `${SITE_URL}/providers/${p.slug}`;
-  const claimUrl = `${listingUrl}?claim=1`;
-  const hasRating = p.rating && Number(p.reviews) > 0;
-  const ratingLine = hasRating
-    ? `Your listing is live with your real Google rating of ${p.rating}★.`
-    : `Your listing is live — but right now it's unclaimed, so visitors see a generic placeholder instead of your photos, hours, services, and description.`;
-  const followLine = hasRating
-    ? `Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.`
-    : `Claiming is free and takes 2 minutes — you control your description, hours, services, and photos so prospective patients see your clinic at its best.`;
+  const claimUrl = `${SITE_URL}/providers/${p.slug}?claim=1`;
+  const city = (p.city || '').trim();
+  const hasRating = !!(p.rating && Number(p.reviews) > 0);
+
+  // Personalized opener: cite the city + (when we have it) their real Google
+  // rating, framed as "you're in a small group of clinics patients trust" —
+  // which is TheDripMap's positioning (verified-quality directory).
+  const opener = hasRating
+    ? `I came across ${display} while researching the top-rated IV therapy clinics in ${city || 'your area'}. Your Google rating of ${p.rating}★ across ${p.reviews} reviews puts you in a small group of clinics patients actually trust — which is exactly the kind we feature on TheDripMap.`
+    : `I came across ${display} while building out our ${city || 'local'} IV therapy listings on TheDripMap — North America's directory for IV therapy clinics.`;
+
   return `Hi ${display} team,
 
-We added ${display} to TheDripMap — North America's directory for IV therapy clinics. ${ratingLine}
+${opener}
 
-${followLine}
-
-Claim your listing here:
+We added your listing — but right now it's unclaimed, so visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes:
 ${claimUrl}
 
 Warmly,
@@ -85,17 +85,33 @@ To unsubscribe from TheDripMap outreach emails, reply with 'unsubscribe' in the 
 function buildMultiLocationBody(providers: ProviderRow[], email: string): string {
   const brand = cleanName(providers[0].name);
   const count = providers.length;
+  const cities = Array.from(
+    new Set(
+      providers
+        .map((p) => (p.city || '').trim())
+        .filter((c) => c.length > 0)
+    )
+  );
+  const cityPhrase = cities.length === 0
+    ? 'multiple cities'
+    : cities.length === 1
+      ? cities[0]
+      : cities.length === 2
+        ? `${cities[0]} and ${cities[1]}`
+        : `${cities.slice(0, -1).join(', ')} and ${cities[cities.length - 1]}`;
+
   const locations = providers.map((p) => {
     const url = `${SITE_URL}/providers/${p.slug}?claim=1`;
     return `  • ${cleanName(p.name)} — ${locationLabel(p)}\n    ${url}`;
   }).join('\n');
+
   return `Hi ${brand} team,
 
-I'm reaching out because ${count} of your locations are live on TheDripMap — North America's directory for IV therapy clinics — but all ${count} are currently unclaimed:
+I came across ${count} of your ${brand} locations across ${cityPhrase} while researching trusted IV therapy clinics for TheDripMap — North America's directory for IV therapy. All ${count} are live with us but currently unclaimed:
 
 ${locations}
 
-Right now visitors see a generic placeholder on each one instead of your photos, hours, services, and description. Claiming each listing is free and takes 2 minutes.
+Right now visitors see a generic placeholder on each one instead of your real photos, hours, services, and description. Claiming each listing is free and takes 2 minutes.
 
 I sent this once to ${email.toLowerCase().trim()} because all ${count} locations share that email — so you only hear from me once, not ${count} times.
 
@@ -151,6 +167,7 @@ export async function GET(req: Request) {
     .eq('is_featured', false)
     .neq('outreach_sent', true)
     .neq('email_bounced', true)
+    .in('email_quality', ['high', 'medium'])
     .or(`rating.gte.${MIN_RATING},rating.is.null`)
     .not('email', 'is', null)
     .neq('email', '')

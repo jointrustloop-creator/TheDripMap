@@ -54,11 +54,18 @@ function isEligibleEmail(email: string | null | undefined): boolean {
 function buildSingleFollowupBody(p: ProviderRow): string {
   const display = cleanName(p.name);
   const claimUrl = `${SITE_URL}/providers/${p.slug}?claim=1`;
+  const city = (p.city || '').trim();
+  const hasRating = !!(p.rating && Number(p.reviews) > 0);
+
+  const recap = hasRating
+    ? `Quick recap: ${display} is live on TheDripMap with your real Google rating of ${p.rating}★ across ${p.reviews} reviews — but the listing is still unclaimed, so visitors in ${city || 'your area'} see a generic placeholder instead of your photos, hours, services, and description.`
+    : `Quick recap: ${display} is live on TheDripMap among the trusted IV therapy clinics in ${city || 'your area'} — but it's still unclaimed, so visitors see a generic placeholder instead of your real photos, hours, services, and description.`;
+
   return `Hi ${display} team,
 
 Following up on the note I sent last week about claiming your free listing on TheDripMap — I know inboxes can be busy.
 
-Quick recap: your clinic is live on our directory, but it's currently unclaimed. Visitors see a generic placeholder instead of your real photos, hours, services, and description. Claiming gives you full control and takes 2 minutes:
+${recap} Claiming gives you full control and takes 2 minutes:
 
 ${claimUrl}
 
@@ -76,13 +83,29 @@ To unsubscribe from TheDripMap outreach emails, reply with 'unsubscribe' in the 
 function buildMultiLocationFollowupBody(providers: ProviderRow[], email: string): string {
   const brand = cleanName(providers[0].name);
   const count = providers.length;
+  const cities = Array.from(
+    new Set(
+      providers
+        .map((p) => (p.city || '').trim())
+        .filter((c) => c.length > 0)
+    )
+  );
+  const cityPhrase = cities.length === 0
+    ? 'multiple cities'
+    : cities.length === 1
+      ? cities[0]
+      : cities.length === 2
+        ? `${cities[0]} and ${cities[1]}`
+        : `${cities.slice(0, -1).join(', ')} and ${cities[cities.length - 1]}`;
+
   const locations = providers.map((p) => {
     const url = `${SITE_URL}/providers/${p.slug}?claim=1`;
     return `  • ${cleanName(p.name)} — ${locationLabel(p)}\n    ${url}`;
   }).join('\n');
+
   return `Hi ${brand} team,
 
-Following up on the note I sent last week — ${count} of your locations are still unclaimed on TheDripMap:
+Following up on the note I sent last week about your ${count} ${brand} locations across ${cityPhrase} on TheDripMap — I know inboxes can be busy. All ${count} are still unclaimed:
 
 ${locations}
 
@@ -143,6 +166,7 @@ export async function GET(req: Request) {
     .eq('outreach_sent', true)
     .neq('followup_sent', true)
     .neq('email_bounced', true)
+    .in('email_quality', ['high', 'medium'])
     .lte('outreach_sent_at', cutoff)
     .not('email', 'is', null)
     .neq('email', '')
