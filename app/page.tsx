@@ -23,7 +23,7 @@ import { BlogCard } from '../src/components/BlogCard';
 import { QuickMatch } from '../src/components/QuickMatch';
 import { ClinicianSection } from '../src/components/ClinicianSection';
 import { TrustSignals } from '../src/components/TrustSignals';
-import { getBlogPosts, getSiteStats, getPopularCities } from '../src/lib/data';
+import { getBlogPosts, getSiteStats, getPopularCities, getFeaturedListings } from '../src/lib/data';
 import { Metadata } from 'next';
 
 export const revalidate = 60;
@@ -68,6 +68,9 @@ export default async function HomePage() {
   const stats = await getSiteStats();
   const blogPosts = await getBlogPosts();
   const popularCities = await getPopularCities();
+  // Featured Verified Clinics — pull the 4 claimed listings live from Supabase
+  // so the homepage always reflects current claimed-and-verified status.
+  const featuredClinics = (await getFeaturedListings(4)) || [];
   const latestPosts = blogPosts.slice(0, 3);
 
   const websiteJsonLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'TheDripMap', url: 'https://www.thedripmap.com', potentialAction: { '@type': 'SearchAction', target: 'https://www.thedripmap.com/search?q={search_term_string}', 'query-input': 'required name=search_term_string' } };
@@ -89,15 +92,18 @@ export default async function HomePage() {
   ];
   const DRIP_IMG_BASE = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/';
 
+  // Each situation card gets a solid color wash driven by color psychology
+  // (warm amber for regret/restoration, cool sky for clinical calm, etc.).
+  // `bg` is the card background, `ink` is the darker on-color text shade.
   const situations = [
-    { Icon: Wine,        label: 'Out too late last night',    drip: 'Hangover Recovery' },
-    { Icon: Thermometer, label: 'Catching something nasty',   drip: 'Immune Support' },
-    { Icon: Brain,       label: 'Brain fog all week',         drip: 'NAD+ / Energy' },
-    { Icon: Dumbbell,    label: 'Race or big workout coming', drip: 'Athletic Recovery' },
-    { Icon: Sparkles,    label: 'Event in a week',            drip: 'Beauty Glow' },
-    { Icon: Plane,       label: 'Just landed jet-lagged',     drip: 'Hydration + B-complex' },
-    { Icon: Pill,        label: 'Bug or stomach flu',         drip: 'Hydration Drip' },
-    { Icon: PartyPopper, label: 'Bachelor / bachelorette',    drip: 'Hangover + Recovery' },
+    { Icon: Wine,        label: 'Out too late last night',    drip: 'Hangover Recovery',  bg: '#F4A261', ink: '#5B3920' },
+    { Icon: Thermometer, label: 'Catching something nasty',   drip: 'Immune Support',     bg: '#6BB6D6', ink: '#1F3A4A' },
+    { Icon: Brain,       label: 'Brain fog all week',         drip: 'NAD+ / Energy',      bg: '#2C2C54', ink: '#E8E8F5' },
+    { Icon: Dumbbell,    label: 'Race or big workout coming', drip: 'Athletic Recovery',  bg: '#E76F51', ink: '#4A1F12' },
+    { Icon: Sparkles,    label: 'Event in a week',            drip: 'Beauty Glow',        bg: '#E9C46A', ink: '#5A4310' },
+    { Icon: Plane,       label: 'Just landed jet-lagged',     drip: 'Hydration + B-complex', bg: '#7FB3D5', ink: '#1C3B52' },
+    { Icon: Pill,        label: 'Bug or stomach flu',         drip: 'Hydration Drip',     bg: '#A8DADC', ink: '#1F4747' },
+    { Icon: PartyPopper, label: 'Bachelor / bachelorette',    drip: 'Hangover + Recovery',bg: '#BC4749', ink: '#FBE9E9' },
   ];
 
   const guides = [
@@ -171,6 +177,40 @@ export default async function HomePage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
+          1.5. LIFESTYLE STRIP — four real wellness photos right under the
+              hero so the page feels human, not SaaS. No copy, just imagery.
+              Mobile: shows the first 2 photos so the page stays scannable.
+          ───────────────────────────────────────────────────────────── */}
+      <section className="bg-white pb-6 md:pb-10 px-3 md:px-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+          {[
+            { src: 'iv-therapy-modern-clinic-recliners.jpg', alt: 'A modern IV therapy clinic interior with reclined seating' },
+            { src: 'iv-therapy-vitamin-drip-citrus.jpg',    alt: 'A vitamin IV drip bag with citrus styling' },
+            { src: 'iv-therapy-two-women.jpg',              alt: 'Two patients receiving IV therapy together' },
+            { src: 'iv-therapy-woman-relaxing.jpg',         alt: 'A patient relaxing during her IV therapy session' },
+          ].map((p, i) => (
+            <div
+              key={p.src}
+              className={`relative aspect-[4/5] md:aspect-[3/4] rounded-2xl md:rounded-3xl overflow-hidden ${i >= 2 ? 'hidden md:block' : ''}`}
+            >
+              <Image
+                src={`${DRIP_IMG_BASE}${p.src}`}
+                alt={p.alt}
+                fill
+                sizes="(max-width: 768px) 50vw, 25vw"
+                className="object-cover"
+              />
+              {/* Subtle warm wash so the strip feels like one cohesive editorial sequence */}
+              <div
+                className="absolute inset-0 pointer-events-none mix-blend-soft-light"
+                style={{ background: 'radial-gradient(ellipse at 50% 30%, rgba(255,228,196,0.5) 0%, rgba(255,228,196,0) 65%)' }}
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
           2. SMART MATCH CTA — white, one emerald focal point
           ───────────────────────────────────────────────────────────── */}
       <section className="bg-white py-20 md:py-32 px-6">
@@ -228,8 +268,8 @@ export default async function HomePage() {
                 href={`/treatments/${s.slug}`}
                 className="group relative overflow-hidden rounded-3xl bg-white flex flex-col shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
               >
-                {/* Product image — 3:4 aspect so the IV bag photo dominates the
-                    card the way a Weedmaps product photo does. Zoom on hover. */}
+                {/* Product image — 4:5 aspect so the IV bag photo dominates the
+                    card. Zoom on hover. */}
                 <div className="relative aspect-[4/5] bg-[#F4F6F4] overflow-hidden">
                   <Image
                     src={`${DRIP_IMG_BASE}${s.image}`}
@@ -237,6 +277,15 @@ export default async function HomePage() {
                     fill
                     sizes="(max-width: 768px) 50vw, 25vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-out"
+                  />
+                  {/* Warm wellness vignette — soft amber-to-clear radial wash so
+                      every clinical clinic photo gets a consistent warm + human
+                      feel. Stays subtle (10-25% opacity range). */}
+                  <div
+                    className="absolute inset-0 pointer-events-none mix-blend-soft-light"
+                    style={{
+                      background: 'radial-gradient(ellipse at 50% 35%, rgba(255,228,196,0.55) 0%, rgba(255,228,196,0.0) 60%)',
+                    }}
                   />
                   {/* Category chip — pinned top-left, on-brand emerald */}
                   <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-sm text-[10px] font-black uppercase tracking-[0.18em] text-[#0F6E56] shadow-sm">
@@ -247,14 +296,10 @@ export default async function HomePage() {
                     <ArrowUpRight size={14} />
                   </span>
                 </div>
-                {/* Card foot — name + tagline + price */}
+                {/* Card foot — name + tagline (no price band; less SaaS, more editorial) */}
                 <div className="px-4 md:px-5 py-4 md:py-5 flex flex-col gap-1.5">
                   <div className="font-black text-slate-900 text-base md:text-lg tracking-tight">{s.name}</div>
                   <div className="text-[12px] md:text-[13px] text-slate-500 leading-snug font-medium">{s.tagline}</div>
-                  <div className="mt-1 flex items-baseline gap-1.5">
-                    <span className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">From</span>
-                    <span className="text-base font-black text-[#0F6E56] tracking-tight">${s.priceFrom}</span>
-                  </div>
                 </div>
               </Link>
             ))}
@@ -288,18 +333,20 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-slate-100 border border-slate-100 rounded-3xl overflow-hidden">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {situations.map((s) => (
               <Link
                 key={s.label}
                 href="/quiz"
-                className="group bg-white hover:bg-[#F8F7F3] p-5 md:p-8 transition-colors relative"
+                className="group rounded-3xl p-5 md:p-7 relative overflow-hidden transition-transform hover:-translate-y-1 shadow-sm hover:shadow-xl"
+                style={{ backgroundColor: s.bg, color: s.ink }}
+                aria-label={`Quiz for ${s.label}`}
               >
-                <s.Icon size={20} className="text-[#0F6E56] mb-5" strokeWidth={1.75} />
-                <div className="font-bold text-slate-900 text-sm md:text-[15px] leading-tight tracking-tight mb-2">
+                <s.Icon size={26} className="mb-6 opacity-90" strokeWidth={1.75} style={{ color: s.ink }} />
+                <div className="font-black text-base md:text-[17px] leading-tight tracking-tight mb-3" style={{ color: s.ink }}>
                   {s.label}
                 </div>
-                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                <div className="inline-block text-[10px] font-black uppercase tracking-[0.18em] px-2.5 py-1 rounded-full bg-white/80 text-slate-700">
                   {s.drip}
                 </div>
               </Link>
@@ -317,6 +364,85 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          4.5. FEATURED VERIFIED CLINICS — Weedmaps-style "featured brands"
+              shelf. Pulls live from getFeaturedListings (claimed clinics
+              with verified credentials). Real photos, real ratings.
+          ───────────────────────────────────────────────────────────── */}
+      {featuredClinics.length > 0 && (
+      <section className="bg-white py-20 md:py-28 px-6 border-t border-slate-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-12 md:mb-16 flex items-end justify-between gap-8 flex-wrap">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] mb-4 md:mb-6 block">Verified on TheDripMap</span>
+              <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1] text-[clamp(2rem,5vw,4rem)]">
+                Featured clinics.<br />
+                <span className="font-serif italic font-normal text-[#0F6E56]">Who we trust.</span>
+              </h2>
+            </div>
+            <Link href="/search?verified=1" className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">
+              All verified clinics <ArrowUpRight size={16} />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+            {featuredClinics.slice(0, 4).map((c) => {
+              const cityLine = [c.city, c.state].filter(Boolean).join(', ');
+              const tagline = ((c as { description?: string }).description || '')
+                .split(/(?<=[.!?])\s+/)[0]
+                ?.replace(/^\s+|\s+$/g, '')
+                .slice(0, 110) || ((c.specialties as string[] | undefined)?.slice(0, 2).join(' · ') || 'Verified IV therapy clinic');
+              return (
+                <Link
+                  key={c.slug || c.name}
+                  href={`/providers/${c.slug}`}
+                  className="group relative overflow-hidden rounded-3xl bg-white border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+                >
+                  <div className="relative aspect-[16/10] bg-gradient-to-br from-slate-100 to-slate-200 overflow-hidden">
+                    {c.image_url ? (
+                      <Image
+                        src={c.image_url}
+                        alt={c.name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-out"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-slate-300 text-[10px] font-black uppercase tracking-[0.25em]">
+                        TheDripMap
+                      </div>
+                    )}
+                    {/* Safety Verified pill */}
+                    <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#0F6E56] text-white text-[10px] font-black uppercase tracking-[0.18em] shadow-md">
+                      <ShieldCheck size={11} strokeWidth={2.5} /> Safety Verified
+                    </span>
+                  </div>
+                  <div className="px-4 md:px-5 py-4 md:py-5 flex flex-col gap-1.5 flex-1">
+                    <div className="font-black text-slate-900 text-base md:text-[17px] tracking-tight leading-tight">{c.name}</div>
+                    <div className="text-[12px] md:text-[13px] text-slate-500 font-medium">{cityLine}</div>
+                    {Number(c.rating) > 0 && (
+                      <div className="flex items-baseline gap-1.5 mt-1">
+                        <span className="text-[#0F6E56] font-black text-sm">★</span>
+                        <span className="text-slate-900 font-black text-sm">{Number(c.rating).toFixed(1)}</span>
+                        <span className="text-slate-400 text-xs font-bold">({c.reviewCount || 0})</span>
+                      </div>
+                    )}
+                    <p className="text-[12.5px] text-slate-500 leading-relaxed mt-2 line-clamp-2">{tagline}</p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="text-center mt-10 md:hidden">
+            <Link href="/search?verified=1" className="inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">
+              All verified clinics <ArrowUpRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
+      )}
 
       {/* ─────────────────────────────────────────────────────────────
           5. CITIES — bone paper, editorial typography
