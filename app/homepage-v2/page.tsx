@@ -163,97 +163,143 @@ export default async function HomepageV2() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────────
-          2. TRUST STRIP — thin band that says "we are real."
+          2. TRUST STRIP — substantial proof band. Shows each verified clinic
+             as a small avatar + name + city + credential pill so the section
+             actually carries visible proof instead of being a thin text band.
           ───────────────────────────────────────────────────────────────── */}
-      <section className="bg-white border-y border-[#0F6E56]/15 py-7 md:py-8 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-center gap-4 md:gap-10 text-center md:text-left">
-          <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.25em] text-[#0F6E56]">
-            Trusted across North America
-          </span>
-          <div className="flex flex-wrap items-center justify-center gap-x-6 md:gap-x-8 gap-y-2 text-[13px] md:text-sm text-[#3D4A5C] font-medium">
-            <span style={{ fontFamily: 'var(--font-playfair)' }} className="italic">Refresh Med Spa LA</span>
-            <span className="text-[#0F6E56]/40">·</span>
-            <span style={{ fontFamily: 'var(--font-playfair)' }} className="italic">Signature Beauty Lounge</span>
-            <span className="text-[#0F6E56]/40">·</span>
-            <span style={{ fontFamily: 'var(--font-playfair)' }} className="italic">Blue Cypress IV &amp; Wellness</span>
+      <section className="bg-white border-y border-[#0F6E56]/15 py-10 md:py-14 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-7 md:mb-10">
+            <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.25em] text-[#0F6E56]">
+              Trusted across North America
+            </span>
+            <p className="mt-3 text-[15px] md:text-[16px] text-[#3D4A5C] font-light leading-relaxed max-w-2xl mx-auto">
+              We verify every featured clinic against the medical board, the compounding pharmacy, and the
+              clinician on file — <em style={{ fontFamily: 'var(--font-playfair)' }} className="not-italic">before</em> they get a badge.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
+            {featured.slice(0, 4).map((c) => {
+              const cityLine = [c.city, c.state].filter(Boolean).join(', ');
+              const initial = (c.name || '?').charAt(0).toUpperCase();
+              return (
+                <Link
+                  key={c.slug || c.name}
+                  href={`/providers/${c.slug}`}
+                  className="group flex items-center gap-3 md:gap-4 rounded-2xl bg-[#FAF9F6] border border-[#0F6E56]/10 hover:border-[#0F6E56]/40 px-3 md:px-4 py-3 md:py-4 transition-all hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden bg-[#0F6E56]/10 shrink-0 border border-[#0F6E56]/15">
+                    {c.image_url ? (
+                      <Image
+                        src={c.image_url}
+                        alt={c.name}
+                        fill
+                        sizes="56px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-[#0F6E56] font-black text-lg">
+                        {initial}
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[12px] md:text-[13px] font-black text-[#0A1628] tracking-tight leading-tight truncate group-hover:text-[#0F6E56] transition-colors">
+                      {c.name}
+                    </div>
+                    <div className="text-[10.5px] md:text-[11px] text-[#3D4A5C]/80 font-medium truncate">{cityLine}</div>
+                    <div className="mt-1.5 inline-flex items-center gap-1 text-[9px] md:text-[10px] font-black uppercase tracking-[0.16em] text-[#0F6E56]">
+                      <ShieldCheck size={10} strokeWidth={2.75} /> Verified
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* ─────────────────────────────────────────────────────────────────
-          3. BROWSE BY TREATMENT — DARK section. Editorial magazine cards
-             with full-bleed lifestyle photo, gradient overlay, large name,
-             small category chip. NO abstract icons as primary visual.
+          3. BROWSE BY TREATMENT — LIGHT editorial section. The lifestyle
+             photos are the hero of each card; the type sits below in a
+             clean white card body so the photos can breathe and the page
+             reads warm and human (not dark + clinical).
           ───────────────────────────────────────────────────────────────── */}
-      <section className="bg-[#0A1628] text-white py-24 md:py-32 px-6 relative overflow-hidden">
+      <section
+        className="py-24 md:py-32 px-6 relative overflow-hidden"
+        style={{ background: 'linear-gradient(180deg, #FAF9F6 0%, #F5EFE6 100%)' }}
+      >
+        {/* Faint emerald + warm radial atmosphere — gives the section depth
+            without going dark. */}
         <div
-          className="absolute top-0 right-0 w-[700px] h-[700px] rounded-full blur-[180px] pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(15,110,86,0.18) 0%, transparent 70%)' }}
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(circle at 90% 0%, rgba(15,110,86,0.06) 0%, transparent 45%), radial-gradient(circle at 10% 100%, rgba(244,162,97,0.08) 0%, transparent 50%)',
+          }}
         />
+
         <div className="max-w-7xl mx-auto relative">
           <div className="mb-14 md:mb-20 flex items-end justify-between gap-8 flex-wrap">
-            <div>
-              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#7ED3B8] mb-5 block">
+            <div className="max-w-2xl">
+              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#0F6E56] mb-5 block">
                 Browse by treatment
               </span>
-              <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] font-black tracking-[-0.02em] leading-[1.04] max-w-2xl">
+              <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] font-black text-[#0A1628] tracking-[-0.02em] leading-[1.04]">
                 The drips,
                 <br />
                 <span
-                  className="italic font-normal text-[#7ED3B8]"
+                  className="italic font-normal text-[#0F6E56]"
                   style={{ fontFamily: 'var(--font-playfair)' }}
                 >
                   shopped honestly.
                 </span>
               </h2>
+              <p className="mt-6 text-lg text-[#3D4A5C] leading-relaxed font-light max-w-xl">
+                Real ingredients. Honest price ranges. Every protocol comes with safety notes
+                and what to ask the clinic before you book.
+              </p>
             </div>
             <Link
               href="/treatments"
-              className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-white/70 hover:text-white transition-colors"
+              className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-[#0A1628] hover:text-[#0F6E56] transition-colors"
             >
               See all 20 treatments <ArrowUpRight size={16} />
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-6">
             {TREATMENTS.map((t) => (
               <Link
                 key={t.slug}
                 href={`/treatments/${t.slug}`}
-                className="group relative overflow-hidden rounded-3xl aspect-[4/5] flex flex-col transition-transform hover:-translate-y-1 hover:shadow-2xl shadow-lg"
+                className="group relative overflow-hidden rounded-3xl bg-white flex flex-col shadow-[0_10px_30px_-10px_rgba(10,22,40,0.12)] hover:shadow-[0_25px_50px_-15px_rgba(10,22,40,0.2)] hover:-translate-y-1 transition-all duration-300"
               >
-                <Image
-                  src={`${SUPABASE_IMG}${t.image}`}
-                  alt={`${t.name} IV drip`}
-                  fill
-                  sizes="(max-width: 768px) 50vw, 25vw"
-                  className="object-cover group-hover:scale-105 transition-transform duration-[1000ms] ease-out"
-                />
-                {/* Warm vignette so every clinical clinic photo gets a consistent human feel */}
-                <div
-                  className="absolute inset-0 pointer-events-none mix-blend-soft-light"
-                  style={{
-                    background:
-                      'radial-gradient(ellipse at 50% 35%, rgba(255,228,196,0.5) 0%, rgba(255,228,196,0) 60%)',
-                  }}
-                />
-                {/* Dark gradient anchored at the bottom for type legibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628]/95 via-[#0A1628]/55 to-transparent" />
-                {/* Category chip pinned top-left */}
-                <span className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-sm text-[10px] font-black uppercase tracking-[0.18em] text-[#0F6E56]">
-                  {t.category}
-                </span>
-                {/* Subtle arrow that wakes up on hover */}
-                <span className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/15 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:translate-x-0 translate-x-1 transition-all">
-                  <ArrowUpRight size={14} />
-                </span>
-                {/* Treatment name + tagline */}
-                <div className="relative z-10 mt-auto p-5 md:p-6">
-                  <div className="text-xl md:text-[22px] font-black tracking-tight leading-[1.05] mb-1 drop-shadow">
-                    {t.name}
-                  </div>
-                  <div className="text-[12px] md:text-[13px] text-white/80 leading-snug drop-shadow">
-                    {t.tagline}
+                {/* Product image — 4:5 portrait so the lifestyle photo dominates */}
+                <div className="relative aspect-[4/5] bg-[#F4F6F4] overflow-hidden">
+                  <Image
+                    src={`${SUPABASE_IMG}${t.image}`}
+                    alt={`${t.name} IV drip`}
+                    fill
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                    className="object-cover group-hover:scale-[1.04] transition-transform duration-[900ms] ease-out"
+                  />
+                  {/* Category chip pinned top-left — kept high-contrast over photo */}
+                  <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-sm text-[10px] font-black uppercase tracking-[0.18em] text-[#0F6E56] shadow-sm">
+                    {t.category}
+                  </span>
+                  {/* Subtle arrow wakes up on hover */}
+                  <span className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#0A1628]/70 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:translate-x-0 translate-x-1 transition-all">
+                    <ArrowUpRight size={14} />
+                  </span>
+                </div>
+                {/* White card body — name + tagline + small editorial flourish */}
+                <div className="px-4 md:px-5 py-4 md:py-5">
+                  <div className="font-black text-[#0A1628] text-base md:text-lg tracking-tight leading-tight">{t.name}</div>
+                  <div className="mt-1 text-[12px] md:text-[13px] text-[#3D4A5C] leading-snug font-medium">{t.tagline}</div>
+                  <div className="mt-3 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-[#0F6E56]">
+                    <span className="border-b border-[#0F6E56]/30 group-hover:border-[#0F6E56] pb-0.5 transition-colors">View clinics</span>
+                    <ArrowRight size={11} className="group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </Link>
@@ -262,7 +308,7 @@ export default async function HomepageV2() {
 
           {/* Mobile "see all" link */}
           <div className="text-center mt-12 md:hidden">
-            <Link href="/treatments" className="inline-flex items-center gap-2 text-sm font-bold text-[#7ED3B8] hover:text-white transition-colors">
+            <Link href="/treatments" className="inline-flex items-center gap-2 text-sm font-bold text-[#0A1628] hover:text-[#0F6E56] transition-colors">
               See all 20 treatments <ArrowUpRight size={16} />
             </Link>
           </div>
