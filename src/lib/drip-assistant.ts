@@ -9,6 +9,7 @@
 import { getServiceSupabase } from './supabase';
 import { TREATMENT_CONTENT } from './treatment-content';
 import { getStatus } from './hours';
+import { getKnowledge } from './agent-knowledge-base';
 
 export interface AssistantClinic {
   name: string;
@@ -434,30 +435,73 @@ function screenPatient(input: ScreenInput): ToolOutcome {
 }
 
 // ── get_treatment_info ──────────────────────────────────────────────
+// Reads from the agent knowledge base (src/lib/agent-knowledge-base.ts)
+// when available, falling back to TREATMENT_CONTENT otherwise. The
+// knowledge base provides structured, sourced detail (FDA status,
+// contraindications, dose-based pricing) the model can use in answers.
 function getTreatmentInfo(input: { treatment_name?: string; country?: string }): ToolOutcome {
   const name = (input.treatment_name || '').toLowerCase().trim();
   if (!name) return { forModel: JSON.stringify({ error: 'treatment_name required' }) };
   const isCanada = (input.country || '').trim().toLowerCase() === 'canada';
   const currency = isCanada ? 'CAD' : 'USD';
+
+  // Knowledge base lookup first — covers treatments + peptides with synonyms.
+  const kb = getKnowledge(name);
+
+  // Legacy TREATMENT_CONTENT lookup for the cost/safety fallback.
   const entry = Object.entries(TREATMENT_CONTENT).find(([key]) => {
     const k = key.toLowerCase();
     return k.includes(name) || name.includes(k) || name.includes(k.split(' ')[0]);
   });
-  if (!entry) {
+
+  if (!kb && !entry) {
     return { forModel: JSON.stringify({ found: false, currency, note: 'No dedicated info for that exact treatment; answer from general knowledge with honest caveats and suggest the clinic confirm specifics.' }) };
   }
-  const [key, c] = entry;
+
+  const legacy = entry ? entry[1] : null;
+  const legacyKey = entry ? entry[0] : null;
+  const treatmentLabel = kb?.name || legacyKey || name;
+
+  // Price: prefer knowledge-base CAD/USD pair when present, else legacy USD.
+  const usdPrice = kb?.costRange.usd || legacy?.costRange || '';
+  const cadPrice = kb?.costRange.cad || '';
+  const costRangeForUser = isCanada
+    ? (cadPrice || `${usdPrice} (CAD figure: confirm with clinic)`)
+    : (usdPrice ? `${usdPrice} USD` : 'Confirm with clinic');
+
+  // Details payload from the knowledge base (only emitted when present —
+  // the model uses it to answer ingredient / mechanism / contraindication
+  // / FDA-status questions without having to ask the clinic).
+  const details = kb
+    ? {
+        ingredients: kb.ingredients,
+        duration: kb.duration,
+        howItWorks: kb.howItWorks,
+        benefits: kb.benefits.slice(0, 6),
+        contraindications: kb.contraindications,
+        whoIsItFor: kb.whoIsItFor,
+        whatToExpect: kb.whatToExpect,
+        howSoon: kb.howSoon,
+        frequency: kb.frequency,
+        safetyNotes: kb.safetyNotes,
+        fdaStatus: kb.fdaStatus,
+        source: kb.source,
+      }
+    : null;
+
   return {
     forModel: JSON.stringify({
       found: true,
-      treatment: key,
-      summary: c.description.split('\n\n')[0],
-      howItWorks: c.howItWorks,
-      costRange: `${c.costRange} ${currency}`,
+      treatment: treatmentLabel,
+      summary: kb?.description || legacy?.description.split('\n\n')[0] || '',
+      howItWorks: kb?.howItWorks || legacy?.howItWorks || '',
+      costRange: costRangeForUser,
       currency,
       currencyNote: isCanada ? 'Prices shown are typical Canadian-clinic CAD ranges.' : 'Prices shown are typical US-clinic USD ranges.',
-      safety: c.safety || 'Always confirm suitability with a licensed clinician.',
-      benefits: c.benefits.slice(0, 4),
+      safety: kb?.safetyNotes || legacy?.safety || 'Always confirm suitability with a licensed clinician.',
+      benefits: (kb?.benefits || legacy?.benefits || []).slice(0, 4),
+      fdaStatus: kb?.fdaStatus || null,
+      details,
     }),
   };
 }
