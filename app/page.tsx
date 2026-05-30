@@ -16,6 +16,10 @@ import {
   Plane,
   PartyPopper,
   Pill,
+  Stethoscope,
+  Check,
+  FlaskConical,
+  UserCheck,
 } from 'lucide-react';
 import { Navbar } from '../src/components/Navbar';
 import { Footer } from '../src/components/Footer';
@@ -177,36 +181,91 @@ export default async function HomePage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          1.5. LIFESTYLE STRIP — four real wellness photos right under the
-              hero so the page feels human, not SaaS. No copy, just imagery.
-              Mobile: shows the first 2 photos so the page stays scannable.
+          1.5. THE STANDARD — premium "manifesto" banner under the hero.
+              Cinematic spa-reception photo on the left; editorial copy
+              + four trust pillars on the right. Replaces what used to be
+              a flat 4-photo strip and now reads like the brand promise of
+              a high-end IV therapy clinic, not a SaaS landing page.
           ───────────────────────────────────────────────────────────── */}
-      <section className="bg-white pb-6 md:pb-10 px-3 md:px-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
-          {[
-            { src: 'iv-therapy-modern-clinic-recliners.jpg', alt: 'A modern IV therapy clinic interior with reclined seating' },
-            { src: 'iv-therapy-vitamin-drip-citrus.jpg',    alt: 'A vitamin IV drip bag with citrus styling' },
-            { src: 'iv-therapy-two-women.jpg',              alt: 'Two patients receiving IV therapy together' },
-            { src: 'iv-therapy-woman-relaxing.jpg',         alt: 'A patient relaxing during her IV therapy session' },
-          ].map((p, i) => (
-            <div
-              key={p.src}
-              className={`relative aspect-[4/5] md:aspect-[3/4] rounded-2xl md:rounded-3xl overflow-hidden ${i >= 2 ? 'hidden md:block' : ''}`}
-            >
-              <Image
-                src={`${DRIP_IMG_BASE}${p.src}`}
-                alt={p.alt}
-                fill
-                sizes="(max-width: 768px) 50vw, 25vw"
-                className="object-cover"
-              />
-              {/* Subtle warm wash so the strip feels like one cohesive editorial sequence */}
-              <div
-                className="absolute inset-0 pointer-events-none mix-blend-soft-light"
-                style={{ background: 'radial-gradient(ellipse at 50% 30%, rgba(255,228,196,0.5) 0%, rgba(255,228,196,0) 65%)' }}
-              />
+      <section className="bg-[#F8F7F3] px-6 py-16 md:py-24 relative overflow-hidden">
+        {/* Atmospheric warm glow + faint emerald — premium spa lounge vibe */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(ellipse at 0% 100%, rgba(244,196,160,0.22) 0%, transparent 55%), radial-gradient(ellipse at 100% 0%, rgba(15,110,86,0.08) 0%, transparent 50%)',
+          }}
+        />
+        <div className="max-w-7xl mx-auto relative">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+            {/* Cinematic photo — soft drop shadow + tinted gradient frame so the
+                clinic-reception shot reads as the actual standard we hold ourselves to. */}
+            <div className="lg:col-span-6 order-2 lg:order-1">
+              <div className="relative aspect-[4/5] md:aspect-[5/6] lg:aspect-[4/5] rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-[0_40px_80px_-30px_rgba(15,40,30,0.35)]">
+                <Image
+                  src={`${DRIP_IMG_BASE}iv-therapy-spa-reception-recliners.jpg`}
+                  alt="A modern IV therapy spa reception interior"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover"
+                  priority
+                />
+                {/* Editorial wash — soft warm overlay so the photo reads like a
+                    magazine spread, not a stock shot. */}
+                <div
+                  className="absolute inset-0 pointer-events-none mix-blend-soft-light"
+                  style={{
+                    background:
+                      'linear-gradient(135deg, rgba(255,229,196,0.4) 0%, rgba(255,229,196,0) 50%, rgba(15,110,86,0.15) 100%)',
+                  }}
+                />
+                {/* Floating "since 2024" emblem — gives the photo provenance */}
+                <div className="absolute bottom-5 left-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-lg">
+                  <ShieldCheck size={14} className="text-[#0F6E56]" strokeWidth={2.5} />
+                  <span className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-900">Safety Verified Standard</span>
+                </div>
+              </div>
             </div>
-          ))}
+
+            {/* Editorial copy + trust pillars */}
+            <div className="lg:col-span-6 order-1 lg:order-2 lg:pl-4">
+              <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#0F6E56] mb-5 md:mb-6 block">
+                The Standard
+              </span>
+              <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1.02] text-[clamp(2rem,4.5vw,3.75rem)] mb-6 md:mb-7">
+                Vetted before<br />
+                <span className="font-serif italic font-normal text-[#0F6E56]">they're shown.</span>
+              </h2>
+              <p className="text-base md:text-lg text-slate-500 leading-relaxed font-light max-w-xl mb-8 md:mb-10">
+                We confirm credentials with the state medical board, we verify bag-compounding with the
+                503B pharmacy, and we check the clinician on file — before a clinic earns a Safety
+                Verified badge. No paid placements. No bought reviews.
+              </p>
+
+              {/* Trust pillars — refined row, NOT a SaaS feature grid. */}
+              <div className="grid grid-cols-2 gap-3 md:gap-4 max-w-2xl">
+                {[
+                  { Icon: Stethoscope, label: 'Medical director verified',  detail: 'License confirmed with state board' },
+                  { Icon: UserCheck,   label: 'Licensed clinician inserts', detail: 'RN, NP, or PA — never a "tech"' },
+                  { Icon: FlaskConical,label: '503B pharmacy compounding',  detail: 'No grey-market bags or vials' },
+                  { Icon: Check,       label: 'Good-faith exam required',   detail: 'Real intake before any infusion' },
+                ].map(({ Icon, label, detail }) => (
+                  <div
+                    key={label}
+                    className="flex items-start gap-3 p-3.5 md:p-4 rounded-2xl bg-white/70 backdrop-blur-sm border border-[#0F6E56]/10"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-[#0F6E56]/10 text-[#0F6E56] flex items-center justify-center shrink-0">
+                      <Icon size={16} strokeWidth={2.25} />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-[12px] md:text-[13px] font-black text-slate-900 tracking-tight leading-tight">{label}</div>
+                      <div className="text-[10.5px] md:text-[11px] text-slate-500 font-medium leading-snug mt-1">{detail}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -242,21 +301,43 @@ export default async function HomePage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          3. DRIP MENU — deep ink, monochrome grid
+          3. DRIP MENU — warm cream marble, white cards with smaller
+              square product images and editorial type. Reads like a
+              high-end spa menu, not a SaaS product grid.
           ───────────────────────────────────────────────────────────── */}
-      <section className="bg-[#0A0B0D] text-white py-20 md:py-44 px-6 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#0F6E56]/10 rounded-full blur-[180px] pointer-events-none" />
+      <section
+        className="px-6 py-20 md:py-32 relative overflow-hidden"
+        style={{ background: 'linear-gradient(180deg, #F5EFE6 0%, #F8F2E8 100%)' }}
+      >
+        {/* Soft marble-like atmosphere — barely-there warm radial accents */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(ellipse 50% 40% at 100% 0%, rgba(15,110,86,0.06) 0%, transparent 60%), radial-gradient(ellipse 40% 30% at 0% 100%, rgba(244,196,160,0.18) 0%, transparent 55%)',
+          }}
+        />
+        {/* Faint dot grid masked to edges — subtle texture, not loud */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.4]"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(15,110,86,0.10) 1px, transparent 1px)',
+            backgroundSize: '34px 34px',
+            maskImage: 'radial-gradient(ellipse 70% 50% at 50% 50%, black, transparent 75%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 70% 50% at 50% 50%, black, transparent 75%)',
+          }}
+        />
 
         <div className="max-w-6xl mx-auto relative">
-          <div className="mb-12 md:mb-20 flex items-end justify-between gap-8 flex-wrap">
+          <div className="mb-14 md:mb-20 flex items-end justify-between gap-8 flex-wrap">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-white/40 mb-6 block">The Menu</span>
-              <h2 className="font-black tracking-[-0.025em] leading-[1] text-[clamp(2rem,5vw,4rem)]">
+              <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-[#0F6E56] mb-5 md:mb-6 block">The Menu</span>
+              <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1] text-[clamp(2rem,5vw,4rem)]">
                 Browse by<br />
-                <span className="font-serif italic font-normal text-[#7ED3B8]">drip type.</span>
+                <span className="font-serif italic font-normal text-[#0F6E56]">drip type.</span>
               </h2>
             </div>
-            <Link href="/search" className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-white/60 hover:text-white transition-colors">
+            <Link href="/search" className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">
               See full directory <ArrowUpRight size={16} />
             </Link>
           </div>
@@ -266,51 +347,48 @@ export default async function HomePage() {
               <Link
                 key={s.slug}
                 href={`/treatments/${s.slug}`}
-                className="group relative overflow-hidden rounded-3xl bg-white flex flex-col shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+                className="group relative bg-white rounded-3xl flex flex-col p-4 md:p-5 shadow-[0_10px_30px_-10px_rgba(15,40,30,0.12)] hover:shadow-[0_25px_50px_-15px_rgba(15,40,30,0.22)] hover:-translate-y-1 transition-all duration-300 border border-[#0F6E56]/5"
               >
-                {/* Product image — 4:5 aspect so the IV bag photo dominates the
-                    card. Zoom on hover. */}
-                <div className="relative aspect-[4/5] bg-[#F4F6F4] overflow-hidden">
+                {/* Square product image — inset within the card with generous
+                    padding around it so it reads like product photography in
+                    a magazine, not a cropped lifestyle shot. */}
+                <div className="relative aspect-square rounded-2xl overflow-hidden bg-[#F4F6F4] mb-4">
                   <Image
                     src={`${DRIP_IMG_BASE}${s.image}`}
                     alt={`${s.name} IV drip`}
                     fill
-                    sizes="(max-width: 768px) 50vw, 25vw"
+                    sizes="(max-width: 768px) 40vw, 22vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-out"
                   />
-                  {/* Warm wellness vignette — soft amber-to-clear radial wash so
-                      every clinical clinic photo gets a consistent warm + human
-                      feel. Stays subtle (10-25% opacity range). */}
+                  {/* Soft warm vignette — subtle, just enough to unify the photos */}
                   <div
                     className="absolute inset-0 pointer-events-none mix-blend-soft-light"
-                    style={{
-                      background: 'radial-gradient(ellipse at 50% 35%, rgba(255,228,196,0.55) 0%, rgba(255,228,196,0.0) 60%)',
-                    }}
+                    style={{ background: 'radial-gradient(ellipse at 50% 35%, rgba(255,228,196,0.4) 0%, rgba(255,228,196,0) 65%)' }}
                   />
-                  {/* Category chip — pinned top-left, on-brand emerald */}
-                  <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-sm text-[10px] font-black uppercase tracking-[0.18em] text-[#0F6E56] shadow-sm">
+                </div>
+                {/* Editorial card foot — small category, big name, tagline,
+                    "View clinics" affordance */}
+                <div className="flex flex-col gap-1 md:gap-1.5 flex-1">
+                  <span className="text-[9.5px] md:text-[10px] font-black uppercase tracking-[0.2em] text-[#0F6E56]/80">
                     {s.category}
                   </span>
-                  {/* Subtle "view product" arrow that wakes up on hover */}
-                  <span className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#0A0B0D]/70 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:translate-x-0 translate-x-1 transition-all">
-                    <ArrowUpRight size={14} />
-                  </span>
-                </div>
-                {/* Card foot — name + tagline (no price band; less SaaS, more editorial) */}
-                <div className="px-4 md:px-5 py-4 md:py-5 flex flex-col gap-1.5">
-                  <div className="font-black text-slate-900 text-base md:text-lg tracking-tight">{s.name}</div>
+                  <div className="font-black text-slate-900 text-lg md:text-[20px] tracking-tight leading-tight">{s.name}</div>
                   <div className="text-[12px] md:text-[13px] text-slate-500 leading-snug font-medium">{s.tagline}</div>
+                  <div className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#0F6E56]">
+                    <span className="border-b border-[#0F6E56]/30 group-hover:border-[#0F6E56] pb-0.5 transition-colors">View clinics</span>
+                    <ArrowRight size={11} className="group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </div>
               </Link>
             ))}
           </div>
 
-          <div className="text-center mt-10 md:mt-12">
+          <div className="text-center mt-12 md:mt-14">
             <Link
               href="/treatments"
-              className="inline-flex items-center gap-2 text-sm font-bold text-[#7ED3B8] hover:text-white transition-colors group"
+              className="inline-flex items-center gap-2 text-sm font-bold text-[#0A1628] hover:text-[#0F6E56] transition-colors group"
             >
-              <span className="border-b border-[#7ED3B8]/40 group-hover:border-white pb-0.5">See all 20 treatments</span>
+              <span className="border-b border-[#0F6E56]/40 group-hover:border-[#0F6E56] pb-0.5">See all 20 treatments</span>
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
