@@ -1,402 +1,353 @@
-/*
- * ─────────────────────────────────────────────────────────────────────
- *  HOMEPAGE — v3 (2026-05-30 redesign, "human-warmth pass")
- * ─────────────────────────────────────────────────────────────────────
- *  Per the design brief: warm cream + brand green accents + dark navy
- *  headings + rounded cards + REAL clinic data + Playfair Display for
- *  the editorial italic moments. Story arc:
- *    Find it → Browse it → Understand it → Trust it → Book it.
- *
- *  Section rhythm (no two dark in a row):
- *    cream hero → white trust → cream treatments → cream situation →
- *    white featured → emerald stats → navy CTA.
- *
- *  All numbers/counts pulled live from getSiteStats. All clinic data
- *  pulled live from getFeaturedListings — real people (Kia, Eva,
- *  Mechelle), no fabricated testimonials.
- *
- *  Previous version preserved at scripts/page-backup-pre-v2-swap-2026-05-30.tsx.
- * ─────────────────────────────────────────────────────────────────────
- */
-
 import Link from 'next/link';
 import Image from 'next/image';
-import { Playfair_Display } from 'next/font/google';
 import {
-  ArrowRight, ArrowUpRight, ShieldCheck, MapPin, Star, Stethoscope,
-  Heart, Sparkles, Activity, Dumbbell, Zap, ShieldCheck as ShieldIcon, Droplets,
+  ArrowRight,
+  ArrowUpRight,
+  Droplets,
+  Activity,
+  Heart,
+  Sparkles,
+  Dumbbell,
+  ShieldCheck,
+  Zap,
+  Wine,
+  Thermometer,
+  Brain,
+  Plane,
+  PartyPopper,
+  Pill,
 } from 'lucide-react';
-import { Metadata } from 'next';
 import { Navbar } from '../src/components/Navbar';
 import { Footer } from '../src/components/Footer';
+import { BlogCard } from '../src/components/BlogCard';
 import { QuickMatch } from '../src/components/QuickMatch';
-import { getSiteStats, getFeaturedListings } from '../src/lib/data';
-
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-playfair',
-});
+import { ClinicianSection } from '../src/components/ClinicianSection';
+import { TrustSignals } from '../src/components/TrustSignals';
+import { getBlogPosts, getSiteStats, getPopularCities, getFeaturedListings } from '../src/lib/data';
+import { Metadata } from 'next';
 
 export const revalidate = 60;
 
-const SUPABASE_IMG = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/';
-const SITE_URL = 'https://www.thedripmap.com';
+/*
+ * ─────────────────────────────────────────────────────────────────────
+ *  HOMEPAGE — V2 (2026-05-27 redesign)
+ * ─────────────────────────────────────────────────────────────────────
+ *  Disciplined palette: deep ink (#0A0B0D), pure white, bone (#F8F7F3),
+ *  brand emerald (#0F6E56). NO other accent colors.
+ *
+ *  Section rhythm: dark → light → dark → light → bone → light → bone →
+ *  emerald. Alternating creates calm contrast without color noise.
+ *
+ *  Previous version preserved at scripts/page-backup-2026-05-27.tsx.
+ * ─────────────────────────────────────────────────────────────────────
+ */
 
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getSiteStats();
   const title = `IV Therapy Clinics Near Me — Find & Compare ${stats.total}+ Providers | TheDripMap`;
   const description = `Find the best IV therapy clinic near you. Compare ${stats.total}+ verified providers across the US and Canada. Filter by treatment, price, and location. Book in 60 seconds.`;
+
   return {
     title,
     description,
-    alternates: { canonical: SITE_URL },
+    alternates: { canonical: 'https://www.thedripmap.com' },
     openGraph: {
       title,
       description,
-      url: SITE_URL,
+      url: 'https://www.thedripmap.com',
       siteName: 'TheDripMap',
-      images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: 'TheDripMap — Find Your IV Therapy Match' }],
+      images: [{ url: 'https://www.thedripmap.com/og-image.png', width: 1200, height: 630, alt: 'TheDripMap — Find Your IV Therapy Match' }],
       locale: 'en_US',
       type: 'website',
     },
-    twitter: { card: 'summary_large_image', description, images: [`${SITE_URL}/og-image.png`] },
+    twitter: { card: 'summary_large_image', description, images: ['https://www.thedripmap.com/og-image.png'] },
   };
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Treatment cards — editorial magazine style, lifestyle photo dominant.
-// ─────────────────────────────────────────────────────────────────────────────
-const TREATMENTS = [
-  { name: 'Hydration',      slug: 'hydration',      Icon: Droplets,    image: 'iv-therapy-dehydration.jpg',         tagline: 'Rapid rehydration',          category: 'Foundational' },
-  { name: 'NAD+',           slug: 'nad-plus',       Icon: Activity,    image: 'iv-therapy-nad-iv-bag-closeup.jpg',  tagline: 'Cellular energy + clarity',  category: 'Longevity'    },
-  { name: 'Myers Cocktail', slug: 'myers-cocktail', Icon: Zap,         image: 'iv-therapy-vitamin-drip-citrus.jpg', tagline: 'The original wellness drip', category: 'Foundational' },
-  { name: 'Hangover',       slug: 'hangover',       Icon: Heart,       image: 'iv-therapy-hangover.jpg',            tagline: 'Reset after a rough night',  category: 'Recovery'     },
-  { name: 'Immune Support', slug: 'immune-support', Icon: ShieldIcon,  image: 'iv-therapy-immunity.jpg',            tagline: 'Vitamin C + zinc boost',     category: 'Wellness'     },
-  { name: 'Beauty Glow',    slug: 'beauty-glow',    Icon: Sparkles,    image: 'iv-therapy-skin-glow.jpg',           tagline: 'Glutathione for skin',       category: 'Beauty'       },
-  { name: 'Recovery',       slug: 'recovery',       Icon: Dumbbell,    image: 'iv-therapy-sports-recovery.jpg',     tagline: 'Amino acids + rebuild',      category: 'Athletic'     },
-  { name: 'Weight Loss',    slug: 'weight-loss',    Icon: Activity,    image: 'iv-therapy-weight-loss.jpg',         tagline: 'MIC + lipo + metabolism',    category: 'Metabolic'    },
-];
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Situation cards — moment-in-time, mood color, large emoji, taller cards.
-// Each tile's bg is a flat color chosen by the emotion the situation evokes,
-// per the approved palette.
-// ─────────────────────────────────────────────────────────────────────────────
-const SITUATIONS = [
-  { emoji: '🍷', label: 'Out too late last night',    drip: 'Hangover Recovery',     bg: '#F4A261', ink: '#5B3920' },
-  { emoji: '🌡️', label: 'Catching something nasty',   drip: 'Immune Support',        bg: '#6BB6D6', ink: '#1F3A4A' },
-  { emoji: '🧠', label: 'Brain fog all week',         drip: 'NAD+ / Energy',         bg: '#2C2C54', ink: '#E8E8F5' },
-  { emoji: '🏃', label: 'Race or big workout coming', drip: 'Athletic Recovery',     bg: '#E76F51', ink: '#4A1F12' },
-  { emoji: '✨', label: 'Event in a week',            drip: 'Beauty Glow',           bg: '#E9C46A', ink: '#5A4310' },
-  { emoji: '✈️', label: 'Just landed jet-lagged',     drip: 'Hydration + B-complex', bg: '#7FB3D5', ink: '#1C3B52' },
-  { emoji: '🤒', label: 'Bug or stomach flu',         drip: 'Hydration Drip',        bg: '#A8DADC', ink: '#1F4747' },
-  { emoji: '🎉', label: 'Bachelor / bachelorette',    drip: 'Hangover + Recovery',   bg: '#BC4749', ink: '#FBE9E9' },
-];
-
-// One-line founder quote per claimed clinic — derived from the first sentence
-// of providers.description (clinically reviewed copy already in DB). This is
-// REAL text, not a fabricated testimonial.
-function founderQuote(name: string, description?: string | null): string {
-  const firstSentence = (description || '').split(/(?<=[.!?])\s+/)[0]?.trim() || '';
-  if (firstSentence) return firstSentence;
-  return `${name} on TheDripMap.`;
-}
-
-function leadingCredential(name: string, slug: string | null): string {
-  // Hand-curated one-line credential per claimed clinic — matches the real
-  // amenities listed in providers.amenities.
-  if (slug === 'refresh-med-spa-la-los-angeles') return 'MD-led · Dr. Kia Rowhanian, MD + Nurse Fatima';
-  if (slug === 'blue-cypress-iv-and-wellness-georgetown') return 'RN-led · Founded by Mechelle Kelley, RN';
-  if (slug === 'signature-beauty-lounge-downtown-toronto') return 'Physician-designed · Dr. Gregory Pugen, MD';
-  if (slug === 'signature-beauty-lounge-richmond-hill') return 'Physician-designed · Dr. Gregory Pugen, MD';
-  return name;
 }
 
 export default async function HomePage() {
   const stats = await getSiteStats();
-  const featured = (await getFeaturedListings(4)) || [];
-  // Pick the LA clinic for the hero card — Kia per the brief.
-  const heroClinic = featured.find((c) => c.slug === 'refresh-med-spa-la-los-angeles') || featured[0];
+  const blogPosts = await getBlogPosts();
+  const popularCities = await getPopularCities();
+  // Featured Verified Clinics — pull the 4 claimed listings live from Supabase
+  // so the homepage always reflects current claimed-and-verified status.
+  const featuredClinics = (await getFeaturedListings(4)) || [];
+  const latestPosts = blogPosts.slice(0, 3);
 
-  const websiteJsonLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'TheDripMap', url: SITE_URL, potentialAction: { '@type': 'SearchAction', target: `${SITE_URL}/search?q={search_term_string}`, 'query-input': 'required name=search_term_string' } };
-  const organizationJsonLd = { '@context': 'https://schema.org', '@type': 'Organization', name: 'TheDripMap', url: SITE_URL, logo: `${SITE_URL}/logo.png`, sameAs: ['https://www.instagram.com/thedripmap'] };
+  const websiteJsonLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'TheDripMap', url: 'https://www.thedripmap.com', potentialAction: { '@type': 'SearchAction', target: 'https://www.thedripmap.com/search?q={search_term_string}', 'query-input': 'required name=search_term_string' } };
+  const organizationJsonLd = { '@context': 'https://schema.org', '@type': 'Organization', name: 'TheDripMap', url: 'https://www.thedripmap.com', logo: 'https://www.thedripmap.com/logo.png', sameAs: ['https://www.instagram.com/thedripmap'] };
+
+  // Product-card data for the dark drip menu. Each card shows an actual IV-bag
+  // / drip product photo (Supabase blog-images) with name, one-line "what it
+  // does" tagline, category chip, and typical price band — Weedmaps-style
+  // product shelf rather than the previous icon-tile grid.
+  const services = [
+    { name: 'Hydration',      slug: 'hydration',      Icon: Droplets,    image: 'iv-therapy-dehydration.jpg',         tagline: 'Rapid rehydration',          category: 'Foundational',  priceFrom: 100 },
+    { name: 'NAD+',           slug: 'nad-plus',       Icon: Activity,    image: 'iv-therapy-nad-iv-bag-closeup.jpg',  tagline: 'Cellular energy + clarity',  category: 'Longevity',     priceFrom: 400 },
+    { name: 'Myers Cocktail', slug: 'myers-cocktail', Icon: Zap,         image: 'iv-therapy-vitamin-drip-citrus.jpg', tagline: 'The original wellness drip', category: 'Foundational',  priceFrom: 150 },
+    { name: 'Hangover',       slug: 'hangover',       Icon: Heart,       image: 'iv-therapy-hangover.jpg',            tagline: 'Reset after a rough night',  category: 'Recovery',      priceFrom: 150 },
+    { name: 'Immune Support', slug: 'immune-support', Icon: ShieldCheck, image: 'iv-therapy-immunity.jpg',            tagline: 'Vitamin C + zinc boost',     category: 'Wellness',      priceFrom: 150 },
+    { name: 'Beauty Glow',    slug: 'beauty-glow',    Icon: Sparkles,    image: 'iv-therapy-skin-glow.jpg',           tagline: 'Glutathione for skin',       category: 'Beauty',        priceFrom: 200 },
+    { name: 'Recovery',       slug: 'recovery',       Icon: Dumbbell,    image: 'iv-therapy-sports-recovery.jpg',     tagline: 'Amino acids + rebuild',      category: 'Athletic',      priceFrom: 175 },
+    { name: 'Weight Loss',    slug: 'weight-loss',    Icon: Activity,    image: 'iv-therapy-weight-loss.jpg',         tagline: 'MIC + lipo + metabolism',    category: 'Metabolic',     priceFrom: 175 },
+  ];
+  const DRIP_IMG_BASE = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/';
+
+  // Each situation card gets a solid color wash driven by color psychology
+  // (warm amber for regret/restoration, cool sky for clinical calm, etc.).
+  // `bg` is the card background, `ink` is the darker on-color text shade.
+  const situations = [
+    { Icon: Wine,        label: 'Out too late last night',    drip: 'Hangover Recovery',  bg: '#F4A261', ink: '#5B3920' },
+    { Icon: Thermometer, label: 'Catching something nasty',   drip: 'Immune Support',     bg: '#6BB6D6', ink: '#1F3A4A' },
+    { Icon: Brain,       label: 'Brain fog all week',         drip: 'NAD+ / Energy',      bg: '#2C2C54', ink: '#E8E8F5' },
+    { Icon: Dumbbell,    label: 'Race or big workout coming', drip: 'Athletic Recovery',  bg: '#E76F51', ink: '#4A1F12' },
+    { Icon: Sparkles,    label: 'Event in a week',            drip: 'Beauty Glow',        bg: '#E9C46A', ink: '#5A4310' },
+    { Icon: Plane,       label: 'Just landed jet-lagged',     drip: 'Hydration + B-complex', bg: '#7FB3D5', ink: '#1C3B52' },
+    { Icon: Pill,        label: 'Bug or stomach flu',         drip: 'Hydration Drip',     bg: '#A8DADC', ink: '#1F4747' },
+    { Icon: PartyPopper, label: 'Bachelor / bachelorette',    drip: 'Hangover + Recovery',bg: '#BC4749', ink: '#FBE9E9' },
+  ];
+
+  const guides = [
+    { num: '01', label: 'Pricing',         title: 'What IV therapy actually costs',         href: '/guide/iv-therapy-cost-guide',                desc: 'Hangover, NAD+, Myers, recovery — real 2026 ranges across US and Canadian metros.',                image: 'iv-therapy-vitamin-drip-citrus.jpg' },
+    { num: '02', label: 'Quality Signals', title: 'How to choose a clinic',                 href: '/guide/how-to-choose-iv-therapy-clinic',      desc: 'The 7 things every reputable IV therapy clinic should have. Walk away if any are missing.', image: 'iv-therapy-modern-clinic-recliners.jpg' },
+    { num: '03', label: 'Walk-through',    title: 'Your first session, step by step',       href: '/guide/first-time-iv-therapy-what-to-expect', desc: 'Intake to needle to discharge. What to expect, what to ask, how to know it went well.',     image: 'iv-therapy-nad-iv-bag-closeup.jpg' },
+  ];
+  const GUIDE_IMG_BASE = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/';
 
   return (
-    <div className={`${playfair.variable} min-h-screen bg-[#FAF9F6] text-[#0A1628]`}>
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
 
-      {/* ─────────────────────────────────────────────────────────────────
-          1. HERO — warm cream, two-column. Left: copy + QuickMatch + 3 stats.
-             Right: a REAL claimed clinic card (Kia/Refresh Med Spa LA) with
-             MD credentials. No dark background; the hero feels like an
-             editorial spread, not a SaaS panel.
-          ───────────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden">
-        {/* Subtle warm radial behind the hero — barely-there atmosphere */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              'radial-gradient(circle at 20% 10%, rgba(15,110,86,0.06) 0%, transparent 45%), radial-gradient(circle at 80% 0%, rgba(244,162,97,0.08) 0%, transparent 50%)',
-          }}
-        />
-        <div className="max-w-7xl mx-auto px-6 pt-16 pb-12 md:pt-24 md:pb-20 relative">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-            {/* Left: copy + QuickMatch + stats */}
-            <div className="lg:col-span-7">
-              <span className="inline-block text-[11px] font-bold uppercase tracking-[0.22em] text-[#0F6E56] mb-6">
-                Verified IV therapy directory · US + Canada
-              </span>
-              <h1 className="text-[clamp(2.5rem,5.8vw,5rem)] font-black tracking-[-0.025em] leading-[1.04] text-[#0A1628] mb-6">
-                Find an IV therapy clinic
-                <br />
-                <span
-                  className="italic font-normal text-[#0F6E56]"
-                  style={{ fontFamily: 'var(--font-playfair)' }}
-                >
-                  you can actually trust.
-                </span>
-              </h1>
-              <p className="text-lg md:text-xl text-[#3D4A5C] leading-relaxed max-w-2xl font-light mb-10">
-                {stats.total.toLocaleString()} clinics across {stats.cities}+ cities. Real credentials,
-                real reviews — checked against the medical board before they get a verified badge.
-              </p>
+      {/* ─────────────────────────────────────────────────────────────
+          1. HERO — light, airy, single emerald accent
+          ───────────────────────────────────────────────────────────── */}
+      <section className="relative bg-gradient-to-b from-[#F4F6F4] via-[#FBFCFB] to-white text-slate-900">
+        {/* Decorative background, clipped to the hero. Kept in its own
+            overflow-hidden layer so the section itself does NOT clip the
+            QuickMatch dropdowns (which open downward past the hero edge). */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Soft emerald glow up top — barely there, just warmth */}
+          <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[1100px] h-[800px] bg-[#0F6E56]/[0.07] rounded-full blur-[170px]" />
+          {/* Faint dot grid, masked to fade at the edges */}
+          <div
+            className="absolute inset-0 opacity-[0.5]"
+            style={{
+              backgroundImage: 'radial-gradient(circle, rgba(15,110,86,0.10) 1px, transparent 1px)',
+              backgroundSize: '34px 34px',
+              maskImage: 'radial-gradient(ellipse 80% 60% at 50% 35%, black, transparent 75%)',
+              WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 35%, black, transparent 75%)',
+            }}
+          />
+        </div>
 
-              <div className="mb-10">
-                <QuickMatch />
-              </div>
+        <div className="max-w-6xl mx-auto px-6 pt-20 pb-16 md:pt-32 md:pb-24 relative">
+          {/* Eyebrow */}
+          <div className="flex items-center gap-3 mb-6 justify-center">
+            <span className="hidden md:block h-px w-8 bg-[#0F6E56]" />
+            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] text-center">North America's IV Therapy Platform</span>
+            <span className="hidden md:block h-px w-8 bg-[#0F6E56]" />
+          </div>
 
-              {/* Three social-proof stats — restrained, not the trust signals component */}
-              <div className="grid grid-cols-3 gap-3 md:gap-6 max-w-2xl">
-                <Stat number={stats.total.toLocaleString()} label="Verified clinics" />
-                <Stat number={`${stats.cities}+`} label="Cities" />
-                <Stat number={stats.avgRating} label="Avg clinic rating" suffix="★" />
-              </div>
-            </div>
+          {/* Hero headline — dark ink with emerald serif italic accent */}
+          <h1 className="text-center font-black tracking-[-0.03em] leading-[0.95] text-[clamp(2.75rem,7.5vw,6.5rem)] mb-6 text-slate-900">
+            Find the right<br />
+            <span className="font-serif italic font-normal text-[#0F6E56] tracking-[-0.02em]">IV therapy clinic.</span>
+          </h1>
 
-            {/* Right: real clinic card (Kia / Refresh Med Spa LA) */}
-            <div className="lg:col-span-5">
-              {heroClinic && <HeroClinicCard clinic={heroClinic} />}
-            </div>
+          <p className="text-center text-base md:text-[20px] text-slate-500 max-w-[560px] mx-auto mb-8 leading-relaxed font-light">
+            {stats.total.toLocaleString()}+ verified clinics across {stats.cities}+ cities. Find the right one for you in under 60 seconds.
+          </p>
+
+          {/* QuickMatch — full width so the city picker + button breathe */}
+          <div className="max-w-4xl mx-auto mb-10">
+            <QuickMatch />
+          </div>
+
+          {/* Trust row — typographic */}
+          <div className="flex flex-wrap items-center justify-center gap-x-5 md:gap-x-10 gap-y-3 text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400">
+            <span><span className="text-slate-900">{stats.total.toLocaleString()}</span> &nbsp;Verified Clinics</span>
+            <span className="hidden md:inline text-slate-300">·</span>
+            <span><span className="text-slate-900">{stats.cities}</span> &nbsp;Cities</span>
+            <span className="hidden md:inline text-slate-300">·</span>
+            <span><span className="text-slate-900">{stats.states}</span> &nbsp;States &amp; Provinces</span>
           </div>
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────
-          2. TRUST STRIP — substantial proof band. Shows each verified clinic
-             as a small avatar + name + city + credential pill so the section
-             actually carries visible proof instead of being a thin text band.
-          ───────────────────────────────────────────────────────────────── */}
-      <section className="bg-white border-y border-[#0F6E56]/15 py-10 md:py-14 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-7 md:mb-10">
-            <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.25em] text-[#0F6E56]">
-              Trusted across North America
-            </span>
-            <p className="mt-3 text-[15px] md:text-[16px] text-[#3D4A5C] font-light leading-relaxed max-w-2xl mx-auto">
-              We verify every featured clinic against the medical board, the compounding pharmacy, and the
-              clinician on file — <em style={{ fontFamily: 'var(--font-playfair)' }} className="not-italic">before</em> they get a badge.
+      {/* ─────────────────────────────────────────────────────────────
+          1.5. LIFESTYLE STRIP — four real wellness photos right under the
+              hero so the page feels human, not SaaS. No copy, just imagery.
+              Mobile: shows the first 2 photos so the page stays scannable.
+          ───────────────────────────────────────────────────────────── */}
+      <section className="bg-white pb-6 md:pb-10 px-3 md:px-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+          {[
+            { src: 'iv-therapy-modern-clinic-recliners.jpg', alt: 'A modern IV therapy clinic interior with reclined seating' },
+            { src: 'iv-therapy-vitamin-drip-citrus.jpg',    alt: 'A vitamin IV drip bag with citrus styling' },
+            { src: 'iv-therapy-two-women.jpg',              alt: 'Two patients receiving IV therapy together' },
+            { src: 'iv-therapy-woman-relaxing.jpg',         alt: 'A patient relaxing during her IV therapy session' },
+          ].map((p, i) => (
+            <div
+              key={p.src}
+              className={`relative aspect-[4/5] md:aspect-[3/4] rounded-2xl md:rounded-3xl overflow-hidden ${i >= 2 ? 'hidden md:block' : ''}`}
+            >
+              <Image
+                src={`${DRIP_IMG_BASE}${p.src}`}
+                alt={p.alt}
+                fill
+                sizes="(max-width: 768px) 50vw, 25vw"
+                className="object-cover"
+              />
+              {/* Subtle warm wash so the strip feels like one cohesive editorial sequence */}
+              <div
+                className="absolute inset-0 pointer-events-none mix-blend-soft-light"
+                style={{ background: 'radial-gradient(ellipse at 50% 30%, rgba(255,228,196,0.5) 0%, rgba(255,228,196,0) 65%)' }}
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          2. SMART MATCH CTA — white, one emerald focal point
+          ───────────────────────────────────────────────────────────── */}
+      <section className="bg-white py-20 md:py-32 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14 md:mb-16">
+            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] mb-6 block">The Smart Match</span>
+            <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1.05] text-[clamp(2rem,5vw,4rem)] max-w-3xl mx-auto">
+              Skip the guesswork.<br />
+              <span className="font-serif italic font-normal text-[#0F6E56]">Get matched in 60 seconds.</span>
+            </h2>
+            <p className="mt-8 text-lg text-slate-500 max-w-xl mx-auto leading-relaxed font-light">
+              Five quick questions. We map your goals, location, and budget to the right clinic — and the right drip.
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
-            {featured.slice(0, 4).map((c) => {
-              const cityLine = [c.city, c.state].filter(Boolean).join(', ');
-              const initial = (c.name || '?').charAt(0).toUpperCase();
-              return (
-                <Link
-                  key={c.slug || c.name}
-                  href={`/providers/${c.slug}`}
-                  className="group flex items-center gap-3 md:gap-4 rounded-2xl bg-[#FAF9F6] border border-[#0F6E56]/10 hover:border-[#0F6E56]/40 px-3 md:px-4 py-3 md:py-4 transition-all hover:-translate-y-0.5 hover:shadow-md"
-                >
-                  <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden bg-[#0F6E56]/10 shrink-0 border border-[#0F6E56]/15">
-                    {c.image_url ? (
-                      <Image
-                        src={c.image_url}
-                        alt={c.name}
-                        fill
-                        sizes="56px"
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-[#0F6E56] font-black text-lg">
-                        {initial}
-                      </div>
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[12px] md:text-[13px] font-black text-[#0A1628] tracking-tight leading-tight truncate group-hover:text-[#0F6E56] transition-colors">
-                      {c.name}
-                    </div>
-                    <div className="text-[10.5px] md:text-[11px] text-[#3D4A5C]/80 font-medium truncate">{cityLine}</div>
-                    <div className="mt-1.5 inline-flex items-center gap-1 text-[9px] md:text-[10px] font-black uppercase tracking-[0.16em] text-[#0F6E56]">
-                      <ShieldCheck size={10} strokeWidth={2.75} /> Verified
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
+
+          <div className="flex flex-col items-center gap-6">
+            <Link
+              href="/quiz"
+              className="group inline-flex items-center gap-3 bg-[#0F6E56] hover:bg-[#0A5742] text-white px-10 py-5 rounded-full font-bold text-base transition-all shadow-[0_20px_40px_-12px_rgba(15,110,86,0.4)] hover:shadow-[0_25px_50px_-12px_rgba(15,110,86,0.5)] hover:-translate-y-0.5"
+            >
+              Start the Match Quiz
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link href="/search" className="text-sm text-slate-500 hover:text-[#0F6E56] transition-colors font-medium underline-offset-4 hover:underline">
+              Or browse all {stats.total.toLocaleString()} clinics directly
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────
-          3. BROWSE BY TREATMENT — LIGHT editorial section. The lifestyle
-             photos are the hero of each card; the type sits below in a
-             clean white card body so the photos can breathe and the page
-             reads warm and human (not dark + clinical).
-          ───────────────────────────────────────────────────────────────── */}
-      <section
-        className="py-24 md:py-32 px-6 relative overflow-hidden"
-        style={{ background: 'linear-gradient(180deg, #FAF9F6 0%, #F5EFE6 100%)' }}
-      >
-        {/* Faint emerald + warm radial atmosphere — gives the section depth
-            without going dark. */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              'radial-gradient(circle at 90% 0%, rgba(15,110,86,0.06) 0%, transparent 45%), radial-gradient(circle at 10% 100%, rgba(244,162,97,0.08) 0%, transparent 50%)',
-          }}
-        />
+      {/* ─────────────────────────────────────────────────────────────
+          3. DRIP MENU — deep ink, monochrome grid
+          ───────────────────────────────────────────────────────────── */}
+      <section className="bg-[#0A0B0D] text-white py-20 md:py-44 px-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#0F6E56]/10 rounded-full blur-[180px] pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto relative">
-          <div className="mb-14 md:mb-20 flex items-end justify-between gap-8 flex-wrap">
-            <div className="max-w-2xl">
-              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#0F6E56] mb-5 block">
-                Browse by treatment
-              </span>
-              <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] font-black text-[#0A1628] tracking-[-0.02em] leading-[1.04]">
-                The drips,
-                <br />
-                <span
-                  className="italic font-normal text-[#0F6E56]"
-                  style={{ fontFamily: 'var(--font-playfair)' }}
-                >
-                  shopped honestly.
-                </span>
+        <div className="max-w-6xl mx-auto relative">
+          <div className="mb-12 md:mb-20 flex items-end justify-between gap-8 flex-wrap">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-white/40 mb-6 block">The Menu</span>
+              <h2 className="font-black tracking-[-0.025em] leading-[1] text-[clamp(2rem,5vw,4rem)]">
+                Browse by<br />
+                <span className="font-serif italic font-normal text-[#7ED3B8]">drip type.</span>
               </h2>
-              <p className="mt-6 text-lg text-[#3D4A5C] leading-relaxed font-light max-w-xl">
-                Real ingredients. Honest price ranges. Every protocol comes with safety notes
-                and what to ask the clinic before you book.
-              </p>
             </div>
-            <Link
-              href="/treatments"
-              className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-[#0A1628] hover:text-[#0F6E56] transition-colors"
-            >
-              See all 20 treatments <ArrowUpRight size={16} />
+            <Link href="/search" className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-white/60 hover:text-white transition-colors">
+              See full directory <ArrowUpRight size={16} />
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-6">
-            {TREATMENTS.map((t) => (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {services.map((s) => (
               <Link
-                key={t.slug}
-                href={`/treatments/${t.slug}`}
-                className="group relative overflow-hidden rounded-3xl bg-white flex flex-col shadow-[0_10px_30px_-10px_rgba(10,22,40,0.12)] hover:shadow-[0_25px_50px_-15px_rgba(10,22,40,0.2)] hover:-translate-y-1 transition-all duration-300"
+                key={s.slug}
+                href={`/treatments/${s.slug}`}
+                className="group relative overflow-hidden rounded-3xl bg-white flex flex-col shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
               >
-                {/* Product image — 4:5 portrait so the lifestyle photo dominates */}
+                {/* Product image — 4:5 aspect so the IV bag photo dominates the
+                    card. Zoom on hover. */}
                 <div className="relative aspect-[4/5] bg-[#F4F6F4] overflow-hidden">
                   <Image
-                    src={`${SUPABASE_IMG}${t.image}`}
-                    alt={`${t.name} IV drip`}
+                    src={`${DRIP_IMG_BASE}${s.image}`}
+                    alt={`${s.name} IV drip`}
                     fill
                     sizes="(max-width: 768px) 50vw, 25vw"
-                    className="object-cover group-hover:scale-[1.04] transition-transform duration-[900ms] ease-out"
+                    className="object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-out"
                   />
-                  {/* Category chip pinned top-left — kept high-contrast over photo */}
+                  {/* Warm wellness vignette — soft amber-to-clear radial wash so
+                      every clinical clinic photo gets a consistent warm + human
+                      feel. Stays subtle (10-25% opacity range). */}
+                  <div
+                    className="absolute inset-0 pointer-events-none mix-blend-soft-light"
+                    style={{
+                      background: 'radial-gradient(ellipse at 50% 35%, rgba(255,228,196,0.55) 0%, rgba(255,228,196,0.0) 60%)',
+                    }}
+                  />
+                  {/* Category chip — pinned top-left, on-brand emerald */}
                   <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-sm text-[10px] font-black uppercase tracking-[0.18em] text-[#0F6E56] shadow-sm">
-                    {t.category}
+                    {s.category}
                   </span>
-                  {/* Subtle arrow wakes up on hover */}
-                  <span className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#0A1628]/70 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:translate-x-0 translate-x-1 transition-all">
+                  {/* Subtle "view product" arrow that wakes up on hover */}
+                  <span className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#0A0B0D]/70 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:translate-x-0 translate-x-1 transition-all">
                     <ArrowUpRight size={14} />
                   </span>
                 </div>
-                {/* White card body — name + tagline + small editorial flourish */}
-                <div className="px-4 md:px-5 py-4 md:py-5">
-                  <div className="font-black text-[#0A1628] text-base md:text-lg tracking-tight leading-tight">{t.name}</div>
-                  <div className="mt-1 text-[12px] md:text-[13px] text-[#3D4A5C] leading-snug font-medium">{t.tagline}</div>
-                  <div className="mt-3 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-[#0F6E56]">
-                    <span className="border-b border-[#0F6E56]/30 group-hover:border-[#0F6E56] pb-0.5 transition-colors">View clinics</span>
-                    <ArrowRight size={11} className="group-hover:translate-x-1 transition-transform" />
-                  </div>
+                {/* Card foot — name + tagline (no price band; less SaaS, more editorial) */}
+                <div className="px-4 md:px-5 py-4 md:py-5 flex flex-col gap-1.5">
+                  <div className="font-black text-slate-900 text-base md:text-lg tracking-tight">{s.name}</div>
+                  <div className="text-[12px] md:text-[13px] text-slate-500 leading-snug font-medium">{s.tagline}</div>
                 </div>
               </Link>
             ))}
           </div>
 
-          {/* Mobile "see all" link */}
-          <div className="text-center mt-12 md:hidden">
-            <Link href="/treatments" className="inline-flex items-center gap-2 text-sm font-bold text-[#0A1628] hover:text-[#0F6E56] transition-colors">
-              See all 20 treatments <ArrowUpRight size={16} />
+          <div className="text-center mt-10 md:mt-12">
+            <Link
+              href="/treatments"
+              className="inline-flex items-center gap-2 text-sm font-bold text-[#7ED3B8] hover:text-white transition-colors group"
+            >
+              <span className="border-b border-[#7ED3B8]/40 group-hover:border-white pb-0.5">See all 20 treatments</span>
+              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────
-          4. BY SITUATION — taller mood-colored cards, large emoji.
-             Cream background between two darker sections so we never
-             stack dark-on-dark.
-          ───────────────────────────────────────────────────────────────── */}
-      <section className="bg-[#FAF9F6] py-24 md:py-32 px-6">
-        <div className="max-w-7xl mx-auto">
+      {/* ─────────────────────────────────────────────────────────────
+          4. SITUATION MATCHER — light, monochrome, type-led
+          ───────────────────────────────────────────────────────────── */}
+      <section className="bg-white py-20 md:py-32 px-6">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14 md:mb-20">
-            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#0F6E56] mb-5 block">
-              By situation
-            </span>
-            <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] font-black text-[#0A1628] tracking-[-0.02em] leading-[1.05] max-w-3xl mx-auto">
-              What are you
-              <br />
-              <span
-                className="italic font-normal text-[#0F6E56]"
-                style={{ fontFamily: 'var(--font-playfair)' }}
-              >
-                actually going through?
-              </span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] mb-6 block">By Situation</span>
+            <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1.05] text-[clamp(2rem,5vw,4rem)] max-w-3xl mx-auto">
+              What are you<br />
+              <span className="font-serif italic font-normal text-[#0F6E56]">actually going through?</span>
             </h2>
-            <p className="mt-7 text-lg text-[#3D4A5C] max-w-xl mx-auto leading-relaxed font-light">
-              Pick the moment closest to yours. We'll match you with the right drip and a clinic
-              that's actually right for you.
+            <p className="mt-8 text-lg text-slate-500 max-w-xl mx-auto leading-relaxed font-light">
+              Pick the moment closest to yours. We'll match you with the right drip and clinic.
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            {SITUATIONS.map((s) => (
+            {situations.map((s) => (
               <Link
                 key={s.label}
                 href="/quiz"
-                className="group rounded-3xl p-5 md:p-7 relative overflow-hidden transition-transform hover:-translate-y-1 shadow-sm hover:shadow-xl min-h-[180px] md:min-h-[230px] flex flex-col"
+                className="group rounded-3xl p-5 md:p-7 relative overflow-hidden transition-transform hover:-translate-y-1 shadow-sm hover:shadow-xl"
                 style={{ backgroundColor: s.bg, color: s.ink }}
                 aria-label={`Quiz for ${s.label}`}
               >
-                {/* Subtle radial texture so the flat color doesn't feel printed-on */}
-                <div
-                  className="absolute inset-0 pointer-events-none opacity-50"
-                  style={{
-                    background:
-                      'radial-gradient(circle at 80% 100%, rgba(255,255,255,0.18) 0%, transparent 55%)',
-                  }}
-                />
-                <div className="relative z-10 flex flex-col h-full">
-                  <div className="text-4xl md:text-5xl mb-auto select-none" aria-hidden>
-                    {s.emoji}
-                  </div>
-                  <div
-                    className="font-black text-base md:text-[17px] leading-tight tracking-tight mt-6 mb-3"
-                    style={{ color: s.ink }}
-                  >
-                    {s.label}
-                  </div>
-                  <div className="inline-block self-start text-[10px] font-black uppercase tracking-[0.18em] px-2.5 py-1 rounded-full bg-white/85 text-slate-700">
-                    {s.drip}
-                  </div>
+                <s.Icon size={26} className="mb-6 opacity-90" strokeWidth={1.75} style={{ color: s.ink }} />
+                <div className="font-black text-base md:text-[17px] leading-tight tracking-tight mb-3" style={{ color: s.ink }}>
+                  {s.label}
+                </div>
+                <div className="inline-block text-[10px] font-black uppercase tracking-[0.18em] px-2.5 py-1 rounded-full bg-white/80 text-slate-700">
+                  {s.drip}
                 </div>
               </Link>
             ))}
@@ -414,269 +365,286 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────
-          5. FEATURED VERIFIED CLINICS — premium cards, real founder names,
-             real credentials, real first-sentence-of-description quote
-             (which IS clinically reviewed copy in the DB).
-          ───────────────────────────────────────────────────────────────── */}
-      {featured.length > 0 && (
-        <section className="bg-white py-24 md:py-32 px-6 border-t border-[#0F6E56]/10">
-          <div className="max-w-7xl mx-auto">
-            <div className="mb-14 md:mb-20 flex items-end justify-between gap-8 flex-wrap">
-              <div className="max-w-2xl">
-                <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#0F6E56] mb-5 block">
-                  Verified on TheDripMap
-                </span>
-                <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] font-black text-[#0A1628] tracking-[-0.02em] leading-[1.05]">
-                  Featured clinics.
-                  <br />
-                  <span
-                    className="italic font-normal text-[#0F6E56]"
-                    style={{ fontFamily: 'var(--font-playfair)' }}
-                  >
-                    Who we trust.
-                  </span>
-                </h2>
-                <p className="mt-6 text-lg text-[#3D4A5C] leading-relaxed font-light">
-                  Every clinic below has had their medical director, clinician, compounding pharmacy,
-                  liability insurance, and state board status verified by us before they got a Safety
-                  Verified badge.
-                </p>
-              </div>
-              <Link
-                href="/search?verified=1"
-                className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-[#0A1628] hover:text-[#0F6E56] transition-colors"
-              >
-                All verified clinics <ArrowUpRight size={16} />
-              </Link>
+      {/* ─────────────────────────────────────────────────────────────
+          4.5. FEATURED VERIFIED CLINICS — Weedmaps-style "featured brands"
+              shelf. Pulls live from getFeaturedListings (claimed clinics
+              with verified credentials). Real photos, real ratings.
+          ───────────────────────────────────────────────────────────── */}
+      {featuredClinics.length > 0 && (
+      <section className="bg-white py-20 md:py-28 px-6 border-t border-slate-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-12 md:mb-16 flex items-end justify-between gap-8 flex-wrap">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] mb-4 md:mb-6 block">Verified on TheDripMap</span>
+              <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1] text-[clamp(2rem,5vw,4rem)]">
+                Featured clinics.<br />
+                <span className="font-serif italic font-normal text-[#0F6E56]">Who we trust.</span>
+              </h2>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
-              {featured.slice(0, 3).map((c) => (
-                <FeaturedClinicCard key={c.slug || c.name} clinic={c} />
-              ))}
-            </div>
-
-            <div className="text-center mt-10 md:hidden">
-              <Link
-                href="/search?verified=1"
-                className="inline-flex items-center gap-2 text-sm font-bold text-[#0A1628] hover:text-[#0F6E56] transition-colors"
-              >
-                All verified clinics <ArrowUpRight size={16} />
-              </Link>
-            </div>
+            <Link href="/search?verified=1" className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">
+              All verified clinics <ArrowUpRight size={16} />
+            </Link>
           </div>
-        </section>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+            {featuredClinics.slice(0, 4).map((c) => {
+              const cityLine = [c.city, c.state].filter(Boolean).join(', ');
+              const tagline = ((c as { description?: string }).description || '')
+                .split(/(?<=[.!?])\s+/)[0]
+                ?.replace(/^\s+|\s+$/g, '')
+                .slice(0, 110) || ((c.specialties as string[] | undefined)?.slice(0, 2).join(' · ') || 'Verified IV therapy clinic');
+              return (
+                <Link
+                  key={c.slug || c.name}
+                  href={`/providers/${c.slug}`}
+                  className="group relative overflow-hidden rounded-3xl bg-white border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+                >
+                  <div className="relative aspect-[16/10] bg-gradient-to-br from-slate-100 to-slate-200 overflow-hidden">
+                    {c.image_url ? (
+                      <Image
+                        src={c.image_url}
+                        alt={c.name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-out"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-slate-300 text-[10px] font-black uppercase tracking-[0.25em]">
+                        TheDripMap
+                      </div>
+                    )}
+                    {/* Safety Verified pill */}
+                    <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#0F6E56] text-white text-[10px] font-black uppercase tracking-[0.18em] shadow-md">
+                      <ShieldCheck size={11} strokeWidth={2.5} /> Safety Verified
+                    </span>
+                  </div>
+                  <div className="px-4 md:px-5 py-4 md:py-5 flex flex-col gap-1.5 flex-1">
+                    <div className="font-black text-slate-900 text-base md:text-[17px] tracking-tight leading-tight">{c.name}</div>
+                    <div className="text-[12px] md:text-[13px] text-slate-500 font-medium">{cityLine}</div>
+                    {Number(c.rating) > 0 && (
+                      <div className="flex items-baseline gap-1.5 mt-1">
+                        <span className="text-[#0F6E56] font-black text-sm">★</span>
+                        <span className="text-slate-900 font-black text-sm">{Number(c.rating).toFixed(1)}</span>
+                        <span className="text-slate-400 text-xs font-bold">({c.reviewCount || 0})</span>
+                      </div>
+                    )}
+                    <p className="text-[12.5px] text-slate-500 leading-relaxed mt-2 line-clamp-2">{tagline}</p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="text-center mt-10 md:hidden">
+            <Link href="/search?verified=1" className="inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">
+              All verified clinics <ArrowUpRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
       )}
 
-      {/* ─────────────────────────────────────────────────────────────────
-          6. STATS BAND — solid brand green, 4 large numbers.
-          ───────────────────────────────────────────────────────────────── */}
-      <section className="bg-[#0F6E56] text-white py-20 md:py-24 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-y-10 md:gap-y-0">
-          <BigStat number={stats.total.toLocaleString()} suffix="+" label="Verified clinics" />
-          <BigStat number={String(stats.cities)} suffix="+" label="Cities covered" />
-          <BigStat number={String(stats.states)} label="States &amp; provinces" />
-          <BigStat number={stats.avgRating} suffix="★" label="Avg clinic rating" />
+      {/* ─────────────────────────────────────────────────────────────
+          5. CITIES — bone paper, editorial typography
+          ───────────────────────────────────────────────────────────── */}
+      <section className="bg-[#F8F7F3] py-20 md:py-32 px-6 border-b border-[#0F6E56]/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-14 md:mb-20 flex items-end justify-between gap-8 flex-wrap">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] mb-6 block">Cities</span>
+              <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1] text-[clamp(2rem,5vw,4rem)]">
+                Major metros,<br />
+                <span className="font-serif italic font-normal text-[#0F6E56]">fully mapped.</span>
+              </h2>
+            </div>
+            <Link href="/cities" className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">
+              All {stats.cities}+ cities <ArrowUpRight size={16} />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-slate-200/60 border border-slate-200/60 rounded-3xl overflow-hidden">
+            {popularCities.map((city) => (
+              <Link
+                key={city.slug}
+                href={`/cities/${city.slug}`}
+                className="group bg-[#F8F7F3] hover:bg-white p-8 md:p-10 transition-colors relative border-l-2 border-transparent hover:border-[#0F6E56]"
+              >
+                <div className="font-bold text-slate-900 text-xl tracking-tight mb-3 group-hover:text-[#0F6E56] transition-colors">
+                  {city.name}
+                </div>
+                {city.count ? (
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-2xl font-black text-[#0F6E56] tracking-tight">{city.count}</span>
+                    <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400">
+                      {city.name.toLowerCase().includes('toronto') ? 'providers' : 'clinics'}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400">View clinics</div>
+                )}
+                <ArrowUpRight size={14} className="absolute top-8 right-8 text-slate-300 group-hover:text-[#0F6E56] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+              </Link>
+            ))}
+          </div>
+
+          {/* Mobile-only fallback for the All N+ cities link hidden in the header */}
+          <div className="text-center mt-10 md:hidden">
+            <Link href="/cities" className="inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">
+              All {stats.cities}+ cities <ArrowUpRight size={16} />
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────
-          7. QUIZ CTA — dark navy close. Warm, short, two buttons.
-          ───────────────────────────────────────────────────────────────── */}
-      <section className="bg-[#0A1628] text-white py-24 md:py-36 px-6 relative overflow-hidden">
-        <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[700px] rounded-full blur-[200px] pointer-events-none"
-          style={{ background: 'rgba(15,110,86,0.18)' }}
-        />
-        <div className="max-w-3xl mx-auto text-center relative">
-          <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-white/55 mb-6 block">
-            Your match is waiting
-          </span>
-          <h2 className="text-[clamp(2.25rem,5.2vw,4.5rem)] font-black tracking-[-0.025em] leading-[1.03] mb-8">
-            Stop guessing.
-            <br />
-            <span
-              className="italic font-normal text-[#7ED3B8]"
-              style={{ fontFamily: 'var(--font-playfair)' }}
-            >
-              Start healing.
-            </span>
+      {/* ─────────────────────────────────────────────────────────────
+          6. GUIDES — light, editorial, restrained
+          ───────────────────────────────────────────────────────────── */}
+      <section className="bg-white pt-20 md:pt-32 pb-14 md:pb-16 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14 md:mb-20">
+            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] mb-6 block">Before You Book</span>
+            <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1.05] text-[clamp(2rem,5vw,4rem)] max-w-3xl mx-auto">
+              The questions <span className="font-serif italic font-normal text-[#0F6E56]">everyone asks</span>,<br />
+              answered plainly.
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            {guides.map((g) => (
+              <Link
+                key={g.num}
+                href={g.href}
+                className="group relative overflow-hidden rounded-3xl flex flex-col min-h-[420px] md:min-h-[480px] shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-500"
+              >
+                <Image
+                  src={`${GUIDE_IMG_BASE}${g.image}`}
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-[1200ms] ease-out"
+                />
+                {/* Strong dark gradient anchored at the bottom so the editorial
+                    type stays legible no matter what the chosen image looks like. */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/65 to-slate-950/30" />
+                {/* Subtle emerald wash on hover — same on-brand accent the
+                    treatments index uses. */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0F6E56]/0 to-[#0F6E56]/0 group-hover:from-[#0F6E56]/25 group-hover:to-transparent transition-all duration-500" />
+
+                <div className="relative z-10 p-7 md:p-12 flex flex-col h-full">
+                  <div className="font-serif italic text-4xl md:text-5xl text-white/45 group-hover:text-[#7ED3B8] transition-colors mb-5 md:mb-8 font-normal">
+                    {g.num}
+                  </div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/70 mb-3">{g.label}</div>
+                  <h3 className="text-xl md:text-2xl font-black text-white tracking-tight leading-[1.15] mb-4 drop-shadow">
+                    {g.title}
+                  </h3>
+                  <p className="text-white/80 text-sm leading-relaxed mb-8 flex-1 drop-shadow">{g.desc}</p>
+                  <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#7ED3B8]">
+                    <span>Read the guide</span>
+                    <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-14 flex flex-wrap gap-x-8 gap-y-3 items-center justify-center text-sm">
+            <span className="font-bold uppercase tracking-[0.2em] text-[10px] text-slate-400">More guides</span>
+            <Link href="/guide/mobile-iv-therapy-vs-clinic" className="font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">Mobile vs in-clinic</Link>
+            <span className="text-slate-300">·</span>
+            <Link href="/guide/iv-therapy-vs-oral-supplements" className="font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">IV vs oral supplements</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          7. BLOG — bone paper, editorial
+          ───────────────────────────────────────────────────────────── */}
+      <section className="bg-[#F8F7F3] pt-14 md:pt-16 pb-20 md:pb-32 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-14 md:mb-20 flex items-end justify-between gap-8 flex-wrap">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] mb-6 block">Latest</span>
+              <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1] text-[clamp(2rem,5vw,4rem)]">
+                From the <span className="font-serif italic font-normal text-[#0F6E56]">journal.</span>
+              </h2>
+            </div>
+            <Link href="/blog" className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">
+              All articles <ArrowUpRight size={16} />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            {latestPosts.map((post, idx) => (
+              <BlogCard key={idx} post={post} index={idx} />
+            ))}
+          </div>
+
+          <div className="text-center mt-10 md:hidden">
+            <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">
+              All articles <ArrowUpRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          8. TRUST SIGNALS — keeps the existing component but lets it
+             breathe within the new rhythm
+          ───────────────────────────────────────────────────────────── */}
+      <TrustSignals stats={{
+        totalListings: stats.total,
+        totalCities: stats.cities,
+        totalStates: stats.states,
+        avgRating: parseFloat(stats.avgRating),
+      }} />
+
+      {/* ─────────────────────────────────────────────────────────────
+          9. CLOSING CTA — single emerald moment, sparse copy
+          ───────────────────────────────────────────────────────────── */}
+      <section className="bg-[#0F6E56] text-white py-20 md:py-36 px-6 relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[800px] bg-white/5 rounded-full blur-[200px] pointer-events-none" />
+        <div className="absolute inset-x-0 top-0 h-px bg-white/20" />
+
+        <div className="max-w-4xl mx-auto text-center relative">
+          <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-white/50 mb-8 block">Your match is waiting</span>
+          <h2 className="font-black tracking-[-0.025em] leading-[1] text-[clamp(2.5rem,6vw,5rem)] mb-10">
+            Stop guessing.<br />
+            <span className="font-serif italic font-normal text-white/85">Start healing.</span>
           </h2>
-          <p className="text-lg md:text-xl text-white/75 max-w-xl mx-auto mb-12 leading-relaxed font-light">
-            Five questions. One verified match. The right drip, the right clinic, the first time.
+          <p className="text-lg md:text-xl text-white/70 max-w-xl mx-auto mb-14 leading-relaxed font-light">
+            Five questions. One match. The right drip, the right clinic, the first time.
           </p>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4">
             <Link
               href="/quiz"
-              className="group inline-flex items-center justify-center gap-3 bg-white text-[#0F6E56] px-10 py-5 rounded-full font-bold text-base transition-all hover:bg-white/95 hover:-translate-y-0.5 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.4)]"
+              className="group inline-flex items-center justify-center gap-3 bg-white text-[#0F6E56] px-10 py-5 rounded-full font-bold text-base transition-all hover:bg-white/95 hover:-translate-y-0.5 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.3)]"
             >
-              Get my match now
+              Get My Match Now
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               href="/search"
-              className="inline-flex items-center justify-center gap-2 text-white/85 hover:text-white px-10 py-5 rounded-full font-bold text-base border border-white/25 hover:border-white/55 transition-colors"
+              className="inline-flex items-center justify-center gap-2 text-white/85 hover:text-white px-10 py-5 rounded-full font-bold text-base border border-white/25 hover:border-white/50 transition-colors"
             >
-              Browse clinics
+              Browse Clinics
             </Link>
           </div>
         </div>
       </section>
 
+      {/* ─────────────────────────────────────────────────────────────
+          10. CLINICIAN SECTION — keep existing component
+          ───────────────────────────────────────────────────────────── */}
+      <ClinicianSection stats={{
+        totalListings: stats.total,
+        totalCities: stats.cities,
+        totalStates: stats.states,
+        avgRating: parseFloat(stats.avgRating),
+        isLive: true,
+      }} />
+
       <Footer />
     </div>
-  );
-}
-
-// ── Hero stat (small) ───────────────────────────────────────────────
-function Stat({ number, label, suffix }: { number: string; label: string; suffix?: string }) {
-  return (
-    <div>
-      <div className="flex items-baseline gap-0.5">
-        <span className="text-2xl md:text-3xl font-black tracking-tight text-[#0A1628] tabular-nums">{number}</span>
-        {suffix && <span className="text-lg md:text-xl font-black text-[#0F6E56]">{suffix}</span>}
-      </div>
-      <div className="mt-1 text-[10px] md:text-[11px] font-black uppercase tracking-[0.18em] text-[#3D4A5C]/70">
-        {label}
-      </div>
-    </div>
-  );
-}
-
-// ── Big stat (band) ─────────────────────────────────────────────────
-function BigStat({ number, suffix, label }: { number: string; suffix?: string; label: string }) {
-  return (
-    <div className="text-center px-4">
-      <div className="flex items-baseline justify-center gap-0.5">
-        <span className="text-5xl md:text-7xl font-black tracking-tight tabular-nums">{number}</span>
-        {suffix && <span className="text-2xl md:text-3xl font-black text-white/75">{suffix}</span>}
-      </div>
-      <div className="mt-3 text-[11px] font-bold uppercase tracking-[0.22em] text-white/70" dangerouslySetInnerHTML={{ __html: label }} />
-    </div>
-  );
-}
-
-// ── Hero clinic card — the WHO + WHAT trust anchor ─────────────────
-interface HeroClinic {
-  name: string;
-  slug?: string | null;
-  city?: string | null;
-  state?: string | null;
-  rating?: number;
-  reviewCount?: number;
-  image_url?: string | null;
-  description?: string | null;
-  amenities?: string[] | null;
-  specialties?: string[] | null;
-}
-function HeroClinicCard({ clinic }: { clinic: HeroClinic }) {
-  const credential = leadingCredential(clinic.name, clinic.slug || null);
-  const cityLine = [clinic.city, clinic.state].filter(Boolean).join(', ');
-  return (
-    <Link
-      href={`/providers/${clinic.slug}`}
-      className="group relative overflow-hidden rounded-[2rem] bg-white shadow-[0_30px_80px_-30px_rgba(10,22,40,0.25)] border border-[#0F6E56]/10 block hover:-translate-y-1 transition-transform duration-300"
-    >
-      <div className="relative aspect-[5/4] bg-gradient-to-br from-[#F4F6F4] to-[#E8EFE8] overflow-hidden">
-        {clinic.image_url ? (
-          <Image
-            src={clinic.image_url}
-            alt={clinic.name}
-            fill
-            sizes="(max-width: 1024px) 100vw, 40vw"
-            className="object-cover group-hover:scale-[1.03] transition-transform duration-[800ms] ease-out"
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-[#0F6E56]/30 text-xs font-black uppercase tracking-[0.25em]">
-            Verified clinic
-          </div>
-        )}
-        {/* Safety Verified badge */}
-        <div className="absolute bottom-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0F6E56] text-white text-[10px] font-black uppercase tracking-[0.18em] shadow-lg">
-          <ShieldCheck size={12} strokeWidth={2.5} /> Safety Verified
-        </div>
-      </div>
-      <div className="px-6 md:px-8 pt-6 pb-7">
-        <div className="flex items-center gap-2 mb-3 text-[11px] font-black uppercase tracking-[0.22em] text-[#0F6E56]">
-          <Stethoscope size={12} /> {credential}
-        </div>
-        <div className="text-2xl md:text-[26px] font-black tracking-tight leading-[1.1] text-[#0A1628] mb-1">
-          {clinic.name}
-        </div>
-        <div className="flex items-center gap-2 text-sm text-[#3D4A5C] font-medium mb-4">
-          <MapPin size={14} className="text-[#0F6E56]" />
-          <span>{cityLine}</span>
-        </div>
-        <div className="flex items-center gap-3 pt-4 border-t border-[#0F6E56]/10">
-          <div className="flex items-center gap-1 text-[#0F6E56]">
-            <Star size={14} fill="currentColor" />
-            <span className="text-[#0A1628] font-black text-sm">{Number(clinic.rating || 0).toFixed(1)}</span>
-            <span className="text-[#3D4A5C] text-xs font-bold">({clinic.reviewCount || 0})</span>
-          </div>
-          <span className="text-[#0F6E56]/30">·</span>
-          <span className="text-xs font-bold text-[#3D4A5C]">
-            5/5 safety checks passed
-          </span>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-// ── Featured Verified Clinic card (Featured section) ───────────────
-function FeaturedClinicCard({ clinic }: { clinic: HeroClinic }) {
-  const credential = leadingCredential(clinic.name, clinic.slug || null);
-  const quote = founderQuote(clinic.name, clinic.description);
-  const cityLine = [clinic.city, clinic.state].filter(Boolean).join(', ');
-  return (
-    <article className="group relative rounded-[2rem] bg-[#FAF9F6] border border-[#0F6E56]/10 overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 shadow-sm">
-      <Link href={`/providers/${clinic.slug}`} className="relative block aspect-square bg-gradient-to-br from-[#F4F6F4] to-[#E8EFE8] overflow-hidden">
-        {clinic.image_url ? (
-          <Image
-            src={clinic.image_url}
-            alt={clinic.name}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-            className="object-cover group-hover:scale-[1.04] transition-transform duration-[1000ms] ease-out"
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-[#0F6E56]/30 text-xs font-black uppercase tracking-[0.25em]">
-            Verified clinic
-          </div>
-        )}
-        <div className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0F6E56] text-white text-[10px] font-black uppercase tracking-[0.18em] shadow-lg">
-          <ShieldCheck size={12} strokeWidth={2.5} /> Safety Verified
-        </div>
-      </Link>
-      <div className="p-7 md:p-8 flex flex-col flex-1">
-        <div className="text-[11px] font-black uppercase tracking-[0.22em] text-[#0F6E56] mb-3">
-          {credential}
-        </div>
-        <h3 className="text-2xl md:text-[28px] font-black tracking-tight leading-[1.05] text-[#0A1628] mb-2" style={{ fontFamily: 'var(--font-playfair)' }}>
-          {clinic.name}
-        </h3>
-        <div className="flex items-center gap-2 text-sm text-[#3D4A5C] font-medium mb-5">
-          <MapPin size={14} className="text-[#0F6E56]" />
-          <span>{cityLine}</span>
-        </div>
-        <blockquote className="text-[15px] text-[#3D4A5C] leading-relaxed font-light italic border-l-2 border-[#0F6E56]/30 pl-4 mb-6 flex-1">
-          &ldquo;{quote}&rdquo;
-        </blockquote>
-        <div className="flex items-center justify-between pt-5 border-t border-[#0F6E56]/10">
-          <div className="flex items-center gap-1.5 text-sm">
-            <Star size={14} className="text-[#0F6E56]" fill="currentColor" />
-            <span className="font-black text-[#0A1628]">{Number(clinic.rating || 0).toFixed(1)}</span>
-            <span className="text-[#3D4A5C] text-xs font-bold">({clinic.reviewCount || 0})</span>
-          </div>
-          <Link
-            href={`/providers/${clinic.slug}`}
-            className="inline-flex items-center gap-2 bg-[#0A1628] hover:bg-[#0F6E56] text-white px-5 py-2.5 rounded-full font-black text-xs uppercase tracking-[0.15em] transition-colors"
-          >
-            Book now <ArrowRight size={14} />
-          </Link>
-        </div>
-      </div>
-    </article>
   );
 }
