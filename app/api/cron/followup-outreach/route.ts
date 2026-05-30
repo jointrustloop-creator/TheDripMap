@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../../src/lib/mailer';
+import { saveDrafts, type DraftPayload } from '../../../../src/lib/draft-saver';
 
 const SITE_URL = 'https://www.thedripmap.com';
 const DAILY_TARGET = 15;
 const FOLLOWUP_DAYS = 7;
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 function cleanName(n: string): string {
   return n
@@ -17,107 +18,43 @@ function cleanName(n: string): string {
     .trim();
 }
 
+function locationLabel(p: ProviderRow): string {
+  const city = (p.city || '').trim();
+  const state = (p.state || '').trim();
+  if (city && state) return `${city}, ${state}`;
+  return city || state || 'location';
+}
+
 interface ProviderRow {
+  id: string;
   name: string;
   slug: string;
   rating: number | null;
   reviews: string | number | null;
   email: string | null;
+  country: string | null;
+  city: string | null;
+  state: string | null;
   outreach_sent_at: string | null;
 }
 
-// GET /api/cron/followup-outreach
-// Sends a second-touch email to clinics that:
-//   - received first outreach (outreach_sent = true)
-//   - were emailed >= 7 days ago (outreach_sent_at)
-//   - did NOT claim (is_featured = false)
-//   - did NOT bounce (email_bounced != true)
-//   - have not received a follow-up yet (followup_sent != true)
-//
-// Industry data: a 7-day follow-up roughly doubles cold-outreach conversion.
-// Cron schedule (vercel.json): 14:00 UTC daily, an hour after first-touch cron.
-//
-// Auth: Vercel attaches Authorization: Bearer ${CRON_SECRET}
-export async function GET(req: Request) {
-  const expected = process.env.CRON_SECRET;
-  if (!expected) {
-    return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
-  }
-  const auth = req.headers.get('authorization') || '';
-  if (auth !== `Bearer ${expected}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+function isCanadian(country?: string | null): boolean {
+  return (country || '').trim().toLowerCase() === 'canada';
+}
 
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    return NextResponse.json({ error: 'SMTP_USER/SMTP_PASS required' }, { status: 500 });
-  }
+function isEligibleEmail(email: string | null | undefined): boolean {
+  if (!email) return false;
+  const e = email.trim().toLowerCase();
+  if (!e) return false;
+  if (/\.(jpe?g|png|gif|webp|svg)$/i.test(e)) return false;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return false;
+  return true;
+}
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
-  // Staggered sending: fires every 2 min during the 10am-ET window
-  // (vercel.json: "*/2 14 * * *") and sends ONE follow-up per invocation —
-  // a natural ~30-minute drip rather than a 15-email burst. Daily cap is
-  // enforced by counting today's follow-ups already sent.
-  const startOfDay = new Date();
-  startOfDay.setUTCHours(0, 0, 0, 0);
-  const { count: sentTodayCount } = await supabase
-    .from('providers')
-    .select('id', { count: 'exact', head: true })
-    .gte('followup_sent_at', startOfDay.toISOString());
-  const sentToday = sentTodayCount || 0;
-
-  if (sentToday >= DAILY_TARGET) {
-    return NextResponse.json({ ok: true, skipped: 'daily target reached', sentToday });
-  }
-
-  const cutoff = new Date(Date.now() - FOLLOWUP_DAYS * 24 * 60 * 60 * 1000).toISOString();
-
-  const { data, error } = await supabase
-    .from('providers')
-    .select('name, slug, rating, reviews, email, outreach_sent_at')
-    .neq('availability', false)
-    .eq('is_featured', false)
-    .eq('outreach_sent', true)
-    .neq('followup_sent', true)
-    .neq('email_bounced', true)
-    .lte('outreach_sent_at', cutoff)
-    .not('email', 'is', null)
-    .neq('email', '')
-    .order('outreach_sent_at', { ascending: true })
-    .limit(DAILY_TARGET * 5);
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  // Re-rank inside the eligible set by rating (still prioritize best clinics)
-  const score = (p: ProviderRow) =>
-    (Number(p.rating) || 0) * Math.log10((Number(p.reviews) || 0) + 1);
-  const ranked = (data as ProviderRow[])
-    .sort((a, b) => {
-      const s = score(b) - score(a);
-      return s !== 0 ? s : a.slug.localeCompare(b.slug);
-    })
-    .slice(0, DAILY_TARGET);
-
-  if (ranked.length === 0) {
-    return NextResponse.json({ ok: true, skipped: 'no eligible follow-ups remaining', sentToday });
-  }
-
-  // Send exactly ONE follow-up this invocation — the highest-ranked eligible.
-  //
-  // CAN-SPAM / CASL: the email includes an unsubscribe notice. Inbound replies are
-  // processed daily by /api/cron/process-unsubscribes (reads the info@ mailbox via
-  // IMAP, matches "unsubscribe" replies to a provider by From address, and sets
-  // email_bounced = true). This cron already skips those via .neq('email_bounced', true).
-  const p = ranked[0];
+function buildSingleFollowupBody(p: ProviderRow): string {
   const display = cleanName(p.name);
   const claimUrl = `${SITE_URL}/providers/${p.slug}?claim=1`;
-  const subject = `Following up — your ${display} listing on TheDripMap`;
-  const text = `Hi ${display} team,
+  return `Hi ${display} team,
 
 Following up on the note I sent last week about claiming your free listing on TheDripMap — I know inboxes can be busy.
 
@@ -134,75 +71,228 @@ info@thedripmap.com
 
 —
 To unsubscribe from TheDripMap outreach emails, reply with 'unsubscribe' in the subject line or email info@thedripmap.com`;
+}
 
-  let mailOk = false;
-  let mailError: string | undefined;
-  try {
-    const mail = await sendMail({
-      from: 'TheDripMap <info@thedripmap.com>',
-      to: p.email!,
-      replyTo: 'info@thedripmap.com',
-      subject,
-      text,
-    });
-    mailOk = mail.ok;
-    mailError = mail.error;
-  } catch (err) {
-    mailError = err instanceof Error ? err.message : String(err);
+function buildMultiLocationFollowupBody(providers: ProviderRow[], email: string): string {
+  const brand = cleanName(providers[0].name);
+  const count = providers.length;
+  const locations = providers.map((p) => {
+    const url = `${SITE_URL}/providers/${p.slug}?claim=1`;
+    return `  • ${cleanName(p.name)} — ${locationLabel(p)}\n    ${url}`;
+  }).join('\n');
+  return `Hi ${brand} team,
+
+Following up on the note I sent last week — ${count} of your locations are still unclaimed on TheDripMap:
+
+${locations}
+
+Quick recap: visitors see a generic placeholder on each one instead of your real photos, hours, services, and description. Claiming each is free and takes 2 minutes.
+
+I sent this once to ${email.toLowerCase().trim()} because all ${count} locations share that email — so you only hear from me once, not ${count} times.
+
+If I'm reaching the wrong person, would you mind forwarding this to whoever handles marketing or the front desk?
+
+Warmly,
+Deborah Triandafilou
+TheDripMap
+info@thedripmap.com
+
+—
+To unsubscribe from TheDripMap outreach emails, reply with 'unsubscribe' in the subject line or email info@thedripmap.com`;
+}
+
+// GET /api/cron/followup-outreach
+// Fires once daily (vercel.json: "0 14 * * *" = 10am ET). Prepares up to 15
+// follow-up DRAFTS for clinics that received first-touch outreach >= 7 days ago
+// and have not claimed. Same email-grouping + Canadian-first ordering as the
+// daily-outreach cron.
+//
+// Idempotent: if any followup_sent_at exists for today, no-op.
+export async function GET(req: Request) {
+  const expected = process.env.CRON_SECRET;
+  if (!expected) return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
+  if ((req.headers.get('authorization') || '') !== `Bearer ${expected}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    return NextResponse.json({ error: 'SMTP_USER/SMTP_PASS required' }, { status: 500 });
   }
 
-  // On failure, DON'T mark sent — the next 2-minute run retries this clinic.
-  if (!mailOk) {
-    return NextResponse.json({ ok: false, sent: false, slug: p.slug, error: mailError });
-  }
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
 
-  await supabase
+  const startOfDay = new Date();
+  startOfDay.setUTCHours(0, 0, 0, 0);
+  const { count: preparedToday } = await supabase
     .from('providers')
-    .update({ followup_sent: true, followup_sent_at: new Date().toISOString() })
-    .eq('slug', p.slug);
+    .select('id', { count: 'exact', head: true })
+    .gte('followup_sent_at', startOfDay.toISOString());
+  if ((preparedToday || 0) > 0) {
+    return NextResponse.json({ ok: true, skipped: 'followup drafts already prepared today', preparedToday });
+  }
 
-  const newSentToday = sentToday + 1;
-  const batchDone = newSentToday >= DAILY_TARGET || ranked.length <= 1;
-  const today = new Date().toISOString().slice(0, 10);
+  const cutoff = new Date(Date.now() - FOLLOWUP_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
-  let reportSent = false;
-  if (batchDone) {
-    const { data: todaySends } = await supabase
-      .from('providers')
-      .select('name, slug, email, followup_sent_at')
-      .gte('followup_sent_at', startOfDay.toISOString())
-      .order('followup_sent_at', { ascending: true });
-    const sends = todaySends || [];
-    const reportLines = [
-      `Daily FOLLOW-UP outreach report — ${today}`,
-      '',
-      `Sent today: ${sends.length}`,
-      `Stopped because: ${newSentToday >= DAILY_TARGET ? 'daily target reached' : 'eligible pool exhausted'}`,
-      '',
-      'Recipients (in send order):',
-      ...sends.map((r) => `✓ ${cleanName(r.name)} — ${r.email}`),
-    ];
+  const { data, error } = await supabase
+    .from('providers')
+    .select('id, name, slug, rating, reviews, email, country, city, state, outreach_sent_at')
+    .neq('availability', false)
+    .eq('is_featured', false)
+    .eq('outreach_sent', true)
+    .neq('followup_sent', true)
+    .neq('email_bounced', true)
+    .lte('outreach_sent_at', cutoff)
+    .not('email', 'is', null)
+    .neq('email', '')
+    .order('outreach_sent_at', { ascending: true })
+    .limit(DAILY_TARGET * 30);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  const candidates = (data as ProviderRow[]).filter((p) => isEligibleEmail(p.email));
+
+  if (candidates.length === 0) {
+    const today = new Date().toISOString().slice(0, 10);
     try {
       await sendMail({
         from: 'TheDripMap <info@thedripmap.com>',
         to: 'info@thedripmap.com',
-        subject: `[TheDripMap] Daily follow-up report — ${today} — ${sends.length} sent`,
-        text: reportLines.join('\n'),
+        subject: `[TheDripMap] 0 followup drafts ready for review — pool exhausted`,
+        text: `Daily followup drafts — ${today}\n\nNo clinics eligible for a 7-day follow-up today.`,
       });
-      reportSent = true;
     } catch (err) {
-      console.error('followup report email failed:', err);
+      console.error('followup pool-exhausted report failed:', err);
     }
+    return NextResponse.json({ ok: true, skipped: 'no eligible follow-ups' });
+  }
+
+  // Score by rating × log10(reviews+1) — same as daily outreach.
+  const score = (p: ProviderRow) =>
+    (Number(p.rating) || 0) * Math.log10((Number(p.reviews) || 0) + 1);
+
+  // Group by lowercased email.
+  const groups = new Map<string, ProviderRow[]>();
+  for (const p of candidates) {
+    const k = (p.email || '').trim().toLowerCase();
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k)!.push(p);
+  }
+  for (const arr of groups.values()) {
+    arr.sort((a, b) => {
+      const s = score(b) - score(a);
+      return s !== 0 ? s : (a.slug || '').localeCompare(b.slug || '');
+    });
+  }
+
+  // Canadian first, then by anchor score.
+  const groupArr = Array.from(groups.entries()).map(([email, providers]) => ({
+    email, providers, anchor: providers[0],
+  }));
+  groupArr.sort((a, b) => {
+    const aCa = isCanadian(a.anchor.country) ? 0 : 1;
+    const bCa = isCanadian(b.anchor.country) ? 0 : 1;
+    if (aCa !== bCa) return aCa - bCa;
+    const s = score(b.anchor) - score(a.anchor);
+    return s !== 0 ? s : (a.anchor.slug || '').localeCompare(b.anchor.slug || '');
+  });
+
+  const selected = groupArr.slice(0, DAILY_TARGET);
+
+  const drafts: DraftPayload[] = selected.map(({ email, providers }) => {
+    const anchor = providers[0];
+    const display = cleanName(anchor.name);
+    const subject = providers.length > 1
+      ? `Following up — your ${display} locations on TheDripMap`
+      : `Following up — your ${display} listing on TheDripMap`;
+    const text = providers.length > 1
+      ? buildMultiLocationFollowupBody(providers, email)
+      : buildSingleFollowupBody(anchor);
+    return {
+      from: 'TheDripMap <info@thedripmap.com>',
+      to: email,
+      replyTo: 'info@thedripmap.com',
+      subject,
+      text,
+    };
+  });
+
+  let draftResults;
+  try {
+    draftResults = await saveDrafts(drafts);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: `saveDrafts failed: ${msg}` }, { status: 500 });
+  }
+
+  const nowIso = new Date().toISOString();
+  let savedDrafts = 0;
+  let savedListings = 0;
+  const failures: { email: string; error: string }[] = [];
+  for (let i = 0; i < selected.length; i++) {
+    const res = draftResults[i];
+    const { email, providers } = selected[i];
+    if (!res.ok) {
+      failures.push({ email, error: res.error || 'unknown' });
+      continue;
+    }
+    const ids = providers.map((p) => p.id);
+    const { error: updErr } = await supabase
+      .from('providers')
+      .update({ followup_sent: true, followup_sent_at: nowIso })
+      .in('id', ids);
+    if (updErr) {
+      failures.push({ email, error: `db: ${updErr.message}` });
+      continue;
+    }
+    savedDrafts += 1;
+    savedListings += providers.length;
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+  const caDrafts = selected.filter((g) => isCanadian(g.anchor.country)).length;
+  const usDrafts = selected.length - caDrafts;
+  const reportLines = [
+    `Daily FOLLOW-UP drafts — ${today}`,
+    '',
+    `Drafts prepared: ${savedDrafts} (covering ${savedListings} provider listings)`,
+    `Canadian drafts: ${caDrafts}`,
+    `US drafts: ${usDrafts}`,
+    '',
+    'Open Gmail Drafts to review and send:',
+    'https://mail.google.com/mail/u/0/#drafts',
+    '',
+    'Recipients (in draft order):',
+    ...selected.map(({ email, providers, anchor }) => {
+      const tag = isCanadian(anchor.country) ? 'CA' : 'US';
+      const brand = cleanName(anchor.name);
+      const note = providers.length > 1 ? ` (${providers.length} listings)` : '';
+      return `✓ [${tag}] ${brand} — ${email}${note}`;
+    }),
+    ...(failures.length ? ['', 'Failures:', ...failures.map((f) => `✗ ${f.email}: ${f.error}`)] : []),
+  ];
+  let reportSent = false;
+  try {
+    await sendMail({
+      from: 'TheDripMap <info@thedripmap.com>',
+      to: 'info@thedripmap.com',
+      subject: `[TheDripMap] ${savedDrafts} followup drafts ready for review`,
+      text: reportLines.join('\n'),
+    });
+    reportSent = true;
+  } catch (err) {
+    console.error('followup drafts report email failed:', err);
   }
 
   return NextResponse.json({
     ok: true,
     date: today,
-    sent: true,
-    slug: p.slug,
-    name: display,
-    sentToday: newSentToday,
-    batchDone,
+    drafts: savedDrafts,
+    listings: savedListings,
+    caDrafts,
+    usDrafts,
+    failures,
     reportSent,
   });
 }
