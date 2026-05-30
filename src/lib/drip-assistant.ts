@@ -39,9 +39,30 @@ function haversineMi(aLat: number, aLng: number, bLat: number, bLng: number): nu
   return 2 * R * Math.asin(Math.sqrt(s));
 }
 
+// Side-by-side comparison payload — emitted by compare_providers so the
+// widget can render a small comparison table inside the chat.
+export interface ComparePayload {
+  providers: Array<{
+    name: string;
+    slug: string | null;
+    city: string | null;
+    state: string | null;
+    rating: number | null;
+    reviewCount: number | null;
+    safetyVerified: boolean;
+    claimed: boolean;
+    treatments: string[];
+    priceRange: string;
+    distanceMi: number | null;
+    bookable: boolean;
+    phone: string | null;
+  }>;
+}
+
 export interface ToolOutcome {
   forModel: string; // JSON/text the model reads
   clinics?: AssistantClinic[]; // structured cards for the UI
+  comparison?: ComparePayload; // optional side-by-side payload for the widget
 }
 
 const SAFETY_FLAGS = [
@@ -676,6 +697,7 @@ async function compareProviders(input: { slugs?: unknown }): Promise<ToolOutcome
     }),
     // Also produce clinic cards so the widget can pin BOOK/CALL CTAs on them.
     clinics: byInputOrder.map((p) => toClinic(p, verifiedSet.has(p.id))),
+    comparison: { providers: compared },
   };
 }
 

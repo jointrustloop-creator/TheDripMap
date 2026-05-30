@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { buildSystemPrompt, TOOL_SCHEMAS, runTool, type AssistantClinic, type AssistantConfig } from '../../../src/lib/drip-assistant';
+import { buildSystemPrompt, TOOL_SCHEMAS, runTool, type AssistantClinic, type AssistantConfig, type ComparePayload } from '../../../src/lib/drip-assistant';
 import { getServiceSupabase } from '../../../src/lib/supabase';
 import { getWhitelabelConfig } from '../../../src/lib/whitelabel-configs';
 
@@ -126,6 +126,7 @@ export async function POST(req: Request) {
 
   const system = buildSystemPrompt(whitelabelConfig || {}, { city: userCity, hasCoords: !!userCoords, clinicCount });
   let lastClinics: AssistantClinic[] = [];
+  let lastComparison: ComparePayload | null = null;
   let finalText = '';
 
   try {
@@ -151,6 +152,7 @@ export async function POST(req: Request) {
           }
           const outcome = await runTool(tu.name, toolInput);
           if (outcome.clinics?.length) roundClinics.push(...outcome.clinics);
+          if (outcome.comparison) lastComparison = outcome.comparison;
           toolResults.push({ type: 'tool_result', tool_use_id: tu.id, content: outcome.forModel });
         }
         if (roundClinics.length) lastClinics = roundClinics;
@@ -195,5 +197,5 @@ export async function POST(req: Request) {
       }
     : null;
 
-  return NextResponse.json({ reply: finalText, clinics, whitelabel: whitelabelMeta });
+  return NextResponse.json({ reply: finalText, clinics, whitelabel: whitelabelMeta, comparison: lastComparison });
 }

@@ -15,7 +15,22 @@ interface Clinic {
   phone?: string | null;
 }
 interface Coords { lat: number; lng: number }
-interface Msg { role: 'user' | 'assistant'; content: string; clinics?: Clinic[]; greeting?: boolean }
+interface ComparisonRow {
+  name: string; slug: string | null;
+  city: string | null; state: string | null;
+  rating: number | null; reviewCount: number | null;
+  safetyVerified: boolean; claimed: boolean;
+  treatments: string[]; priceRange: string;
+  distanceMi: number | null; bookable: boolean; phone: string | null;
+}
+interface Comparison { providers: ComparisonRow[] }
+interface Msg {
+  role: 'user' | 'assistant';
+  content: string;
+  clinics?: Clinic[];
+  comparison?: Comparison;
+  greeting?: boolean;
+}
 
 const GREETING = 'Hi! I can help you find the right IV therapy or peptide clinic near you — or answer quick questions about treatments. What are you looking for?';
 
@@ -57,6 +72,60 @@ function slugify(name: string) {
 function telHref(phone: string): string {
   const digits = phone.replace(/[^\d+]/g, '');
   return `tel:${digits}`;
+}
+
+// Side-by-side comparison rendered when the agent calls compare_providers.
+// Compact 2-3 column table tuned for the chat's narrow viewport.
+function ComparisonTable({ data }: { data: Comparison }) {
+  const rows = data.providers.slice(0, 3);
+  if (rows.length < 2) return null;
+  return (
+    <div className="mt-2 bg-white rounded-2xl border border-slate-200 overflow-hidden">
+      <div className="px-3 py-2 bg-emerald-50 border-b border-emerald-100">
+        <div className="text-[10px] font-black uppercase tracking-wider text-emerald-700">Side-by-side</div>
+      </div>
+      <div className="grid" style={{ gridTemplateColumns: `repeat(${rows.length}, minmax(0, 1fr))` }}>
+        {rows.map((r) => (
+          <div key={r.slug || r.name} className="p-3 border-r last:border-r-0 border-slate-100">
+            <div className="text-xs font-black text-slate-900 truncate" title={r.name}>{r.name}</div>
+            <div className="mt-1 space-y-1 text-[11px] text-slate-600">
+              {r.rating != null && r.rating > 0 ? (
+                <div className="inline-flex items-center gap-0.5 font-bold text-slate-700">
+                  <Star size={10} fill="currentColor" className="text-amber-400" />
+                  {r.rating.toFixed(1)}
+                  {r.reviewCount ? <span className="text-slate-400 font-medium"> · {r.reviewCount}</span> : null}
+                </div>
+              ) : (
+                <div className="text-slate-400">No rating yet</div>
+              )}
+              <div>
+                {r.safetyVerified ? (
+                  <span className="inline-flex items-center gap-0.5 text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100 px-1.5 py-0.5 rounded-full">
+                    <ShieldCheck size={9} /> Verified
+                  </span>
+                ) : r.claimed ? (
+                  <span className="text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100 px-1.5 py-0.5 rounded-full">Claimed</span>
+                ) : (
+                  <span className="text-[9px] font-black uppercase tracking-wider bg-slate-50 text-slate-500 border border-slate-100 px-1.5 py-0.5 rounded-full">Unclaimed</span>
+                )}
+              </div>
+              <div className="text-[11px] text-slate-500">
+                <span className="font-bold text-slate-700">Price:</span>{' '}
+                <span className="truncate inline-block max-w-full" title={r.priceRange}>{r.priceRange}</span>
+              </div>
+              <div className="text-[11px] text-slate-500">
+                <span className="font-bold text-slate-700">Booking:</span>{' '}
+                {r.bookable ? 'Online' : r.phone ? 'By phone' : 'Contact'}
+              </div>
+              {r.distanceMi != null && (
+                <div className="text-[11px] text-[#0F6E56] font-bold">{r.distanceMi} mi away</div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function ClinicMiniCard({ c }: { c: Clinic }) {
@@ -223,7 +292,7 @@ export const DripAssistant = (props: WhitelabelProps = {}) => {
       const data = await res.json();
       if (!res.ok) setMessages((m) => [...m, { role: 'assistant', content: data.error || 'Sorry, something went wrong. Please try again.' }]);
       else {
-        setMessages((m) => [...m, { role: 'assistant', content: data.reply, clinics: data.clinics }]);
+        setMessages((m) => [...m, { role: 'assistant', content: data.reply, clinics: data.clinics, comparison: data.comparison }]);
         // If we didn't know the user's city, learn it from the matched results so
         // future "near me" turns don't have to ask again.
         if (!userCity && Array.isArray(data.clinics) && data.clinics[0]?.city) {
@@ -367,6 +436,28 @@ export const DripAssistant = (props: WhitelabelProps = {}) => {
                 </div>
                 {m.clinics && m.clinics.length > 0 && (
                   <div className="mt-2 space-y-2">{m.clinics.map((c) => <ClinicMiniCard key={c.slug || c.name} c={c} />)}</div>
+                )}
+                {/* "Compare these" link — only when the agent surfaced exactly */}
+                {/* 3 clinics AND hasn't already produced a comparison this turn. */}
+                {m.role === 'assistant' && m.clinics && m.clinics.length >= 2 && !m.comparison && (
+                  <button
+                    onClick={() => {
+                      const slugs = (m.clinics || [])
+                        .map((c) => c.slug || slugify(c.name))
+                        .filter(Boolean)
+                        .slice(0, 3);
+                      // The synthetic user message includes the slugs so the
+                      // model has them in context for the compare_providers call.
+                      const slugHint = slugs.length ? ` (${slugs.join(', ')})` : '';
+                      sendText(`Compare those three for me${slugHint}.`);
+                    }}
+                    className="mt-2 inline-flex items-center gap-1 text-[11px] font-black text-[#0F6E56] hover:underline"
+                  >
+                    Compare these <ArrowRight size={11} />
+                  </button>
+                )}
+                {m.comparison && m.comparison.providers && m.comparison.providers.length >= 2 && (
+                  <ComparisonTable data={m.comparison} />
                 )}
               </div>
             ))}
