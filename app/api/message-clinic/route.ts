@@ -18,16 +18,16 @@ export async function POST(req: Request) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    // listing_id is left null because the existing FK points at the orphan
-    // 'listings' table, not 'providers'. The clinic context is preserved in
-    // the message body so leads aren't lost. Once the FK is repointed to
-    // providers.id (scripts/fix-inquiries-fk.sql), we can set this field.
+    // FK now correctly points at providers (repointed 2026-05-30 via
+    // scripts/fix-inquiries-fk.sql). Setting listing_id lets us properly
+    // attribute leads to their clinic via a join, instead of regex-parsing
+    // the message body.
     const { error: insertError } = await supabase.from('inquiries').insert({
       name: data.name,
       email: data.email,
       phone: data.phone || null,
       message: `[Lead for ${data.clinicName} · clinicId=${data.clinicId}] ${data.message}`,
-      listing_id: null,
+      listing_id: data.clinicId,
       created_at: new Date().toISOString(),
     });
 
