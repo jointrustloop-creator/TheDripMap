@@ -88,6 +88,28 @@ const nextConfig = {
         destination: '/providers/:slug*',
         permanent: true,
       },
+      // -----------------------------------------------------------------
+      // GSC 404 cleanup — 2026-05-30
+      // -----------------------------------------------------------------
+      // Routes Google indexed in the last 1–3 days that we removed since:
+      //   1. Quiz archetype share-card OG route (c753b8e, 2026-05-30):
+      //      6 archetype URLs (recovery-athlete, beauty-devotee,
+      //      brain-fog-fighter, immunity-shield, hangover-warrior,
+      //      longevity-seeker). Point all at /quiz so the user lands on
+      //      the live result flow.
+      //   2. Homepage v3 preview at /homepage-v2 (601903c, 2026-05-30):
+      //      lived ~24h, was noindexed but Google may have crawled.
+      //      Send to /.
+      {
+        source: '/api/quiz-card/:archetype*',
+        destination: '/quiz',
+        permanent: true,
+      },
+      {
+        source: '/homepage-v2',
+        destination: '/',
+        permanent: true,
+      },
       // "Who We Serve" clinic-owners entry → existing /for-clinics page.
       {
         source: '/for/clinic-owners',
