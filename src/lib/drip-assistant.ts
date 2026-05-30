@@ -549,6 +549,236 @@ async function bookAppointment(input: { slug?: string }): Promise<ToolOutcome> {
   };
 }
 
+// ── compare_providers ──────────────────────────────────────────────
+// Side-by-side comparison of 2-3 provider slugs. Returns a structured
+// payload the model uses to write a short 2-3 sentence comparison AND
+// (separately, on the route side) a structured `comparison` payload the
+// widget can render as a small table.
+async function compareProviders(input: { slugs?: unknown }): Promise<ToolOutcome> {
+  const rawSlugs = Array.isArray(input?.slugs) ? (input.slugs as unknown[]) : [];
+  const slugs = rawSlugs
+    .map((s) => (typeof s === 'string' ? s.trim() : ''))
+    .filter((s) => !!s)
+    .slice(0, 3);
+  if (slugs.length < 2) {
+    return { forModel: JSON.stringify({ error: 'Need 2-3 provider slugs to compare' }) };
+  }
+  const sb = getServiceSupabase();
+  const { data, error } = await sb
+    .from('providers')
+    .select('id, name, slug, city, state, rating, reviews, is_featured, type, specialties, mobile_service, website, phone, description, working_hours, latitude, longitude, online_booking_url')
+    .in('slug', slugs);
+  if (error) return { forModel: JSON.stringify({ error: 'compare query failed' }) };
+  const rows = (data as ProviderRow[]) || [];
+  if (rows.length === 0) {
+    return { forModel: JSON.stringify({ error: 'No providers found for those slugs', slugs }) };
+  }
+
+  // Verified set lookup for the claimed ones.
+  const claimedIds = rows.filter((r) => r.is_featured).map((r) => r.id);
+  const verifiedSet = new Set<string>();
+  if (claimedIds.length) {
+    const { data: profs } = await sb
+      .from('operator_profiles')
+      .select('clinic_id, profile_data')
+      .in('clinic_id', claimedIds);
+    for (const pr of (profs as { clinic_id: string; profile_data: Record<string, unknown> | null }[]) || []) {
+      const pd = pr.profile_data || {};
+      if (SAFETY_FLAGS.every((f) => pd[f] === true)) verifiedSet.add(pr.clinic_id);
+    }
+  }
+
+  // Best-effort price lookup from TREATMENT_CONTENT — uses each clinic's first
+  // matching specialty. If nothing matches we honestly say "varies".
+  function priceFor(specialties: string[] | null): string {
+    if (!specialties || specialties.length === 0) return 'varies';
+    for (const sp of specialties) {
+      const low = (sp || '').toLowerCase();
+      for (const [key, content] of Object.entries(TREATMENT_CONTENT)) {
+        if (low.includes(key.toLowerCase()) || key.toLowerCase().includes(low)) {
+          return content.costRange;
+        }
+      }
+    }
+    return 'varies';
+  }
+
+  // Re-sort to match input slug order so the model's narrative matches the cards.
+  const byInputOrder = slugs.map((s) => rows.find((r) => r.slug === s)).filter(Boolean) as ProviderRow[];
+  const compared = byInputOrder.map((p) => {
+    const verified = verifiedSet.has(p.id);
+    return {
+      name: p.name,
+      slug: p.slug,
+      city: p.city,
+      state: p.state,
+      rating: p.rating != null ? Number(p.rating) : null,
+      reviewCount: p.reviews != null ? Number(p.reviews) : null,
+      safetyVerified: verified, // 5/5 verified
+      claimed: !!p.is_featured,
+      treatments: (p.specialties || []).slice(0, 6),
+      priceRange: priceFor(p.specialties),
+      distanceMi: null as number | null, // distance not passed in; UI can fold in from the prior search
+      bookable: !!p.online_booking_url,
+      phone: p.phone || null,
+    };
+  });
+
+  return {
+    forModel: JSON.stringify({
+      count: compared.length,
+      providers: compared,
+      note: 'Give a clear 2-3 sentence comparison highlighting the most useful differences (verified status, rating, bookable vs call-only, treatments offered, price range). End with: "Want me to book one of them?"',
+    }),
+    // Also produce clinic cards so the widget can pin BOOK/CALL CTAs on them.
+    clinics: byInputOrder.map((p) => toClinic(p, verifiedSet.has(p.id))),
+  };
+}
+
+// ── get_availability_hint ──────────────────────────────────────────
+// Reports whether a clinic is open right now. Strict — unparseable hours
+// return 'hours_unknown' rather than silently asserting open.
+async function getAvailabilityHint(input: { slug?: string }): Promise<ToolOutcome> {
+  if (!input.slug) return { forModel: JSON.stringify({ error: 'slug required' }) };
+  const sb = getServiceSupabase();
+  const { data: p } = await sb
+    .from('providers')
+    .select('name, slug, working_hours')
+    .eq('slug', input.slug)
+    .maybeSingle();
+  if (!p) return { forModel: JSON.stringify({ status: 'hours_unknown', reason: 'clinic not found' }) };
+  const row = p as { name: string; slug: string; working_hours: Record<string, string> | null };
+  const hours = row.working_hours;
+  if (!hours || typeof hours !== 'object') {
+    return { forModel: JSON.stringify({ status: 'hours_unknown', clinic: row.name, slug: row.slug }) };
+  }
+
+  // First, today's status using the existing helper.
+  let todayStatus: { isOpen: boolean; text: string; todayHours: string } | null = null;
+  try { todayStatus = getStatus(hours as Record<string, string>); } catch { todayStatus = null; }
+
+  // Parse "9AM-5PM" style strings into start/end labels we can return.
+  const parseRange = (s: string): { start: string; end: string } | null => {
+    if (!s || typeof s !== 'string') return null;
+    const parts = s.split('-').map((t) => t.trim());
+    if (parts.length < 2 || !parts[0] || !parts[1]) return null;
+    // Sanity-check both ends parse to a known AM/PM time.
+    const ok = parts.every((t) => /\d+(:\d+)?\s*(AM|PM)/i.test(t));
+    return ok ? { start: parts[0], end: parts[1] } : null;
+  };
+
+  const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const now = new Date();
+  const todayKey = days[now.getDay()];
+  const todayRange = parseRange(hours[todayKey] as string);
+
+  if (todayStatus?.isOpen && todayRange) {
+    return {
+      forModel: JSON.stringify({
+        status: 'open_now',
+        clinic: row.name,
+        slug: row.slug,
+        closesAt: todayRange.end,
+        todayHours: todayStatus.todayHours,
+      }),
+    };
+  }
+
+  // Closed — find the next opens-at: today (if not yet open) or next valid day.
+  if (todayRange) {
+    return {
+      forModel: JSON.stringify({
+        status: 'closed_now',
+        clinic: row.name,
+        slug: row.slug,
+        opensAt: todayRange.start,
+        opensWhen: 'today',
+        todayHours: todayStatus?.todayHours || hours[todayKey],
+      }),
+    };
+  }
+  // Look ahead up to 7 days for the next day we can parse.
+  for (let i = 1; i <= 7; i++) {
+    const dKey = days[(now.getDay() + i) % 7];
+    const range = parseRange(hours[dKey] as string);
+    if (range) {
+      return {
+        forModel: JSON.stringify({
+          status: 'closed_now',
+          clinic: row.name,
+          slug: row.slug,
+          opensAt: range.start,
+          opensWhen: dKey,
+        }),
+      };
+    }
+  }
+  return { forModel: JSON.stringify({ status: 'hours_unknown', clinic: row.name, slug: row.slug }) };
+}
+
+// ── capture_lead ────────────────────────────────────────────────────
+// Stores a lead so we can notify the user when we add a clinic in their
+// city. Validates email. NEVER invent the user's email — only call this
+// tool when the user explicitly volunteers one. source defaults to
+// 'agent_no_coverage' (the original brief case).
+//
+// Implementation note: writes primarily to public.leads. If that table
+// doesn't yet exist in this environment, falls back to public.inquiries
+// with a structured marker so the lead is never lost.
+function isEmailShape(v: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+
+async function captureLead(input: { email?: string; city?: string; treatment?: string; source?: string }): Promise<ToolOutcome> {
+  const email = (input.email || '').trim().toLowerCase();
+  const city = (input.city || '').trim().slice(0, 80) || null;
+  const treatment = (input.treatment || '').trim().slice(0, 80) || null;
+  const source = (input.source || 'agent_no_coverage').trim().slice(0, 60) || 'agent_no_coverage';
+  if (!email || !isEmailShape(email)) {
+    return { forModel: JSON.stringify({ ok: false, error: 'invalid_email', note: 'Ask the user for a valid email; do not retry without a clean address.' }) };
+  }
+  const sb = getServiceSupabase();
+  const nowIso = new Date().toISOString();
+
+  // Try the dedicated leads table first.
+  try {
+    const { data, error } = await sb
+      .from('leads')
+      .insert({ email, city, treatment, source, created_at: nowIso })
+      .select('id')
+      .maybeSingle();
+    if (!error && data) {
+      return { forModel: JSON.stringify({ ok: true, leadId: (data as { id: string }).id, source }) };
+    }
+    // If error indicates table missing, fall through. Otherwise log + fall through too.
+    if (error) console.warn('captureLead: leads insert failed —', error.message);
+  } catch (e) {
+    console.warn('captureLead: leads insert threw —', e instanceof Error ? e.message : String(e));
+  }
+
+  // Fallback: inquiries (already used as the project-wide lead store).
+  try {
+    const { data, error } = await sb
+      .from('inquiries')
+      .insert({
+        name: 'Drip Assistant Lead',
+        email,
+        phone: null,
+        message: `[AGENT LEAD] source=${source} city=${city || '(n/a)'} treatment=${treatment || '(n/a)'}`,
+        listing_id: null,
+        created_at: nowIso,
+      })
+      .select('id')
+      .maybeSingle();
+    if (error) {
+      return { forModel: JSON.stringify({ ok: false, error: error.message || 'insert_failed' }) };
+    }
+    return { forModel: JSON.stringify({ ok: true, leadId: (data as { id: string } | null)?.id || null, source, fallback: 'inquiries' }) };
+  } catch (e) {
+    return { forModel: JSON.stringify({ ok: false, error: e instanceof Error ? e.message : String(e) }) };
+  }
+}
+
 export async function runTool(name: string, input: Record<string, unknown>): Promise<ToolOutcome> {
   switch (name) {
     case 'search_providers': return searchProviders(input as never);
@@ -557,6 +787,9 @@ export async function runTool(name: string, input: Record<string, unknown>): Pro
     case 'get_city_stats': return getCityStats(input as never);
     case 'book_appointment': return bookAppointment(input as never);
     case 'screen_patient': return screenPatient(input as never);
+    case 'compare_providers': return compareProviders(input as never);
+    case 'get_availability_hint': return getAvailabilityHint(input as never);
+    case 'capture_lead': return captureLead(input as never);
     default: return { forModel: JSON.stringify({ error: `unknown tool ${name}` }) };
   }
 }
@@ -623,6 +856,48 @@ export const TOOL_SCHEMAS = [
         slug: { type: 'string', description: 'The clinic\'s slug from a previous search_providers result.' },
       },
       required: ['slug'],
+    },
+  },
+  {
+    name: 'compare_providers',
+    description: 'Produce a structured side-by-side comparison of 2 or 3 clinics the user has just seen in the chat. Call this when the user says "compare", "vs", "which one is better", "show me a comparison", etc. Pass the clinic slugs from the prior search result (between 2 and 3). Returns rating, reviews, safety verified, claimed status, top treatments, price range, bookable yes/no, and phone for each. After the tool returns, give a 2-3 sentence comparison and end with "Want me to book one of them?".',
+    input_schema: {
+      type: 'object',
+      properties: {
+        slugs: {
+          type: 'array',
+          minItems: 2,
+          maxItems: 3,
+          items: { type: 'string' },
+          description: 'Array of 2-3 provider slugs to compare, in display order.',
+        },
+      },
+      required: ['slugs'],
+    },
+  },
+  {
+    name: 'get_availability_hint',
+    description: 'Check whether a specific clinic is open right now from its stored working_hours. Returns one of: open_now (with closesAt), closed_now (with opensAt today or next open day), or hours_unknown. Use this when the user asks "are they open now" / "are they open today" / "what are their hours". Be strict — if hours are missing or unparseable, the tool returns hours_unknown; do not silently say "open".',
+    input_schema: {
+      type: 'object',
+      properties: {
+        slug: { type: 'string', description: 'The clinic\'s slug.' },
+      },
+      required: ['slug'],
+    },
+  },
+  {
+    name: 'capture_lead',
+    description: 'Save the user\'s email so we can notify them when we add a clinic in their area (or for any other follow-up they explicitly volunteer their email for). Call ONLY when the user has typed an email address themselves — never invent an email. Use source="agent_no_coverage" (default) when we don\'t have clinics in their city; pass a different source string for other cases. Returns { ok, leadId } or { ok: false, error }.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', description: 'The user\'s email address — must be supplied by the user, not invented.' },
+        city: { type: 'string', description: 'The city the user is asking about (optional).' },
+        treatment: { type: 'string', description: 'The treatment the user is interested in (optional).' },
+        source: { type: 'string', description: 'Optional source tag; defaults to "agent_no_coverage".' },
+      },
+      required: ['email'],
     },
   },
 ];
