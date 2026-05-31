@@ -91,6 +91,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const MATRIX_TREATMENT_SLUGS = [
     'hydration', 'nad-plus', 'myers-cocktail', 'hangover-recovery', 'immune-support',
     'beauty-glow', 'athletic-recovery', 'mobile-iv', 'weight-loss', 'vitamin-c',
+    'glutathione', 'glp-1-weight-loss', 'iron-infusion',
   ];
   const CANADA_MATRIX_CITIES = ['Toronto', 'Vancouver', 'Calgary', 'Ottawa', 'Mississauga', 'Richmond Hill', 'North York', 'Oakville', 'Edmonton', 'Montreal', 'Quebec City', 'Winnipeg', 'Halifax', 'Victoria', 'Kelowna', 'Red Deer'];
   const topUSMatrixCities = cities

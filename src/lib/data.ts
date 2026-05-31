@@ -255,12 +255,16 @@ export async function getListingsByCity(city: string, state?: string) {
     // 2. Standard Search
     const tryQuery = async (cityName: string, stateName?: string) => {
       let query = supabase.from('providers').select('*').neq('availability', false);
-      
-      const gtaCitiesLower = GTA_CITIES.map(c => c.toLowerCase());
-      const isGTA = gtaCitiesLower.includes(cityName.toLowerCase()) || cityName.toLowerCase() === 'gta' || cityName.toLowerCase() === 'ontario';
 
-      // Special case for Toronto & GTA
-      if (isGTA) {
+      // GTA bucket: ONLY for explicit "gta" / "ontario" pseudo-queries (search UX).
+      // City slugs — including toronto and every satellite — get their real per-city
+      // results so SERP titles and grids reflect each city's actual provider count.
+      // (Previously every GTA city aliased to the same shared pool, producing 6
+      // duplicate-content satellite pages all reading "100 Verified Clinics".)
+      const cityLower = cityName.toLowerCase();
+      const isGTABucket = cityLower === 'gta' || cityLower === 'ontario';
+
+      if (isGTABucket) {
         query = query.in('city', GTA_CITIES).eq('country', 'Canada');
       } else {
         // HARD FILTER: City must match
@@ -792,10 +796,11 @@ export async function searchListings(query: string, city?: string) {
     let q = supabase.from('providers').select('*').neq('availability', false);
 
     if (city && city !== 'All') {
-      const gtaCitiesLower = GTA_CITIES.map(c => c.toLowerCase());
-      const isGTA = gtaCitiesLower.includes(city.toLowerCase()) || city.toLowerCase() === 'gta' || city.toLowerCase() === 'ontario';
-      
-      if (isGTA) {
+      // Same GTA-bucket policy as getListingsByCity: explicit pseudo-queries only.
+      const cityLower = city.toLowerCase();
+      const isGTABucket = cityLower === 'gta' || cityLower === 'ontario';
+
+      if (isGTABucket) {
         q = q.in('city', GTA_CITIES).eq('country', 'Canada');
       } else {
         q = q.ilike('city', `%${city}%`);
@@ -1048,7 +1053,12 @@ export async function getBlogPosts() {
 
       if (!error && data && data.length > 0) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (data as any[]).map(post => {
+        return (data as any[])
+          // Drafts are excluded from listings, sitemap, and generateStaticParams.
+          // Convention: category === 'Draft' OR slug starts with '_draft-'.
+          // A draft is still reachable directly at /blog/<slug> for preview.
+          .filter(post => post.category !== 'Draft' && !(post.slug || '').startsWith('_draft-'))
+          .map(post => {
           let content = post.content || post.body || post.markdown || '';
 
           // Strip any HTML comments (e.g. leftover content-injection markers like

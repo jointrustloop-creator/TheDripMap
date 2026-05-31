@@ -264,8 +264,19 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
     }
   ];
 
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.question,
+      acceptedAnswer: { '@type': 'Answer', text: f.answer },
+    })),
+  };
+
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <Navbar />
       <main className="max-w-7xl mx-auto px-6 py-12">
         <BreadcrumbNav
