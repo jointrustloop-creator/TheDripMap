@@ -336,6 +336,21 @@ const nextConfig = {
         destination: '/cities/north-york',
         permanent: true,
       },
+      // C10 Richmond Hill: blog redirects into the city money page after
+      // a fresh /cities/richmond-hill row was inserted (no row had existed —
+      // page was resolving via the slug-aware provider fallback). 14,542
+      // chars of merged content including the Signature Beauty Lounge
+      // Richmond Hill spotlight section preserved verbatim from the
+      // source. Eva's /providers/signature-beauty-lounge-richmond-hill
+      // page is untouched; her clinic continues to rank #1 in the city's
+      // listings grid via is_featured + is_claimed = true ordering.
+      // Sacred safety: zero references to the redirect target found in
+      // Signature RH's provider row.
+      {
+        source: '/blog/iv-therapy-richmond-hill-2026-guide',
+        destination: '/cities/richmond-hill',
+        permanent: true,
+      },
     ];
   },
 };
