@@ -232,6 +232,25 @@ const nextConfig = {
         destination: '/cities/oakville',
         permanent: true,
       },
+      // C14 Calgary × Mobile: blog post consolidated into the treatment-city
+      // money page. Unique content (Calgary mobile coverage to Airdrie/
+      // Cochrane/Okotoks/Banff/Canmore + response times + travel fees) was
+      // already captured in /cities/calgary's "Mobile IV Across Alberta"
+      // section during the C13 merge.
+      {
+        source: '/blog/mobile-iv-therapy-calgary',
+        destination: '/iv-therapy/mobile-iv/calgary',
+        permanent: true,
+      },
+      // C12 Vancouver × NAD+: blog post consolidated into the treatment-city
+      // money page. Unique content (BC-specific NAD+ 3-tier CAD pricing,
+      // BCCNM/CPSBC/CNPBC scope rules for NAD+, safety considerations) was
+      // already captured in /cities/vancouver during the C11 merge.
+      {
+        source: '/blog/nad-iv-therapy-vancouver-bc',
+        destination: '/iv-therapy/nad-plus/vancouver',
+        permanent: true,
+      },
     ];
   },
 };
