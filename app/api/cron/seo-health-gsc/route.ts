@@ -1,30 +1,43 @@
-// Layer B — weekly GSC report.
+// Sunday weekly SEO digest.
 //
-// Schedule: 11:00 UTC weekly Monday (= 7am ET).
-//   In vercel.json we set "0 11 * * 1" so this fires only on Mondays.
+// Schedule: Sunday 00:00 UTC = Sunday 8pm ET (during EDT). vercel.json sets
+//   "0 0 * * 1" which in UTC is Monday 00:00 — which lands at Sunday 8pm ET.
 // Auth: Bearer ${CRON_SECRET}.
 // Query params:
-//   ?test=1 → force-run and force-email regardless of day.
+//   ?test=1      → force-email regardless of day.
+//   ?skipCrawl=1 → skip the inline Layer A crawl and rely on the stored baseline.
 //
-// Behavior:
-//   1. Fetch sitemap URLs (we reuse the same crawler library — single source
-//      of truth for the URL pool the URL Inspection sampler rotates through).
-//   2. Build the GSC report (or a stub if credentials are missing).
-//   3. Email it to info@thedripmap.com.
-//
-// Note on the choice to make this a separate route from Layer A:
-//   - Different cadence (Mon-only vs daily) and a different time budget.
-//   - GSC API can be slow + flaky; keeping it isolated avoids dragging down
-//     Layer A's daily run reliability.
+// Flow:
+//   1. Run a fresh Layer A crawl inline (so the report is current this week).
+//      Falls back to the stored baseline if the crawl errors out.
+//   2. Build the GSC report (returns stub if GSC_SERVICE_ACCOUNT_KEY isn't set).
+//   3. Combine both into one good / bad / ugly digest.
+//   4. Email it to info@thedripmap.com.
 
 import { NextResponse } from 'next/server';
-import { fetchSitemapUrls } from '../../../../src/lib/seo-health-crawler';
+import {
+  crawlUrls,
+  detectIssues,
+  fetchSitemapUrls,
+  Issue,
+} from '../../../../src/lib/seo-health-crawler';
+import { loadBaseline } from '../../../../src/lib/seo-health-baseline';
 import { buildGscReport } from '../../../../src/lib/seo-health-gsc';
-import { buildLayerBEmail } from '../../../../src/lib/seo-health-email';
+import { buildSundayDigestEmail } from '../../../../src/lib/seo-health-email';
 import { sendMail } from '../../../../src/lib/mailer';
 
 export const maxDuration = 300;
 export const dynamic = 'force-dynamic';
+
+function prettyDate(d = new Date()): string {
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(d);
+}
 
 export async function GET(req: Request) {
   const expected = process.env.CRON_SECRET;
@@ -38,12 +51,78 @@ export async function GET(req: Request) {
 
   const url = new URL(req.url);
   const forceTest = url.searchParams.get('test') === '1';
+  const skipCrawl = url.searchParams.get('skipCrawl') === '1';
   const todayIso = new Date().toISOString().slice(0, 10);
+  const today = prettyDate();
 
+  // 1. Sitemap (always — feeds both the GSC URL Inspection sampler and the
+  //    Layer A crawl).
   const sitemapUrls = await fetchSitemapUrls();
-  const report = await buildGscReport(sitemapUrls);
 
-  const body = buildLayerBEmail(report, todayIso);
+  // 2. Layer A: prefer a fresh inline crawl. Fall back to the stored baseline
+  //    if the crawl is skipped, errors, or returns nothing.
+  type CrawlPayload = {
+    totalUrls: number;
+    crawledUrls: number;
+    truncated: boolean;
+    durationMs: number;
+    issues: Issue[];
+    asOfIso: string;
+    fresh: boolean;
+  };
+  let crawlPayload: CrawlPayload | null = null;
+  let crawlError: string | null = null;
+  if (!skipCrawl && sitemapUrls.length > 0) {
+    try {
+      // Budget: 200s on the crawl leaves ~80s for GSC + email.
+      const summary = await crawlUrls(sitemapUrls, {
+        concurrency: 24,
+        totalBudgetMs: 200_000,
+      });
+      const issues = detectIssues(summary);
+      crawlPayload = {
+        totalUrls: summary.totalUrls,
+        crawledUrls: summary.crawledUrls,
+        truncated: summary.truncated,
+        durationMs: summary.durationMs,
+        issues,
+        asOfIso: new Date().toISOString(),
+        fresh: true,
+      };
+    } catch (err) {
+      crawlError = err instanceof Error ? err.message : String(err);
+    }
+  }
+  if (!crawlPayload) {
+    const baseline = await loadBaseline();
+    if (baseline) {
+      const issues: Issue[] = baseline.issues.map((i) => ({
+        type: i.type,
+        url: i.url,
+        detail: i.detail,
+      }));
+      crawlPayload = {
+        totalUrls: baseline.totalUrls,
+        crawledUrls: baseline.totalUrls,
+        truncated: false,
+        durationMs: 0,
+        issues,
+        asOfIso: baseline.lastRunIso,
+        fresh: false,
+      };
+    }
+  }
+
+  // 3. GSC report (stubbed when key missing).
+  const gscReport = await buildGscReport(sitemapUrls);
+
+  // 4. Build the digest email.
+  const body = buildSundayDigestEmail({
+    gscReport,
+    crawl: crawlPayload,
+    todayIso,
+    prettyDate: today,
+  });
 
   let emailResult: { ok: boolean; provider?: string; error?: string } | null = null;
   try {
@@ -65,12 +144,25 @@ export async function GET(req: Request) {
   return NextResponse.json({
     ok: true,
     today: todayIso,
+    prettyDate: today,
     forceTest,
-    reportKind: report.kind,
     sitemapUrls: sitemapUrls.length,
+    crawl: crawlPayload
+      ? {
+          fresh: crawlPayload.fresh,
+          crawledUrls: crawlPayload.crawledUrls,
+          totalUrls: crawlPayload.totalUrls,
+          issues: crawlPayload.issues.length,
+          truncated: crawlPayload.truncated,
+          durationMs: crawlPayload.durationMs,
+          asOfIso: crawlPayload.asOfIso,
+        }
+      : null,
+    crawlError,
+    gscKind: gscReport.kind,
     subject: body.subject,
     email: emailResult,
-    // Echo the human-readable text so the caller can see the report inline.
     reportPreview: body.text.slice(0, 4000),
   });
 }
+
