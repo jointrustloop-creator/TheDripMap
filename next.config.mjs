@@ -171,6 +171,21 @@ const nextConfig = {
         destination: '/cities/vancouver',
         permanent: true,
       },
+      // C13 Calgary: two blog duplicates consolidated into the city
+      // money page. /cities/calgary content went from null → 14,932 chars
+      // (CRNA/CPSA/CNDA/CLPNA framework, per-dose NAD+ CAD bands,
+      // 7-neighbourhood cluster map, altitude-driven hydration context,
+      // honest contraindications).
+      {
+        source: '/blog/best-iv-therapy-calgary-2026',
+        destination: '/cities/calgary',
+        permanent: true,
+      },
+      {
+        source: '/blog/iv-therapy-calgary-2026-guide',
+        destination: '/cities/calgary',
+        permanent: true,
+      },
     ];
   },
 };
