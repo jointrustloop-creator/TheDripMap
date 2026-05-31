@@ -201,6 +201,21 @@ const nextConfig = {
         destination: '/cities/ottawa',
         permanent: true,
       },
+      // C16 Montreal: two blog duplicates consolidated into the city
+      // money page. /cities/montreal content went from null → 13,818
+      // chars (OIIQ/CMQ regulatory framework, the Quebec-distinct
+      // ordonnance collective mechanism, Bill 96 bilingual law, real
+      // 2026 CAD bands, 5-neighbourhood cluster map, RAMQ coverage).
+      {
+        source: '/blog/best-iv-therapy-montreal-2026',
+        destination: '/cities/montreal',
+        permanent: true,
+      },
+      {
+        source: '/blog/iv-therapy-montreal-2026-guide',
+        destination: '/cities/montreal',
+        permanent: true,
+      },
     ];
   },
 };
