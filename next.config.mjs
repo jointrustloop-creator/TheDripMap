@@ -251,6 +251,40 @@ const nextConfig = {
         destination: '/iv-therapy/nad-plus/vancouver',
         permanent: true,
       },
+      // -----------------------------------------------------------------
+      // Toronto treatment-city consolidations — 2026-05-31
+      // -----------------------------------------------------------------
+      // C3, C4, C5, C6: each blog post duplicates the corresponding
+      // /iv-therapy/{treatment}/toronto money page which already renders
+      // the real provider grid + treatment-specific FAQs + treatment
+      // education. No content merge required — search intent (e.g.,
+      // "NAD+ Toronto") maps cleanly to the directory page.
+      // None of these redirects touch the Signature Beauty Lounge
+      // Downtown Toronto claimed provider page at /providers/*.
+      // C3 Toronto × NAD+
+      {
+        source: '/blog/nad-plus-therapy-toronto-guide',
+        destination: '/iv-therapy/nad-plus/toronto',
+        permanent: true,
+      },
+      // C4 Toronto × Hangover
+      {
+        source: '/blog/hangover-iv-therapy-toronto',
+        destination: '/iv-therapy/hangover-recovery/toronto',
+        permanent: true,
+      },
+      // C5 Toronto × Myers Cocktail
+      {
+        source: '/blog/myers-cocktail-toronto',
+        destination: '/iv-therapy/myers-cocktail/toronto',
+        permanent: true,
+      },
+      // C6 Toronto × Mobile IV
+      {
+        source: '/blog/mobile-iv-therapy-toronto-gta',
+        destination: '/iv-therapy/mobile-iv/toronto',
+        permanent: true,
+      },
     ];
   },
 };
