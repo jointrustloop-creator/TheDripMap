@@ -216,6 +216,22 @@ const nextConfig = {
         destination: '/cities/montreal',
         permanent: true,
       },
+      // C9 Oakville: two blog duplicates consolidated into the city money
+      // page. Inserted a fresh row in the cities table (none existed —
+      // page was resolving via the slug-aware provider fallback) with
+      // 14,966 chars of merged content. Gold: Oakville-specific ND/CONO
+      // angle, naturopathic high-dose vitamin C oncology-adjunct framing,
+      // physician-vs-ND clinic model comparison, 4-neighbourhood map.
+      {
+        source: '/blog/iv-therapy-oakville',
+        destination: '/cities/oakville',
+        permanent: true,
+      },
+      {
+        source: '/blog/iv-therapy-oakville-2026-guide',
+        destination: '/cities/oakville',
+        permanent: true,
+      },
     ];
   },
 };
