@@ -113,14 +113,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const canonical = `${SITE_URL}/iv-therapy/${t.slug}/${slugify(resolved.name)}`;
 
   return {
-    title: `${t.name} in ${cityLabel} (${YEAR}) — ${count} Verified ${count === 1 ? 'Clinic' : 'Clinics'} | TheDripMap`,
-    description: `Compare ${count > 0 ? `${count} ` : ''}${t.name.toLowerCase()} providers in ${cityLabel}. See verified clinics, what to expect, typical pricing, and book your session — all on TheDripMap.`,
+    title: `${t.name} in ${cityLabel} (${YEAR}) — ${count} ${count === 1 ? 'Clinic' : 'Clinics'} | TheDripMap`,
+    description: `Compare ${count > 0 ? `${count} ` : ''}${t.name.toLowerCase()} providers in ${cityLabel}. See clinics, what to expect, typical pricing, and book your session — all on TheDripMap.`,
     alternates: { canonical },
     // Don't index empty combinations — avoids thin programmatic pages.
     robots: count === 0 ? { index: false, follow: true } : undefined,
     openGraph: {
       title: `${t.name} in ${cityLabel} (${YEAR}) | TheDripMap`,
-      description: `Find verified ${t.name.toLowerCase()} clinics in ${cityLabel}.`,
+      description: `Find ${t.name.toLowerCase()} clinics in ${cityLabel}.`,
       url: canonical,
       type: 'website',
       images: [`${SITE_URL}/og-image.png`],
@@ -163,7 +163,7 @@ export default async function TreatmentCityPage({ params }: PageProps) {
   const topNames = clinics.slice(0, 3).map((c) => c.name).filter(Boolean);
   const summarySentence = content?.description?.split('. ')[0];
   const intro = count > 0
-    ? `There ${count === 1 ? 'is' : 'are'} ${count} ${t.name.toLowerCase()} ${count === 1 ? 'provider' : 'providers'} in ${cityLabel} on TheDripMap${verifiedCount > 0 ? `, ${verifiedCount} of them claimed and verified` : ''}.${topNames.length ? ` Options include ${topNames.join(', ')}.` : ''} ${summarySentence ? summarySentence + '.' : ''} Compare what each clinic offers below, then book directly.`
+    ? `There ${count === 1 ? 'is' : 'are'} ${count} ${t.name.toLowerCase()} ${count === 1 ? 'provider' : 'providers'} in ${cityLabel} on TheDripMap${verifiedCount > 0 ? `, ${verifiedCount} of them claimed (Safety Verified)` : ''}.${topNames.length ? ` Options include ${topNames.join(', ')}.` : ''} ${summarySentence ? summarySentence + '.' : ''} Compare what each clinic offers below, then book directly.`
     : `We're still adding ${t.name.toLowerCase()} providers in ${cityLabel}. ${summarySentence ? summarySentence + '.' : ''} In the meantime, browse nearby clinics or explore the treatment guide below.`;
 
   // Treatment-and-city-specific FAQs.
@@ -181,7 +181,7 @@ export default async function TreatmentCityPage({ params }: PageProps) {
     },
     {
       q: `How do I choose a safe ${t.name.toLowerCase()} clinic in ${resolved.name}?`,
-      a: `Look for licensed medical oversight, transparent ingredients and pricing, and verification. On TheDripMap, claimed and verified ${resolved.name} clinics carry a badge. ${content?.safety ? content.safety.split('. ')[0] + '.' : 'Always confirm suitability with a licensed clinician.'}`,
+      a: `Look for licensed medical oversight, transparent ingredients and pricing, and verification. On TheDripMap, claimed ${resolved.name} clinics carry a Safety Verified badge. ${content?.safety ? content.safety.split('. ')[0] + '.' : 'Always confirm suitability with a licensed clinician.'}`,
     },
     {
       q: `Do I need an appointment for ${t.name.toLowerCase()} in ${resolved.name}?`,
@@ -237,7 +237,7 @@ export default async function TreatmentCityPage({ params }: PageProps) {
             <MapPin size={14} /> {cityLabel}
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-[1.02]">
-            {t.name} in {resolved.name} — Find Verified Clinics
+            {t.name} in {resolved.name} — Find Clinics
           </h1>
           <p className="text-lg text-slate-600 leading-relaxed">{intro}</p>
           {count > 0 && (
@@ -247,7 +247,7 @@ export default async function TreatmentCityPage({ params }: PageProps) {
               </span>
               {verifiedCount > 0 && (
                 <span className="inline-flex items-center gap-1.5 text-sm font-bold text-wellness-700 bg-wellness-50 border border-wellness-100 px-4 py-2 rounded-full">
-                  <ShieldCheck size={14} /> {verifiedCount} verified
+                  <ShieldCheck size={14} /> {verifiedCount} Safety Verified
                 </span>
               )}
             </div>

@@ -139,6 +139,23 @@ const nextConfig = {
         destination: '/cities',
         permanent: true,
       },
+      // -----------------------------------------------------------------
+      // Canadian cluster consolidation — 2026-05-31
+      // -----------------------------------------------------------------
+      // C8 Mississauga: two blog duplicates consolidated into the city
+      // money page after a content merge (regulatory framework, CAD
+      // pricing bands, neighbourhood clusters, Toronto comparison,
+      // naturopathic insurance angle were lifted into /cities/mississauga).
+      {
+        source: '/blog/iv-therapy-mississauga',
+        destination: '/cities/mississauga',
+        permanent: true,
+      },
+      {
+        source: '/blog/iv-therapy-mississauga-2026-guide',
+        destination: '/cities/mississauga',
+        permanent: true,
+      },
     ];
   },
 };

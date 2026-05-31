@@ -94,7 +94,9 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   // consistent and patient-friendly. Per-city description overrides still win
   // (city-intros.ts can shape the meta description for high-traffic pages),
   // but the title itself is locked to "IV Therapy in {City}, {State} ({Year}) |
-  // {N} Verified Clinics" — highest-ROI traffic format per the playbook.
+  // {N} Clinics" — highest-ROI traffic format per the playbook. "Verified" was
+  // dropped 2026-05-31 to keep the Safety Verified badge meaningful (only
+  // claimed clinics earn it; the directory aggregate must not imply otherwise).
   //
   // Many cities rows have no state populated; when that's the case, derive the
   // modal state from the actual listings so the format renders consistently.
@@ -115,7 +117,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     resolvedState = best;
   }
   const cityStateLabel = resolvedState ? `${name}, ${resolvedState}` : name;
-  const title = `IV Therapy in ${cityStateLabel} (${titleYear}) | ${count} Verified Clinics`;
+  const title = `IV Therapy in ${cityStateLabel} (${titleYear}) | ${count} Clinics`;
   const description =
     intro?.metaDescription ||
     cityData?.meta_description?.replace('{count}', String(count)) ||
