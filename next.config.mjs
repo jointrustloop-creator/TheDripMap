@@ -156,6 +156,21 @@ const nextConfig = {
         destination: '/cities/mississauga',
         permanent: true,
       },
+      // C11 Vancouver: two blog duplicates consolidated into the city
+      // money page after a content merge. /cities/vancouver content went
+      // from null → 13,881 chars (BCCNM/CPSBC/CNPBC regulatory framework,
+      // real 2026 CAD pricing bands, 8-signal clinic checklist, G6PD
+      // safety, neighbourhood clusters).
+      {
+        source: '/blog/best-iv-therapy-vancouver-2026',
+        destination: '/cities/vancouver',
+        permanent: true,
+      },
+      {
+        source: '/blog/iv-therapy-vancouver-2026-guide',
+        destination: '/cities/vancouver',
+        permanent: true,
+      },
     ];
   },
 };
