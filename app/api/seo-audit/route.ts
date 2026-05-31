@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getServiceSupabase } from '../../../src/lib/supabase';
 import { getCitySearches } from '../../../src/lib/city-search-data';
+import { generateLocalBusinessSchema, type GeneratedSchema } from '../../../src/lib/seo-audit-schema';
+import { runLlmAudit, loadBlogCorpus, type LlmAuditResult } from '../../../src/lib/seo-audit-llm';
+import { runLocalVisibilityCheck, type LocalVisibilityResult } from '../../../src/lib/seo-audit-places';
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 // Scoring weights (must total 100). Every point measures a GENUINE, verifiable
@@ -36,6 +39,15 @@ export interface AuditCheck {
   counted?: boolean;
 }
 
+export interface FeatureFlags {
+  /** AI pillars (1-3). True if ANTHROPIC_API_KEY is present at runtime. */
+  llmEnabled: boolean;
+  /** Pillar 5 — true if GOOGLE_PLACES_API_KEY is present at runtime. */
+  placesEnabled: boolean;
+  /** SERP rank lookups (out of scope for v1). Always false unless flipped via env. */
+  serpRankEnabled: boolean;
+}
+
 export interface AuditResult {
   url: string;
   finalUrl: string;
@@ -57,6 +69,27 @@ export interface AuditResult {
     searchesPerMonth: number;
     competitors: number;
   };
+
+  // ===== NEW PILLAR FIELDS =====
+
+  /** Detected business name (best-guess from <title>/og:site_name/H1). */
+  detectedBusinessName: string;
+  /** Detected services from the page HTML (used in LLM + schema). */
+  detectedServices: string[];
+  /** Detected phone (if any) — fed to NAP check. */
+  detectedPhone: string;
+  /** Detected street address (if any). */
+  detectedAddress: string;
+
+  /** Pillars 1-3 — paste-ready fixes, missing pages, patient questions. */
+  llm: LlmAuditResult;
+  /** Pillar 4 — JSON-LD schema generator output. */
+  schemaPillar: GeneratedSchema;
+  /** Pillar 5 — local visibility (gated; degrades to setup-required). */
+  localVisibility: LocalVisibilityResult | null;
+
+  /** Feature flag visibility so the UI can render stubs gracefully. */
+  featureFlags: FeatureFlags;
 }
 
 function normalizeUrl(raw: string): string | null {
@@ -156,6 +189,7 @@ interface ProviderMatch {
   name: string;
   slug: string | null;
   city: string | null;
+  state?: string | null;
   website: string | null;
   image_url: string | null;
   description: string | null;
@@ -165,8 +199,114 @@ interface ProviderMatch {
   is_featured: boolean | null;
 }
 
+// ===== Detection helpers for the new pillars =====
+
+/** Strip HTML tags and collapse whitespace for clean text mining. */
+function htmlToText(html: string): string {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** Detect the clinic's business name. og:site_name wins, then <title>, then H1. */
+function detectBusinessName(html: string, fallback: string): string {
+  const og = getMetaContent(html, ['og:site_name', 'og:title']);
+  if (og) {
+    // Strip the "| Site Name" suffix common in title tags.
+    const cleaned = og.split(/\s+[|\-–·]\s+/)[0].trim();
+    if (cleaned.length >= 3 && cleaned.length <= 80) return cleaned;
+  }
+  const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  if (titleMatch) {
+    const cleaned = titleMatch[1].replace(/\s+/g, ' ').trim().split(/\s+[|\-–·]\s+/)[0].trim();
+    if (cleaned.length >= 3 && cleaned.length <= 80) return cleaned;
+  }
+  const h1Match = html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
+  if (h1Match) {
+    const cleaned = htmlToText(h1Match[1]).slice(0, 80);
+    if (cleaned.length >= 3) return cleaned;
+  }
+  return fallback;
+}
+
+// Library of canonical IV therapy treatment names we look for in page text.
+// Used both for the LLM prompt and the schema generator. Kept tight so we
+// don't over-match generic words.
+const TREATMENT_KEYWORDS: { canonical: string; patterns: RegExp[] }[] = [
+  { canonical: 'NAD+ Therapy', patterns: [/\bNAD\+?\b/i, /nicotinamide adenine/i] },
+  { canonical: 'Myers Cocktail', patterns: [/myers'?\s*cocktail/i] },
+  { canonical: 'Hangover Recovery IV', patterns: [/hangover/i] },
+  { canonical: 'Immune Support IV', patterns: [/immune (boost|support|drip)/i, /immunity drip/i] },
+  { canonical: 'Beauty / Glow IV', patterns: [/beauty drip/i, /glow drip/i, /glutathione/i] },
+  { canonical: 'Hydration IV', patterns: [/hydration drip/i, /hydration iv/i, /\b(re)?hydrate\b/i] },
+  { canonical: 'Athletic Recovery IV', patterns: [/athlet(e|ic) recovery/i, /performance drip/i] },
+  { canonical: 'Vitamin C / High-Dose Vitamin C', patterns: [/vitamin c (drip|iv|infusion)/i, /high[- ]dose vitamin c/i] },
+  { canonical: 'B12 Injections', patterns: [/\bB12\b/i, /b-12/i] },
+  { canonical: 'Mobile IV Therapy', patterns: [/mobile iv/i, /in-home iv/i, /iv at home/i] },
+  { canonical: 'Migraine Relief IV', patterns: [/migraine drip/i, /migraine iv/i] },
+  { canonical: 'Weight Loss Support IV', patterns: [/weight loss drip/i, /lipo[\s-]?tropic/i, /semaglutide/i, /tirzepatide/i] },
+];
+
+function detectServices(html: string): string[] {
+  const text = htmlToText(html).slice(0, 100_000);
+  const found = new Set<string>();
+  for (const t of TREATMENT_KEYWORDS) {
+    if (t.patterns.some((p) => p.test(text))) found.add(t.canonical);
+    if (found.size >= 8) break;
+  }
+  return Array.from(found);
+}
+
+/** Detect a phone number from common patterns + tel: links. Returns first match. */
+function detectPhone(html: string): string {
+  const telMatch = html.match(/href\s*=\s*["']tel:([^"']+)["']/i);
+  if (telMatch) return telMatch[1].trim();
+  const text = htmlToText(html).slice(0, 50_000);
+  const m =
+    text.match(/(\+?1[\s.\-]?)?\(?\d{3}\)?[\s.\-]?\d{3}[\s.\-]?\d{4}/) ||
+    text.match(/\+?\d{1,3}\s?\d{1,4}\s?\d{3,4}\s?\d{3,4}/);
+  return m ? m[0].trim() : '';
+}
+
+/** Best-effort street address detection from JSON-LD or address blocks. */
+function detectAddress(html: string): { street: string; postal: string } {
+  // 1. Try existing JSON-LD address blocks (most reliable).
+  const ldMatches = html.match(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi) || [];
+  for (const blk of ldMatches) {
+    const inner = blk.replace(/<script[^>]*>/i, '').replace(/<\/script>/i, '');
+    try {
+      const data = JSON.parse(inner);
+      const candidates = Array.isArray(data) ? data : [data];
+      for (const c of candidates) {
+        const a = c?.address || c?.['@graph']?.find?.((x: { address?: unknown }) => x?.address)?.address;
+        if (a && typeof a === 'object') {
+          return {
+            street: String(a.streetAddress || ''),
+            postal: String(a.postalCode || ''),
+          };
+        }
+      }
+    } catch {
+      // ignore — not all JSON-LD blocks parse
+    }
+  }
+  // 2. Common postal patterns in plain text (US 5-digit ZIP or CA A1A 1A1).
+  const text = htmlToText(html).slice(0, 50_000);
+  const us = text.match(/(\d+\s+[A-Za-z][\w .'-]+(Street|St\.?|Ave\.?|Avenue|Blvd\.?|Road|Rd\.?|Drive|Dr\.?|Lane|Ln\.?|Way))\b/);
+  const postal = text.match(/\b(\d{5}(-\d{4})?|[A-Z]\d[A-Z]\s?\d[A-Z]\d)\b/);
+  return { street: us ? us[1] : '', postal: postal ? postal[1] : '' };
+}
+
+function detectOgImage(html: string): string {
+  return getMetaContent(html, ['og:image', 'twitter:image']);
+}
+
 export async function POST(req: Request) {
-  let body: { url?: string; city?: string };
+  let body: { url?: string; city?: string; gated?: boolean; businessName?: string; ownerName?: string };
   try {
     body = await req.json();
   } catch {
@@ -175,6 +315,8 @@ export async function POST(req: Request) {
 
   const url = normalizeUrl(body.url || '');
   const city = (body.city || '').trim();
+  const gated = !!body.gated;
+  const submittedBusinessName = (body.businessName || '').trim();
   if (!url) {
     return NextResponse.json({ error: 'Please enter a valid website URL.' }, { status: 400 });
   }
@@ -304,6 +446,7 @@ export async function POST(req: Request) {
   // --- Check: H1 heading ---
   const h1Matches = html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/gi) || [];
   const h1Count = h1Matches.length;
+  const firstH1Text = h1Matches[0] ? htmlToText(h1Matches[0]) : '';
   let headingsEarned = 0;
   let headingsStatus: CheckStatus = 'fail';
   let headingsDetail = 'No H1 heading found — search engines use your main heading to understand the page.';
@@ -387,7 +530,7 @@ export async function POST(req: Request) {
       const { data } = await sb
         .from('providers')
         .select(
-          'id, name, slug, city, website, image_url, description, specialties, rating, reviews, is_featured'
+          'id, name, slug, city, state, website, image_url, description, specialties, rating, reviews, is_featured'
         )
         .ilike('website', `%${host}%`)
         .limit(10);
@@ -461,6 +604,88 @@ export async function POST(req: Request) {
     }
   }
 
+  // ===== NEW: Pillar inputs =====
+
+  const detectedBusinessName = detectBusinessName(html, submittedBusinessName || provider?.name || (host || ''));
+  const detectedServices = reachable ? detectServices(html) : [];
+  const detectedPhone = reachable ? detectPhone(html) : '';
+  const detectedAddr = reachable ? detectAddress(html) : { street: '', postal: '' };
+  const detectedOgImg = reachable ? detectOgImage(html) : '';
+  const citySearchesPerMonth = getCitySearches(cityName);
+
+  // ----- Pillar 4: schema generator (template, no external call) -----
+  const schemaPillar = generateLocalBusinessSchema({
+    name: detectedBusinessName,
+    url: site.finalUrl,
+    city: cityName,
+    state: provider?.state || '',
+    phone: detectedPhone,
+    streetAddress: detectedAddr.street,
+    postalCode: detectedAddr.postal,
+    services: detectedServices.length
+      ? detectedServices
+      : Array.isArray(provider?.specialties)
+        ? (provider?.specialties || []).slice(0, 6)
+        : [],
+    description: desc,
+    image: detectedOgImg,
+    country: provider?.state && /(Ontario|Quebec|British Columbia|Alberta|Manitoba|Saskatchewan|Nova Scotia|New Brunswick|Newfoundland|Prince Edward Island)/i.test(provider.state) ? 'CA' : 'US',
+  });
+
+  // ----- Pillars 1-3: LLM call (skip if site fully unreachable to avoid wasted tokens) -----
+  let llm: LlmAuditResult;
+  if (!reachable) {
+    llm = {
+      state: 'stubbed',
+      reason: "We couldn't load your site so the AI pillars were skipped. The site may be blocking automated requests or temporarily down.",
+      pasteReadyFixes: [],
+      missingPages: [],
+      patientQuestions: [],
+      impactHeadline: cityName
+        ? `We couldn't load your site, so we can't compare it to the IV searches in ${cityName} yet.`
+        : "We couldn't load your site, so the AI section is unavailable.",
+    };
+  } else {
+    const failingChecks = checks
+      .filter((c) => c.counted !== false && c.status !== 'pass')
+      .map((c) => `${c.label.toLowerCase()} (${c.status})`);
+    const corpus = await loadBlogCorpus(cityName);
+    llm = await runLlmAudit({
+      url: site.finalUrl,
+      city: cityName,
+      businessName: detectedBusinessName,
+      services: detectedServices,
+      currentTitle: title,
+      currentMeta: desc,
+      currentH1: firstH1Text,
+      failingChecks,
+      pageSnippet: htmlToText(html).slice(0, 6000),
+      corpus,
+      citySearchesPerMonth,
+      cityCompetitors: competitors,
+    });
+  }
+
+  // ----- Pillar 5: gated local visibility (Places API) -----
+  // Only run when (a) the request opted into the gated tier, AND (b) the
+  // Places API key is present. If gated=false we don't burn the quota; if
+  // the key is missing the helper returns a setup-required stub.
+  let localVisibility: LocalVisibilityResult | null = null;
+  if (gated) {
+    localVisibility = await runLocalVisibilityCheck({
+      businessName: detectedBusinessName,
+      city: cityName,
+      websitePhone: detectedPhone,
+      websiteUrl: site.finalUrl,
+    });
+  }
+
+  const featureFlags: FeatureFlags = {
+    llmEnabled: !!process.env.ANTHROPIC_API_KEY,
+    placesEnabled: !!process.env.GOOGLE_PLACES_API_KEY,
+    serpRankEnabled: process.env.SERP_RANK_ENABLED === 'true',
+  };
+
   const result: AuditResult = {
     url,
     finalUrl: site.finalUrl,
@@ -479,9 +704,17 @@ export async function POST(req: Request) {
     },
     cityInsight: {
       name: cityName,
-      searchesPerMonth: getCitySearches(cityName),
+      searchesPerMonth: citySearchesPerMonth,
       competitors,
     },
+    detectedBusinessName,
+    detectedServices,
+    detectedPhone,
+    detectedAddress: detectedAddr.street,
+    llm,
+    schemaPillar,
+    localVisibility,
+    featureFlags,
   };
 
   return NextResponse.json(result);
