@@ -10,7 +10,7 @@ import { Footer } from '@/src/components/Footer';
 import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
 import { QuizCTA } from '@/src/components/QuizCTA';
 import { ListingController } from '@/src/components/ListingController';
-import { getCityBySlug, getListingsByCity, getAllCities, getListingsByState, getFeaturedListings, getBlogPostBySlug } from '@/src/lib/data';
+import { getCityBySlug, getListingsByCity, getAllCities, getListingsByState, getFeaturedListings, getBlogPostBySlug, slugify } from '@/src/lib/data';
 import { getCityIntro } from '@/src/lib/city-intros';
 import { MapTrigger } from '@/src/components/MapTrigger';
 import { FAQSection } from '@/src/components/FAQSection';
@@ -71,7 +71,19 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   }
 
   // Fetch actual count for accurate metadata
-  const listings = await getListingsByCity(name, state);
+  let listings = await getListingsByCity(name, state);
+  // Slug-aware fallback: catches DB city strings the naive reconstruction
+  // can't produce (e.g. "Whitchurch-Stouffville" preserves dash, "St. Petersburg"
+  // preserves period). slugify("Whitchurch-Stouffville") === "whitchurch-stouffville".
+  if (listings.length === 0 && !cityData) {
+    const all = await getAllCities();
+    const match = all.find((c) => slugify(c.city) === slug);
+    if (match) {
+      name = match.city;
+      state = match.state || match.stateAbbr || '';
+      listings = await getListingsByCity(name, state);
+    }
+  }
   const count = listings.length;
 
   if (count === 0 && !cityData) {
@@ -147,17 +159,31 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
 
   // If no city record was found in the 'cities' table or mock data
   if (!cityData) {
-    // Check if we can reconstruction from slug as a last resort before 404
-    // Only if it looks like a valid-ish city slug
-    const name = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    const listings = await getListingsByCity(name);
-    
+    // 1. Try naive slug→name reconstruction (handles san-diego → San Diego).
+    let name = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    let resolvedState = '';
+    let listings = await getListingsByCity(name);
+
+    // 2. Slug-aware fallback: match against actual provider cities so we catch
+    //    DB strings the naive reconstruction can't produce — e.g.
+    //    "Whitchurch-Stouffville" (preserves dash) or "St. Petersburg"
+    //    (preserves period). slugify both round-trip back to the URL slug.
+    if (listings.length === 0) {
+      const all = await getAllCities();
+      const match = all.find((c) => slugify(c.city) === slug);
+      if (match) {
+        name = match.city;
+        resolvedState = match.state || match.stateAbbr || '';
+        listings = await getListingsByCity(name, resolvedState);
+      }
+    }
+
     if (listings.length > 0) {
       cityData = {
         id: `fallback-${slug}`,
         name,
         slug,
-        state: '',
+        state: resolvedState,
         content: null,
         meta_title: null,
         meta_description: null

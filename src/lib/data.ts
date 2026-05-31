@@ -1278,7 +1278,7 @@ export async function getListingsByServiceAndCity(service: string, city: string,
     // Fallback: If no specific results in this city, try a broader wellness filter for the same city
     if (!data || data.length === 0) {
       console.log(`No specific results for ${service} in ${city}, trying fallback broad search...`);
-      const broadFilter = "name.ilike.%hydration%,description.ilike.%hydration%,name.ilike.%wellness%,description.ilike.%wellness%,name.ilike.%drip%,description.iv%";
+      const broadFilter = "name.ilike.%hydration%,description.ilike.%hydration%,name.ilike.%wellness%,description.ilike.%wellness%,name.ilike.%drip%,description.ilike.%iv%";
       const { data: fallbackData, error: fallbackError } = await supabase
         .from('providers')
         .select('*')
