@@ -285,6 +285,27 @@ const nextConfig = {
         destination: '/iv-therapy/mobile-iv/toronto',
         permanent: true,
       },
+      // C17 Insurance / Canada: the Ontario-specific subset is redirected
+      // into the Canada-wide keeper. Unique Ontario gold (year-end deadline,
+      // family-coverage stacking, package-pricing tips) was lifted into the
+      // keeper before redirect. The /blog/iv-therapy-canada-complete-guide-
+      // 2026 umbrella post stays standalone (different intent per audit).
+      {
+        source: '/blog/iv-therapy-insurance-ontario',
+        destination: '/blog/iv-therapy-insurance-coverage-canada',
+        permanent: true,
+      },
+      // C7 Toronto × Glutathione: keeper is the new treatment-city page
+      // built into the matrix in A1 (commit d71fa8d). Verified live —
+      // /iv-therapy/glutathione/toronto returns HTTP 200 with title
+      // "Glutathione IV in Toronto, ON (2026) — 7 Clinics". The
+      // /blog/glutathione-iv-therapy-benefits treatment-generic post (no
+      // city) is left alone per audit (different intent).
+      {
+        source: '/blog/glutathione-iv-therapy-toronto',
+        destination: '/iv-therapy/glutathione/toronto',
+        permanent: true,
+      },
     ];
   },
 };
