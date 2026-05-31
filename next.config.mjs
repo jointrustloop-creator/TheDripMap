@@ -186,6 +186,21 @@ const nextConfig = {
         destination: '/cities/calgary',
         permanent: true,
       },
+      // C15 Ottawa: two blog duplicates consolidated into the city money
+      // page. /cities/ottawa content went from null → 13,847 chars
+      // (CPSO/CNO/CONO regulatory framework, real 2026 CAD bands,
+      // 5-neighbourhood cluster map, the unique bilingual NCR + Gatineau
+      // OIIQ/CMQ angle, compounding-pharmacy quality signal).
+      {
+        source: '/blog/best-iv-therapy-ottawa-2026',
+        destination: '/cities/ottawa',
+        permanent: true,
+      },
+      {
+        source: '/blog/iv-therapy-ottawa-2026-guide',
+        destination: '/cities/ottawa',
+        permanent: true,
+      },
     ];
   },
 };
