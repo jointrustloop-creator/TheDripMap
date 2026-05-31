@@ -306,6 +306,36 @@ const nextConfig = {
         destination: '/iv-therapy/glutathione/toronto',
         permanent: true,
       },
+      // C1 Toronto general: two large blog duplicates consolidated into
+      // the city money page. /cities/toronto.content rewritten 4,178 →
+      // 11,840 chars (CONO IVIT framework, 2026 CAD bands, neighbourhood
+      // landscape, 7 most-common drips with safety, mobile-vs-in-clinic,
+      // red-flag checklist, naturopathic-insurance angle). Signature
+      // Beauty Lounge Downtown's /providers/* page is unaffected and
+      // continues to rank #1 in the city's listings grid (is_featured +
+      // is_claimed = true).
+      {
+        source: '/blog/best-iv-therapy-toronto-2026',
+        destination: '/cities/toronto',
+        permanent: true,
+      },
+      {
+        source: '/blog/iv-therapy-toronto-complete-guide',
+        destination: '/cities/toronto',
+        permanent: true,
+      },
+      // C2 Toronto sub-geo (North York): blog redirects into the city
+      // money page after a fresh /cities/north-york row was inserted in
+      // the cities table (no row had existed — page was resolving via
+      // the slug-aware provider fallback). 5,396 chars of merged content
+      // with explicit deference to /cities/toronto for the regulatory
+      // framework. /blog/iv-therapy-yorkville-toronto stays standalone
+      // per audit (true neighborhood, no /cities/yorkville exists).
+      {
+        source: '/blog/iv-therapy-north-york',
+        destination: '/cities/north-york',
+        permanent: true,
+      },
     ];
   },
 };
