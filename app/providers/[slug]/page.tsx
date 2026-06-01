@@ -380,7 +380,10 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
           clinic logo as a small inset avatar and the clinic name in display type.
           Solves the legacy "logo stretched across 384px" and "name wraps to 2 lines"
           issues at the same time. */}
-      {provider.is_featured && (() => {
+      {/* Tier-split (2026-06-01): the magazine hero is the FREE-tier baseline experience.
+          Any claimed clinic gets it. Paid (Featured) clinics still get all the premium
+          extras (testimonials, schema, instant-book, top placement) below. */}
+      {provider.is_claimed && (() => {
         // Deterministic gradient per clinic — feels unique without using stock photo.
         // 6 dark-base gradients with tinted accents; pick from slug hash.
         const HERO_GRADIENTS = [
@@ -472,7 +475,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
 
       <main className="max-w-7xl mx-auto px-6 py-12">
         {/* BREADCRUMB — only show for unclaimed listings (claimed listings get the breadcrumb inside the hero) */}
-        {!provider.is_featured && (
+        {!provider.is_claimed && (
           <div className="mb-12">
             <BreadcrumbNav
               items={[
@@ -486,7 +489,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
 
         {/* Verified-and-claimed confirmation banner suppressed for claimed listings —
             the magazine hero above already shows the "Verified Clinic" pill prominently. */}
-        {!provider.is_featured && (
+        {!provider.is_claimed && (
           <div className="mb-12 space-y-6">
             <ClaimListingTrigger
               provider={provider}
@@ -537,7 +540,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               {/* H1 + key facts only render for UNCLAIMED listings — claimed
                   listings get the magazine hero above with the same content
                   in display type. */}
-              {!provider.is_featured && (
+              {!provider.is_claimed && (
                 <div className="flex flex-col md:flex-row gap-8 items-start">
                   <div>
                     <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight text-balance max-w-3xl">
@@ -632,7 +635,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 );
               })()}
 
-              {provider.is_featured && (
+              {provider.is_claimed && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {(provider.price_range || provider.priceRange) && (
                     <div className="flex flex-col gap-4">
@@ -677,7 +680,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
 
                 {/* Secondary city row only renders for unclaimed listings.
                     Claimed listings get the city in the magazine hero badge row. */}
-                {!provider.is_featured && (
+                {!provider.is_claimed && (
                   <div className="flex flex-wrap items-center gap-x-8 gap-y-4 text-base font-bold text-slate-500 mb-8">
                     <div className="flex items-center gap-2">
                       <MapPin size={20} className="text-wellness-600" />
@@ -686,8 +689,9 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   </div>
                 )}
 
-                {/* PHONE + WEBSITE ROW */}
-                {!provider.is_featured && (provider.phone || provider.website) && (
+                {/* PHONE + WEBSITE ROW — only for unclaimed listings.
+                    Claimed listings use the contact card above (gated on is_claimed). */}
+                {!provider.is_claimed && (provider.phone || provider.website) && (
                   <div className="flex flex-wrap gap-4 mb-8">
                     {provider.phone && (
                       provider.is_featured ? (
@@ -773,7 +777,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 pill chips for unclaimed. */}
             {provider.specialties && provider.specialties.length > 0 && (
               <section className="pt-8 border-t border-slate-100">
-                {provider.is_featured ? (
+                {provider.is_claimed ? (
                   (() => {
                     // Use real per-service prices from provider.services if populated.
                     // Never extrapolate a "from $150" floor from price_range tier — that
@@ -897,7 +901,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               </section>
             )}
 
-            {provider.is_featured && (
+            {provider.is_claimed && (
               <section className="pt-8 border-t border-slate-100">
                 <div className="bg-emerald-50 rounded-[2.5rem] border border-emerald-100 p-8 flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -913,8 +917,9 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               </section>
             )}
 
-            {/* QUICK FACTS GRID */}
-            {!provider.is_featured && (() => {
+            {/* QUICK FACTS GRID — only for unclaimed listings. Claimed listings
+                surface the same info inside their richer rendering above. */}
+            {!provider.is_claimed && (() => {
               const hasFacts = (provider.price_range || provider.priceRange) || 
                                isMobile || 
                                provider.walk_ins_welcome || 
@@ -961,8 +966,9 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               );
             })()}
 
-            {/* HOURS SECTION */}
-            {!provider.is_featured && provider.hours && Object.keys(provider.hours).length > 0 && (
+            {/* HOURS SECTION — simple stacked variant, unclaimed only.
+                Claimed listings get the side-by-side hours + map variant below. */}
+            {!provider.is_claimed && provider.hours && Object.keys(provider.hours).length > 0 && (
               <section id="hours" className="pt-8 border-t border-slate-100">
                 <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Hours</h2>
                 <div className="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm">
@@ -993,8 +999,10 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               </section>
             )}
 
-            {/* HOURS AND LOCATION - SIDE BY SIDE FOR FEATURED */}
-            {provider.is_featured && (
+            {/* HOURS AND LOCATION - SIDE BY SIDE for any claimed clinic
+                (free or featured). Premium presentation, but it's a free benefit
+                of the basic claim, not gated on Featured. */}
+            {provider.is_claimed && (
               <section id="location-hours" className="pt-16 border-t border-slate-100">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
                   {/* HOURS */}
@@ -1191,8 +1199,8 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                         className="bg-white rounded-[2rem] border border-slate-100 p-6 hover:shadow-xl transition-all group flex flex-col h-full"
                       >
                         <div className="relative h-40 rounded-2xl overflow-hidden mb-6">
-                          {clinic.is_featured ? (
-                            <ClinicImage 
+                          {clinic.is_claimed ? (
+                            <ClinicImage
                               name={clinic.name}
                               initials={cInitials}
                               imageUrl={clinic.imageUrl || clinic.image_url}
@@ -1241,20 +1249,23 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               </section>
             )}
 
-            {/* UPGRADE CTA FOR CLAIMED CLINICS */}
+            {/* UPGRADE CTA — FREE-tier (claimed but not Featured) only. Activated
+                2026-06-01 as part of the tier-split: claim now flips is_claimed
+                only, so this branch is real production code, not dead. */}
             {provider.is_claimed && !provider.is_featured && (
               <section className="bg-slate-900 rounded-[3rem] p-12 text-center text-white relative overflow-hidden shadow-2xl mt-16">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-wellness-600/20 rounded-full -mr-48 -mt-48 blur-3xl opacity-50" />
                 <div className="relative z-10">
                   <h2 className="text-3xl md:text-4xl font-black mb-6 tracking-tight">Unlock Your Clinic&apos;s Full Potential</h2>
                   <p className="text-xl opacity-80 mb-10 max-w-xl mx-auto font-medium leading-relaxed">
-                    Upgrade to a Featured listing to get 5x more visibility, verified badges, and a custom profile redesigned for conversions.
+                    Your free listing covers the basics. Upgrade to Featured for top placement on city + treatment pages, full photo gallery, patient testimonials, and instant-book CTAs.
                   </p>
-                  <button 
+                  <Link
+                    href="/for-clinics/upgrade"
                     className="inline-flex items-center gap-3 bg-wellness-600 text-white px-12 py-6 rounded-2xl font-black text-xl hover:scale-105 transition-all shadow-xl"
                   >
                     View Upgrade Options <ArrowRight size={24} />
-                  </button>
+                  </Link>
                 </div>
               </section>
             )}
@@ -1288,8 +1299,9 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
           <aside>
             <div className="sticky top-24 space-y-4">
               <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden">
-                {/* CARD HEADER — small logo + clinic name (visible after user scrolls past hero) */}
-                {provider.is_featured && (
+                {/* CARD HEADER — small logo + clinic name (visible after user scrolls past hero)
+                    Available to all claimed listings as part of the FREE-tier basics. */}
+                {provider.is_claimed && (
                   <div className="bg-gradient-to-br from-slate-50 to-white px-6 py-5 border-b border-slate-100 flex items-center gap-3">
                     {provider.imageUrl && (
                       <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 p-1.5 shrink-0 flex items-center justify-center">
@@ -1389,8 +1401,8 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                     </div>
                   )}
 
-                  {/* UNCLAIMED CTA — sidebar variant */}
-                  {!provider.is_featured && (
+                  {/* UNCLAIMED CTA — sidebar variant — only for unclaimed listings. */}
+                  {!provider.is_claimed && (
                     <div className="pt-4 border-t border-slate-100">
                       <ClaimListingTrigger
                         provider={provider}
@@ -1408,12 +1420,12 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
       </main>
 
       {/* Persistent claim CTA — desktop floating card + mobile bottom sheet. Unclaimed only. */}
-      {!provider.is_featured && <StickyClaimRail provider={provider} />}
+      {!provider.is_claimed && <StickyClaimRail provider={provider} />}
 
       {/* Auto-open claim modal when URL has ?claim=1 (outreach email link). Unclaimed only.
           Wrapped in Suspense because ClaimAutoOpener uses useSearchParams() —
           Next.js requires that to be Suspense-bounded for static prerender to succeed. */}
-      {!provider.is_featured && (
+      {!provider.is_claimed && (
         <Suspense fallback={null}>
           <ClaimAutoOpener provider={provider} />
         </Suspense>

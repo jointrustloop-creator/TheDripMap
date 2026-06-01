@@ -97,7 +97,11 @@ function step(name, ok, detail = '') {
       `status=${claimAfter?.status} verified_at=${claimAfter?.verified_at}`));
     const { data: provAfter } = await s.from('providers').select('is_claimed, is_featured').eq('id', testProvider.id).maybeSingle();
     results.push(step('providers.is_claimed = true', provAfter?.is_claimed === true));
-    results.push(step('providers.is_featured = true', provAfter?.is_featured === true));
+    // Stage 1 tier-split (2026-06-01): claim NO LONGER auto-grants Featured.
+    // A fresh claim should leave is_featured = false. Operators flip is_featured
+    // manually when a clinic upgrades to the paid tier.
+    results.push(step('providers.is_featured = false (free tier)', provAfter?.is_featured === false,
+      `actual is_featured=${provAfter?.is_featured}`));
 
     // STEP 5: Re-fire verify-claim with same token to confirm "already verified" path
     console.log('\n[STEP 5] Hit /verify-claim again — should be "already_verified"...');

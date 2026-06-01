@@ -88,9 +88,12 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
     return { status: 'error', reason: 'already_verified' };
   }
 
+  // Stage 1 tier-split (2026-06-01): claim flips is_claimed ONLY. is_featured
+  // stays false until manual operator upgrade or a paid Featured purchase —
+  // unblocking a real "claimed (free) vs Featured (paid)" distinction.
   const { error: updProvErr } = await supabase
     .from('providers')
-    .update({ is_claimed: true, is_featured: true })
+    .update({ is_claimed: true })
     .eq('id', provider.id);
 
   if (updProvErr) {
@@ -119,7 +122,7 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
 
 Your claim for ${provider.name} on TheDripMap has been verified.
 
-Our team will review and activate your profile within 24 hours. You'll be able to upgrade to a Featured listing for full benefits soon after.
+Your free listing is now live with verified status, your own logo, hours, services, contact info, and a map. To unlock Featured benefits — top placement on city + treatment pages, full photo gallery, patient testimonials, and instant-book CTAs — see https://www.thedripmap.com/for-clinics/upgrade.
 
 View your listing: ${listingUrl}
 
@@ -142,7 +145,7 @@ Owner phone: ${claim.owner_phone || 'Not provided'}
 Listing ID: ${provider.id}
 Public listing: ${listingUrl}
 
-Next step: review and set is_featured = true if approved.
+Status: claimed (free tier). Manually set is_featured=true if approved for a Featured upgrade.
 `,
   });
 
