@@ -36,13 +36,18 @@ import {
   getSimilarClinics,
   getApprovedTestimonials
 } from '../../../src/lib/data';
+import { SupabaseUnreachableError } from '../../../src/lib/supabase-health';
+import { TemporarilyUnavailable } from '../../../src/components/TemporarilyUnavailable';
 import { Provider } from '../../../src/types';
 import { cn } from '../../../src/lib/utils';
 import { getStatus } from '../../../src/lib/hours';
 import SmartSummary from '../../../src/components/SmartSummary';
 import { calculateValueMetrics } from '../../../src/lib/price-utils';
 
-export const revalidate = 60; // Revalidate every minute for live-ish data updates
+// Revalidate every 5 min. Bumped from 60 → 300 on 2026-05-31 alongside the
+// SupabaseUnreachableError fallback so a postgrest outage can't pin clinic
+// pages at 404 by caching a notFound() state.
+export const revalidate = 300;
 
 const STATE_MAP: Record<string, string> = {
   'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
@@ -126,8 +131,18 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: ProviderPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const provider = await getListingBySlug(slug);
-  
+  let provider: Awaited<ReturnType<typeof getListingBySlug>>;
+  try {
+    provider = await getListingBySlug(slug);
+  } catch (err) {
+    if (err instanceof SupabaseUnreachableError) {
+      // Soft fallback so a transient Supabase outage doesn't ship a "not found"
+      // title into Google's cache. Page renders TemporarilyUnavailable below.
+      return { title: 'IV Therapy Clinic | TheDripMap' };
+    }
+    throw err;
+  }
+
   if (!provider || provider.availability === false) {
     notFound();
   }
@@ -192,8 +207,17 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
 
 export default async function ProviderPage({ params }: ProviderPageProps) {
   const { slug } = await params;
-  const provider = await getListingBySlug(slug);
-  
+  let provider: Awaited<ReturnType<typeof getListingBySlug>>;
+  try {
+    provider = await getListingBySlug(slug);
+  } catch (err) {
+    if (err instanceof SupabaseUnreachableError) {
+      const guess = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      return <TemporarilyUnavailable kind="clinic" label={guess} />;
+    }
+    throw err;
+  }
+
   if (!provider || provider.availability === false) {
     notFound();
   }

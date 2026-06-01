@@ -1,5 +1,6 @@
 import { Provider, BlogPost, OperatorProfile, ListingStats } from '../types';
 import { supabase, isSupabaseConfigured, fetchAllRows } from './supabase';
+import { SupabaseUnreachableError, isSupabaseConnectionError } from './supabase-health';
 import { MOCK_BLOG_POSTS, MOCK_LISTINGS, MOCK_CITIES } from './mock-data';
 import { htmlToMarkdown, containsHtml } from './blog-utils';
 
@@ -419,6 +420,9 @@ export async function getListingBySlug(slug: string) {
     
     const { data: slugMatch, error: slugError } = await query.maybeSingle();
 
+    if (slugError && isSupabaseConnectionError(slugError)) {
+      throw new SupabaseUnreachableError(slugError.message);
+    }
     if (!slugError && slugMatch) {
       return enrichProvider(slugMatch);
     }
@@ -456,6 +460,8 @@ export async function getListingBySlug(slug: string) {
     const found = MOCK_LISTINGS.find(p => matchesSlug(p, slug));
     return found ? enrichProvider(found) : null;
   } catch (err) {
+    if (err instanceof SupabaseUnreachableError) throw err;
+    if (isSupabaseConnectionError(err)) throw new SupabaseUnreachableError((err as Error).message);
     console.error('Error in getListingBySlug:', err);
     const found = MOCK_LISTINGS.find(p => matchesSlug(p, slug));
     return found ? enrichProvider(found) : null;
@@ -1176,34 +1182,42 @@ export async function getCityBySlug(slug: string) {
       .ilike('slug', slug)
       .maybeSingle();
 
+    if (error && isSupabaseConnectionError(error)) {
+      throw new SupabaseUnreachableError(error.message);
+    }
     if (error || !data) {
       // Extended fallback: try matching by name if slug fails
       const namePattern = slug.replace(/-/g, ' ');
-      const { data: nameMatch } = await supabase
+      const nameResp = await supabase
         .from('cities')
         .select('*')
         .ilike('name', `%${namePattern}%`)
         .limit(1)
         .maybeSingle();
-      
-      if (nameMatch) return nameMatch;
+
+      if (nameResp.error && isSupabaseConnectionError(nameResp.error)) {
+        throw new SupabaseUnreachableError(nameResp.error.message);
+      }
+      if (nameResp.data) return nameResp.data;
 
       // Final fallback to mock
       const found = MOCK_CITIES.find(c => slugify(c.city) === slug);
-      return found ? { 
-        name: found.city, 
-        state: found.state, 
+      return found ? {
+        name: found.city,
+        state: found.state,
         slug: slugify(found.city),
         id: `mock-${slug}`
       } : null;
     }
     return data;
   } catch (err) {
+    if (err instanceof SupabaseUnreachableError) throw err;
+    if (isSupabaseConnectionError(err)) throw new SupabaseUnreachableError((err as Error).message);
     console.warn('Error in getCityBySlug:', err);
     const found = MOCK_CITIES.find(c => slugify(c.city) === slug);
-    return found ? { 
-      name: found.city, 
-      state: found.state, 
+    return found ? {
+      name: found.city,
+      state: found.state,
       slug: slugify(found.city),
       id: `mock-${slug}`
     } : null;

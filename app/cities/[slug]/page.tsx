@@ -11,15 +11,18 @@ import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
 import { QuizCTA } from '@/src/components/QuizCTA';
 import { ListingController } from '@/src/components/ListingController';
 import { getCityBySlug, getListingsByCity, getAllCities, getListingsByState, getFeaturedListings, getBlogPostBySlug, slugify } from '@/src/lib/data';
+import { SupabaseUnreachableError } from '@/src/lib/supabase-health';
+import { TemporarilyUnavailable } from '@/src/components/TemporarilyUnavailable';
 import { getCityIntro } from '@/src/lib/city-intros';
 import { MapTrigger } from '@/src/components/MapTrigger';
 import { FAQSection } from '@/src/components/FAQSection';
 import { NearbyCities } from '@/src/components/NearbyCities';
 
-// Short revalidate so listings_count / new providers propagate within ~1 minute.
-// Reverted from a brief force-dynamic experiment that was never actually deployed
-// (Vercel build pipeline was stuck — see commit history around 2026-05-25).
-export const revalidate = 60;
+// Revalidate every 5 min: balances freshness against the cost of a Supabase
+// outage caching a notFound() state. Bumped from 60 → 300 on 2026-05-31
+// alongside the SupabaseUnreachableError fallback so a 22-min postgrest
+// outage (like the one that night) can't pin every city page at 404.
+export const revalidate = 300;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
@@ -57,7 +60,21 @@ interface CityPageProps {
 
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const cityData = await getCityBySlug(slug);
+  let cityData;
+  try {
+    cityData = await getCityBySlug(slug);
+  } catch (err) {
+    if (err instanceof SupabaseUnreachableError) {
+      // Soft fallback: keep the page indexable with a generic title so a brief
+      // Supabase outage doesn't poison Google's cache with a "City Not Found".
+      const guess = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      return {
+        title: `IV Therapy in ${guess} | TheDripMap`,
+        description: `IV therapy clinics and providers in ${guess}.`,
+      };
+    }
+    throw err;
+  }
   
   let name = '';
   let state = '';
@@ -157,7 +174,16 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
 
 export default async function IndividualCityPage({ params }: CityPageProps) {
   const { slug } = await params;
-  let cityData = await getCityBySlug(slug);
+  let cityData;
+  try {
+    cityData = await getCityBySlug(slug);
+  } catch (err) {
+    if (err instanceof SupabaseUnreachableError) {
+      const guess = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      return <TemporarilyUnavailable kind="city" label={guess} />;
+    }
+    throw err;
+  }
 
   // If no city record was found in the 'cities' table or mock data
   if (!cityData) {
