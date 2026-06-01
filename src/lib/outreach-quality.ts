@@ -154,17 +154,12 @@ export function isDomainMismatch(
 }
 
 /**
- * Reusable CASL-compliant footer fragment. Drop into the bottom of any
- * cold-outreach email. Always end the email body with this block.
+ * Outreach footer fragment. Drop into the bottom of any cold-outreach email.
  *
- * Leaves [MAILING ADDRESS] as a literal placeholder so the human reviewer can
- * paste in the correct address before sending. (We deliberately do NOT have
- * the code emit a hard-coded mailing address — there isn't one in env, and we
- * don't want to ship a wrong one to clinics.)
- *
- * Identification: TheDripMap + info email + placeholder mailing address.
- * Unsubscribe: reply with 'unsubscribe' OR email info@thedripmap.com.
+ * 2026-06-01: The mailing-address identification line was stripped at the
+ * operator's request. This footer is intentionally NOT fully CASL-compliant —
+ * sender + mailing address identification is omitted. The unsubscribe block is
+ * preserved as a baseline-of-decency signal. Operator has accepted the tradeoff.
  */
 export const CASL_FOOTER = `\n—
-TheDripMap · info@thedripmap.com · [MAILING ADDRESS]
 You're receiving this because your clinic was identified as an IV therapy provider in our directory. To stop receiving these emails, reply with 'unsubscribe' in the subject line, or email info@thedripmap.com with 'unsubscribe'.`;
