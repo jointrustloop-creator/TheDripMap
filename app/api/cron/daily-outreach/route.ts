@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../../src/lib/mailer';
 import { saveDrafts, type DraftPayload } from '../../../../src/lib/draft-saver';
+import { isJunkEmail, isDomainMismatch, CASL_FOOTER } from '../../../../src/lib/outreach-quality';
 
 const SITE_URL = 'https://www.thedripmap.com';
 const DAILY_TARGET = 19;
@@ -36,6 +37,7 @@ interface ProviderRow {
   country: string | null;
   city: string | null;
   state: string | null;
+  website: string | null;
 }
 
 function isCanadian(country?: string | null): boolean {
@@ -43,14 +45,9 @@ function isCanadian(country?: string | null): boolean {
 }
 
 function isEligibleEmail(email: string | null | undefined): boolean {
-  if (!email) return false;
-  const e = email.trim().toLowerCase();
-  if (!e) return false;
-  // Skip image-scrape garbage like "images-merchandise_..._site@2x.jpeg"
-  if (/\.(jpe?g|png|gif|webp|svg)$/i.test(e)) return false;
-  // Basic shape check
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return false;
-  return true;
+  // Now delegates to the shared junk-scrubber. Kept as a thin wrapper to
+  // minimise the diff against the rest of this route.
+  return !isJunkEmail(email);
 }
 
 function buildSingleLocationBody(p: ProviderRow): string {
@@ -77,9 +74,7 @@ Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-
-—
-To unsubscribe from TheDripMap outreach emails, reply with 'unsubscribe' in the subject line or email info@thedripmap.com`;
+${CASL_FOOTER}`;
 }
 
 function buildMultiLocationBody(providers: ProviderRow[], email: string): string {
@@ -119,9 +114,7 @@ Warmly,
 Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
-
-—
-To unsubscribe from TheDripMap outreach emails, reply with 'unsubscribe' in the subject line or email info@thedripmap.com`;
+${CASL_FOOTER}`;
 }
 
 // GET /api/cron/daily-outreach
@@ -162,7 +155,7 @@ export async function GET(req: Request) {
   // Canadian inventory considered before US.
   const { data, error } = await supabase
     .from('providers')
-    .select('id, name, slug, rating, reviews, email, country, city, state')
+    .select('id, name, slug, rating, reviews, email, country, city, state, website')
     .neq('availability', false)
     .eq('is_featured', false)
     .neq('outreach_sent', true)
@@ -176,9 +169,12 @@ export async function GET(req: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Existing rating/reviews filter (unrated rows allowed; rated rows must meet threshold).
+  // Existing rating/reviews filter (unrated rows allowed; rated rows must meet
+  // threshold) + the new quality scrubbers: hard reject junk/catchall emails,
+  // soft reject vendor-domain-mismatch emails.
   const candidates = (data as ProviderRow[]).filter((p) => {
     if (!isEligibleEmail(p.email)) return false;
+    if (isDomainMismatch(p.email, p.website)) return false;
     return !p.rating || (Number(p.reviews) >= MIN_REVIEWS && Number(p.rating) >= MIN_RATING);
   });
 

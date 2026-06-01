@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../../src/lib/mailer';
 import { saveDrafts, type DraftPayload } from '../../../../src/lib/draft-saver';
+import { isJunkEmail, isDomainMismatch, CASL_FOOTER } from '../../../../src/lib/outreach-quality';
 
 const SITE_URL = 'https://www.thedripmap.com';
 const DAILY_TARGET = 15;
@@ -35,6 +36,7 @@ interface ProviderRow {
   country: string | null;
   city: string | null;
   state: string | null;
+  website: string | null;
   outreach_sent_at: string | null;
 }
 
@@ -43,12 +45,8 @@ function isCanadian(country?: string | null): boolean {
 }
 
 function isEligibleEmail(email: string | null | undefined): boolean {
-  if (!email) return false;
-  const e = email.trim().toLowerCase();
-  if (!e) return false;
-  if (/\.(jpe?g|png|gif|webp|svg)$/i.test(e)) return false;
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return false;
-  return true;
+  // Delegates to the shared junk-scrubber in outreach-quality.ts.
+  return !isJunkEmail(email);
 }
 
 function buildSingleFollowupBody(p: ProviderRow): string {
@@ -76,8 +74,7 @@ Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
 
-—
-To unsubscribe from TheDripMap outreach emails, reply with 'unsubscribe' in the subject line or email info@thedripmap.com`;
+${CASL_FOOTER}`;
 }
 
 function buildMultiLocationFollowupBody(providers: ProviderRow[], email: string): string {
@@ -120,8 +117,7 @@ Deborah Triandafilou
 TheDripMap
 info@thedripmap.com
 
-—
-To unsubscribe from TheDripMap outreach emails, reply with 'unsubscribe' in the subject line or email info@thedripmap.com`;
+${CASL_FOOTER}`;
 }
 
 // GET /api/cron/followup-outreach
@@ -160,7 +156,7 @@ export async function GET(req: Request) {
 
   const { data, error } = await supabase
     .from('providers')
-    .select('id, name, slug, rating, reviews, email, country, city, state, outreach_sent_at')
+    .select('id, name, slug, rating, reviews, email, country, city, state, website, outreach_sent_at')
     .neq('availability', false)
     .eq('is_featured', false)
     .eq('outreach_sent', true)
@@ -175,7 +171,11 @@ export async function GET(req: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const candidates = (data as ProviderRow[]).filter((p) => isEligibleEmail(p.email));
+  // Same scrub+mismatch filter as the daily cron — keeps the followup pool
+  // consistent so we never follow up on a junk address we shouldn't have used.
+  const candidates = (data as ProviderRow[]).filter((p) =>
+    isEligibleEmail(p.email) && !isDomainMismatch(p.email, p.website)
+  );
 
   if (candidates.length === 0) {
     const today = new Date().toISOString().slice(0, 10);
