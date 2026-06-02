@@ -877,6 +877,37 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               </section>
             )}
 
+            {/* PHOTOS GRID — up to 3 real photos for any claimed clinic (FREE tier).
+                Applies the same stock-image filter as enrichProvider does for
+                image_url, so any seed picsum/unsplash URLs are silently skipped. */}
+            {provider.is_claimed && Array.isArray(provider.photos) && (() => {
+              const realPhotos = (provider.photos as unknown[])
+                .filter((p): p is string => typeof p === 'string' && p.length > 0)
+                .filter((p) => !p.includes('picsum.photos') && !p.includes('unsplash.com'))
+                .slice(0, 3);
+              if (realPhotos.length === 0) return null;
+              return (
+                <section className="pt-8 border-t border-slate-100">
+                  <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Photos</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {realPhotos.map((photo, idx) => (
+                      <div
+                        key={photo + idx}
+                        className="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200"
+                      >
+                        <ResilientImage
+                          src={photo}
+                          fallbackSrc={DEFAULT_CLINIC_IMAGE}
+                          alt={`${provider.name} photo ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              );
+            })()}
+
             {/* UNCLAIMED LISTING CARD / FEATURED BADGE */}
             {!provider.is_featured && !provider.is_claimed && (
               <section className="pt-8 border-t border-slate-100">
