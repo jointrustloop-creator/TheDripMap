@@ -60,14 +60,14 @@ function buildSingleLocationBody(p: ProviderRow): string {
   // rating, framed as "you're in a small group of clinics patients trust" —
   // which is TheDripMap's positioning (verified-quality directory).
   const opener = hasRating
-    ? `I came across ${display} while researching the top-rated IV therapy clinics in ${city || 'your area'}. Your Google rating of ${p.rating}★ across ${p.reviews} reviews puts you in a small group of clinics patients actually trust — which is exactly the kind we feature on TheDripMap.`
-    : `I came across ${display} while building out our ${city || 'local'} IV therapy listings on TheDripMap — North America's directory for IV therapy clinics.`;
+    ? `I came across ${display} while researching the top-rated IV therapy clinics in ${city || 'your area'}. Your Google rating of ${p.rating}★ across ${p.reviews} reviews puts you in a small group of clinics patients actually trust, which is exactly the kind we feature on TheDripMap.`
+    : `I came across ${display} while building out our ${city || 'local'} IV therapy listings on TheDripMap, North America's directory for IV therapy clinics.`;
 
   return `Hi ${display} team,
 
 ${opener}
 
-We added your listing — but right now it's unclaimed, so visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes:
+We added your listing, but right now it's unclaimed, so visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes:
 ${claimUrl}
 
 Warmly,
@@ -97,18 +97,18 @@ function buildMultiLocationBody(providers: ProviderRow[], email: string): string
 
   const locations = providers.map((p) => {
     const url = `${SITE_URL}/providers/${p.slug}?claim=1`;
-    return `  • ${cleanName(p.name)} — ${locationLabel(p)}\n    ${url}`;
+    return `  • ${cleanName(p.name)} - ${locationLabel(p)}\n    ${url}`;
   }).join('\n');
 
   return `Hi ${brand} team,
 
-I came across ${count} of your ${brand} locations across ${cityPhrase} while researching trusted IV therapy clinics for TheDripMap — North America's directory for IV therapy. All ${count} are live with us but currently unclaimed:
+I came across ${count} of your ${brand} locations across ${cityPhrase} while researching trusted IV therapy clinics for TheDripMap, North America's directory for IV therapy. All ${count} are live with us but currently unclaimed:
 
 ${locations}
 
 Right now visitors see a generic placeholder on each one instead of your real photos, hours, services, and description. Claiming each listing is free and takes 2 minutes.
 
-I sent this once to ${email.toLowerCase().trim()} because all ${count} locations share that email — so you only hear from me once, not ${count} times.
+I sent this once to ${email.toLowerCase().trim()} because all ${count} locations share that email, so you only hear from me once, not ${count} times.
 
 Warmly,
 Deborah Triandafilou
@@ -185,8 +185,8 @@ export async function GET(req: Request) {
       await sendMail({
         from: 'TheDripMap <info@thedripmap.com>',
         to: 'info@thedripmap.com',
-        subject: `[TheDripMap] 0 outreach drafts ready for review — pool exhausted`,
-        text: `Daily outreach drafts — ${today}\n\nThe eligible outreach pool is exhausted. No new drafts prepared today.\n\nNext steps: source more emails for unclaimed listings, or expand inventory.`,
+        subject: `[TheDripMap] 0 outreach drafts ready for review, pool exhausted`,
+        text: `Daily outreach drafts, ${today}\n\nThe eligible outreach pool is exhausted. No new drafts prepared today.\n\nNext steps: source more emails for unclaimed listings, or expand inventory.`,
       });
     } catch (err) {
       console.error('outreach pool-exhausted report failed:', err);
@@ -281,7 +281,7 @@ export async function GET(req: Request) {
   const caDrafts = selected.filter((g) => isCanadian(g.anchor.country)).length;
   const usDrafts = selected.length - caDrafts;
   const reportLines = [
-    `Daily outreach drafts — ${today}`,
+    `Daily outreach drafts, ${today}`,
     '',
     `Drafts prepared: ${savedDrafts} (covering ${savedListings} provider listings)`,
     `Canadian drafts: ${caDrafts}`,
@@ -295,7 +295,7 @@ export async function GET(req: Request) {
       const tag = isCanadian(anchor.country) ? 'CA' : 'US';
       const brand = cleanName(anchor.name);
       const note = providers.length > 1 ? ` (${providers.length} listings)` : '';
-      return `✓ [${tag}] ${brand} — ${email}${note}`;
+      return `✓ [${tag}] ${brand} - ${email}${note}`;
     }),
     ...(failures.length ? ['', 'Failures:', ...failures.map((f) => `✗ ${f.email}: ${f.error}`)] : []),
     '',

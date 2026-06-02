@@ -56,12 +56,12 @@ function buildSingleFollowupBody(p: ProviderRow): string {
   const hasRating = !!(p.rating && Number(p.reviews) > 0);
 
   const recap = hasRating
-    ? `Quick recap: ${display} is live on TheDripMap with your real Google rating of ${p.rating}★ across ${p.reviews} reviews — but the listing is still unclaimed, so visitors in ${city || 'your area'} see a generic placeholder instead of your photos, hours, services, and description.`
-    : `Quick recap: ${display} is live on TheDripMap among the trusted IV therapy clinics in ${city || 'your area'} — but it's still unclaimed, so visitors see a generic placeholder instead of your real photos, hours, services, and description.`;
+    ? `Quick recap: ${display} is live on TheDripMap with your real Google rating of ${p.rating}★ across ${p.reviews} reviews, but the listing is still unclaimed, so visitors in ${city || 'your area'} see a generic placeholder instead of your photos, hours, services, and description.`
+    : `Quick recap: ${display} is live on TheDripMap among the trusted IV therapy clinics in ${city || 'your area'}, but it's still unclaimed, so visitors see a generic placeholder instead of your real photos, hours, services, and description.`;
 
   return `Hi ${display} team,
 
-Following up on the note I sent last week about claiming your free listing on TheDripMap — I know inboxes can be busy.
+Following up on the note I sent last week about claiming your free listing on TheDripMap. I know inboxes can be busy.
 
 ${recap} Claiming gives you full control and takes 2 minutes:
 
@@ -97,18 +97,18 @@ function buildMultiLocationFollowupBody(providers: ProviderRow[], email: string)
 
   const locations = providers.map((p) => {
     const url = `${SITE_URL}/providers/${p.slug}?claim=1`;
-    return `  • ${cleanName(p.name)} — ${locationLabel(p)}\n    ${url}`;
+    return `  • ${cleanName(p.name)} - ${locationLabel(p)}\n    ${url}`;
   }).join('\n');
 
   return `Hi ${brand} team,
 
-Following up on the note I sent last week about your ${count} ${brand} locations across ${cityPhrase} on TheDripMap — I know inboxes can be busy. All ${count} are still unclaimed:
+Following up on the note I sent last week about your ${count} ${brand} locations across ${cityPhrase} on TheDripMap. I know inboxes can be busy. All ${count} are still unclaimed:
 
 ${locations}
 
 Quick recap: visitors see a generic placeholder on each one instead of your real photos, hours, services, and description. Claiming each is free and takes 2 minutes.
 
-I sent this once to ${email.toLowerCase().trim()} because all ${count} locations share that email — so you only hear from me once, not ${count} times.
+I sent this once to ${email.toLowerCase().trim()} because all ${count} locations share that email, so you only hear from me once, not ${count} times.
 
 If I'm reaching the wrong person, would you mind forwarding this to whoever handles marketing or the front desk?
 
@@ -183,8 +183,8 @@ export async function GET(req: Request) {
       await sendMail({
         from: 'TheDripMap <info@thedripmap.com>',
         to: 'info@thedripmap.com',
-        subject: `[TheDripMap] 0 followup drafts ready for review — pool exhausted`,
-        text: `Daily followup drafts — ${today}\n\nNo clinics eligible for a 7-day follow-up today.`,
+        subject: `[TheDripMap] 0 followup drafts ready for review, pool exhausted`,
+        text: `Daily followup drafts, ${today}\n\nNo clinics eligible for a 7-day follow-up today.`,
       });
     } catch (err) {
       console.error('followup pool-exhausted report failed:', err);
@@ -228,8 +228,8 @@ export async function GET(req: Request) {
     const anchor = providers[0];
     const display = cleanName(anchor.name);
     const subject = providers.length > 1
-      ? `Following up — your ${display} locations on TheDripMap`
-      : `Following up — your ${display} listing on TheDripMap`;
+      ? `Following up on your ${display} locations on TheDripMap`
+      : `Following up on your ${display} listing on TheDripMap`;
     const text = providers.length > 1
       ? buildMultiLocationFollowupBody(providers, email)
       : buildSingleFollowupBody(anchor);
@@ -278,7 +278,7 @@ export async function GET(req: Request) {
   const caDrafts = selected.filter((g) => isCanadian(g.anchor.country)).length;
   const usDrafts = selected.length - caDrafts;
   const reportLines = [
-    `Daily FOLLOW-UP drafts — ${today}`,
+    `Daily FOLLOW-UP drafts, ${today}`,
     '',
     `Drafts prepared: ${savedDrafts} (covering ${savedListings} provider listings)`,
     `Canadian drafts: ${caDrafts}`,
@@ -292,7 +292,7 @@ export async function GET(req: Request) {
       const tag = isCanadian(anchor.country) ? 'CA' : 'US';
       const brand = cleanName(anchor.name);
       const note = providers.length > 1 ? ` (${providers.length} listings)` : '';
-      return `✓ [${tag}] ${brand} — ${email}${note}`;
+      return `✓ [${tag}] ${brand} - ${email}${note}`;
     }),
     ...(failures.length ? ['', 'Failures:', ...failures.map((f) => `✗ ${f.email}: ${f.error}`)] : []),
   ];

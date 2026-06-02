@@ -539,9 +539,33 @@ export default function DefinitiveListingLayout({
                   {(provider.address || (provider.latitude && provider.longitude)) && (
                     <div>
                       <div className="text-[11.5px] tracking-[0.18em] uppercase text-[#b08a3e] font-semibold inline-flex items-center gap-[10px] mb-[14px] before:content-[''] before:w-[22px] before:h-[1px] before:bg-[#b08a3e]">Location</div>
-                      <div className="h-[182px] rounded-[16px] border border-[rgba(25,36,28,0.09)] bg-[#ebf1e5] flex items-center justify-center text-[#a8b69b] mt-2">
-                        <MapIcon size={24} />
-                      </div>
+                      {provider.latitude && provider.longitude ? (
+                        <a
+                          href={directionsHref || `https://www.google.com/maps/search/?api=1&query=${provider.latitude},${provider.longitude}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block h-[182px] rounded-[16px] border border-[rgba(25,36,28,0.09)] overflow-hidden bg-[#ebf1e5] mt-2 relative group"
+                          aria-label={`Open map of ${provider.name} location in Google Maps`}
+                        >
+                          {process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ? (
+                            <ResilientImage
+                              src={`https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+1f3a27(${provider.longitude},${provider.latitude})/${provider.longitude},${provider.latitude},14,0/700x300@2x?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`}
+                              alt={`${provider.name} map location`}
+                              fill
+                              className="object-cover"
+                              fallbackSrc={DEFAULT_CLINIC_IMAGE}
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center h-full text-[#5c685e] text-sm font-medium">
+                              <MapIcon size={24} className="mr-2" /> Open in Google Maps
+                            </div>
+                          )}
+                        </a>
+                      ) : (
+                        <div className="h-[182px] rounded-[16px] border border-[rgba(25,36,28,0.09)] bg-[#ebf1e5] flex items-center justify-center text-[#a8b69b] mt-2">
+                          <MapIcon size={24} />
+                        </div>
+                      )}
                       {provider.address && (
                         <div className="text-[14.5px] text-[#5c685e] mt-[14px] leading-[1.55]">
                           <b className="text-[#19241c] font-semibold">{provider.address}</b>
@@ -577,9 +601,13 @@ export default function DefinitiveListingLayout({
             )}
           </main>
 
-          {/* ───────────────────────── STICKY BOOKING ASIDE ───────────────────────── */}
-          <aside>
-            <div className="lg:sticky lg:top-6 bg-[#fffefa] border border-[rgba(25,36,28,0.15)] rounded-[22px] overflow-hidden shadow-sm">
+          {/* ───────────────────────── STICKY BOOKING ASIDE ─────────────────────────
+              Sticky lives on the <aside> itself (with self-start so the aside
+              doesn't stretch to the row height and so sticky has actual scroll
+              runway inside the surrounding grid row). The inner card stays a
+              plain block. */}
+          <aside className="lg:sticky lg:top-6 lg:self-start">
+            <div className="bg-[#fffefa] border border-[rgba(25,36,28,0.15)] rounded-[22px] overflow-hidden shadow-sm">
               <div className="h-[4px]" style={{ background: 'linear-gradient(90deg, #b08a3e, #d8b878)' }} />
               <div className="p-6">
                 <div className="flex gap-3 items-center pb-[18px] border-b border-[rgba(25,36,28,0.09)]">

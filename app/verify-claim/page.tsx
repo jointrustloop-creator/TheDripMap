@@ -122,11 +122,11 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
 
 Your claim for ${provider.name} on TheDripMap has been verified.
 
-Your free listing is now live with verified status, your own logo, hours, services, contact info, and a map. To unlock Featured benefits — top placement on city + treatment pages, full photo gallery, patient testimonials, and instant-book CTAs — see https://www.thedripmap.com/for-clinics/upgrade.
+Your free listing is now live with verified status, your own logo, hours, services, contact info, and a map. To unlock Featured benefits (top placement on city and treatment pages, full photo gallery, patient testimonials, and instant-book CTAs), see https://www.thedripmap.com/for-clinics/upgrade.
 
 View your listing: ${listingUrl}
 
-— The TheDripMap Team
+The TheDripMap Team
 `,
   });
 
