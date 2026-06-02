@@ -385,7 +385,9 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
     return (
       <div className="min-h-screen bg-[#f8f5ee]">
         <Navbar />
-        <ClaimAutoOpener provider={provider} />
+        {/* ClaimAutoOpener intentionally omitted on the claimed branch — it
+            uses useSearchParams() and would need a Suspense boundary, and
+            a claimed clinic has no claim modal to auto-open anyway. */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(medicalBusinessJsonLd) }}
