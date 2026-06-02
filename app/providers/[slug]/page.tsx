@@ -436,8 +436,15 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <div className="inline-flex items-center gap-1.5 bg-emerald-500/95 text-white text-[10px] font-black uppercase tracking-[0.15em] px-2.5 py-1 rounded-full mb-3 shadow-lg">
-                  <CheckCircle2 size={11} /> Verified Clinic
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  <div className="inline-flex items-center gap-1.5 bg-emerald-500/95 text-white text-[10px] font-black uppercase tracking-[0.15em] px-2.5 py-1 rounded-full shadow-lg">
+                    <CheckCircle2 size={11} /> Verified Clinic
+                  </div>
+                  {(provider as { decision_drivers?: { safety_verified?: boolean } }).decision_drivers?.safety_verified && (
+                    <div className="inline-flex items-center gap-1.5 bg-sky-500/95 text-white text-[10px] font-black uppercase tracking-[0.15em] px-2.5 py-1 rounded-full shadow-lg" title="Operator confirmed: licensed medical oversight, sterile pharmaceutical-grade IV products, and trained clinical staff.">
+                      <CheckCircle2 size={11} /> Safety Verified
+                    </div>
+                  )}
                 </div>
                 <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.05] text-balance">
                   {displayName}

@@ -157,7 +157,11 @@ export function enrichProvider(p: any): Provider {
     is_verified: isVerified,
     is_top_rated: isTopRated,
     type: isMobile ? 'Mobile' : (p.type || 'In-Clinic'),
-    services: specialties,
+    // Preserve structured services [{name, price}] when present (so per-treatment
+    // pricing reaches the Drip Menu). Otherwise fall back to specialty strings.
+    services: (Array.isArray(p.services) && p.services.some((sv: unknown) =>
+      sv && typeof sv === 'object' && 'name' in (sv as Record<string, unknown>) && 'price' in (sv as Record<string, unknown>)
+    )) ? p.services : specialties,
     reviews_data: p.reviews_data || [],
     medical_team: p.medical_team || [],
     special_offers: p.special_offers || []
