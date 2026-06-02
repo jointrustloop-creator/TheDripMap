@@ -43,6 +43,7 @@ import { cn } from '../../../src/lib/utils';
 import { getStatus } from '../../../src/lib/hours';
 import SmartSummary from '../../../src/components/SmartSummary';
 import { calculateValueMetrics } from '../../../src/lib/price-utils';
+import DefinitiveListingLayout from '../../../src/components/DefinitiveListingLayout';
 
 // Revalidate every 5 min. Bumped from 60 → 300 on 2026-05-31 alongside the
 // SupabaseUnreachableError fallback so a postgrest outage can't pin clinic
@@ -375,6 +376,51 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
       }
     ]
   } : null;
+
+  // ─────────────────────────────────────────────────────────────
+  // CLAIMED LISTINGS: render the new editorial template (DefinitiveListingLayout).
+  // Unclaimed listings continue to use the legacy render path below.
+  // ─────────────────────────────────────────────────────────────
+  if (provider.is_claimed) {
+    return (
+      <div className="min-h-screen bg-[#f8f5ee]">
+        <Navbar />
+        <ClaimAutoOpener provider={provider} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(medicalBusinessJsonLd) }}
+        />
+        {faqJsonLd && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+          />
+        )}
+        <DefinitiveListingLayout
+          provider={provider}
+          profile={profile}
+          safetyResults={safetyResults.map(r => ({ key: r.key, label: r.label, detail: r.detail, passed: r.passed }))}
+          safetyVerified={safetyVerified}
+          status={status}
+          displayName={displayName}
+          displayRating={displayRating}
+          displayReviewCount={displayReviewCount}
+          stateCode={stateCode}
+          cityLabel={cityLabel}
+          initials={initials}
+          similarClinics={similarClinics.map(c => ({
+            name: c.name,
+            slug: c.slug || '',
+            city: c.city,
+            state: c.state,
+            specialties: c.specialties || [],
+          }))}
+          citySlug={citySlug}
+        />
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FDFDFB]">

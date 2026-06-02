@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from 'next/font/google';
+import { Inter, Outfit, Fraunces, Hanken_Grotesk } from 'next/font/google';
 import "./globals.css";
 import Script from "next/script";
 import { ErrorBoundary } from "../src/components/ErrorBoundary";
@@ -16,6 +16,21 @@ const inter = Inter({
 const outfit = Outfit({
   subsets: ['latin'],
   variable: '--font-display',
+});
+
+// Editorial-listing fonts (used by DefinitiveListingLayout on claimed clinic
+// pages). Exposed site-wide as CSS variables — only the listing template
+// actually references them, so other pages are unaffected.
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  weight: ['300', '400', '500'],
+  variable: '--font-fraunces',
+});
+
+const hankenGrotesk = Hanken_Grotesk({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-hanken',
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thedripmap.com';
@@ -90,7 +105,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
+    <html lang="en" className={`${inter.variable} ${outfit.variable} ${fraunces.variable} ${hankenGrotesk.variable}`}>
       <head>
         <script
           id="fix-fetch-getter"
