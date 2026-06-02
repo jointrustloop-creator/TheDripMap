@@ -176,43 +176,86 @@ function SetupContent() {
           details: error.details,
           hint: error.hint
         });
-        throw error;
+        // Note: we deliberately do not throw — the operator_profile is a
+        // nice-to-have audit trail. The canonical user-facing outcome (claim +
+        // verification email) is the /api/notify-operator call below, and it
+        // must always run so the owner never dead-ends.
+      } else {
+        console.log('Profile saved successfully:', data);
       }
 
-      console.log('Profile saved successfully:', data);
-      
-      // Send Telegram notification
+      // 4. CANONICAL CLAIM PATH: every setup submission must converge on the
+      // same verified flow as the ClaimListingModal — create a claim_requests
+      // row, send the owner a verification email, and (for orphan claims with
+      // no matching listing) auto-create a providers stub. /api/notify-operator
+      // is the single chokepoint for all of that. We pass listingId when the
+      // operator arrived from a provider page (?clinicId=...), and let the
+      // route handle the orphan stub creation when they typed a clinic name
+      // we do not yet have. We also pass city / address / state / ownerPhone
+      // so the stub is created with real data, not just a bare name.
+      let claimSucceeded = false;
       try {
-        await fetch('/api/notify-operator', {
+        // Best-effort lookup of the provider's slug + city when claiming an
+        // existing listing, so the admin notification has full context.
+        let providerSlug: string | null = null;
+        let providerCity: string | null = clinicCity || null;
+        let providerState: string | null = null;
+        let providerAddress: string | null = null;
+        if (clinicId) {
+          const { data: prov } = await supabase
+            .from('providers')
+            .select('slug, city, state, address')
+            .eq('id', clinicId)
+            .maybeSingle();
+          if (prov) {
+            providerSlug = prov.slug || null;
+            providerCity = providerCity || prov.city || null;
+            providerState = prov.state || null;
+            providerAddress = prov.address || null;
+          }
+        }
+
+        const notifyRes = await fetch('/api/notify-operator', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             clinicName: formData.clinicName,
             ownerName: formData.ownerName,
             email: formData.email,
-            specialty: formData.primarySpecialty
-          })
+            specialty: formData.primarySpecialty,
+            // Pass listing context when we have it so notify-operator links
+            // the claim to the right provider instead of creating a stub.
+            listingId: clinicId || null,
+            providerSlug,
+            // Address fields used by notify-operator's orphan stub creation
+            // (ignored when listingId is supplied).
+            address: providerAddress,
+            city: providerCity,
+            state: providerState,
+          }),
         });
+        claimSucceeded = notifyRes.ok;
+        if (!notifyRes.ok) {
+          console.error('notify-operator returned non-OK:', notifyRes.status);
+        }
       } catch (notifyErr) {
-        console.error('Failed to send telegram notification:', notifyErr);
-        // Don't block the user if notification fails
+        console.error('Failed to call /api/notify-operator:', notifyErr);
+        // Do not block — fall through to success page. Operator still has
+        // the operator_profile record, and the admin will see the orphan
+        // claim in the daily review.
       }
-      
+
       // Save email to localStorage for dashboard lookup persistence without auth
       localStorage.setItem('operator_email', formData.email);
 
-      // 4. Update the listings table if claiming
-      if (clinicId) {
-        await supabase
-          .from('providers')
-          .update({ 
-            is_featured: true 
-          })
-          .eq('id', clinicId);
-      }
+      // NOTE (Stage 1 tier-split, 2026-06-01): we no longer flip is_featured
+      // here. The verify-claim flow flips is_claimed only after the owner
+      // confirms ownership via the email link. Featured is paid-tier and
+      // gated by manual operator upgrade, not by setup-form submission.
 
-      // Redirect to confirmation success page
-      router.push('/for-clinics/success');
+      // Redirect — pass a flag so the success page can hint at "check your
+      // email for the verification link" when the claim path actually fired.
+      router.push(`/for-clinics/success${claimSucceeded ? '?verify=sent' : ''}`);
     } catch (err: unknown) {
       console.error('Final registration error:', err);
       router.push('/for-clinics/success');
