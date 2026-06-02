@@ -76,24 +76,46 @@ interface Props {
 // Region → regulator line. Localizes the State board criterion in the Safety
 // Verified module. Falls back to a generic label if not mapped.
 const REGULATOR_MAP: Record<string, string> = {
-  // Canadian provinces — nursing or naturopathic boards depending on
-  // primary admin type, simplified to one line per province.
+  // Canadian provinces, nursing or naturopathic boards depending on primary
+  // admin type, simplified to one line per province.
   ON: 'College of Nurses of Ontario',
   BC: 'CCHPBC (BC Naturopathic Doctors)',
-  AB: 'College of Physicians & Surgeons of Alberta',
+  AB: 'College of Physicians and Surgeons of Alberta',
   QC: 'Ordre des infirmières et infirmiers du Québec',
   MB: 'College of Registered Nurses of Manitoba',
   SK: 'Saskatchewan Registered Nurses Association',
   NS: 'Nova Scotia College of Nursing',
-  // US — generic
+  NB: 'Nurses Association of New Brunswick',
+  NL: 'College of Registered Nurses of Newfoundland and Labrador',
+  PE: 'College of Registered Nurses of Prince Edward Island',
+  // US, generic for top targets
   NY: 'New York State Education Department, Office of the Professions',
   CA: 'California Board of Registered Nursing',
   TX: 'Texas Board of Nursing',
   FL: 'Florida Board of Nursing',
 };
 
+// Normalize either a 2-letter code or a full province/state name to the
+// 2-letter code used by REGULATOR_MAP. Some providers store "Ontario",
+// others store "ON" — be defensive.
+const STATE_NAME_TO_CODE: Record<string, string> = {
+  ontario: 'ON',
+  'british columbia': 'BC',
+  alberta: 'AB',
+  quebec: 'QC',
+  québec: 'QC',
+  manitoba: 'MB',
+  saskatchewan: 'SK',
+  'nova scotia': 'NS',
+  'new brunswick': 'NB',
+  'newfoundland and labrador': 'NL',
+  'prince edward island': 'PE',
+};
+
 function regulatorLine(stateCode: string): string {
-  return REGULATOR_MAP[stateCode] || 'State / provincial professional board';
+  const raw = (stateCode || '').trim();
+  const code = raw.length === 2 ? raw.toUpperCase() : (STATE_NAME_TO_CODE[raw.toLowerCase()] || raw.toUpperCase());
+  return REGULATOR_MAP[code] || 'State or provincial professional board';
 }
 
 // Case-insensitive dedupe that preserves the first cased version seen.
