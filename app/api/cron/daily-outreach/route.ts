@@ -2,119 +2,24 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../../src/lib/mailer';
 import { saveDrafts, type DraftPayload } from '../../../../src/lib/draft-saver';
-import { isJunkEmail, isDomainMismatch, CASL_FOOTER } from '../../../../src/lib/outreach-quality';
+import { isJunkEmail, isDomainMismatch } from '../../../../src/lib/outreach-quality';
+import {
+  cleanName,
+  buildSingleLocationBody,
+  buildMultiLocationBody,
+  isCanadian,
+  outreachSubject,
+  type ProviderRow,
+} from '../../../../src/lib/outreach-templates';
 
-const SITE_URL = 'https://www.thedripmap.com';
 const DAILY_TARGET = 19;
 const MIN_RATING = 4.5;
 const MIN_REVIEWS = 10;
 
 export const maxDuration = 60;
 
-function cleanName(n: string): string {
-  return n
-    .split(' - ')[0]
-    .split(' | ')[0]
-    .split(', A Division of')[0]
-    .replace(/\s+IV (Hydration|Therapy).*$/i, '')
-    .trim();
-}
-
-function locationLabel(p: ProviderRow): string {
-  const city = (p.city || '').trim();
-  const state = (p.state || '').trim();
-  if (city && state) return `${city}, ${state}`;
-  return city || state || 'location';
-}
-
-interface ProviderRow {
-  id: string;
-  name: string;
-  slug: string;
-  rating: number | null;
-  reviews: string | number | null;
-  email: string | null;
-  country: string | null;
-  city: string | null;
-  state: string | null;
-  website: string | null;
-}
-
-function isCanadian(country?: string | null): boolean {
-  return (country || '').trim().toLowerCase() === 'canada';
-}
-
 function isEligibleEmail(email: string | null | undefined): boolean {
-  // Now delegates to the shared junk-scrubber. Kept as a thin wrapper to
-  // minimise the diff against the rest of this route.
   return !isJunkEmail(email);
-}
-
-function buildSingleLocationBody(p: ProviderRow): string {
-  const display = cleanName(p.name);
-  const claimUrl = `${SITE_URL}/providers/${p.slug}?claim=1`;
-  const city = (p.city || '').trim();
-  const hasRating = !!(p.rating && Number(p.reviews) > 0);
-
-  // Personalized opener: cite the city + (when we have it) their real Google
-  // rating, framed as "you're in a small group of clinics patients trust" —
-  // which is TheDripMap's positioning (verified-quality directory).
-  const opener = hasRating
-    ? `I came across ${display} while researching the top-rated IV therapy clinics in ${city || 'your area'}. Your Google rating of ${p.rating}★ across ${p.reviews} reviews puts you in a small group of clinics patients actually trust, which is exactly the kind we feature on TheDripMap.`
-    : `I came across ${display} while building out our ${city || 'local'} IV therapy listings on TheDripMap, North America's directory for IV therapy clinics.`;
-
-  return `Hi ${display} team,
-
-${opener}
-
-We added your listing, but right now it's unclaimed, so visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes:
-${claimUrl}
-
-Warmly,
-Deborah Triandafilou
-TheDripMap
-info@thedripmap.com
-${CASL_FOOTER}`;
-}
-
-function buildMultiLocationBody(providers: ProviderRow[], email: string): string {
-  const brand = cleanName(providers[0].name);
-  const count = providers.length;
-  const cities = Array.from(
-    new Set(
-      providers
-        .map((p) => (p.city || '').trim())
-        .filter((c) => c.length > 0)
-    )
-  );
-  const cityPhrase = cities.length === 0
-    ? 'multiple cities'
-    : cities.length === 1
-      ? cities[0]
-      : cities.length === 2
-        ? `${cities[0]} and ${cities[1]}`
-        : `${cities.slice(0, -1).join(', ')} and ${cities[cities.length - 1]}`;
-
-  const locations = providers.map((p) => {
-    const url = `${SITE_URL}/providers/${p.slug}?claim=1`;
-    return `  • ${cleanName(p.name)} - ${locationLabel(p)}\n    ${url}`;
-  }).join('\n');
-
-  return `Hi ${brand} team,
-
-I came across ${count} of your ${brand} locations across ${cityPhrase} while researching trusted IV therapy clinics for TheDripMap, North America's directory for IV therapy. All ${count} are live with us but currently unclaimed:
-
-${locations}
-
-Right now visitors see a generic placeholder on each one instead of your real photos, hours, services, and description. Claiming each listing is free and takes 2 minutes.
-
-I sent this once to ${email.toLowerCase().trim()} because all ${count} locations share that email, so you only hear from me once, not ${count} times.
-
-Warmly,
-Deborah Triandafilou
-TheDripMap
-info@thedripmap.com
-${CASL_FOOTER}`;
 }
 
 // GET /api/cron/daily-outreach
@@ -227,10 +132,6 @@ export async function GET(req: Request) {
   // Build draft payloads. saveDrafts opens one IMAP connection and appends each.
   const drafts: DraftPayload[] = selected.map(({ email, providers }) => {
     const anchor = providers[0];
-    const display = cleanName(anchor.name);
-    const subject = providers.length > 1
-      ? `Your ${display} locations on TheDripMap`
-      : `Your ${display} listing on TheDripMap`;
     const text = providers.length > 1
       ? buildMultiLocationBody(providers, email)
       : buildSingleLocationBody(anchor);
@@ -238,7 +139,7 @@ export async function GET(req: Request) {
       from: 'TheDripMap <info@thedripmap.com>',
       to: email,
       replyTo: 'info@thedripmap.com',
-      subject,
+      subject: outreachSubject(cleanName(anchor.name), providers.length),
       text,
     };
   });
