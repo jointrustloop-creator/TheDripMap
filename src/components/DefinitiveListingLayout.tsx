@@ -112,7 +112,12 @@ const STATE_NAME_TO_CODE: Record<string, string> = {
   'prince edward island': 'PE',
 };
 
-function regulatorLine(stateCode: string): string {
+// providers.regulator_override (TEXT, nullable) is the operator-specified
+// regulator string used verbatim. Added 2026-06-02 for clinics whose primary
+// admin type doesn't match the province default (e.g. an Ontario naturopath
+// clinic where REGULATOR_MAP['ON'] would otherwise be the nursing college).
+function regulatorLine(stateCode: string, override?: string | null): string {
+  if (typeof override === 'string' && override.trim()) return override.trim();
   const raw = (stateCode || '').trim();
   const code = raw.length === 2 ? raw.toUpperCase() : (STATE_NAME_TO_CODE[raw.toLowerCase()] || raw.toUpperCase());
   return REGULATOR_MAP[code] || 'State or provincial professional board';
@@ -469,7 +474,8 @@ export default function DefinitiveListingLayout({
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-[14px_26px] mt-[22px] relative">
                     {safetyResults.map((c, idx) => {
-                      const label = c.key === 'verifiedStateBoard' ? regulatorLine(stateCode) : c.label;
+                      const regOverride = (provider as unknown as { regulator_override?: string | null }).regulator_override;
+                      const label = c.key === 'verifiedStateBoard' ? regulatorLine(stateCode, regOverride) : c.label;
                       return (
                         <div key={c.key} className="flex gap-[11px] items-start">
                           <CheckCircle2 size={18} className="text-[#d8b878] flex-none mt-[2px]" />
