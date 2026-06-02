@@ -225,6 +225,21 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   const profiles = await getOperatorProfiles();
   // Match on either camelCase or snake_case — DB stores clinic_id, type allows both.
   const profile = profiles.find(p => p.clinicId === provider.id || p.clinic_id === provider.id);
+
+  // Platform-wide safety verification (mirrors app/api/safety-check/route.ts).
+  // 5 operator-confirmed criteria stored in operator_profiles.profile_data.
+  // "Safety Verified" pill + detailed section render only when ALL 5 + claimed.
+  const SAFETY_CHECKS = [
+    { key: 'verifiedMedicalDirector',     label: 'Licensed medical director', detail: 'A board-licensed physician or nurse practitioner oversees protocols and patient care.' },
+    { key: 'verifiedClinician',           label: 'Licensed clinical staff',   detail: 'IVs and injections are administered by RNs, NPs, or physicians — never unlicensed staff.' },
+    { key: 'verifiedCompoundingPharmacy', label: 'Pharmaceutical-grade IVs',  detail: 'Ingredients are sourced from a licensed compounding pharmacy and prepared under sterile conditions.' },
+    { key: 'verifiedLiabilityInsurance',  label: 'Liability insurance',       detail: 'Active medical liability coverage for IV therapy and adjacent treatments.' },
+    { key: 'verifiedStateBoard',          label: 'State / provincial board',  detail: 'Operating in good standing with the relevant medical or nursing regulator.' },
+  ] as const;
+  const profileData = (profile?.profile_data || {}) as Record<string, unknown>;
+  const safetyResults = SAFETY_CHECKS.map(c => ({ ...c, passed: profileData[c.key] === true }));
+  const safetyVerifiedCount = safetyResults.filter(c => c.passed).length;
+  const safetyVerified = !!provider.is_claimed && safetyVerifiedCount === 5;
   const stateCode = provider.state || getStateFromProvider(provider);
   const timezone = TIMEZONE_MAP[stateCode] || 'America/New_York';
   const stateName = STATE_MAP[stateCode] || stateCode;
@@ -440,10 +455,10 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   <div className="inline-flex items-center gap-1.5 bg-emerald-500/95 text-white text-[10px] font-black uppercase tracking-[0.15em] px-2.5 py-1 rounded-full shadow-lg">
                     <CheckCircle2 size={11} /> Verified Clinic
                   </div>
-                  {(provider as { decision_drivers?: { safety_verified?: boolean } }).decision_drivers?.safety_verified && (
-                    <div className="inline-flex items-center gap-1.5 bg-sky-500/95 text-white text-[10px] font-black uppercase tracking-[0.15em] px-2.5 py-1 rounded-full shadow-lg" title="Operator confirmed: licensed medical oversight, sterile pharmaceutical-grade IV products, and trained clinical staff.">
-                      <CheckCircle2 size={11} /> Safety Verified
-                    </div>
+                  {safetyVerified && (
+                    <a href="#safety-verified" className="inline-flex items-center gap-1.5 bg-sky-500/95 hover:bg-sky-400 text-white text-[10px] font-black uppercase tracking-[0.15em] px-2.5 py-1 rounded-full shadow-lg transition-colors" title="Operator confirmed all 5 safety criteria — tap to see the breakdown.">
+                      <CheckCircle2 size={11} /> Safety Verified · 5/5
+                    </a>
                   )}
                 </div>
                 <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.05] text-balance">
@@ -881,6 +896,41 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                     </div>
                   </>
                 )}
+              </section>
+            )}
+
+            {/* SAFETY VERIFIED — 5-check breakdown for clinics that pass all 5.
+                Mirrors the platform-wide model used by /api/safety-check. */}
+            {safetyVerified && (
+              <section id="safety-verified" className="pt-8 border-t border-slate-100 scroll-mt-24">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-2xl bg-sky-500 text-white flex items-center justify-center shadow-md">
+                    <CheckCircle2 size={20} strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-tight">Safety Verified</h2>
+                    <p className="text-sm font-bold text-sky-700 uppercase tracking-widest mt-0.5">All 5 of 5 criteria · operator confirmed</p>
+                  </div>
+                </div>
+                <p className="text-sm text-slate-500 font-medium mb-8 max-w-2xl">
+                  Every clinic on TheDripMap is asked to confirm five operational safety standards. {provider.name} has confirmed all five.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {safetyResults.map((c) => (
+                    <div key={c.key} className="flex items-start gap-3 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                        <CheckCircle2 size={16} strokeWidth={2.5} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-black text-slate-900 text-[15px] leading-snug">{c.label}</div>
+                        <div className="text-xs text-slate-500 font-medium leading-relaxed mt-1">{c.detail}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[11px] text-slate-400 font-medium leading-relaxed mt-5">
+                  These criteria are self-attested by the clinic operator. TheDripMap does not perform on-site audits. If you believe any of these is no longer accurate, email <a href="mailto:info@thedripmap.com" className="text-sky-600 hover:underline font-bold">info@thedripmap.com</a>.
+                </p>
               </section>
             )}
 
