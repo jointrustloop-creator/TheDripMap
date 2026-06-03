@@ -150,7 +150,7 @@ export default async function HomePage() {
           {/* Eyebrow */}
           <div className="flex items-center gap-3 mb-6 justify-center">
             <span className="hidden md:block h-px w-8 bg-[#0F6E56]" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] text-center">North America's IV Therapy Platform</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] text-center">North America's IV therapy matching platform</span>
             <span className="hidden md:block h-px w-8 bg-[#0F6E56]" />
           </div>
 
@@ -160,18 +160,23 @@ export default async function HomePage() {
             <span className="font-serif italic font-normal text-[#0F6E56] tracking-[-0.02em]">IV therapy clinic.</span>
           </h1>
 
-          <p className="text-center text-base md:text-[20px] text-slate-500 max-w-[560px] mx-auto mb-8 leading-relaxed font-light">
-            {stats.total.toLocaleString()}+ verified clinics across {stats.cities}+ cities. Find the right one for you in under 60 seconds.
+          <p className="text-center text-base md:text-[20px] text-slate-500 max-w-[620px] mx-auto mb-8 leading-relaxed font-light">
+            Tell us your goal and location, and we match you to the right one of {stats.total.toLocaleString()} clinics across {stats.cities} cities, in under 60 seconds.
           </p>
 
           {/* QuickMatch — full width so the city picker + button breathe */}
-          <div className="max-w-4xl mx-auto mb-10">
+          <div className="max-w-4xl mx-auto mb-4">
             <QuickMatch />
           </div>
 
+          {/* Muted trust line directly under the search bar */}
+          <p className="text-center text-[12px] md:text-[13px] text-slate-400 font-medium max-w-2xl mx-auto mb-10 leading-relaxed">
+            Featured clinics answer our safety questionnaire in writing. We never sell placement.
+          </p>
+
           {/* Trust row — typographic */}
           <div className="flex flex-wrap items-center justify-center gap-x-5 md:gap-x-10 gap-y-3 text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400">
-            <span><span className="text-slate-900">{stats.total.toLocaleString()}</span> &nbsp;Verified Clinics</span>
+            <span><span className="text-slate-900">{stats.total.toLocaleString()}</span> &nbsp;Clinics Listed</span>
             <span className="hidden md:inline text-slate-300">·</span>
             <span><span className="text-slate-900">{stats.cities}</span> &nbsp;Cities</span>
             <span className="hidden md:inline text-slate-300">·</span>
@@ -238,7 +243,7 @@ export default async function HomePage() {
               </h2>
               <p className="text-base md:text-lg text-slate-500 leading-relaxed font-light max-w-xl mb-8 md:mb-10">
                 When a clinic carries the Safety Verified badge, it has answered our safety
-                questionnaire in writing — who oversees care, who performs your insert, where its IV
+                questionnaire in writing. Who oversees care, who performs your insert, where its IV
                 solutions come from, and whether an intake is required before treatment. We don't
                 take a cent for placement, and we never buy or sell reviews.
               </p>
@@ -247,8 +252,8 @@ export default async function HomePage() {
               <div className="grid grid-cols-2 gap-3 md:gap-4 max-w-2xl">
                 {[
                   { Icon: Stethoscope, label: 'Medical director on file',         detail: 'Clinic confirms a licensed physician oversees care' },
-                  { Icon: UserCheck,   label: 'Licensed clinicians — not techs',  detail: 'Clinic confirms an RN or NP performs every insert' },
-                  { Icon: FlaskConical,label: 'Pharmacy-sourced solutions',       detail: 'Clinic confirms a licensed compounding pharmacy — no grey-market' },
+                  { Icon: UserCheck,   label: 'Licensed clinicians, not techs',   detail: 'Clinic confirms an RN or NP performs every insert' },
+                  { Icon: FlaskConical,label: 'Pharmacy-sourced solutions',       detail: 'Clinic confirms a licensed compounding pharmacy, no grey-market' },
                   { Icon: Check,       label: 'Intake before infusion',           detail: 'Clinic confirms a clinical assessment before treatment' },
                 ].map(({ Icon, label, detail }) => (
                   <div
