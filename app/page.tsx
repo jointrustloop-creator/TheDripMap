@@ -84,15 +84,29 @@ export default async function HomePage() {
   // / drip product photo (Supabase blog-images) with name, one-line "what it
   // does" tagline, category chip, and typical price band — Weedmaps-style
   // product shelf rather than the previous icon-tile grid.
-  const services = [
-    { name: 'Hydration',      slug: 'hydration',      Icon: Droplets,    image: 'iv-therapy-dehydration.jpg',         tagline: 'Rapid rehydration',          category: 'Foundational',  priceFrom: 100 },
-    { name: 'NAD+',           slug: 'nad-plus',       Icon: Activity,    image: 'iv-therapy-nad-iv-bag-closeup.jpg',  tagline: 'Cellular energy + clarity',  category: 'Longevity',     priceFrom: 400 },
-    { name: 'Myers Cocktail', slug: 'myers-cocktail', Icon: Zap,         image: 'iv-therapy-vitamin-drip-citrus.jpg', tagline: 'The original wellness drip', category: 'Foundational',  priceFrom: 150 },
-    { name: 'Hangover',       slug: 'hangover',       Icon: Heart,       image: 'iv-therapy-hangover.jpg',            tagline: 'Reset after a rough night',  category: 'Recovery',      priceFrom: 150 },
-    { name: 'Immune Support', slug: 'immune-support', Icon: ShieldCheck, image: 'iv-therapy-immunity.jpg',            tagline: 'Vitamin C + zinc boost',     category: 'Wellness',      priceFrom: 150 },
-    { name: 'Beauty Glow',    slug: 'beauty-glow',    Icon: Sparkles,    image: 'iv-therapy-skin-glow.jpg',           tagline: 'Glutathione for skin',       category: 'Beauty',        priceFrom: 200 },
-    { name: 'Recovery',       slug: 'recovery',       Icon: Dumbbell,    image: 'iv-therapy-sports-recovery.jpg',     tagline: 'Amino acids + rebuild',      category: 'Athletic',      priceFrom: 175 },
-    { name: 'Weight Loss',    slug: 'weight-loss',    Icon: Activity,    image: 'iv-therapy-weight-loss.jpg',         tagline: 'MIC + lipo + metabolism',    category: 'Metabolic',     priceFrom: 175 },
+  // Curated 2026-06-03 — every image hand-picked from blog-images bucket for
+  // (a) no baked-in marketing text, (b) high resolution (1200-1730 wide where
+  // possible), (c) cohesive warm-light editorial palette so the 8-card grid
+  // reads as designed, not assembled. objectPosition tunes focal point so
+  // subjects aren't cropped badly inside the fixed-aspect frame.
+  const services: Array<{
+    name: string;
+    slug: string;
+    Icon: React.ComponentType<{ size?: number; className?: string }>;
+    image: string;
+    tagline: string;
+    category: string;
+    priceFrom: number;
+    objectPosition?: string;
+  }> = [
+    { name: 'Hydration',      slug: 'hydration',      Icon: Droplets,    image: 'iv-therapy-woman-yacht.jpg',                 tagline: 'Rapid rehydration',          category: 'Foundational',  priceFrom: 100, objectPosition: '50% 35%' },
+    { name: 'NAD+',           slug: 'nad-plus',       Icon: Activity,    image: 'iv-therapy-nad-iv-bag-closeup.jpg',          tagline: 'Cellular energy + clarity',  category: 'Longevity',     priceFrom: 400, objectPosition: '70% 50%' },
+    { name: 'Myers Cocktail', slug: 'myers-cocktail', Icon: Zap,         image: 'iv-therapy-modern-clinic-recliners.jpg',     tagline: 'The original wellness drip', category: 'Foundational',  priceFrom: 150, objectPosition: '50% 50%' },
+    { name: 'Hangover',       slug: 'hangover',       Icon: Heart,       image: 'iv-therapy-for-chronic-fatigue-hero.webp',   tagline: 'Reset after a rough night',  category: 'Recovery',      priceFrom: 150, objectPosition: '60% 40%' },
+    { name: 'Immune Support', slug: 'immune-support', Icon: ShieldCheck, image: 'iv-therapy-clinical-medical-setting.jpg',    tagline: 'Vitamin C + zinc boost',     category: 'Wellness',      priceFrom: 150, objectPosition: '50% 50%' },
+    { name: 'Beauty Glow',    slug: 'beauty-glow',    Icon: Sparkles,    image: 'iv-therapy-beauty-glow-pink-lounge.jpg',     tagline: 'Glutathione for skin',       category: 'Beauty',        priceFrom: 200, objectPosition: '60% 50%' },
+    { name: 'Recovery',       slug: 'recovery',       Icon: Dumbbell,    image: 'iv-therapy-man-blue.jpg',                    tagline: 'Amino acids + rebuild',      category: 'Athletic',      priceFrom: 175, objectPosition: '50% 35%' },
+    { name: 'Weight Loss',    slug: 'weight-loss',    Icon: Activity,    image: 'iv-therapy-spa-reception-recliners.jpg',     tagline: 'MIC + lipo + metabolism',    category: 'Metabolic',     priceFrom: 175, objectPosition: '50% 50%' },
   ];
   const DRIP_IMG_BASE = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/';
 
@@ -346,42 +360,55 @@ export default async function HomePage() {
                 <span className="font-serif italic font-normal text-[#0F6E56]">drip type.</span>
               </h2>
             </div>
-            <Link href="/search" className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#0F6E56] transition-colors">
-              See full directory <ArrowUpRight size={16} />
-            </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {services.map((s) => (
               <Link
                 key={s.slug}
                 href={`/treatments/${s.slug}`}
                 className="group relative bg-white rounded-3xl flex flex-col p-4 md:p-5 shadow-[0_10px_30px_-10px_rgba(15,40,30,0.12)] hover:shadow-[0_25px_50px_-15px_rgba(15,40,30,0.22)] hover:-translate-y-1 transition-all duration-300 border border-[#0F6E56]/5"
               >
-                {/* Square product image — inset within the card with generous
-                    padding around it so it reads like product photography in
-                    a magazine, not a cropped lifestyle shot. */}
-                <div className="relative aspect-square rounded-2xl overflow-hidden bg-[#F4F6F4] mb-4">
+                {/* Editorial image frame — uniform 4:5 portrait aspect across
+                    all 8 cards so the grid is rhythmically identical. Pill
+                    (category) floats top-left, droplet badge top-right. */}
+                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-[#F4F6F4] mb-4">
                   <Image
                     src={`${DRIP_IMG_BASE}${s.image}`}
                     alt={`${s.name} IV drip`}
                     fill
-                    sizes="(max-width: 768px) 40vw, 22vw"
+                    sizes="(max-width: 640px) 92vw, (max-width: 768px) 46vw, 22vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-out"
+                    style={{ objectPosition: s.objectPosition ?? '50% 50%' }}
                   />
                   {/* Soft warm vignette — subtle, just enough to unify the photos */}
                   <div
                     className="absolute inset-0 pointer-events-none mix-blend-soft-light"
                     style={{ background: 'radial-gradient(ellipse at 50% 35%, rgba(255,228,196,0.4) 0%, rgba(255,228,196,0) 65%)' }}
                   />
-                </div>
-                {/* Editorial card foot — small category, big name, tagline,
-                    "View clinics" affordance */}
-                <div className="flex flex-col gap-1 md:gap-1.5 flex-1">
-                  <span className="text-[9.5px] md:text-[10px] font-black uppercase tracking-[0.2em] text-[#0F6E56]/80">
+                  {/* Faint bottom gradient — guarantees pill / badge legibility
+                      regardless of the underlying photo, without darkening the
+                      subject. */}
+                  <div
+                    className="absolute inset-x-0 top-0 h-20 pointer-events-none"
+                    style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0) 100%)' }}
+                  />
+                  {/* Category pill — floats on the image, top-left */}
+                  <span className="absolute top-3 left-3 inline-flex items-center bg-white/95 backdrop-blur-sm text-[9px] md:text-[10px] font-black uppercase tracking-[0.18em] text-[#0F6E56] px-2.5 py-1 rounded-full shadow-[0_4px_12px_-4px_rgba(0,0,0,0.18)]">
                     {s.category}
                   </span>
-                  <div className="font-black text-slate-900 text-lg md:text-[20px] tracking-tight leading-tight">{s.name}</div>
+                  {/* Consistent droplet badge — floats top-right of every card */}
+                  <span
+                    className="absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-[0_4px_12px_-4px_rgba(0,0,0,0.22)]"
+                    aria-hidden
+                  >
+                    <Droplets size={14} className="text-[#0F6E56]" />
+                  </span>
+                </div>
+                {/* Editorial card foot — serif name, tagline, "View clinics"
+                    affordance. Category lives ON the image now. */}
+                <div className="flex flex-col gap-1 md:gap-1.5 flex-1">
+                  <div className="font-serif text-slate-900 text-[22px] md:text-[24px] tracking-tight leading-tight">{s.name}</div>
                   <div className="text-[12px] md:text-[13px] text-slate-500 leading-snug font-medium">{s.tagline}</div>
                   <div className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#0F6E56]">
                     <span className="border-b border-[#0F6E56]/30 group-hover:border-[#0F6E56] pb-0.5 transition-colors">View clinics</span>
