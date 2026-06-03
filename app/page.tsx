@@ -290,7 +290,7 @@ export default async function HomePage() {
               <span className="font-serif italic font-normal text-[#0F6E56]">Get matched in 60 seconds.</span>
             </h2>
             <p className="mt-8 text-lg text-slate-500 max-w-xl mx-auto leading-relaxed font-light">
-              Five quick questions. We map your goals, location, and budget to the right clinic — and the right drip.
+              Five quick questions. We map your goals, location, and budget to the right clinic, and the right drip.
             </p>
           </div>
 
