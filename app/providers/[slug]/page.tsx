@@ -169,20 +169,22 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     ? `Read reviews for ${displayName} in ${provider.city}, ${provider.state}. ${provider.rating} stars, ${provider.reviewCount} reviews. IV therapy treatments include ${topSpecialties}. Book your session today.`
     : `Find ${displayName} in ${provider.city}, ${provider.state}. IV therapy treatments include ${topSpecialties}. Compare prices and book your drip session today on TheDripMap.`;
 
+  // Orphan-claim stubs are placeholders created when a setup-form submission
+  // doesn't match any existing listing. They have no real content until the
+  // owner verifies the claim — keep them out of Google's index until then.
+  // Matches the same filter used by app/sitemap.ts so the two stay in sync.
+  const dd = (provider as { decision_drivers?: { source?: string } | null }).decision_drivers;
+  const isOrphanStub = dd?.source === 'orphan_claim_stub' && provider.is_claimed !== true;
+
   return {
     title,
     description,
     alternates: {
       canonical: canonicalUrl,
     },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-      },
-    },
+    robots: isOrphanStub
+      ? { index: false, follow: true, googleBot: { index: false, follow: true } }
+      : { index: true, follow: true, googleBot: { index: true, follow: true } },
     openGraph: {
       title,
       description,

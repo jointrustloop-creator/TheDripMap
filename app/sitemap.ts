@@ -69,8 +69,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const providers = await getAllListings();
+
+  // Exclude orphan-claim stubs from the sitemap. These are placeholders the
+  // owner submitted via /for-clinics/setup and hasn't verified yet — they
+  // carry no real content, are flagged noindex on the provider page, and
+  // should not be advertised to Google. Once the owner verifies (flips
+  // is_claimed=true), they re-appear in the sitemap automatically.
+  const isOrphanStub = (p: { is_claimed?: boolean; decision_drivers?: unknown }): boolean => {
+    const dd = p.decision_drivers as { source?: string } | null | undefined;
+    return dd?.source === 'orphan_claim_stub' && p.is_claimed !== true;
+  };
   const providerRoutes = providers
-    .filter((p) => p.name)
+    .filter((p) => p.name && !isOrphanStub(p as { is_claimed?: boolean; decision_drivers?: unknown }))
     .map((p) => ({
       url: `${baseUrl}/providers/${p.slug || slugify(p.name)}`,
       lastModified: new Date(),
@@ -100,9 +110,53 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .slice(0, 20)
     .map((c) => c.city);
   const matrixCities = [...CANADA_MATRIX_CITIES, ...topUSMatrixCities];
+
+  // Gate each treatment × city pair on having at least 1 matching provider.
+  // The page (app/iv-therapy/[treatment]/[city]/page.tsx:120) noindexes when
+  // count === 0, which created sitemap entries that GSC flagged as
+  // "Excluded by noindex tag." Sitemap must list only indexable URLs.
+  //
+  // Most matrix treatments are "core" services every IV clinic offers —
+  // for those, the existing cityRoutes filter (count > 0) already guarantees
+  // at least one provider in the city. The non-core treatments below need
+  // an explicit per-treatment keyword check against the provider's
+  // specialties / services / description / mobile flag.
+  type ProviderLike = {
+    city?: string | null;
+    specialties?: unknown;
+    services?: unknown;
+    description?: string | null;
+    mobile_service?: boolean;
+    type?: string | null;
+  };
+  const providersByCityKey = new Map<string, ProviderLike[]>();
+  for (const p of providers as ProviderLike[]) {
+    const key = (p.city || '').toLowerCase().trim();
+    if (!key) continue;
+    if (!providersByCityKey.has(key)) providersByCityKey.set(key, []);
+    providersByCityKey.get(key)!.push(p);
+  }
+  const treatmentBlob = (p: ProviderLike): string => {
+    const specs = Array.isArray(p.specialties) ? p.specialties.filter((s): s is string => typeof s === 'string') : [];
+    const services = Array.isArray(p.services)
+      ? p.services.map((s) => typeof s === 'string' ? s : (s && typeof s === 'object' && 'name' in s ? String((s as { name: unknown }).name) : '')).filter(Boolean)
+      : [];
+    return [...specs, ...services, p.description || ''].join(' ').toLowerCase();
+  };
+  // Non-core treatments require an explicit keyword/feature match.
+  const NON_CORE_TREATMENT_CHECK: Record<string, (p: ProviderLike) => boolean> = {
+    'mobile-iv': (p) => p.mobile_service === true || (p.type || '').toLowerCase() === 'mobile',
+    'glutathione': (p) => treatmentBlob(p).includes('glutathione'),
+    'iron-infusion': (p) => /\biron\b/.test(treatmentBlob(p)),
+  };
+
   const matrixRoutes: MetadataRoute.Sitemap = [];
   for (const t of MATRIX_TREATMENT_SLUGS) {
+    const checker = NON_CORE_TREATMENT_CHECK[t];
     for (const city of matrixCities) {
+      const cityProviders = providersByCityKey.get(city.toLowerCase().trim()) || [];
+      if (cityProviders.length === 0) continue;
+      if (checker && !cityProviders.some(checker)) continue;
       matrixRoutes.push({
         url: `${baseUrl}/iv-therapy/${t}/${slugify(city)}`,
         lastModified: new Date(),
