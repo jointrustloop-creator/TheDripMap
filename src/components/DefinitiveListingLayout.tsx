@@ -34,6 +34,7 @@ import { MessageClinicButton } from './MessageClinicButton';
 import { SubmitTestimonialButton } from './SubmitTestimonialButton';
 import { TreatmentDefinitionDisclosure } from './TreatmentDefinitionDisclosure';
 import { findDefinition } from '../lib/treatment-definitions';
+import TrackedLink from './TrackedLink';
 import type { Provider, OperatorProfile } from '../types';
 
 const DEFAULT_CLINIC_IMAGE = '/og-image.png';
@@ -571,12 +572,14 @@ export default function DefinitiveListingLayout({
                     <div>
                       <div className="text-[11.5px] tracking-[0.18em] uppercase text-[#b08a3e] font-semibold inline-flex items-center gap-[10px] mb-[14px] before:content-[''] before:w-[22px] before:h-[1px] before:bg-[#b08a3e]">Location</div>
                       {provider.latitude && provider.longitude ? (
-                        <a
+                        <TrackedLink
+                          providerId={provider.id}
+                          eventType="directions_click"
                           href={directionsHref || `https://www.google.com/maps/search/?api=1&query=${provider.latitude},${provider.longitude}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="block h-[182px] rounded-[16px] border border-[rgba(25,36,28,0.09)] overflow-hidden bg-[#ebf1e5] mt-2 relative group"
-                          aria-label={`Open map of ${provider.name} location in Google Maps`}
+                          ariaLabel={`Open map of ${provider.name} location in Google Maps`}
                         >
                           {process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ? (
                             <ResilientImage
@@ -591,7 +594,7 @@ export default function DefinitiveListingLayout({
                               <MapIcon size={24} className="mr-2" /> Open in Google Maps
                             </div>
                           )}
-                        </a>
+                        </TrackedLink>
                       ) : (
                         <div className="h-[182px] rounded-[16px] border border-[rgba(25,36,28,0.09)] bg-[#ebf1e5] flex items-center justify-center text-[#a8b69b] mt-2">
                           <MapIcon size={24} />
@@ -655,18 +658,35 @@ export default function DefinitiveListingLayout({
                   <span className="font-semibold text-[#b08a3e]">{status.text}</span>
                 </div>
                 {bookingHref ? (
-                  <a href={bookingHref} target="_blank" rel="noopener noreferrer" className="block w-full text-center py-[15px] rounded-[13px] font-semibold text-[15px] mb-[10px] bg-[#1f3a27] text-[#f3efe2] hover:bg-[#142619] transition">
+                  <TrackedLink
+                    providerId={provider.id}
+                    eventType="book_click"
+                    href={bookingHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full text-center py-[15px] rounded-[13px] font-semibold text-[15px] mb-[10px] bg-[#1f3a27] text-[#f3efe2] hover:bg-[#142619] transition"
+                  >
                     <Calendar size={15} className="inline-block -mt-1 mr-2" /> Book appointment
-                  </a>
+                  </TrackedLink>
                 ) : phoneHref ? (
-                  <a href={phoneHref} className="block w-full text-center py-[15px] rounded-[13px] font-semibold text-[15px] mb-[10px] bg-[#1f3a27] text-[#f3efe2] hover:bg-[#142619] transition">
+                  <TrackedLink
+                    providerId={provider.id}
+                    eventType="call_click"
+                    href={phoneHref}
+                    className="block w-full text-center py-[15px] rounded-[13px] font-semibold text-[15px] mb-[10px] bg-[#1f3a27] text-[#f3efe2] hover:bg-[#142619] transition"
+                  >
                     <Phone size={15} className="inline-block -mt-1 mr-2" /> Call to book
-                  </a>
+                  </TrackedLink>
                 ) : null}
                 {phoneHref && bookingHref && (
-                  <a href={phoneHref} className="block w-full text-center py-[15px] rounded-[13px] font-semibold text-[15px] mb-[10px] border border-[rgba(25,36,28,0.15)] hover:bg-[#ebf1e5] transition">
+                  <TrackedLink
+                    providerId={provider.id}
+                    eventType="call_click"
+                    href={phoneHref}
+                    className="block w-full text-center py-[15px] rounded-[13px] font-semibold text-[15px] mb-[10px] border border-[rgba(25,36,28,0.15)] hover:bg-[#ebf1e5] transition"
+                  >
                     <Phone size={15} className="inline-block -mt-1 mr-2 text-[#2f5436]" /> Call clinic
-                  </a>
+                  </TrackedLink>
                 )}
                 {clinicEmail && (
                   <MessageClinicButton
@@ -683,7 +703,16 @@ export default function DefinitiveListingLayout({
                   )}
                   {directionsHref && (
                     <div className="mt-[5px]">
-                      <a href={directionsHref} target="_blank" rel="noopener noreferrer" className="text-[#2f5436] font-semibold hover:underline">Get directions →</a>
+                      <TrackedLink
+                        providerId={provider.id}
+                        eventType="directions_click"
+                        href={directionsHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#2f5436] font-semibold hover:underline"
+                      >
+                        Get directions →
+                      </TrackedLink>
                     </div>
                   )}
                   {(displayRating > 0 && displayReviewCount > 0) && (

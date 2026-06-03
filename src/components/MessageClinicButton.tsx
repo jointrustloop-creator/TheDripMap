@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { MessageSquare } from 'lucide-react';
 import { Provider } from '../types';
 import { MessageClinicModal } from './MessageClinicModal';
+import { trackEvent } from '../lib/analytics-client';
 
 interface MessageClinicButtonProps {
   provider: Provider;
@@ -34,6 +35,10 @@ export const MessageClinicButton = ({
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
+          // First-party analytics: a message_click here represents
+          // patient intent to contact the clinic. Provider id is
+          // required; if it's missing for any reason we skip silently.
+          if (provider?.id) trackEvent(provider.id, 'message_click');
           setIsOpen(true);
         }}
         className={className || baseClass}

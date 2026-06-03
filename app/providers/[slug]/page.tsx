@@ -46,6 +46,8 @@ import { getStatus } from '../../../src/lib/hours';
 import SmartSummary from '../../../src/components/SmartSummary';
 import { calculateValueMetrics } from '../../../src/lib/price-utils';
 import DefinitiveListingLayout from '../../../src/components/DefinitiveListingLayout';
+import ListingAnalytics from '../../../src/components/ListingAnalytics';
+import TrackedLink from '../../../src/components/TrackedLink';
 
 // Revalidate every 5 min. Bumped from 60 → 300 on 2026-05-31 alongside the
 // SupabaseUnreachableError fallback so a postgrest outage can't pin clinic
@@ -402,6 +404,9 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
             dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
           />
         )}
+        {/* Fires a single 'view' analytics event per session. See
+            ListingAnalytics for the 30-min sessionStorage dedupe. */}
+        <ListingAnalytics providerId={provider.id} />
         <DefinitiveListingLayout
           provider={provider}
           profile={profile}
@@ -431,6 +436,11 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
+
+      {/* First-party 'view' capture. Fires once per provider per session
+          (30-minute TTL) for both claimed and unclaimed listings so we
+          can power profile insights without a third-party pixel. */}
+      <ListingAnalytics providerId={provider.id} />
 
       <script
         type="application/ld+json"
@@ -769,40 +779,48 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   <div className="flex flex-wrap gap-4 mb-8">
                     {provider.phone && (
                       provider.is_featured ? (
-                        <a 
+                        <TrackedLink
+                          providerId={provider.id}
+                          eventType="call_click"
                           href={`tel:${provider.phone}`}
                           className="flex items-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-2xl font-black text-lg hover:bg-slate-800 transition-all shadow-lg"
                         >
                           📞 Call Now
-                        </a>
+                        </TrackedLink>
                       ) : (
-                        <a 
+                        <TrackedLink
+                          providerId={provider.id}
+                          eventType="call_click"
                           href={`tel:${provider.phone}`}
                           className="flex items-center gap-2 text-xl font-black text-slate-900 hover:text-wellness-600 transition-colors"
                         >
                           <span>📞</span> {provider.phone}
-                        </a>
+                        </TrackedLink>
                       )
                     )}
                     {provider.website && (
                       provider.is_featured ? (
-                        <a 
+                        <TrackedLink
+                          providerId={provider.id}
+                          eventType="website_click"
                           href={provider.website}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 bg-wellness-600 text-white px-6 py-3 rounded-2xl font-black text-lg hover:bg-wellness-700 transition-all shadow-lg"
                         >
                           🌐 Visit Website
-                        </a>
+                        </TrackedLink>
                       ) : (
-                        <a 
+                        <TrackedLink
+                          providerId={provider.id}
+                          eventType="website_click"
                           href={provider.website}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 text-xl font-black text-wellness-600 hover:underline"
                         >
                           <span>🌐</span> Visit Website →
-                        </a>
+                        </TrackedLink>
                       )
                     )}
                   </div>
@@ -1494,29 +1512,35 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   {/* PRIMARY ACTIONS — Book is the conversion CTA */}
                   <div className="space-y-3">
                     {provider.website && (
-                      <a
+                      <TrackedLink
+                        providerId={provider.id}
+                        eventType="book_click"
                         href={provider.website}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-full bg-wellness-600 text-white px-6 py-4 rounded-2xl font-black text-base hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-200/50 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
                       >
                         Book Appointment <ExternalLink size={18} />
-                      </a>
+                      </TrackedLink>
                     )}
                     {provider.phone && (
-                      <a
+                      <TrackedLink
+                        providerId={provider.id}
+                        eventType="call_click"
                         href={`tel:${provider.phone}`}
                         className="w-full bg-white border-2 border-slate-200 text-slate-900 px-6 py-4 rounded-2xl font-black text-base hover:border-slate-900 transition-all flex items-center justify-center gap-2"
                       >
                         <Phone size={18} /> Call Clinic
-                      </a>
+                      </TrackedLink>
                     )}
                     <MessageClinicButton provider={provider} variant="secondary" />
                   </div>
 
                   {/* ADDRESS + DIRECTIONS — clickable to open in maps */}
                   {provider.address && (
-                    <a
+                    <TrackedLink
+                      providerId={provider.id}
+                      eventType="directions_click"
                       href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${provider.address} ${provider.city} ${stateCode}`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -1531,7 +1555,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                           Get directions <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
                         </div>
                       </div>
-                    </a>
+                    </TrackedLink>
                   )}
 
                   {/* RATING — quick credibility anchor */}
