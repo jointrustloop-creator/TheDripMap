@@ -14,6 +14,7 @@ import {
   STATE_MAP,
 } from '../../../../src/lib/data';
 import { getTreatmentContent } from '../../../../src/lib/treatment-content';
+import { findDefinition } from '../../../../src/lib/treatment-definitions';
 import { Provider } from '../../../../src/types';
 
 export const revalidate = 86400;
@@ -189,6 +190,20 @@ export default async function TreatmentCityPage({ params }: PageProps) {
     },
   ];
 
+  // One-line definition from the shared map. Falls back to null when no
+  // match — page still renders fine via the longer treatment-content block.
+  // Match against the matrix display name first, then the filter keyword.
+  const oneLineDef = findDefinition(t.name) || findDefinition(t.filter);
+
+  const definedTermJsonLd = oneLineDef ? {
+    '@context': 'https://schema.org',
+    '@type': 'DefinedTerm',
+    name: oneLineDef.name,
+    description: oneLineDef.definition,
+    inDefinedTermSet: `${SITE_URL}/treatments`,
+    url: oneLineDef.slug ? `${SITE_URL}/iv-therapy/${oneLineDef.slug}` : `${SITE_URL}/treatments`,
+  } : null;
+
   const itemListJsonLd = count > 0 ? {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -226,6 +241,7 @@ export default async function TreatmentCityPage({ params }: PageProps) {
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
       {itemListJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />}
+      {definedTermJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermJsonLd) }} />}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <main className="max-w-6xl mx-auto px-6 py-12">
@@ -239,6 +255,20 @@ export default async function TreatmentCityPage({ params }: PageProps) {
           <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-[1.02]">
             {t.name} in {resolved.name} — Find Clinics
           </h1>
+          {oneLineDef && (
+            <div className="bg-wellness-50/60 border border-wellness-100 rounded-2xl px-5 py-4 mb-5">
+              <div className="text-[10px] font-black uppercase tracking-[0.18em] text-wellness-700 mb-1">
+                What it is
+              </div>
+              <p className="text-base text-slate-700 leading-relaxed">
+                <strong className="text-slate-900">{oneLineDef.name}:</strong>{' '}
+                {oneLineDef.definition}{' '}
+                <Link href="/treatments" className="text-wellness-700 font-bold hover:underline whitespace-nowrap">
+                  See all treatments
+                </Link>
+              </p>
+            </div>
+          )}
           <p className="text-lg text-slate-600 leading-relaxed">{intro}</p>
           {count > 0 && (
             <div className="flex flex-wrap gap-3 mt-6">

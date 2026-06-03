@@ -32,6 +32,8 @@ import {
 import { ResilientImage } from './ResilientImage';
 import { MessageClinicButton } from './MessageClinicButton';
 import { SubmitTestimonialButton } from './SubmitTestimonialButton';
+import { TreatmentDefinitionDisclosure } from './TreatmentDefinitionDisclosure';
+import { findDefinition } from '../lib/treatment-definitions';
 import type { Provider, OperatorProfile } from '../types';
 
 const DEFAULT_CLINIC_IMAGE = '/og-image.png';
@@ -504,14 +506,15 @@ export default function DefinitiveListingLayout({
                 <div className="grid gap-[10px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(185px, 1fr))' }}>
                   {dripNames.map((name) => {
                     const meta = dripByName.get(name.trim().toLowerCase());
+                    const def = findDefinition(name);
                     return (
-                      <div key={name} className="flex items-center gap-[11px] bg-[#fffefa] border border-[rgba(25,36,28,0.09)] rounded-[13px] py-[14px] px-4 font-medium text-[14.5px] transition hover:border-[#d4e0cb] hover:bg-[#ebf1e5]">
-                        <Droplets size={17} className="text-[#b08a3e] flex-none" />
-                        <span className="min-w-0 truncate">{name}</span>
-                        {meta?.price && (
-                          <span className="ml-auto text-[12.5px] text-[#5c685e] font-semibold whitespace-nowrap">{meta.price.startsWith('$') ? meta.price : `$${meta.price}`}</span>
-                        )}
-                      </div>
+                      <TreatmentDefinitionDisclosure
+                        key={name}
+                        name={name}
+                        definition={def}
+                        price={meta?.price ?? null}
+                        variant="claimed"
+                      />
                     );
                   })}
                 </div>

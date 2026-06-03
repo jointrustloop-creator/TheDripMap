@@ -27,6 +27,8 @@ import { StickyClaimRail } from '../../../src/components/StickyClaimRail';
 import { MessageClinicButton } from '../../../src/components/MessageClinicButton';
 import { PatientTestimonials } from '../../../src/components/PatientTestimonials';
 import { ClaimAutoOpener } from '../../../src/components/ClaimAutoOpener';
+import { TreatmentDefinitionDisclosure } from '../../../src/components/TreatmentDefinitionDisclosure';
+import { findDefinition } from '../../../src/lib/treatment-definitions';
 import {
   getListingBySlug,
   slugify,
@@ -933,16 +935,26 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   })()
                 ) : (
                   <>
-                    <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Services</h2>
+                    <h2 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">Services</h2>
+                    <p className="text-sm text-slate-500 font-medium mb-6 max-w-2xl">
+                      Tap a service to see what it is.{' '}
+                      <Link href="/treatments" className="text-wellness-600 hover:underline font-bold">
+                        Browse the full treatment glossary
+                      </Link>
+                      .
+                    </p>
                     <div className="flex flex-wrap gap-3">
-                      {[...new Set(provider.specialties)].map((service, idx) => (
-                        <span
-                          key={idx}
-                          className="px-6 py-3 rounded-2xl font-bold text-sm transition-all shadow-sm bg-white border border-slate-100 text-slate-700 hover:border-wellness-200 hover:text-wellness-600"
-                        >
-                          {service}
-                        </span>
-                      ))}
+                      {[...new Set(provider.specialties)].map((service, idx) => {
+                        const def = findDefinition(service);
+                        return (
+                          <TreatmentDefinitionDisclosure
+                            key={service + idx}
+                            name={service}
+                            definition={def}
+                            variant="unclaimed"
+                          />
+                        );
+                      })}
                     </div>
                   </>
                 )}

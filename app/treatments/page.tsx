@@ -10,6 +10,7 @@ import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { BreadcrumbNav } from '../../src/components/BreadcrumbNav';
 import { getTreatmentContent } from '../../src/lib/treatment-content';
+import { getAllDefinitionsAlphabetical } from '../../src/lib/treatment-definitions';
 
 const STORAGE_BASE =
   'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/';
@@ -91,6 +92,28 @@ export default function TreatmentsIndexPage() {
     })),
   };
 
+  // Glossary entries (alphabetical) sourced from the shared definitions map.
+  const glossary = getAllDefinitionsAlphabetical();
+
+  // DefinedTermSet JSON-LD — cleanest schema for a definitions index that
+  // search engines and AI assistants can cite directly.
+  const definedTermSetJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'DefinedTermSet',
+    '@id': `${SITE_URL}/treatments#glossary`,
+    name: 'IV Therapy Treatments Glossary',
+    description:
+      'Plain-language one-line definitions of every IV therapy treatment in TheDripMap directory.',
+    url: `${SITE_URL}/treatments`,
+    hasDefinedTerm: glossary.map((d) => ({
+      '@type': 'DefinedTerm',
+      name: d.name,
+      description: d.definition,
+      inDefinedTermSet: `${SITE_URL}/treatments#glossary`,
+      url: d.slug ? `${SITE_URL}/iv-therapy/${d.slug}` : `${SITE_URL}/treatments`,
+    })),
+  };
+
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
@@ -98,6 +121,10 @@ export default function TreatmentsIndexPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermSetJsonLd) }}
       />
 
       <main className="max-w-6xl mx-auto px-6 py-12">
@@ -175,6 +202,57 @@ export default function TreatmentsIndexPage() {
               </Link>
             );
           })}
+        </section>
+
+        {/* Glossary — plain-language one-line definitions, alphabetical.
+            Server-rendered so search engines + AI assistants can cite the
+            definitions directly. Anchor target = #glossary for internal links. */}
+        <section id="glossary" className="mb-24 scroll-mt-24">
+          <div className="max-w-3xl mb-10">
+            <div className="inline-flex items-center gap-2 bg-wellness-50 text-wellness-700 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.2em] mb-5 border border-wellness-100">
+              <BookOpen size={14} />
+              Glossary
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tighter leading-[0.98]">
+              IV therapy treatments, in plain English.
+            </h2>
+            <p className="text-base text-slate-500 leading-relaxed">
+              One-line definitions of every drip and injection you&apos;ll see on
+              clinic menus. Tap any treatment chip on a clinic listing to see
+              the same definition inline.
+            </p>
+          </div>
+
+          <dl className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden divide-y divide-slate-100">
+            {glossary.map((entry) => (
+              <div
+                key={entry.name}
+                id={`def-${entry.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`}
+                className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-3 md:gap-8 p-6 md:p-7 scroll-mt-24"
+              >
+                <dt className="font-black text-slate-900 text-lg leading-snug tracking-tight">
+                  {entry.name}
+                </dt>
+                <dd className="text-slate-600 leading-relaxed text-[15.5px]">
+                  <p>{entry.definition}</p>
+                  {entry.slug && (
+                    <Link
+                      href={`/iv-therapy/${entry.slug}`}
+                      className="inline-flex items-center gap-1 mt-2 text-wellness-700 font-bold text-sm hover:underline"
+                    >
+                      Learn more about {entry.name.toLowerCase()}
+                      <ArrowRight size={13} aria-hidden="true" />
+                    </Link>
+                  )}
+                </dd>
+              </div>
+            ))}
+          </dl>
+
+          <p className="text-xs text-slate-400 mt-4 font-medium">
+            Educational only. Not medical advice. Suitability and dosing should
+            be confirmed with a licensed clinician.
+          </p>
         </section>
 
         {/* Cross-links */}

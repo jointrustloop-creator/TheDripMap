@@ -28,6 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/contact`,                priority: 0.6, changeFrequency: 'monthly', lastModified: new Date() },
     { url: `${baseUrl}/symptoms`,               priority: 0.7, changeFrequency: 'monthly', lastModified: new Date() },
     { url: `${baseUrl}/iv-therapy-statistics`,  priority: 0.6, changeFrequency: 'monthly', lastModified: new Date() },
+    { url: `${baseUrl}/treatments`,             priority: 0.8, changeFrequency: 'monthly', lastModified: new Date() },
   ];
 
   const symptomRoutes = USE_CASES.map((useCase) => ({
