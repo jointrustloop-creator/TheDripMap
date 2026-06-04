@@ -99,14 +99,14 @@ export default async function HomePage() {
     priceFrom: number;
     objectPosition?: string;
   }> = [
-    { name: 'Hydration',      slug: 'hydration',      Icon: Droplets,    image: 'iv-therapy-woman-yacht.jpg',                 tagline: 'Rapid rehydration',          category: 'Foundational',  priceFrom: 100, objectPosition: '50% 35%' },
-    { name: 'NAD+',           slug: 'nad-plus',       Icon: Activity,    image: 'iv-therapy-nad-iv-bag-closeup.jpg',          tagline: 'Cellular energy + clarity',  category: 'Longevity',     priceFrom: 400, objectPosition: '70% 50%' },
-    { name: 'Myers Cocktail', slug: 'myers-cocktail', Icon: Zap,         image: 'iv-therapy-modern-clinic-recliners.jpg',     tagline: 'The original wellness drip', category: 'Foundational',  priceFrom: 150, objectPosition: '50% 50%' },
-    { name: 'Hangover',       slug: 'hangover',       Icon: Heart,       image: 'iv-therapy-for-chronic-fatigue-hero.webp',   tagline: 'Reset after a rough night',  category: 'Recovery',      priceFrom: 150, objectPosition: '60% 40%' },
-    { name: 'Immune Support', slug: 'immune-support', Icon: ShieldCheck, image: 'iv-therapy-clinical-medical-setting.jpg',    tagline: 'Vitamin C + zinc boost',     category: 'Wellness',      priceFrom: 150, objectPosition: '50% 50%' },
-    { name: 'Beauty Glow',    slug: 'beauty-glow',    Icon: Sparkles,    image: 'iv-therapy-beauty-glow-pink-lounge.jpg',     tagline: 'Glutathione for skin',       category: 'Beauty',        priceFrom: 200, objectPosition: '60% 50%' },
-    { name: 'Recovery',       slug: 'recovery',       Icon: Dumbbell,    image: 'iv-therapy-man-blue.jpg',                    tagline: 'Amino acids + rebuild',      category: 'Athletic',      priceFrom: 175, objectPosition: '50% 35%' },
-    { name: 'Weight Loss',    slug: 'weight-loss',    Icon: Activity,    image: 'iv-therapy-spa-reception-recliners.jpg',     tagline: 'MIC + lipo + metabolism',    category: 'Metabolic',     priceFrom: 175, objectPosition: '50% 50%' },
+    { name: 'Hydration',      slug: 'hydration',      Icon: Droplets,    image: '/images/treatments/hydration.png',      tagline: 'Rapid rehydration',          category: 'Foundational',  priceFrom: 100 },
+    { name: 'NAD+',           slug: 'nad-plus',       Icon: Activity,    image: '/images/treatments/nad-plus.png',       tagline: 'Cellular energy + clarity',  category: 'Longevity',     priceFrom: 400 },
+    { name: 'Myers Cocktail', slug: 'myers-cocktail', Icon: Zap,         image: '/images/treatments/myers-cocktail.png', tagline: 'The original wellness drip', category: 'Foundational',  priceFrom: 150 },
+    { name: 'Hangover',       slug: 'hangover',       Icon: Heart,       image: '/images/treatments/hangover.png',       tagline: 'Reset after a rough night',  category: 'Recovery',      priceFrom: 150 },
+    { name: 'Immune Support', slug: 'immune-support', Icon: ShieldCheck, image: '/images/treatments/immune-support.png', tagline: 'Vitamin C + zinc boost',     category: 'Wellness',      priceFrom: 150 },
+    { name: 'Beauty Glow',    slug: 'beauty-glow',    Icon: Sparkles,    image: '/images/treatments/beauty-glow.png',    tagline: 'Glutathione for skin',       category: 'Beauty',        priceFrom: 200 },
+    { name: 'Recovery',       slug: 'recovery',       Icon: Dumbbell,    image: '/images/treatments/recovery.png',       tagline: 'Amino acids + rebuild',      category: 'Athletic',      priceFrom: 175 },
+    { name: 'Weight Loss',    slug: 'weight-loss',    Icon: Activity,    image: '/images/treatments/weight-loss.png',    tagline: 'MIC + lipo + metabolism',    category: 'Metabolic',     priceFrom: 175 },
   ];
   const DRIP_IMG_BASE = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/';
 
@@ -369,12 +369,14 @@ export default async function HomePage() {
                 href={`/treatments/${s.slug}`}
                 className="group relative bg-white rounded-3xl flex flex-col p-4 md:p-5 shadow-[0_10px_30px_-10px_rgba(15,40,30,0.12)] hover:shadow-[0_25px_50px_-15px_rgba(15,40,30,0.22)] hover:-translate-y-1 transition-all duration-300 border border-[#0F6E56]/5"
               >
-                {/* Editorial image frame — uniform 4:5 portrait aspect across
-                    all 8 cards so the grid is rhythmically identical. Pill
-                    (category) floats top-left, droplet badge top-right. */}
-                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-[#F4F6F4] mb-4">
+                {/* Editorial image frame — uniform square aspect across all 8
+                    cards so the grid is rhythmically identical. Square frame
+                    matches the near-square 365x377 source PNGs so object-cover
+                    barely crops. Pill (category) floats top-left, droplet
+                    badge top-right. */}
+                <div className="relative aspect-square rounded-2xl overflow-hidden bg-[#F4F6F4] mb-4">
                   <Image
-                    src={`${DRIP_IMG_BASE}${s.image}`}
+                    src={s.image.startsWith('/') ? s.image : `${DRIP_IMG_BASE}${s.image}`}
                     alt={`${s.name} IV drip`}
                     fill
                     sizes="(max-width: 640px) 92vw, (max-width: 768px) 46vw, 22vw"
