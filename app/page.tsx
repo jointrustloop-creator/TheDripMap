@@ -222,11 +222,11 @@ export default async function HomePage() {
             <div className="lg:col-span-6 order-2 lg:order-1">
               <div className="relative aspect-[4/5] md:aspect-[5/6] lg:aspect-[4/5] rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-[0_40px_80px_-30px_rgba(15,40,30,0.35)]">
                 <Image
-                  src={`${DRIP_IMG_BASE}iv-therapy-spa-reception-recliners.jpg`}
-                  alt="A modern IV therapy spa reception interior"
+                  src="/images/marketing/verified-clinic-thedripmap.png"
+                  alt="TheDripMap Safety Verified clinic badge"
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover"
+                  className="object-contain p-6 md:p-10"
                   priority
                 />
                 {/* Editorial wash — soft warm overlay so the photo reads like a
