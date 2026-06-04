@@ -65,8 +65,7 @@ We added your listing, but right now it's unclaimed, so visitors see a generic p
 ${claimUrl}
 
 Warmly,
-Deborah Triandafilou
-TheDripMap
+TheDripMap Team
 info@thedripmap.com
 ${CASL_FOOTER}`;
 }
@@ -105,8 +104,7 @@ Right now visitors see a generic placeholder on each one instead of your real ph
 I sent this once to ${email.toLowerCase().trim()} because all ${count} locations share that email, so you only hear from me once, not ${count} times.
 
 Warmly,
-Deborah Triandafilou
-TheDripMap
+TheDripMap Team
 info@thedripmap.com
 ${CASL_FOOTER}`;
 }

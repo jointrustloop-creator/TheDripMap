@@ -87,7 +87,7 @@ ${verifyUrl}
 
 If you did not submit this claim, you can safely ignore this email.
 
-The TheDripMap Team
+TheDripMap Team
 `;
 
   const result = await sendMail({

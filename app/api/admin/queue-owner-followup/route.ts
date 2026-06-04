@@ -146,8 +146,7 @@ A simple reply with answers a, b, c is perfect, no formal documents needed.
 That is the full ask. Reply with whatever you have and I will integrate it within a day.
 
 Warmly,
-Deborah Triandafilou
-TheDripMap
+TheDripMap Team
 info@thedripmap.com
 `;
   return body;

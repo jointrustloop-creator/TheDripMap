@@ -1,4 +1,4 @@
-// Backlink outreach email templates — one per target_type.
+// Backlink outreach email templates, one per target_type.
 // The research cron tags each target with a target_type. The drafts cron
 // picks the template, asks Claude to personalize the {{placeholders}}
 // using the page_title / contact_name / reason from research, and saves
@@ -17,7 +17,7 @@ export interface BacklinkTemplate {
   preferredArticles: string[]; // article slugs that fit this target type
 }
 
-const SIGNATURE = `\nDeborah Triandafilou\nTheDripMap · https://www.thedripmap.com`;
+const SIGNATURE = `\nTheDripMap Team\nhttps://www.thedripmap.com`;
 
 export const BACKLINK_TEMPLATES: Record<BacklinkTargetType, BacklinkTemplate> = {
   nursing_school: {

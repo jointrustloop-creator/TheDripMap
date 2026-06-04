@@ -70,8 +70,7 @@ ${claimUrl}
 If I'm reaching the wrong person, would you mind forwarding this to whoever handles marketing or the front desk?
 
 Warmly,
-Deborah Triandafilou
-TheDripMap
+TheDripMap Team
 info@thedripmap.com
 
 ${CASL_FOOTER}`;
@@ -113,8 +112,7 @@ I sent this once to ${email.toLowerCase().trim()} because all ${count} locations
 If I'm reaching the wrong person, would you mind forwarding this to whoever handles marketing or the front desk?
 
 Warmly,
-Deborah Triandafilou
-TheDripMap
+TheDripMap Team
 info@thedripmap.com
 
 ${CASL_FOOTER}`;
@@ -171,7 +169,7 @@ export async function GET(req: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Same scrub+mismatch filter as the daily cron — keeps the followup pool
+  // Same scrub+mismatch filter as the daily cron, keeps the followup pool
   // consistent so we never follow up on a junk address we shouldn't have used.
   const candidates = (data as ProviderRow[]).filter((p) =>
     isEligibleEmail(p.email) && !isDomainMismatch(p.email, p.website)
@@ -192,7 +190,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: true, skipped: 'no eligible follow-ups' });
   }
 
-  // Score by rating × log10(reviews+1) — same as daily outreach.
+  // Score by rating × log10(reviews+1), same as daily outreach.
   const score = (p: ProviderRow) =>
     (Number(p.rating) || 0) * Math.log10((Number(p.reviews) || 0) + 1);
 

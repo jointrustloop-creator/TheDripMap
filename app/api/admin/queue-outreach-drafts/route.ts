@@ -101,8 +101,7 @@ Claim your listing here:
 ${claimUrl}
 
 Warmly,
-Deborah Triandafilou
-TheDripMap
+TheDripMap Team
 info@thedripmap.com`,
     };
   });

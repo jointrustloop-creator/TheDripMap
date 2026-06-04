@@ -77,7 +77,7 @@ function isLikelyBounceError(err: string | undefined): boolean {
 // Bounce suppression: returns sentCount / failedCount / bouncePct so the caller
 // can stop firing when the rolling bounce rate exceeds the configured threshold
 // (default 5%). The caller is responsible for tracking cumulative state across
-// pages — each call also returns the per-page failure rate.
+// pages, each call also returns the per-page failure rate.
 //
 // Pacing: this endpoint sends its slice in one shot (no internal sleeps so we
 // stay under Vercel's function timeout). The CALLER spaces calls out across
@@ -112,7 +112,7 @@ export async function POST(req: Request) {
 }
 
 // ---------------------------------------------------------------------------
-// mode=today — sends drafts queued by the daily-outreach cron this UTC day.
+// mode=today, sends drafts queued by the daily-outreach cron this UTC day.
 // ---------------------------------------------------------------------------
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnySupabaseClient = any;
@@ -279,7 +279,7 @@ async function countTodayBounced(
 }
 
 // ---------------------------------------------------------------------------
-// mode=rank — original behavior: re-rank unclaimed pool and send next slice.
+// mode=rank, original behavior: re-rank unclaimed pool and send next slice.
 // Preserved for task #52 historical driver script + any ad-hoc calls.
 // ---------------------------------------------------------------------------
 async function sendRankBatch(
@@ -326,7 +326,7 @@ async function sendRankBatch(
     const subject = `Your ${display} listing on TheDripMap`;
     const text = `Hi ${display} team,
 
-We added ${display} to TheDripMap — North America's directory for IV therapy clinics. Your listing is live with your real Google rating of ${p.rating}★ from ${reviews} patient reviews.
+We added ${display} to TheDripMap, North America's directory for IV therapy clinics. Your listing is live with your real Google rating of ${p.rating}★ from ${reviews} patient reviews.
 
 Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 
@@ -334,8 +334,7 @@ Claim your listing here:
 ${claimUrl}
 
 Warmly,
-Deborah Triandafilou
-TheDripMap
+TheDripMap Team
 info@thedripmap.com`;
 
     try {
