@@ -10,16 +10,11 @@ import {
   Dumbbell,
   ShieldCheck,
   Zap,
-  Wine,
-  Thermometer,
-  Brain,
-  Plane,
-  PartyPopper,
-  Pill,
   Stethoscope,
   Check,
   FlaskConical,
   UserCheck,
+  MapPin,
 } from 'lucide-react';
 import { Navbar } from '../src/components/Navbar';
 import { Footer } from '../src/components/Footer';
@@ -27,7 +22,7 @@ import { BlogCard } from '../src/components/BlogCard';
 import { QuickMatch } from '../src/components/QuickMatch';
 import { ClinicianSection } from '../src/components/ClinicianSection';
 import { TrustSignals } from '../src/components/TrustSignals';
-import { getBlogPosts, getSiteStats, getPopularCities, getFeaturedListings } from '../src/lib/data';
+import { getBlogPosts, getSiteStats, getPopularCities, getFeaturedListings, getOperatorProfiles } from '../src/lib/data';
 import { Metadata } from 'next';
 
 export const revalidate = 60;
@@ -77,6 +72,60 @@ export default async function HomePage() {
   const featuredClinics = (await getFeaturedListings(4)) || [];
   const latestPosts = blogPosts.slice(0, 3);
 
+  // Build a per-clinic "Safety Verified" map for the featured shelf. Mirrors
+  // the platform definition used on app/providers/[slug]/page.tsx: a clinic is
+  // Safety Verified only when (a) it is claimed AND (b) all 5 operator-profile
+  // safety criteria are true. We compute this server-side so the badge never
+  // shows on a clinic that hasn't actually completed verification.
+  const SAFETY_KEYS = [
+    'verifiedMedicalDirector',
+    'verifiedClinician',
+    'verifiedCompoundingPharmacy',
+    'verifiedLiabilityInsurance',
+    'verifiedStateBoard',
+  ] as const;
+  const operatorProfiles = await getOperatorProfiles();
+  const safetyVerifiedById = new Map<string, boolean>();
+  for (const c of featuredClinics) {
+    const profile = operatorProfiles.find(
+      p => p.clinicId === c.id || p.clinic_id === c.id
+    );
+    const pd = (profile?.profile_data || {}) as Record<string, unknown>;
+    const allFive = SAFETY_KEYS.every(k => pd[k] === true);
+    safetyVerifiedById.set(String(c.id), !!c.is_claimed && allFive);
+  }
+
+  // Initials helper for the small circular logo chip when a clinic has no
+  // standalone logo asset. "Signature Beauty Lounge, Downtown" -> "SBL".
+  // Falls back to the first letter if only one word survives.
+  const clinicInitials = (name: string): string => {
+    const words = (name || '')
+      .replace(/[^A-Za-z0-9\s'-]/g, ' ')
+      .split(/\s+/)
+      .filter(Boolean)
+      .filter(w => !['and', 'the', 'of', 'at', 'in'].includes(w.toLowerCase()));
+    if (words.length === 0) return '?';
+    if (words.length === 1) return words[0][0].toUpperCase();
+    return (words[0][0] + words[1][0]).toUpperCase();
+  };
+
+  // Real clinic-logo files placed under /public/images/clinic-logos/.
+  // Mapping is hardcoded so we don't pay an fs probe per request — when
+  // we onboard a new logo, add the slug here. Render with object-contain
+  // on a white chip; the initials chip is only the fallback.
+  const logoBySlug: Record<string, string> = {
+    'blue-cypress-iv-and-wellness-georgetown':
+      '/images/clinic-logos/blue-cypress-iv-and-wellness-georgetown.jpg',
+    'signature-beauty-lounge-downtown-toronto':
+      '/images/clinic-logos/signature-beauty-lounge-downtown-toronto.jpg',
+    'signature-beauty-lounge-richmond-hill':
+      '/images/clinic-logos/signature-beauty-lounge-richmond-hill.jpg',
+    'diamond-aesthetics-brampton':
+      '/images/clinic-logos/diamond-aesthetics-brampton.png',
+    'bay-wellness-centre-vancouver':
+      '/images/clinic-logos/bay-wellness-centre-vancouver.webp',
+  };
+
   const websiteJsonLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'TheDripMap', url: 'https://www.thedripmap.com', potentialAction: { '@type': 'SearchAction', target: 'https://www.thedripmap.com/search?q={search_term_string}', 'query-input': 'required name=search_term_string' } };
   const organizationJsonLd = { '@context': 'https://schema.org', '@type': 'Organization', name: 'TheDripMap', url: 'https://www.thedripmap.com', logo: 'https://www.thedripmap.com/logo.png', sameAs: ['https://www.instagram.com/thedripmap'] };
 
@@ -110,18 +159,27 @@ export default async function HomePage() {
   ];
   const DRIP_IMG_BASE = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/';
 
-  // Each situation card gets a solid color wash driven by color psychology
-  // (warm amber for regret/restoration, cool sky for clinical calm, etc.).
-  // `bg` is the card background, `ink` is the darker on-color text shade.
-  const situations = [
-    { Icon: Wine,        label: 'Out too late last night',    drip: 'Hangover Recovery',  bg: '#F4A261', ink: '#5B3920' },
-    { Icon: Thermometer, label: 'Catching something nasty',   drip: 'Immune Support',     bg: '#6BB6D6', ink: '#1F3A4A' },
-    { Icon: Brain,       label: 'Brain fog all week',         drip: 'NAD+ / Energy',      bg: '#2C2C54', ink: '#E8E8F5' },
-    { Icon: Dumbbell,    label: 'Race or big workout coming', drip: 'Athletic Recovery',  bg: '#E76F51', ink: '#4A1F12' },
-    { Icon: Sparkles,    label: 'Event in a week',            drip: 'Beauty Glow',        bg: '#E9C46A', ink: '#5A4310' },
-    { Icon: Plane,       label: 'Just landed jet-lagged',     drip: 'Hydration + B-complex', bg: '#7FB3D5', ink: '#1C3B52' },
-    { Icon: Pill,        label: 'Bug or stomach flu',         drip: 'Hydration Drip',     bg: '#A8DADC', ink: '#1F4747' },
-    { Icon: PartyPopper, label: 'Bachelor / bachelorette',    drip: 'Hangover + Recovery',bg: '#BC4749', ink: '#FBE9E9' },
+  // Photo-card situation set (2026-06-03). Each PNG in
+  // /public/images/situations already has the situation's icon baked
+  // into the top-left corner, so the card does NOT render a separate
+  // icon overlay. Category pills use soft pastel tints (peach, teal,
+  // lavender, butter, etc.) instead of the previous loud primaries to
+  // fit the cream-and-emerald homepage palette.
+  const situations: Array<{
+    label: string;
+    drip: string;
+    image: string;
+    pillBg: string;
+    pillInk: string;
+  }> = [
+    { label: 'Out too late last night',    drip: 'Hangover Recovery',     image: '/images/situations/out-too-late.png',           pillBg: '#FBD0B6', pillInk: '#6B3A1B' },
+    { label: 'Catching something nasty',   drip: 'Immune Support',        image: '/images/situations/catching-something-nasty.png', pillBg: '#C8E5E0', pillInk: '#1F4747' },
+    { label: 'Brain fog all week',         drip: 'NAD+ / Energy',         image: '/images/situations/brain-fog.png',              pillBg: '#D8D5EC', pillInk: '#2C2C54' },
+    { label: 'Race or big workout coming', drip: 'Athletic Recovery',     image: '/images/situations/race-or-workout.png',        pillBg: '#F4C9BB', pillInk: '#4A1F12' },
+    { label: 'Event in a week',            drip: 'Beauty Glow',           image: '/images/situations/event-in-a-week.png',        pillBg: '#F2E4B4', pillInk: '#5A4310' },
+    { label: 'Just landed jet-lagged',     drip: 'Hydration + B-complex', image: '/images/situations/jet-lagged.png',             pillBg: '#CFE0EE', pillInk: '#1C3B52' },
+    { label: 'Bug or stomach flu',         drip: 'Hydration Drip',        image: '/images/situations/stomach-flu.png',            pillBg: '#CDE6E5', pillInk: '#1F4747' },
+    { label: 'Bachelor / bachelorette',    drip: 'Hangover + Recovery',   image: '/images/situations/bachelor-bachelorette.png',  pillBg: '#EAC8C9', pillInk: '#5B2728' },
   ];
 
   const guides = [
@@ -449,21 +507,45 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
             {situations.map((s) => (
               <Link
                 key={s.label}
                 href="/quiz"
-                className="group rounded-3xl p-5 md:p-7 relative overflow-hidden transition-transform hover:-translate-y-1 shadow-sm hover:shadow-xl"
-                style={{ backgroundColor: s.bg, color: s.ink }}
+                className="group bg-white rounded-3xl border border-slate-200/80 overflow-hidden flex flex-col shadow-[0_8px_24px_-12px_rgba(15,40,30,0.10)] hover:shadow-[0_24px_48px_-18px_rgba(15,40,30,0.22)] hover:-translate-y-1 transition-all duration-300"
                 aria-label={`Quiz for ${s.label}`}
               >
-                <s.Icon size={26} className="mb-6 opacity-90" strokeWidth={1.75} style={{ color: s.ink }} />
-                <div className="font-black text-base md:text-[17px] leading-tight tracking-tight mb-3" style={{ color: s.ink }}>
-                  {s.label}
+                {/* Wide landscape image banner. PNGs are ~345x200 (1.7:1),
+                    so aspect-[17/10] matches the source ratio almost exactly
+                    and object-cover crops minimally. The colored icon badge
+                    is baked into the top-left of every photo, so we do NOT
+                    overlay a separate icon. */}
+                <div className="relative aspect-[17/10] overflow-hidden bg-slate-50">
+                  <Image
+                    src={s.image}
+                    alt={s.label}
+                    fill
+                    sizes="(max-width: 640px) 92vw, (max-width: 768px) 46vw, 22vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-[700ms] ease-out"
+                  />
                 </div>
-                <div className="inline-block text-[10px] font-black uppercase tracking-[0.18em] px-2.5 py-1 rounded-full bg-white/80 text-slate-700">
-                  {s.drip}
+                {/* Card foot: two-line title, then muted pastel category pill,
+                    then a small circular arrow button bottom-right. */}
+                <div className="flex flex-col gap-3 p-5 flex-1">
+                  <div className="font-black text-slate-900 text-base md:text-[17px] leading-tight tracking-tight min-h-[2.6em]">
+                    {s.label}
+                  </div>
+                  <div className="flex items-center justify-between gap-3 mt-auto">
+                    <span
+                      className="inline-block text-[10px] font-black uppercase tracking-[0.18em] px-2.5 py-1 rounded-full"
+                      style={{ backgroundColor: s.pillBg, color: s.pillInk }}
+                    >
+                      {s.drip}
+                    </span>
+                    <span className="w-8 h-8 rounded-full bg-[#0F6E56] text-white flex items-center justify-center shrink-0 group-hover:bg-[#0A5742] transition-colors">
+                      <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                    </span>
+                  </div>
                 </div>
               </Link>
             ))}
@@ -502,49 +584,121 @@ export default async function HomePage() {
             </Link>
           </div>
 
+          {/* Card design (2026-06-03): photo hero, "Safety Verified" badge
+              top-left (only when truly verified), small circular logo chip
+              overlapping the hero base, serif clinic name, MapPin location,
+              gold stars + rating + review count, "View clinic" footer with
+              chevron, lift-plus-zoom on hover. When a clinic has no
+              image_url we render a branded deep-green panel with the
+              initials centered — never flat grey. */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
             {featuredClinics.slice(0, 4).map((c) => {
               const cityLine = [c.city, c.state].filter(Boolean).join(', ');
-              const tagline = ((c as { description?: string }).description || '')
-                .split(/(?<=[.!?])\s+/)[0]
-                ?.replace(/^\s+|\s+$/g, '')
-                .slice(0, 110) || ((c.specialties as string[] | undefined)?.slice(0, 2).join(' · ') || 'Verified IV therapy clinic');
+              const isSafetyVerified = safetyVerifiedById.get(String(c.id)) === true;
+              const initials = clinicInitials(c.name);
+              const logoUrl = c.slug ? logoBySlug[c.slug] || null : null;
+              const rating = Number(c.rating) || 0;
+              const reviewCount = Number(c.reviewCount) || 0;
+              const fullStars = Math.round(rating);
               return (
                 <Link
                   key={c.slug || c.name}
                   href={`/providers/${c.slug}`}
-                  className="group relative overflow-hidden rounded-3xl bg-white border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+                  className="group relative overflow-hidden rounded-3xl bg-white border border-slate-200/80 shadow-[0_8px_24px_-12px_rgba(15,40,30,0.10)] hover:shadow-[0_26px_50px_-30px_rgba(15,40,30,0.45)] hover:-translate-y-1 hover:border-[#d3dfca] transition-all duration-300 flex flex-col"
                 >
-                  <div className="relative aspect-[16/10] bg-gradient-to-br from-slate-100 to-slate-200 overflow-hidden">
+                  {/* Photo hero — uniform aspect-[16/10] across all 4 cards,
+                      object-cover keeps a centered focal point with no
+                      stretching or letterbox. The hero is NOT clipped by
+                      the chip overflow because the chip sits absolutely
+                      below the hero base and the card's overflow-hidden
+                      crops only the chip's outer edge softly. */}
+                  <div className="relative aspect-[16/10] overflow-hidden">
                     {c.image_url ? (
                       <Image
                         src={c.image_url}
                         alt={c.name}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-out"
+                        className="object-cover group-hover:scale-105 transition-transform duration-[700ms] ease-out"
                       />
                     ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-slate-300 text-[10px] font-black uppercase tracking-[0.25em]">
-                        TheDripMap
+                      // Branded deep-green fallback panel for clinics without
+                      // a photo (radial gradient mirrors the design ref). If
+                      // the clinic has a real logo we center it inside a
+                      // padded white pill (object-contain so it's never
+                      // cropped). Otherwise we fall back to the clinic's
+                      // initials in italic serif so the panel still feels
+                      // designed, not empty.
+                      <div
+                        className="absolute inset-0 flex items-center justify-center group-hover:scale-[1.03] transition-transform duration-[700ms] ease-out"
+                        style={{ background: 'radial-gradient(120% 120% at 30% 20%, #2f5436, #142619)' }}
+                      >
+                        {logoUrl ? (
+                          <div className="relative w-[58%] h-[58%] rounded-2xl bg-white shadow-[0_8px_24px_-10px_rgba(0,0,0,0.4)] p-4 flex items-center justify-center">
+                            <Image
+                              src={logoUrl}
+                              alt={c.name}
+                              fill
+                              sizes="(max-width: 640px) 60vw, (max-width: 1024px) 30vw, 15vw"
+                              className="object-contain p-2"
+                            />
+                          </div>
+                        ) : (
+                          <span className="text-[#e8efe4] font-serif italic font-normal text-4xl tracking-[0.02em]">
+                            {initials}
+                          </span>
+                        )}
                       </div>
                     )}
-                    {/* Safety Verified pill */}
-                    <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#0F6E56] text-white text-[10px] font-black uppercase tracking-[0.18em] shadow-md">
-                      <ShieldCheck size={11} strokeWidth={2.5} /> Safety Verified
-                    </span>
+                    {/* Safety Verified badge — only on truly verified clinics. */}
+                    {isSafetyVerified && (
+                      <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1f3a27] text-white text-[10px] font-bold uppercase tracking-[0.06em] shadow-[0_4px_12px_rgba(20,38,25,0.35)]">
+                        <Check size={11} strokeWidth={3} /> Safety Verified
+                      </span>
+                    )}
+                    {/* Logo chip — small white circle overlapping the hero base.
+                        When the clinic has a real logo file under
+                        /public/images/clinic-logos/{slug}.{ext} we render it
+                        with object-contain + small padding so the FULL logo
+                        shows and never gets cropped. When no logo file
+                        exists we fall back to the clinic's initials in
+                        serif (matching the design reference). */}
+                    {logoUrl ? (
+                      <span className="absolute -bottom-5 left-4 w-12 h-12 rounded-full bg-white border-[3px] border-white shadow-[0_6px_16px_-6px_rgba(25,36,28,0.5)] overflow-hidden z-[2]">
+                        <Image
+                          src={logoUrl}
+                          alt={c.name}
+                          width={48}
+                          height={48}
+                          className="w-full h-full object-contain p-1"
+                        />
+                      </span>
+                    ) : (
+                      <span className="absolute -bottom-5 left-4 w-12 h-12 rounded-full bg-white border-[3px] border-white shadow-[0_6px_16px_-6px_rgba(25,36,28,0.5)] flex items-center justify-center font-serif text-[18px] text-[#142619] z-[2]">
+                        {initials}
+                      </span>
+                    )}
                   </div>
-                  <div className="px-4 md:px-5 py-4 md:py-5 flex flex-col gap-1.5 flex-1">
-                    <div className="font-black text-slate-900 text-base md:text-[17px] tracking-tight leading-tight">{c.name}</div>
-                    <div className="text-[12px] md:text-[13px] text-slate-500 font-medium">{cityLine}</div>
-                    {Number(c.rating) > 0 && (
-                      <div className="flex items-baseline gap-1.5 mt-1">
-                        <span className="text-[#0F6E56] font-black text-sm">★</span>
-                        <span className="text-slate-900 font-black text-sm">{Number(c.rating).toFixed(1)}</span>
-                        <span className="text-slate-400 text-xs font-bold">({c.reviewCount || 0})</span>
+                  <div className="px-5 pt-8 pb-5 flex flex-col flex-1">
+                    <div className="font-serif text-[19px] leading-[1.15] tracking-[-0.01em] text-[#142619]">
+                      {c.name}
+                    </div>
+                    <div className="mt-1.5 flex items-center gap-1.5 text-[13px] text-slate-500">
+                      <MapPin size={12} className="text-slate-400 shrink-0" strokeWidth={2} />
+                      <span className="truncate">{cityLine}</span>
+                    </div>
+                    {rating > 0 && (
+                      <div className="mt-3 flex items-center gap-2">
+                        <span className="text-[#c89a3c] text-[13px] tracking-[1px]" aria-hidden="true">
+                          {'★'.repeat(fullStars)}{'☆'.repeat(5 - fullStars)}
+                        </span>
+                        <span className="text-[13.5px] font-bold text-[#142619]">{rating.toFixed(1)}</span>
+                        <span className="text-[12.5px] text-slate-400">({reviewCount})</span>
                       </div>
                     )}
-                    <p className="text-[12.5px] text-slate-500 leading-relaxed mt-2 line-clamp-2">{tagline}</p>
+                    <div className="mt-auto pt-4 border-t border-slate-100 flex items-center gap-1.5 text-[13px] font-semibold text-[#2f5436] group-hover:gap-2.5 transition-[gap] duration-200">
+                      View clinic <ArrowRight size={14} strokeWidth={2.25} />
+                    </div>
                   </div>
                 </Link>
               );
