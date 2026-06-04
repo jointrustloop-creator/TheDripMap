@@ -104,20 +104,38 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { treatment, city } = await params;
+  const safeTreatment = treatment || 'iv-therapy';
+  const safeCity = city || 'usa';
+  const fallbackCanonical = `${SITE_URL}/iv-therapy/${safeTreatment}/${safeCity}`;
+  const niceTreatment = safeTreatment.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  const niceCity = safeCity.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
   const t = findTreatment(treatment);
-  if (!t) return { title: 'Not found' };
+  if (!t) {
+    return {
+      title: `${niceTreatment} IV Therapy in ${niceCity} | TheDripMap`,
+      description: `Find ${niceTreatment.toLowerCase()} IV therapy clinics in ${niceCity}. Compare options, pricing, and book your session on TheDripMap.`,
+      alternates: { canonical: fallbackCanonical },
+      robots: { index: false, follow: true },
+    };
+  }
+
   const resolved = await resolveCity(city);
   const clinics = await getListingsByServiceAndCity(t.filter, resolved.name, 60);
   const count = clinics.length;
   const cityLabel = resolved.stateAbbr ? `${resolved.name}, ${resolved.stateAbbr}` : resolved.name;
   // Canonicalize the city to its resolved slug so variant URLs dedupe to one URL.
-  const canonical = `${SITE_URL}/iv-therapy/${t.slug}/${slugify(resolved.name)}`;
+  const canonical = `${SITE_URL}/iv-therapy/${t.slug}/${slugify(resolved.name) || safeCity}`;
+
+  const titleCount = count === 1 ? '1 Clinic' : `${count} Clinics`;
+  const title = `${t.name} in ${cityLabel} (${YEAR}) | ${titleCount} | TheDripMap`;
+  const description = `Compare ${count > 0 ? `${count} ` : ''}${t.name.toLowerCase()} providers in ${cityLabel}. See clinics, what to expect, typical pricing, and book your session on TheDripMap.`;
 
   return {
-    title: `${t.name} in ${cityLabel} (${YEAR}) — ${count} ${count === 1 ? 'Clinic' : 'Clinics'} | TheDripMap`,
-    description: `Compare ${count > 0 ? `${count} ` : ''}${t.name.toLowerCase()} providers in ${cityLabel}. See clinics, what to expect, typical pricing, and book your session — all on TheDripMap.`,
+    title,
+    description,
     alternates: { canonical },
-    // Don't index empty combinations — avoids thin programmatic pages.
+    // Don't index empty combinations to avoid thin programmatic pages.
     robots: count === 0 ? { index: false, follow: true } : undefined,
     openGraph: {
       title: `${t.name} in ${cityLabel} (${YEAR}) | TheDripMap`,
@@ -235,6 +253,18 @@ export default async function TreatmentCityPage({ params }: PageProps) {
     : t.slug === 'vitamin-c' ? 'high-dose-vitamin-c'
     : t.slug;
 
+  // BreadcrumbList JSON-LD for the treatment x city page.
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+      { '@type': 'ListItem', position: 2, name: 'Treatments', item: `${SITE_URL}/treatments` },
+      { '@type': 'ListItem', position: 3, name: t.name, item: `${SITE_URL}/treatments/${treatmentPageSlug}` },
+      { '@type': 'ListItem', position: 4, name: cityLabel, item: canonical },
+    ],
+  };
+
   const otherTreatments = MATRIX_TREATMENTS.filter((x) => x.slug !== t.slug).slice(0, 6);
 
   return (
@@ -242,6 +272,7 @@ export default async function TreatmentCityPage({ params }: PageProps) {
       <Navbar />
       {itemListJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />}
       {definedTermJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermJsonLd) }} />}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <main className="max-w-6xl mx-auto px-6 py-12">

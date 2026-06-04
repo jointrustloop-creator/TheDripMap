@@ -136,46 +136,90 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: ProviderPageProps): Promise<Metadata> {
   const { slug } = await params;
-  let provider: Awaited<ReturnType<typeof getListingBySlug>>;
+
+  // Canonical URL is built from the URL slug as a final fallback so we ALWAYS
+  // emit one, even when Supabase is unreachable or the provider row is null.
+  // Search Console's duplicate-canonical flag and the "missing canonical" flag
+  // both stem from variants of this metadata function returning early.
+  const safeSlug = slug || 'unknown';
+  const fallbackCanonical = `https://www.thedripmap.com/providers/${safeSlug}`;
+  const fallbackTitleFromSlug = safeSlug
+    .split('-')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+
+  let provider: Awaited<ReturnType<typeof getListingBySlug>> = null;
   try {
     provider = await getListingBySlug(slug);
   } catch (err) {
     if (err instanceof SupabaseUnreachableError) {
       // Soft fallback so a transient Supabase outage doesn't ship a "not found"
       // title into Google's cache. Page renders TemporarilyUnavailable below.
-      return { title: 'IV Therapy Clinic | TheDripMap' };
+      // Canonical and a generic description still emitted so the page is never
+      // tagless even mid-outage.
+      return {
+        title: `${fallbackTitleFromSlug} | IV Therapy Clinic | TheDripMap`,
+        description: `Find ${fallbackTitleFromSlug} and other IV therapy clinics on TheDripMap. Compare prices, read reviews, and book your drip session today.`,
+        alternates: { canonical: fallbackCanonical },
+      };
     }
     throw err;
   }
 
-  if (!provider || provider.availability === false) {
+  // If the slug doesn't resolve to a provider, fall through to a tagged
+  // "not found" rather than calling notFound() here — Next still 404s the
+  // page render, but at least the metadata never goes out empty if the
+  // fuzzy-resolver returns null between cache rebuilds.
+  if (!provider) {
+    return {
+      title: `IV Therapy Clinic Not Found | TheDripMap`,
+      description: `We couldn't find that clinic on TheDripMap. Browse our directory of IV therapy providers near you.`,
+      alternates: { canonical: fallbackCanonical },
+      robots: { index: false, follow: true },
+    };
+  }
+  if (provider.availability === false) {
     notFound();
   }
 
-  const displayName = provider.name
+  // Safe field extraction — every downstream string MUST tolerate missing
+  // data. After enrichProvider() the fields default to sane values, but we
+  // belt-and-suspenders here because the bella-excellence-tampa-tampa stub
+  // (description=null, specialties=null, rating=null) is the canonical
+  // proof that partial rows reach this function.
+  const providerName = (provider.name || '').trim() || fallbackTitleFromSlug || 'IV Therapy Clinic';
+  const displayName = providerName
     .split(' | ')[0]
     .split(' - IV')[0]
     .split(' - Drip')[0]
-    .trim();
+    .trim() || 'IV Therapy Clinic';
+  const cityLabel = (provider.city && String(provider.city).trim()) || 'the US or Canada';
+  const stateLabel = (provider.state && String(provider.state).trim()) || '';
+  const locationLabel = stateLabel ? `${cityLabel}, ${stateLabel}` : cityLabel;
 
-  const topSpecialties = provider.specialties?.slice(0, 3).join(', ') || 'hydration, NAD+, immune support';
+  const specialtyList = Array.isArray(provider.specialties)
+    ? provider.specialties.filter((s): s is string => typeof s === 'string' && s.length > 0)
+    : [];
+  const topSpecialties = specialtyList.slice(0, 3).join(', ') || 'hydration, NAD+, immune support';
 
   // Canonicalize to the provider's TRUE slug, not the requested URL slug.
   // getListingBySlug() fuzzy-matches, so several URL variants can resolve to
-  // the same provider — pointing every variant's canonical at the one true
+  // the same provider. Pointing every variant's canonical at the one true
   // slug is what tells Google they're the same page (fixes duplicate-canonical
   // flags in Search Console).
-  const canonicalSlug = provider.slug || slugify(provider.name);
+  const canonicalSlug = provider.slug || slugify(providerName) || safeSlug;
   const canonicalUrl = `https://www.thedripmap.com/providers/${canonicalSlug}`;
 
-  const title = `${displayName} — IV Therapy in ${provider.city}, ${provider.state} | Reviews & Booking | TheDripMap`;
-  const description = provider.is_featured && provider.reviewCount > 0
-    ? `Read reviews for ${displayName} in ${provider.city}, ${provider.state}. ${provider.rating} stars, ${provider.reviewCount} reviews. IV therapy treatments include ${topSpecialties}. Book your session today.`
-    : `Find ${displayName} in ${provider.city}, ${provider.state}. IV therapy treatments include ${topSpecialties}. Compare prices and book your drip session today on TheDripMap.`;
+  // Title format locked to: "<Name> | IV Therapy in <City>, <Region> | TheDripMap"
+  // Pipe separators (no em-dash) per the site-wide copy rule.
+  const title = `${displayName} | IV Therapy in ${locationLabel} | TheDripMap`;
+  const description = provider.is_featured && Number(provider.reviewCount) > 0
+    ? `Read reviews for ${displayName} in ${locationLabel}. ${provider.rating} stars, ${provider.reviewCount} reviews. IV therapy treatments include ${topSpecialties}. Book your session today.`
+    : `Find ${displayName} in ${locationLabel}. IV therapy treatments include ${topSpecialties}. Compare prices and book your drip session today on TheDripMap.`;
 
   // Orphan-claim stubs are placeholders created when a setup-form submission
   // doesn't match any existing listing. They have no real content until the
-  // owner verifies the claim — keep them out of Google's index until then.
+  // owner verifies the claim. Keep them out of Google's index until then.
   // Matches the same filter used by app/sitemap.ts so the two stay in sync.
   const dd = (provider as { decision_drivers?: { source?: string } | null }).decision_drivers;
   const isOrphanStub = dd?.source === 'orphan_claim_stub' && provider.is_claimed !== true;
@@ -199,7 +243,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
           url: provider.imageUrl || 'https://www.thedripmap.com/og-image.png',
           width: 1200,
           height: 630,
-          alt: provider.name,
+          alt: providerName,
         },
       ],
     },
@@ -336,7 +380,9 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
       "addressLocality": provider.city,
       "addressRegion": stateCode,
       "postalCode": provider.postal_code,
-      "addressCountry": "US"
+      // Use the actual stored country so Canadian clinics aren't tagged "US".
+      // Falls back to "US" only when no country is on the row.
+      "addressCountry": /canada/i.test(String((provider as { country?: string }).country || '')) ? "CA" : "US"
     },
     "geo": {
       "@type": "GeoCoordinates",
@@ -383,6 +429,19 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
     ]
   } : null;
 
+  // BreadcrumbList JSON-LD for every provider page (claimed or not). Mirrors
+  // the visible <BreadcrumbNav> shown in both render branches.
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.thedripmap.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Cities", "item": "https://www.thedripmap.com/cities" },
+      { "@type": "ListItem", "position": 3, "name": cityLabel, "item": `https://www.thedripmap.com/cities/${citySlug}` },
+      { "@type": "ListItem", "position": 4, "name": displayName, "item": `https://www.thedripmap.com/providers/${provider.slug || slugify(provider.name)}` },
+    ]
+  };
+
   // ─────────────────────────────────────────────────────────────
   // CLAIMED LISTINGS: render the new editorial template (DefinitiveListingLayout).
   // Unclaimed listings continue to use the legacy render path below.
@@ -397,6 +456,10 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(medicalBusinessJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
         />
         {faqJsonLd && (
           <script
@@ -446,13 +509,17 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(medicalBusinessJsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {faqJsonLd && (
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       )}
-      
+
       {/* MAGAZINE HERO — claimed listings only. Edge-to-edge cover photo with the
           clinic logo as a small inset avatar and the clinic name in display type.
           Solves the legacy "logo stretched across 384px" and "name wraps to 2 lines"
@@ -973,6 +1040,29 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                           />
                         );
                       })}
+                    </div>
+
+                    {/* Crawl-depth helper: subtle links to the city hub + a
+                        couple of common treatment x city matrix pages so the
+                        unclaimed listing is connected to deeper money pages.
+                        Kept purposely understated; not a CTA. */}
+                    <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-slate-500 font-medium">
+                      <span className="font-bold text-slate-700">More in {provider.city}:</span>
+                      <Link href={`/cities/${citySlug}`} className="text-wellness-700 hover:underline font-bold">
+                        All {provider.city} clinics
+                      </Link>
+                      <span className="text-slate-300">·</span>
+                      <Link href={`/iv-therapy/nad-plus/${citySlug}`} className="text-wellness-700 hover:underline font-bold">
+                        NAD+ in {provider.city}
+                      </Link>
+                      <span className="text-slate-300">·</span>
+                      <Link href={`/iv-therapy/hangover-recovery/${citySlug}`} className="text-wellness-700 hover:underline font-bold">
+                        Hangover recovery in {provider.city}
+                      </Link>
+                      <span className="text-slate-300">·</span>
+                      <Link href={`/iv-therapy/myers-cocktail/${citySlug}`} className="text-wellness-700 hover:underline font-bold">
+                        Myers Cocktail in {provider.city}
+                      </Link>
                     </div>
                   </>
                 )}

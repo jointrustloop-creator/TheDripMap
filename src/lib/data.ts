@@ -33,6 +33,21 @@ export const STATE_MAP: Record<string, string> = {
 
 export const GTA_CITIES = ['Toronto', 'Ajax', 'Brampton', 'Mississauga', 'Oakville', 'Richmond Hill', 'Vaughan'];
 
+// Toronto-as-city + former municipalities that amalgamated into the City of
+// Toronto in 1998. Clinics here are presented as "IV therapy in Toronto".
+export const TORONTO_CORE_CITIES = ['Toronto', 'North York', 'Scarborough', 'Etobicoke', 'York', 'East York'];
+
+// Surrounding Greater Toronto Area municipalities (York / Peel / Durham /
+// Halton regions). Clinics here are presented under "Nearby in the GTA" and
+// keep their REAL city label. Closest-to-downtown-Toronto sort order is
+// applied at the page level.
+export const TORONTO_GTA_NEARBY_CITIES = [
+  'Markham', 'Vaughan', 'Richmond Hill', 'Mississauga', 'Brampton',
+  'Oakville', 'Burlington', 'Pickering', 'Ajax', 'Whitby', 'Oshawa',
+  'Milton', 'Aurora', 'Newmarket', 'Stouffville', 'Whitchurch-Stouffville',
+  'King City', 'Caledon', 'Bolton', 'Halton Hills', 'Georgetown', 'Acton',
+];
+
 // Reverse mapping for full names
 export const REVERSE_STATE_MAP: Record<string, string> = Object.fromEntries(
   Object.entries(STATE_MAP).map(([name, abbr]) => [abbr, name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())])
@@ -348,6 +363,85 @@ export async function getListingsByCity(city: string, state?: string) {
   } catch (err) {
     console.error('Error fetching listings by city:', err);
     return [];
+  }
+}
+
+// Toronto + GTA two-tier fetch — used ONLY by the Toronto city page so other
+// city pages keep their existing one-tier behavior.
+//
+// Tier 1 ("IV therapy in Toronto"): clinics in Toronto proper and the former
+// municipalities that amalgamated into Toronto. Verified (is_featured) first,
+// then rating desc.
+//
+// Tier 2 ("Nearby in the Greater Toronto Area"): clinics in surrounding GTA
+// municipalities, sorted by Haversine distance from downtown Toronto
+// (43.6532, -79.3832) using the lat/lng already stored on the provider row.
+// Verified first within the tier, then closest first. Clinics with no
+// lat/lng fall to the end of the tier.
+//
+// Each clinic keeps its REAL city label — suburban clinics are NOT relabeled
+// "Toronto". Callers render them honestly under the right municipality.
+export async function getTorontoGtaTieredListings(): Promise<{
+  core: Provider[];
+  nearby: Provider[];
+}> {
+  const empty = { core: [] as Provider[], nearby: [] as Provider[] };
+  if (!isSupabaseConfigured()) return empty;
+
+  const TORONTO_LAT = 43.6532;
+  const TORONTO_LNG = -79.3832;
+  const distKm = (la: number, lo: number) => {
+    if (!Number.isFinite(la) || !Number.isFinite(lo)) return Number.POSITIVE_INFINITY;
+    const R = 6371;
+    const dLat = ((la - TORONTO_LAT) * Math.PI) / 180;
+    const dLng = ((lo - TORONTO_LNG) * Math.PI) / 180;
+    const s =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos((TORONTO_LAT * Math.PI) / 180) *
+        Math.cos((la * Math.PI) / 180) *
+        Math.sin(dLng / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(s));
+  };
+
+  try {
+    const [coreRes, nearRes] = await Promise.all([
+      supabase
+        .from('providers')
+        .select('*')
+        .neq('availability', false)
+        .in('city', TORONTO_CORE_CITIES)
+        .or('state.ilike.Ontario,state.ilike.ON')
+        .order('is_featured', { ascending: false })
+        .order('rating', { ascending: false, nullsFirst: false })
+        .limit(200),
+      supabase
+        .from('providers')
+        .select('*')
+        .neq('availability', false)
+        .in('city', TORONTO_GTA_NEARBY_CITIES)
+        .or('state.ilike.Ontario,state.ilike.ON')
+        .order('is_featured', { ascending: false })
+        .order('rating', { ascending: false, nullsFirst: false })
+        .limit(200),
+    ]);
+
+    const core = (coreRes.data || []).map(enrichProvider);
+    const nearby = (nearRes.data || []).map(enrichProvider);
+
+    // Tier 2 ordering: verified first; within each bucket, closest first.
+    nearby.sort((a, b) => {
+      const fa = a.is_featured ? 1 : 0;
+      const fb = b.is_featured ? 1 : 0;
+      if (fa !== fb) return fb - fa;
+      const da = distKm(Number(a.latitude), Number(a.longitude));
+      const db = distKm(Number(b.latitude), Number(b.longitude));
+      return da - db;
+    });
+
+    return { core, nearby };
+  } catch (err) {
+    console.error('Error in getTorontoGtaTieredListings:', err);
+    return empty;
   }
 }
 

@@ -43,23 +43,38 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getBlogPostBySlug(slug);
-  
-  if (!post) return { title: 'Post Not Found' };
+  const safeSlug = slug || 'unknown';
+  const fallbackTitle = safeSlug
+    .split('-')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+  const canonical = `https://www.thedripmap.com/blog/${safeSlug}`;
 
-  const title = `${post.title} | TheDripMap`;
-  const description = post.metaDescription || post.excerpt || `Read our latest guide on ${post.title.toLowerCase()}. Expert insights from TheDripMap Team.`;
+  const post = await getBlogPostBySlug(slug);
+
+  // Even on a missing post we emit canonical + title + description so the page
+  // is never tagless. Tagged noindex so Google doesn't index the 404 body.
+  if (!post) {
+    return {
+      title: `${fallbackTitle} | TheDripMap Blog`,
+      description: `Read our latest IV therapy guides and city insights on TheDripMap.`,
+      alternates: { canonical },
+      robots: { index: false, follow: true },
+    };
+  }
+
+  const safeTitle = (post.title && String(post.title).trim()) || fallbackTitle;
+  const title = `${safeTitle} | TheDripMap`;
+  const description = post.metaDescription || post.excerpt || `Read our latest guide on ${safeTitle.toLowerCase()}. Expert insights from TheDripMap Team.`;
 
   return {
     title,
     description,
-    alternates: {
-      canonical: `https://www.thedripmap.com/blog/${slug}`,
-    },
+    alternates: { canonical },
     openGraph: {
       title,
       description,
-      url: `https://www.thedripmap.com/blog/${slug}`,
+      url: canonical,
       images: [{ url: post.imageUrl || 'https://www.thedripmap.com/og-image.png' }],
       type: 'article',
       publishedTime: post.date,
@@ -104,6 +119,17 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     return validCitySlugs.has(slug)
       ? `/cities/${slug}`
       : `/search?city=${encodeURIComponent(cityName)}`;
+  };
+
+  // BreadcrumbList JSON-LD for blog detail.
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.thedripmap.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.thedripmap.com/blog" },
+      { "@type": "ListItem", "position": 3, "name": post.title, "item": `https://www.thedripmap.com/blog/${slug}` },
+    ]
   };
 
   const jsonLd = {
@@ -205,6 +231,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       {itemListJsonLd && (
         <script

@@ -10,7 +10,7 @@ import { Footer } from '@/src/components/Footer';
 import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
 import { QuizCTA } from '@/src/components/QuizCTA';
 import { ListingController } from '@/src/components/ListingController';
-import { getCityBySlug, getListingsByCity, getAllCities, getListingsByState, getFeaturedListings, getBlogPostBySlug, slugify } from '@/src/lib/data';
+import { getCityBySlug, getListingsByCity, getAllCities, getListingsByState, getFeaturedListings, getBlogPostBySlug, slugify, getTorontoGtaTieredListings } from '@/src/lib/data';
 import { SupabaseUnreachableError } from '@/src/lib/supabase-health';
 import { TemporarilyUnavailable } from '@/src/components/TemporarilyUnavailable';
 import { getCityIntro } from '@/src/lib/city-intros';
@@ -60,31 +60,36 @@ interface CityPageProps {
 
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const safeSlug = slug || 'unknown';
+  const fallbackName = safeSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  const fallbackCanonical = `https://www.thedripmap.com/cities/${safeSlug}`;
+
   let cityData;
   try {
     cityData = await getCityBySlug(slug);
   } catch (err) {
     if (err instanceof SupabaseUnreachableError) {
-      // Soft fallback: keep the page indexable with a generic title so a brief
-      // Supabase outage doesn't poison Google's cache with a "City Not Found".
-      const guess = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      // Soft fallback: keep the page indexable with a generic title + canonical
+      // so a brief Supabase outage doesn't poison Google's cache with a
+      // "City Not Found" page that's also missing its canonical tag.
       return {
-        title: `IV Therapy in ${guess} | TheDripMap`,
-        description: `IV therapy clinics and providers in ${guess}.`,
+        title: `IV Therapy in ${fallbackName} | TheDripMap`,
+        description: `Find and compare IV therapy clinics in ${fallbackName}. Read reviews, compare prices, and book hangover recovery, NAD+, immune support and hydration drips near you.`,
+        alternates: { canonical: fallbackCanonical },
       };
     }
     throw err;
   }
-  
+
   let name = '';
   let state = '';
-  
+
   if (cityData) {
     name = cityData.name;
     state = cityData.state || '';
   } else {
     // Fallback: convert slug to title case (e.g. "san-diego" -> "San Diego")
-    name = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    name = fallbackName;
   }
 
   // Fetch actual count for accurate metadata
@@ -103,8 +108,16 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   }
   const count = listings.length;
 
+  // Even for a totally unknown city slug, emit title + description + canonical
+  // so the page is never tagless. Mark noindex when there is literally no data
+  // to back a hub page.
   if (count === 0 && !cityData) {
-    return { title: 'City Not Found' };
+    return {
+      title: `IV Therapy in ${fallbackName} | TheDripMap`,
+      description: `IV therapy clinics and providers in ${fallbackName}. Compare hydration drips, NAD+, hangover recovery and more on TheDripMap.`,
+      alternates: { canonical: fallbackCanonical },
+      robots: { index: false, follow: true },
+    };
   }
 
   // Unified city title format — applies to every city page so the SERP feels
@@ -221,9 +234,23 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
     }
   }
 
+  // TORONTO-ONLY two-tier view: Toronto + former municipalities up top, then
+  // surrounding GTA below sorted by distance from downtown. Other city pages
+  // keep the existing one-tier flow untouched.
+  const isToronto = slug === 'toronto';
+  let torontoCore: Awaited<ReturnType<typeof getTorontoGtaTieredListings>>['core'] = [];
+  let torontoNearby: Awaited<ReturnType<typeof getTorontoGtaTieredListings>>['nearby'] = [];
+  if (isToronto) {
+    const tiered = await getTorontoGtaTieredListings();
+    torontoCore = tiered.core;
+    torontoNearby = tiered.nearby;
+  }
+
   // Fetch actual listings for display
-  let listings = await getListingsByCity(cityData.name, cityData.state || '');
-  const exactCityCount = listings.length;
+  let listings = isToronto
+    ? [...torontoCore, ...torontoNearby]
+    : await getListingsByCity(cityData.name, cityData.state || '');
+  const exactCityCount = isToronto ? torontoCore.length : listings.length;
 
   // Tiered fallback so a small/empty city never shows 0 cards:
   // 1) widen to state-level top-rated
@@ -232,7 +259,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   // expansion (banner) instead of silently swapping providers.
   let isBroadened = false;
   let broadenedScope: 'state' | 'national' | null = null;
-  if (exactCityCount < 3 && cityData.state) {
+  if (!isToronto && exactCityCount < 3 && cityData.state) {
     const stateListings = await getListingsByState(cityData.state);
     const existingIds = new Set(listings.map(p => p.id));
     for (const p of stateListings) {
@@ -247,7 +274,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
       broadenedScope = 'state';
     }
   }
-  if (listings.length < 3) {
+  if (!isToronto && listings.length < 3) {
     const featured = await getFeaturedListings(24);
     const existingIds = new Set(listings.map(p => p.id));
     for (const p of featured) {
@@ -302,9 +329,22 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
     })),
   };
 
+  // BreadcrumbList JSON-LD — mirrors the visible <BreadcrumbNav> so search
+  // engines and AI assistants can place the city page in the site hierarchy.
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.thedripmap.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Cities', item: 'https://www.thedripmap.com/cities' },
+      { '@type': 'ListItem', position: 3, name: cityData.name, item: `https://www.thedripmap.com/cities/${cityData.slug || slug}` },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <Navbar />
       <main className="max-w-7xl mx-auto px-6 py-12">
         <BreadcrumbNav
@@ -328,10 +368,16 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
         {/* 1. H1 + subheading — clean and simple */}
         <section className="mt-4 mb-8">
           <h1 className="text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-            IV Therapy in {cityData.name}
+            {isToronto
+              ? <>IV Therapy in Toronto <span className="text-slate-500">&amp; the GTA</span></>
+              : <>IV Therapy in {cityData.name}</>
+            }
           </h1>
           <p className="text-lg md:text-xl text-slate-500 font-medium mt-3">
-            Compare {count} {count === 1 ? 'clinic' : 'clinics'} — in-clinic and mobile
+            {isToronto
+              ? `Compare ${torontoCore.length} ${torontoCore.length === 1 ? 'clinic' : 'clinics'} in Toronto plus ${torontoNearby.length} more across the surrounding GTA. In-clinic and mobile.`
+              : `Compare ${count} ${count === 1 ? 'clinic' : 'clinics'}. In-clinic and mobile.`
+            }
           </p>
           {cityGuidePost && (
             <Link
@@ -365,37 +411,84 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           return (
             <section className="mb-12 max-w-4xl">
               <p className="text-lg text-slate-600 leading-relaxed">
-                Looking for IV therapy in {cityData.name}? Compare {count === 1 ? '1 top-rated clinic' : `${count} top-rated clinics`} offering hydration drips, NAD+, immune support, hangover recovery, and beauty treatments. Read reviews, see prices, and book your session — in-clinic or mobile, whichever you prefer.
+                Looking for IV therapy in {cityData.name}? Compare {count === 1 ? '1 top-rated clinic' : `${count} top-rated clinics`} offering hydration drips, NAD+, immune support, hangover recovery, and beauty treatments. Read reviews, see prices, and book your session in-clinic or mobile, whichever you prefer.
               </p>
             </section>
           );
         })()}
 
-        {/* 4. Verified Providers listings grid */}
-        {listings.length > 0 && (
+        {/* 4. Verified Providers listings grid.
+            TORONTO: two-tier render — Toronto + former municipalities up top,
+            then "Nearby in the Greater Toronto Area" below. Other cities use
+            the single ListingController.
+            Each clinic keeps its REAL city label; suburban clinics are NOT
+            relabeled "Toronto". */}
+        {isToronto ? (
           <>
-            {isBroadened && (
-              <div className="mb-8 bg-amber-50 border-2 border-amber-200 rounded-3xl p-5 flex items-start gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
-                  <MapPin size={18} />
+            {torontoCore.length > 0 && (
+              <section className="mb-16">
+                <div className="flex items-end justify-between gap-4 mb-6">
+                  <div>
+                    <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
+                      IV therapy in Toronto
+                    </h2>
+                    <p className="text-sm font-bold text-slate-500 mt-1">
+                      {torontoCore.length} {torontoCore.length === 1 ? 'clinic' : 'clinics'} in Toronto, North York, Scarborough, Etobicoke, York &amp; East York
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-black text-amber-900 mb-1">
-                    {exactCityCount === 0
-                      ? `No clinics in ${cityData.name} yet — showing top-rated ${broadenedScope === 'state' ? `in ${cityData.state}` : 'nearby'}.`
-                      : `Only ${exactCityCount} clinic${exactCityCount === 1 ? '' : 's'} in ${cityData.name} — adding more from ${broadenedScope === 'state' ? cityData.state : 'nearby'} so you have options.`}
-                  </p>
-                  <p className="text-xs text-amber-800 font-medium leading-relaxed">
-                    Mobile IV providers in some listings will travel — check the clinic page for service area.
-                  </p>
-                </div>
-              </div>
+                <ListingController
+                  initialProviders={torontoCore}
+                  cityName={cityData.name}
+                />
+              </section>
             )}
-            <ListingController
-              initialProviders={listings}
-              cityName={cityData.name}
-            />
+
+            {torontoNearby.length > 0 && (
+              <section className="mb-16">
+                <div className="flex items-end justify-between gap-4 mb-6">
+                  <div>
+                    <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
+                      Nearby in the Greater Toronto Area
+                    </h2>
+                    <p className="text-sm font-bold text-slate-500 mt-1">
+                      {torontoNearby.length} {torontoNearby.length === 1 ? 'clinic' : 'clinics'} across Markham, Vaughan, Richmond Hill, Mississauga, Brampton, Oakville, Burlington &amp; the rest of the GTA. Closest to downtown first.
+                    </p>
+                  </div>
+                </div>
+                <ListingController
+                  initialProviders={torontoNearby}
+                  cityName={cityData.name}
+                />
+              </section>
+            )}
           </>
+        ) : (
+          listings.length > 0 && (
+            <>
+              {isBroadened && (
+                <div className="mb-8 bg-amber-50 border-2 border-amber-200 rounded-3xl p-5 flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                    <MapPin size={18} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-black text-amber-900 mb-1">
+                      {exactCityCount === 0
+                        ? `No clinics in ${cityData.name} yet. Showing top-rated ${broadenedScope === 'state' ? `in ${cityData.state}` : 'nearby'}.`
+                        : `Only ${exactCityCount} clinic${exactCityCount === 1 ? '' : 's'} in ${cityData.name}. Adding more from ${broadenedScope === 'state' ? cityData.state : 'nearby'} so you have options.`}
+                    </p>
+                    <p className="text-xs text-amber-800 font-medium leading-relaxed">
+                      Mobile IV providers in some listings will travel. Check the clinic page for service area.
+                    </p>
+                  </div>
+                </div>
+              )}
+              <ListingController
+                initialProviders={listings}
+                cityName={cityData.name}
+              />
+            </>
+          )
         )}
 
         {/* 5. Match quiz CTA block */}
@@ -428,7 +521,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           <div className="bg-gradient-to-br from-wellness-50 to-white p-10 md:p-14 rounded-[3rem] border border-wellness-100">
             <h3 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">Browse IV Treatments in {cityData.name}</h3>
             <p className="text-lg text-slate-600 mb-10 max-w-3xl">
-              Most {cityData.name} clinics offer these popular treatment protocols. Tap any drip for the full breakdown — benefits, who it&apos;s for, cost, and how to find a provider near you.
+              Most {cityData.name} clinics offer these popular treatment protocols. Tap any drip for the full breakdown: benefits, who it&apos;s for, cost, and how to find a provider near you.
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
