@@ -7,6 +7,7 @@ import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { slugify } from '../../src/lib/data';
 import { sendMail } from '../../src/lib/mailer';
+import { autoEnrichProvider } from '../../src/lib/auto-enrich';
 
 export const dynamic = 'force-dynamic';
 
@@ -109,6 +110,27 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
   if (updClaimErr) {
     console.error('verify-claim: claim update error', updClaimErr);
   }
+
+  // Fire-and-forget public-data enrichment. Runs in the background so the
+  // owner's redirect + welcome email aren't blocked on Nominatim or a slow
+  // clinic website. Errors are logged, never thrown. Daily report surfaces
+  // success/failure the next morning.
+  Promise.resolve()
+    .then(() => autoEnrichProvider(provider.id))
+    .then((res) => {
+      if (!res.ok) {
+        console.error('auto-enrich failed', { providerId: provider.id, errors: res.errors });
+      } else {
+        console.log('auto-enrich complete', {
+          providerId: provider.id,
+          filled: res.filled,
+          skipped: res.skipped,
+        });
+      }
+    })
+    .catch((err) => {
+      console.error('auto-enrich crashed', err);
+    });
 
   const providerSlug = provider.slug || slugify(provider.name);
   const listingUrl = `${SITE_URL}/providers/${providerSlug}`;
