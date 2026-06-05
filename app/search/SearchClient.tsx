@@ -7,6 +7,10 @@ import {
   Zap,
   CheckCircle2,
   MapPin,
+  ArrowDown,
+  ArrowUp,
+  Sparkles,
+  ShieldCheck,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Provider, City, TreatmentType, ListingStats } from '../../src/types';
@@ -114,6 +118,11 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
   
   const [sortBy, setSortBy] = useState<'best' | 'rating' | 'reviews' | 'distance' | 'value'>('best');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  // Default-view behavior (no city, no query, no chips): show ONLY verified
+  // clinics sorted by claim date. The toggles flip the sort direction and let
+  // the visitor escape into the full directory pool.
+  const [verifiedSortAsc, setVerifiedSortAsc] = useState(false); // false = newest claim first
+  const [showAllClinics, setShowAllClinics] = useState(false);
   const [filteredProviders, setFilteredProviders] = useState<Provider[]>(initialProviders);
   // True when the user's combination of filters produced zero results and we
   // auto-broadened to nationwide top-rated. Drives the amber "broadened" banner.
@@ -235,21 +244,52 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
     loadData();
   }, [initialCities, initialStats]);
 
+  // Helpers shared by both the default-view path and the search/filter path.
+  // claimDateMs returns the parsed claimed_at as a number; missing values fall
+  // back to 0 so unstamped grandfathered rows sink rather than scramble order.
+  const claimDateMs = React.useCallback((p: Provider): number => {
+    return p.claimed_at ? new Date(p.claimed_at).getTime() : 0;
+  }, []);
+
+  // True when nothing the visitor did has narrowed the page yet. In this state
+  // we show ONLY verified clinics by claim date (the "spot new ones" view),
+  // unless the visitor explicitly clicks "Browse all" to escape into the
+  // broader directory.
+  const isDefaultView =
+    selectedCity === 'All' &&
+    searchQuery.trim() === '' &&
+    (activeChips.length === 0 || (activeChips.length === 1 && activeChips[0] === 'All'));
+
   useEffect(() => {
     const fetchListings = async () => {
-      // Don't fetch if we're on first load with no parameters (already have initialProviders)
-      const hasSearch = searchQuery.trim() !== '' || (selectedCity !== 'All' && selectedCity !== '');
-      const hasChips = !activeChips.includes('All');
-      
-      if (!hasSearch && !hasChips && sortBy === 'best') {
-        setFilteredProviders(initialProviders);
+      // --- Default view: verified-only, sorted by claim date ---
+      if (isDefaultView && !showAllClinics) {
+        const verifiedOnly = initialProviders
+          .filter((p) => p.is_claimed)
+          .slice()
+          .sort((a, b) =>
+            verifiedSortAsc ? claimDateMs(a) - claimDateMs(b) : claimDateMs(b) - claimDateMs(a),
+          );
+        setFilteredProviders(verifiedOnly);
+        setIsBroadened(false);
+        return;
+      }
+
+      // --- Default view + "Browse all" escape: full pool, claimed pinned top ---
+      if (isDefaultView && showAllClinics) {
+        const all = initialProviders.slice().sort((a, b) => {
+          if (a.is_claimed !== b.is_claimed) return a.is_claimed ? -1 : 1;
+          if (a.is_claimed && b.is_claimed) return claimDateMs(b) - claimDateMs(a);
+          return (b.rating ?? 0) - (a.rating ?? 0);
+        });
+        setFilteredProviders(all);
         setIsBroadened(false);
         return;
       }
 
       setIsLoading(true);
       let results = await searchListings(searchQuery, selectedCity);
-      
+
       // Apply Chips Filters
       if (!activeChips.includes('All')) {
         if (activeChips.includes('Mobile')) {
@@ -267,7 +307,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
         if (activeChips.includes('TopRated')) {
           results = results.filter(isTopRated);
         }
-        
+
         const activeGoalChips = Object.keys(GOAL_KEYWORDS).filter(id => activeChips.includes(id));
         if (activeGoalChips.length > 0) {
           results = results.filter(p => {
@@ -277,8 +317,8 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
             const pDesc = (p.description || '').toLowerCase();
             return activeGoalChips.some(chipId => {
               const keywords = GOAL_KEYWORDS[chipId];
-              return keywords.some(kw => 
-                pSpecialties.some(s => s.includes(kw)) || 
+              return keywords.some(kw =>
+                pSpecialties.some(s => s.includes(kw)) ||
                 pSubtypes.some(s => s.includes(kw)) ||
                 pName.includes(kw) ||
                 pDesc.includes(kw)
@@ -288,12 +328,15 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
         }
       }
 
-      // Apply Sorting.
-      // Claimed (is_featured) listings are pinned to the top in every sort mode.
-      // The chosen sort acts as the tiebreaker among unclaimed listings (and among
-      // claimed listings, on the rare occasion there's more than one in view).
-      // This mirrors how Google/Yelp keep sponsored results pinned regardless of
-      // sort — and protects the value clinics buy when they claim a listing.
+      // Apply Sorting (city or query active).
+      //
+      // Pinning changed 2026-06-05: claimed (is_claimed) clinics pin to the
+      // top, replacing the older is_featured pin. Within the claimed group,
+      // newest claimed_at first so a freshly verified clinic surfaces above
+      // older claims. Among the unclaimed remainder, the visitor's chosen
+      // sort applies. Mirrors how Yelp/Google keep verified results pinned
+      // regardless of sort, and protects the value clinics get when they
+      // claim.
       const sorted = [...results];
       const tiebreaker = (a: Provider, b: Provider): number => {
         if (sortBy === 'rating') return (b.rating ?? 0) - (a.rating ?? 0);
@@ -308,7 +351,8 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
         return (b.rating ?? 0) - (a.rating ?? 0);
       };
       sorted.sort((a, b) => {
-        if (a.is_featured !== b.is_featured) return a.is_featured ? -1 : 1;
+        if (a.is_claimed !== b.is_claimed) return a.is_claimed ? -1 : 1;
+        if (a.is_claimed && b.is_claimed) return claimDateMs(b) - claimDateMs(a);
         return tiebreaker(a, b);
       });
 
@@ -318,7 +362,8 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
       if (sorted.length === 0 && selectedCity !== 'All' && selectedCity !== '') {
         const broadened = await searchListings(searchQuery, 'All');
         const fallback = broadened.slice().sort((a, b) => {
-          if (a.is_featured !== b.is_featured) return a.is_featured ? -1 : 1;
+          if (a.is_claimed !== b.is_claimed) return a.is_claimed ? -1 : 1;
+          if (a.is_claimed && b.is_claimed) return claimDateMs(b) - claimDateMs(a);
           return (b.rating ?? 0) - (a.rating ?? 0);
         }).slice(0, 24);
         setFilteredProviders(fallback);
@@ -331,7 +376,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
     };
 
     fetchListings();
-  }, [selectedCity, searchQuery, activeChips, sortBy, userLocation, initialProviders]);
+  }, [selectedCity, searchQuery, activeChips, sortBy, userLocation, initialProviders, isDefaultView, showAllClinics, verifiedSortAsc, claimDateMs]);
 
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
@@ -351,12 +396,49 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pt-8 border-t border-slate-50">
-            <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-              {selectedCity === 'All' ? 'All Clinics' : `IV Therapy in ${selectedCity}`}
-              <span className="text-wellness-600 ml-2">
-                ({filteredProviders.length})
-              </span>
-            </h2>
+            <div>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                {isDefaultView && !showAllClinics ? (
+                  <>
+                    <ShieldCheck size={22} className="inline -mt-1 text-wellness-600 mr-2" />
+                    Safety Verified IV Therapy Clinics
+                  </>
+                ) : selectedCity === 'All' ? (
+                  'All Clinics'
+                ) : (
+                  `IV Therapy in ${selectedCity}`
+                )}
+                <span className="text-wellness-600 ml-2">
+                  ({filteredProviders.length})
+                </span>
+              </h2>
+              {isDefaultView && !showAllClinics && (
+                <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
+                  <button
+                    onClick={() => setVerifiedSortAsc((v) => !v)}
+                    className="inline-flex items-center gap-1.5 font-bold text-slate-600 hover:text-slate-900"
+                  >
+                    {verifiedSortAsc ? <ArrowUp size={12} /> : <ArrowDown size={12} />}
+                    {verifiedSortAsc ? 'Oldest claim first' : 'Newest claim first'}
+                  </button>
+                  <span className="text-slate-300">·</span>
+                  <button
+                    onClick={() => setShowAllClinics(true)}
+                    className="font-bold text-wellness-700 hover:text-wellness-800 underline-offset-2 hover:underline"
+                  >
+                    Browse all {totalCount.toLocaleString()} clinics
+                  </button>
+                </div>
+              )}
+              {isDefaultView && showAllClinics && (
+                <button
+                  onClick={() => setShowAllClinics(false)}
+                  className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-wellness-700 hover:text-wellness-800 underline-offset-2 hover:underline"
+                >
+                  <ShieldCheck size={12} /> Back to Safety Verified only
+                </button>
+              )}
+            </div>
             
             <div className="flex flex-col sm:flex-row items-center gap-3">
               <div className="relative w-full sm:w-80">
@@ -521,7 +603,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-black text-amber-900 mb-1">
-                      No matches for your filters in {selectedCity} — showing top-rated nationwide.
+                      No matches for your filters in {selectedCity}, showing top-rated nationwide.
                     </p>
                     <p className="text-xs text-amber-800 font-medium leading-relaxed">
                       Adjust the city, clear a chip, or pick a different sort to narrow down.
@@ -535,6 +617,45 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
                   </button>
                 </div>
               )}
+
+              {/* Recent Additions strip — only renders in the default verified-only
+                  view when there are at least 3 verified clinics with claim dates.
+                  Top 3 are still shown in the full grid below; this is a high-
+                  visibility "spot what just claimed" surface. */}
+              {isDefaultView && !showAllClinics && (() => {
+                const newest = filteredProviders
+                  .filter((p) => p.claimed_at)
+                  .slice(0, 3);
+                if (newest.length < 3) return null;
+                return (
+                  <section className="mb-12">
+                    <div className="flex items-center justify-between mb-5">
+                      <div className="flex items-center gap-3">
+                        <span className="inline-flex items-center justify-center w-9 h-9 rounded-2xl bg-wellness-100 text-wellness-700">
+                          <Sparkles size={16} />
+                        </span>
+                        <div>
+                          <h3 className="text-lg font-black text-slate-900 tracking-tight">Recent additions</h3>
+                          <p className="text-xs font-bold text-slate-500">3 most recently verified clinics</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {newest.map((p, idx) => (
+                        <div key={`new-${p.id}`} className="relative">
+                          {idx === 0 && (
+                            <span className="absolute -top-2 left-4 z-10 bg-wellness-600 text-white text-[10px] font-black uppercase tracking-[0.18em] px-3 py-1 rounded-full shadow-md shadow-wellness-200">
+                              NEW
+                            </span>
+                          )}
+                          <ProviderCard provider={p} />
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                );
+              })()}
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredProviders.map((provider) => (
                   <div key={provider.id} className={cn(provider.is_featured ? "md:col-span-2 lg:col-span-3" : "")}>

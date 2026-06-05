@@ -102,6 +102,17 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
     return { status: 'error', reason: 'server_error' };
   }
 
+  // claimed_at (2026-06-05): stamp the moment of claim so /search can sort
+  // verified clinics newest-first. Only writes when null so hand-set
+  // grandfathered dates from the 2026-06-05 backfill aren't overwritten if
+  // an operator re-clicks the verify link. Non-fatal if it errors — the
+  // claim itself already succeeded above.
+  await supabase
+    .from('providers')
+    .update({ claimed_at: new Date().toISOString() })
+    .eq('id', provider.id)
+    .is('claimed_at', null);
+
   const { error: updClaimErr } = await supabase
     .from('claim_requests')
     .update({ status: 'verified', verified_at: new Date().toISOString() })
