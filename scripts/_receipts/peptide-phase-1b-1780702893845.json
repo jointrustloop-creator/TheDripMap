@@ -1,0 +1,162 @@
+{
+  "phase": "1b",
+  "timestamp": "2026-06-05T23:41:32.342Z",
+  "modified": [
+    {
+      "id": "835c095b-2627-45e1-8384-91ab83a8ba65",
+      "slug": "daniel-benhuri-md-beverly-hills",
+      "city": "Beverly Hills",
+      "country": "United States",
+      "before": {
+        "specialties": [
+          "Semaglutide",
+          "Tirzepatide",
+          "Tesamorelin",
+          "PT-141",
+          "BPC-157",
+          "NAD+",
+          "Peptide Therapy"
+        ],
+        "category": "Peptide Therapy"
+      },
+      "after": {
+        "specialties": [
+          "NAD+"
+        ],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "217396bc-d908-4189-8673-80981da824a9",
+      "slug": "evolv-wellness-medspa-denver",
+      "city": "Denver",
+      "country": "United States",
+      "before": {
+        "specialties": [
+          "Peptide Therapy",
+          "Semaglutide",
+          "NAD+"
+        ],
+        "category": "Peptide Therapy"
+      },
+      "after": {
+        "specialties": [
+          "NAD+"
+        ],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "37de28cf-931a-4912-b9c8-6d4f76a1cd22",
+      "slug": "htx-urology-webster",
+      "city": "Webster",
+      "country": "United States",
+      "before": {
+        "specialties": [
+          "BPC-157",
+          "TB-500",
+          "Ipamorelin",
+          "CJC-1295",
+          "Sermorelin",
+          "PT-141",
+          "NAD+",
+          "Semaglutide",
+          "Tirzepatide",
+          "Peptide Therapy"
+        ],
+        "category": "Peptide Therapy"
+      },
+      "after": {
+        "specialties": [
+          "NAD+"
+        ],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "f532e482-6c75-48fb-97fa-1cf925d470a4",
+      "slug": "natura-med-spa-and-iv-bar-denver",
+      "city": "Denver",
+      "country": "United States",
+      "before": {
+        "specialties": [
+          "Semaglutide",
+          "Tirzepatide",
+          "Peptide Therapy"
+        ],
+        "category": "Peptide Therapy"
+      },
+      "after": {
+        "specialties": [],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "77c6c3f2-df9b-4846-81a9-066c3e470b6a",
+      "slug": "omni-sculpt-md-dallas",
+      "city": "Dallas",
+      "country": "United States",
+      "before": {
+        "specialties": [
+          "Semaglutide",
+          "Tirzepatide",
+          "BPC-157",
+          "AOD-9604",
+          "NAD+",
+          "Sermorelin",
+          "Peptide Therapy"
+        ],
+        "category": "Peptide Therapy"
+      },
+      "after": {
+        "specialties": [
+          "NAD+"
+        ],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "0e0c1a5f-9444-4757-a66f-af5870876896",
+      "slug": "thrive-health-solutions-englewood",
+      "city": "Englewood",
+      "country": "United States",
+      "before": {
+        "specialties": [
+          "Sermorelin",
+          "Semaglutide",
+          "NAD+",
+          "Peptide Therapy"
+        ],
+        "category": "Peptide Therapy"
+      },
+      "after": {
+        "specialties": [
+          "NAD+"
+        ],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "2f0927af-b3fd-43f4-bb78-235e97208b93",
+      "slug": "tribecamed-miami-beach",
+      "city": "Miami Beach",
+      "country": "United States",
+      "before": {
+        "specialties": [
+          "Sermorelin",
+          "Semaglutide",
+          "Tirzepatide",
+          "NAD+",
+          "Peptide Therapy"
+        ],
+        "category": "Peptide Therapy"
+      },
+      "after": {
+        "specialties": [
+          "NAD+"
+        ],
+        "category": "IV Therapy"
+      }
+    }
+  ]
+}
