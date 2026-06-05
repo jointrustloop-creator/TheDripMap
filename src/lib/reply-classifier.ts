@@ -211,14 +211,20 @@ export function classifyReply(input: ClassifyInput): ClassifyResult {
   const question = any(QUESTION_PATTERNS, haystack);
   const negative = any(NEGATIVE_PATTERNS, haystack);
 
-  // Negative sentiment (without opt-out language): operator should still
-  // see it but it's not a CASL suppression trigger.
-  if (negative && !positive) {
+  // Negative wins over positive: phrases like "Not interested at this
+  // time" contain the word "interested" and trip the positive keyword
+  // check. The operator brief is clear that a real "not interested"
+  // signal must not be misfiled as a lead. Note this is NOT a CASL
+  // suppression trigger (only the opt-out keywords above are), so the
+  // contact stays mailable until they explicitly opt out.
+  if (negative) {
     return {
       category: 'not_interested',
-      confidence: 'medium',
+      confidence: positive ? 'low' : 'medium',
       needsHuman: true,
-      reason: 'negative-sentiment keyword, no opt-out keyword',
+      reason: positive
+        ? 'negative + positive keywords both present, negative wins'
+        : 'negative-sentiment keyword, no opt-out keyword',
     };
   }
 
