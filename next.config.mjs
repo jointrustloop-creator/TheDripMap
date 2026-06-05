@@ -152,6 +152,18 @@ const nextConfig = {
         permanent: true,
       },
       // -----------------------------------------------------------------
+      // 2026-06-05: peptide therapy decommission. The /treatments/peptide-therapy
+      // page and the Peptide chip/filter were removed from the site. Soft-land
+      // any inbound link on the treatments index instead of 404ing. The
+      // matrix /iv-therapy/peptide-therapy/{city} pages were never in
+      // MATRIX_TREATMENT_SLUGS so they require no redirect.
+      // -----------------------------------------------------------------
+      {
+        source: '/treatments/peptide-therapy',
+        destination: '/treatments',
+        permanent: true,
+      },
+      // -----------------------------------------------------------------
       // 2026-06-03: The 19 blog -> /cities/* and blog -> /iv-therapy/*
       // redirects added during the C1-C17 consolidation work
       // (2026-05-31) have been REMOVED. Those redirects suppressed

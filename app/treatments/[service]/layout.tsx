@@ -12,7 +12,6 @@ const SERVICES = [
   { name: 'Myers Cocktail',      slug: 'myers-cocktail',       aliases: [] },
   { name: 'Jet Lag',             slug: 'jet-lag',              aliases: [] },
   { name: 'Energy Boost',        slug: 'energy-boost',         aliases: [] },
-  { name: 'Peptide Therapy',     slug: 'peptide-therapy',      aliases: ['peptides', 'peptide'] },
   { name: 'GLP-1 Weight Loss',   slug: 'glp-1-weight-loss',    aliases: ['glp-1', 'glp1', 'semaglutide', 'tirzepatide', 'ozempic', 'wegovy', 'mounjaro'] },
   { name: 'Iron Infusion',       slug: 'iron-infusion',        aliases: ['iron', 'iv-iron'] },
   { name: 'Vitamin D',           slug: 'vitamin-d',            aliases: ['vitamin-d-injection', 'vitamin-d3', 'd3'] },

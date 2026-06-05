@@ -337,30 +337,6 @@ export const TREATMENTS: Record<string, TreatmentKnowledge> = {
     source: 'TheDripMap clinical review',
   },
 
-  'Peptide Therapy': {
-    name: 'Peptide Therapy',
-    description: firstTwoSentences(TC['Peptide Therapy'].description),
-    ingredients: TC['Peptide Therapy'].primaryIngredients,
-    duration: TC['Peptide Therapy'].sessionDuration,
-    howItWorks: TC['Peptide Therapy'].howItWorks,
-    benefits: TC['Peptide Therapy'].benefits,
-    contraindications: [
-      'Pregnancy or breastfeeding',
-      'Active or history of cancer (growth-hormone peptides influence cell growth)',
-      'Personal or family history of medullary thyroid carcinoma or MEN2 (for GLP-1 peptides)',
-      'History of pancreatitis (for GLP-1 peptides)',
-      'Severe liver or kidney disease',
-    ],
-    costRange: { usd: TC['Peptide Therapy'].costRange, cad: usdToCadRange(TC['Peptide Therapy'].costRange) },
-    whoIsItFor: TC['Peptide Therapy'].whoItsFor || 'Confirm with clinic',
-    whatToExpect: TC['Peptide Therapy'].whatToExpect,
-    howSoon: 'Varies dramatically by peptide. GLP-1 appetite effects begin within days; growth-hormone peptide effects build over weeks to months.',
-    frequency: 'Most peptides are dosed on weekly or nightly schedules set by the prescriber. Ongoing protocol, not a one-time treatment.',
-    safetyNotes: TC['Peptide Therapy'].safety || 'Confirm with clinic',
-    fdaStatus: 'compound only', // mix — only GLP-1s are FDA-approved; the rest are compound or research-only.
-    source: 'TheDripMap clinical review; FDA peptide compounding guidance 2024-2025',
-  },
-
   'GLP-1 Weight Loss': {
     name: 'GLP-1 Weight Loss',
     description: firstTwoSentences(TC['GLP-1 Weight Loss'].description),
@@ -778,33 +754,6 @@ export const PEPTIDES: Record<string, PeptideKnowledge> = {
     source: 'FDA registry (Geref discontinuation); compounding pharmacy standards',
   },
 
-  'NAD+ (peptide form)': {
-    name: 'NAD+ (peptide form)',
-    description: 'NAD+ is a coenzyme found in every living cell — not technically a peptide, but commonly included in peptide-therapy menus. Clinics deliver it primarily as a slow IV infusion (the standard delivery method) and occasionally as a subcutaneous injection; subcutaneous NAD+ is generally less studied than IV NAD+.',
-    ingredients: ['Nicotinamide adenine dinucleotide (NAD+)'],
-    duration: 'IV: 2-4 hours for 250-500 mg, up to 6-8 hours for high-dose protocols. Subcutaneous (where offered): a short daily injection',
-    howItWorks: 'Replenishes cellular NAD+, which is essential for mitochondrial energy production (NADH electron transport), DNA-repair enzyme activity (sirtuins), and circadian regulation. Oral NAD+ has very poor bioavailability, which is why IV delivery is the standard.',
-    benefits: [
-      'Restores cellular NAD+ levels that decline with age',
-      'Supports mitochondrial energy production',
-      'Used adjunctively in supervised addiction-recovery protocols',
-      'Often combined with B-complex, glutathione, or amino acids',
-    ],
-    contraindications: [
-      'Pregnancy or breastfeeding (limited safety data)',
-      'Significant heart disease (rate-related chest pressure sensation)',
-      'Multiple concurrent medications (review interactions)',
-      'Recent severe illness without medical clearance',
-    ],
-    costRange: { usd: '$400 to $1,200 per session (IV)', cad: usdToCadRange('$400 to $1,200') + ' per session' },
-    whoIsItFor: 'Adults dealing with age-related fatigue, burnout, or brain fog who have realistic expectations about the still-emerging evidence base. Also used in supervised addiction-recovery settings.',
-    whatToExpect: 'IV protocol: long session (2-4 hours) in a reclining chair with snacks and entertainment. The infusion is run slowly to avoid flushing, chest pressure, or nausea. Subcutaneous protocol: short daily self-injection.',
-    howSoon: 'Most clients report effects building over the days following each session; benefit is typically cumulative across a series.',
-    frequency: 'Often a series of 4-10 IV sessions, then maintenance every 2-4 weeks. Subcutaneous schedules are prescriber-set.',
-    safetyNotes: 'Side effects track with infusion speed — too fast triggers flushing, nausea, cramping, and a temporary chest-tightness sensation that eases when slowed. Not FDA-approved as a therapeutic; clinics use it off-label as a wellness intervention.',
-    fdaStatus: 'off-label',
-    source: 'TheDripMap clinical review; published clinical experience with IV NAD+',
-  },
 };
 
 // ── SAFETY KNOWLEDGE ───────────────────────────────────────────────
@@ -832,7 +781,6 @@ export const SAFETY = {
   pregnancy_by_treatment: {
     avoidEntirely: [
       'GLP-1 Weight Loss (semaglutide, tirzepatide)',
-      'Peptide Therapy (BPC-157, TB-500, sermorelin, CJC-1295, ipamorelin)',
       'Glutathione (insufficient safety data)',
       'High-dose Vitamin C (relative — only with clinician clearance)',
       'Hormone Therapy (TRT, estrogen-based HRT)',
@@ -1031,8 +979,6 @@ const TREATMENT_SYNONYMS: Record<string, string> = {
   'travel': 'Jet Lag',
   'energy': 'Energy Boost',
   'b complex': 'Energy Boost',
-  'peptide': 'Peptide Therapy',
-  'peptides': 'Peptide Therapy',
   'glp-1': 'GLP-1 Weight Loss',
   'glp1': 'GLP-1 Weight Loss',
   'ozempic': 'GLP-1 Weight Loss',

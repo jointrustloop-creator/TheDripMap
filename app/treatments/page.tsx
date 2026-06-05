@@ -54,7 +54,6 @@ const TREATMENTS = [
   { name: 'Myers Cocktail', slug: 'myers-cocktail', icon: Zap,         category: 'Foundational',       image: 'iv-therapy-vitamin-drip-citrus.jpg' },
   { name: 'Jet Lag',        slug: 'jet-lag',        icon: Droplets,    category: 'Travel',             image: 'iv-therapy-jet-lag.jpg' },
   { name: 'Energy Boost',   slug: 'energy-boost',   icon: Zap,         category: 'Energy & Longevity', image: 'iv-therapy-fatigue.jpg' },
-  { name: 'Peptide Therapy', slug: 'peptide-therapy', icon: Sparkles,  category: 'Advanced',           image: 'iv-therapy-weight-loss.jpg' },
   { name: 'GLP-1 Weight Loss', slug: 'glp-1-weight-loss', icon: Activity, category: 'Metabolic',         image: 'iv-therapy-weight-loss.jpg' },
   { name: 'Iron Infusion',  slug: 'iron-infusion',  icon: Droplets,    category: 'Medical',            image: 'iv-therapy-clinical-medical-setting.jpg' },
   { name: 'Vitamin D',      slug: 'vitamin-d',      icon: Zap,         category: 'Nutrient',           image: 'iv-therapy-vitamin-drip-citrus.jpg' },

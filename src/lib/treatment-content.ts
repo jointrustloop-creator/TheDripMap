@@ -338,38 +338,6 @@ This drip is popular with busy professionals, parents, frequent travellers, and 
     ],
   },
 
-  'Peptide Therapy': {
-    description: `Peptide therapy uses short chains of amino acids — the body's own signaling molecules — to target specific goals like weight loss, recovery, growth-hormone support, and longevity. The category spans a huge range of legitimacy: at one end are FDA-approved GLP-1 medications such as semaglutide (Ozempic, Wegovy) and tirzepatide (Mounjaro, Zepbound); at the other are compounded or research-grade peptides like BPC-157, sermorelin, and the CJC-1295/ipamorelin stack that are not FDA-approved.
-
-Unlike most IV drips, peptides are usually prescribed after a consultation and self-administered at home as small subcutaneous injections — GLP-1 pens are weekly, growth-hormone peptides are often nightly. NAD+ is the exception, delivered by IV at a clinic. Because dosing, sourcing, and sterility all matter, peptide therapy should always involve a licensed prescriber and a licensed US compounding pharmacy.
-
-The regulatory landscape is changing fast. After the 2024–2025 GLP-1 shortages were declared resolved, routine compounding of semaglutide and tirzepatide became restricted, and peptides like BPC-157 now sit in a regulatory gray zone. Work only with reputable, transparent providers — and read our full peptide therapy guide before you start.`,
-    howItWorks: `Peptides bind to specific receptors to trigger targeted effects: GLP-1 peptides act on appetite and insulin pathways; growth-hormone secretagogues (sermorelin, CJC-1295, ipamorelin) prompt the pituitary to release the body's own growth hormone; recovery peptides like BPC-157 are studied for tissue repair (largely in animal models so far). Most are given as subcutaneous injections after a clinician consult and bloodwork, while NAD+ is infused by IV.`,
-    benefits: [
-      'GLP-1 peptides (semaglutide, tirzepatide) are FDA-approved and proven for weight loss and diabetes',
-      'Growth-hormone peptides are used for recovery, sleep, and body composition',
-      'Recovery peptides like BPC-157 are popular for injury support (evidence still emerging)',
-      'Prescribed and dosed by a licensed clinician — not guesswork',
-      'Convenient at-home subcutaneous dosing for most protocols',
-    ],
-    whatToExpect: `Peptide therapy starts with a consultation and usually bloodwork, after which a licensed prescriber designs a protocol that a compounding pharmacy fills. Most peptides are self-injected at home with a tiny needle on a set schedule, with follow-up visits to monitor results and adjust dosing. It is an ongoing protocol rather than a one-time treatment.`,
-    costRange: '$90 to $650+ per month',
-    costContext: `Cost varies enormously by peptide. FDA-approved GLP-1s run roughly $199–$499/month through manufacturer self-pay programs; growth-hormone stacks (CJC-1295/ipamorelin) run about $300–$600/month; sermorelin about $96–$400/month. Wellness peptides are cash-pay and generally not covered by insurance.`,
-    primaryIngredients: ['GLP-1 peptides (semaglutide, tirzepatide)', 'BPC-157', 'Sermorelin / CJC-1295 / Ipamorelin', 'TB-500', 'PT-141'],
-    sessionDuration: 'Consult + ongoing protocol',
-    alternateName: 'Peptide Treatment',
-    relevantSpecialty: 'Regenerative Medicine',
-    whoItsFor: `Peptide therapy suits adults pursuing medically-supervised weight loss (GLP-1s), recovery, hormone optimization, or longevity goals — who want a licensed prescriber and pharmacy behind their protocol rather than a gray-market vial. It is not appropriate for people who are pregnant or breastfeeding, those with active or a history of cancer (some peptides influence cell growth), or anyone seeking a no-questions-asked shortcut.`,
-    safety: `Only semaglutide and tirzepatide are FDA-approved; most other peptides are compounded or research-grade with limited human safety data. The biggest risk is the "research use only / not for human consumption" gray market — products with no purity, sterility, or dosing guarantees. Use only a licensed prescriber and a US-licensed compounding pharmacy, expect bloodwork and monitoring, and treat any seller that skips the prescription as a red flag.`,
-    faqs: [
-      { question: 'Are peptides FDA-approved?', answer: 'Only the GLP-1 drugs semaglutide and tirzepatide are FDA-approved. Others like BPC-157, sermorelin, CJC-1295, and ipamorelin are compounded or research-grade and not FDA-approved — an important thing to understand before starting.' },
-      { question: 'Is compounded semaglutide still available?', answer: 'Largely not. After the FDA declared the GLP-1 shortages resolved in 2024–2025, routine compounding of semaglutide and tirzepatide became restricted. Legitimate access now generally means the brand-name drug or a documented patient-specific compound.' },
-      { question: 'How are peptides taken?', answer: 'Most are self-administered at home as small subcutaneous injections after a clinician consult — GLP-1 pens weekly, growth-hormone peptides often nightly. NAD+ is the exception, given by IV at a clinic.' },
-      { question: 'How do I find a legitimate provider?', answer: 'Look for a licensed prescriber, a US-licensed compounding pharmacy, bloodwork and monitoring, and transparency that the peptide is compounded and not FDA-approved. Avoid any site selling peptides "for research use only" with no prescription.' },
-      { question: 'How much does peptide therapy cost?', answer: 'It varies widely: FDA-approved GLP-1s run about $199–$499/month via manufacturer self-pay, growth-hormone stacks about $300–$600/month, and sermorelin about $96–$400/month. Wellness peptides are cash-pay.' },
-    ],
-  },
-
   'Iron Infusion': {
     description: `Iron infusion is a medical treatment that delivers iron directly into the bloodstream to correct iron-deficiency anemia — not a wellness drip, and not something to take "for energy" without documented low iron. It is reserved for people whose iron stores are confirmed low on bloodwork and who either cannot tolerate oral iron, do not absorb it (due to conditions like celiac disease, inflammatory bowel disease, or bariatric surgery), have ongoing blood loss that outpaces pills, or need their levels restored faster than oral iron allows. The modern agents — ferric carboxymaltose, iron sucrose, and ferric derisomaltose — let a clinician replace a large iron deficit in one or a few visits.
 

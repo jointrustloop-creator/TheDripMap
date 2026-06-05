@@ -26,6 +26,15 @@ import { cn } from '../../../src/lib/utils';
 
 export const revalidate = 3600;
 
+// Archived posts: still renderable for anyone with the link, but noindex and
+// stamped with an "archived" banner. Reversible by removing the slug here.
+const ARCHIVED_POSTS: Record<string, { reason: string }> = {
+  'peptide-therapy-guide-2026': {
+    reason:
+      'TheDripMap no longer covers peptide therapy as a category. This guide is kept online for archive reference only.',
+  },
+};
+
 interface BlogPostPageProps {
   params: Promise<{
     slug: string;
@@ -67,10 +76,13 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   const title = `${safeTitle} | TheDripMap`;
   const description = post.metaDescription || post.excerpt || `Read our latest guide on ${safeTitle.toLowerCase()}. Expert insights from TheDripMap Team.`;
 
+  const isArchived = ARCHIVED_POSTS[slug];
+
   return {
     title,
     description,
     alternates: { canonical },
+    ...(isArchived ? { robots: { index: false, follow: true } } : {}),
     openGraph: {
       title,
       description,
@@ -351,6 +363,19 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </div>
             )}
 
+            {ARCHIVED_POSTS[post.slug] && (
+              <div className="mb-8 rounded-3xl border-2 border-amber-200 bg-amber-50 p-5 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                  <ShieldCheck size={18} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-black text-amber-900 mb-1">Archived guide</p>
+                  <p className="text-xs text-amber-800 font-medium leading-relaxed">
+                    {ARCHIVED_POSTS[post.slug].reason}
+                  </p>
+                </div>
+              </div>
+            )}
             <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline markdown-body">
               {post.content ? (
                 <article className="markdown-body">

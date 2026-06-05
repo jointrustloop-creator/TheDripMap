@@ -1,0 +1,607 @@
+{
+  "phase": 1,
+  "timestamp": "2026-06-05T22:53:46.079Z",
+  "modified": [
+    {
+      "id": "f6d889c9-7cbc-4c88-b0dc-2d5b122eecec",
+      "slug": "vital-infusions-and-performance-las-vegas",
+      "city": "Las Vegas",
+      "country": "United States",
+      "before": {
+        "specialties": [
+          "IV Therapy",
+          "Hydration",
+          "NAD+",
+          "Peptide Therapy",
+          "Hormone Therapy",
+          "Medical Weight Loss",
+          "Vitamin Injections"
+        ],
+        "category": "IV Therapy"
+      },
+      "after": {
+        "specialties": [
+          "IV Therapy",
+          "Hydration",
+          "NAD+",
+          "Hormone Therapy",
+          "Medical Weight Loss",
+          "Vitamin Injections"
+        ],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "6aa0a315-bd65-4e30-99e3-691e9a62b943",
+      "slug": "vitality-medical-and-wellness-center-las-vegas",
+      "city": "Las Vegas",
+      "country": "United States",
+      "before": {
+        "specialties": [
+          "IV Therapy",
+          "Hydration",
+          "NAD+",
+          "Peptide Therapy",
+          "Functional Medicine"
+        ],
+        "category": "IV Therapy"
+      },
+      "after": {
+        "specialties": [
+          "IV Therapy",
+          "Hydration",
+          "NAD+",
+          "Functional Medicine"
+        ],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "e8c36234-c91e-4065-bdc0-389c54228352",
+      "slug": "beso-wellness-and-beauty-phoenix",
+      "city": "Phoenix",
+      "country": "United States",
+      "before": {
+        "specialties": [
+          "Peptide Therapy",
+          "Semaglutide",
+          "Tirzepatide",
+          "NAD+",
+          "IV Therapy",
+          "Mobile IV"
+        ],
+        "category": "IV Therapy"
+      },
+      "after": {
+        "specialties": [
+          "NAD+",
+          "IV Therapy",
+          "Mobile IV"
+        ],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "51c2b8f2-21ec-401c-a7f4-4fb047b5d355",
+      "slug": "healor-primary-care-las-vegas",
+      "city": "Las Vegas",
+      "country": "United States",
+      "before": {
+        "specialties": [
+          "IV Therapy",
+          "Hydration",
+          "Peptide Therapy",
+          "Hormone Therapy"
+        ],
+        "category": "IV Therapy"
+      },
+      "after": {
+        "specialties": [
+          "IV Therapy",
+          "Hydration",
+          "Hormone Therapy"
+        ],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "fa19bac1-7856-4f12-91b1-5793c5413ef1",
+      "slug": "sky-health-wellness-clinic-las-vegas",
+      "city": "Las Vegas",
+      "country": "United States",
+      "before": {
+        "specialties": [
+          "Peptide Therapy",
+          "IV Therapy",
+          "Medical Weight Loss"
+        ],
+        "category": "IV Therapy"
+      },
+      "after": {
+        "specialties": [
+          "IV Therapy",
+          "Medical Weight Loss"
+        ],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "883acd6f-fd01-4ac8-9407-1145e5f04b40",
+      "slug": "suite-six-medical-aesthetics-seaport-boston",
+      "city": "Boston",
+      "country": "United States",
+      "before": {
+        "specialties": [
+          "IV Therapy",
+          "Hydration",
+          "Hangover",
+          "Semaglutide",
+          "Peptide Therapy"
+        ],
+        "category": "IV Therapy"
+      },
+      "after": {
+        "specialties": [
+          "IV Therapy",
+          "Hydration",
+          "Hangover"
+        ],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "d7c8c71a-8116-462d-b474-d05782302ec7",
+      "slug": "bay-wellness-centre-vancouver",
+      "city": "Vancouver",
+      "country": "Canada",
+      "before": {
+        "specialties": [
+          "Nutrient IV Therapy",
+          "Glutathione Push",
+          "Iron Infusion",
+          "Women's Health",
+          "Medical Aesthetics — Botox",
+          "Medical Aesthetics — Dermal Filler",
+          "Medical Aesthetics — PRP",
+          "Medical Aesthetics — Sculptra"
+        ],
+        "category": "Peptide Therapy"
+      },
+      "after": {
+        "specialties": [
+          "Nutrient IV Therapy",
+          "Glutathione Push",
+          "Iron Infusion",
+          "Women's Health",
+          "Medical Aesthetics — Botox",
+          "Medical Aesthetics — Dermal Filler",
+          "Medical Aesthetics — PRP",
+          "Medical Aesthetics — Sculptra"
+        ],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "d5b91b17-eec8-42e7-aade-2461ae21ed8a",
+      "slug": "id-cosmetic-clinic-markham",
+      "city": "Markham",
+      "country": "Canada",
+      "before": {
+        "specialties": [
+          "Peptide Therapy",
+          "IV Therapy",
+          "Vitamin Injections",
+          "Beauty Glow"
+        ],
+        "category": "IV Therapy"
+      },
+      "after": {
+        "specialties": [
+          "IV Therapy",
+          "Vitamin Injections",
+          "Beauty Glow"
+        ],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "13dae627-e04c-4c59-9efd-cc6dbf9dfcc1",
+      "slug": "modern-wellness-clinic-las-vegas",
+      "city": "Las Vegas",
+      "country": "United States",
+      "before": {
+        "specialties": [
+          "IV Therapy",
+          "NAD+",
+          "Hydration",
+          "Peptide Therapy",
+          "Semaglutide",
+          "Tirzepatide",
+          "Hormone Therapy",
+          "Medical Weight Loss"
+        ],
+        "category": "IV Therapy"
+      },
+      "after": {
+        "specialties": [
+          "IV Therapy",
+          "NAD+",
+          "Hydration",
+          "Hormone Therapy",
+          "Medical Weight Loss"
+        ],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "4f39ddaf-a408-476b-a824-eb5ced053214",
+      "slug": "neem-medical-spa-somerville",
+      "city": "Somerville",
+      "country": "United States",
+      "before": {
+        "specialties": [
+          "Semaglutide",
+          "Medical Weight Loss",
+          "Peptide Therapy",
+          "IV Therapy",
+          "NAD+"
+        ],
+        "category": "IV Therapy"
+      },
+      "after": {
+        "specialties": [
+          "Medical Weight Loss",
+          "IV Therapy",
+          "NAD+"
+        ],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "fefdb78c-3ede-4764-9903-1f58dce3032e",
+      "slug": "performance-rejuvenation-center-washington",
+      "city": "Washington",
+      "country": "United States",
+      "before": {
+        "specialties": [
+          "Peptide Therapy",
+          "NAD+",
+          "Medical Weight Loss",
+          "Hormone Therapy"
+        ],
+        "category": "IV Therapy"
+      },
+      "after": {
+        "specialties": [
+          "NAD+",
+          "Medical Weight Loss",
+          "Hormone Therapy"
+        ],
+        "category": "IV Therapy"
+      }
+    },
+    {
+      "id": "1fce1327-c5f3-4d5d-8148-b55171ae06a5",
+      "slug": "gameday-men-s-health-midtown-toronto-toronto",
+      "city": "Toronto",
+      "country": "Canada",
+      "before": {
+        "specialties": [
+          "Peptide Therapy",
+          "GLP-1 Weight Loss",
+          "Weight Loss",
+          "Vitamin Injections",
+          "Hormone Therapy",
+          "Energy"
+        ],
+        "category": "IV Therapy"
+      },
+      "after": {
+        "specialties": [
+          "Weight Loss",
+          "Vitamin Injections",
+          "Hormone Therapy",
+          "Energy"
+        ],
+        "category": "IV Therapy"
+      }
+    }
+  ],
+  "skipped_peptide_primary": [
+    {
+      "id": "48e9f3d6-ab9d-47af-9288-9017d938419d",
+      "slug": "citrin-wellness-beverly-hills",
+      "country": "United States"
+    },
+    {
+      "id": "9fd5cbb8-cf40-41ca-acd5-6113f1506d45",
+      "slug": "regenerative-health-ny-little-neck",
+      "country": "United States"
+    },
+    {
+      "id": "584647f9-c510-4b9d-a5bf-0a0f2d5557d0",
+      "slug": "alphaman-clinic-sherman-oaks",
+      "country": "United States"
+    },
+    {
+      "id": "4404f055-f960-471b-a54f-9de800552c55",
+      "slug": "tower-urology-medical-group-los-angeles",
+      "country": "United States"
+    },
+    {
+      "id": "92ddf8b9-3b74-4545-8cde-127e3f2d954b",
+      "slug": "renew-beauty-med-spa-and-wellness-dallas",
+      "country": "United States"
+    },
+    {
+      "id": "62229021-2750-4c62-aaa2-ee0e08963301",
+      "slug": "vitalitymd-toronto",
+      "country": "Canada"
+    },
+    {
+      "id": "64502659-94b2-4d84-99fd-25eeb0484c0b",
+      "slug": "infinity-premier-health-houston",
+      "country": "United States"
+    },
+    {
+      "id": "36c467b8-897e-4d71-b72e-c9972a6a7bb6",
+      "slug": "integrative-wellness-fx-dallas",
+      "country": "United States"
+    },
+    {
+      "id": "e2ca7f16-0218-463f-bfdf-2505f9ccba69",
+      "slug": "vida-integrative-health-miami",
+      "country": "United States"
+    },
+    {
+      "id": "217396bc-d908-4189-8673-80981da824a9",
+      "slug": "evolv-wellness-medspa-denver",
+      "country": "United States"
+    },
+    {
+      "id": "84aa35c0-d84f-4fe5-8fbb-58b6f023bed7",
+      "slug": "gameday-men-s-health-dallas-north-dallas",
+      "country": "United States"
+    },
+    {
+      "id": "613708b0-30f3-4ce4-8f0b-d9f9ac98d05f",
+      "slug": "executive-medicine-of-texas-southlake",
+      "country": "United States"
+    },
+    {
+      "id": "e8e79cc0-07a9-4541-9584-cbf26e59f9f8",
+      "slug": "lume-wellness-chicago",
+      "country": "United States"
+    },
+    {
+      "id": "c8b2c9d5-19be-4ab2-980f-a824f4775d45",
+      "slug": "colorado-medical-solutions-denver",
+      "country": "United States"
+    },
+    {
+      "id": "920bddf6-3ebd-4f29-9c75-3f22c17b73ed",
+      "slug": "aspire-rejuvenation-plano",
+      "country": "United States"
+    },
+    {
+      "id": "87b304e6-eeb2-4d9e-bb7f-0a9814a8d311",
+      "slug": "gleam-medical-spa-denver",
+      "country": "United States"
+    },
+    {
+      "id": "08b4d23f-89ee-406e-a58f-12fcb255a55f",
+      "slug": "men-s-vitality-clinic-vancouver",
+      "country": "Canada"
+    },
+    {
+      "id": "0e0c1a5f-9444-4757-a66f-af5870876896",
+      "slug": "thrive-health-solutions-englewood",
+      "country": "United States"
+    },
+    {
+      "id": "ab72fe98-9c4c-43e6-acd1-694f1c16a10a",
+      "slug": "physio-logic-nyc-brooklyn",
+      "country": "United States"
+    },
+    {
+      "id": "840f6596-bfbc-4c97-aaa6-f33e905cf50b",
+      "slug": "restorative-injectables-med-spa-denver",
+      "country": "United States"
+    },
+    {
+      "id": "4339e0d4-d254-413d-9255-9e9e266efcdb",
+      "slug": "wellness-at-century-city-los-angeles",
+      "country": "United States"
+    },
+    {
+      "id": "51aa1610-3277-48be-ba3e-a3fdb17d49ff",
+      "slug": "hebe-aesthetics-and-vitality-atlanta",
+      "country": "United States"
+    },
+    {
+      "id": "2d30d889-3244-4651-b3e7-e1d3821d3a5f",
+      "slug": "peptide-balance-clinic-las-vegas-las-vegas",
+      "country": "United States"
+    },
+    {
+      "id": "f5ddb03a-0161-4f60-b383-122296c2888f",
+      "slug": "age-well-atl-atlanta",
+      "country": "United States"
+    },
+    {
+      "id": "bf92d91a-994b-4513-8153-0359c64c6982",
+      "slug": "moksha-aesthetics-potomac",
+      "country": "United States"
+    },
+    {
+      "id": "11bdaaee-d0c8-48dd-8867-c8782469c300",
+      "slug": "center-for-plastic-surgery-chevy-chase",
+      "country": "United States"
+    },
+    {
+      "id": "52c23e5f-9063-43d0-b518-487ce27485cc",
+      "slug": "renewalpeptides-las-vegas-las-vegas",
+      "country": "United States"
+    },
+    {
+      "id": "6bbbb264-2cf9-420b-b1c0-6deacceb6f4c",
+      "slug": "elevate-miami-miami",
+      "country": "United States"
+    },
+    {
+      "id": "aa783ea0-a8c6-4a02-8f6d-b18adde9ddd9",
+      "slug": "elite-health-center-nyc-new-york",
+      "country": "United States"
+    },
+    {
+      "id": "2230b6d7-0c6d-47ab-bb7d-cc6261e4554c",
+      "slug": "weiss-wellness-beauty-new-york",
+      "country": "United States"
+    },
+    {
+      "id": "2c51a145-4d56-435a-9b0b-694a64acfb82",
+      "slug": "houston-regenerative-medicine-houston",
+      "country": "United States"
+    },
+    {
+      "id": "9d68bf2c-83a7-4bfc-bd30-818ff18ff274",
+      "slug": "dr-bobby-s-clinic-calgary",
+      "country": "Canada"
+    },
+    {
+      "id": "4917c42e-1472-48c0-8b3f-f05685244301",
+      "slug": "tbt-medical-edmonton",
+      "country": "Canada"
+    },
+    {
+      "id": "37de28cf-931a-4912-b9c8-6d4f76a1cd22",
+      "slug": "htx-urology-webster",
+      "country": "United States"
+    },
+    {
+      "id": "2f0927af-b3fd-43f4-bb78-235e97208b93",
+      "slug": "tribecamed-miami-beach",
+      "country": "United States"
+    },
+    {
+      "id": "452c345c-1fe1-4068-920d-74b941a2f7a8",
+      "slug": "chicago-aesthetics-surgery-and-med-spa-chicago",
+      "country": "United States"
+    },
+    {
+      "id": "fedaeacd-f35c-4d70-8fce-97802b4aa1cf",
+      "slug": "z-med-clinic-and-med-spa-houston",
+      "country": "United States"
+    },
+    {
+      "id": "12aed01d-d63e-4b04-b9e4-f1d4c51b42a4",
+      "slug": "the-biostation-miami-beach",
+      "country": "United States"
+    },
+    {
+      "id": "5c1704f4-1be5-4aac-ac93-eb9c433cf024",
+      "slug": "evexias-medical-center-denver-lone-tree",
+      "country": "United States"
+    },
+    {
+      "id": "77c6c3f2-df9b-4846-81a9-066c3e470b6a",
+      "slug": "omni-sculpt-md-dallas",
+      "country": "United States"
+    },
+    {
+      "id": "6a995576-e274-41f5-9ab2-7214a977e763",
+      "slug": "prive-aesthetics-dallas",
+      "country": "United States"
+    },
+    {
+      "id": "0c5cb8e6-d1f8-402b-a694-d450dc1e29f5",
+      "slug": "houston-men-s-health-clinic-houston",
+      "country": "United States"
+    },
+    {
+      "id": "66484082-90aa-4b49-9d99-811fb7f3934e",
+      "slug": "toronto-plastic-surgeons-wellness-centre-toronto",
+      "country": "Canada"
+    },
+    {
+      "id": "1dd4fa14-2399-4b1e-80fb-cf5c1a400be7",
+      "slug": "gameday-men-s-health-north-york-north-york",
+      "country": "Canada"
+    },
+    {
+      "id": "835c095b-2627-45e1-8384-91ab83a8ba65",
+      "slug": "daniel-benhuri-md-beverly-hills",
+      "country": "United States"
+    },
+    {
+      "id": "fc86b6b0-60c8-4e69-98cd-df82e371dfdb",
+      "slug": "juventas-wellness-denver",
+      "country": "United States"
+    },
+    {
+      "id": "e68aa5d2-e49e-4c8b-95ce-2b0f3985ab54",
+      "slug": "dr-sende-wellness-miami",
+      "country": "United States"
+    },
+    {
+      "id": "3cc53d51-a5bc-42f6-be62-25205e671627",
+      "slug": "michael-aziz-md-and-associates-new-york",
+      "country": "United States"
+    },
+    {
+      "id": "84c26048-9130-40ed-b64f-83078e44b8e0",
+      "slug": "north-dallas-dermatology-associates-dallas",
+      "country": "United States"
+    },
+    {
+      "id": "681aa352-2c76-4485-a3bd-12e251d10084",
+      "slug": "revolution-medical-clinic-vancouver",
+      "country": "Canada"
+    },
+    {
+      "id": "d419d5c6-a405-4781-b8c2-11cf787bb882",
+      "slug": "wholehealth-chicago-chicago",
+      "country": "United States"
+    },
+    {
+      "id": "27d7d19f-d29a-4bd7-960c-56b99a075122",
+      "slug": "dr-kris-conrad-toronto",
+      "country": "Canada"
+    },
+    {
+      "id": "fbf6f022-37d9-42cd-94d1-1645a78c2da6",
+      "slug": "sparrow-md-advanced-medical-aesthetics-vancouver",
+      "country": "Canada"
+    },
+    {
+      "id": "f532e482-6c75-48fb-97fa-1cf925d470a4",
+      "slug": "natura-med-spa-and-iv-bar-denver",
+      "country": "United States"
+    },
+    {
+      "id": "bd54badd-d533-4593-b201-b94aadb3d701",
+      "slug": "dr-jennifer-levine-new-york",
+      "country": "United States"
+    },
+    {
+      "id": "8d977cf7-f9ba-43d8-92dc-52f9dabffa8a",
+      "slug": "pure-medical-spa-chicago",
+      "country": "United States"
+    },
+    {
+      "id": "f65bdc99-401f-40df-aad6-24dd595223dc",
+      "slug": "enerchanges-vancouver",
+      "country": "Canada"
+    },
+    {
+      "id": "729985d8-341e-44cf-ab0d-6f1be83709f5",
+      "slug": "elysium-aesthetics-longevity-chicago",
+      "country": "United States"
+    },
+    {
+      "id": "7300537e-8b96-4bb9-a2f5-abf43fb118c1",
+      "slug": "progressive-medical-center-atlanta",
+      "country": "United States"
+    }
+  ]
+}

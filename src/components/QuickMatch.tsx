@@ -15,7 +15,6 @@ import {
   Dumbbell,
   Navigation,
   Plane,
-  FlaskConical
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
@@ -31,7 +30,6 @@ const GOALS = [
   { id: 'recovery', label: 'Athletic Recovery', icon: <Dumbbell size={18} /> },
   { id: 'myers-cocktail', label: 'Myers Cocktail', icon: <Target size={18} /> },
   { id: 'jet-lag', label: 'Jet Lag & Travel', icon: <Plane size={18} /> },
-  { id: 'peptide-therapy', label: 'Peptide Therapy', icon: <FlaskConical size={18} /> },
 ];
 
 // Popular metros with the strongest directory inventory — shown in the

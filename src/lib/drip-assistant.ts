@@ -338,7 +338,6 @@ const SAFETY_MATRIX: Record<string, Record<SafetyFlag, SafetyTier>> = {
   'High-Dose Vitamin C':        { pregnant: 'amber', kidney: 'amber', g6pd: 'red',   thinners: 'green' },
   'NAD+':                       { pregnant: 'amber', kidney: 'amber', g6pd: 'green', thinners: 'green' },
   'GLP-1 Weight Loss':          { pregnant: 'red',   kidney: 'amber', g6pd: 'green', thinners: 'green' },
-  'Peptide Therapy':            { pregnant: 'red',   kidney: 'amber', g6pd: 'green', thinners: 'amber' },
   'Iron Infusion':              { pregnant: 'green', kidney: 'amber', g6pd: 'green', thinners: 'amber' },
   'Glutathione':                { pregnant: 'amber', kidney: 'green', g6pd: 'green', thinners: 'green' },
 };
@@ -346,7 +345,6 @@ const SAFETY_MATRIX: Record<string, Record<SafetyFlag, SafetyTier>> = {
 function normalizeTreatmentForSafety(name: string): keyof typeof SAFETY_MATRIX {
   const t = (name || '').toLowerCase().trim();
   if (/(glp-?1|semaglutide|ozempic|wegovy|mounjaro|tirzepatide)/.test(t)) return 'GLP-1 Weight Loss';
-  if (/peptide|bpc-?157|tb-?500|sermorelin|ipamorelin|cjc-?1295/.test(t)) return 'Peptide Therapy';
   if (/high.?dose.?vit|ivc\b|^vit\.?\s*c$|vitamin\s*c\b/.test(t)) return 'High-Dose Vitamin C';
   if (/glutathione|gsh/.test(t)) return 'Glutathione';
   if (/iron|ferritin/.test(t)) return 'Iron Infusion';
