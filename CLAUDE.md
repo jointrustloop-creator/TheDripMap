@@ -5,15 +5,19 @@ URL: https://www.thedripmap.com
 Stack: Next.js, Supabase, Vercel, Tailwind CSS
 Email: info@thedripmap.com
 
-## Database
-- 771 providers, 4 claimed (is_featured = true)
+## Database (as of 2026-06-04)
+- 1,374 providers total (997 United States, 377 Canada, 0 null country)
+- 7 claimed (is_claimed = true), 6 featured (is_featured = true)
 - Claimed:
   1. blue-cypress-iv-and-wellness-georgetown (Mechelle)
   2. signature-beauty-lounge-downtown-toronto (Eva)
   3. signature-beauty-lounge-richmond-hill (Eva)
-  4. refresh-med-spa-la-los-angeles (Kia - joined May 26)
-- 92 blog posts live
-- 517 providers in outreach pipeline
+  4. refresh-med-spa-la-los-angeles (Kia, joined May 26)
+  5. diamond-aesthetics-brampton (organic enrichment)
+  6. bay-wellness-centre-vancouver
+  7. tri-health-wellness-centre-vaughan (organic claim June 2)
+- 112 blog posts live
+- Verify the count live with `select id count exact` on providers, not from this file
 
 ## Hard Rules
 1. Read GOAL.md at start of every session
