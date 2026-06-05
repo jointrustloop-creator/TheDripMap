@@ -205,7 +205,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   // don't pollute the output).
   const faqJsonLd = (() => {
     const content = String(post.content || '');
-    const faqStartMatch = content.match(/##\s+Frequently asked questions[\s\S]*$/);
+    const faqStartMatch = content.match(/##\s+Frequently asked questions[\s\S]*$/i);
     if (!faqStartMatch) return null;
     const faqBlock = faqStartMatch[0];
     const qaPattern = /###\s+([^\n]+)\n+([\s\S]+?)(?=\n###\s+|\n##\s+|<!--|$)/g;
