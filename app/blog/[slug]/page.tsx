@@ -196,9 +196,16 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   // FAQPage JSON-LD — parse Q/A pairs out of the enriched FAQ markdown block.
   // Pattern: "### Question?\n\nAnswer paragraph" within the FAQ section.
+  // NOTE: do NOT use the /m flag here. With /m, `$` matches end-of-LINE,
+  // so faqBlock would only capture the heading itself and the inner Q/A
+  // loop would never find anything — silently degrading FAQPage JSON-LD
+  // across every post. Without /m, `$` matches end-of-string and the
+  // whole FAQ block is captured (the inner qaPattern stops at the next
+  // ## heading on its own, so trailing sections like "What to do next"
+  // don't pollute the output).
   const faqJsonLd = (() => {
     const content = String(post.content || '');
-    const faqStartMatch = content.match(/##\s+Frequently asked questions[\s\S]*?$/m);
+    const faqStartMatch = content.match(/##\s+Frequently asked questions[\s\S]*$/);
     if (!faqStartMatch) return null;
     const faqBlock = faqStartMatch[0];
     const qaPattern = /###\s+([^\n]+)\n+([\s\S]+?)(?=\n###\s+|\n##\s+|<!--|$)/g;
