@@ -49,20 +49,28 @@ export function isCanadian(country?: string | null): boolean {
 
 export function buildSingleLocationBody(p: ProviderRow): string {
   const display = cleanName(p.name);
+  const providerUrl = `${SITE_URL}/providers/${p.slug}`;
   const claimUrl = `${SITE_URL}/providers/${p.slug}?claim=1`;
   const city = (p.city || '').trim();
-  const hasRating = !!(p.rating && Number(p.reviews) > 0);
-
-  const opener = hasRating
-    ? `I came across ${display} while researching the top-rated IV therapy clinics in ${city || 'your area'}. Your Google rating of ${p.rating}★ across ${p.reviews} reviews puts you in a small group of clinics patients actually trust, which is exactly the kind we feature on TheDripMap.`
-    : `I came across ${display} while building out our ${city || 'local'} IV therapy listings on TheDripMap, North America's directory for IV therapy clinics.`;
+  const cityLabel = city || 'your area';
 
   return `Hi ${display} team,
 
-${opener}
+Your clinic is listed on TheDripMap, North America's IV therapy directory, here:
+${providerUrl}
 
-We added your listing, but right now it's unclaimed, so visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes:
+Right now your page shows a generic placeholder where your photos, hours, services, and description should be. When someone searching "IV therapy in ${cityLabel}" lands on it, they see a thin profile and move on to the next clinic.
+
+Claimed clinics on TheDripMap get:
+  • Real photos and your full menu of drips, prices, and add-ons
+  • Hours, phone, and a direct "Book now" link to your site
+  • A verified badge once we confirm your medical director and licensed staff
+  • Patient reviews aggregated from Google plus TheDripMap
+
+Claiming is free and takes 2 minutes:
 ${claimUrl}
+
+Separately, we're opening a Featured tier later this year for clinics that want top placement on their city page and treatment pages. Limited inventory, 3 slots per city. If you want first dibs in ${cityLabel}, reply with the word WAITLIST and I'll add you.
 
 Warmly,
 TheDripMap Team
@@ -95,11 +103,21 @@ export function buildMultiLocationBody(providers: ProviderRow[], email: string):
 
   return `Hi ${brand} team,
 
-I came across ${count} of your ${brand} locations across ${cityPhrase} while researching trusted IV therapy clinics for TheDripMap, North America's directory for IV therapy. All ${count} are live with us but currently unclaimed:
+All ${count} of your ${brand} locations across ${cityPhrase} are listed on TheDripMap, North America's IV therapy directory:
 
 ${locations}
 
-Right now visitors see a generic placeholder on each one instead of your real photos, hours, services, and description. Claiming each listing is free and takes 2 minutes.
+Right now each page shows a generic placeholder where your photos, hours, services, and description should be. When someone searching for IV therapy lands on one of them, they see a thin profile and move on.
+
+Claimed clinics on TheDripMap get:
+  • Real photos and your full menu of drips, prices, and add-ons
+  • Hours, phone, and a direct "Book now" link to your site
+  • A verified badge once we confirm your medical director and licensed staff
+  • Patient reviews aggregated from Google plus TheDripMap
+
+Claiming each listing is free and takes 2 minutes.
+
+Separately, we're opening a Featured tier later this year for clinics that want top placement on their city page and treatment pages. Limited inventory, 3 slots per city. If you want first dibs in any of your cities, reply with the word WAITLIST and the city names and I'll add you.
 
 I sent this once to ${email.toLowerCase().trim()} because all ${count} locations share that email, so you only hear from me once, not ${count} times.
 

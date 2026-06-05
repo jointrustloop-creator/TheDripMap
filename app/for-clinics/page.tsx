@@ -222,9 +222,26 @@ export default async function ForClinicsPage() {
             </div>
           </div>
           <p className="mt-6 text-center text-[11px] text-slate-400 font-medium italic">
-            Real listings pulled live from the directory — not mockups.
+            Real listings pulled live from the directory, not mockups.
           </p>
         </div>
+
+        {/* Featured waitlist — soft mention, no pricing, no oversell */}
+        <Link
+          href="/for-clinics/featured-waitlist"
+          className="group flex flex-col sm:flex-row items-center gap-5 bg-slate-900 text-white rounded-3xl p-6 md:p-7 mb-20 max-w-3xl mx-auto hover:bg-slate-800 transition-all"
+        >
+          <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0 text-wellness-300">
+            <ShieldCheck size={24} />
+          </div>
+          <div className="flex-1 text-center sm:text-left">
+            <div className="font-black text-white text-lg">Want first dibs when we open Featured placement in your city?</div>
+            <div className="text-slate-300 text-sm">Three slots per city, max. No pricing today, no commitment. Just a heads up when your city opens.</div>
+          </div>
+          <span className="inline-flex items-center gap-2 font-black text-sm text-wellness-300 shrink-0">
+            Join the waitlist <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+          </span>
+        </Link>
 
         {/* Social Proof Row */}
         <div className="py-12 border-y border-slate-100 mb-20">

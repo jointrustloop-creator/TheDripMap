@@ -10,13 +10,16 @@ import { Footer } from '@/src/components/Footer';
 import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
 import { QuizCTA } from '@/src/components/QuizCTA';
 import { ListingController } from '@/src/components/ListingController';
+import { ProviderCard } from '@/src/components/ProviderCard';
 import { getCityBySlug, getListingsByCity, getAllCities, getListingsByState, getFeaturedListings, getBlogPostBySlug, slugify, getTorontoGtaTieredListings } from '@/src/lib/data';
 import { SupabaseUnreachableError } from '@/src/lib/supabase-health';
 import { TemporarilyUnavailable } from '@/src/components/TemporarilyUnavailable';
 import { getCityIntro } from '@/src/lib/city-intros';
+import { getCityMeta, filterByUseCase } from '@/src/lib/city-meta';
 import { MapTrigger } from '@/src/components/MapTrigger';
 import { FAQSection } from '@/src/components/FAQSection';
 import { NearbyCities } from '@/src/components/NearbyCities';
+import { ShieldCheck, BookOpen } from 'lucide-react';
 
 // Revalidate every 5 min: balances freshness against the cost of a Supabase
 // outage caching a notFound() state. Bumped from 60 → 300 on 2026-05-31
@@ -304,7 +307,22 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
     .filter(c => c.state === cityData.state && c.city !== cityData.name)
     .slice(0, 5);
 
-  const faqs = [
+  // City-specific deep meta (regulation note, use cases, faqs, internal links).
+  // Toronto is the gold-standard pilot; other cities silently render the
+  // existing layout when no meta is present.
+  const cityMeta = getCityMeta(slug);
+
+  // Precompute use-case pools so each section can short-circuit when empty.
+  // Each filter is a cheap O(n) pass over the local listing pool.
+  const useCaseSections = (cityMeta?.useCases || [])
+    .map((uc) => ({ useCase: uc, providers: filterByUseCase(listings, uc) }))
+    .filter((s) => s.providers.length >= 2);
+
+  // City-specific FAQs (if curated) outrank the generic 3, then the generic
+  // fallbacks fill any remaining slots. Cap at 6 so the FAQPage JSON-LD stays
+  // focused and the visible block stays scannable.
+  const curatedFaqs = cityMeta?.faqs || [];
+  const genericFaqs = [
     {
       question: `How many IV therapy clinics are in ${cityData.name}?`,
       answer: `There are currently ${count} IV therapy providers in ${cityData.name} listed on TheDripMap, including both clinic locations and mobile services.`
@@ -318,6 +336,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
       answer: `While prices vary by provider and specific protocol, most standard hydration and wellness drips in ${cityData.name} range from $150 to $300. Specialized treatments like NAD+ therapy typically start at $500.`
     }
   ];
+  const faqs = [...curatedFaqs, ...genericFaqs].slice(0, 6);
 
   const faqJsonLd = {
     '@context': 'https://schema.org',
@@ -417,6 +436,36 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           );
         })()}
 
+        {/* Regulation / market note — only renders when the city has curated meta
+            (Toronto today). Frames it as general information with a link to the
+            full guide. */}
+        {cityMeta?.regulationNote && (
+          <section className="mb-12 max-w-4xl">
+            <div className="rounded-3xl border border-wellness-200 bg-wellness-50/60 p-6 md:p-7">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-wellness-600 text-white flex items-center justify-center shrink-0">
+                  <ShieldCheck size={20} />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-lg font-black text-wellness-900 mb-2">{cityMeta.regulationNote.headline}</h2>
+                  <p className="text-sm text-wellness-900/80 leading-relaxed">
+                    {cityMeta.regulationNote.body}
+                  </p>
+                  {cityMeta.regulationNote.linkBlogSlug && cityMeta.regulationNote.linkLabel && (
+                    <Link
+                      href={`/blog/${cityMeta.regulationNote.linkBlogSlug}`}
+                      className="inline-flex items-center gap-2 mt-4 text-sm font-black text-wellness-700 hover:text-wellness-800 group"
+                    >
+                      <BookOpen size={14} /> {cityMeta.regulationNote.linkLabel}
+                      <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* 4. Verified Providers listings grid.
             TORONTO: two-tier render — Toronto + former municipalities up top,
             then "Nearby in the Greater Toronto Area" below. Other cities use
@@ -491,6 +540,44 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           )
         )}
 
+        {/* 4b. Use-case groupings — "Best for hangover recovery", "Best for
+            mobile in-home drips", etc. Only renders for cities with a curated
+            cityMeta block AND only sections that found at least 2 matching
+            clinics. Each card links to the provider page; the user-facing
+            ListingController above is untouched. */}
+        {useCaseSections.length > 0 && (
+          <section className="mb-24">
+            <div className="mb-8 max-w-3xl">
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight mb-3">
+                Find the right drip for what you actually need
+              </h2>
+              <p className="text-base text-slate-500 leading-relaxed">
+                Curated picks from the {cityData.name} listings, grouped by the most common reasons people book.
+              </p>
+            </div>
+            <div className="space-y-12">
+              {useCaseSections.map(({ useCase, providers }) => (
+                <div key={useCase.key}>
+                  <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-5">
+                    <div>
+                      <h3 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">{useCase.title}</h3>
+                      <p className="text-sm text-slate-500 mt-1 max-w-2xl">{useCase.blurb}</p>
+                    </div>
+                    <span className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 shrink-0">
+                      {providers.length} {providers.length === 1 ? 'pick' : 'picks'}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {providers.map((p) => (
+                      <ProviderCard key={p.id} provider={p} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* 5. Match quiz CTA block */}
         <QuizCTA
           className="mb-24"
@@ -513,6 +600,30 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
         ) : (
           <section className="mb-24 bg-white p-12 rounded-[3.5rem] border border-slate-100">
             <p className="text-slate-500 italic text-center">Comprehensive hydration guides for {cityData.name} are currently being updated.</p>
+          </section>
+        )}
+
+        {/* 6a. Related reading — curated blog links for cities with a meta block.
+            Internal linking from high-traffic city pages → topic blog posts
+            pushes PageRank where it matters and gives readers a real next step. */}
+        {cityMeta?.links?.blogPosts && cityMeta.links.blogPosts.length > 0 && (
+          <section className="mb-12">
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 md:p-7">
+              <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Related reading</h3>
+              <div className="flex flex-wrap gap-3">
+                {cityMeta.links.blogPosts.map((post) => (
+                  <Link
+                    key={post.slug}
+                    href={`/blog/${post.slug}`}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-slate-200 hover:border-wellness-300 hover:bg-wellness-50 text-sm font-bold text-slate-700 hover:text-wellness-700 transition-all group"
+                  >
+                    <BookOpen size={14} className="text-slate-400 group-hover:text-wellness-600" />
+                    {post.label}
+                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                ))}
+              </div>
+            </div>
           </section>
         )}
 
