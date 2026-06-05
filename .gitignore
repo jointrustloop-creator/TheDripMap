@@ -8,6 +8,7 @@ next-env.d.ts
 
 # Local env files — CONTAIN SECRETS
 .env
+.env.*
 .env*.local
 
 # Logs
@@ -41,3 +42,5 @@ thedripmap.com-Performance-on-Search-*.zip
 new images/
 _temp_*
 
+
+.vercel
