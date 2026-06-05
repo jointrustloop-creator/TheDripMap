@@ -65,6 +65,262 @@ export interface CityMeta {
 }
 
 const metas: Record<string, CityMeta> = {
+  'los-angeles': {
+    regulationNote: {
+      headline: 'Who can legally administer IV therapy in California',
+      body:
+        'IV administration in California is regulated under the Medical Practice Act and the Nursing Practice Act. Physicians, nurse practitioners, physician assistants, and registered nurses operating under appropriate physician orders can administer IV therapy in the state. Every clinic listed below operates with licensed clinical staff. This is general information, not legal or medical advice, and we recommend confirming credentials with the clinic before booking.',
+    },
+    useCases: [
+      {
+        key: 'hangover',
+        title: 'Best for hangover recovery',
+        blurb:
+          'Same-day appointments or in-room mobile drips for fast morning-after recovery in LA.',
+        matchAny: ['hangover', 'recovery', 'rehydrate', 'rehydration'],
+        maxResults: 5,
+      },
+      {
+        key: 'wellness',
+        title: 'Best for ongoing wellness and immunity',
+        blurb:
+          'Clinics with regular maintenance protocols, Myers cocktails, and immune-support drips.',
+        matchAny: ['myers', 'immune', 'wellness', 'vitamin', 'glutathione'],
+        maxResults: 5,
+      },
+      {
+        key: 'energy',
+        title: 'Best for energy, NAD+, and athletic recovery',
+        blurb:
+          'Higher-dose energy and recovery protocols, including NAD+ and amino-acid drips.',
+        matchAny: ['nad', 'energy', 'athletic', 'amino', 'performance'],
+        maxResults: 5,
+      },
+      {
+        key: 'mobile',
+        title: 'Best for in-home, hotel, and on-set mobile drips',
+        blurb:
+          'Bring the drip to your home, hotel, trailer, or studio anywhere across LA County.',
+        matchAny: ['mobile', 'in-home', 'concierge', 'hotel'],
+        maxResults: 5,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Is IV therapy legal in Los Angeles?',
+        answer:
+          'Yes. IV administration in California is regulated under the Medical Practice Act and the Nursing Practice Act. Physicians, nurse practitioners, physician assistants, and registered nurses operating under appropriate physician orders can administer IV therapy. All clinics listed on TheDripMap operate with licensed clinical staff. Confirm credentials with the clinic before booking.',
+      },
+      {
+        question: 'Who can administer IV therapy in California?',
+        answer:
+          'In California, IV administration is performed by licensed physicians (MD or DO), nurse practitioners, physician assistants, and registered nurses working under physician orders or established standing orders. Naturopathic doctor scope in California is more limited than in some other states, so confirm directly with the clinic if you specifically want an ND-led drip.',
+      },
+      {
+        question: 'How much does IV therapy cost in Los Angeles?',
+        answer:
+          'Standard hydration and wellness drips in LA typically run $175 to $400 USD. NAD+ protocols generally range from $700 to over $1,200 USD depending on dose. Mobile service (in-home, hotel, on-set) usually adds $50 to $150. Final pricing varies by clinic and protocol.',
+      },
+      {
+        question: 'Do Los Angeles clinics offer mobile or in-home IV therapy?',
+        answer:
+          'Yes. Mobile IV therapy across LA County is mature, with providers serving West LA, Beverly Hills, Hollywood, Studio City, Santa Monica, Pasadena, the South Bay, and the surrounding metro. Many clinics also serve hotels and film sets. Look for the Mobile Service tag in the listings.',
+      },
+    ],
+    links: {
+      blogPosts: [
+        {
+          slug: 'best-iv-therapy-los-angeles-2026',
+          label: '2026 guide: best IV therapy in Los Angeles',
+        },
+      ],
+      treatments: [
+        'hangover-recovery',
+        'myers-cocktail',
+        'nad-plus-therapy',
+        'immune-support',
+        'hydration',
+        'beauty-glow',
+        'energy-boost',
+        'athletic-recovery',
+      ],
+    },
+  },
+
+  'new-york': {
+    regulationNote: {
+      headline: 'Who can legally administer IV therapy in New York State',
+      body:
+        'IV administration in New York is regulated by the New York State Education Department and the State Board of Nursing. Physicians, nurse practitioners, physician assistants, and registered nurses working under appropriate orders can administer IV therapy in the state. Every clinic listed below operates with licensed clinical staff. This is general information, not legal or medical advice, and we recommend confirming credentials with the clinic before booking.',
+    },
+    useCases: [
+      {
+        key: 'hangover',
+        title: 'Best for hangover recovery',
+        blurb:
+          'Same-day clinic appointments or in-room mobile drips for fast morning-after recovery in NYC.',
+        matchAny: ['hangover', 'recovery', 'rehydrate', 'rehydration'],
+        maxResults: 5,
+      },
+      {
+        key: 'wellness',
+        title: 'Best for ongoing wellness and immunity',
+        blurb:
+          'Clinics with regular maintenance protocols, Myers cocktails, and immune-support drips.',
+        matchAny: ['myers', 'immune', 'wellness', 'vitamin', 'glutathione'],
+        maxResults: 5,
+      },
+      {
+        key: 'energy',
+        title: 'Best for energy, NAD+, and athletic recovery',
+        blurb:
+          'Higher-dose energy and recovery protocols, including NAD+ and amino-acid drips for high-output schedules.',
+        matchAny: ['nad', 'energy', 'athletic', 'amino', 'performance'],
+        maxResults: 5,
+      },
+      {
+        key: 'mobile',
+        title: 'Best for in-room, in-office, and in-home mobile drips',
+        blurb:
+          'Bring the drip to your apartment, hotel room, or midtown office anywhere across the five boroughs.',
+        matchAny: ['mobile', 'in-home', 'concierge', 'hotel'],
+        maxResults: 5,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Is IV therapy legal in New York?',
+        answer:
+          'Yes. IV administration in New York is regulated by the New York State Education Department and the State Board of Nursing. Physicians, nurse practitioners, physician assistants, and registered nurses working under appropriate orders can legally administer IV therapy. All clinics listed on TheDripMap operate with licensed clinical staff. Confirm credentials with the clinic before booking.',
+      },
+      {
+        question: 'Who can administer IV therapy in New York State?',
+        answer:
+          'In New York, IV administration is performed by licensed physicians (MD or DO), nurse practitioners, physician assistants, and registered nurses working under physician orders. New York does not license naturopathic doctors as primary care providers, so IV drips in NY are typically delivered under the supervision of an MD, DO, or NP.',
+      },
+      {
+        question: 'How much does IV therapy cost in New York City?',
+        answer:
+          'NYC pricing sits on the higher end of the US market. Standard hydration and wellness drips at Manhattan clinics typically run $200 to $450 USD. NAD+ protocols generally range from $700 to over $1,200 USD depending on dose. Outer-borough and mobile-focused providers are usually $50 to $100 lower. Final pricing varies by clinic and protocol.',
+      },
+      {
+        question: 'Do New York clinics offer mobile or in-home IV therapy?',
+        answer:
+          'Yes. Mobile IV therapy across NYC is well-developed, with providers serving Manhattan apartments, hotels, and midtown offices, plus the surrounding boroughs of Brooklyn, Queens, the Bronx, and Staten Island. Many providers run extended-hours or near-24/7 service. Look for the Mobile Service tag in the listings.',
+      },
+    ],
+    links: {
+      blogPosts: [
+        {
+          slug: 'best-iv-therapy-new-york-2026',
+          label: '2026 guide: best IV therapy in New York',
+        },
+      ],
+      treatments: [
+        'hangover-recovery',
+        'myers-cocktail',
+        'nad-plus-therapy',
+        'immune-support',
+        'hydration',
+        'beauty-glow',
+        'energy-boost',
+        'athletic-recovery',
+      ],
+    },
+  },
+
+  vancouver: {
+    regulationNote: {
+      headline: 'Who can legally administer IV therapy in British Columbia',
+      body:
+        'IV administration is a regulated activity in British Columbia under the Health Professions Act. Physicians, registered nurses, nurse practitioners, and naturopathic physicians with the prescribing and infusion authority granted by the College of Complementary Health Professionals of BC (CCHPBC) can administer IV therapy in the province. Every clinic listed below operates with licensed clinical staff. This is general information, not legal or medical advice, and we recommend confirming credentials with the clinic before booking.',
+      linkBlogSlug: 'who-can-legally-give-iv-canada-rules-by-province-2026',
+      linkLabel: 'Read the full Canada IV therapy regulation guide',
+    },
+    useCases: [
+      {
+        key: 'hangover',
+        title: 'Best for hangover recovery',
+        blurb:
+          'Same-day clinic appointments or in-room mobile drips for fast morning-after recovery in Vancouver.',
+        matchAny: ['hangover', 'recovery', 'rehydrate', 'rehydration'],
+        maxResults: 5,
+      },
+      {
+        key: 'wellness',
+        title: 'Best for ongoing wellness and immunity',
+        blurb:
+          'Clinics with regular maintenance protocols, Myers cocktails, and immune-support drips.',
+        matchAny: ['myers', 'immune', 'wellness', 'vitamin', 'glutathione'],
+        maxResults: 5,
+      },
+      {
+        key: 'energy',
+        title: 'Best for energy, NAD+, and athletic recovery',
+        blurb:
+          'Higher-dose energy and recovery protocols, including NAD+ and amino-acid drips.',
+        matchAny: ['nad', 'energy', 'athletic', 'amino', 'performance'],
+        maxResults: 5,
+      },
+      {
+        key: 'mobile',
+        title: 'Best for in-home and hotel mobile drips',
+        blurb:
+          'Bring the drip to your home, hotel, or office anywhere across Vancouver, the North Shore, Burnaby, and Richmond.',
+        matchAny: ['mobile', 'in-home', 'concierge', 'hotel'],
+        maxResults: 5,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Is IV therapy legal in Vancouver?',
+        answer:
+          'Yes. IV administration is a regulated activity in British Columbia, but physicians, registered nurses, nurse practitioners, and naturopathic physicians with the appropriate prescribing and infusion authority can legally administer IV therapy. All clinics listed on TheDripMap operate with licensed clinical staff. Confirm credentials with the clinic before booking.',
+      },
+      {
+        question: 'Can a naturopathic doctor give an IV in British Columbia?',
+        answer:
+          'Naturopathic physicians in BC can administer IV therapy when they hold the IV therapy and chelation prescribing authority granted through the College of Complementary Health Professionals of BC (CCHPBC). Not every ND has this authority, so confirm directly with the clinic if you specifically want an ND-led drip.',
+      },
+      {
+        question: 'How much does IV therapy cost in Vancouver?',
+        answer:
+          'Standard hydration and wellness drips in Vancouver typically run $200 to $400 CAD. NAD+ protocols generally range from $500 to over $1,000 CAD depending on dose. Mobile (in-home or hotel) service usually adds $50 to $100. Final pricing varies by clinic and protocol.',
+      },
+      {
+        question: 'Do Vancouver clinics offer mobile or in-home IV therapy?',
+        answer:
+          'Yes. Mobile IV therapy across Metro Vancouver is mature, with providers serving downtown Vancouver, the West End, Kitsilano, Yaletown, plus the North Shore, Burnaby, Richmond, and the surrounding Lower Mainland. Look for the Mobile Service tag in the listings.',
+      },
+    ],
+    links: {
+      blogPosts: [
+        {
+          slug: 'iv-therapy-vancouver-2026-guide',
+          label: 'Complete 2026 Vancouver IV therapy guide',
+        },
+        {
+          slug: 'nad-iv-therapy-vancouver-bc',
+          label: 'NAD+ IV therapy in Vancouver: real BC pricing',
+        },
+        {
+          slug: 'who-can-legally-give-iv-canada-rules-by-province-2026',
+          label: 'Canada IV therapy regulation by province',
+        },
+      ],
+      treatments: [
+        'hangover-recovery',
+        'myers-cocktail',
+        'nad-plus-therapy',
+        'immune-support',
+        'hydration',
+        'beauty-glow',
+        'energy-boost',
+        'athletic-recovery',
+      ],
+    },
+  },
+
   toronto: {
     regulationNote: {
       headline: 'Who can legally administer IV therapy in Ontario',
