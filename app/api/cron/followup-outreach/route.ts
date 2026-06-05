@@ -190,13 +190,48 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: true, skipped: 'no eligible follow-ups' });
   }
 
+  // CASL suppression check, same as daily-outreach. Skip any email on
+  // the permanent suppression list and stamp WHY.
+  const candidateEmails = Array.from(
+    new Set(candidates.map((p) => (p.email || '').trim().toLowerCase()).filter(Boolean))
+  );
+  const suppressedSet = new Set<string>();
+  if (candidateEmails.length > 0) {
+    const { data: suppressedRows } = await supabase
+      .from('email_suppressions')
+      .select('email')
+      .in('email', candidateEmails);
+    for (const row of (suppressedRows || []) as Array<{ email: string }>) {
+      suppressedSet.add(row.email.toLowerCase());
+    }
+  }
+  const skippedSuppressed: { id: string; email: string }[] = [];
+  const filteredCandidates = candidates.filter((p) => {
+    const k = (p.email || '').trim().toLowerCase();
+    if (k && suppressedSet.has(k)) {
+      skippedSuppressed.push({ id: p.id, email: k });
+      return false;
+    }
+    return true;
+  });
+  if (skippedSuppressed.length > 0) {
+    const ids = skippedSuppressed.map((s) => s.id);
+    await supabase
+      .from('providers')
+      .update({
+        outreach_skipped_reason: 'suppression_list',
+        outreach_skipped_at: new Date().toISOString(),
+      })
+      .in('id', ids);
+  }
+
   // Score by rating × log10(reviews+1), same as daily outreach.
   const score = (p: ProviderRow) =>
     (Number(p.rating) || 0) * Math.log10((Number(p.reviews) || 0) + 1);
 
   // Group by lowercased email.
   const groups = new Map<string, ProviderRow[]>();
-  for (const p of candidates) {
+  for (const p of filteredCandidates) {
     const k = (p.email || '').trim().toLowerCase();
     if (!groups.has(k)) groups.set(k, []);
     groups.get(k)!.push(p);
@@ -315,6 +350,7 @@ export async function GET(req: Request) {
     caDrafts,
     usDrafts,
     failures,
+    suppressedSkipped: skippedSuppressed.length,
     reportSent,
   });
 }

@@ -348,11 +348,99 @@ export async function GET(req: Request) {
   }
   lines.push('');
 
-  // Replies needing personal response (Gmail IMAP scan is its own beast —
-  // surface a placeholder pointer for now so the operator knows where to look)
-  lines.push('REPLIES NEEDING PERSONAL RESPONSE');
-  lines.push('  (Open Gmail; outreach replies land in the standard inbox.');
-  lines.push('   Automated reply-classification is a future build — pending.)');
+  // Replies today, populated from the email_replies table written by
+  // /api/cron/process-replies. Two sub-buckets: needs your response
+  // (interested/question/unclear AND unhandled) and handled automatically
+  // (opt-outs suppressed, bounces suppressed, OOOs noted).
+  {
+    const { data: repliesTodayRaw } = await supabase
+      .from('email_replies')
+      .select('id, from_email, from_name, subject, snippet, category, needs_human, matched_provider_ids, gmail_thread_url, handled_at, received_at')
+      .gte('received_at', sodIso)
+      .order('received_at', { ascending: true });
+    const repliesToday = (repliesTodayRaw || []) as Array<{
+      id: string;
+      from_email: string;
+      from_name: string | null;
+      subject: string | null;
+      snippet: string | null;
+      category: string;
+      needs_human: boolean;
+      matched_provider_ids: string[] | null;
+      gmail_thread_url: string | null;
+      handled_at: string | null;
+      received_at: string;
+    }>;
+
+    // Resolve clinic names for matched providers.
+    const replyProviderIds = Array.from(
+      new Set(
+        repliesToday
+          .flatMap((r) => r.matched_provider_ids || [])
+          .filter(Boolean),
+      ),
+    );
+    const replyProviderMap = new Map<string, { name: string | null; city: string | null; state: string | null }>();
+    if (replyProviderIds.length > 0) {
+      const { data: provs } = await supabase
+        .from('providers')
+        .select('id, name, city, state')
+        .in('id', replyProviderIds);
+      for (const p of (provs || []) as Array<{ id: string; name: string | null; city: string | null; state: string | null }>) {
+        replyProviderMap.set(p.id, { name: p.name, city: p.city, state: p.state });
+      }
+    }
+
+    const needsResponse = repliesToday.filter(
+      (r) =>
+        !r.handled_at &&
+        (r.needs_human ||
+          r.category === 'interested' ||
+          r.category === 'question'),
+    );
+    const handledAuto = repliesToday.filter((r) => !needsResponse.includes(r));
+
+    lines.push(`REPLIES TODAY (${repliesToday.length})`);
+    if (repliesToday.length === 0) {
+      lines.push('  0 replies today.');
+    } else {
+      lines.push(`  Needs your response (${needsResponse.length})`);
+      if (needsResponse.length === 0) {
+        lines.push('    None.');
+      } else {
+        for (const r of needsResponse) {
+          const pid = (r.matched_provider_ids || [])[0];
+          const p = pid ? replyProviderMap.get(pid) : undefined;
+          const clinic = p?.name || '(no clinic match)';
+          const loc = [p?.city, p?.state].filter(Boolean).join(', ');
+          const sender = r.from_name ? `${r.from_name} <${r.from_email}>` : r.from_email;
+          const tag = r.category === 'interested' ? '[INTERESTED]'
+                    : r.category === 'question' ? '[QUESTION]'
+                    : '[UNCLEAR]';
+          lines.push(`    ${tag} ${clinic}${loc ? ' (' + loc + ')' : ''}`);
+          lines.push(`        from: ${sender}`);
+          lines.push(`        re:   ${r.subject || '(no subject)'}`);
+          if (r.snippet) lines.push(`        snip: ${r.snippet.slice(0, 200)}`);
+          if (r.gmail_thread_url) lines.push(`        open: ${r.gmail_thread_url}`);
+        }
+      }
+      lines.push(`  Handled automatically (${handledAuto.length})`);
+      if (handledAuto.length === 0) {
+        lines.push('    None.');
+      } else {
+        const optOuts = handledAuto.filter((r) => r.category === 'not_interested');
+        const bounces = handledAuto.filter((r) => r.category === 'bounce');
+        const autoreplies = handledAuto.filter((r) => r.category === 'auto_reply');
+        const other = handledAuto.filter(
+          (r) => !['not_interested','bounce','auto_reply'].includes(r.category),
+        );
+        if (optOuts.length) lines.push(`    Opt-outs suppressed: ${optOuts.length}`);
+        if (bounces.length) lines.push(`    Bounces suppressed:  ${bounces.length}`);
+        if (autoreplies.length) lines.push(`    Auto-replies/OOO:    ${autoreplies.length}`);
+        if (other.length) lines.push(`    Other handled:       ${other.length}`);
+      }
+    }
+  }
   lines.push('');
 
   // Drafts + totals

@@ -25,9 +25,12 @@ export default async function AdminToolsPage() {
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-12">
       <div className="max-w-3xl mx-auto">
-        <div className="mb-8">
+        <div className="mb-8 flex items-center gap-6">
           <a href="/admin/insights" className="text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-slate-900">
             ← back to insights
+          </a>
+          <a href="/admin/replies" className="text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-slate-900">
+            Replies →
           </a>
         </div>
         <h1 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">Admin tools</h1>

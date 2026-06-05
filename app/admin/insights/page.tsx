@@ -192,6 +192,12 @@ export default async function AdminInsightsPage() {
             >
               Testimonials
             </Link>
+            <Link
+              href="/admin/replies"
+              className="text-xs font-bold text-slate-500 hover:text-wellness-600"
+            >
+              Replies
+            </Link>
           </div>
           <form action="/api/admin/logout" method="POST">
             <button className="text-xs font-bold text-slate-500 hover:text-rose-600">

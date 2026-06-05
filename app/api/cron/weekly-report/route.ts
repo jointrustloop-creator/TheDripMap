@@ -149,6 +149,24 @@ export async function GET(req: Request) {
     for (const p of (provs || []) as ProviderLite[]) topProviderMap.set(p.id, p);
   }
 
+  // Reply funnel this week (drafts -> replies, opt-outs, bounces).
+  const { data: repliesThisRaw } = await supabase
+    .from('email_replies')
+    .select('id, category, received_at')
+    .gte('received_at', weekStart.toISOString());
+  const repliesThis = (repliesThisRaw || []) as Array<{ category: string }>;
+  const { data: suppressionsThisRaw } = await supabase
+    .from('email_suppressions')
+    .select('id, reason, suppressed_at')
+    .gte('suppressed_at', weekStart.toISOString());
+  const suppressionsThis = (suppressionsThisRaw || []) as Array<{ reason: string }>;
+  const drafts = draftsThis || 0;
+  const optOutsThis = suppressionsThis.filter((s) => s.reason === 'unsubscribe').length;
+  const bouncesThis = suppressionsThis.filter((s) => s.reason === 'hard_bounce').length;
+  const respRate = drafts > 0 ? `${repliesThis.length} / ${drafts} = ${Math.round((repliesThis.length / drafts) * 100)}%` : `${repliesThis.length} / 0 drafts (n/a)`;
+  const optRate  = drafts > 0 ? `${optOutsThis} / ${drafts} = ${Math.round((optOutsThis / drafts) * 100)}%` : `${optOutsThis} / 0 drafts (n/a)`;
+  const bounceRate = drafts > 0 ? `${bouncesThis} / ${drafts} = ${Math.round((bouncesThis / drafts) * 100)}%` : `${bouncesThis} / 0 drafts (n/a)`;
+
   // SEO health snapshot
   let seoLine = 'No SEO baseline row found.';
   try {
@@ -186,6 +204,11 @@ export async function GET(req: Request) {
   lines.push(`  Drafts:        ${trend(draftsThis || 0, draftsPrior || 0)}`);
   lines.push('');
   lines.push(`OUTREACH -> CLAIM CONVERSION (this week): ${conv}`);
+  lines.push('');
+  lines.push('REPLY FUNNEL (this week)');
+  lines.push(`  Response rate: ${respRate}`);
+  lines.push(`  Opt-out rate:  ${optRate}`);
+  lines.push(`  Bounce rate:   ${bounceRate}`);
   lines.push('');
   lines.push('TOTALS');
   lines.push(`  Verified clinics: ${totalVerified || 0}`);
@@ -232,6 +255,9 @@ export async function GET(req: Request) {
       draftsPrior: draftsPrior || 0,
       totalVerified: totalVerified || 0,
       totalListings: totalListings || 0,
+      repliesThis: repliesThis.length,
+      optOutsThis,
+      bouncesThis,
     },
     mail: mailResult,
     telegram: tgResult,
