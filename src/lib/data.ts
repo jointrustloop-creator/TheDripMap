@@ -232,7 +232,7 @@ export async function getListingsByCity(city: string, state?: string) {
     return MOCK_LISTINGS.filter(p => 
       isCityMatch(p.city, city) && 
       (!state || p.state?.toLowerCase() === state.toLowerCase())
-    ).map(enrichProvider);
+    ).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
   }
   
   let searchCity = city?.trim();
@@ -268,7 +268,7 @@ export async function getListingsByCity(city: string, state?: string) {
         .limit(100);
       
       if (!zipError && zipData && zipData.length > 0) {
-        return zipData.map(enrichProvider);
+        return zipData.filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
       }
     }
 
@@ -334,11 +334,11 @@ export async function getListingsByCity(city: string, state?: string) {
       const { getListingsByState } = await import('./data'); // Self-referential fix if needed, but we are in data.ts
       const stateListings = await getListingsByState(searchState);
       if (stateListings.length > 0) {
-        return stateListings.map(enrichProvider);
+        return stateListings.filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
       }
     }
 
-      const dbResults = (response.data || []).map(enrichProvider);
+      const dbResults = (response.data || []).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
 
       // Merge with mock data - apply SAME strict filtering
       const mockResults = MOCK_LISTINGS.filter(p => {
@@ -356,7 +356,7 @@ export async function getListingsByCity(city: string, state?: string) {
         }
 
         return cityMatch && stateMatch;
-      }).map(enrichProvider);
+      }).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
 
     const merged = deduplicateListings([...dbResults, ...mockResults]);
     return merged;
@@ -425,8 +425,8 @@ export async function getTorontoGtaTieredListings(): Promise<{
         .limit(200),
     ]);
 
-    const core = (coreRes.data || []).map(enrichProvider);
-    const nearby = (nearRes.data || []).map(enrichProvider);
+    const core = (coreRes.data || []).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
+    const nearby = (nearRes.data || []).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
 
     // Tier 2 ordering: verified first; within each bucket, closest first.
     nearby.sort((a, b) => {
@@ -449,7 +449,7 @@ export async function getListingsByState(state: string) {
   if (!isSupabaseConfigured()) {
     return MOCK_LISTINGS.filter(p => 
       p.state?.toLowerCase() === state.toLowerCase()
-    ).map(enrichProvider);
+    ).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
   }
   
   try {
@@ -480,7 +480,7 @@ export async function getListingsByState(state: string) {
       .limit(300);
 
     if (error) throw error;
-    return (data || []).map(enrichProvider);
+    return (data || []).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
   } catch (err) {
     console.error('Error fetching listings by state:', err);
     return [];
@@ -863,7 +863,7 @@ export async function getListingsByService(service: string, limit: number = 4) {
     if (error) throw error;
     
     // Deduplicate to ensure brand diversity while allowing multiple locations
-    const uniqueListings = deduplicateListings(data || []).map(enrichProvider);
+    const uniqueListings = deduplicateListings(data || []).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
 
     return uniqueListings.slice(0, limit);
   } catch (err) {
@@ -889,7 +889,7 @@ export async function searchListings(query: string, city?: string) {
         p.description.toLowerCase().includes(searchTerm) ||
         p.specialties.some(s => s.toLowerCase().includes(searchTerm));
       return matchCity && matchQuery;
-    }).map(enrichProvider);
+    }).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
   }
 
   try {
@@ -933,7 +933,7 @@ export async function searchListings(query: string, city?: string) {
     }
 
     // Deduplicate by content to ensure clean search results
-    return deduplicateListings(results).map(enrichProvider);
+    return deduplicateListings(results).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
   } catch {
     // Fallback on error
     return [];
@@ -952,7 +952,7 @@ export async function getFeaturedListings(limit: number = 6, city?: string) {
     return MOCK_LISTINGS
       .filter(p => p.is_featured && isCityMatch(p.city, city))
       .slice(0, limit)
-      .map(enrichProvider);
+      .filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
   }
   
   try {
@@ -974,20 +974,20 @@ export async function getFeaturedListings(limit: number = 6, city?: string) {
     if (error) throw error;
     
     if (data && data.length > 0) {
-      return deduplicateListings(data).map(enrichProvider);
+      return deduplicateListings(data).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
     }
     
     // Fallback to mock if no DB results
     return MOCK_LISTINGS
       .filter(p => p.is_featured && isCityMatch(p.city, city))
       .slice(0, limit)
-      .map(enrichProvider);
+      .filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
   } catch (err) {
     console.warn('Supabase error in getFeaturedListings:', err);
     return MOCK_LISTINGS
       .filter(p => p.is_featured && isCityMatch(p.city, city))
       .slice(0, limit)
-      .map(enrichProvider);
+      .filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
   }
 }
 
@@ -1141,9 +1141,17 @@ export async function getListingStats(): Promise<ListingStats> {
   };
 }
 
+// Archived blog post slugs: still resolvable at /blog/<slug> with noindex +
+// archive banner (see app/blog/[slug]/page.tsx ARCHIVED_POSTS), but excluded
+// from /blog index, sitemap, and generateStaticParams so we stop advertising
+// them to Google.
+export const ARCHIVED_BLOG_SLUGS = new Set<string>([
+  'peptide-therapy-guide-2026',
+]);
+
 export async function getBlogPosts() {
   const configured = isSupabaseConfigured();
-  
+
   if (configured) {
     try {
       const { data, error } = await supabase
@@ -1158,6 +1166,7 @@ export async function getBlogPosts() {
           // Convention: category === 'Draft' OR slug starts with '_draft-'.
           // A draft is still reachable directly at /blog/<slug> for preview.
           .filter(post => post.category !== 'Draft' && !(post.slug || '').startsWith('_draft-'))
+          .filter(post => !ARCHIVED_BLOG_SLUGS.has(post.slug || ''))
           .map(post => {
           let content = post.content || post.body || post.markdown || '';
 
@@ -1329,7 +1338,7 @@ export async function getAllUseCases() {
 }
 
 export async function getAllListings() {
-  if (!isSupabaseConfigured()) return MOCK_LISTINGS.map(enrichProvider);
+  if (!isSupabaseConfigured()) return MOCK_LISTINGS.filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
 
   try {
     // PostgREST gateway caps single responses at 1,000 rows regardless
@@ -1345,9 +1354,9 @@ export async function getAllListings() {
     );
 
     const results = data && data.length > 0 ? data : MOCK_LISTINGS;
-    return results.map(enrichProvider);
+    return results.filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
   } catch {
-    return MOCK_LISTINGS.map(enrichProvider);
+    return MOCK_LISTINGS.filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
   }
 }
 
@@ -1363,7 +1372,7 @@ export async function getListingsByIds(ids: string[]) {
       .order('rating', { ascending: false, nullsFirst: false });
 
     if (error) throw error;
-    return (data || []).map(enrichProvider);
+    return (data || []).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
   } catch (err) {
     console.error('Supabase error fetching listings by ids:', err);
     return [];
@@ -1413,7 +1422,7 @@ export async function getListingsByServiceAndCity(service: string, city: string,
     }
     
     // Deduplicate while allowing multiple locations
-    const dbResults = deduplicateListings(data || []).map(enrichProvider);
+    const dbResults = deduplicateListings(data || []).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
 
     // Merge with mock data for this city and service
     const isCityMatch = (pCity: string, search: string) => {
@@ -1428,7 +1437,7 @@ export async function getListingsByServiceAndCity(service: string, city: string,
         p.specialties.some(s => s.toLowerCase().includes(service.toLowerCase())) ||
         p.name.toLowerCase().includes(service.toLowerCase());
       return cityMatch && serviceMatch;
-    }).map(enrichProvider);
+    }).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
 
     const merged = deduplicateListings([...dbResults, ...mockResults]);
 
@@ -1512,7 +1521,7 @@ export async function getSimilarClinics(currentSlug: string, city: string, state
 
     if (cityError) throw cityError;
 
-    let results = (cityData || []).map(enrichProvider);
+    let results = (cityData || []).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
 
     // 2. If not enough in the city, find some in the same state
     if (results.length < limit) {
@@ -1529,7 +1538,7 @@ export async function getSimilarClinics(currentSlug: string, city: string, state
         .limit(remaining);
 
       if (stateError) throw stateError;
-      results = [...results, ...(stateData || []).map(enrichProvider)];
+      results = [...results, ...(stateData || []).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider)];
     }
 
     return results;

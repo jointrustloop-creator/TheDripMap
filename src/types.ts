@@ -40,6 +40,7 @@ export interface Provider {
   is_verified?: boolean;
   is_top_rated?: boolean;
   is_claimed?: boolean;
+  is_hidden?: boolean;
   claimed_at?: string;
   subscription_tier?: string;
   mobile_service?: boolean;
