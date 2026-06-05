@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { TARGET_TYPES, BacklinkTargetType, BACKLINK_TEMPLATES } from '../../../../src/lib/backlink-templates';
+import { AUTO_RESEARCH_TYPES, BacklinkTargetType, BACKLINK_TEMPLATES } from '../../../../src/lib/backlink-templates';
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
@@ -10,13 +10,15 @@ const DAILY_TARGET = 5;
 const MIN_DA = 20;
 
 // Rotate target type by day-of-year so we naturally vary the kind of
-// outreach without manual tuning. Same type ~once every 5 days.
+// outreach without manual tuning. Same type ~once every N days where N is
+// AUTO_RESEARCH_TYPES.length. NYC patient-side types are intentionally
+// excluded from auto-rotation (see backlink-templates.ts).
 function todaysTargetType(): BacklinkTargetType {
   const today = new Date();
   const start = new Date(today.getFullYear(), 0, 0);
   const diff = today.getTime() - start.getTime();
   const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
-  return TARGET_TYPES[dayOfYear % TARGET_TYPES.length];
+  return AUTO_RESEARCH_TYPES[dayOfYear % AUTO_RESEARCH_TYPES.length];
 }
 
 interface CandidateFromAI {
@@ -30,7 +32,9 @@ interface CandidateFromAI {
   already_links?: boolean;
 }
 
-const SEARCH_QUERIES: Record<BacklinkTargetType, string[]> = {
+// Only the AUTO_RESEARCH_TYPES need queries — the NYC patient-side types are
+// inserted by a human operator after manual research, never auto-discovered.
+const SEARCH_QUERIES: Partial<Record<BacklinkTargetType, string[]>> = {
   nursing_school: [
     'nursing school entrepreneurship resources IV therapy',
     'nursing program student resources starting a wellness business',
@@ -181,6 +185,17 @@ export async function GET(req: Request) {
   const targetType = todaysTargetType();
   const template = BACKLINK_TEMPLATES[targetType];
   const queries = SEARCH_QUERIES[targetType];
+  if (!queries || queries.length === 0) {
+    // Defensive: today's target type has no auto-research queries configured.
+    // This should not happen for any type in AUTO_RESEARCH_TYPES, so log it
+    // and skip the run rather than crash or send a malformed prompt.
+    return NextResponse.json({
+      ok: true,
+      skipped: true,
+      targetType,
+      reason: 'no auto-research queries for this target type',
+    });
+  }
   const articleList = template.preferredArticles
     .map((slug) => `  • ${slug}: ${ARTICLE_DESCRIPTIONS[slug] || ''}`)
     .join('\n');

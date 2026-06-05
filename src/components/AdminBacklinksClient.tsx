@@ -45,6 +45,11 @@ const TYPE_LABELS: Record<string, string> = {
   wellness_publication: 'Wellness Pub',
   nurse_entrepreneur: 'Nurse Entrepreneur',
   medical_director_match: 'MD Match',
+  nyc_wellness_blog: 'NYC Wellness Blog',
+  nyc_fitness_studio: 'NYC Fitness Studio',
+  nyc_hospitality_concierge: 'NYC Concierge',
+  nyc_local_press: 'NYC Local Press',
+  nyc_corporate_wellness: 'NYC Corp Wellness',
 };
 
 const STATUS_COLOR: Record<BacklinkStatus, string> = {
