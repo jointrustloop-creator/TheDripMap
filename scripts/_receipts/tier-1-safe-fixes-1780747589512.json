@@ -1,0 +1,102 @@
+{
+  "phase": "tier-1-safe-fixes",
+  "timestamp": "2026-06-06T12:06:28.761Z",
+  "changes": [
+    {
+      "slug": "bay-wellness-centre-vancouver",
+      "before": {
+        "description": "Downtown Vancouver naturopathic clinic offering nutrient IV therapy, peptide therapy, bioidentical hormones, regenerative injections, and natural aesthetics, led by Dr. Megan Maycher, ND and Dr. Annie Savage, ND.",
+        "specialties": [
+          "Nutrient IV Therapy",
+          "Glutathione Push",
+          "Iron Infusion",
+          "Women's Health",
+          "Medical Aesthetics — Botox",
+          "Medical Aesthetics — Dermal Filler",
+          "Medical Aesthetics — PRP",
+          "Medical Aesthetics — Sculptra"
+        ],
+        "services": [
+          {
+            "name": "Nutrient IV Therapy",
+            "price": "$170"
+          },
+          {
+            "name": "Glutathione Push",
+            "price": "$85"
+          },
+          {
+            "name": "Iron Infusion",
+            "price": "$185"
+          },
+          {
+            "name": "Women's Health"
+          },
+          {
+            "name": "Medical Aesthetics — Botox"
+          },
+          {
+            "name": "Medical Aesthetics — Dermal Filler"
+          },
+          {
+            "name": "Medical Aesthetics — PRP"
+          },
+          {
+            "name": "Medical Aesthetics — Sculptra"
+          }
+        ]
+      },
+      "after": {
+        "description": "Downtown Vancouver naturopathic clinic offering nutrient IV therapy, bioidentical hormones, regenerative injections, and natural aesthetics, led by Dr. Megan Maycher, ND and Dr. Annie Savage, ND.",
+        "specialties": [
+          "Nutrient IV Therapy",
+          "Glutathione Push",
+          "Iron Infusion",
+          "Women's Health",
+          "Medical Aesthetics - Botox",
+          "Medical Aesthetics - Dermal Filler",
+          "Medical Aesthetics - PRP",
+          "Medical Aesthetics - Sculptra"
+        ],
+        "services": [
+          {
+            "name": "Nutrient IV Therapy",
+            "price": "$170"
+          },
+          {
+            "name": "Glutathione Push",
+            "price": "$85"
+          },
+          {
+            "name": "Iron Infusion",
+            "price": "$185"
+          },
+          {
+            "name": "Women's Health"
+          },
+          {
+            "name": "Medical Aesthetics - Botox"
+          },
+          {
+            "name": "Medical Aesthetics - Dermal Filler"
+          },
+          {
+            "name": "Medical Aesthetics - PRP"
+          },
+          {
+            "name": "Medical Aesthetics - Sculptra"
+          }
+        ]
+      }
+    },
+    {
+      "slug": "refresh-med-spa-la-los-angeles",
+      "before": {
+        "description": "Refresh Med Spa LA offers professional aesthetic and wellness services in Woodland Hills. Founded by Dr. Kia Rowhanian and Nurse Fatima, the practice combines nearly two decades of medical expertise to provide IV therapy, BOTOX, dermal fillers, medical weight loss, hormone replacement, and advanced skin rejuvenation — with fully customized treatment plans, by appointment only."
+      },
+      "after": {
+        "description": "Refresh Med Spa LA offers professional aesthetic and wellness services in Woodland Hills. Founded by Dr. Kia Rowhanian and Nurse Fatima, the practice combines nearly two decades of medical expertise to provide IV therapy, BOTOX, dermal fillers, medical weight loss, hormone replacement, and advanced skin rejuvenation - with fully customized treatment plans, by appointment only."
+      }
+    }
+  ]
+}
