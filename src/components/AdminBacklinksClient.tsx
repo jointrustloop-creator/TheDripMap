@@ -50,6 +50,15 @@ const TYPE_LABELS: Record<string, string> = {
   nyc_hospitality_concierge: 'NYC Concierge',
   nyc_local_press: 'NYC Local Press',
   nyc_corporate_wellness: 'NYC Corp Wellness',
+  toronto_wellness_blog: 'Toronto Wellness Blog',
+  toronto_local_press: 'Toronto Local Press',
+  gta_fitness_studio: 'GTA Fitness Studio',
+  canada_naturopathic_assoc: 'CA Naturopathic Assoc',
+  toronto_corporate_wellness: 'Toronto Corp Wellness',
+  vancouver_wellness_blog: 'Vancouver Wellness Blog',
+  vancouver_local_press: 'Vancouver Local Press',
+  vancouver_fitness_studio: 'Vancouver Fitness Studio',
+  vancouver_corporate_wellness: 'Vancouver Corp Wellness',
 };
 
 const STATUS_COLOR: Record<BacklinkStatus, string> = {

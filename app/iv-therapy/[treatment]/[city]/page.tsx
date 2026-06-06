@@ -135,8 +135,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title,
     description,
     alternates: { canonical },
-    // Don't index empty combinations to avoid thin programmatic pages.
-    robots: count === 0 ? { index: false, follow: true } : undefined,
+    // Don't index thin combinations (fewer than 3 providers) so Google sees
+    // the rest of the site as higher quality. 2026-06-06: bumped the
+    // threshold from 0 to 3 after the matrix audit found 99 of 468 combos
+    // sitting at 1-2 providers, those pages diluting overall site authority
+    // signal. Pages remain reachable for users via direct URL and internal
+    // links, just noindexed.
+    robots: count < 3 ? { index: false, follow: true } : undefined,
     openGraph: {
       title: `${t.name} in ${cityLabel} (${YEAR}) | TheDripMap`,
       description: `Find ${t.name.toLowerCase()} clinics in ${cityLabel}.`,

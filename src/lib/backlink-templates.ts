@@ -17,7 +17,21 @@ export type BacklinkTargetType =
   | 'nyc_fitness_studio'
   | 'nyc_hospitality_concierge'
   | 'nyc_local_press'
-  | 'nyc_corporate_wellness';
+  | 'nyc_corporate_wellness'
+  // Canadian patient-facing flywheel (added 2026-06-06). Canada-first pivot
+  // after Search Console showed Canada at 16x US CTR. Templates pitch the
+  // already-ranking Canadian assets (mobile-IV Toronto guide pos 12,
+  // Mississauga post pos 21, Canada insurance post pos 7, Ontario hub
+  // pos 11). NYC types stay registered but parked per operator brief.
+  | 'toronto_wellness_blog'
+  | 'toronto_local_press'
+  | 'gta_fitness_studio'
+  | 'canada_naturopathic_assoc'
+  | 'toronto_corporate_wellness'
+  | 'vancouver_wellness_blog'
+  | 'vancouver_local_press'
+  | 'vancouver_fitness_studio'
+  | 'vancouver_corporate_wellness';
 
 export interface BacklinkTemplate {
   subject: string;
@@ -219,6 +233,190 @@ If you ever build a wellness vendor resource for clients, we'd be grateful for t
       'best-iv-therapy-new-york-2026',
     ],
   },
+
+  // ---------- Toronto + GTA patient-facing flywheel (Canada-first 2026-06-06) ----------
+  toronto_wellness_blog: {
+    subject: 'IV therapy guide for your Toronto + GTA readers',
+    body: `Hi {{contact_name | "there"}},
+
+I enjoyed {{page_title}} on {{organization_name}}. {{topic_hook | "Your Toronto wellness coverage"}} matched the questions we hear from readers searching for IV therapy across the GTA.
+
+We just refreshed our mobile and in-clinic IV therapy guide for the Toronto and GTA market, covering Ontario regulation (CNO for RNs and NPs, CONO for naturopaths), typical CAD pricing, mobile coverage zones, and what to look for in a clinic before booking:
+
+  https://www.thedripmap.com/blog/mobile-iv-therapy-toronto-gta
+
+We also keep a maintained directory of every IV clinic in Toronto and the GTA with the Safety Verified credential filter:
+
+  https://www.thedripmap.com/cities/toronto
+
+If either is a fit for a roundup or resources page, a link would mean a lot. No tracking, no email gate, both are free.${SIGNATURE}`,
+    preferredArticles: [
+      'mobile-iv-therapy-toronto-gta',
+      'iv-therapy-mississauga',
+    ],
+  },
+
+  toronto_local_press: {
+    subject: 'Source for your IV therapy coverage in the GTA',
+    body: `Hi {{contact_name | "there"}},
+
+I read {{page_title}}. {{topic_hook | "Your local Toronto reporting"}} on the wellness scene has been some of the most grounded I've seen for the GTA market.
+
+I run TheDripMap, an IV therapy directory covering the US and Canada. We track every Toronto-area clinic, their credentials, and pricing. Our 2026 GTA guide pulls together who can legally administer IV therapy in Ontario (RNs and NPs through CNO, naturopaths through CONO), typical CAD pricing across the city and suburbs, and the mobile coverage map:
+
+  https://www.thedripmap.com/blog/mobile-iv-therapy-toronto-gta
+
+If a future piece touches IV therapy, hangover recovery, or GTA wellness, we're a free source for data, market commentary, or clinic operator quotes. Happy to provide whatever's useful.${SIGNATURE}`,
+    preferredArticles: [
+      'mobile-iv-therapy-toronto-gta',
+      'iv-therapy-insurance-coverage-canada',
+    ],
+  },
+
+  gta_fitness_studio: {
+    subject: 'IV recovery resource for your GTA members',
+    body: `Hi {{contact_name | "there"}},
+
+{{specific_observation | "Your members train hard, recovery comes up often."}} A lot of GTA fitness clients ask about IV therapy as part of their post-workout or pre-event recovery routine, and there's no shortage of clinics across the GTA so the question is usually "which one is safe and worth it."
+
+We maintain a free directory of every IV therapy clinic in Toronto and the GTA, with credential filters and mobile-service flags:
+
+  https://www.thedripmap.com/cities/toronto
+
+Plus the 2026 mobile + in-clinic guide that walks through what to look for (medical director, RN-led drips, CAD pricing transparency, naturopathic clinics with CONO authorization):
+
+  https://www.thedripmap.com/blog/mobile-iv-therapy-toronto-gta
+
+If your members would find either useful, we'd be grateful for a mention on your resources page. Happy to send a short blurb you can drop in.${SIGNATURE}`,
+    preferredArticles: [
+      'mobile-iv-therapy-toronto-gta',
+    ],
+  },
+
+  canada_naturopathic_assoc: {
+    subject: 'Patient-facing IV therapy resource referencing CONO + CCHPBC',
+    body: `Hi {{contact_name | "there"}},
+
+I follow the work {{organization_name}} does on naturopathic scope of practice in Canada. {{specific_observation | "The advocacy and credentialing guidance is genuinely useful for patients."}}
+
+We run TheDripMap, an IV therapy directory across Canada and the US. Our 2026 Canada regulation guide explains who can legally administer IV therapy province by province, including the CONO authorization for Ontario NDs, the CCHPBC infusion authority for BC naturopathic physicians, and what patients should ask before booking:
+
+  https://www.thedripmap.com/blog/who-can-legally-give-iv-canada-rules-by-province-2026
+
+Plus our Canada insurance coverage piece, which gets cited by patients looking for benefits guidance:
+
+  https://www.thedripmap.com/blog/iv-therapy-insurance-coverage-canada
+
+If either is a fit for your patient-facing resources, a link would be appreciated. Equally happy to be a referral source the other direction.${SIGNATURE}`,
+    preferredArticles: [
+      'who-can-legally-give-iv-canada-rules-by-province-2026',
+      'iv-therapy-insurance-coverage-canada',
+    ],
+  },
+
+  toronto_corporate_wellness: {
+    subject: 'IV therapy benefit resource for GTA employers',
+    body: `Hi {{contact_name | "there"}},
+
+{{specific_observation | "The corporate wellness work you do in the GTA is exactly the kind of context where this lands."}} A growing number of Toronto-area employers are asking about IV therapy as a recovery and wellness perk, and the legal side under Ontario rules plus the CAD pricing picture aren't always easy to find in one place.
+
+We maintain a free directory of every Toronto and GTA IV clinic (credential filters, mobile and in-office service flags, CAD pricing transparency):
+
+  https://www.thedripmap.com/cities/toronto
+
+Plus a 2026 mobile + in-clinic guide for the GTA covering CNO and CONO rules, typical pricing, and what to look for in a clinic partner:
+
+  https://www.thedripmap.com/blog/mobile-iv-therapy-toronto-gta
+
+And our Canada-wide IV therapy insurance coverage breakdown:
+
+  https://www.thedripmap.com/blog/iv-therapy-insurance-coverage-canada
+
+If you build a wellness vendor resource for clients, we'd be grateful for the mention.${SIGNATURE}`,
+    preferredArticles: [
+      'mobile-iv-therapy-toronto-gta',
+      'iv-therapy-insurance-coverage-canada',
+    ],
+  },
+
+  // ---------- Vancouver / BC patient-facing flywheel ----------
+  vancouver_wellness_blog: {
+    subject: 'IV therapy resource for your Vancouver readers',
+    body: `Hi {{contact_name | "there"}},
+
+I read {{page_title}} on {{organization_name}}. {{topic_hook | "Your Vancouver wellness coverage"}} captured the kind of questions we hear from BC patients searching for IV therapy.
+
+We maintain a directory of every IV therapy clinic in Vancouver and across BC, with the Safety Verified credential filter:
+
+  https://www.thedripmap.com/cities/vancouver
+
+Our 2026 Canada regulation guide explains who can legally administer IV therapy in BC (RNs and NPs through BCCNM, naturopathic physicians through CCHPBC with the IV infusion authority):
+
+  https://www.thedripmap.com/blog/who-can-legally-give-iv-canada-rules-by-province-2026
+
+If either is a fit for a roundup or resources page, a link would mean a lot. Both are free, no tracking.${SIGNATURE}`,
+    preferredArticles: [
+      'who-can-legally-give-iv-canada-rules-by-province-2026',
+    ],
+  },
+
+  vancouver_local_press: {
+    subject: 'Source for your IV therapy coverage in BC',
+    body: `Hi {{contact_name | "there"}},
+
+I read {{page_title}}. {{topic_hook | "Your BC reporting"}} on the local wellness scene has been some of the most grounded I've seen for the Vancouver market.
+
+I run TheDripMap, an IV therapy directory across Canada and the US. Our 2026 Canada regulation guide pulls together the BC-specific rules: BCCNM for RNs and NPs, CCHPBC for naturopathic physicians with the IV infusion authority, and what patients should ask:
+
+  https://www.thedripmap.com/blog/who-can-legally-give-iv-canada-rules-by-province-2026
+
+If a future piece touches IV therapy, recovery, or BC wellness, we're a free source for data, market commentary, or operator quotes.${SIGNATURE}`,
+    preferredArticles: [
+      'who-can-legally-give-iv-canada-rules-by-province-2026',
+    ],
+  },
+
+  vancouver_fitness_studio: {
+    subject: 'IV recovery resource for your Vancouver members',
+    body: `Hi {{contact_name | "there"}},
+
+{{specific_observation | "Your members train hard, recovery questions come up."}} A lot of Vancouver fitness clients ask about IV therapy as part of post-workout or pre-event recovery, and the BC question is always "which clinic is safe and worth it."
+
+We maintain a directory of Vancouver and BC IV therapy clinics with credential filters and mobile-service flags:
+
+  https://www.thedripmap.com/cities/vancouver
+
+Plus our Canada regulation guide so members can vet a clinic before booking (BCCNM for nurses, CCHPBC for naturopathic physicians with IV authority):
+
+  https://www.thedripmap.com/blog/who-can-legally-give-iv-canada-rules-by-province-2026
+
+If your members would find either useful, we'd be grateful for a mention on your resources page.${SIGNATURE}`,
+    preferredArticles: [
+      'who-can-legally-give-iv-canada-rules-by-province-2026',
+    ],
+  },
+
+  vancouver_corporate_wellness: {
+    subject: 'IV therapy benefit resource for Vancouver employers',
+    body: `Hi {{contact_name | "there"}},
+
+{{specific_observation | "The corporate wellness work you do in Vancouver is exactly the kind of context where this lands."}} A growing number of BC employers are asking about IV therapy as a recovery and wellness perk, and the BC-specific clinical side (BCCNM for nurses, CCHPBC for naturopathic physicians with IV authority) plus CAD pricing aren't always easy to find.
+
+We maintain a free directory of Vancouver and BC IV clinics:
+
+  https://www.thedripmap.com/cities/vancouver
+
+Plus our Canada regulation guide and our IV therapy insurance coverage breakdown:
+
+  https://www.thedripmap.com/blog/who-can-legally-give-iv-canada-rules-by-province-2026
+  https://www.thedripmap.com/blog/iv-therapy-insurance-coverage-canada
+
+If you build a wellness vendor resource for clients, we'd be grateful for the mention.${SIGNATURE}`,
+    preferredArticles: [
+      'who-can-legally-give-iv-canada-rules-by-province-2026',
+      'iv-therapy-insurance-coverage-canada',
+    ],
+  },
 };
 
 export const TARGET_TYPES: BacklinkTargetType[] = [
@@ -232,6 +430,15 @@ export const TARGET_TYPES: BacklinkTargetType[] = [
   'nyc_hospitality_concierge',
   'nyc_local_press',
   'nyc_corporate_wellness',
+  'toronto_wellness_blog',
+  'toronto_local_press',
+  'gta_fitness_studio',
+  'canada_naturopathic_assoc',
+  'toronto_corporate_wellness',
+  'vancouver_wellness_blog',
+  'vancouver_local_press',
+  'vancouver_fitness_studio',
+  'vancouver_corporate_wellness',
 ];
 
 // Subset of TARGET_TYPES that the daily backlink-research cron is allowed to

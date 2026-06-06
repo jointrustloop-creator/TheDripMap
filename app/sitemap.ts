@@ -151,13 +151,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'iron-infusion': (p) => /\biron\b/.test(treatmentBlob(p)),
   };
 
+  // Sitemap thin-page guard: only advertise matrix routes when there are
+  // genuinely 3+ relevant providers in the city. The page itself emits
+  // robots:noindex for count < 3 (see app/iv-therapy/[treatment]/[city]/page.tsx),
+  // so sitemap and page-level robots stay in sync. Pages stay reachable via
+  // direct URL, just not crawl-prioritized.
+  const MIN_PROVIDERS_FOR_SITEMAP = 3;
   const matrixRoutes: MetadataRoute.Sitemap = [];
   for (const t of MATRIX_TREATMENT_SLUGS) {
     const checker = NON_CORE_TREATMENT_CHECK[t];
     for (const city of matrixCities) {
       const cityProviders = providersByCityKey.get(city.toLowerCase().trim()) || [];
-      if (cityProviders.length === 0) continue;
-      if (checker && !cityProviders.some(checker)) continue;
+      if (cityProviders.length < MIN_PROVIDERS_FOR_SITEMAP) continue;
+      if (checker && cityProviders.filter(checker).length < MIN_PROVIDERS_FOR_SITEMAP) continue;
       matrixRoutes.push({
         url: `${baseUrl}/iv-therapy/${t}/${slugify(city)}`,
         lastModified: new Date(),

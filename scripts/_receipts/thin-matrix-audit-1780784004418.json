@@ -1,0 +1,3286 @@
+{
+  "buckets": {
+    "0": 304,
+    "1": 63,
+    "2": 36,
+    "3+": 65
+  },
+  "detail": [
+    {
+      "treatment": "hydration",
+      "city": "Toronto",
+      "citySlug": "toronto",
+      "count": 37,
+      "country": "CA"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Vancouver",
+      "citySlug": "vancouver",
+      "count": 9,
+      "country": "CA"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Calgary",
+      "citySlug": "calgary",
+      "count": 3,
+      "country": "CA"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Ottawa",
+      "citySlug": "ottawa",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Mississauga",
+      "citySlug": "mississauga",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Richmond Hill",
+      "citySlug": "richmond-hill",
+      "count": 4,
+      "country": "CA"
+    },
+    {
+      "treatment": "hydration",
+      "city": "North York",
+      "citySlug": "north-york",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Oakville",
+      "citySlug": "oakville",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Edmonton",
+      "citySlug": "edmonton",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Montreal",
+      "citySlug": "montreal",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Quebec City",
+      "citySlug": "quebec-city",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Winnipeg",
+      "citySlug": "winnipeg",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Halifax",
+      "citySlug": "halifax",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Victoria",
+      "citySlug": "victoria",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Kelowna",
+      "citySlug": "kelowna",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Red Deer",
+      "citySlug": "red-deer",
+      "count": 3,
+      "country": "CA"
+    },
+    {
+      "treatment": "hydration",
+      "city": "New York",
+      "citySlug": "new-york",
+      "count": 47,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Dallas",
+      "citySlug": "dallas",
+      "count": 4,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Tampa",
+      "citySlug": "tampa",
+      "count": 10,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Atlanta",
+      "citySlug": "atlanta",
+      "count": 11,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Houston",
+      "citySlug": "houston",
+      "count": 10,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Phoenix",
+      "citySlug": "phoenix",
+      "count": 9,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "San Diego",
+      "citySlug": "san-diego",
+      "count": 8,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Washington",
+      "citySlug": "washington",
+      "count": 19,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Boston",
+      "citySlug": "boston",
+      "count": 3,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Los Angeles",
+      "citySlug": "los-angeles",
+      "count": 3,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Clearwater",
+      "citySlug": "clearwater",
+      "count": 28,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Las Vegas",
+      "citySlug": "las-vegas",
+      "count": 19,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Philadelphia",
+      "citySlug": "philadelphia",
+      "count": 6,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Miami",
+      "citySlug": "miami",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Austin",
+      "citySlug": "austin",
+      "count": 3,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "San Francisco",
+      "citySlug": "san-francisco",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Denver",
+      "citySlug": "denver",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Katy",
+      "citySlug": "katy",
+      "count": 4,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Chicago",
+      "citySlug": "chicago",
+      "count": 3,
+      "country": "US"
+    },
+    {
+      "treatment": "hydration",
+      "city": "Kansas City",
+      "citySlug": "kansas-city",
+      "count": 10,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Toronto",
+      "citySlug": "toronto",
+      "count": 16,
+      "country": "CA"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Vancouver",
+      "citySlug": "vancouver",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Calgary",
+      "citySlug": "calgary",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Ottawa",
+      "citySlug": "ottawa",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Mississauga",
+      "citySlug": "mississauga",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Richmond Hill",
+      "citySlug": "richmond-hill",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "North York",
+      "citySlug": "north-york",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Oakville",
+      "citySlug": "oakville",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Edmonton",
+      "citySlug": "edmonton",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Montreal",
+      "citySlug": "montreal",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Quebec City",
+      "citySlug": "quebec-city",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Winnipeg",
+      "citySlug": "winnipeg",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Halifax",
+      "citySlug": "halifax",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Victoria",
+      "citySlug": "victoria",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Kelowna",
+      "citySlug": "kelowna",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Red Deer",
+      "citySlug": "red-deer",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "New York",
+      "citySlug": "new-york",
+      "count": 3,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Dallas",
+      "citySlug": "dallas",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Tampa",
+      "citySlug": "tampa",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Atlanta",
+      "citySlug": "atlanta",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Houston",
+      "citySlug": "houston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Phoenix",
+      "citySlug": "phoenix",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "San Diego",
+      "citySlug": "san-diego",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Washington",
+      "citySlug": "washington",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Boston",
+      "citySlug": "boston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Los Angeles",
+      "citySlug": "los-angeles",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Clearwater",
+      "citySlug": "clearwater",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Las Vegas",
+      "citySlug": "las-vegas",
+      "count": 12,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Philadelphia",
+      "citySlug": "philadelphia",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Miami",
+      "citySlug": "miami",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Austin",
+      "citySlug": "austin",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "San Francisco",
+      "citySlug": "san-francisco",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Denver",
+      "citySlug": "denver",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Katy",
+      "citySlug": "katy",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Chicago",
+      "citySlug": "chicago",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "nad-plus",
+      "city": "Kansas City",
+      "citySlug": "kansas-city",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Toronto",
+      "citySlug": "toronto",
+      "count": 8,
+      "country": "CA"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Vancouver",
+      "citySlug": "vancouver",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Calgary",
+      "citySlug": "calgary",
+      "count": 3,
+      "country": "CA"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Ottawa",
+      "citySlug": "ottawa",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Mississauga",
+      "citySlug": "mississauga",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Richmond Hill",
+      "citySlug": "richmond-hill",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "North York",
+      "citySlug": "north-york",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Oakville",
+      "citySlug": "oakville",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Edmonton",
+      "citySlug": "edmonton",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Montreal",
+      "citySlug": "montreal",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Quebec City",
+      "citySlug": "quebec-city",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Winnipeg",
+      "citySlug": "winnipeg",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Halifax",
+      "citySlug": "halifax",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Victoria",
+      "citySlug": "victoria",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Kelowna",
+      "citySlug": "kelowna",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Red Deer",
+      "citySlug": "red-deer",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "New York",
+      "citySlug": "new-york",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Dallas",
+      "citySlug": "dallas",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Tampa",
+      "citySlug": "tampa",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Atlanta",
+      "citySlug": "atlanta",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Houston",
+      "citySlug": "houston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Phoenix",
+      "citySlug": "phoenix",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "San Diego",
+      "citySlug": "san-diego",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Washington",
+      "citySlug": "washington",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Boston",
+      "citySlug": "boston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Los Angeles",
+      "citySlug": "los-angeles",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Clearwater",
+      "citySlug": "clearwater",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Las Vegas",
+      "citySlug": "las-vegas",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Philadelphia",
+      "citySlug": "philadelphia",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Miami",
+      "citySlug": "miami",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Austin",
+      "citySlug": "austin",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "San Francisco",
+      "citySlug": "san-francisco",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Denver",
+      "citySlug": "denver",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Katy",
+      "citySlug": "katy",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Chicago",
+      "citySlug": "chicago",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "myers-cocktail",
+      "city": "Kansas City",
+      "citySlug": "kansas-city",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Toronto",
+      "citySlug": "toronto",
+      "count": 3,
+      "country": "CA"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Vancouver",
+      "citySlug": "vancouver",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Calgary",
+      "citySlug": "calgary",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Ottawa",
+      "citySlug": "ottawa",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Mississauga",
+      "citySlug": "mississauga",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Richmond Hill",
+      "citySlug": "richmond-hill",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "North York",
+      "citySlug": "north-york",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Oakville",
+      "citySlug": "oakville",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Edmonton",
+      "citySlug": "edmonton",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Montreal",
+      "citySlug": "montreal",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Quebec City",
+      "citySlug": "quebec-city",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Winnipeg",
+      "citySlug": "winnipeg",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Halifax",
+      "citySlug": "halifax",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Victoria",
+      "citySlug": "victoria",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Kelowna",
+      "citySlug": "kelowna",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Red Deer",
+      "citySlug": "red-deer",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "New York",
+      "citySlug": "new-york",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Dallas",
+      "citySlug": "dallas",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Tampa",
+      "citySlug": "tampa",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Atlanta",
+      "citySlug": "atlanta",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Houston",
+      "citySlug": "houston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Phoenix",
+      "citySlug": "phoenix",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "San Diego",
+      "citySlug": "san-diego",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Washington",
+      "citySlug": "washington",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Boston",
+      "citySlug": "boston",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Los Angeles",
+      "citySlug": "los-angeles",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Clearwater",
+      "citySlug": "clearwater",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Las Vegas",
+      "citySlug": "las-vegas",
+      "count": 8,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Philadelphia",
+      "citySlug": "philadelphia",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Miami",
+      "citySlug": "miami",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Austin",
+      "citySlug": "austin",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "San Francisco",
+      "citySlug": "san-francisco",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Denver",
+      "citySlug": "denver",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Katy",
+      "citySlug": "katy",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Chicago",
+      "citySlug": "chicago",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "hangover-recovery",
+      "city": "Kansas City",
+      "citySlug": "kansas-city",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Toronto",
+      "citySlug": "toronto",
+      "count": 39,
+      "country": "CA"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Vancouver",
+      "citySlug": "vancouver",
+      "count": 4,
+      "country": "CA"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Calgary",
+      "citySlug": "calgary",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Ottawa",
+      "citySlug": "ottawa",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Mississauga",
+      "citySlug": "mississauga",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Richmond Hill",
+      "citySlug": "richmond-hill",
+      "count": 3,
+      "country": "CA"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "North York",
+      "citySlug": "north-york",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Oakville",
+      "citySlug": "oakville",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Edmonton",
+      "citySlug": "edmonton",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Montreal",
+      "citySlug": "montreal",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Quebec City",
+      "citySlug": "quebec-city",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Winnipeg",
+      "citySlug": "winnipeg",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Halifax",
+      "citySlug": "halifax",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Victoria",
+      "citySlug": "victoria",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Kelowna",
+      "citySlug": "kelowna",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Red Deer",
+      "citySlug": "red-deer",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "New York",
+      "citySlug": "new-york",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Dallas",
+      "citySlug": "dallas",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Tampa",
+      "citySlug": "tampa",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Atlanta",
+      "citySlug": "atlanta",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Houston",
+      "citySlug": "houston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Phoenix",
+      "citySlug": "phoenix",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "San Diego",
+      "citySlug": "san-diego",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Washington",
+      "citySlug": "washington",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Boston",
+      "citySlug": "boston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Los Angeles",
+      "citySlug": "los-angeles",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Clearwater",
+      "citySlug": "clearwater",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Las Vegas",
+      "citySlug": "las-vegas",
+      "count": 5,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Philadelphia",
+      "citySlug": "philadelphia",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Miami",
+      "citySlug": "miami",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Austin",
+      "citySlug": "austin",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "San Francisco",
+      "citySlug": "san-francisco",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Denver",
+      "citySlug": "denver",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Katy",
+      "citySlug": "katy",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Chicago",
+      "citySlug": "chicago",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "immune-support",
+      "city": "Kansas City",
+      "citySlug": "kansas-city",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Toronto",
+      "citySlug": "toronto",
+      "count": 27,
+      "country": "CA"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Vancouver",
+      "citySlug": "vancouver",
+      "count": 3,
+      "country": "CA"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Calgary",
+      "citySlug": "calgary",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Ottawa",
+      "citySlug": "ottawa",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Mississauga",
+      "citySlug": "mississauga",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Richmond Hill",
+      "citySlug": "richmond-hill",
+      "count": 4,
+      "country": "CA"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "North York",
+      "citySlug": "north-york",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Oakville",
+      "citySlug": "oakville",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Edmonton",
+      "citySlug": "edmonton",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Montreal",
+      "citySlug": "montreal",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Quebec City",
+      "citySlug": "quebec-city",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Winnipeg",
+      "citySlug": "winnipeg",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Halifax",
+      "citySlug": "halifax",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Victoria",
+      "citySlug": "victoria",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Kelowna",
+      "citySlug": "kelowna",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Red Deer",
+      "citySlug": "red-deer",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "New York",
+      "citySlug": "new-york",
+      "count": 3,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Dallas",
+      "citySlug": "dallas",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Tampa",
+      "citySlug": "tampa",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Atlanta",
+      "citySlug": "atlanta",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Houston",
+      "citySlug": "houston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Phoenix",
+      "citySlug": "phoenix",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "San Diego",
+      "citySlug": "san-diego",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Washington",
+      "citySlug": "washington",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Boston",
+      "citySlug": "boston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Los Angeles",
+      "citySlug": "los-angeles",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Clearwater",
+      "citySlug": "clearwater",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Las Vegas",
+      "citySlug": "las-vegas",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Philadelphia",
+      "citySlug": "philadelphia",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Miami",
+      "citySlug": "miami",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Austin",
+      "citySlug": "austin",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "San Francisco",
+      "citySlug": "san-francisco",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Denver",
+      "citySlug": "denver",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Katy",
+      "citySlug": "katy",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Chicago",
+      "citySlug": "chicago",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "beauty-glow",
+      "city": "Kansas City",
+      "citySlug": "kansas-city",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Toronto",
+      "citySlug": "toronto",
+      "count": 10,
+      "country": "CA"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Vancouver",
+      "citySlug": "vancouver",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Calgary",
+      "citySlug": "calgary",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Ottawa",
+      "citySlug": "ottawa",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Mississauga",
+      "citySlug": "mississauga",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Richmond Hill",
+      "citySlug": "richmond-hill",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "North York",
+      "citySlug": "north-york",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Oakville",
+      "citySlug": "oakville",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Edmonton",
+      "citySlug": "edmonton",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Montreal",
+      "citySlug": "montreal",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Quebec City",
+      "citySlug": "quebec-city",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Winnipeg",
+      "citySlug": "winnipeg",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Halifax",
+      "citySlug": "halifax",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Victoria",
+      "citySlug": "victoria",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Kelowna",
+      "citySlug": "kelowna",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Red Deer",
+      "citySlug": "red-deer",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "New York",
+      "citySlug": "new-york",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Dallas",
+      "citySlug": "dallas",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Tampa",
+      "citySlug": "tampa",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Atlanta",
+      "citySlug": "atlanta",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Houston",
+      "citySlug": "houston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Phoenix",
+      "citySlug": "phoenix",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "San Diego",
+      "citySlug": "san-diego",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Washington",
+      "citySlug": "washington",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Boston",
+      "citySlug": "boston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Los Angeles",
+      "citySlug": "los-angeles",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Clearwater",
+      "citySlug": "clearwater",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Las Vegas",
+      "citySlug": "las-vegas",
+      "count": 4,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Philadelphia",
+      "citySlug": "philadelphia",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Miami",
+      "citySlug": "miami",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Austin",
+      "citySlug": "austin",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "San Francisco",
+      "citySlug": "san-francisco",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Denver",
+      "citySlug": "denver",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Katy",
+      "citySlug": "katy",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Chicago",
+      "citySlug": "chicago",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "athletic-recovery",
+      "city": "Kansas City",
+      "citySlug": "kansas-city",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Toronto",
+      "citySlug": "toronto",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Vancouver",
+      "citySlug": "vancouver",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Calgary",
+      "citySlug": "calgary",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Ottawa",
+      "citySlug": "ottawa",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Mississauga",
+      "citySlug": "mississauga",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Richmond Hill",
+      "citySlug": "richmond-hill",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "North York",
+      "citySlug": "north-york",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Oakville",
+      "citySlug": "oakville",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Edmonton",
+      "citySlug": "edmonton",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Montreal",
+      "citySlug": "montreal",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Quebec City",
+      "citySlug": "quebec-city",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Winnipeg",
+      "citySlug": "winnipeg",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Halifax",
+      "citySlug": "halifax",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Victoria",
+      "citySlug": "victoria",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Kelowna",
+      "citySlug": "kelowna",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Red Deer",
+      "citySlug": "red-deer",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "New York",
+      "citySlug": "new-york",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Dallas",
+      "citySlug": "dallas",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Tampa",
+      "citySlug": "tampa",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Atlanta",
+      "citySlug": "atlanta",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Houston",
+      "citySlug": "houston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Phoenix",
+      "citySlug": "phoenix",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "San Diego",
+      "citySlug": "san-diego",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Washington",
+      "citySlug": "washington",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Boston",
+      "citySlug": "boston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Los Angeles",
+      "citySlug": "los-angeles",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Clearwater",
+      "citySlug": "clearwater",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Las Vegas",
+      "citySlug": "las-vegas",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Philadelphia",
+      "citySlug": "philadelphia",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Miami",
+      "citySlug": "miami",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Austin",
+      "citySlug": "austin",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "San Francisco",
+      "citySlug": "san-francisco",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Denver",
+      "citySlug": "denver",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Katy",
+      "citySlug": "katy",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Chicago",
+      "citySlug": "chicago",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "mobile-iv",
+      "city": "Kansas City",
+      "citySlug": "kansas-city",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Toronto",
+      "citySlug": "toronto",
+      "count": 4,
+      "country": "CA"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Vancouver",
+      "citySlug": "vancouver",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Calgary",
+      "citySlug": "calgary",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Ottawa",
+      "citySlug": "ottawa",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Mississauga",
+      "citySlug": "mississauga",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Richmond Hill",
+      "citySlug": "richmond-hill",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "North York",
+      "citySlug": "north-york",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Oakville",
+      "citySlug": "oakville",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Edmonton",
+      "citySlug": "edmonton",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Montreal",
+      "citySlug": "montreal",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Quebec City",
+      "citySlug": "quebec-city",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Winnipeg",
+      "citySlug": "winnipeg",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Halifax",
+      "citySlug": "halifax",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Victoria",
+      "citySlug": "victoria",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Kelowna",
+      "citySlug": "kelowna",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Red Deer",
+      "citySlug": "red-deer",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "New York",
+      "citySlug": "new-york",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Dallas",
+      "citySlug": "dallas",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Tampa",
+      "citySlug": "tampa",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Atlanta",
+      "citySlug": "atlanta",
+      "count": 3,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Houston",
+      "citySlug": "houston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Phoenix",
+      "citySlug": "phoenix",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "San Diego",
+      "citySlug": "san-diego",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Washington",
+      "citySlug": "washington",
+      "count": 7,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Boston",
+      "citySlug": "boston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Los Angeles",
+      "citySlug": "los-angeles",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Clearwater",
+      "citySlug": "clearwater",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Las Vegas",
+      "citySlug": "las-vegas",
+      "count": 5,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Philadelphia",
+      "citySlug": "philadelphia",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Miami",
+      "citySlug": "miami",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Austin",
+      "citySlug": "austin",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "San Francisco",
+      "citySlug": "san-francisco",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Denver",
+      "citySlug": "denver",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Katy",
+      "citySlug": "katy",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Chicago",
+      "citySlug": "chicago",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "weight-loss",
+      "city": "Kansas City",
+      "citySlug": "kansas-city",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Toronto",
+      "citySlug": "toronto",
+      "count": 8,
+      "country": "CA"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Vancouver",
+      "citySlug": "vancouver",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Calgary",
+      "citySlug": "calgary",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Ottawa",
+      "citySlug": "ottawa",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Mississauga",
+      "citySlug": "mississauga",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Richmond Hill",
+      "citySlug": "richmond-hill",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "North York",
+      "citySlug": "north-york",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Oakville",
+      "citySlug": "oakville",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Edmonton",
+      "citySlug": "edmonton",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Montreal",
+      "citySlug": "montreal",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Quebec City",
+      "citySlug": "quebec-city",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Winnipeg",
+      "citySlug": "winnipeg",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Halifax",
+      "citySlug": "halifax",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Victoria",
+      "citySlug": "victoria",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Kelowna",
+      "citySlug": "kelowna",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Red Deer",
+      "citySlug": "red-deer",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "New York",
+      "citySlug": "new-york",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Dallas",
+      "citySlug": "dallas",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Tampa",
+      "citySlug": "tampa",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Atlanta",
+      "citySlug": "atlanta",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Houston",
+      "citySlug": "houston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Phoenix",
+      "citySlug": "phoenix",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "San Diego",
+      "citySlug": "san-diego",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Washington",
+      "citySlug": "washington",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Boston",
+      "citySlug": "boston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Los Angeles",
+      "citySlug": "los-angeles",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Clearwater",
+      "citySlug": "clearwater",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Las Vegas",
+      "citySlug": "las-vegas",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Philadelphia",
+      "citySlug": "philadelphia",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Miami",
+      "citySlug": "miami",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Austin",
+      "citySlug": "austin",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "San Francisco",
+      "citySlug": "san-francisco",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Denver",
+      "citySlug": "denver",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Katy",
+      "citySlug": "katy",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Chicago",
+      "citySlug": "chicago",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "vitamin-c",
+      "city": "Kansas City",
+      "citySlug": "kansas-city",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Toronto",
+      "citySlug": "toronto",
+      "count": 7,
+      "country": "CA"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Vancouver",
+      "citySlug": "vancouver",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Calgary",
+      "citySlug": "calgary",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Ottawa",
+      "citySlug": "ottawa",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Mississauga",
+      "citySlug": "mississauga",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Richmond Hill",
+      "citySlug": "richmond-hill",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "North York",
+      "citySlug": "north-york",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Oakville",
+      "citySlug": "oakville",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Edmonton",
+      "citySlug": "edmonton",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Montreal",
+      "citySlug": "montreal",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Quebec City",
+      "citySlug": "quebec-city",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Winnipeg",
+      "citySlug": "winnipeg",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Halifax",
+      "citySlug": "halifax",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Victoria",
+      "citySlug": "victoria",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Kelowna",
+      "citySlug": "kelowna",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Red Deer",
+      "citySlug": "red-deer",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "New York",
+      "citySlug": "new-york",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Dallas",
+      "citySlug": "dallas",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Tampa",
+      "citySlug": "tampa",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Atlanta",
+      "citySlug": "atlanta",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Houston",
+      "citySlug": "houston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Phoenix",
+      "citySlug": "phoenix",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "San Diego",
+      "citySlug": "san-diego",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Washington",
+      "citySlug": "washington",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Boston",
+      "citySlug": "boston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Los Angeles",
+      "citySlug": "los-angeles",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Clearwater",
+      "citySlug": "clearwater",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Las Vegas",
+      "citySlug": "las-vegas",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Philadelphia",
+      "citySlug": "philadelphia",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Miami",
+      "citySlug": "miami",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Austin",
+      "citySlug": "austin",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "San Francisco",
+      "citySlug": "san-francisco",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Denver",
+      "citySlug": "denver",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Katy",
+      "citySlug": "katy",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Chicago",
+      "citySlug": "chicago",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "glutathione",
+      "city": "Kansas City",
+      "citySlug": "kansas-city",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Toronto",
+      "citySlug": "toronto",
+      "count": 5,
+      "country": "CA"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Vancouver",
+      "citySlug": "vancouver",
+      "count": 4,
+      "country": "CA"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Calgary",
+      "citySlug": "calgary",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Ottawa",
+      "citySlug": "ottawa",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Mississauga",
+      "citySlug": "mississauga",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Richmond Hill",
+      "citySlug": "richmond-hill",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "North York",
+      "citySlug": "north-york",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Oakville",
+      "citySlug": "oakville",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Edmonton",
+      "citySlug": "edmonton",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Montreal",
+      "citySlug": "montreal",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Quebec City",
+      "citySlug": "quebec-city",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Winnipeg",
+      "citySlug": "winnipeg",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Halifax",
+      "citySlug": "halifax",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Victoria",
+      "citySlug": "victoria",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Kelowna",
+      "citySlug": "kelowna",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Red Deer",
+      "citySlug": "red-deer",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "New York",
+      "citySlug": "new-york",
+      "count": 4,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Dallas",
+      "citySlug": "dallas",
+      "count": 6,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Tampa",
+      "citySlug": "tampa",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Atlanta",
+      "citySlug": "atlanta",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Houston",
+      "citySlug": "houston",
+      "count": 4,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Phoenix",
+      "citySlug": "phoenix",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "San Diego",
+      "citySlug": "san-diego",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Washington",
+      "citySlug": "washington",
+      "count": 5,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Boston",
+      "citySlug": "boston",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Los Angeles",
+      "citySlug": "los-angeles",
+      "count": 2,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Clearwater",
+      "citySlug": "clearwater",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Las Vegas",
+      "citySlug": "las-vegas",
+      "count": 3,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Philadelphia",
+      "citySlug": "philadelphia",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Miami",
+      "citySlug": "miami",
+      "count": 5,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Austin",
+      "citySlug": "austin",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "San Francisco",
+      "citySlug": "san-francisco",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Denver",
+      "citySlug": "denver",
+      "count": 6,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Katy",
+      "citySlug": "katy",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Chicago",
+      "citySlug": "chicago",
+      "count": 5,
+      "country": "US"
+    },
+    {
+      "treatment": "glp-1-weight-loss",
+      "city": "Kansas City",
+      "citySlug": "kansas-city",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Toronto",
+      "citySlug": "toronto",
+      "count": 3,
+      "country": "CA"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Vancouver",
+      "citySlug": "vancouver",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Calgary",
+      "citySlug": "calgary",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Ottawa",
+      "citySlug": "ottawa",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Mississauga",
+      "citySlug": "mississauga",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Richmond Hill",
+      "citySlug": "richmond-hill",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "North York",
+      "citySlug": "north-york",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Oakville",
+      "citySlug": "oakville",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Edmonton",
+      "citySlug": "edmonton",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Montreal",
+      "citySlug": "montreal",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Quebec City",
+      "citySlug": "quebec-city",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Winnipeg",
+      "citySlug": "winnipeg",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Halifax",
+      "citySlug": "halifax",
+      "count": 1,
+      "country": "CA"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Victoria",
+      "citySlug": "victoria",
+      "count": 2,
+      "country": "CA"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Kelowna",
+      "citySlug": "kelowna",
+      "count": 3,
+      "country": "CA"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Red Deer",
+      "citySlug": "red-deer",
+      "count": 0,
+      "country": "CA"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "New York",
+      "citySlug": "new-york",
+      "count": 47,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Dallas",
+      "citySlug": "dallas",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Tampa",
+      "citySlug": "tampa",
+      "count": 6,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Atlanta",
+      "citySlug": "atlanta",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Houston",
+      "citySlug": "houston",
+      "count": 8,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Phoenix",
+      "citySlug": "phoenix",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "San Diego",
+      "citySlug": "san-diego",
+      "count": 7,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Washington",
+      "citySlug": "washington",
+      "count": 15,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Boston",
+      "citySlug": "boston",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Los Angeles",
+      "citySlug": "los-angeles",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Clearwater",
+      "citySlug": "clearwater",
+      "count": 28,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Las Vegas",
+      "citySlug": "las-vegas",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Philadelphia",
+      "citySlug": "philadelphia",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Miami",
+      "citySlug": "miami",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Austin",
+      "citySlug": "austin",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "San Francisco",
+      "citySlug": "san-francisco",
+      "count": 1,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Denver",
+      "citySlug": "denver",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Katy",
+      "citySlug": "katy",
+      "count": 3,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Chicago",
+      "citySlug": "chicago",
+      "count": 0,
+      "country": "US"
+    },
+    {
+      "treatment": "iron-infusion",
+      "city": "Kansas City",
+      "citySlug": "kansas-city",
+      "count": 10,
+      "country": "US"
+    }
+  ]
+}
