@@ -49,6 +49,15 @@ Run e2e test after ANY changes to claim flow
 $10,000/month by November 20 2026
 Full details in GOAL.md and DAILY_CHECKLIST.md
 
+## Standing Decisions
+- **Peptides: parked, not promoted, not purged (2026-06-06).** Do not build or
+  restore any peptide category, peptide treatment pages, peptide nav links, or
+  peptide-specific content/positioning. But also do not hide, delete, or strip
+  existing provider listings on peptide grounds. The is_hidden column added
+  during the 2026-06-05 peptide decommission is kept but every provider is
+  is_hidden=false; the 19 hybrids cleaned during Phase 1/1b stay cleaned (those
+  changes were operator-greenlit independent of the hide decision).
+
 ## Today's Hard Lessons
 - Invalid vercel.json property blocked all deploys for 1 hour
 - claim_requests FK pointed to wrong table - broke Kia's claim
