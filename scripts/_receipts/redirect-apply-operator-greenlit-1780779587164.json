@@ -1,0 +1,31 @@
+{
+  "phase": "redirect-apply-operator-greenlit",
+  "timestamp": "2026-06-06T20:59:44.822Z",
+  "updated": [
+    {
+      "slug": "modern-laser-medispa-moncton",
+      "before": "https://modernlaser.ca",
+      "after": "https://modernskin.ca/"
+    },
+    {
+      "slug": "radiance-east-bay-aesthetics-pleasanton",
+      "before": "https://www.radiancewellnessandaesthetics.com/",
+      "after": "https://radianceeastbay.com/"
+    },
+    {
+      "slug": "san-diego-iv-mobile-iv-therapy-san-diego",
+      "before": "https://www.sdivservice.com/",
+      "after": "https://www.sandiegoiv.com/"
+    },
+    {
+      "slug": "thrive-wellness-center-sioux-city",
+      "before": "https://www.thrivewellnesscenter.net/",
+      "after": "https://thriveforlife.us/"
+    },
+    {
+      "slug": "thrive-natural-health-selkirk-naturopathic-maple-ridge",
+      "before": "https://selkirkclinic.com",
+      "after": "https://thrivenaturalhealth.ca/"
+    }
+  ]
+}

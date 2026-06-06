@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Loader2, Mail, Star, Clock, Link as LinkIcon } from 'lucide-react';
+import { Loader2, Mail, Star, Clock, Link as LinkIcon, Search } from 'lucide-react';
 
 type RegenerateRecipient = {
   email: string;
@@ -70,11 +70,23 @@ type EnrichHoursResponse = { ok: boolean; totalConsidered?: number; filled?: num
 type Rescue404Row = { slug: string; name: string; city: string | null; beforeUrl: string | null; afterUrl: string | null; status: string };
 type Rescue404Response = { ok: boolean; total?: number; updated?: number; noListing?: number; rows?: Rescue404Row[]; offset?: number; limit?: number; nextOffset?: number | null; totalCandidates?: number; error?: string };
 
+type InspectRow = {
+  slug: string;
+  name: string;
+  listedCity: string | null;
+  listedWebsite: string | null;
+  places: null | { name: string | null; address: string | null; types: string[]; business_status: string | null; website: string | null; phone: string | null; place_id: string | null; rating: number | null; user_ratings_total: number | null; cityMatch: boolean; looksLikeIvClinic: boolean };
+  verdict: string;
+  notes: string[];
+};
+type InspectResponse = { ok: boolean; rows?: InspectRow[]; error?: string };
+
 export function AdminToolsClient() {
   const [draftsState, setDraftsState] = useState<ButtonState<RegenerateResponse>>({ loading: false, result: null, error: null });
   const [ratingsState, setRatingsState] = useState<ButtonState<RefreshResponse>>({ loading: false, result: null, error: null });
   const [hoursState, setHoursState] = useState<ButtonState<EnrichHoursResponse>>({ loading: false, result: null, error: null });
   const [rescueState, setRescueState] = useState<ButtonState<Rescue404Response>>({ loading: false, result: null, error: null });
+  const [inspectState, setInspectState] = useState<ButtonState<InspectResponse>>({ loading: false, result: null, error: null });
 
   const generateDrafts = async () => {
     setDraftsState({ loading: true, result: null, error: null });
@@ -121,6 +133,18 @@ export function AdminToolsClient() {
       }
     } catch (err) {
       setRescueState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
+    }
+  };
+
+  const inspectHeld = async () => {
+    setInspectState({ loading: true, result: null, error: null });
+    try {
+      const r = await fetch('/api/admin/places-inspect', { method: 'POST' });
+      const data = (await r.json()) as InspectResponse;
+      if (!r.ok) setInspectState({ loading: false, result: null, error: data.error || `HTTP ${r.status}` });
+      else setInspectState({ loading: false, result: data, error: null });
+    } catch (err) {
+      setInspectState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
     }
   };
 
@@ -354,6 +378,61 @@ export function AdminToolsClient() {
                 </li>
               ))}
             </ul>
+          </div>
+        )}
+      </Card>
+
+      <Card
+        title="Inspect 3 held redirects (research only, no writes)"
+        description="puredropiv-washington (acquired by Baseline), one-iv-hydration-and-medspa-riverview (TRT brand redirect), drip-suites-birmingham (dead JaneApp link). Looks each up by name + city on Google Places and reports: name, address, business status, types, current website. Nothing is updated."
+        icon={<Search size={18} />}
+      >
+        <button
+          type="button"
+          onClick={inspectHeld}
+          disabled={inspectState.loading}
+          className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
+        >
+          {inspectState.loading ? (<><Loader2 size={16} className="animate-spin" />Looking up on Places…</>) : 'Inspect 3 held clinics'}
+        </button>
+        {inspectState.error && (
+          <div className="mt-5 px-4 py-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm font-bold">Error: {inspectState.error}</div>
+        )}
+        {inspectState.result && (
+          <div className="mt-5 space-y-4">
+            {(inspectState.result.rows || []).map((r) => (
+              <div key={r.slug} className="border border-slate-200 rounded-2xl p-5 bg-slate-50/40">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className={'text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ' + (
+                    r.verdict === 'keep_iv_clinic' ? 'bg-emerald-100 text-emerald-800' :
+                    r.verdict === 'maybe_not_iv' ? 'bg-amber-100 text-amber-800' :
+                    r.verdict === 'closed' ? 'bg-rose-100 text-rose-800' :
+                    'bg-slate-100 text-slate-700'
+                  )}>{r.verdict.replace(/_/g, ' ')}</span>
+                  <span className="font-black text-slate-900">{r.name}</span>
+                  <span className="text-xs text-slate-500">{r.listedCity}</span>
+                </div>
+                <div className="text-xs text-slate-500 mb-2"><strong>Listed website:</strong> {r.listedWebsite || '(none)'}</div>
+                {r.places ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1.5 text-xs text-slate-700">
+                    <div><strong>Places name:</strong> {r.places.name || '–'}</div>
+                    <div><strong>Status:</strong> {r.places.business_status || '–'}</div>
+                    <div className="md:col-span-2"><strong>Address:</strong> {r.places.address || '–'}</div>
+                    <div className="md:col-span-2"><strong>Website on Places:</strong> {r.places.website || '–'}</div>
+                    <div><strong>Phone:</strong> {r.places.phone || '–'}</div>
+                    <div><strong>Rating:</strong> {r.places.rating ?? '–'} ({r.places.user_ratings_total ?? 0} reviews)</div>
+                    <div className="md:col-span-2"><strong>Types:</strong> {r.places.types.join(', ') || '–'}</div>
+                  </div>
+                ) : (
+                  <div className="text-xs text-rose-700 font-bold">No Google Places result.</div>
+                )}
+                {r.notes.length > 0 && (
+                  <ul className="mt-3 text-xs text-amber-800 list-disc pl-5 space-y-1">
+                    {r.notes.map((n, i) => <li key={i}>{n}</li>)}
+                  </ul>
+                )}
+              </div>
+            ))}
           </div>
         )}
       </Card>
