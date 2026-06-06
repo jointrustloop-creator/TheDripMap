@@ -1,0 +1,191 @@
+{
+  "phase": "redirect-apply-safe",
+  "timestamp": "2026-06-06T20:36:31.627Z",
+  "updated": [
+    {
+      "slug": "reviv-miami-brickell-miami",
+      "before": "https://go.revivme.com/miami-brickell",
+      "after": "https://www.revivme.com/",
+      "reason": "same brand token (revivme <-> revivme)"
+    },
+    {
+      "slug": "durand-integrated-health-group-hamilton",
+      "before": "https://durandhealth.com",
+      "after": "https://www.durand.clinic/",
+      "reason": "same brand token (durandhealth <-> durand)"
+    },
+    {
+      "slug": "live-hydration-spa-old-market-omaha",
+      "before": "https://livehydrationspa.com/locations/old-market-omaha-ne/",
+      "after": "https://locations.livehydrationspa.com/ne/omaha/old-market.html",
+      "reason": "same brand token (livehydrationspa <-> livehydrationspa)"
+    },
+    {
+      "slug": "live-hydration-spa-vintage-park-houston",
+      "before": "https://www.livehydrationspa.com/location/vintage-park",
+      "after": "https://locations.livehydrationspa.com/tx/houston/vintage-park.html",
+      "reason": "same brand token (livehydrationspa <-> livehydrationspa)"
+    },
+    {
+      "slug": "bronte-wellness-oakville",
+      "before": "https://brontewellness.ca",
+      "after": "https://www.brontewellness.com/",
+      "reason": ".ca/.com variant on same brand"
+    },
+    {
+      "slug": "root-cause-medical-clinic-clearwater",
+      "before": "https://rootcausemedicalclinic.com/",
+      "after": "https://rootcausemedicalclinics.com/",
+      "reason": "same brand token (rootcausemedicalclinic <-> rootcausemedicalclinics)"
+    },
+    {
+      "slug": "physicians-wellness-clearwater",
+      "before": "https://rymaps.xyz/business/physicians-wellness-86l5xa",
+      "after": "https://rymaps.com/business/physicians-wellness-86l5xa",
+      "reason": "same brand token (rymaps <-> rymaps)"
+    },
+    {
+      "slug": "live-hydration-spa-franchise-elkhorn",
+      "before": "http://www.livehydrationspafranchise.com/",
+      "after": "https://livehydrationspa.com/franchise-opportunities/",
+      "reason": "same brand token (livehydrationspafranchise <-> livehydrationspa)"
+    },
+    {
+      "slug": "elysian-wellness-centre-hunt-club-ottawa",
+      "before": "https://elysianwellnesscentre.com",
+      "after": "https://elysianwellnesscentre.ca/",
+      "reason": ".ca/.com variant on same brand"
+    },
+    {
+      "slug": "pure-infusion-suites-of-fresno-fresno",
+      "before": "https://pureinfusionsuites.com/locations/fresno/",
+      "after": "https://pureinfusion.com/locations/",
+      "reason": "same brand token (pureinfusionsuites <-> pureinfusion)"
+    },
+    {
+      "slug": "enhanced-body-medical-dunedin",
+      "before": "https://www.enhancebodymedical.com/",
+      "after": "https://enhancedbodymedical.com/",
+      "reason": "operator example: typo fix"
+    }
+  ],
+  "judgment": [
+    {
+      "slug": "modern-laser-medispa-moncton",
+      "name": "Modern Laser Medispa",
+      "city": "Moncton",
+      "country": "Canada",
+      "is_claimed": false,
+      "website": "https://modernlaser.ca",
+      "verdict": "redirect_off_domain",
+      "status": 200,
+      "reason": "expected=modernlaser.ca final=modernskin.ca",
+      "finalUrl": "https://modernskin.ca/",
+      "_reason": "brand mismatch modernlaser -> modernskin"
+    },
+    {
+      "slug": "puredropiv-washington",
+      "name": "PureDropIV",
+      "city": "Washington",
+      "country": "United States",
+      "is_claimed": false,
+      "website": "https://puredropiv.com/washington-dc/",
+      "verdict": "redirect_off_domain",
+      "status": 200,
+      "reason": "expected=puredropiv.com final=baselinemedical.com",
+      "finalUrl": "https://baselinemedical.com/service-area",
+      "_reason": "brand mismatch puredropiv -> baselinemedical"
+    },
+    {
+      "slug": "radiance-east-bay-aesthetics-pleasanton",
+      "name": "Radiance East Bay Aesthetics",
+      "city": "Pleasanton",
+      "country": "United States",
+      "is_claimed": false,
+      "website": "https://www.radiancewellnessandaesthetics.com/",
+      "verdict": "redirect_off_domain",
+      "status": 200,
+      "reason": "expected=radiancewellnessandaesthetics.com final=radianceeastbay.com",
+      "finalUrl": "https://radianceeastbay.com/",
+      "_reason": "brand mismatch radiancewellnessandaesthetics -> radianceeastbay"
+    },
+    {
+      "slug": "san-diego-iv-mobile-iv-therapy-san-diego",
+      "name": "San Diego IV | Mobile IV Therapy",
+      "city": "San Diego",
+      "country": "United States",
+      "is_claimed": false,
+      "website": "https://www.sdivservice.com/",
+      "verdict": "redirect_off_domain",
+      "status": 200,
+      "reason": "expected=sdivservice.com final=sandiegoiv.com",
+      "finalUrl": "https://www.sandiegoiv.com/",
+      "_reason": "brand mismatch sdivservice -> sandiegoiv"
+    },
+    {
+      "slug": "thrive-wellness-center-sioux-city",
+      "name": "Thrive Wellness Center",
+      "city": "Sioux City",
+      "country": "United States",
+      "is_claimed": false,
+      "website": "https://www.thrivewellnesscenter.net/",
+      "verdict": "redirect_off_domain",
+      "status": 200,
+      "reason": "expected=thrivewellnesscenter.net final=thriveforlife.us",
+      "finalUrl": "https://thriveforlife.us/",
+      "_reason": "brand mismatch thrivewellnesscenter -> thriveforlife"
+    },
+    {
+      "slug": "one-iv-hydration-and-medspa-riverview",
+      "name": "ONE IV hydration and medspa",
+      "city": "Riverview",
+      "country": "United States",
+      "is_claimed": false,
+      "website": "http://oneivmedspa.com/",
+      "verdict": "redirect_off_domain",
+      "status": 200,
+      "reason": "expected=oneivmedspa.com final=usatrtcenter.com",
+      "finalUrl": "https://usatrtcenter.com/?utm_source=oneivmedspa.com",
+      "_reason": "brand mismatch oneivmedspa -> usatrtcenter"
+    },
+    {
+      "slug": "thrive-natural-health-selkirk-naturopathic-maple-ridge",
+      "name": "Thrive Natural Health (Selkirk Naturopathic)",
+      "city": "Maple Ridge",
+      "country": "Canada",
+      "is_claimed": false,
+      "website": "https://selkirkclinic.com",
+      "verdict": "redirect_off_domain",
+      "status": 200,
+      "reason": "expected=selkirkclinic.com final=thrivenaturalhealth.ca",
+      "finalUrl": "https://thrivenaturalhealth.ca/",
+      "_reason": "brand mismatch selkirkclinic -> thrivenaturalhealth"
+    },
+    {
+      "slug": "drip-suites-birmingham",
+      "name": "Drip Suites",
+      "city": "Birmingham",
+      "country": "United States",
+      "is_claimed": false,
+      "website": "http://www.dripsuites.janeapp.com/",
+      "verdict": "redirect_off_domain",
+      "status": 200,
+      "reason": "expected=dripsuites.janeapp.com final=accounts.janeapp.com",
+      "finalUrl": "https://accounts.janeapp.com/lookup",
+      "_reason": "brand mismatch dripsuites -> accounts"
+    },
+    {
+      "slug": "duo-wellness-rejuvenation-washington",
+      "name": "Duo Wellness Rejuvenation",
+      "city": "Washington",
+      "country": "United States",
+      "is_claimed": false,
+      "website": "https://www.duowellnessrejuvenation.com/",
+      "verdict": "redirect_off_domain",
+      "status": 200,
+      "reason": "expected=duowellnessrejuvenation.com final=houstonfamilylegal.com",
+      "finalUrl": "https://houstonfamilylegal.com/",
+      "_reason": "brand mismatch duowellnessrejuvenation -> houstonfamilylegal"
+    }
+  ]
+}

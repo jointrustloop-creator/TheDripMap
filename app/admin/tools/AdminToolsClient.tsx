@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Loader2, Mail, Star } from 'lucide-react';
+import { Loader2, Mail, Star, Clock, Link as LinkIcon } from 'lucide-react';
 
 type RegenerateRecipient = {
   email: string;
@@ -64,9 +64,17 @@ function Card({ title, description, icon, children }: { title: string; descripti
   );
 }
 
+type EnrichHoursRow = { slug: string; name: string; status: string; message?: string };
+type EnrichHoursResponse = { ok: boolean; totalConsidered?: number; filled?: number; rows?: EnrichHoursRow[]; error?: string };
+
+type Rescue404Row = { slug: string; name: string; city: string | null; beforeUrl: string | null; afterUrl: string | null; status: string };
+type Rescue404Response = { ok: boolean; total?: number; updated?: number; noListing?: number; rows?: Rescue404Row[]; offset?: number; limit?: number; nextOffset?: number | null; totalCandidates?: number; error?: string };
+
 export function AdminToolsClient() {
   const [draftsState, setDraftsState] = useState<ButtonState<RegenerateResponse>>({ loading: false, result: null, error: null });
   const [ratingsState, setRatingsState] = useState<ButtonState<RefreshResponse>>({ loading: false, result: null, error: null });
+  const [hoursState, setHoursState] = useState<ButtonState<EnrichHoursResponse>>({ loading: false, result: null, error: null });
+  const [rescueState, setRescueState] = useState<ButtonState<Rescue404Response>>({ loading: false, result: null, error: null });
 
   const generateDrafts = async () => {
     setDraftsState({ loading: true, result: null, error: null });
@@ -80,6 +88,39 @@ export function AdminToolsClient() {
       }
     } catch (err) {
       setDraftsState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
+    }
+  };
+
+  const enrichHours = async () => {
+    setHoursState({ loading: true, result: null, error: null });
+    try {
+      const r = await fetch('/api/admin/places-enrich-hours', { method: 'POST' });
+      const data = (await r.json()) as EnrichHoursResponse;
+      if (!r.ok) setHoursState({ loading: false, result: null, error: data.error || `HTTP ${r.status}` });
+      else setHoursState({ loading: false, result: data, error: null });
+    } catch (err) {
+      setHoursState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
+    }
+  };
+
+  const [rescueOffset, setRescueOffset] = useState(0);
+  const rescueBatch = async (offset: number) => {
+    setRescueState({ loading: true, result: null, error: null });
+    try {
+      const r = await fetch('/api/admin/places-rescue-404', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ offset, limit: 50 }),
+      });
+      const data = (await r.json()) as Rescue404Response;
+      if (!r.ok) setRescueState({ loading: false, result: null, error: data.error || `HTTP ${r.status}` });
+      else {
+        setRescueState({ loading: false, result: data, error: null });
+        if (typeof data.nextOffset === 'number') setRescueOffset(data.nextOffset);
+        else setRescueOffset(0);
+      }
+    } catch (err) {
+      setRescueState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
     }
   };
 
@@ -222,6 +263,97 @@ export function AdminToolsClient() {
                 </ul>
               </div>
             )}
+          </div>
+        )}
+      </Card>
+
+      <Card
+        title="Backfill missing hours for claimed clinics"
+        description="Hits Google Place Details for each claimed clinic that has no working_hours yet, parses weekday_text into the DB shape, writes ONLY when the field is empty. Skips Bay Wellness by default (operator confirmed complete)."
+        icon={<Clock size={18} />}
+      >
+        <button
+          type="button"
+          onClick={enrichHours}
+          disabled={hoursState.loading}
+          className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
+        >
+          {hoursState.loading ? (<><Loader2 size={16} className="animate-spin" />Pulling hours…</>) : 'Backfill claimed clinic hours'}
+        </button>
+        {hoursState.error && (
+          <div className="mt-5 px-4 py-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm font-bold">Error: {hoursState.error}</div>
+        )}
+        {hoursState.result && (
+          <div className="mt-5">
+            <div className="text-sm text-slate-700 font-bold mb-3">Considered {hoursState.result.totalConsidered ?? 0} · Filled {hoursState.result.filled ?? 0}</div>
+            <ul className="text-sm text-slate-700 space-y-1.5">
+              {(hoursState.result.rows || []).map((r) => (
+                <li key={r.slug} className="flex items-center gap-2">
+                  <span className={'text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ' + (
+                    r.status === 'filled' ? 'bg-emerald-100 text-emerald-800' :
+                    r.status === 'skipped_present' ? 'bg-slate-100 text-slate-600' :
+                    'bg-amber-100 text-amber-800'
+                  )}>{r.status.replace(/_/g, ' ')}</span>
+                  <span className="font-bold">{r.name}</span>
+                  {r.message && <span className="text-xs text-rose-600">{r.message}</span>}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </Card>
+
+      <Card
+        title="Rescue dead-link URLs via Google Places"
+        description="For each provider in the bundled dead-link list (from the latest Tier 2 link scan), search Google Places by name + city. If a current website is found on Google, update the URL. Never deletes. Processes 50 per click, paginated. Click again to walk the next batch."
+        icon={<LinkIcon size={18} />}
+      >
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={() => rescueBatch(rescueOffset)}
+            disabled={rescueState.loading}
+            className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
+          >
+            {rescueState.loading ? (<><Loader2 size={16} className="animate-spin" />Rescuing batch…</>) : `Rescue next 50 (offset ${rescueOffset})`}
+          </button>
+          <button
+            type="button"
+            onClick={() => setRescueOffset(0)}
+            disabled={rescueState.loading}
+            className="text-xs font-bold text-slate-500 hover:text-slate-900 underline-offset-2 hover:underline"
+          >
+            Reset offset to 0
+          </button>
+        </div>
+        {rescueState.error && (
+          <div className="mt-5 px-4 py-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm font-bold">Error: {rescueState.error}</div>
+        )}
+        {rescueState.result && (
+          <div className="mt-5">
+            <div className="text-sm text-slate-700 font-bold mb-3">
+              Batch: offset {rescueState.result.offset} / total {rescueState.result.totalCandidates} · {rescueState.result.updated ?? 0} URL{(rescueState.result.updated ?? 0) === 1 ? '' : 's'} updated · {rescueState.result.noListing ?? 0} no Google listing
+              {rescueState.result.nextOffset === null ? ' · DONE' : ` · next offset ${rescueState.result.nextOffset}`}
+            </div>
+            <ul className="text-sm text-slate-700 space-y-1.5">
+              {(rescueState.result.rows || []).map((r) => (
+                <li key={r.slug}>
+                  <span className={'text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full mr-2 ' + (
+                    r.status === 'updated' ? 'bg-emerald-100 text-emerald-800' :
+                    r.status === 'no_listing' ? 'bg-rose-100 text-rose-800' :
+                    r.status === 'same_url' ? 'bg-slate-100 text-slate-600' :
+                    'bg-amber-100 text-amber-800'
+                  )}>{r.status.replace(/_/g, ' ')}</span>
+                  <span className="font-bold">{r.name}</span>
+                  {r.status === 'updated' && (
+                    <div className="ml-16 text-xs text-slate-500 font-medium">
+                      <div>was: {r.beforeUrl}</div>
+                      <div>now: {r.afterUrl}</div>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </Card>
