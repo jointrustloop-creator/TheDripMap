@@ -1,0 +1,108 @@
+{
+  "phase": "fix-today-faq",
+  "timestamp": "2026-06-07T23:15:50.188Z",
+  "updated": [
+    {
+      "slug": "best-iv-therapy-clinics-canada-2026",
+      "stripped": true,
+      "q_converted": 5,
+      "qa_count_after": 5,
+      "qa_preview": [
+        {
+          "q": "How did you actually rank these clinics?",
+          "a": "For each city we calculated a composite score of Google rating multiplied by the"
+        },
+        {
+          "q": "Why is the Toronto list so short?",
+          "a": "Of 61 Toronto IV providers in our matching platform, only 2 currently have verif"
+        },
+        {
+          "q": "Can a clinic pay to be on this list?",
+          "a": "No. We do not sell rankings. Clinics can claim their listing for free, but claim"
+        },
+        {
+          "q": "Do you receive a commission if I book through a clinic on this list?",
+          "a": "No. Our rankings are editorial. Clinics pay nothing to be listed and we do not t"
+        },
+        {
+          "q": "How often will this list update?",
+          "a": "We refresh quarterly or whenever a significant data improvement lands (for examp"
+        }
+      ]
+    },
+    {
+      "slug": "is-iv-therapy-a-scam-what-the-science-says",
+      "stripped": true,
+      "q_converted": 4,
+      "qa_count_after": 4,
+      "qa_preview": [
+        {
+          "q": "Is IV therapy FDA or Health Canada approved?",
+          "a": "Saline, B12, iron, and other licensed IV pharmaceuticals are Health Canada appro"
+        },
+        {
+          "q": "Will an IV drip really cure my hangover?",
+          "a": "Saline hydration helps with dehydration, which is part of the hangover. The vita"
+        },
+        {
+          "q": "Should I avoid IV therapy altogether?",
+          "a": "Not if you have a real indication. Iron deficiency, B12 deficiency, clinical deh"
+        },
+        {
+          "q": "How do I find a reputable IV clinic in Canada?",
+          "a": "Use [TheDripMap.com](https://www.thedripmap.com), our Canadian IV therapy matchi"
+        }
+      ]
+    },
+    {
+      "slug": "canadian-iv-clinic-regulations-2026",
+      "stripped": true,
+      "q_converted": 4,
+      "qa_count_after": 4,
+      "qa_preview": [
+        {
+          "q": "Can a naturopathic doctor in Quebec legally administer IV?",
+          "a": "No. Quebec law restricts IV administration outside hospital settings to physicia"
+        },
+        {
+          "q": "What is the Health Canada peptide advisory?",
+          "a": "Health Canada has issued advisories about unauthorized peptide products being im"
+        },
+        {
+          "q": "Do I need a medical director to run an IV clinic in Canada?",
+          "a": "It depends on your province and your lead practitioner type. BC ND IV authorizat"
+        },
+        {
+          "q": "Is this article legal advice?",
+          "a": "No. This is a regulatory overview for orientation. For decisions about your spec"
+        }
+      ]
+    },
+    {
+      "slug": "7-questions-before-iv-therapy",
+      "stripped": true,
+      "q_converted": 4,
+      "qa_count_after": 4,
+      "qa_preview": [
+        {
+          "q": "Is it rude to ask these questions before booking?",
+          "a": "No. A real IV clinic expects these questions from informed patients. The clinics"
+        },
+        {
+          "q": "What if a clinic refuses to answer?",
+          "a": "That is your answer. Find another clinic. There are over 480 IV therapy clinics "
+        },
+        {
+          "q": "Should I screenshot this list and bring it with me?",
+          "a": "Yes. We built it to be screenshot-ready. Take it with you for any first appointm"
+        },
+        {
+          "q": "Where can I find IV clinics that have answered these questions in advance?",
+          "a": "Use TheDripMap.com. We are publishing Safety Verified profiles through 2026 for "
+        }
+      ]
+    }
+  ],
+  "skipped": [],
+  "errors": []
+}
