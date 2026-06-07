@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { isAdminRequest } from '../../../../src/lib/admin-auth';
 import { saveDrafts, deleteDraftsBySubject, type DraftPayload } from '../../../../src/lib/draft-saver';
+import { applyOutreachCountryFilter } from '../../../../src/lib/outreach-config';
 
 const SITE_URL = 'https://www.thedripmap.com';
 
@@ -52,7 +53,8 @@ export async function POST(req: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  const { data: candidates, error } = await supabase
+  // Country filter (see src/lib/outreach-config.ts) — current: Canada-only.
+  const baseLegacyQuery = supabase
     .from('providers')
     .select('name, slug, rating, reviews, email')
     .neq('availability', false)
@@ -60,6 +62,7 @@ export async function POST(req: Request) {
     .gte('rating', minRating)
     .order('rating', { ascending: false })
     .limit(200);
+  const { data: candidates, error } = await applyOutreachCountryFilter(baseLegacyQuery);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

@@ -11,6 +11,7 @@ import {
   outreachSubject,
   type ProviderRow,
 } from '../../../../src/lib/outreach-templates';
+import { applyOutreachCountryFilter, outreachScopeLabel } from '../../../../src/lib/outreach-config';
 
 const DAILY_TARGET = 19;
 const MIN_RATING = 4.5;
@@ -57,8 +58,10 @@ export async function GET(req: Request) {
   }
 
   // Pull a wide pool — grouping by email reduces effective count, and we want
-  // Canadian inventory considered before US.
-  const { data, error } = await supabase
+  // Canadian inventory considered before US. The country filter (see
+  // src/lib/outreach-config.ts) optionally narrows to a specific
+  // country list; current setting Canada-only.
+  const baseQuery = supabase
     .from('providers')
     .select('id, name, slug, rating, reviews, email, country, city, state, website')
     .neq('availability', false)
@@ -71,6 +74,7 @@ export async function GET(req: Request) {
     .neq('email', '')
     .order('rating', { ascending: false, nullsFirst: false })
     .limit(DAILY_TARGET * 30);
+  const { data, error } = await applyOutreachCountryFilter(baseQuery);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 

@@ -24,6 +24,7 @@ import { createClient } from '@supabase/supabase-js';
 import { isAdminRequest } from '../../../../src/lib/admin-auth';
 import { saveDrafts, deleteDraftsBySubject, type DraftPayload } from '../../../../src/lib/draft-saver';
 import { isJunkEmail, isDomainMismatch } from '../../../../src/lib/outreach-quality';
+import { applyOutreachCountryFilter } from '../../../../src/lib/outreach-config';
 import {
   cleanName,
   buildSingleLocationBody,
@@ -161,7 +162,8 @@ export async function POST(req: Request) {
   if (mode === 'next') {
     // Pull pool excluding already-outreached providers (today's morning batch
     // included), then apply same scrubbers + ranking as the daily cron.
-    const { data, error } = await supabase
+    // Country filter (see src/lib/outreach-config.ts) — current: Canada-only.
+    const baseRegenQuery = supabase
       .from('providers')
       .select('id, name, slug, rating, reviews, email, country, city, state, website')
       .neq('availability', false)
@@ -174,6 +176,7 @@ export async function POST(req: Request) {
       .neq('email', '')
       .order('rating', { ascending: false, nullsFirst: false })
       .limit(limit * 30);
+    const { data, error } = await applyOutreachCountryFilter(baseRegenQuery);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
     const candidates = (data as ProviderRow[]).filter((p) => {

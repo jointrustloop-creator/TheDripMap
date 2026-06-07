@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../../src/lib/mailer';
 import { saveDrafts, type DraftPayload } from '../../../../src/lib/draft-saver';
 import { isJunkEmail, isDomainMismatch, CASL_FOOTER } from '../../../../src/lib/outreach-quality';
+import { applyOutreachCountryFilter } from '../../../../src/lib/outreach-config';
 
 const SITE_URL = 'https://www.thedripmap.com';
 const DAILY_TARGET = 15;
@@ -152,7 +153,8 @@ export async function GET(req: Request) {
 
   const cutoff = new Date(Date.now() - FOLLOWUP_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
-  const { data, error } = await supabase
+  // Country gate (see src/lib/outreach-config.ts) — current: Canada-only.
+  const baseFollowupQuery = supabase
     .from('providers')
     .select('id, name, slug, rating, reviews, email, country, city, state, website, outreach_sent_at')
     .neq('availability', false)
@@ -166,6 +168,7 @@ export async function GET(req: Request) {
     .neq('email', '')
     .order('outreach_sent_at', { ascending: true })
     .limit(DAILY_TARGET * 30);
+  const { data, error } = await applyOutreachCountryFilter(baseFollowupQuery);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
