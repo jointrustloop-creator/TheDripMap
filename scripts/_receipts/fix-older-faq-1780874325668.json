@@ -1,0 +1,183 @@
+{
+  "phase": "fix-older-faq",
+  "timestamp": "2026-06-07T23:18:42.502Z",
+  "updated": [
+    {
+      "slug": "iv-therapy-for-chronic-fatigue",
+      "date": "2026-05-03",
+      "stripped_literal_script": false,
+      "bold_to_h3": 6,
+      "qa_after": 6
+    },
+    {
+      "slug": "iv-hydration-for-athletic-performance-recovery",
+      "date": "2024-03-20",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "iv-therapy-for-migraines-headaches",
+      "date": "2026-05-03",
+      "stripped_literal_script": false,
+      "bold_to_h3": 6,
+      "qa_after": 6
+    },
+    {
+      "slug": "iv-therapy-immune-support",
+      "date": "2026-04-27",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "vitamin-b12-iv-therapy-benefits-deficiency",
+      "date": "2026-04-20",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "iv-therapy-near-me-how-to-find-best-provider",
+      "date": "2026-04-20",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "how-much-does-iv-therapy-cost",
+      "date": "2026-04-20",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "myers-cocktail-iv-therapy-complete-guide",
+      "date": "2026-05-03",
+      "stripped_literal_script": false,
+      "bold_to_h3": 6,
+      "qa_after": 6
+    },
+    {
+      "slug": "nad-plus-therapy-toronto-guide",
+      "date": "2026-04-27",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "nad-plus-iv-therapy-cellular-longevity-guide",
+      "date": "2024-03-28",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "iv-therapy-for-anxiety-stress",
+      "date": "2026-04-27",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "iv-therapy-for-long-covid",
+      "date": "2026-04-27",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "iv-therapy-anti-aging-longevity",
+      "date": "2026-04-27",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "mobile-iv-vs-in-clinic-comparison",
+      "date": "2024-03-10",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "iv-therapy-for-athletes-sports-recovery",
+      "date": "2026-05-03",
+      "stripped_literal_script": false,
+      "bold_to_h3": 6,
+      "qa_after": 6
+    },
+    {
+      "slug": "high-dose-vitamin-c-iv-therapy-benefits",
+      "date": "2026-04-20",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "iv-therapy-for-jet-lag",
+      "date": "2026-04-27",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "iv-therapy-safety-side-effects-guide",
+      "date": "2024-03-15",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "iv-therapy-insurance-coverage-canada",
+      "date": "2026-04-27",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "myers-cocktail-iv-benefits-chronic-fatigue",
+      "date": "2024-03-25",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "glutathione-iv-therapy-benefits",
+      "date": "2026-04-20",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "iv-therapy-during-pregnancy",
+      "date": "2026-04-27",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "iv-therapy-for-energy-fatigue",
+      "date": "2026-04-20",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "science-of-iv-therapy-for-hangover-recovery",
+      "date": "2024-04-01",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    },
+    {
+      "slug": "iv-therapy-for-weight-loss",
+      "date": "2026-04-27",
+      "stripped_literal_script": false,
+      "bold_to_h3": 5,
+      "qa_after": 5
+    }
+  ],
+  "skipped": [],
+  "errors": []
+}
