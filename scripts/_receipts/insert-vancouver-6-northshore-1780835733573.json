@@ -1,0 +1,35 @@
+{
+  "phase": "insert-vancouver-6-northshore",
+  "timestamp": "2026-06-07T12:35:30.638Z",
+  "inserted": [
+    {
+      "id": "b7074b67-484c-4c07-80e3-b923f3d5e2c5",
+      "slug": "deva-med-spa-and-body-contouring-north-vancouver",
+      "name": "Deva Med Spa and Body Contouring",
+      "email": "info.devamedspa@gmail.com"
+    }
+  ],
+  "skipped_existing": [
+    {
+      "slug": "celebrity-laser-and-skin-care-north-vancouver",
+      "existing_id": "31310b6b-d4d9-4207-b102-e7c054c85e06"
+    },
+    {
+      "slug": "parsa-wellness-clinic-north-vancouver",
+      "existing_id": "dfb3c751-c9be-4a1f-9554-25c425cf4186"
+    },
+    {
+      "slug": "aspire-naturopathic-health-centre-north-vancouver",
+      "existing_id": "e7ddacbd-a711-44d5-a60e-433212ec629f"
+    },
+    {
+      "slug": "edgemont-naturopathic-clinic-north-vancouver",
+      "existing_id": "4ced7eb3-ac88-461e-9959-c991b2ba6c3f"
+    },
+    {
+      "slug": "dr-alexa-chichak-nd-north-vancouver",
+      "existing_id": "d1495887-2bc8-43f4-b50b-17498bbdd1e3"
+    }
+  ],
+  "errors": []
+}
