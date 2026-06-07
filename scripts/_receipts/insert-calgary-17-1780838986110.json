@@ -1,0 +1,144 @@
+{
+  "phase": "insert-calgary-17",
+  "timestamp": "2026-06-07T13:29:41.787Z",
+  "inserted": [
+    {
+      "id": "a679d617-49a6-434b-84fc-566335eb0db7",
+      "slug": "vena-mobile-health-airdrie",
+      "city": "Airdrie",
+      "type": "Mobile",
+      "name": "Vena Mobile Health",
+      "email": "info@venamobilehealth.com"
+    },
+    {
+      "id": "7ee6efe7-2f35-4394-b579-f23aa0016d19",
+      "slug": "flow-iv-health-and-wellness-calgary",
+      "city": "Calgary",
+      "type": "Both",
+      "name": "Flow IV Health & Wellness",
+      "email": null
+    },
+    {
+      "id": "c16f19c9-1fe0-4e03-b183-4d8d6a27548f",
+      "slug": "viva-wellness-drip-calgary-calgary",
+      "city": "Calgary",
+      "type": "Mobile",
+      "name": "Viva Wellness Drip Calgary",
+      "email": "info@wwellness.co"
+    },
+    {
+      "id": "6b3606a8-d1fa-4311-b817-9f10ed69fe54",
+      "slug": "unity-collective-studios-mobile-iv-okotoks",
+      "city": "Okotoks",
+      "type": "Both",
+      "name": "Unity Collective Studios (Mobile IV)",
+      "email": "unitycollectivestudios@gmail.com"
+    },
+    {
+      "id": "91bec227-d6d4-4100-b60f-fca0b27099da",
+      "slug": "physigo-mobile-calgary",
+      "city": "Calgary",
+      "type": "Mobile",
+      "name": "PhysiGO Mobile",
+      "email": "info@physigomobile.com"
+    },
+    {
+      "id": "ac93c528-557c-4abf-986f-fd972c1e74f3",
+      "slug": "new-skin-yyc-calgary",
+      "city": "Calgary",
+      "type": "Clinic",
+      "name": "New Skin YYC",
+      "email": "info@newskinyyc.ca"
+    },
+    {
+      "id": "1a046a3e-4430-4498-af84-9f43cec4ab5c",
+      "slug": "yhvh-medical-and-aesthetic-clinic-calgary",
+      "city": "Calgary",
+      "type": "Clinic",
+      "name": "YHVH Medical & Aesthetic Clinic",
+      "email": "admin@yhvhclinic.ca"
+    },
+    {
+      "id": "cf5434e0-4c0d-4c00-ac7e-bb6cce716191",
+      "slug": "zulu-medical-cosmetics-calgary",
+      "city": "Calgary",
+      "type": "Clinic",
+      "name": "Zulu Medical Cosmetics",
+      "email": "care@zulumc.com"
+    },
+    {
+      "id": "48f05f6f-00f8-4a98-9cf3-fabfc72b6b3c",
+      "slug": "calgary-integrative-medicine-calgary",
+      "city": "Calgary",
+      "type": "Clinic",
+      "name": "Calgary Integrative Medicine",
+      "email": "info@calgarymed.ca"
+    },
+    {
+      "id": "809a5a39-38e9-426a-8910-a2c9278772e6",
+      "slug": "healthflow-naturopathic-clinic-calgary",
+      "city": "Calgary",
+      "type": "Clinic",
+      "name": "Healthflow Naturopathic Clinic",
+      "email": null
+    },
+    {
+      "id": "8ba135f1-87f5-4f73-bc05-7c8d60a09d9f",
+      "slug": "paradigm-health-group-dr-schlee-calgary",
+      "city": "Calgary",
+      "type": "Clinic",
+      "name": "Dr. Schlee / Paradigm Health Group",
+      "email": null
+    },
+    {
+      "id": "089f9d2e-91e6-4fee-a585-7881c7d54802",
+      "slug": "aisthetikos-wellness-calgary",
+      "city": "Calgary",
+      "type": "Clinic",
+      "name": "Aisthetikos Wellness & Advanced Medical Aesthetics",
+      "email": "hello@aisthetikos.ca"
+    },
+    {
+      "id": "f5f9d0a7-f501-4a67-8464-ab9636ed7a99",
+      "slug": "aeon-future-health-calgary",
+      "city": "Calgary",
+      "type": "Clinic",
+      "name": "Aeon Future Health",
+      "email": "susan@aeonfuturehealth.com"
+    },
+    {
+      "id": "249847be-49fa-48c4-ba82-87906111453d",
+      "slug": "pro-motion-calgary-calgary",
+      "city": "Calgary",
+      "type": "Clinic",
+      "name": "Pro Motion Calgary",
+      "email": "info@promotioncalgary.com"
+    },
+    {
+      "id": "fc3e7573-2d24-456e-8e1b-5431f3aeb7b1",
+      "slug": "essence-wellness-sage-hill-calgary",
+      "city": "Calgary",
+      "type": "Clinic",
+      "name": "Essence Wellness - Sage Hill",
+      "email": null
+    },
+    {
+      "id": "7bf2b593-7a39-434d-8a1b-9688408dcf3a",
+      "slug": "essence-wellness-willow-park-calgary",
+      "city": "Calgary",
+      "type": "Clinic",
+      "name": "Essence Wellness - Willow Park",
+      "email": null
+    },
+    {
+      "id": "0db89e91-3fc9-409d-bc20-1b77925bc9cf",
+      "slug": "essence-wellness-mahogany-calgary",
+      "city": "Calgary",
+      "type": "Clinic",
+      "name": "Essence Wellness - Mahogany",
+      "email": null
+    }
+  ],
+  "skipped_existing": [],
+  "errors": []
+}
