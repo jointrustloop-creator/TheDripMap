@@ -1,0 +1,33 @@
+{
+  "phase": "apply-5-emails-from-email-finder",
+  "timestamp": "2026-06-07T13:03:37.864Z",
+  "updated": [
+    {
+      "slug": "erin-mills-optimum-health-mississauga",
+      "email": "erinmillshealth@bellnet.ca",
+      "email_quality": "medium"
+    },
+    {
+      "slug": "kaizen-medspa-mississauga",
+      "email": "info@kaizenhealthgroup.com",
+      "email_quality": "high"
+    },
+    {
+      "slug": "integrative-naturopathic-medical-centre-vancouver",
+      "email": "reception@integrative.ca",
+      "email_quality": "high"
+    },
+    {
+      "slug": "qi-integrated-health-vancouver",
+      "email": "info@qiintegratedhealth.com",
+      "email_quality": "high"
+    },
+    {
+      "slug": "everyoung-medical-aesthetics-burnaby",
+      "email": "info@everyoungmed.com",
+      "email_quality": "high"
+    }
+  ],
+  "skipped": [],
+  "errors": []
+}
