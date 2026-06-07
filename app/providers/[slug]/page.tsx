@@ -173,7 +173,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   if (!provider) {
     return {
       title: `IV Therapy Clinic Not Found | TheDripMap`,
-      description: `We couldn't find that clinic on TheDripMap. Browse our directory of IV therapy providers near you.`,
+      description: `We couldn't find that clinic on TheDripMap. Browse all clinics of IV therapy providers near you.`,
       alternates: { canonical: fallbackCanonical },
       robots: { index: false, follow: true },
     };
@@ -1548,7 +1548,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
             {/* MEDICAL DISCLAIMER */}
             <div className="pt-12 border-t border-slate-100">
               <p className="text-xs text-slate-400 leading-relaxed font-medium">
-                TheDripMap is an independent directory and matching service. Always verify credentials directly with the provider before booking any treatment.
+                TheDripMap is an independent matching service. Always verify credentials directly with the provider before booking any treatment.
               </p>
             </div>
           </div>

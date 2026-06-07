@@ -216,7 +216,7 @@ export default async function UseCasePage({ params }: PageProps) {
       <section className="py-20 bg-white border-t border-gray-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-black text-slate-900 mb-4">Find a {useCase.title} IV clinic in your city</h2>
-          <p className="text-slate-500 mb-10">Search our directory of top-rated providers specializing in {useCase.title.toLowerCase()} support.</p>
+          <p className="text-slate-500 mb-10">Search our matching platform for top-rated providers specializing in {useCase.title.toLowerCase()} support.</p>
           
           <form action="/search" method="GET" className="relative max-w-xl mx-auto mb-12">
             <input type="hidden" name="service" value={useCase.serviceTag} />

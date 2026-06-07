@@ -109,7 +109,7 @@ export function ClinicAgentDemoClient() {
               What's different about YOUR agent
             </h2>
             <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-              The public Drip Assistant on TheDripMap is a directory concierge. Your agent is
+              The public Drip Assistant on TheDripMap is a matching platform concierge. Your agent is
               your clinic's concierge — laser-focused on your patients and your bookings.
             </p>
           </div>

@@ -326,7 +326,7 @@ async function sendRankBatch(
     const subject = `Your ${display} listing on TheDripMap`;
     const text = `Hi ${display} team,
 
-We added ${display} to TheDripMap, North America's directory for IV therapy clinics. Your listing is live with your real Google rating of ${p.rating}★ from ${reviews} patient reviews.
+We added ${display} to TheDripMap, North America's matching platform for IV therapy clinics. Your listing is live with your real Google rating of ${p.rating}★ from ${reviews} patient reviews.
 
 Right now it's unclaimed, which means visitors see a generic placeholder instead of your photos, hours, services, and description. Claiming is free and takes 2 minutes.
 

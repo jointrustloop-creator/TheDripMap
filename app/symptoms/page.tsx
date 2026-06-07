@@ -11,13 +11,13 @@ import { ResilientImage } from '@/src/components/ResilientImage';
 
 export const metadata: Metadata = {
   title: 'IV Therapy for Symptoms & Conditions — Treatment Protocols | TheDripMap',
-  description: 'Comprehensive directory of IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',
+  description: 'Comprehensive guide to IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',
   alternates: {
     canonical: 'https://www.thedripmap.com/symptoms',
   },
   openGraph: {
     title: 'IV Therapy for Symptoms & Conditions — Treatment Protocols | TheDripMap',
-    description: 'Comprehensive directory of IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',
+    description: 'Comprehensive guide to IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',
     url: 'https://www.thedripmap.com/symptoms',
     siteName: 'TheDripMap',
     images: [
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'IV Therapy for Symptoms & Conditions — Treatment Protocols | TheDripMap',
-    description: 'Comprehensive directory of IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',
+    description: 'Comprehensive guide to IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',
     images: ['https://www.thedripmap.com/og-image.png'],
   },
 };

@@ -134,7 +134,7 @@ function buildReportText(email: string, r: AuditResult, businessName: string, ow
   lines.push('');
 
   lines.push('—');
-  lines.push('TheDripMap · North America\'s IV therapy directory');
+  lines.push('TheDripMap · North America\'s IV therapy matching platform');
   lines.push(`Run another audit: ${SITE_URL}/tools/seo-audit`);
   return lines.join('\n');
 }

@@ -36,7 +36,7 @@ const STRATEGIES = [
   },
   {
     icon: ListChecks,
-    name: 'Consistent directory listings',
+    name: 'Consistent platform listings',
     why: 'Consistent Name/Address/Phone (NAP) across directories is a foundational local-ranking signal, and niche directories put you in front of searchers already looking for exactly your service. Inconsistent listings actively cost you customers.',
     tip: 'Pick one canonical name/address/phone and make it identical everywhere — Google, Apple/Bing Maps, Yelp, and niche IV/med-spa directories. Fix or remove duplicates.',
     stat: 'Businesses with incorrect NAP data are reported to lose ~22% of customers who reach the wrong info.',

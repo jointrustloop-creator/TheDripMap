@@ -337,7 +337,7 @@ export default async function TreatmentCityPage({ params }: PageProps) {
                 All clinics in {resolved.name}
               </Link>
               <Link href="/search" className="bg-white border-2 border-slate-200 text-slate-700 px-6 py-3 rounded-2xl font-black text-sm hover:border-slate-300 transition-all">
-                Search the directory
+                Search all clinics
               </Link>
             </div>
           </section>

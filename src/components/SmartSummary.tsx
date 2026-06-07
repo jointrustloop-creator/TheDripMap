@@ -37,7 +37,7 @@ export default function SmartSummary({ reviews, clinicName }: SmartSummaryProps)
           .join('\n---\n');
 
         const prompt = `
-          You are a medical directory expert. I am providing you with customer reviews for an IV therapy clinic called "${clinicName}".
+          You are a medical matching platform expert. I am providing you with customer reviews for an IV therapy clinic called "${clinicName}".
           
           Based on these reviews, write a 2-sentence "The Bottom Line" summary.
           The first sentence should highlight the primary strength (e.g. mobile speed, luxury ambiance, specific drip effectiveness).

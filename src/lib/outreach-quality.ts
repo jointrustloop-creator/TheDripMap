@@ -161,4 +161,4 @@ export function isDomainMismatch(
  * sender + mailing address identification is omitted. The unsubscribe block is
  * preserved as a baseline-of-decency signal. Operator has accepted the tradeoff.
  */
-export const CASL_FOOTER = `\nYou're receiving this because your clinic was identified as an IV therapy provider in our directory. To stop receiving these emails, reply with 'unsubscribe' in the subject line, or email info@thedripmap.com with 'unsubscribe'.`;
+export const CASL_FOOTER = `\nYou're receiving this because your clinic was identified as an IV therapy provider in our matching platform. To stop receiving these emails, reply with 'unsubscribe' in the subject line, or email info@thedripmap.com with 'unsubscribe'.`;

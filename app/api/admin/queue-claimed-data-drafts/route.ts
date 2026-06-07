@@ -29,7 +29,7 @@ export async function POST() {
 
 Refresh Med Spa LA is now live and claimed on TheDripMap, congrats and welcome. (I just learned you're the medical director, even better.)
 
-I want to make your listing as authentic and conversion-focused as possible. Right now I'm using only the info from your website, but a few details from you would take it from good to the best on the directory. Each item is optional:
+I want to make your listing as authentic and conversion-focused as possible. Right now I'm using only the info from your website, but a few details from you would take it from good to the best on the matching platform. Each item is optional:
 
 1. 3-5 real photos (interior, treatment rooms, you and Nurse Fatima together if you have one), JPGs by reply, or links from your IG.
 
@@ -58,7 +58,7 @@ info@thedripmap.com`,
 
 Blue Cypress IV and Wellness is live and claimed on TheDripMap, thanks for being one of our earliest verified clinics in Kentucky.
 
-I want to make your listing as authentic and conversion-focused as possible. Right now I'm using info from your Google profile and website, but a few details from you would take it from good to the best on the directory. Each item is optional:
+I want to make your listing as authentic and conversion-focused as possible. Right now I'm using info from your Google profile and website, but a few details from you would take it from good to the best on the matching platform. Each item is optional:
 
 1. 3-5 real photos (interior, treatment room, team, IV station), JPGs by reply, or links.
 
@@ -87,7 +87,7 @@ info@thedripmap.com`,
 
 Both Signature Beauty Lounge locations (Downtown Toronto and Richmond Hill) are live and claimed on TheDripMap, thanks for being one of our earliest verified clinics in the GTA.
 
-I want to make your listings as authentic and conversion-focused as possible. Right now I'm using info from your website, but a few details from you would take them from good to the best on the directory. Each item is optional:
+I want to make your listings as authentic and conversion-focused as possible. Right now I'm using info from your website, but a few details from you would take them from good to the best on the matching platform. Each item is optional:
 
 1. 3-5 real photos per location (interior, treatment room, team, IV station), JPGs by reply, or links. If they're different between Downtown and Richmond Hill, please note which is which.
 

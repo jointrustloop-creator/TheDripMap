@@ -11,7 +11,7 @@ import { getCityPhoto, getCityGradient, getCityInitial } from '@/src/lib/city-im
 
 const citiesTitle = 'Cities Archive — Browse IV Therapy Locations | TheDripMap';
 const citiesDescription =
-  'Explore our complete directory of cities providing IV therapy. Find top-rated clinics and mobile services across the US and Canada.';
+  'Explore our complete matching platform for cities providing IV therapy. Find top-rated clinics and mobile services across the US and Canada.';
 const citiesOgImage = 'https://www.thedripmap.com/og-image.png';
 
 export const metadata: Metadata = {
@@ -68,7 +68,7 @@ export default async function CitiesHubPage() {
             </span>
           </h1>
           <p className="text-xl text-slate-500 leading-relaxed">
-            Browse every city in our directory. Tap any card for clinics, reviews, prices, and instant booking.
+            Browse every city in our matching platform. Tap any card for clinics, reviews, prices, and instant booking.
           </p>
         </section>
 
@@ -165,7 +165,7 @@ export default async function CitiesHubPage() {
             </div>
             <h3 className="text-xl font-bold text-slate-900 mb-2">No cities found</h3>
             <p className="text-slate-500">
-              We are currently updating our city directory. Please check back soon.
+              We are currently updating our city listings. Please check back soon.
             </p>
           </div>
         )}

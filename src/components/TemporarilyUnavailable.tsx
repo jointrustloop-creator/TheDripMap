@@ -34,7 +34,7 @@ export function TemporarilyUnavailable({ kind, label }: Props) {
               We&apos;ll be back in a few minutes
             </h1>
             <p className="text-slate-700 leading-relaxed mb-5">
-              Our directory is briefly catching its breath, so this {noun}
+              Our matching platform is briefly catching its breath, so this {noun}
               {subject} can&apos;t load right now. Nothing is lost — try again in
               two or three minutes and it will be back to normal.
             </p>

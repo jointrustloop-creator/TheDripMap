@@ -1,0 +1,1192 @@
+{
+  "phase": "sweep-directory-to-matching-platform",
+  "timestamp": "2026-06-07T22:52:34.411Z",
+  "code_files": [
+    {
+      "file": "app/for-clinics/page.tsx",
+      "changes": 4,
+      "lines": [
+        {
+          "line_num": 15,
+          "before": "const description = `Join the nation's #1 IV therapy directory with ${stats.total.toLocaleString()}+ listed clinics. Claim your free listing to reach thousands of patients searching for wellness drips",
+          "after": "const description = `Join the nation's #1 IV therapy matching platform with ${stats.total.toLocaleString()}+ listed clinics. Claim your free listing to reach thousands of patients searching for wellne"
+        },
+        {
+          "line_num": 123,
+          "before": "{ icon: <Globe size={32} />, title: 'SEO Dominance', desc: 'Leverage our high-authority directory to boost your own clinical presence online.' }",
+          "after": "{ icon: <Globe size={32} />, title: 'SEO Dominance', desc: 'Leverage our high-authority matching platform to boost your own clinical presence online.' }"
+        },
+        {
+          "line_num": 150,
+          "before": "Both cards below are pulled live from the directory — exactly what patients see today, and what changes the moment you claim.",
+          "after": "Both cards below are pulled live from the matching platform — exactly what patients see today, and what changes the moment you claim."
+        },
+        {
+          "line_num": 225,
+          "before": "Real listings pulled live from the directory, not mockups.",
+          "after": "Real listings pulled live from the matching platform, not mockups."
+        }
+      ]
+    },
+    {
+      "file": "app/treatments/page.tsx",
+      "changes": 1,
+      "lines": [
+        {
+          "line_num": 105,
+          "before": "'Plain-language one-line definitions of every IV therapy treatment in TheDripMap directory.',",
+          "after": "'Plain-language one-line definitions of every IV therapy treatment in TheDripMap matching platform.',"
+        }
+      ]
+    },
+    {
+      "file": "app/tools/clinic-agent-demo/ClinicAgentDemoClient.tsx",
+      "changes": 1,
+      "lines": [
+        {
+          "line_num": 112,
+          "before": "The public Drip Assistant on TheDripMap is a directory concierge. Your agent is",
+          "after": "The public Drip Assistant on TheDripMap is a matching platform concierge. Your agent is"
+        }
+      ]
+    },
+    {
+      "file": "app/terms/page.tsx",
+      "changes": 5,
+      "lines": [
+        {
+          "line_num": 45,
+          "before": "<h2>1. About the Service — Informational Directory Only</h2>",
+          "after": "<h2>1. About the Service — Informational Matching Platform Only</h2>"
+        },
+        {
+          "line_num": 47,
+          "before": "TheDripMap is an online directory that helps people discover IV therapy and wellness clinics across",
+          "after": "TheDripMap is an online matching platform that helps people discover IV therapy and wellness clinics across"
+        },
+        {
+          "line_num": 49,
+          "before": "We are a directory and matching platform — we do not provide medical, health, or treatment services,",
+          "after": "We are a matching platform and matching platform — we do not provide medical, health, or treatment services,"
+        },
+        {
+          "line_num": 66,
+          "before": "We work to keep our directory accurate, but clinic information — including services, hours, pricing,",
+          "after": "We work to keep our matching platform accurate, but clinic information — including services, hours, pricing,"
+        },
+        {
+          "line_num": 70,
+          "before": "endorse, recommend, or vouch for any clinic, and the inclusion of a clinic in our directory is not an",
+          "after": "endorse, recommend, or vouch for any clinic, and the inclusion of a clinic in our matching platform is not an"
+        }
+      ]
+    },
+    {
+      "file": "app/contact/layout.tsx",
+      "changes": 1,
+      "lines": [
+        {
+          "line_num": 3,
+          "before": "const title = 'Contact TheDripMap — IV Therapy Directory Support';",
+          "after": "const title = 'Contact TheDripMap — IV Therapy Matching Platform Support';"
+        }
+      ]
+    },
+    {
+      "file": "app/symptoms/[slug]/page.tsx",
+      "changes": 1,
+      "lines": [
+        {
+          "line_num": 222,
+          "before": "<p className=\"text-slate-500 mb-10\">Search our directory of top-rated providers specializing in {useCase.title.toLowerCase()} support.</p>",
+          "after": "<p className=\"text-slate-500 mb-10\">Search our matching platform of top-rated providers specializing in {useCase.title.toLowerCase()} support.</p>"
+        }
+      ]
+    },
+    {
+      "file": "app/symptoms/page.tsx",
+      "changes": 3,
+      "lines": [
+        {
+          "line_num": 14,
+          "before": "description: 'Comprehensive directory of IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',",
+          "after": "description: 'Comprehensive matching platform of IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',"
+        },
+        {
+          "line_num": 20,
+          "before": "description: 'Comprehensive directory of IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',",
+          "after": "description: 'Comprehensive matching platform of IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',"
+        },
+        {
+          "line_num": 36,
+          "before": "description: 'Comprehensive directory of IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',",
+          "after": "description: 'Comprehensive matching platform of IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',"
+        }
+      ]
+    },
+    {
+      "file": "app/cities/page.tsx",
+      "changes": 3,
+      "lines": [
+        {
+          "line_num": 14,
+          "before": "'Explore our complete directory of cities providing IV therapy. Find top-rated clinics and mobile services across the US and Canada.';",
+          "after": "'Explore our complete matching platform of cities providing IV therapy. Find top-rated clinics and mobile services across the US and Canada.';"
+        },
+        {
+          "line_num": 71,
+          "before": "Browse every city in our directory. Tap any card for clinics, reviews, prices, and instant booking.",
+          "after": "Browse every city in our matching platform. Tap any card for clinics, reviews, prices, and instant booking."
+        },
+        {
+          "line_num": 168,
+          "before": "We are currently updating our city directory. Please check back soon.",
+          "after": "We are currently updating our city listings. Please check back soon."
+        }
+      ]
+    },
+    {
+      "file": "app/states/[state]/page.tsx",
+      "changes": 2,
+      "lines": [
+        {
+          "line_num": 62,
+          "before": "description: `Directory of ${total} IV therapy clinics across ${cityCount} cities in ${state.name}.`,",
+          "after": "description: `Matching platform for ${total} IV therapy clinics across ${cityCount} cities in ${state.name}.`,"
+        },
+        {
+          "line_num": 142,
+          "before": "<p className=\"text-slate-500 italic\">No IV therapy clinics found in {state.name} yet. Check back soon as we expand our directory.</p>",
+          "after": "<p className=\"text-slate-500 italic\">No IV therapy clinics found in {state.name} yet. Check back soon as we expand our matching platform.</p>"
+        }
+      ]
+    },
+    {
+      "file": "app/iv-therapy-statistics/page.tsx",
+      "changes": 13,
+      "lines": [
+        {
+          "line_num": 23,
+          "before": "const description = `Comprehensive IV therapy market statistics from TheDripMap's directory of ${total} verified US clinics. Data on top cities, states, and trends across ${cities} cities and ${states",
+          "after": "const description = `Comprehensive IV therapy market statistics from TheDripMap's matching platform of ${total} verified US clinics. Data on top cities, states, and trends across ${cities} cities and "
+        },
+        {
+          "line_num": 70,
+          "before": "answer: `Based on TheDripMap's directory of ${stats.total.toLocaleString()} verified clinics across ${stats.cities} cities and ${stats.states} states, IV therapy is widely available across the United ",
+          "after": "answer: `Based on TheDripMap's matching platform of ${stats.total.toLocaleString()} verified clinics across ${stats.cities} cities and ${stats.states} states, IV therapy is widely available across the"
+        },
+        {
+          "line_num": 74,
+          "before": "answer: `${topStates[0]?.name} leads all US states with ${topStates[0]?.count} listed IV therapy clinics, followed by ${topStates[1]?.name} (${topStates[1]?.count}) and ${topStates[2]?.name} (${topSta",
+          "after": "answer: `${topStates[0]?.name} leads all US states with ${topStates[0]?.count} listed IV therapy clinics, followed by ${topStates[1]?.name} (${topStates[1]?.count}) and ${topStates[2]?.name} (${topSta"
+        },
+        {
+          "line_num": 93,
+          "before": "\"name\": \"US IV Therapy Clinic Directory Statistics\",",
+          "after": "\"name\": \"US IV Therapy Clinic Matching Platform Statistics\","
+        },
+        {
+          "line_num": 94,
+          "before": "\"description\": \"Statistics on IV therapy clinics across the United States compiled from TheDripMap's verified directory\",",
+          "after": "\"description\": \"Statistics on IV therapy clinics across the United States compiled from TheDripMap's verified matching platform\","
+        },
+        {
+          "line_num": 168,
+          "before": "The following statistics are compiled from TheDripMap&apos;s verified directory of IV therapy clinics across the United States. Data is updated regularly as new clinics are added to the directory. Las",
+          "after": "The following statistics are compiled from TheDripMap&apos;s verified matching platform of IV therapy clinics across the United States. Data is updated regularly as new clinics are added to the matchi"
+        },
+        {
+          "line_num": 219,
+          "before": "&quot;Data represents clinics currently listed in the TheDripMap directory. Actual clinic counts per state may be higher as the directory continues to expand.&quot;",
+          "after": "&quot;Data represents clinics currently listed in the TheDripMap matching platform. Actual clinic counts per state may be higher as the matching platform continues to expand.&quot;"
+        },
+        {
+          "line_num": 283,
+          "before": "&quot;Clinics with 100 or more reviews represent the most established providers in the directory. These clinics have a proven track record of patient satisfaction and consistent service delivery.&quot",
+          "after": "&quot;Clinics with 100 or more reviews represent the most established providers in the matching platform. These clinics have a proven track record of patient satisfaction and consistent service delive"
+        },
+        {
+          "line_num": 331,
+          "before": "&quot;Data source: TheDripMap directory of verified US IV therapy clinics. Statistics reflect current directory coverage and are updated as new clinics are added. TheDripMap is an independent director",
+          "after": "&quot;Data source: TheDripMap matching platform of verified US IV therapy clinics. Statistics reflect current matching platform coverage and are updated as new clinics are added. TheDripMap is an inde"
+        }
+      ]
+    },
+    {
+      "file": "app/iv-therapy-for/[slug]/page.tsx",
+      "changes": 1,
+      "lines": [
+        {
+          "line_num": 219,
+          "before": "<p className=\"text-slate-500 mb-10\">Search our directory of top-rated providers specializing in {useCase.title.toLowerCase()} support.</p>",
+          "after": "<p className=\"text-slate-500 mb-10\">Search our matching platform of top-rated providers specializing in {useCase.title.toLowerCase()} support.</p>"
+        }
+      ]
+    },
+    {
+      "file": "app/resources/safety-checker/page.tsx",
+      "changes": 2,
+      "lines": [
+        {
+          "line_num": 10,
+          "before": "'Check any IV therapy clinic instantly. See whether it\\'s claimed, safety-verified, and its rating — or get verified alternatives near you if it isn\\'t in our directory.';",
+          "after": "'Check any IV therapy clinic instantly. See whether it\\'s claimed, safety-verified, and its rating — or get verified alternatives near you if it isn\\'t in our matching platform.';"
+        },
+        {
+          "line_num": 37,
+          "before": "Type any clinic name to see its verification status in our directory — claimed, safety-verified, and rated. Not found? We&apos;ll show verified alternatives near you.",
+          "after": "Type any clinic name to see its verification status in our matching platform — claimed, safety-verified, and rated. Not found? We&apos;ll show verified alternatives near you."
+        }
+      ]
+    },
+    {
+      "file": "app/resources/patient-acquisition/page.tsx",
+      "changes": 1,
+      "lines": [
+        {
+          "line_num": 39,
+          "before": "name: 'Consistent directory listings',",
+          "after": "name: 'Consistent platform listings',"
+        }
+      ]
+    },
+    {
+      "file": "app/resources/clinic-owners/page.tsx",
+      "changes": 1,
+      "lines": [
+        {
+          "line_num": 31,
+          "before": "{ slug: 'how-to-get-patients-iv-therapy-clinic-without-ads', title: 'Get Patients Without Paid Ads', blurb: '8 organic strategies that actually work in 2026 — directory listings, local SEO, reviews, r",
+          "after": "{ slug: 'how-to-get-patients-iv-therapy-clinic-without-ads', title: 'Get Patients Without Paid Ads', blurb: '8 organic strategies that actually work in 2026 — platform listings, local SEO, reviews, re"
+        }
+      ]
+    },
+    {
+      "file": "app/quiz/results/page.tsx",
+      "changes": 4,
+      "lines": [
+        {
+          "line_num": 150,
+          "before": "why: 'Based on the goal you selected, this is the protocol most clinics in our directory offer for this concern.',",
+          "after": "why: 'Based on the goal you selected, this is the protocol most clinics in our matching platform offer for this concern.',"
+        },
+        {
+          "line_num": 299,
+          "before": "TheDripMap is a directory, not a medical provider. This isn&apos;t medical advice.",
+          "after": "TheDripMap is a matching platform, not a medical provider. This isn&apos;t medical advice."
+        },
+        {
+          "line_num": 341,
+          "before": "Browse our national directory or retake the quiz with a different location.",
+          "after": "Browse all clinics nationwide or retake the quiz with a different location."
+        },
+        {
+          "line_num": 348,
+          "before": "Browse Directory",
+          "after": "Browse Clinics"
+        }
+      ]
+    },
+    {
+      "file": "app/iv-therapy/[treatment]/[city]/page.tsx",
+      "changes": 1,
+      "lines": [
+        {
+          "line_num": 340,
+          "before": "Search the directory",
+          "after": "Search all clinics"
+        }
+      ]
+    },
+    {
+      "file": "app/providers/[slug]/page.tsx",
+      "changes": 2,
+      "lines": [
+        {
+          "line_num": 176,
+          "before": "description: `We couldn't find that clinic on TheDripMap. Browse our directory of IV therapy providers near you.`,",
+          "after": "description: `We couldn't find that clinic on TheDripMap. Browse all clinics of IV therapy providers near you.`,"
+        },
+        {
+          "line_num": 1551,
+          "before": "TheDripMap is an independent directory and matching service. Always verify credentials directly with the provider before booking any treatment.",
+          "after": "TheDripMap is an independent matching service. Always verify credentials directly with the provider before booking any treatment."
+        }
+      ]
+    },
+    {
+      "file": "app/privacy/page.tsx",
+      "changes": 6,
+      "lines": [
+        {
+          "line_num": 40,
+          "before": "TheDripMap operates an online directory of IV therapy and wellness clinics across the United States",
+          "after": "TheDripMap operates an online matching platform of IV therapy and wellness clinics across the United States"
+        },
+        {
+          "line_num": 47,
+          "before": "<p>We collect only the information we need to run the directory and the tools we offer:</p>",
+          "after": "<p>We collect only the information we need to run the matching platform and the tools we offer:</p>"
+        },
+        {
+          "line_num": 49,
+          "before": "<li><strong>Clinic &amp; business information</strong> — the name, address, phone number, website, hours, services, ratings, and other publicly available details of the IV therapy clinics listed in ou",
+          "after": "<li><strong>Clinic &amp; business information</strong> — the name, address, phone number, website, hours, services, ratings, and other publicly available details of the IV therapy clinics listed in ou"
+        },
+        {
+          "line_num": 60,
+          "before": "<li>Build and maintain our public directory listings of IV therapy clinics.</li>",
+          "after": "<li>Build and maintain our public platform listings of IV therapy clinics.</li>"
+        },
+        {
+          "line_num": 74,
+          "before": "<li><strong>Supabase</strong> — database and authentication (stores our directory data and account information).</li>",
+          "after": "<li><strong>Supabase</strong> — database and authentication (stores our matching platform data and account information).</li>"
+        },
+        {
+          "line_num": 100,
+          "before": "about their directory listings. We are committed to following the anti-spam laws of both countries.",
+          "after": "about their platform listings. We are committed to following the anti-spam laws of both countries."
+        }
+      ]
+    },
+    {
+      "file": "app/og-image/route.tsx",
+      "changes": 1,
+      "lines": [
+        {
+          "line_num": 43,
+          "before": "North America&apos;s IV Therapy Clinic Directory",
+          "after": "North America&apos;s IV Therapy Clinic Matching Platform"
+        }
+      ]
+    },
+    {
+      "file": "app/api/admin/send-outreach-batch/route.ts",
+      "changes": 1,
+      "lines": [
+        {
+          "line_num": 329,
+          "before": "We added ${display} to TheDripMap, North America's directory for IV therapy clinics. Your listing is live with your real Google rating of ${p.rating}★ from ${reviews} patient reviews.",
+          "after": "We added ${display} to TheDripMap, North America's matching platform for IV therapy clinics. Your listing is live with your real Google rating of ${p.rating}★ from ${reviews} patient reviews."
+        }
+      ]
+    },
+    {
+      "file": "app/api/admin/queue-outreach-drafts/route.ts",
+      "changes": 1,
+      "lines": [
+        {
+          "line_num": 99,
+          "before": "We added ${display} to TheDripMap, North America's directory for IV therapy clinics. Your listing is live with your real Google rating of ${p.rating}★ from ${reviews} patient reviews.",
+          "after": "We added ${display} to TheDripMap, North America's matching platform for IV therapy clinics. Your listing is live with your real Google rating of ${p.rating}★ from ${reviews} patient reviews."
+        }
+      ]
+    },
+    {
+      "file": "app/api/admin/queue-claimed-data-drafts/route.ts",
+      "changes": 3,
+      "lines": [
+        {
+          "line_num": 32,
+          "before": "I want to make your listing as authentic and conversion-focused as possible. Right now I'm using only the info from your website, but a few details from you would take it from good to the best on the ",
+          "after": "I want to make your listing as authentic and conversion-focused as possible. Right now I'm using only the info from your website, but a few details from you would take it from good to the best on the "
+        },
+        {
+          "line_num": 61,
+          "before": "I want to make your listing as authentic and conversion-focused as possible. Right now I'm using info from your Google profile and website, but a few details from you would take it from good to the be",
+          "after": "I want to make your listing as authentic and conversion-focused as possible. Right now I'm using info from your Google profile and website, but a few details from you would take it from good to the be"
+        },
+        {
+          "line_num": 90,
+          "before": "I want to make your listings as authentic and conversion-focused as possible. Right now I'm using info from your website, but a few details from you would take them from good to the best on the direct",
+          "after": "I want to make your listings as authentic and conversion-focused as possible. Right now I'm using info from your website, but a few details from you would take them from good to the best on the matchi"
+        }
+      ]
+    },
+    {
+      "file": "app/api/seo-audit/lead/route.ts",
+      "changes": 1,
+      "lines": [
+        {
+          "line_num": 137,
+          "before": "lines.push('TheDripMap · North America\\'s IV therapy directory');",
+          "after": "lines.push('TheDripMap · North America\\'s IV therapy matching platform');"
+        }
+      ]
+    },
+    {
+      "file": "app/api/brand-voice/route.ts",
+      "changes": 1,
+      "lines": [
+        {
+          "line_num": 41,
+          "before": "\"listingDescription\": \"2-3 sentences for a directory listing\",",
+          "after": "\"listingDescription\": \"2-3 sentences for a platform listing\","
+        }
+      ]
+    },
+    {
+      "file": "app/api/cron/backlink-research/route.ts",
+      "changes": 2,
+      "lines": [
+        {
+          "line_num": 55,
+          "before": "'nurse practitioner side business directory',",
+          "after": "'nurse practitioner side business matching platform',"
+        },
+        {
+          "line_num": 203,
+          "before": "const prompt = `Find ${DAILY_TARGET} genuine backlink candidates for TheDripMap (an IV therapy clinic directory) of type: ${targetType.replace(/_/g, ' ')}.",
+          "after": "const prompt = `Find ${DAILY_TARGET} genuine backlink candidates for TheDripMap (an IV therapy clinic matching platform) of type: ${targetType.replace(/_/g, ' ')}."
+        }
+      ]
+    },
+    {
+      "file": "src/components/SafetyChecker.tsx",
+      "changes": 3,
+      "lines": [
+        {
+          "line_num": 140,
+          "before": "<p className=\"text-slate-500 font-semibold\">Checking our directory…</p>",
+          "after": "<p className=\"text-slate-500 font-semibold\">Checking our matching platform…</p>"
+        },
+        {
+          "line_num": 168,
+          "before": "<div className=\"font-black text-amber-900\">This clinic isn&apos;t in our directory.</div>",
+          "after": "<div className=\"font-black text-amber-900\">This clinic isn&apos;t in our matching platform.</div>"
+        },
+        {
+          "line_num": 192,
+          "before": "<span className=\"flex items-center gap-1.5\"><Check size={14} className=\"text-emerald-600\" strokeWidth={3} /> Real-time directory check</span>",
+          "after": "<span className=\"flex items-center gap-1.5\"><Check size={14} className=\"text-emerald-600\" strokeWidth={3} /> Real-time platform check</span>"
+        }
+      ]
+    },
+    {
+      "file": "src/components/TemporarilyUnavailable.tsx",
+      "changes": 1,
+      "lines": [
+        {
+          "line_num": 37,
+          "before": "Our directory is briefly catching its breath, so this {noun}",
+          "after": "Our matching platform is briefly catching its breath, so this {noun}"
+        }
+      ]
+    },
+    {
+      "file": "src/components/SmartSummary.tsx",
+      "changes": 1,
+      "lines": [
+        {
+          "line_num": 40,
+          "before": "You are a medical directory expert. I am providing you with customer reviews for an IV therapy clinic called \"${clinicName}\".",
+          "after": "You are a medical matching platform expert. I am providing you with customer reviews for an IV therapy clinic called \"${clinicName}\"."
+        }
+      ]
+    },
+    {
+      "file": "src/lib/drip-assistant.ts",
+      "changes": 8,
+      "lines": [
+        {
+          "line_num": 246,
+          "before": "? `No clinics found in \"${input.city}\". Tell the user honestly we don't list that area yet, and offer one of the covered cities below or browsing the full directory.`",
+          "after": "? `No clinics found in \"${input.city}\". Tell the user honestly we don't list that area yet, and offer one of the covered cities below or browsing the full matching platform.`"
+        },
+        {
+          "line_num": 864,
+          "before": "description: 'Search TheDripMap\\'s directory for IV therapy / peptide clinics. Use this for any \"find me a clinic\" request. All args optional but pass what the user gave.',",
+          "after": "description: 'Search TheDripMap\\'s matching platform for IV therapy / peptide clinics. Use this for any \"find me a clinic\" request. All args optional but pass what the user gave.',"
+        },
+        {
+          "line_num": 993,
+          "before": "clinicCount?: number; // total available clinics in the directory (queried per request — never hardcoded)",
+          "after": "clinicCount?: number; // total available clinics in the matching platform (queried per request — never hardcoded)"
+        },
+        {
+          "line_num": 1014,
+          "before": "return `You are the chat concierge for ${name}, an IV therapy & wellness clinic. You ONLY answer for ${name} — you are NOT a directory and you do NOT recommend other clinics.",
+          "after": "return `You are the chat concierge for ${name}, an IV therapy & wellness clinic. You ONLY answer for ${name} — you are NOT a matching platform and you do NOT recommend other clinics."
+        },
+        {
+          "line_num": 1034,
+          "before": "- Call directory tools — you only have the booking link above to share.${extra}`;",
+          "after": "- Call matching platform tools — you only have the booking link above to share.${extra}`;"
+        },
+        {
+          "line_num": 1055,
+          "before": ": 'a large directory of IV therapy and peptide clinics';",
+          "after": ": 'a large matching platform of IV therapy and peptide clinics';"
+        },
+        {
+          "line_num": 1057,
+          "before": "return `You are \"Drip Assistant\", the chat concierge for TheDripMap — North America's IV therapy & peptide clinic directory (${sizePhrase}, with verified safety badges on claimed clinics).",
+          "after": "return `You are \"Drip Assistant\", the chat concierge for TheDripMap — North America's IV therapy & peptide clinic matching platform (${sizePhrase}, with verified safety badges on claimed clinics)."
+        },
+        {
+          "line_num": 1118,
+          "before": "- NEVER invent clinic names, prices, hours, ratings, or verification status. Only state what the tools return. If a tool returns nothing, say so honestly and offer a covered city or the directory — ne",
+          "after": "- NEVER invent clinic names, prices, hours, ratings, or verification status. Only state what the tools return. If a tool returns nothing, say so honestly and offer a covered city or the matching platf"
+        }
+      ]
+    },
+    {
+      "file": "src/lib/backlink-templates.ts",
+      "changes": 15,
+      "lines": [
+        {
+          "line_num": 129,
+          "before": "I run TheDripMap (directory of IV therapy clinics across the US and Canada). We get questions about medical director match weekly, so we wrote a guide explaining what to look for, typical fee structur",
+          "after": "I run TheDripMap (matching platform of IV therapy clinics across the US and Canada). We get questions about medical director match weekly, so we wrote a guide explaining what to look for, typical fee "
+        },
+        {
+          "line_num": 151,
+          "before": "We also keep a maintained directory of every IV clinic in NYC with verified-credential filters:",
+          "after": "We also keep a maintained matching platform for every IV clinic in NYC with verified-credential filters:"
+        },
+        {
+          "line_num": 167,
+          "before": "We maintain a free directory of every IV therapy clinic in NYC with credential filters, mobile-service flags, and price ranges:",
+          "after": "We maintain a free matching platform for every IV therapy clinic in NYC with credential filters, mobile-service flags, and price ranges:"
+        },
+        {
+          "line_num": 185,
+          "before": "I run TheDripMap, the IV therapy directory for the US and Canada. We hear from a fair number of NYC visitors searching for in-room or hotel-delivered IV drips, usually after a flight or a long event n",
+          "after": "I run TheDripMap, the IV therapy matching platform for the US and Canada. We hear from a fair number of NYC visitors searching for in-room or hotel-delivered IV drips, usually after a flight or a long"
+        },
+        {
+          "line_num": 207,
+          "before": "I run TheDripMap, an IV therapy directory covering the US and Canada. We track every NYC clinic, their credentials, and pricing, and we just published a 2026 New York guide pulling together who can le",
+          "after": "I run TheDripMap, an IV therapy matching platform covering the US and Canada. We track every NYC clinic, their credentials, and pricing, and we just published a 2026 New York guide pulling together wh"
+        },
+        {
+          "line_num": 223,
+          "before": "We maintain a free directory of NYC IV clinics (credential filters, mobile/in-office service flags, transparent pricing):",
+          "after": "We maintain a free matching platform for NYC IV clinics (credential filters, mobile/in-office service flags, transparent pricing):"
+        },
+        {
+          "line_num": 248,
+          "before": "We also keep a maintained directory of every IV clinic in Toronto and the GTA with the Safety Verified credential filter:",
+          "after": "We also keep a maintained matching platform for every IV clinic in Toronto and the GTA with the Safety Verified credential filter:"
+        },
+        {
+          "line_num": 265,
+          "before": "I run TheDripMap, an IV therapy directory covering the US and Canada. We track every Toronto-area clinic, their credentials, and pricing. Our 2026 GTA guide pulls together who can legally administer I",
+          "after": "I run TheDripMap, an IV therapy matching platform covering the US and Canada. We track every Toronto-area clinic, their credentials, and pricing. Our 2026 GTA guide pulls together who can legally admi"
+        },
+        {
+          "line_num": 282,
+          "before": "We maintain a free directory of every IV therapy clinic in Toronto and the GTA, with credential filters and mobile-service flags:",
+          "after": "We maintain a free matching platform for every IV therapy clinic in Toronto and the GTA, with credential filters and mobile-service flags:"
+        },
+        {
+          "line_num": 302,
+          "before": "We run TheDripMap, an IV therapy directory across Canada and the US. Our 2026 Canada regulation guide explains who can legally administer IV therapy province by province, including the CONO authorizat",
+          "after": "We run TheDripMap, an IV therapy matching platform across Canada and the US. Our 2026 Canada regulation guide explains who can legally administer IV therapy province by province, including the CONO au"
+        },
+        {
+          "line_num": 323,
+          "before": "We maintain a free directory of every Toronto and GTA IV clinic (credential filters, mobile and in-office service flags, CAD pricing transparency):",
+          "after": "We maintain a free matching platform for every Toronto and GTA IV clinic (credential filters, mobile and in-office service flags, CAD pricing transparency):"
+        },
+        {
+          "line_num": 349,
+          "before": "We maintain a directory of every IV therapy clinic in Vancouver and across BC, with the Safety Verified credential filter:",
+          "after": "We maintain a matching platform for every IV therapy clinic in Vancouver and across BC, with the Safety Verified credential filter:"
+        },
+        {
+          "line_num": 369,
+          "before": "I run TheDripMap, an IV therapy directory across Canada and the US. Our 2026 Canada regulation guide pulls together the BC-specific rules: BCCNM for RNs and NPs, CCHPBC for naturopathic physicians wit",
+          "after": "I run TheDripMap, an IV therapy matching platform across Canada and the US. Our 2026 Canada regulation guide pulls together the BC-specific rules: BCCNM for RNs and NPs, CCHPBC for naturopathic physic"
+        },
+        {
+          "line_num": 385,
+          "before": "We maintain a directory of Vancouver and BC IV therapy clinics with credential filters and mobile-service flags:",
+          "after": "We maintain a matching platform for Vancouver and BC IV therapy clinics with credential filters and mobile-service flags:"
+        },
+        {
+          "line_num": 405,
+          "before": "We maintain a free directory of Vancouver and BC IV clinics:",
+          "after": "We maintain a free matching platform for Vancouver and BC IV clinics:"
+        }
+      ]
+    },
+    {
+      "file": "src/lib/outreach-templates.ts",
+      "changes": 2,
+      "lines": [
+        {
+          "line_num": 59,
+          "before": "Your clinic is listed on TheDripMap, North America's IV therapy directory, here:",
+          "after": "Your clinic is listed on TheDripMap, North America's IV therapy matching platform, here:"
+        },
+        {
+          "line_num": 106,
+          "before": "All ${count} of your ${brand} locations across ${cityPhrase} are listed on TheDripMap, North America's IV therapy directory:",
+          "after": "All ${count} of your ${brand} locations across ${cityPhrase} are listed on TheDripMap, North America's IV therapy matching platform:"
+        }
+      ]
+    },
+    {
+      "file": "src/lib/outreach-quality.ts",
+      "changes": 1,
+      "lines": [
+        {
+          "line_num": 164,
+          "before": "export const CASL_FOOTER = `\\nYou're receiving this because your clinic was identified as an IV therapy provider in our directory. To stop receiving these emails, reply with 'unsubscribe' in the subje",
+          "after": "export const CASL_FOOTER = `\\nYou're receiving this because your clinic was identified as an IV therapy provider in our matching platform. To stop receiving these emails, reply with 'unsubscribe' in t"
+        }
+      ]
+    },
+    {
+      "file": "src/lib/seo-audit-llm.ts",
+      "changes": 2,
+      "lines": [
+        {
+          "line_num": 172,
+          "before": "LOCAL SEARCH DEMAND (real numbers from our directory's data)",
+          "after": "LOCAL SEARCH DEMAND (real numbers from our matching platform's data)"
+        },
+        {
+          "line_num": 174,
+          "before": "- Competing clinics in this city in our directory: ${i.cityCompetitors}",
+          "after": "- Competing clinics in this city in our matching platform: ${i.cityCompetitors}"
+        }
+      ]
+    }
+  ],
+  "blog_posts": [
+    {
+      "slug": "iv-therapy-ottawa-2026-guide",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "magnesium-iv-therapy-guide",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-montreal-2026-guide",
+      "changes": 4,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-cost-canada-2026",
+      "changes": 4,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-mississauga-2026-guide",
+      "changes": 3,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-near-me-how-to-find-best-provider",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-laws-canada-province-by-province-2026",
+      "changes": 2,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "how-to-start-iv-therapy-business-2026",
+      "changes": 3,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "how-much-does-iv-therapy-cost",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-vancouver-2026-guide",
+      "changes": 6,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "mobile-iv-therapy-canada-laws-province-by-province",
+      "changes": 2,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "myers-cocktail-iv-therapy-complete-guide",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "nad-plus-therapy-toronto-guide",
+      "changes": 2,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "nad-iv-therapy-vancouver-bc",
+      "changes": 4,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-oakville-2026-guide",
+      "changes": 9,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "nad-plus-therapy-nyc",
+      "changes": 2,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-calgary-2026-guide",
+      "changes": 4,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-laws-by-state-2026",
+      "changes": 2,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-richmond-hill-2026-guide",
+      "changes": 5,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "science-of-iv-therapy-for-hangover-recovery",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "hangover-iv-therapy-nyc",
+      "changes": 2,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "how-much-does-it-cost-to-open-iv-therapy-clinic",
+      "changes": 2,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-new-york-2026",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "mobile-iv-therapy-calgary",
+      "changes": 4,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "myers-cocktail-nyc",
+      "changes": 2,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "mobile-iv-therapy-near-me",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "who-can-legally-give-iv-canada-rules-by-province-2026",
+      "changes": 9,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "mobile-iv-therapy-vancouver",
+      "changes": 3,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-mississauga",
+      "changes": 5,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "mobile-iv-therapy-nyc",
+      "changes": 2,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-yorkville-toronto",
+      "changes": 5,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-los-angeles-2026",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "mobile-iv-therapy-ottawa",
+      "changes": 4,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-oakville",
+      "changes": 5,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iron-iv-therapy-guide",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "saline-iv-therapy-at-home-guide",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "mobile-iv-therapy-edmonton",
+      "changes": 5,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-first-time-discount-guide",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "how-to-get-patients-iv-therapy-clinic-without-ads",
+      "changes": 7,
+      "fields_updated": [
+        "content",
+        "meta_description",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "mobile-iv-therapy-toronto-gta",
+      "changes": 2,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-canada-complete-guide-2026",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-miami-2026",
+      "changes": 3,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-clinics-canada-2026",
+      "changes": 13,
+      "fields_updated": [
+        "content",
+        "excerpt",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-manhattan",
+      "changes": 6,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-edmonton-2026",
+      "changes": 2,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "thedripmap-launches-toronto-gta-iv-therapy",
+      "changes": 9,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-san-diego-2026",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-washington-dc-2026",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-brooklyn",
+      "changes": 5,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "7-questions-before-iv-therapy",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-north-york",
+      "changes": 5,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-upper-east-side",
+      "changes": 5,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "myers-cocktail-toronto",
+      "changes": 2,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-san-francisco-2026",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-toronto-2026",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-greater-toronto-area",
+      "changes": 5,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-montreal-2026",
+      "changes": 2,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-trends-2026-whats-new",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-calgary-2026",
+      "changes": 2,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-dallas-2026",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-vancouver-2026",
+      "changes": 2,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-houston-2026",
+      "changes": 1,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-drip-nyc",
+      "changes": 5,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-ottawa-2026",
+      "changes": 4,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "hangover-iv-therapy-toronto",
+      "changes": 2,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    },
+    {
+      "slug": "iv-therapy-toronto-complete-guide",
+      "changes": 6,
+      "fields_updated": [
+        "content",
+        "last_updated"
+      ]
+    }
+  ],
+  "flags": []
+}

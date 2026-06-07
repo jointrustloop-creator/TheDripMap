@@ -59,7 +59,7 @@ export default async function StatePage({ params }: StatePageProps) {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     name: `IV Therapy in ${state.name}`,
-    description: `Directory of ${total} IV therapy clinics across ${cityCount} cities in ${state.name}.`,
+    description: `Matching platform for ${total} IV therapy clinics across ${cityCount} cities in ${state.name}.`,
     url: `${SITE_URL}/states/${state.slug}`,
     isPartOf: { '@type': 'WebSite', name: 'TheDripMap', url: SITE_URL },
   };
@@ -139,7 +139,7 @@ export default async function StatePage({ params }: StatePageProps) {
           </section>
         ) : (
           <section className="mb-24 bg-white p-12 rounded-[3rem] border border-slate-100 text-center">
-            <p className="text-slate-500 italic">No IV therapy clinics found in {state.name} yet. Check back soon as we expand our directory.</p>
+            <p className="text-slate-500 italic">No IV therapy clinics found in {state.name} yet. Check back soon as we expand our matching platform.</p>
           </section>
         )}
 

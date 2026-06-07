@@ -28,7 +28,7 @@ const GUIDES = [
   { slug: 'how-much-does-it-cost-to-open-iv-therapy-clinic', title: 'How Much Does It Cost to Open an IV Therapy Clinic?', blurb: 'A real startup budget breakdown — mobile vs. fixed vs. hybrid, low/mid/high totals, ongoing costs, and an honest path to break-even.' },
   { slug: 'iv-therapy-laws-by-state-2026', title: 'IV Therapy Laws by State (2026)', blurb: 'Ownership/CPOM rules, who can administer IVs, good-faith exams, and medical-director requirements — with a state-by-state table.' },
   { slug: 'how-to-find-medical-director-iv-therapy-clinic', title: 'How to Find a Medical Director', blurb: 'What a medical director does, what to pay, where to find one, and the absentee-doctor arrangements that get clinics shut down.' },
-  { slug: 'how-to-get-patients-iv-therapy-clinic-without-ads', title: 'Get Patients Without Paid Ads', blurb: '8 organic strategies that actually work in 2026 — directory listings, local SEO, reviews, referrals, and more.' },
+  { slug: 'how-to-get-patients-iv-therapy-clinic-without-ads', title: 'Get Patients Without Paid Ads', blurb: '8 organic strategies that actually work in 2026 — platform listings, local SEO, reviews, referrals, and more.' },
 ];
 
 export default async function ClinicOwnerResourcesPage() {

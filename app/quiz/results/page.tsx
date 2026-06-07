@@ -147,7 +147,7 @@ function ResultsContent() {
     return {
       name,
       what: 'A clinically common IV protocol for this goal.',
-      why: 'Based on the goal you selected, this is the protocol most clinics in our directory offer for this concern.',
+      why: 'Based on the goal you selected, this is the protocol most clinics in our matching platform forfer for this concern.',
       askBeforeBooking: [],
       typicalCost: '',
       duration: '',
@@ -296,7 +296,7 @@ function ResultsContent() {
                 your situation.
               </p>
               <p className="text-xs text-amber-800 font-bold">
-                TheDripMap is a directory, not a medical provider. This isn&apos;t medical advice.
+                TheDripMap is a matching platform, not a medical provider. This isn&apos;t medical advice.
               </p>
             </div>
           </motion.div>
@@ -338,14 +338,14 @@ function ResultsContent() {
               No verified clinics found in {surveyData.city || 'your area'} yet.
             </h3>
             <p className="text-slate-500 mb-8 max-w-md mx-auto">
-              Browse our national directory or retake the quiz with a different location.
+              Browse all clinics nationwide or retake the quiz with a different location.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/search"
                 className="bg-wellness-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-wellness-700 transition-all shadow-sm"
               >
-                Browse Directory
+                Browse Clinics
               </Link>
               <button
                 onClick={() => router.push('/quiz')}

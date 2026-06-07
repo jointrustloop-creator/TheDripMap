@@ -137,7 +137,7 @@ export const SafetyChecker = () => {
       {loading && (
         <div className="text-center py-12">
           <Loader2 size={26} className="animate-spin mx-auto text-emerald-600 mb-3" />
-          <p className="text-slate-500 font-semibold">Checking our directory…</p>
+          <p className="text-slate-500 font-semibold">Checking our matching platform…</p>
         </div>
       )}
 
@@ -165,7 +165,7 @@ export const SafetyChecker = () => {
               <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5 flex items-start gap-3">
                 <ShieldAlert size={20} className="text-amber-600 shrink-0 mt-0.5" />
                 <div>
-                  <div className="font-black text-amber-900">This clinic isn&apos;t in our directory.</div>
+                  <div className="font-black text-amber-900">This clinic isn&apos;t in our matching platform.</div>
                   <div className="text-sm text-amber-800/80 mt-0.5">
                     We couldn&apos;t find &quot;{result.query.name}&quot;{result.query.city ? ` in ${result.query.city}` : ''}. That doesn&apos;t mean it&apos;s unsafe — but here are verified alternatives you can trust.
                   </div>
@@ -189,7 +189,7 @@ export const SafetyChecker = () => {
 
       {!result && !loading && (
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-semibold text-slate-400">
-          <span className="flex items-center gap-1.5"><Check size={14} className="text-emerald-600" strokeWidth={3} /> Real-time directory check</span>
+          <span className="flex items-center gap-1.5"><Check size={14} className="text-emerald-600" strokeWidth={3} /> Real-time platform check</span>
           <span className="flex items-center gap-1.5"><ShieldCheck size={14} className="text-emerald-600" /> Verification status</span>
           <span className="flex items-center gap-1.5"><X size={14} className="text-slate-300" strokeWidth={3} /> No signup</span>
         </div>

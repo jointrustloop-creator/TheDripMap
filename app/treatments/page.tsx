@@ -102,7 +102,7 @@ export default function TreatmentsIndexPage() {
     '@id': `${SITE_URL}/treatments#glossary`,
     name: 'IV Therapy Treatments Glossary',
     description:
-      'Plain-language one-line definitions of every IV therapy treatment in TheDripMap directory.',
+      'Plain-language one-line definitions of every IV therapy treatment in TheDripMap matching platform.',
     url: `${SITE_URL}/treatments`,
     hasDefinedTerm: glossary.map((d) => ({
       '@type': 'DefinedTerm',

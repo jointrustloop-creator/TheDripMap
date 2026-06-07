@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const year = new Date().getFullYear();
   const title = `IV Therapy Statistics & Market Data ${year} | TheDripMap`;
-  const description = `Comprehensive IV therapy market statistics from TheDripMap's directory of ${total} verified US clinics. Data on top cities, states, and trends across ${cities} cities and ${states} states.`;
+  const description = `Comprehensive IV therapy market statistics from TheDripMap's matching platform for ${total} verified US clinics. Data on top cities, states, and trends across ${cities} cities and ${states} states.`;
   const ogImage = 'https://www.thedripmap.com/og-image.png';
 
   return {
@@ -67,11 +67,11 @@ export default async function StatisticsPage() {
   const faqs = [
     {
       question: "How many IV therapy clinics are there in the US?",
-      answer: `Based on TheDripMap's directory of ${stats.total.toLocaleString()} verified clinics across ${stats.cities} cities and ${stats.states} states, IV therapy is widely available across the United States. The actual total number of IV therapy providers nationwide is likely significantly higher as TheDripMap continues to expand its coverage.`
+      answer: `Based on TheDripMap's matching platform for ${stats.total.toLocaleString()} verified clinics across ${stats.cities} cities and ${stats.states} states, IV therapy is widely available across the United States. The actual total number of IV therapy providers nationwide is likely significantly higher as TheDripMap continues to expand its coverage.`
     },
     {
       question: "Which US state has the most IV therapy clinics?",
-      answer: `${topStates[0]?.name} leads all US states with ${topStates[0]?.count} listed IV therapy clinics, followed by ${topStates[1]?.name} (${topStates[1]?.count}) and ${topStates[2]?.name} (${topStates[2]?.count}). Together these three states account for a significant portion of all IV therapy providers in TheDripMap's national directory.`
+      answer: `${topStates[0]?.name} leads all US states with ${topStates[0]?.count} listed IV therapy clinics, followed by ${topStates[1]?.name} (${topStates[1]?.count}) and ${topStates[2]?.name} (${topStates[2]?.count}). Together these three states account for a significant portion of all IV therapy providers in TheDripMap's national matching platform.`
     },
     {
       question: "Which US city has the most IV therapy clinics?",
@@ -90,8 +90,8 @@ export default async function StatisticsPage() {
   const datasetSchema = {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    "name": "US IV Therapy Clinic Directory Statistics",
-    "description": "Statistics on IV therapy clinics across the United States compiled from TheDripMap's verified directory",
+    "name": "US IV Therapy Clinic Matching Platform Statistics",
+    "description": "Statistics on IV therapy clinics across the United States compiled from TheDripMap's verified matching platform",
     "url": "https://www.thedripmap.com/iv-therapy-statistics",
     "creator": {
       "@type": "Organization",
@@ -165,7 +165,7 @@ export default async function StatisticsPage() {
             <span className="text-wellness-600">Market Statistics & Data</span>
           </h1>
           <p className="text-xl text-slate-500 max-w-3xl leading-relaxed">
-            The following statistics are compiled from TheDripMap&apos;s verified directory of IV therapy clinics across the United States. Data is updated regularly as new clinics are added to the directory. Last updated: {lastUpdated}.
+            The following statistics are compiled from TheDripMap&apos;s verified matching platform for IV therapy clinics across the United States. Data is updated regularly as new clinics are added to the matching platform. Last updated: {lastUpdated}.
           </p>
         </section>
 
@@ -216,7 +216,7 @@ export default async function StatisticsPage() {
             </table>
           </div>
           <p className="mt-6 text-sm text-slate-400 font-medium">
-            &quot;Data represents clinics currently listed in the TheDripMap directory. Actual clinic counts per state may be higher as the directory continues to expand.&quot;
+            &quot;Data represents clinics currently listed in the TheDripMap matching platform. Actual clinic counts per state may be higher as the matching platform continues to expand.&quot;
           </p>
         </section>
 
@@ -280,7 +280,7 @@ export default async function StatisticsPage() {
             </table>
           </div>
           <p className="text-lg text-slate-600 leading-relaxed max-w-4xl">
-            &quot;Clinics with 100 or more reviews represent the most established providers in the directory. These clinics have a proven track record of patient satisfaction and consistent service delivery.&quot;
+            &quot;Clinics with 100 or more reviews represent the most established providers in the matching platform. These clinics have a proven track record of patient satisfaction and consistent service delivery.&quot;
           </p>
         </section>
 
@@ -328,7 +328,7 @@ export default async function StatisticsPage() {
         {/* Footer Note */}
         <section className="pt-12 border-t border-slate-100 text-center max-w-4xl mx-auto">
           <p className="text-sm text-slate-400 font-medium leading-relaxed">
-            &quot;Data source: TheDripMap directory of verified US IV therapy clinics. Statistics reflect current directory coverage and are updated as new clinics are added. TheDripMap is an independent directory and matching service and does not endorse any individual clinic. Always verify credentials directly with the provider before booking any IV therapy treatment.&quot;
+            &quot;Data source: TheDripMap matching platform for verified US IV therapy clinics. Statistics reflect current matching platform coverage and are updated as new clinics are added. TheDripMap is an independent matching service and does not endorse any individual clinic. Always verify credentials directly with the provider before booking any IV therapy treatment.&quot;
           </p>
         </section>
       </main>

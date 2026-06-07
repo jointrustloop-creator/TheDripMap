@@ -1,0 +1,48 @@
+{
+  "phase": "remediate-awkward",
+  "timestamp": "2026-06-07T23:05:25.592Z",
+  "code_changes": [
+    {
+      "file": "app/terms/page.tsx",
+      "fixes": 1
+    },
+    {
+      "file": "app/symptoms/[slug]/page.tsx",
+      "fixes": 1
+    },
+    {
+      "file": "app/symptoms/page.tsx",
+      "fixes": 3
+    },
+    {
+      "file": "app/cities/page.tsx",
+      "fixes": 1
+    },
+    {
+      "file": "app/iv-therapy-statistics/page.tsx",
+      "fixes": 4
+    },
+    {
+      "file": "app/iv-therapy-for/[slug]/page.tsx",
+      "fixes": 1
+    },
+    {
+      "file": "app/quiz/results/page.tsx",
+      "fixes": 1
+    },
+    {
+      "file": "app/privacy/page.tsx",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/drip-assistant.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/backlink-templates.ts",
+      "fixes": 1
+    }
+  ],
+  "blog_changes": [],
+  "flags": []
+}

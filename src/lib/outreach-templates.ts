@@ -56,7 +56,7 @@ export function buildSingleLocationBody(p: ProviderRow): string {
 
   return `Hi ${display} team,
 
-Your clinic is listed on TheDripMap, North America's IV therapy directory, here:
+Your clinic is listed on TheDripMap, North America's IV therapy matching platform, here:
 ${providerUrl}
 
 Right now your page shows a generic placeholder where your photos, hours, services, and description should be. When someone searching "IV therapy in ${cityLabel}" lands on it, they see a thin profile and move on to the next clinic.
@@ -103,7 +103,7 @@ export function buildMultiLocationBody(providers: ProviderRow[], email: string):
 
   return `Hi ${brand} team,
 
-All ${count} of your ${brand} locations across ${cityPhrase} are listed on TheDripMap, North America's IV therapy directory:
+All ${count} of your ${brand} locations across ${cityPhrase} are listed on TheDripMap, North America's IV therapy matching platform:
 
 ${locations}
 

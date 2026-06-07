@@ -7,7 +7,7 @@ import { SafetyChecker } from '../../../src/components/SafetyChecker';
 const EMERALD = '#0F6E56';
 const title = 'IV Clinic Safety Checker — Is This Clinic Verified? | TheDripMap';
 const description =
-  'Check any IV therapy clinic instantly. See whether it\'s claimed, safety-verified, and its rating — or get verified alternatives near you if it isn\'t in our directory.';
+  'Check any IV therapy clinic instantly. See whether it\'s claimed, safety-verified, and its rating — or get verified alternatives near you if it isn\'t in our matching platform.';
 
 export const metadata: Metadata = {
   title,
@@ -34,7 +34,7 @@ export default function SafetyCheckerPage() {
               <span className="block font-serif italic font-normal" style={{ color: EMERALD }}>actually verified?</span>
             </h1>
             <p className="text-[20px] text-slate-500 max-w-[560px] mx-auto leading-relaxed font-light">
-              Type any clinic name to see its verification status in our directory — claimed, safety-verified, and rated. Not found? We&apos;ll show verified alternatives near you.
+              Type any clinic name to see its verification status in our matching platform — claimed, safety-verified, and rated. Not found? We&apos;ll show verified alternatives near you.
             </p>
           </div>
         </section>

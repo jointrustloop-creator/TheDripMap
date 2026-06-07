@@ -12,7 +12,7 @@ import { Provider } from '../../src/types';
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getSiteStats();
   const title = "List Your IV Therapy Clinic — Reach More Patients | TheDripMap";
-  const description = `Join the nation's #1 IV therapy directory with ${stats.total.toLocaleString()}+ listed clinics. Claim your free listing to reach thousands of patients searching for wellness drips in your city every month.`;
+  const description = `Join the nation's #1 IV therapy matching platform with ${stats.total.toLocaleString()}+ listed clinics. Claim your free listing to reach thousands of patients searching for wellness drips in your city every month.`;
 
   return {
     title,
@@ -120,7 +120,7 @@ export default async function ForClinicsPage() {
           {[
             { icon: <Users size={32} />, title: 'New Patient Leads', desc: 'Connect with high-intent patients specifically looking for IV treatments in your area.' },
             { icon: <BarChart size={32} />, title: 'Market Insights', desc: 'Access data on local demand, popular services, and competitive pricing in your city.' },
-            { icon: <Globe size={32} />, title: 'SEO Dominance', desc: 'Leverage our high-authority directory to boost your own clinical presence online.' }
+            { icon: <Globe size={32} />, title: 'SEO Dominance', desc: 'Leverage our high-authority matching platform to boost your own clinical presence online.' }
           ].map((item, idx) => (
             <div key={idx} className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl text-center">
               <div className="w-16 h-16 bg-wellness-50 rounded-2xl flex items-center justify-center text-wellness-600 mx-auto mb-8">
@@ -147,7 +147,7 @@ export default async function ForClinicsPage() {
               The same clinic, two very different listings
             </h2>
             <p className="text-lg text-slate-500 leading-relaxed">
-              Both cards below are pulled live from the directory — exactly what patients see today, and what changes the moment you claim.
+              Both cards below are pulled live from the matching platform — exactly what patients see today, and what changes the moment you claim.
             </p>
           </div>
 
@@ -222,7 +222,7 @@ export default async function ForClinicsPage() {
             </div>
           </div>
           <p className="mt-6 text-center text-[11px] text-slate-400 font-medium italic">
-            Real listings pulled live from the directory, not mockups.
+            Real listings pulled live from the matching platform, not mockups.
           </p>
         </div>
 

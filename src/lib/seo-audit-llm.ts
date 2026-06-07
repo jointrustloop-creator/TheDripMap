@@ -169,9 +169,9 @@ CLINIC
 - City: ${i.city || '(not provided)'}
 - Detected services: ${i.services.join(', ') || '(none detected)'}
 
-LOCAL SEARCH DEMAND (real numbers from our directory's data)
+LOCAL SEARCH DEMAND (real numbers from our matching platform's data)
 - Monthly "iv therapy ${i.city || 'their city'}" searches: ${i.citySearchesPerMonth}
-- Competing clinics in this city in our directory: ${i.cityCompetitors}
+- Competing clinics in this city in our matching platform: ${i.cityCompetitors}
 
 CURRENT ON-PAGE STATE
 - Current <title>: ${i.currentTitle || '(missing)'}

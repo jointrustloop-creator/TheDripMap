@@ -38,7 +38,7 @@ Match the tone to the brand vibe and speak to the ideal patient. Be specific to 
 
 Respond with ONLY valid minified JSON (no markdown, no commentary) using exactly these keys:
 {
- "listingDescription": "2-3 sentences for a directory listing",
+ "listingDescription": "2-3 sentences for a platform listing",
  "gbpAbout": "Google Business Profile About blurb, MAX 250 characters",
  "instagramBio": "Instagram bio, MAX 150 characters, may use 1-2 tasteful emojis",
  "instagramCaptions": [

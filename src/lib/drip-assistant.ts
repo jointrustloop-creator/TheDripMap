@@ -243,7 +243,7 @@ async function searchProviders(input: {
         count: 0,
         clinics: [],
         note: hasCity
-          ? `No clinics found in "${input.city}". Tell the user honestly we don't list that area yet, and offer one of the covered cities below or browsing the full directory.`
+          ? `No clinics found in "${input.city}". Tell the user honestly we don't list that area yet, and offer one of the covered cities below or browsing the full matching platform.`
           : 'No clinics found near those coordinates. Ask for a city or suggest a covered city below.',
         suggestedCities,
       }),
@@ -861,7 +861,7 @@ export async function runTool(name: string, input: Record<string, unknown>): Pro
 export const TOOL_SCHEMAS = [
   {
     name: 'search_providers',
-    description: 'Search TheDripMap\'s directory for IV therapy / peptide clinics. Use this for any "find me a clinic" request. All args optional but pass what the user gave.',
+    description: 'Search TheDripMap\'s matching platform for IV therapy / peptide clinics. Use this for any "find me a clinic" request. All args optional but pass what the user gave.',
     input_schema: {
       type: 'object',
       properties: {
@@ -990,7 +990,7 @@ export interface AssistantConfig {
 export interface AssistantContext {
   city?: string | null; // user's detected/stated city
   hasCoords?: boolean; // true if the browser gave us precise coordinates
-  clinicCount?: number; // total available clinics in the directory (queried per request — never hardcoded)
+  clinicCount?: number; // total available clinics in the matching platform (queried per request — never hardcoded)
 }
 
 function buildWhitelabelPrompt(config: AssistantConfig): string {
@@ -1011,7 +1011,7 @@ function buildWhitelabelPrompt(config: AssistantConfig): string {
   const phoneLine = config.phone ? `\nPHONE: ${config.phone}` : '';
   const extra = config.extraSystemPrompt ? `\n\n${config.extraSystemPrompt}` : '';
 
-  return `You are the chat concierge for ${name}, an IV therapy & wellness clinic. You ONLY answer for ${name} — you are NOT a directory and you do NOT recommend other clinics.
+  return `You are the chat concierge for ${name}, an IV therapy & wellness clinic. You ONLY answer for ${name} — you are NOT a matching platform and you do NOT recommend other clinics.
 
 PERSONALITY: warm, knowledgeable, trustworthy — like a friend who happens to be a nurse. Never salesy.
 ${treatments}${menu}${hours}${phoneLine}${booking}
@@ -1031,7 +1031,7 @@ DO NOT:
 - Compare ${name} to other clinics or mention competitors.
 - Recommend treatments not on the menu above.
 - Make medical promises or guarantee outcomes.
-- Call directory tools — you only have the booking link above to share.${extra}`;
+- Call matching platform tools — you only have the booking link above to share.${extra}`;
 }
 
 export function buildSystemPrompt(config: AssistantConfig = {}, ctx: AssistantContext = {}): string {
@@ -1052,9 +1052,9 @@ export function buildSystemPrompt(config: AssistantConfig = {}, ctx: AssistantCo
   const sizePhrase =
     typeof ctx.clinicCount === 'number' && ctx.clinicCount > 0
       ? `${ctx.clinicCount.toLocaleString()}+ listed clinics`
-      : 'a large directory of IV therapy and peptide clinics';
+      : 'a large matching platform for IV therapy and peptide clinics';
 
-  return `You are "Drip Assistant", the chat concierge for TheDripMap — North America's IV therapy & peptide clinic directory (${sizePhrase}, with verified safety badges on claimed clinics).
+  return `You are "Drip Assistant", the chat concierge for TheDripMap — North America's IV therapy & peptide clinic matching platform (${sizePhrase}, with verified safety badges on claimed clinics).
 
 YOUR JOB: help patients find the right clinic right now, and answer IV therapy / peptide questions accurately. Finding a clinic is your PRIMARY job; education is secondary. End educational answers by offering to find a relevant clinic.
 
@@ -1115,7 +1115,7 @@ SAFETY SCREENING — required for these treatments: high-dose vitamin C, GLP-1 /
 For plain hydration, Myers cocktail, hangover recovery, immune support, and other low-risk treatments, screening is NOT required — go straight to search_providers.
 
 HONESTY & SAFETY (critical):
-- NEVER invent clinic names, prices, hours, ratings, or verification status. Only state what the tools return. If a tool returns nothing, say so honestly and offer a covered city or the directory — never fabricate.
+- NEVER invent clinic names, prices, hours, ratings, or verification status. Only state what the tools return. If a tool returns nothing, say so honestly and offer a covered city or the matching platform — never fabricate.
 - Ratings/reviews exist only for claimed/verified clinics; don't imply unclaimed clinics have ratings.
 - "Verified" = the clinic confirmed all 5 safety checks (medical director, licensed clinician, compounding pharmacy, liability insurance, state-board compliance). "Claimed" = the owner manages the listing.
 - For medical questions, give honest, balanced info, note where evidence is limited, and always recommend confirming suitability with a licensed clinician. You are not a doctor and don't give medical advice or diagnoses.

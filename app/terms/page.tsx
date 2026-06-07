@@ -42,11 +42,11 @@ export default function TermsPage() {
             Services.
           </p>
 
-          <h2>1. About the Service — Informational Directory Only</h2>
+          <h2>1. About the Service — Informational Matching Platform Only</h2>
           <p>
-            TheDripMap is an online directory that helps people discover IV therapy and wellness clinics across
+            TheDripMap is an online matching platform that helps people discover IV therapy and wellness clinics across
             the United States and Canada. The Services are provided for general informational purposes only.
-            We are a directory and matching platform — we do not provide medical, health, or treatment services,
+            We are a matching platform — we do not provide medical, health, or treatment services,
             and we are not a clinic, pharmacy, or healthcare provider.
           </p>
 
@@ -63,11 +63,11 @@ export default function TermsPage() {
 
           <h2>3. Clinic Listing Accuracy</h2>
           <p>
-            We work to keep our directory accurate, but clinic information — including services, hours, pricing,
+            We work to keep our matching platform accurate, but clinic information — including services, hours, pricing,
             ratings, contact details, and availability — may change or become out of date, and may contain errors.
             We do not warrant or guarantee the accuracy, completeness, or currency of any listing. Always confirm
             details directly with the clinic before relying on them or booking a service. TheDripMap does not
-            endorse, recommend, or vouch for any clinic, and the inclusion of a clinic in our directory is not an
+            endorse, recommend, or vouch for any clinic, and the inclusion of a clinic in our matching platform is not an
             endorsement of its services, qualifications, or safety.
           </p>
 

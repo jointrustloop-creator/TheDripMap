@@ -37,16 +37,16 @@ export default function PrivacyPage() {
           <p><strong>Last updated: May 2026</strong></p>
           <p>
             At TheDripMap (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;), we take your privacy seriously.
-            TheDripMap operates an online directory of IV therapy and wellness clinics across the United States
+            TheDripMap operates an online matching platform for IV therapy and wellness clinics across the United States
             and Canada. This policy explains, in plain English, what information we collect, how we use it, who
             we share it with, and the rights you have over your data. If you have any questions, email us anytime
             at <a href="mailto:info@thedripmap.com">info@thedripmap.com</a>.
           </p>
 
           <h2>1. Information We Collect</h2>
-          <p>We collect only the information we need to run the directory and the tools we offer:</p>
+          <p>We collect only the information we need to run the matching platform and the tools we offer:</p>
           <ul>
-            <li><strong>Clinic &amp; business information</strong> — the name, address, phone number, website, hours, services, ratings, and other publicly available details of the IV therapy clinics listed in our directory.</li>
+            <li><strong>Clinic &amp; business information</strong> — the name, address, phone number, website, hours, services, ratings, and other publicly available details of the IV therapy clinics listed in our matching platform.</li>
             <li><strong>Email addresses</strong> — addresses of clinics we contact about their listings, and addresses you provide when you sign up, submit a form, or request results from one of our tools.</li>
             <li><strong>Quiz answers</strong> — the responses you give in our clinical matching quiz so we can match you with appropriate IV therapy providers.</li>
             <li><strong>Lead &amp; contact form submissions</strong> — information you submit through our contact forms, &ldquo;message a clinic&rdquo; forms, and lead-capture forms (such as your name, email, and message).</li>
@@ -57,7 +57,7 @@ export default function PrivacyPage() {
           <h2>2. How We Use Your Information</h2>
           <p>We use the information we collect to:</p>
           <ul>
-            <li>Build and maintain our public directory listings of IV therapy clinics.</li>
+            <li>Build and maintain our public platform listings of IV therapy clinics.</li>
             <li>Send outreach and follow-up emails to clinics about claiming or improving their listings.</li>
             <li>Capture and respond to leads and contact-form inquiries.</li>
             <li>Generate and return SEO-audit results and other tool outputs you request.</li>
@@ -71,7 +71,7 @@ export default function PrivacyPage() {
             process data on our behalf and under our instructions:
           </p>
           <ul>
-            <li><strong>Supabase</strong> — database and authentication (stores our directory data and account information).</li>
+            <li><strong>Supabase</strong> — database and authentication (stores our matching platform data and account information).</li>
             <li><strong>Vercel</strong> — website hosting and delivery.</li>
             <li><strong>Mapbox</strong> — interactive maps and clinic location display.</li>
             <li><strong>Anthropic</strong> — AI services that power our chat assistant, brand-voice tools, and SEO tools.</li>
@@ -97,7 +97,7 @@ export default function PrivacyPage() {
           <h2>5. Email Communications &amp; Anti-Spam Compliance</h2>
           <p>
             TheDripMap sends commercial electronic messages to IV therapy clinics in the United States and Canada
-            about their directory listings. We are committed to following the anti-spam laws of both countries.
+            about their platform listings. We are committed to following the anti-spam laws of both countries.
           </p>
 
           <h3>Canada — CASL (Canada&rsquo;s Anti-Spam Legislation)</h3>

@@ -126,7 +126,7 @@ If you ever round up resources for the community, these are free + linkable. No 
 
 {{page_title}} clearly answers a real pain point. The operator side of medical director sourcing rarely gets written about honestly.
 
-I run TheDripMap (directory of IV therapy clinics across the US and Canada). We get questions about medical director match weekly, so we wrote a guide explaining what to look for, typical fee structures, and red flags, pulled from our conversations with operators in 30+ markets:
+I run TheDripMap (matching platform for IV therapy clinics across the US and Canada). We get questions about medical director match weekly, so we wrote a guide explaining what to look for, typical fee structures, and red flags, pulled from our conversations with operators in 30+ markets:
 
   https://www.thedripmap.com/blog/how-to-find-medical-director-iv-therapy-clinic
 
@@ -148,7 +148,7 @@ We just refreshed our 2026 guide to IV therapy in New York: who can legally admi
 
   https://www.thedripmap.com/blog/best-iv-therapy-new-york-2026
 
-We also keep a maintained directory of every IV clinic in NYC with verified-credential filters:
+We also keep a maintained matching platform for every IV clinic in NYC with verified-credential filters:
 
   https://www.thedripmap.com/cities/new-york
 
@@ -164,7 +164,7 @@ If either is a fit for a roundup or resources page, a link would mean a lot. No 
 
 {{specific_observation | "Your members train hard, so recovery comes up often."}} A lot of NYC fitness clients ask about IV therapy as part of their post-workout or pre-event recovery routine, and there's no shortage of clinics in the city, so the question is usually "which one is safe and worth it."
 
-We maintain a free directory of every IV therapy clinic in NYC with credential filters, mobile-service flags, and price ranges:
+We maintain a free matching platform for every IV therapy clinic in NYC with credential filters, mobile-service flags, and price ranges:
 
   https://www.thedripmap.com/cities/new-york
 
@@ -182,7 +182,7 @@ If your members would find either useful, we'd be grateful for a mention on your
     subject: 'Resource for guests asking about in-room IV therapy',
     body: `Hi {{contact_name | "there"}},
 
-I run TheDripMap, the IV therapy directory for the US and Canada. We hear from a fair number of NYC visitors searching for in-room or hotel-delivered IV drips, usually after a flight or a long event night, and we know concierge desks field the same questions.
+I run TheDripMap, the IV therapy matching platform for the US and Canada. We hear from a fair number of NYC visitors searching for in-room or hotel-delivered IV drips, usually after a flight or a long event night, and we know concierge desks field the same questions.
 
 We keep a maintained list of NYC clinics that offer mobile and in-room service, with verified clinical staff:
 
@@ -204,7 +204,7 @@ If a link from your guest resources page makes sense, a mention would be appreci
 
 I read {{page_title}}. {{topic_hook | "Your coverage of the NYC wellness market"}} has been some of the most grounded reporting on the space.
 
-I run TheDripMap, an IV therapy directory covering the US and Canada. We track every NYC clinic, their credentials, and pricing, and we just published a 2026 New York guide pulling together who can legally administer IV therapy under NY State rules, average prices across the boroughs, and red flags to watch for:
+I run TheDripMap, an IV therapy matching platform covering the US and Canada. We track every NYC clinic, their credentials, and pricing, and we just published a 2026 New York guide pulling together who can legally administer IV therapy under NY State rules, average prices across the boroughs, and red flags to watch for:
 
   https://www.thedripmap.com/blog/best-iv-therapy-new-york-2026
 
@@ -220,7 +220,7 @@ If a future piece touches IV therapy, hangover recovery, or the broader NYC well
 
 {{specific_observation | "The corporate wellness work you do in NYC is exactly the kind of context where this lands."}} A growing number of NYC employers are asking about IV therapy as a recovery and wellness perk, and the legal-side and clinical-side answers aren't always easy to find.
 
-We maintain a free directory of NYC IV clinics (credential filters, mobile/in-office service flags, transparent pricing):
+We maintain a free matching platform for NYC IV clinics (credential filters, mobile/in-office service flags, transparent pricing):
 
   https://www.thedripmap.com/cities/new-york
 
@@ -245,7 +245,7 @@ We just refreshed our mobile and in-clinic IV therapy guide for the Toronto and 
 
   https://www.thedripmap.com/blog/mobile-iv-therapy-toronto-gta
 
-We also keep a maintained directory of every IV clinic in Toronto and the GTA with the Safety Verified credential filter:
+We also keep a maintained matching platform for every IV clinic in Toronto and the GTA with the Safety Verified credential filter:
 
   https://www.thedripmap.com/cities/toronto
 
@@ -262,7 +262,7 @@ If either is a fit for a roundup or resources page, a link would mean a lot. No 
 
 I read {{page_title}}. {{topic_hook | "Your local Toronto reporting"}} on the wellness scene has been some of the most grounded I've seen for the GTA market.
 
-I run TheDripMap, an IV therapy directory covering the US and Canada. We track every Toronto-area clinic, their credentials, and pricing. Our 2026 GTA guide pulls together who can legally administer IV therapy in Ontario (RNs and NPs through CNO, naturopaths through CONO), typical CAD pricing across the city and suburbs, and the mobile coverage map:
+I run TheDripMap, an IV therapy matching platform covering the US and Canada. We track every Toronto-area clinic, their credentials, and pricing. Our 2026 GTA guide pulls together who can legally administer IV therapy in Ontario (RNs and NPs through CNO, naturopaths through CONO), typical CAD pricing across the city and suburbs, and the mobile coverage map:
 
   https://www.thedripmap.com/blog/mobile-iv-therapy-toronto-gta
 
@@ -279,7 +279,7 @@ If a future piece touches IV therapy, hangover recovery, or GTA wellness, we're 
 
 {{specific_observation | "Your members train hard, recovery comes up often."}} A lot of GTA fitness clients ask about IV therapy as part of their post-workout or pre-event recovery routine, and there's no shortage of clinics across the GTA so the question is usually "which one is safe and worth it."
 
-We maintain a free directory of every IV therapy clinic in Toronto and the GTA, with credential filters and mobile-service flags:
+We maintain a free matching platform for every IV therapy clinic in Toronto and the GTA, with credential filters and mobile-service flags:
 
   https://www.thedripmap.com/cities/toronto
 
@@ -299,7 +299,7 @@ If your members would find either useful, we'd be grateful for a mention on your
 
 I follow the work {{organization_name}} does on naturopathic scope of practice in Canada. {{specific_observation | "The advocacy and credentialing guidance is genuinely useful for patients."}}
 
-We run TheDripMap, an IV therapy directory across Canada and the US. Our 2026 Canada regulation guide explains who can legally administer IV therapy province by province, including the CONO authorization for Ontario NDs, the CCHPBC infusion authority for BC naturopathic physicians, and what patients should ask before booking:
+We run TheDripMap, an IV therapy matching platform across Canada and the US. Our 2026 Canada regulation guide explains who can legally administer IV therapy province by province, including the CONO authorization for Ontario NDs, the CCHPBC infusion authority for BC naturopathic physicians, and what patients should ask before booking:
 
   https://www.thedripmap.com/blog/who-can-legally-give-iv-canada-rules-by-province-2026
 
@@ -320,7 +320,7 @@ If either is a fit for your patient-facing resources, a link would be appreciate
 
 {{specific_observation | "The corporate wellness work you do in the GTA is exactly the kind of context where this lands."}} A growing number of Toronto-area employers are asking about IV therapy as a recovery and wellness perk, and the legal side under Ontario rules plus the CAD pricing picture aren't always easy to find in one place.
 
-We maintain a free directory of every Toronto and GTA IV clinic (credential filters, mobile and in-office service flags, CAD pricing transparency):
+We maintain a free matching platform for every Toronto and GTA IV clinic (credential filters, mobile and in-office service flags, CAD pricing transparency):
 
   https://www.thedripmap.com/cities/toronto
 
@@ -346,7 +346,7 @@ If you build a wellness vendor resource for clients, we'd be grateful for the me
 
 I read {{page_title}} on {{organization_name}}. {{topic_hook | "Your Vancouver wellness coverage"}} captured the kind of questions we hear from BC patients searching for IV therapy.
 
-We maintain a directory of every IV therapy clinic in Vancouver and across BC, with the Safety Verified credential filter:
+We maintain a matching platform for every IV therapy clinic in Vancouver and across BC, with the Safety Verified credential filter:
 
   https://www.thedripmap.com/cities/vancouver
 
@@ -366,7 +366,7 @@ If either is a fit for a roundup or resources page, a link would mean a lot. Bot
 
 I read {{page_title}}. {{topic_hook | "Your BC reporting"}} on the local wellness scene has been some of the most grounded I've seen for the Vancouver market.
 
-I run TheDripMap, an IV therapy directory across Canada and the US. Our 2026 Canada regulation guide pulls together the BC-specific rules: BCCNM for RNs and NPs, CCHPBC for naturopathic physicians with the IV infusion authority, and what patients should ask:
+I run TheDripMap, an IV therapy matching platform across Canada and the US. Our 2026 Canada regulation guide pulls together the BC-specific rules: BCCNM for RNs and NPs, CCHPBC for naturopathic physicians with the IV infusion authority, and what patients should ask:
 
   https://www.thedripmap.com/blog/who-can-legally-give-iv-canada-rules-by-province-2026
 
@@ -382,7 +382,7 @@ If a future piece touches IV therapy, recovery, or BC wellness, we're a free sou
 
 {{specific_observation | "Your members train hard, recovery questions come up."}} A lot of Vancouver fitness clients ask about IV therapy as part of post-workout or pre-event recovery, and the BC question is always "which clinic is safe and worth it."
 
-We maintain a directory of Vancouver and BC IV therapy clinics with credential filters and mobile-service flags:
+We maintain a matching platform for Vancouver and BC IV therapy clinics with credential filters and mobile-service flags:
 
   https://www.thedripmap.com/cities/vancouver
 
@@ -402,7 +402,7 @@ If your members would find either useful, we'd be grateful for a mention on your
 
 {{specific_observation | "The corporate wellness work you do in Vancouver is exactly the kind of context where this lands."}} A growing number of BC employers are asking about IV therapy as a recovery and wellness perk, and the BC-specific clinical side (BCCNM for nurses, CCHPBC for naturopathic physicians with IV authority) plus CAD pricing aren't always easy to find.
 
-We maintain a free directory of Vancouver and BC IV clinics:
+We maintain a free matching platform for Vancouver and BC IV clinics:
 
   https://www.thedripmap.com/cities/vancouver
 

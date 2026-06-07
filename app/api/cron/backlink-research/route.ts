@@ -52,7 +52,7 @@ const SEARCH_QUERIES: Partial<Record<BacklinkTargetType, string[]>> = {
   ],
   nurse_entrepreneur: [
     'nurse entrepreneur community resources IV therapy',
-    'nurse practitioner side business directory',
+    'nurse practitioner side business matching platform',
     'NP business owner support group resources',
   ],
   medical_director_match: [
@@ -200,7 +200,7 @@ export async function GET(req: Request) {
     .map((slug) => `  • ${slug}: ${ARTICLE_DESCRIPTIONS[slug] || ''}`)
     .join('\n');
 
-  const prompt = `Find ${DAILY_TARGET} genuine backlink candidates for TheDripMap (an IV therapy clinic directory) of type: ${targetType.replace(/_/g, ' ')}.
+  const prompt = `Find ${DAILY_TARGET} genuine backlink candidates for TheDripMap (an IV therapy clinic matching platform) of type: ${targetType.replace(/_/g, ' ')}.
 
 Use the web_search tool. Run 2-3 queries from this list to discover candidates:
 ${queries.map((q) => `  - "${q}"`).join('\n')}
