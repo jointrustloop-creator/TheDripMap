@@ -1,0 +1,29 @@
+{
+  "phase": "unpublish-and-redraft-2-3",
+  "timestamp": "2026-06-07T21:34:16.538Z",
+  "deleted": [
+    {
+      "slug": "is-iv-therapy-a-scam-what-the-science-says",
+      "id": "25fba4a6-9100-4ea7-81bd-761151a2891f"
+    },
+    {
+      "slug": "canadian-iv-clinic-regulations-2026",
+      "id": "2194c35c-d160-41dc-8871-ca06fff8eaab"
+    }
+  ],
+  "drafts_written": [
+    {
+      "slug": "is-iv-therapy-a-scam-what-the-science-says",
+      "chars": 8402
+    },
+    {
+      "slug": "canadian-iv-clinic-regulations-2026",
+      "chars": 10509
+    }
+  ],
+  "forbidden_hits": {
+    "article2": [],
+    "article3": []
+  },
+  "errors": []
+}
