@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Loader2, Mail, Star, Clock, Link as LinkIcon, Search } from 'lucide-react';
+import { Loader2, Mail, Star, Clock, Link as LinkIcon, Search, MapPin } from 'lucide-react';
+import { OUTREACH_COUNTRY_FILTER, outreachScopeLabel } from '@/src/lib/outreach-config';
 
 type RegenerateRecipient = {
   email: string;
@@ -163,8 +164,28 @@ export function AdminToolsClient() {
     }
   };
 
+  const scope = outreachScopeLabel();
+  const isCanadaOnly = OUTREACH_COUNTRY_FILTER.length === 1 && OUTREACH_COUNTRY_FILTER[0] === 'Canada';
+  const isAllCountries = OUTREACH_COUNTRY_FILTER.length === 0;
+
   return (
     <>
+      <div className={`mb-6 rounded-2xl border p-4 flex items-start gap-3 ${isCanadaOnly ? 'bg-red-50 border-red-200' : isAllCountries ? 'bg-amber-50 border-amber-200' : 'bg-blue-50 border-blue-200'}`}>
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isCanadaOnly ? 'bg-red-100 text-red-700' : isAllCountries ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
+          <MapPin size={16} />
+        </div>
+        <div className="flex-1">
+          <div className={`text-sm font-black ${isCanadaOnly ? 'text-red-900' : isAllCountries ? 'text-amber-900' : 'text-blue-900'}`}>
+            Outreach scope: {scope}
+          </div>
+          <div className={`text-xs font-medium mt-0.5 ${isCanadaOnly ? 'text-red-700' : isAllCountries ? 'text-amber-700' : 'text-blue-700'}`}>
+            {isCanadaOnly && 'All outreach buttons + crons (daily, follow-up, queue, regenerate) target Canadian providers only. Flip in src/lib/outreach-config.ts to change.'}
+            {isAllCountries && 'No country filter applied. All providers in the pool are eligible.'}
+            {!isCanadaOnly && !isAllCountries && 'Scope is multi-country. Flip in src/lib/outreach-config.ts to change.'}
+          </div>
+        </div>
+      </div>
+
       <Card
         title="Generate 10 outreach drafts"
         description="Picks the next 10 candidates from the scrubbed pool (Canadian-first, grouped by shared email). Saves drafts to info@thedripmap.com Gmail Drafts, signed 'TheDripMap Team'. Marks outreach_sent_at so the 7-day follow-up cron picks them up."

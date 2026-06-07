@@ -1,0 +1,1795 @@
+{
+  "summary": {
+    "audited": 120,
+    "clean": 1,
+    "bySev": {
+      "high": 0,
+      "med": 164,
+      "low": 23
+    },
+    "byCat": {
+      "META": 26,
+      "SCHEMA": 0,
+      "STRUCTURE": 112,
+      "INTERNAL": 27,
+      "CANADA": 22,
+      "HYGIENE": 0
+    }
+  },
+  "results": [
+    {
+      "slug": "iv-therapy-ottawa-2026-guide",
+      "title": "IV Therapy Ottawa: Verified Wellness Lounges, Real 2026 Pricing, and the National Capital Region Guide",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-package-deals-membership-guide",
+      "title": "IV Therapy Package Deals and Memberships — Are They Worth It?",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-for-chronic-fatigue",
+      "title": "IV Therapy for Chronic Fatigue: Can It Help, What Does It Cost & What to Expect",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "vitamin-c-iv-therapy-guide",
+      "title": "Vitamin C IV Therapy — Benefits, Cost and Where to Get It",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 2 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-hydration-for-athletic-performance-recovery",
+      "title": "Peak Performance: How Elite Athletes Use IV Hydration for Recovery",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-immune-support",
+      "title": "IV Therapy for Immune Support: The Science-Backed Protocol for Getting Sick Less",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-cost-canada-2026",
+      "title": "The Real Cost of IV Therapy in Canada (2026): A City-by-City CAD Price Breakdown",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_title too long (93 chars; aim 50-60)"
+        },
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_description long (203 chars; aim 150-160)"
+        },
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "image_url missing (no hero image)"
+        },
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "peptide-therapy-guide-2026",
+      "title": "Peptide Therapy: The Complete Guide to BPC-157, Semaglutide, and the Most Popular Protocols in 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_title too long (99 chars; aim 50-60)"
+        },
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_description long (252 chars; aim 150-160)"
+        },
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-montreal-2026-guide",
+      "title": "IV Therapy Montréal: Verified Clinics, Real 2026 CAD Pricing, and How Quebec's Rules Differ from Ontario",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "myers-cocktail-nyc",
+      "title": "Myers Cocktail NYC: Where to Get It, What It Costs & What to Expect (2026)",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 0 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-for-migraines-headaches",
+      "title": "IV Therapy for Migraines: Does It Work, What's in It & How to Find a Clinic",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "how-to-start-iv-therapy-business-2026",
+      "title": "How to Start an IV Therapy Business in 2026 — The Complete Guide for Nurses and Entrepreneurs",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_title too long (93 chars; aim 50-60)"
+        },
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 0 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "how-much-does-iv-therapy-cost",
+      "title": "How Much Does IV Therapy Cost? Complete 2026 Pricing Guide",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-mississauga-2026-guide",
+      "title": "IV Therapy Mississauga: Peel Region's Verified Wellness Lounges, Real 2026 Pricing, and What to Ask",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "vitamin-b12-iv-therapy-benefits-deficiency",
+      "title": "Vitamin B12 IV Therapy: Signs of Deficiency, Benefits, and What to Expect",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iron-iv-therapy-guide",
+      "title": "Iron IV Therapy — When You Need It and What to Expect",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-vancouver-2026-guide",
+      "title": "IV Therapy Vancouver: The Complete 2026 Guide to BC's Verified Clinics, Real Pricing, and What to Ask Before You Book",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "myers-cocktail-iv-therapy-complete-guide",
+      "title": "Myers Cocktail IV Therapy: The Complete Guide to Benefits, Cost & What to Expect",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "mobile-iv-therapy-canada-laws-province-by-province",
+      "title": "Mobile IV Therapy in Canada (2026): Is It Legal in Your Province? A Province-by-Province Guide",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_title too long (107 chars; aim 50-60)"
+        },
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_description long (205 chars; aim 150-160)"
+        },
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "image_url missing (no hero image)"
+        },
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "nad-plus-therapy-toronto-guide",
+      "title": "NAD+ Therapy in Toronto: Where to Get It, What It Costs, and Whether It's Worth It",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "nad-iv-therapy-vancouver-bc",
+      "title": "NAD+ IV Therapy Vancouver: Where to Get It, Real BC Pricing, and Whether It's Worth It in 2026",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-oakville-2026-guide",
+      "title": "IV Therapy Oakville: Halton Region's Verified Clinics, Real 2026 CAD Pricing, and the Lakeshore Wellness Scene",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-seattle-2026",
+      "title": "Best IV Therapy in Seattle 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "nad-plus-iv-therapy-cellular-longevity-guide",
+      "title": "NAD+ IV Therapy: A Deep Dive into Cellular Longevity and DNA Repair",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-for-anxiety-stress",
+      "title": "IV Therapy for Anxiety and Stress: The Nutritional Root Causes Nobody Talks About",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-anti-aging-longevity",
+      "title": "IV Therapy for Anti-Aging: The Science Behind Looking and Feeling Younger",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "biotin-iv-therapy-guide",
+      "title": "Biotin IV Therapy — Hair, Skin, Nails Truth and Lab Test Warning",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_title too long (73 chars; aim 50-60)"
+        },
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-hangover-does-it-actually-work",
+      "title": "IV Therapy for Hangovers — Does It Actually Work?",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-calgary-2026-guide",
+      "title": "IV Therapy Calgary: Top Verified Clinics, Real 2026 Pricing, and What to Ask Before You Book",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-for-perimenopause-symptoms",
+      "title": "IV Therapy for Perimenopause — What Actually Helps",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-laws-by-state-2026",
+      "title": "IV Therapy Laws by State — What Every Clinic Owner Must Know in 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 0 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "how-much-does-it-cost-to-open-iv-therapy-clinic",
+      "title": "How Much Does It Cost to Open an IV Therapy Clinic in 2026? Real Startup Budget Breakdown",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_title too long (89 chars; aim 50-60)"
+        },
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 0 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "hangover-iv-therapy-nyc",
+      "title": "Hangover IV Therapy NYC: Same-Day Relief Delivered Anywhere in the City",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 0 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-for-athletes-sports-recovery",
+      "title": "IV Therapy for Athletes: How Sports Recovery Drips Work, What They Cost & Who Uses Them",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "mobile-iv-vs-in-clinic-comparison",
+      "title": "Mobile IV Therapy vs. In-Clinic: Which Experience is Right for You?",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "mobile-iv-therapy-calgary",
+      "title": "Mobile IV Therapy Calgary: How It Works in Alberta, Honest Pricing, and Where to Find a Licensed Nurse",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_description long (195 chars; aim 150-160)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-chicago-2026",
+      "title": "Best IV Therapy in Chicago 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "hsa-fsa-iv-therapy-reimbursement-united-states",
+      "title": "HSA and FSA for IV Therapy — What Qualifies in the US",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 1 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-for-jet-lag",
+      "title": "IV Therapy for Jet Lag: The Frequent Flyer's Secret Weapon",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-miami-2026",
+      "title": "Best IV Therapy in Miami 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "mobile-iv-therapy-near-me",
+      "title": "Mobile IV Therapy Near Me — How It Works, What It Costs & How to Find a Service",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "who-can-legally-give-iv-canada-rules-by-province-2026",
+      "title": "Who Can Legally Give You an IV in Canada? Rules by Province (2026)",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses pricing but uses no CAD or $ figures"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-safety-side-effects-guide",
+      "title": "Is IV Therapy Safe? A Comprehensive Guide to Risks and Best Practices",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-north-york",
+      "title": "IV Therapy in North York: Top Clinics & What to Expect (2026)",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "glutathione-iv-therapy-toronto",
+      "title": "Glutathione IV Therapy Toronto: Skin Brightening, Anti-Aging, and Liver Detox — 2026 Guide",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "mobile-iv-therapy-vancouver",
+      "title": "Mobile IV Therapy Vancouver: How It Works in BC, Honest Pricing, and Where to Find a Licensed Provider",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_description long (201 chars; aim 150-160)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-mississauga",
+      "title": "IV Therapy in Mississauga: Top Clinics, Costs & Mobile Services (2026)",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-upper-east-side",
+      "title": "IV Therapy Upper East Side NYC: Top Clinics & What to Expect (2026)",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "how-much-does-nad-plus-iv-therapy-cost",
+      "title": "How Much Does NAD+ IV Therapy Cost? 2026 Pricing Breakdown",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-yorkville-toronto",
+      "title": "IV Therapy in Yorkville Toronto: The Best Clinics in the City (2026)",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-boston-2026",
+      "title": "Best IV Therapy in Boston 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-insurance-ontario",
+      "title": "Does Insurance Cover IV Therapy in Ontario? Complete 2026 Guide",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-denver-2026",
+      "title": "Best IV Therapy in Denver 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-oakville",
+      "title": "IV Therapy in Oakville: Best Clinics & Mobile Services (2026)",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-san-francisco-2026",
+      "title": "Best IV Therapy in San Francisco 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "saline-iv-therapy-at-home-guide",
+      "title": "Saline IV at Home — Mobile Service, Safety, and Why DIY Is Dangerous",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 2 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-first-time-discount-guide",
+      "title": "Getting Discounts on Your First IV Therapy Session",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 2 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "mobile-iv-therapy-toronto-gta",
+      "title": "Mobile IV Therapy Toronto: Same-Day Service, Honest Pricing, and How It Actually Works",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-insurance-coverage-united-states",
+      "title": "IV Therapy Insurance Coverage in the US — When It Is Covered",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 2 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "how-to-get-patients-iv-therapy-clinic-without-ads",
+      "title": "How to Get Patients for Your IV Therapy Clinic Without Paid Ads — 8 Strategies That Actually Work in 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_title too long (105 chars; aim 50-60)"
+        },
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 0 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-toronto-2026",
+      "title": "Best IV Therapy in Toronto 2026",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "how-to-find-medical-director-iv-therapy-clinic",
+      "title": "How to Find a Medical Director for Your IV Therapy Clinic — What They Do, What to Pay, and Red Flags to Avoid",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_title too long (109 chars; aim 50-60)"
+        },
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 0 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-canada-complete-guide-2026",
+      "title": "IV Therapy in Canada: The Complete 2026 Guide",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_title too long (73 chars; aim 50-60)"
+        },
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-clinics-canada-2026",
+      "title": "The Best IV Therapy Clinics in Canada, 2026: Real Rankings From Real Google Data",
+      "isCA": true,
+      "issues": []
+    },
+    {
+      "slug": "iv-therapy-manhattan",
+      "title": "IV Therapy in Manhattan: Best Clinics by Neighbourhood (2026)",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-phoenix-2026",
+      "title": "Best IV Therapy in Phoenix 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "glutathione-iv-therapy-benefits",
+      "title": "Glutathione IV Therapy: Benefits for Skin, Detox, and Anti-Aging",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-edmonton-2026",
+      "title": "Best IV Therapy in Edmonton 2026",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "thedripmap-launches-toronto-gta-iv-therapy",
+      "title": "TheDripMap Is Now Live in Toronto — Find Verified IV Therapy Clinics Across the GTA",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_title too long (74 chars; aim 50-60)"
+        },
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_description long (223 chars; aim 150-160)"
+        },
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 1 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-calgary-2026",
+      "title": "Best IV Therapy in Calgary 2026",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-washington-dc-2026",
+      "title": "Best IV Therapy in Washington DC 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-san-diego-2026",
+      "title": "Best IV Therapy in San Diego 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-dallas-2026",
+      "title": "Best IV Therapy in Dallas 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-during-pregnancy",
+      "title": "IV Therapy During Pregnancy: What Is Safe, What Helps, and What to Avoid",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-las-vegas-2026",
+      "title": "Best IV Therapy in Las Vegas 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "can-you-drink-alcohol-after-iv-therapy",
+      "title": "Can You Drink Alcohol After IV Therapy? The Honest Answer",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-for-seniors-65-plus",
+      "title": "IV Therapy for Seniors 65+ — Benefits, Precautions, and What to Expect",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-for-energy-fatigue",
+      "title": "IV Therapy for Energy and Fatigue: Which Drip Works Best and Why",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "7-questions-before-iv-therapy",
+      "title": "7 Questions to Ask Before You Let Anyone Put an IV in Your Arm",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 0 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-for-night-shift-workers",
+      "title": "IV Therapy for Night Shift Workers — Sleep, Energy, and Recovery",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-vs-emergency-room-when-to-choose",
+      "title": "IV Therapy Clinic vs Emergency Room — When to Choose Each",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 2 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-houston-2026",
+      "title": "Best IV Therapy in Houston 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-philadelphia-2026",
+      "title": "Best IV Therapy in Philadelphia 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "ozempic-vitamin-gap-iv-therapy-real-prices-2026",
+      "title": "Ozempic Is Stripping Your Vitamins: 5 Deficiencies Every GLP-1 User Needs to Know (And the Real Cost of Fixing Them with IV Therapy)",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_title too long (76 chars; aim 50-60)"
+        },
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_description long (186 chars; aim 150-160)"
+        },
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 2 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-medication-interactions-guide",
+      "title": "IV Therapy and Your Medications — Interaction Guide",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 2 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "is-iv-therapy-a-scam-what-the-science-says",
+      "title": "Is IV Therapy a Scam? What the Science Actually Says",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 0 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-near-me-how-to-find-best-provider",
+      "title": "IV Therapy Near Me: How to Find and Choose the Best Provider in Your City",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "myers-cocktail-toronto",
+      "title": "Myers Cocktail Toronto: Where to Get It, What It Costs & What to Expect (2026)",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 2 internal links (aim 3+)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "b12-iv-vs-b12-injection-comparison",
+      "title": "B12 IV vs B12 Injection — Which Should You Choose?",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 0 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "canadian-iv-clinic-regulations-2026",
+      "title": "Could Your Canadian IV Clinic Get Shut Down? The 2026 Rules Every Operator Needs to Know",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 0 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-for-long-covid",
+      "title": "IV Therapy for Long COVID: Addressing the Fatigue, Brain Fog, and Immune Dysfunction That Won't Go Away",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "magnesium-iv-therapy-guide",
+      "title": "Magnesium IV Therapy — When You Actually Need It",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 1 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-vs-iv-vitamin-shots-explained",
+      "title": "IV Therapy vs IV Vitamin Shots — What is the Difference?",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-greater-toronto-area",
+      "title": "IV Therapy in the Greater Toronto Area: Complete GTA Guide (2026)",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-los-angeles-2026",
+      "title": "Best IV Therapy in Los Angeles 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "high-dose-vitamin-c-iv-therapy-benefits",
+      "title": "High-Dose Vitamin C IV Therapy: Immune Support, Cancer Care, and Anti-Aging Benefits",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-laws-canada-province-by-province-2026",
+      "title": "IV Therapy Laws in Canada (2026): Province-by-Province Rules on Who Can Administer, Medical Directors, and Mobile Service",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_title too long (134 chars; aim 50-60)"
+        },
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_description long (204 chars; aim 150-160)"
+        },
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "image_url missing (no hero image)"
+        },
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses pricing but uses no CAD or $ figures"
+        }
+      ]
+    },
+    {
+      "slug": "mobile-iv-therapy-edmonton",
+      "title": "Mobile IV Therapy Edmonton: How It Works in Alberta, Honest Pricing, and Where to Find a Licensed Nurse",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_description long (222 chars; aim 150-160)"
+        }
+      ]
+    },
+    {
+      "slug": "how-often-can-you-get-iv-therapy",
+      "title": "How Often Can You Safely Get IV Therapy?",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-insurance-coverage-canada",
+      "title": "Is IV Therapy Covered by Insurance in Canada? The Complete 2026 Guide",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "nad-plus-therapy-nyc",
+      "title": "NAD+ Therapy NYC: Best Clinics, Costs & What to Expect (2026)",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 0 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "myers-cocktail-iv-benefits-chronic-fatigue",
+      "title": "The Myers’ Cocktail: The Original Wellness Drip for Chronic Fatigue",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-montreal-2026",
+      "title": "Best IV Therapy in Montreal 2026",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-trends-2026-whats-new",
+      "title": "IV Therapy Trends in 2026 — New Protocols and Where the Industry Is Heading",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-richmond-hill-2026-guide",
+      "title": "IV Therapy Richmond Hill: York Region's Premium Wellness Lounges, Real 2026 CAD Pricing, and What to Ask",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-brooklyn",
+      "title": "IV Therapy in Brooklyn: Best Clinics & Mobile Services (2026)",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-vancouver-2026",
+      "title": "Best IV Therapy in Vancouver 2026",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_title too long (73 chars; aim 50-60)"
+        },
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-myths-debunked",
+      "title": "IV Therapy Myths Debunked — Separating Fact from Marketing",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-for-wedding-day-prep",
+      "title": "IV Therapy for Your Wedding Day — Beauty and Energy Prep",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "low",
+          "msg": "short-ish (790 words; aim 800+)"
+        },
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 2 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "science-of-iv-therapy-for-hangover-recovery",
+      "title": "The Science of Hangover Recovery: Why IV Therapy is the Gold Standard",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "mobile-iv-therapy-nyc",
+      "title": "Mobile IV Therapy NYC: Same-Day Delivery to Your Home, Hotel or Office (2026)",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 2 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "ozone-iv-therapy-guide",
+      "title": "Ozone IV Therapy — What It Is, Who Uses It, and What the Evidence Says",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 0 internal links (aim 3+)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-atlanta-2026",
+      "title": "Best IV Therapy in Atlanta 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-ottawa-2026",
+      "title": "Best IV Therapy in Ottawa 2026",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "hangover-iv-therapy-toronto",
+      "title": "Hangover IV Therapy Toronto: Does It Actually Work and Where Should You Go?",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "INTERNAL",
+          "sev": "med",
+          "msg": "only 2 internal links (aim 3+)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-for-weight-loss",
+      "title": "IV Therapy for Weight Loss: What Actually Works and What Is Just Marketing",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "best-iv-therapy-new-york-2026",
+      "title": "Best IV Therapy in New York 2026",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "mobile-iv-therapy-ottawa",
+      "title": "Mobile IV Therapy Ottawa: How It Works in Ontario, Honest Pricing, and Where to Find a Licensed Nurse",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "META",
+          "sev": "med",
+          "msg": "meta_description long (209 chars; aim 150-160)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-drip-nyc",
+      "title": "IV Drip NYC: Complete Guide to Prices, Clinics & Booking (2026)",
+      "isCA": false,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        }
+      ]
+    },
+    {
+      "slug": "iv-therapy-toronto-complete-guide",
+      "title": "IV Therapy Toronto: The Complete 2026 Guide to Clinics, Costs, and What Actually Works",
+      "isCA": true,
+      "issues": [
+        {
+          "cat": "STRUCTURE",
+          "sev": "med",
+          "msg": "contains em-dash or en-dash (operator rule: ASCII only)"
+        },
+        {
+          "cat": "CANADA",
+          "sev": "low",
+          "msg": "CA-targeted post discusses regulation but names no provincial regulator (CONO/CCHPBC/CNDA/CRNA/BCCNM/CNO/OIIQ)"
+        }
+      ]
+    }
+  ]
+}
