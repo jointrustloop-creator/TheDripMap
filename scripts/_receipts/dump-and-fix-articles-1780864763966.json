@@ -1,0 +1,54 @@
+{
+  "phase": "dump-and-fix-articles",
+  "timestamp": "2026-06-07T20:39:21.955Z",
+  "dumped": [
+    {
+      "slug": "best-iv-therapy-clinics-canada-2026",
+      "path": "scripts\\_drafts\\best-iv-therapy-clinics-canada-2026.md",
+      "chars": 10286
+    },
+    {
+      "slug": "is-iv-therapy-a-scam-what-the-science-says",
+      "path": "scripts\\_drafts\\is-iv-therapy-a-scam-what-the-science-says.md",
+      "chars": 9704
+    },
+    {
+      "slug": "canadian-iv-clinic-regulations-2026",
+      "path": "scripts\\_drafts\\canadian-iv-clinic-regulations-2026.md",
+      "chars": 11022
+    },
+    {
+      "slug": "what-iv-therapy-costs-across-canada-2026",
+      "path": "scripts\\_drafts\\what-iv-therapy-costs-across-canada-2026.md",
+      "chars": 8845
+    },
+    {
+      "slug": "7-questions-before-iv-therapy",
+      "path": "scripts\\_drafts\\7-questions-before-iv-therapy.md",
+      "chars": 8887
+    }
+  ],
+  "unpublished": [
+    {
+      "slug": "what-iv-therapy-costs-across-canada-2026",
+      "id": "584d6435-7d05-42c9-8b30-49f7c06c3d35"
+    }
+  ],
+  "patched": [
+    {
+      "slug": "is-iv-therapy-a-scam-what-the-science-says",
+      "id": "25fba4a6-9100-4ea7-81bd-761151a2891f",
+      "replacements": 13
+    },
+    {
+      "slug": "canadian-iv-clinic-regulations-2026",
+      "id": "2194c35c-d160-41dc-8871-ca06fff8eaab",
+      "replacements": 6
+    }
+  ],
+  "unchanged": [
+    "best-iv-therapy-clinics-canada-2026",
+    "7-questions-before-iv-therapy"
+  ],
+  "errors": []
+}
