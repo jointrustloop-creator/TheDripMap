@@ -1,0 +1,28 @@
+{
+  "phase": "insert-chain-sisters-4",
+  "timestamp": "2026-06-07T16:37:13.651Z",
+  "inserted": [
+    {
+      "id": "8516142d-503c-449b-a17e-7e8560417901",
+      "slug": "telus-health-montreal-downtown-montreal",
+      "city": "Montreal"
+    },
+    {
+      "id": "1ff59f89-cc08-4c9f-85dc-cff5b9bcb01c",
+      "slug": "mybest-clinic-longueuil-longueuil",
+      "city": "Longueuil"
+    },
+    {
+      "id": "42d389e9-a3ed-4058-adb1-e04a7732ddb8",
+      "slug": "centre-for-advanced-medicine-markham",
+      "city": "Markham"
+    },
+    {
+      "id": "01aceb7d-0278-4395-8653-8770b13cff31",
+      "slug": "beautify-skin-clinic-concord",
+      "city": "Concord"
+    }
+  ],
+  "skipped": [],
+  "errors": []
+}
