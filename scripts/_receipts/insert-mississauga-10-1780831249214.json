@@ -1,0 +1,67 @@
+{
+  "phase": "insert-mississauga-10",
+  "timestamp": "2026-06-07T11:20:45.650Z",
+  "inserted": [
+    {
+      "id": "255815ef-bf6f-4c2f-9d1a-c098bbe1e315",
+      "slug": "erin-mills-optimum-health-mississauga",
+      "name": "Erin Mills Optimum Health",
+      "email": null
+    },
+    {
+      "id": "63bcf4f5-2529-4a4e-96cc-f555d64b7952",
+      "slug": "mindful-healing-naturopathic-clinic-mississauga",
+      "name": "Mindful Healing Naturopathic Clinic",
+      "email": "info@mindfulclinic.ca"
+    },
+    {
+      "id": "df97ee92-960b-40cd-b3a0-833a207afce1",
+      "slug": "revive-skin-medical-spa-mississauga",
+      "name": "Revive Skin Medical Spa",
+      "email": "info@reviveskinmedicalspa.com"
+    },
+    {
+      "id": "d377f93b-107a-40ed-9736-db0954729a96",
+      "slug": "reforme-lab-mississauga",
+      "name": "Reforme Lab",
+      "email": "info@reformelab.com"
+    },
+    {
+      "id": "ba275f14-fd02-49fc-86dc-eb92e682c2a4",
+      "slug": "kaizen-medspa-mississauga",
+      "name": "Kaizen Medspa",
+      "email": null
+    },
+    {
+      "id": "a876258e-2db6-493b-b970-727117807199",
+      "slug": "medcaire-health-mississauga",
+      "name": "MedCAiRE Health",
+      "email": "Filipe@MedCAiRE.ca"
+    },
+    {
+      "id": "eff53864-86f5-4857-919a-d7826fa3eeb1",
+      "slug": "health-globe-wellness-clinic-mississauga",
+      "name": "Health Globe Wellness Clinic",
+      "email": "info@healthglobe.ca"
+    },
+    {
+      "id": "f11bf14a-f552-4709-af00-3751e64a373a",
+      "slug": "youthful-derma-mississauga",
+      "name": "Youthful Derma",
+      "email": "shahnaz@youthfulderma.ca"
+    },
+    {
+      "id": "1e16ba56-42f1-4381-a05d-8152f9bef824",
+      "slug": "ageless-elegance-med-spa-mississauga",
+      "name": "Ageless Elegance Med Spa",
+      "email": null
+    }
+  ],
+  "skipped_existing": [
+    {
+      "slug": "purebalance-wellness-mississauga",
+      "existing_id": "b86b9d4e-bdf2-4cc1-80c5-90215b3045b4"
+    }
+  ],
+  "errors": []
+}
