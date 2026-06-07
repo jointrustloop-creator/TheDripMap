@@ -1,0 +1,124 @@
+{
+  "phase": "insert-vancouver-19",
+  "timestamp": "2026-06-07T12:29:10.081Z",
+  "inserted": [
+    {
+      "id": "75a95cea-6dd6-4f46-a77d-76c307e1a5b1",
+      "slug": "integrative-naturopathic-medical-centre-vancouver",
+      "city": "Vancouver",
+      "name": "Integrative Naturopathic Medical Centre",
+      "email": null
+    },
+    {
+      "id": "f8f27bc9-3f6a-43e2-adab-350f60d15554",
+      "slug": "qi-integrated-health-vancouver",
+      "city": "Vancouver",
+      "name": "Qi Integrated Health",
+      "email": null
+    },
+    {
+      "id": "b3542f0d-11f4-4dcb-9cc7-ab857edef2ee",
+      "slug": "tandem-clinic-vancouver",
+      "city": "Vancouver",
+      "name": "Tandem Clinic",
+      "email": "info@tandemclinic.com"
+    },
+    {
+      "id": "6c401117-e9e2-498d-b1b4-dcdd4830c606",
+      "slug": "local-health-integrative-clinic-vancouver",
+      "city": "Vancouver",
+      "name": "Local Health Integrative Clinic",
+      "email": "info@localhealthco.com"
+    },
+    {
+      "id": "db966211-9ffd-40fb-af72-6f8b9b05d3e8",
+      "slug": "yaletown-integrative-clinic-vancouver",
+      "city": "Vancouver",
+      "name": "Yaletown Integrative Clinic",
+      "email": "info@yaletownintegrative.com"
+    },
+    {
+      "id": "39c28706-2a83-448a-b56e-912c1bb84296",
+      "slug": "first-ave-medical-spa-vancouver",
+      "city": "Vancouver",
+      "name": "First Ave Medical Spa",
+      "email": "info@firstavemedicalspa.com"
+    },
+    {
+      "id": "40b6fc2f-1ced-4cb8-b7b1-e445d7dc7016",
+      "slug": "pink-peony-wellness-centre-north-vancouver",
+      "city": "North Vancouver",
+      "name": "Pink Peony Wellness Centre",
+      "email": "pinkpeonywellness@gmail.com"
+    },
+    {
+      "id": "3c038aff-ae87-4414-bcfc-fdc15d9de019",
+      "slug": "caremed-integrative-health-centre-north-vancouver",
+      "city": "North Vancouver",
+      "name": "CareMed Integrative Health Centre",
+      "email": "hello@caremedhealth.com"
+    },
+    {
+      "id": "603c9823-ac51-49f7-88bf-e84dfa092830",
+      "slug": "everyoung-medical-aesthetics-burnaby",
+      "city": "Burnaby",
+      "name": "EverYoung Medical Aesthetics",
+      "email": null
+    },
+    {
+      "id": "b94b44ae-1740-40e9-b865-6217c18ca0bc",
+      "slug": "oak-integrative-health-burnaby",
+      "city": "Burnaby",
+      "name": "Oak Integrative Health",
+      "email": "office@oakintegrative.com"
+    },
+    {
+      "id": "43594161-adbe-4131-b845-1c9c7029531c",
+      "slug": "richmond-laser-and-cosmetic-richmond",
+      "city": "Richmond",
+      "name": "Richmond Laser & Cosmetic",
+      "email": "richmondcosmetic@gmail.com"
+    },
+    {
+      "id": "c1773207-1885-4972-8075-8e493ed8b9c7",
+      "slug": "polo-health-and-longevity-centre-new-westminster",
+      "city": "New Westminster",
+      "name": "Polo Health + Longevity Centre",
+      "email": "info@polohealth.com"
+    },
+    {
+      "id": "fbca16a0-ecc2-4a05-8dd2-45bdd7c47c35",
+      "slug": "catalyst-kinetics-new-westminster",
+      "city": "New Westminster",
+      "name": "Catalyst Kinetics (CKG New Westminster)",
+      "email": "newwest@catalystkinetics.com"
+    }
+  ],
+  "skipped_existing": [
+    {
+      "slug": "soma-burnaby-wellness-burnaby",
+      "existing_id": "57b7009c-d9a6-45ef-9a68-9b62c89ba7c1"
+    },
+    {
+      "slug": "panda-clinic-metrotown-burnaby",
+      "existing_id": "aed4421f-cf16-4978-9a84-5694cee32bfd"
+    },
+    {
+      "slug": "bc-orchard-aesthetics-burnaby",
+      "existing_id": "b73c3456-baa3-46bb-a26e-2de18014be6e"
+    },
+    {
+      "slug": "gilmore-wellness-clinic-burnaby",
+      "existing_id": "5e132564-4d70-46c2-a526-65bf5a99e3ac"
+    },
+    {
+      "slug": "skinart-md-burnaby",
+      "existing_id": "1fd879ff-a890-49dd-9f40-f45d3fa27820"
+    },
+    {
+      "slug": "amre-aesthetics-and-wellness-burnaby",
+      "existing_id": "0e10421b-c730-4a1a-b729-90943c774304"
+    }
+  ],
+  "errors": []
+}
