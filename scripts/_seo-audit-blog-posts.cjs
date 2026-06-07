@@ -46,8 +46,9 @@ function countH(content, level) {
 }
 
 function countInternalLinks(content) {
-  // Match markdown links to relative paths starting with /clinics, /cities, /treatments, /search, /for-clinics, /symptoms
-  const re = /\]\((https?:\/\/(www\.)?thedripmap\.com)?\/(clinics|cities|treatments|search|for-clinics|symptoms|iv-therapy|tools|blog|resources)\//g;
+  // Match markdown links to relative paths starting with /clinics, /cities, /treatments, /search, /for-clinics, /symptoms.
+  // Allow the path segment to be followed by /, ?, ), or # so that "/search)" and "/search?q=..." also count.
+  const re = /\]\((https?:\/\/(www\.)?thedripmap\.com)?\/(clinics|cities|treatments|search|for-clinics|symptoms|iv-therapy|tools|blog|resources)(\/|\?|\)|#)/g;
   return (content.match(re) || []).length;
 }
 
