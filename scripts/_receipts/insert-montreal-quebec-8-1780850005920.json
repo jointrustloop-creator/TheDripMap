@@ -1,0 +1,58 @@
+{
+  "phase": "insert-montreal-quebec-8",
+  "timestamp": "2026-06-07T16:33:24.347Z",
+  "inserted": [
+    {
+      "id": "e57f5e27-4f89-4443-b8fb-cab2ea92b5eb",
+      "slug": "xyd-lab-montreal",
+      "city": "Montreal",
+      "type": "Clinic"
+    },
+    {
+      "id": "2c54f371-6932-46eb-9752-a8d044f6e434",
+      "slug": "gtr-sante-downtown-montreal",
+      "city": "Montreal",
+      "type": "Both"
+    },
+    {
+      "id": "3fd5631e-fdfd-4031-ab90-b12d1c6088ec",
+      "slug": "gtr-sante-saint-laurent-montreal",
+      "city": "Saint-Laurent",
+      "type": "Both"
+    },
+    {
+      "id": "6130cf13-89a8-42e6-a781-ddd7f5bcd69d",
+      "slug": "clinique-nord-laval",
+      "city": "Laval",
+      "type": "Clinic"
+    },
+    {
+      "id": "7c646c7b-7579-49b6-a607-461a80003ff1",
+      "slug": "icryo-brossard-brossard",
+      "city": "Brossard",
+      "type": "Clinic"
+    },
+    {
+      "id": "1905485d-9758-430a-8b7e-55d01c628712",
+      "slug": "medispa-victoria-park-gatineau-gatineau",
+      "city": "Gatineau",
+      "type": "Clinic"
+    }
+  ],
+  "skipped_slug_exists": [],
+  "skipped_domain_exists": [
+    {
+      "candidate": "telus-health-montreal-downtown-montreal",
+      "existing_slug": "telus-health-care-centre-quebec-city-quebec-city",
+      "existing_city": "Quebec City",
+      "domain": "telus.com"
+    },
+    {
+      "candidate": "mybest-clinic-longueuil-longueuil",
+      "existing_slug": "mybest-clinic-montreal-montreal",
+      "existing_city": "Montreal",
+      "domain": "mybestclinic.com"
+    }
+  ],
+  "errors": []
+}

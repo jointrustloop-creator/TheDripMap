@@ -1,0 +1,177 @@
+{
+  "phase": "insert-edmonton-24",
+  "timestamp": "2026-06-07T16:30:39.930Z",
+  "inserted": [
+    {
+      "id": "8dd36844-31d6-4e48-8533-3eb31977cf96",
+      "slug": "west-edmonton-naturopathic-wellness-centre-edmonton",
+      "city": "Edmonton",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "d2f9dbfd-608c-4aa5-8e88-eefa386fa613",
+      "slug": "the-genomic-clinic-edmonton",
+      "city": "Edmonton",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "7fbe4a9e-403e-4a01-9d8e-394766b57269",
+      "slug": "naturally-inclined-health-edmonton",
+      "city": "Edmonton",
+      "type": "Clinic",
+      "email": "info@naturallyinclinedhealth.com"
+    },
+    {
+      "id": "7105b570-6234-4342-83df-9216475db11f",
+      "slug": "smrt-health-edmonton",
+      "city": "Edmonton",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "e1e3a6bc-3c02-4d88-84b3-81a2970a6d33",
+      "slug": "flow-functional-health-care-edmonton",
+      "city": "Edmonton",
+      "type": "Clinic",
+      "email": "admin@flowyeg.ca"
+    },
+    {
+      "id": "dbf9ba0e-3a88-449b-a0f4-f7f2396d0822",
+      "slug": "edmonton-iron-clinic-edmonton",
+      "city": "Edmonton",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "8939796c-23ec-458b-a749-0adc102105bd",
+      "slug": "infuse-health-inc-edmonton",
+      "city": "Edmonton",
+      "type": "Clinic",
+      "email": "infusehealthiv@gmail.com"
+    },
+    {
+      "id": "858f4a69-59f2-4e72-bd24-a3cc7551aa0a",
+      "slug": "solis-medical-clinic-edmonton",
+      "city": "Edmonton",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "80d37531-a800-4b2d-9d53-e0240cb708ee",
+      "slug": "nutridrip-and-wellness-edmonton",
+      "city": "Edmonton",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "a71ac87f-d8e9-4271-92f4-e3cd3a257b6c",
+      "slug": "alpine-health-naturopathic-clinic-edmonton",
+      "city": "Edmonton",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "40a4160a-649f-4d2e-ad6d-46a4ec396377",
+      "slug": "rejuvaderm-cosmetic-dermatology-edmonton",
+      "city": "Edmonton",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "601ea79c-b901-4086-bde3-abb47c468ee6",
+      "slug": "true-movement-edmonton-edmonton",
+      "city": "Edmonton",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "04601205-e974-42a1-af90-e90f864bd485",
+      "slug": "cove-chiropractic-and-wellness-edmonton",
+      "city": "Edmonton",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "429c9903-8d5d-4fa4-8a98-a35ae60175e9",
+      "slug": "st-albert-naturopathic-clinic-st-albert",
+      "city": "St. Albert",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "9cc3cba2-bf0a-470f-95e5-a3d27afd8745",
+      "slug": "wellness-within-st-albert",
+      "city": "St. Albert",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "aec26242-85c8-4a8c-a679-d75858691891",
+      "slug": "rn-and-co-infusion-lounge-st-albert",
+      "city": "St. Albert",
+      "type": "Both",
+      "email": null
+    },
+    {
+      "id": "d10f124d-e596-4523-9923-667751d36c94",
+      "slug": "excellence-medical-and-skin-care-clinic-sherwood-park",
+      "city": "Sherwood Park",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "5502e7a3-0162-48dc-8ea5-a24dfaefaa63",
+      "slug": "relief-medical-centre-sherwood-park",
+      "city": "Sherwood Park",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "78d55ac0-3534-4027-8d2d-f381f749ef6c",
+      "slug": "body-and-mind-naturopathic-medicine-sherwood-park",
+      "city": "Sherwood Park",
+      "type": "Clinic",
+      "email": "drkim@drkimnaturopath.ca"
+    },
+    {
+      "id": "4faaf888-22ec-45f3-a39c-4d07fc0a635c",
+      "slug": "luna-integrated-health-sherwood-park",
+      "city": "Sherwood Park",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "5256469b-03d5-4744-8852-5c69be9be6a2",
+      "slug": "enhanced-wellness-and-functional-medicine-sherwood-park",
+      "city": "Sherwood Park",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "7f165563-8200-4a65-8f93-be27bc77c06c",
+      "slug": "vita-sana-naturopathic-wellness-clinic-spruce-grove",
+      "city": "Spruce Grove",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "3dd78076-2d31-450a-94d0-7c736c584977",
+      "slug": "leduc-naturopathic-clinic-leduc",
+      "city": "Leduc",
+      "type": "Clinic",
+      "email": null
+    },
+    {
+      "id": "86234e1a-18d8-4d7d-bdf4-34d9914e8fd5",
+      "slug": "naturopathie-integrative-clinic-beaumont",
+      "city": "Beaumont",
+      "type": "Clinic",
+      "email": null
+    }
+  ],
+  "skipped_slug_exists": [],
+  "skipped_domain_exists": [],
+  "errors": []
+}

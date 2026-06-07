@@ -1,0 +1,137 @@
+{
+  "phase": "insert-gta-satellites-22",
+  "timestamp": "2026-06-07T16:35:00.900Z",
+  "inserted": [
+    {
+      "id": "d81989fe-42d7-428a-9bf9-df683b8cc215",
+      "slug": "fleur-aesthetics-brampton",
+      "city": "Brampton",
+      "type": "Clinic"
+    },
+    {
+      "id": "d8e8bc24-3243-4ee9-a775-e4f58e662d07",
+      "slug": "glamore-beauty-bar-skin-and-laser-clinic-brampton",
+      "city": "Brampton",
+      "type": "Clinic"
+    },
+    {
+      "id": "4014448a-4004-42d2-a5fb-f48010740c8a",
+      "slug": "natures-touch-naturopathic-clinic-brampton",
+      "city": "Brampton",
+      "type": "Clinic"
+    },
+    {
+      "id": "1bb76c31-a17c-46ec-9d2d-c606c5789314",
+      "slug": "ketamind-health-markham",
+      "city": "Markham",
+      "type": "Clinic"
+    },
+    {
+      "id": "cdd4a0eb-abdd-4404-8118-314715579ca3",
+      "slug": "grand-genesis-plastic-surgery-richmond-hill",
+      "city": "Richmond Hill",
+      "type": "Clinic"
+    },
+    {
+      "id": "73af6145-ae5d-4828-b94a-c3de3ad9b710",
+      "slug": "meridian-spine-and-sport-richmond-hill",
+      "city": "Richmond Hill",
+      "type": "Clinic"
+    },
+    {
+      "id": "e50ac354-5c83-4b2b-8665-365279d4916b",
+      "slug": "dr-gabriella-chow-nd-richmond-hill",
+      "city": "Richmond Hill",
+      "type": "Clinic"
+    },
+    {
+      "id": "e6116a69-f78c-46a0-b4af-22a1d49efcbc",
+      "slug": "purete-medical-spa-etobicoke",
+      "city": "Etobicoke",
+      "type": "Clinic"
+    },
+    {
+      "id": "5d126eaa-4a54-4dd1-9bb0-0de8f70feb85",
+      "slug": "vhmec-etobicoke",
+      "city": "Etobicoke",
+      "type": "Clinic"
+    },
+    {
+      "id": "b01eab15-dab7-4f86-8c62-a9534c5f64b0",
+      "slug": "scarborough-naturopathic-clinic-scarborough",
+      "city": "Scarborough",
+      "type": "Clinic"
+    },
+    {
+      "id": "77f5fff2-3ea1-418f-8470-ec5f9e65a186",
+      "slug": "silk-aesthetic-skin-clinic-scarborough",
+      "city": "Scarborough",
+      "type": "Clinic"
+    },
+    {
+      "id": "88572ded-4893-4bd1-992a-0b08c61aed4a",
+      "slug": "mobile-iv-canada-toronto",
+      "city": "Toronto",
+      "type": "Mobile"
+    }
+  ],
+  "skipped_slug_exists": [
+    {
+      "slug": "centre-for-health-and-performance-vaughan"
+    },
+    {
+      "slug": "venice-cosmetic-clinic-vaughan"
+    }
+  ],
+  "skipped_domain_exists": [
+    {
+      "candidate": "centre-for-advanced-medicine-markham",
+      "existing_slug": "centre-for-advanced-medicine-whitby",
+      "existing_city": "Whitby",
+      "domain": "advancedmedicine.ca"
+    },
+    {
+      "candidate": "the-mom-loft-north-york",
+      "existing_slug": "the-mom-loft-toronto",
+      "existing_city": "Toronto",
+      "domain": "themomloft.com"
+    },
+    {
+      "candidate": "atheria-wellness-etobicoke",
+      "existing_slug": "atheria-wellness-toronto",
+      "existing_city": "Toronto",
+      "domain": "atheriawellness.com"
+    },
+    {
+      "candidate": "care-clinic-on-albion-etobicoke",
+      "existing_slug": "care-clinic-on-albion-toronto",
+      "existing_city": "Toronto",
+      "domain": "carecliniconalbion.ca"
+    },
+    {
+      "candidate": "foundation-health-etobicoke-medical-clinic-etobicoke",
+      "existing_slug": "foundation-health-toronto",
+      "existing_city": "Toronto",
+      "domain": "foundationhealth.ca"
+    },
+    {
+      "candidate": "skin-studio-toronto-etobicoke",
+      "existing_slug": "skin-studio-toronto-toronto",
+      "existing_city": "Toronto",
+      "domain": "skinstudiotoronto.ca"
+    },
+    {
+      "candidate": "the-borough-health-and-wellness-etobicoke",
+      "existing_slug": "the-borough-health-and-wellness-toronto",
+      "existing_city": "Toronto",
+      "domain": "theborough.to"
+    },
+    {
+      "candidate": "beautify-skin-clinic-concord",
+      "existing_slug": "beautify-skin-clinic-vaughan",
+      "existing_city": "Vaughan",
+      "domain": "beautifygroup.com"
+    }
+  ],
+  "errors": []
+}

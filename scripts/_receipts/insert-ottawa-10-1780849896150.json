@@ -1,0 +1,69 @@
+{
+  "phase": "insert-ottawa-10",
+  "timestamp": "2026-06-07T16:31:33.950Z",
+  "inserted": [
+    {
+      "id": "ff9f57e3-351e-417f-bb54-da22dc975823",
+      "slug": "iv-alchemy-ottawa",
+      "city": "Ottawa",
+      "type": "Mobile"
+    },
+    {
+      "id": "6fc147e0-e3c2-4202-9163-c43778781523",
+      "slug": "thrive-wellness-and-aesthetics-manotick-ottawa",
+      "city": "Ottawa",
+      "type": "Both"
+    },
+    {
+      "id": "74ffac37-e943-41b7-8ebe-38582c6fac6a",
+      "slug": "the-aesthetic-lounge-ottawa",
+      "city": "Ottawa",
+      "type": "Clinic"
+    },
+    {
+      "id": "2b57b63d-91b5-49b9-bd5e-feeb0c1f6016",
+      "slug": "sculpted-clinic-ottawa",
+      "city": "Ottawa",
+      "type": "Clinic"
+    },
+    {
+      "id": "ba745bdf-c21a-4768-9932-6779b1b0b3dc",
+      "slug": "inskinity-aesthetic-clinic-ottawa",
+      "city": "Ottawa",
+      "type": "Clinic"
+    },
+    {
+      "id": "060e7c4f-9bdc-4c0b-abc1-e852b9b872a1",
+      "slug": "rocaderm-clinic-ottawa",
+      "city": "Ottawa",
+      "type": "Clinic"
+    },
+    {
+      "id": "1daff6ec-4b94-47d5-9591-7ed235951e28",
+      "slug": "the-cosmetic-clinic-barrhaven-ottawa",
+      "city": "Ottawa",
+      "type": "Clinic"
+    },
+    {
+      "id": "1240fd88-21b4-4c54-9df8-308adfc1c42e",
+      "slug": "stittsville-health-and-wellness-ottawa",
+      "city": "Ottawa",
+      "type": "Clinic"
+    },
+    {
+      "id": "a6c93cad-599b-429f-8402-cc6adf1eaf68",
+      "slug": "panorama-aesthetics-kanata-ottawa",
+      "city": "Ottawa",
+      "type": "Clinic"
+    },
+    {
+      "id": "d39b757b-5240-415e-9283-4589155e9531",
+      "slug": "bci-clinic-nepean-ottawa",
+      "city": "Ottawa",
+      "type": "Clinic"
+    }
+  ],
+  "skipped_slug_exists": [],
+  "skipped_domain_exists": [],
+  "errors": []
+}

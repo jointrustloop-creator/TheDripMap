@@ -1,0 +1,970 @@
+{
+  "montreal": [
+    {
+      "name": "Clinique IV",
+      "slug": "clinique-iv-montreal",
+      "city": "Montreal",
+      "address": "Montreal, QC",
+      "website": "https://cliniqueiv.com",
+      "type": null
+    },
+    {
+      "name": "Dermamode",
+      "slug": "dermamode-montreal",
+      "city": "Montreal",
+      "address": "1001 Rue Saint-Antoine O, Suite 110, Montreal, QC H3C 4M7",
+      "website": "https://dermamode.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Drip Bar MTL",
+      "slug": "drip-bar-mtl-montreal",
+      "city": "Montreal",
+      "address": "Westmount, Montreal, QC",
+      "website": "https://fr.dripbarmtl.com/",
+      "type": null
+    },
+    {
+      "name": "Drip Hydration Montreal",
+      "slug": "drip-hydration-montreal-montreal",
+      "city": "Montreal",
+      "address": "Mobile IV service, Montreal, QC",
+      "website": "https://driphydration.com/coverage-areas/canada/montreal/",
+      "type": null
+    },
+    {
+      "name": "Ideal Body Clinic",
+      "slug": "ideal-body-clinic-montreal",
+      "city": "Montreal",
+      "address": "6000 Avenue de Monkland, Montreal, QC H4A 1G8",
+      "website": "https://vitaminboost.ca",
+      "type": null
+    },
+    {
+      "name": "IV.CLINIC",
+      "slug": "iv-clinic-montreal",
+      "city": "Montreal",
+      "address": "1216 Stanley Street, 3rd Floor, Montreal, QC H3B 2S7",
+      "website": "https://iv.clinic",
+      "type": null
+    },
+    {
+      "name": "Mobile Mediq",
+      "slug": "mobile-mediq-montreal",
+      "city": "Montreal",
+      "address": "Greater Montreal Area, Montreal, QC",
+      "website": "https://www.mobilemediq.ca",
+      "type": null
+    },
+    {
+      "name": "MyBest Clinic Montreal",
+      "slug": "mybest-clinic-montreal-montreal",
+      "city": "Montreal",
+      "address": "407 Rue McGill, Suite 900, Montreal, QC H2Y 2G3",
+      "website": "https://mybestclinic.com/location-montreal/",
+      "type": null
+    },
+    {
+      "name": "RN Privée",
+      "slug": "rn-priv-e-montreal",
+      "city": "Montreal",
+      "address": "Mobile clinic serving Greater Montreal, Montreal, QC",
+      "website": "https://rnprivee.com",
+      "type": null
+    },
+    {
+      "name": "Viva Wellness Drip Montreal",
+      "slug": "viva-wellness-drip-montreal-montreal",
+      "city": "Montreal",
+      "address": "Mobile IV service, Montreal, QC",
+      "website": "https://vivawellnessdrip.com/montreal/",
+      "type": null
+    },
+    {
+      "name": "Wellness Mobile IV Montreal",
+      "slug": "wellness-mobile-iv-montreal-montreal",
+      "city": "Montreal",
+      "address": "Mobile IV service, Montreal, QC",
+      "website": "https://www.ivwellnessmobile.com/",
+      "type": null
+    },
+    {
+      "name": "Zénith Santé",
+      "slug": "z-nith-sant-montreal",
+      "city": "Montreal",
+      "address": "7895 Avenue Papineau, Suite 210, Montreal, QC H2E 2H4",
+      "website": "https://zenithsante.com",
+      "type": null
+    }
+  ],
+  "quebec_city": [
+    {
+      "name": "TELUS Health Care Centre - Quebec City",
+      "slug": "telus-health-care-centre-quebec-city-quebec-city",
+      "city": "Quebec City",
+      "address": "3165 chemin St-Louis, Suite 410, Quebec City, QC",
+      "website": "https://www.telus.com/en/health/care-centres/locations/quebec-city",
+      "type": "Clinic"
+    }
+  ],
+  "edmonton": [
+    {
+      "name": "Bliss MediSpa & Integrated Wellness",
+      "slug": "bliss-medispa-and-integrated-wellness-edmonton",
+      "city": "Edmonton",
+      "address": "5954 Mullen Way NW, Edmonton, AB T6R 0S9",
+      "website": "https://www.blissmedispa.ca/wellness-edmonton/iv-nutrient-therapy/",
+      "type": null
+    },
+    {
+      "name": "Emerald Medical and Wellness Centre",
+      "slug": "emerald-medical-and-wellness-centre-edmonton",
+      "city": "Edmonton",
+      "address": "9943 109 Street NW, Edmonton, AB T5K 1H6",
+      "website": "https://emeraldwellness.ca/iv-therapy-edmonton",
+      "type": null
+    },
+    {
+      "name": "Feel Irie Medical Services",
+      "slug": "feel-irie-medical-services-edmonton",
+      "city": "Edmonton",
+      "address": "Mobile IV service, Edmonton, AB",
+      "website": "https://www.feeliriemedicalservices.ca/iv-drip",
+      "type": null
+    },
+    {
+      "name": "Hydro Oasis Wellness",
+      "slug": "hydro-oasis-wellness-edmonton",
+      "city": "Edmonton",
+      "address": "10328 73 Avenue NW, Edmonton, AB T6E 6N5",
+      "website": "https://www.hydrooasiswellness.com/",
+      "type": null
+    },
+    {
+      "name": "Optimum Wellness Integrated Clinic",
+      "slug": "optimum-wellness-integrated-clinic-edmonton",
+      "city": "Edmonton",
+      "address": "Suite 201, 9080 25 Avenue SW, Edmonton, AB T6X 2H4",
+      "website": "https://optimumwellnessclinic.ca/",
+      "type": null
+    },
+    {
+      "name": "TBT Medical",
+      "slug": "tbt-medical-edmonton",
+      "city": "Edmonton",
+      "address": null,
+      "website": "https://tbtmedicaledmonton.com/peptide-therapy/",
+      "type": "Clinic"
+    },
+    {
+      "name": "The Lounge Medical Spa & Wellness",
+      "slug": "the-lounge-medical-spa-and-wellness-edmonton",
+      "city": "Edmonton",
+      "address": "4075 106 St #400, Edmonton, AB T6J 7H3",
+      "website": "https://theloungemedicalspa.com/iv-vitamin-drip-edmonton/",
+      "type": "Clinic"
+    },
+    {
+      "name": "Tonic IV",
+      "slug": "tonic-iv-edmonton",
+      "city": "Edmonton",
+      "address": "Mobile service across Edmonton, Sherwood Park, St. Albert, AB",
+      "website": "https://toniciv.ca/",
+      "type": null
+    },
+    {
+      "name": "TruMed Naturopath Clinic",
+      "slug": "trumed-naturopath-clinic-edmonton",
+      "city": "Edmonton",
+      "address": "14620 Stony Plain Road, Edmonton, AB T5N 3S2",
+      "website": "https://www.trumed.ca/",
+      "type": null
+    },
+    {
+      "name": "VitaDrip IV",
+      "slug": "vitadrip-iv-edmonton",
+      "city": "Edmonton",
+      "address": "Suite 2367, 8882 170 Street NW, Edmonton, AB T5T 4M2",
+      "website": "https://www.vitadripiv.ca/",
+      "type": null
+    },
+    {
+      "name": "VitaPoke Infusion Lounge (Poke Beauty)",
+      "slug": "vitapoke-infusion-lounge-poke-beauty-edmonton",
+      "city": "Edmonton",
+      "address": "Edmonton, AB (in-clinic and mobile, Edmonton, Sherwood Park, St. Albert)",
+      "website": "https://www.pokebeauty.ca/services/iv-therapy",
+      "type": null
+    },
+    {
+      "name": "Viva Wellness Drip Edmonton",
+      "slug": "viva-wellness-drip-edmonton-edmonton",
+      "city": "Edmonton",
+      "address": "Mobile service across Greater Edmonton Area, AB",
+      "website": "https://edmonton.vivawellnessdrip.com/",
+      "type": null
+    },
+    {
+      "name": "Zia IV Infusion & Injection Lounge",
+      "slug": "zia-iv-infusion-and-injection-lounge-edmonton",
+      "city": "Edmonton",
+      "address": "4424 Calgary Trail NW, Edmonton, AB T6H 5W6",
+      "website": "https://www.ziaiv.ca/",
+      "type": null
+    },
+    {
+      "name": "Nectar IV Hydration & Wellness",
+      "slug": "nectar-iv-hydration-and-wellness-st-albert",
+      "city": "St. Albert",
+      "address": "Suite #2, 150 Carleton Dr, St. Albert, AB",
+      "website": "https://www.nectariv.ca/",
+      "type": "Clinic"
+    }
+  ],
+  "ottawa": [
+    {
+      "name": "ElevateRx Medical Aesthetics",
+      "slug": "elevaterx-medical-aesthetics-ottawa",
+      "city": "Ottawa",
+      "address": "164 Lebreton St N, Ottawa, ON K1R 7H8",
+      "website": "https://www.elevaterx.ca",
+      "type": null
+    },
+    {
+      "name": "Elixir Beauty Clinic",
+      "slug": "elixir-beauty-clinic-ottawa",
+      "city": "Ottawa",
+      "address": "1279 Wellington St W, Ottawa, ON K1Y 3A8",
+      "website": "https://elixirbeautyottawa.com",
+      "type": null
+    },
+    {
+      "name": "Elysian Wellness Centre - Hunt Club",
+      "slug": "elysian-wellness-centre-hunt-club-ottawa",
+      "city": "Ottawa",
+      "address": "290 W Hunt Club Rd, Unit 4A, Ottawa, ON K2E 0B7",
+      "website": "https://elysianwellnesscentre.ca/",
+      "type": null
+    },
+    {
+      "name": "LyfeMedica Wellness Clinic - Ottawa",
+      "slug": "lyfemedica-wellness-clinic-ottawa-ottawa",
+      "city": "Ottawa",
+      "address": "1280 Old Innes Rd, Unit 802, Ottawa, ON K1B 5M6",
+      "website": "https://lyfemedica.com",
+      "type": null
+    },
+    {
+      "name": "NutriChem Compounding Pharmacy & Clinic",
+      "slug": "nutrichem-compounding-pharmacy-and-clinic-ottawa",
+      "city": "Ottawa",
+      "address": "2599 Carling Ave, Ottawa, ON K2B 7H7",
+      "website": "https://nutrichem.com",
+      "type": null
+    },
+    {
+      "name": "Ottawa Integrative Health Centre",
+      "slug": "ottawa-integrative-health-centre-ottawa",
+      "city": "Ottawa",
+      "address": "904 Lady Ellen Pl, Ottawa, ON K1Z 5L5",
+      "website": "https://www.oihc.ca",
+      "type": null
+    },
+    {
+      "name": "Pure Medical Cosmetics",
+      "slug": "pure-medical-cosmetics-ottawa",
+      "city": "Ottawa",
+      "address": "4289 Innes Rd, Orleans, ON K1E 0A8",
+      "website": "https://www.puremedicalcosmetics.com",
+      "type": null
+    },
+    {
+      "name": "Refined Image Ottawa",
+      "slug": "refined-image-ottawa-ottawa",
+      "city": "Ottawa",
+      "address": "408A Churchill Ave N, Ottawa, ON K1Z 5C6",
+      "website": "https://refinedimageottawa.com",
+      "type": null
+    },
+    {
+      "name": "RevIVe U Mobile IV Wellness Clinic",
+      "slug": "revive-u-mobile-iv-wellness-clinic-ottawa",
+      "city": "Ottawa",
+      "address": "Mobile service area, Ottawa, ON",
+      "website": "https://www.reviveu.ca",
+      "type": null
+    },
+    {
+      "name": "Revivelife Clinic",
+      "slug": "revivelife-clinic-ottawa",
+      "city": "Ottawa",
+      "address": "69 Kempster Ave, Ottawa, ON K2B 6M2",
+      "website": "https://revivelifeclinic.com",
+      "type": null
+    },
+    {
+      "name": "Skin Logic Ottawa",
+      "slug": "skin-logic-ottawa-ottawa",
+      "city": "Ottawa",
+      "address": "11 Holland Ave, Suite 400, Ottawa, ON K1Y 4S1",
+      "website": "https://skinlogicottawa.com",
+      "type": null
+    },
+    {
+      "name": "Somerset Health & Wellness Centre",
+      "slug": "somerset-health-and-wellness-centre-ottawa",
+      "city": "Ottawa",
+      "address": "190 Somerset St W, Suite 210, Ottawa, ON K2P 0J4",
+      "website": "https://somersethealth.ca",
+      "type": null
+    },
+    {
+      "name": "The Centre for Health Innovation",
+      "slug": "the-centre-for-health-innovation-ottawa",
+      "city": "Ottawa",
+      "address": "429 MacLaren Street, Ottawa, ON K2P 0M7",
+      "website": "https://thechi.ca",
+      "type": null
+    }
+  ],
+  "winnipeg": [
+    {
+      "name": "Centre for Natural Pain Solutions",
+      "slug": "centre-for-natural-pain-solutions-winnipeg",
+      "city": "Winnipeg",
+      "address": "578 Broadway, Winnipeg, MB R3C 0W5",
+      "website": "https://cfnps.ca",
+      "type": null
+    },
+    {
+      "name": "Centre for Natural Pain Solutions (Dr. Ceaser)",
+      "slug": "centre-for-natural-pain-solutions-dr-ceaser-winnipeg",
+      "city": "Winnipeg",
+      "address": "578 Broadway, Winnipeg, MB",
+      "website": "https://drceaser.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Enhance Aesthetics and Laser",
+      "slug": "enhance-aesthetics-and-laser-winnipeg",
+      "city": "Winnipeg",
+      "address": "2227 Henderson Hwy, East St. Paul, MB R2E 0B8",
+      "website": "https://www.enhanceaesthetics.ca",
+      "type": null
+    },
+    {
+      "name": "Fortify Wellness",
+      "slug": "fortify-wellness-winnipeg",
+      "city": "Winnipeg",
+      "address": "100-123 Marion Street, Winnipeg, MB R2H 3G9",
+      "website": "https://thisisfortify.com",
+      "type": null
+    },
+    {
+      "name": "L'atelier Medical Aesthetics",
+      "slug": "latelier-medical-aesthetics-winnipeg",
+      "city": "Winnipeg",
+      "address": "186 Provencher Boulevard, Winnipeg, MB R2H 0G4",
+      "website": "https://www.ateliermedicalaesthetics.com",
+      "type": null
+    },
+    {
+      "name": "Prime Medical Services",
+      "slug": "prime-medical-services-winnipeg",
+      "city": "Winnipeg",
+      "address": "1555 Inkster Blvd, Winnipeg, MB R2X 1R2",
+      "website": "https://www.primemedicalsvc.com",
+      "type": null
+    },
+    {
+      "name": "Skin Suite Laser & Medical Aesthetics",
+      "slug": "skin-suite-laser-and-medical-aesthetics-winnipeg",
+      "city": "Winnipeg",
+      "address": "1365 Grant Ave, Winnipeg, MB R3M 1Z8",
+      "website": "http://skinsuitewpg.com/",
+      "type": null
+    },
+    {
+      "name": "The Gray Clinic",
+      "slug": "the-gray-clinic-winnipeg",
+      "city": "Winnipeg",
+      "address": "1053 Autumnwood Drive, Winnipeg, MB R2J 1C6",
+      "website": "https://www.thegrayclinic.ca",
+      "type": null
+    },
+    {
+      "name": "The Nature Doctors",
+      "slug": "the-nature-doctors-winnipeg",
+      "city": "Winnipeg",
+      "address": "1200 Waverley Street, Suite 7, Winnipeg, MB R3T 0P4",
+      "website": "https://www.thenaturedoctors.ca",
+      "type": null
+    },
+    {
+      "name": "Theradrip Mobile IV Therapy",
+      "slug": "theradrip-mobile-iv-therapy-winnipeg",
+      "city": "Winnipeg",
+      "address": "Mobile service — Winnipeg, MB",
+      "website": "https://www.theradrip.ca",
+      "type": null
+    },
+    {
+      "name": "Via Natural Medicine",
+      "slug": "via-natural-medicine-winnipeg",
+      "city": "Winnipeg",
+      "address": "554 Des Meurons Street, Unit A, Winnipeg, MB R2H 2P8",
+      "website": "https://vianatural.ca",
+      "type": null
+    },
+    {
+      "name": "Visage Clinical Beauty",
+      "slug": "visage-clinical-beauty-winnipeg",
+      "city": "Winnipeg",
+      "address": "160 Provencher Boulevard #101, Winnipeg, MB R2H 0H3",
+      "website": "https://visagebeauty.ca",
+      "type": null
+    },
+    {
+      "name": "Winnipeg Clinic Infusion Centre",
+      "slug": "winnipeg-clinic-infusion-centre-winnipeg",
+      "city": "Winnipeg",
+      "address": "425 St. Mary Avenue, Winnipeg, MB R3C 0N2",
+      "website": "https://www.winnipegclinic.com/infusion-centre",
+      "type": null
+    }
+  ],
+  "gta_satellites": [
+    {
+      "name": "Aurora Rejuvenation and Therapeutic Clinic",
+      "slug": "aurora-rejuvenation-and-therapeutic-clinic-aurora",
+      "city": "Aurora",
+      "address": "236 Wellington St E, Aurora, ON",
+      "website": "https://www.aurorarejuvenation.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Beauty O'Clock Medical Spa - Aurora",
+      "slug": "beauty-o-clock-medical-spa-aurora-aurora",
+      "city": "Aurora",
+      "address": "14993 Yonge St, Unit 202, Aurora, ON L4G 1M5",
+      "website": "https://beautyoclock.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Canira Cosmetic",
+      "slug": "canira-cosmetic-aurora",
+      "city": "Aurora",
+      "address": "15150 Yonge Street, Aurora, ON",
+      "website": "https://caniracosmetic.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Summerview Medical Clinic - Aurora",
+      "slug": "summerview-medical-clinic-aurora-aurora",
+      "city": "Aurora",
+      "address": "372 Hollandview Trail, Suite 201, Aurora, ON",
+      "website": "https://www.summerviewmedical.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Velmont Medical Clinic",
+      "slug": "velmont-medical-clinic-aurora",
+      "city": "Aurora",
+      "address": "15187 Yonge St, Aurora, ON",
+      "website": "https://www.velmontmedicalclinic.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Astra Medicare",
+      "slug": "astra-medicare-brampton",
+      "city": "Brampton",
+      "address": "456 Vodden Street E, Brampton, ON L6S 5Y8",
+      "website": "https://www.astramedicare.ca",
+      "type": "In-Clinic"
+    },
+    {
+      "name": "Diamond Aesthetics",
+      "slug": "diamond-aesthetics-brampton",
+      "city": "Brampton",
+      "address": "84 Moffatt Ave, Brampton, ON L6Y 2P3",
+      "website": "https://diamondaesthetics.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Heart Lake Aesthetics",
+      "slug": "heart-lake-aesthetics-brampton",
+      "city": "Brampton",
+      "address": "180 Sandalwood Pkwy E, Unit F1, Brampton, ON L6Z 1Y4",
+      "website": "https://heartlakeaesthetics.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Miracle Medical & Aesthetic Clinic",
+      "slug": "miracle-medical-and-aesthetic-clinic-brampton",
+      "city": "Brampton",
+      "address": "170 Sandalwood Pkwy E #1, Brampton, ON L6Z 1Y5",
+      "website": "https://miraclemedclinic.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Peel Weight Loss Clinic",
+      "slug": "peel-weight-loss-clinic-brampton",
+      "city": "Brampton",
+      "address": "2250 Bovaird Drive East, Suite 303, Brampton, ON",
+      "website": "https://www.peelweightlossclinic.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Aesthefusion Medical Aesthetics",
+      "slug": "aesthefusion-medical-aesthetics-markham",
+      "city": "Markham",
+      "address": "7595 Markham Rd, Unit 23, Markham, ON L3S 0B6",
+      "website": "https://aesthefusion.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "BelleBeauté MedSpa",
+      "slug": "bellebeaut-medspa-markham",
+      "city": "Markham",
+      "address": "156 Main St Unionville, Markham, ON L3R 2G9",
+      "website": "https://bellebeautemedspa.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "GMA Clinic - The Grand Medical Aesthetic Clinic",
+      "slug": "gma-clinic-the-grand-medical-aesthetic-clinic-markham",
+      "city": "Markham",
+      "address": "4581 Hwy 7 #103B, Unionville, ON L3R 1M6",
+      "website": "https://gmaclinic.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "HealthyToDos - Markham Health & Rehab Clinic",
+      "slug": "healthytodos-markham-health-and-rehab-clinic-markham",
+      "city": "Markham",
+      "address": "4581 Hwy 7, Unit 102, Markham, ON L3R 1M6",
+      "website": "https://healthytodos.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "ID Cosmetic Clinic",
+      "slug": "id-cosmetic-clinic-markham",
+      "city": "Markham",
+      "address": "30 Gibson Dr, Unit 113-117, Markham, ON L3R 2S3",
+      "website": "https://idcosmeticclinic.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Markham Integrative Medicine",
+      "slug": "markham-integrative-medicine-markham",
+      "city": "Markham",
+      "address": "300 Main St N, Markham, ON L3P 1Y8",
+      "website": "https://integrative-medicine.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "METALAB - IV Therapy & Regenerative Medicine",
+      "slug": "metalab-iv-therapy-and-regenerative-medicine-markham",
+      "city": "Markham",
+      "address": "50 McIntosh Dr, Suite 201, Markham, ON L3R 9T3",
+      "website": "https://www.metatherapylab.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Serene Cosmetic Clinic",
+      "slug": "serene-cosmetic-clinic-markham",
+      "city": "Markham",
+      "address": "8200 Birchmount Rd, Unit K, Markham, ON L3R 9W1",
+      "website": "https://www.serenecosmeticclinic.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Signature Cosmetic Clinic Markham",
+      "slug": "signature-cosmetic-clinic-markham",
+      "city": "Markham",
+      "address": "Markham, ON L3R 0Y9",
+      "website": "https://signaturemedispa.com",
+      "type": null
+    },
+    {
+      "name": "Silver Spruce Naturopathic Clinic",
+      "slug": "silver-spruce-naturopathic-clinic-markham",
+      "city": "Markham",
+      "address": "96 Main St N, Lower Level, Markham, ON L3P 1X8",
+      "website": "https://silverspruce.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "N.H.F Clinics",
+      "slug": "n-h-f-clinics-newmarket",
+      "city": "Newmarket",
+      "address": "72 Prospect Street, Newmarket, ON L3Y 3T2",
+      "website": "https://www.nhfclinics.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "NewM Clinic",
+      "slug": "newm-clinic-newmarket",
+      "city": "Newmarket",
+      "address": "21 Charles Street, Office 2, Newmarket, ON L3Y 3V7",
+      "website": "https://newmclinic.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Newmarket Naturopathic Clinic (Dr. Michael Morsillo)",
+      "slug": "newmarket-naturopathic-clinic-dr-michael-morsillo-newmarket",
+      "city": "Newmarket",
+      "address": "16655 Yonge St, Newmarket, ON",
+      "website": "https://drmorsillo.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Vita Beauty Medi Spa",
+      "slug": "vita-beauty-medi-spa-newmarket",
+      "city": "Newmarket",
+      "address": "16600 Bayview Avenue, Unit 203, Newmarket, ON",
+      "website": "https://www.vitabeautymedispa.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Gameday Men's Health - North York",
+      "slug": "gameday-men-s-health-north-york-north-york",
+      "city": "North York",
+      "address": "4211 Yonge St, Ste 304, North York, ON M2P 2A9",
+      "website": "https://gamedaymenshealth.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Eclat Spa",
+      "slug": "eclat-spa-richmond-hill-x",
+      "city": "Richmond Hill",
+      "address": "22 Richmond St, Unit 202, Richmond Hill, ON L4C 3Y1",
+      "website": "https://eclatspa.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Eclat SPA Richmond Hill",
+      "slug": "eclat-spa-richmond-hill",
+      "city": "Richmond Hill",
+      "address": "22 Richmond Street, Unit 202, Richmond Hill, ON L4C 3Y1",
+      "website": "https://eclatspa.com",
+      "type": "In-Clinic"
+    },
+    {
+      "name": "Golden Glow Skin Clinic",
+      "slug": "golden-glow-skin-clinic-richmond-hill",
+      "city": "Richmond Hill",
+      "address": "Richmond Hill, ON",
+      "website": "https://goldenglowskinclinic.com",
+      "type": "In-Clinic"
+    },
+    {
+      "name": "iGood Health Centre",
+      "slug": "igood-health-centre-richmond-hill",
+      "city": "Richmond Hill",
+      "address": "60 Granton Drive, Unit 1, Richmond Hill, ON L4B 2N6",
+      "website": "https://www.igood.ca/iv-therapy/",
+      "type": "In-Clinic"
+    },
+    {
+      "name": "Signature Beauty Lounge Richmond Hill",
+      "slug": "signature-beauty-lounge-richmond-hill",
+      "city": "Richmond Hill",
+      "address": "2457 Yonge Street, 1st Floor, Richmond Hill, ON",
+      "website": "https://signaturebeautylounge.ca/iv-drips/",
+      "type": "In-Clinic"
+    },
+    {
+      "name": "Dr. Wrinkle Away",
+      "slug": "dr-wrinkle-away-whitchurch-stouffville",
+      "city": "Whitchurch-Stouffville",
+      "address": "15301 Ontario 48, Whitchurch-Stouffville, ON L4A 3H7",
+      "website": "https://www.drwrinkleaway.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Healthspace Collective",
+      "slug": "healthspace-collective-whitchurch-stouffville",
+      "city": "Whitchurch-Stouffville",
+      "address": "117 Ringwood Drive, 2nd Floor Unit 4D, Stouffville, ON L4A 8C1",
+      "website": "https://healthspacecollective.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Seamless Health & Medical Aesthetics",
+      "slug": "seamless-health-and-medical-aesthetics-whitchurch-stouffville",
+      "city": "Whitchurch-Stouffville",
+      "address": "60 Innovator Ave, Suite 18, Whitchurch-Stouffville, ON L4A 0Y2",
+      "website": "https://www.seamlesshealth.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Springview Health & Wellness",
+      "slug": "springview-health-and-wellness-whitchurch-stouffville",
+      "city": "Whitchurch-Stouffville",
+      "address": "6312 Main St, Whitchurch-Stouffville, ON L4A 1G8",
+      "website": "https://www.springviewwellness.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Stouffville Natural Health Clinic",
+      "slug": "stouffville-natural-health-clinic-whitchurch-stouffville",
+      "city": "Whitchurch-Stouffville",
+      "address": "37 Sandiford Dr, Suite 309, Whitchurch-Stouffville, ON L4A 3Z2",
+      "website": "https://stouffvillenhc.com",
+      "type": "Clinic"
+    }
+  ],
+  "hamilton_niagara": [
+    {
+      "name": "Clarity Health Burlington (Dr. Dominique Vanier ND)",
+      "slug": "clarity-health-burlington-dr-dominique-vanier-nd-burlington",
+      "city": "Burlington",
+      "address": "4380 South Service Road, Unit 3, Burlington, ON L7L 5Y6",
+      "website": "https://clarityhealthburlington.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "deRMA Skin Institute",
+      "slug": "derma-skin-institute-burlington",
+      "city": "Burlington",
+      "address": "4265 Thomas Alton Blvd, Unit 9 & 10, Burlington, ON L7M 0Z4",
+      "website": "https://dermaskininstitute.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Dr. West Aesthetic Medicine",
+      "slug": "dr-west-aesthetic-medicine-burlington",
+      "city": "Burlington",
+      "address": "691 Brant St, Burlington, ON L7R 2H4",
+      "website": "https://drdaniellewest.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Empact Wellness",
+      "slug": "empact-wellness-burlington",
+      "city": "Burlington",
+      "address": "3325 Harvester Road, Unit 8, Burlington, ON",
+      "website": "https://empactwellness.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Health Hub Clinic",
+      "slug": "health-hub-clinic-burlington",
+      "city": "Burlington",
+      "address": "1500 Upper Middle Road, Unit 11, Burlington, ON",
+      "website": "https://www.healthhubclinic.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Imbuir Naturopathic Medicine + IV Therapy",
+      "slug": "imbuir-naturopathic-medicine-iv-therapy-burlington",
+      "city": "Burlington",
+      "address": "1860 Appleby Line, Unit 15, Burlington, ON L7L 0B7",
+      "website": "https://imbuir.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Nex Wellness",
+      "slug": "nex-wellness-burlington",
+      "city": "Burlington",
+      "address": "672 Brant Street, Suite 301, Burlington, ON",
+      "website": "https://www.nexwellness.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Phenom HPM Clinic",
+      "slug": "phenom-hpm-clinic-burlington",
+      "city": "Burlington",
+      "address": "980 Fraser Drive, Suite 202, Burlington, ON L7L 5P5",
+      "website": "https://phenomhpm.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "PRIX Wellness",
+      "slug": "prix-wellness-burlington",
+      "city": "Burlington",
+      "address": null,
+      "website": "https://prixwellness.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Renovo Medical Spa",
+      "slug": "renovo-medical-spa-burlington",
+      "city": "Burlington",
+      "address": "181 Plains Rd W, Burlington, ON L7T 0B1",
+      "website": "https://renovomedispa.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "The Healing Path Chiropractic and Wellness Centre",
+      "slug": "the-healing-path-chiropractic-and-wellness-centre-burlington",
+      "city": "Burlington",
+      "address": "2435 Appleby Line, Burlington, ON L7L 0B6",
+      "website": "https://www.thehealingpath.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Dr. Morais ND - Good Health Mart",
+      "slug": "dr-morais-nd-good-health-mart-hamilton",
+      "city": "Hamilton",
+      "address": "640 Mohawk Road W, Unit 13, Hamilton, ON L9C 1X6",
+      "website": "https://drmoraisnd.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Durand Integrated Health Group",
+      "slug": "durand-integrated-health-group-hamilton",
+      "city": "Hamilton",
+      "address": "136 Young Street, Hamilton, ON L8N 1V5",
+      "website": "https://www.durand.clinic/",
+      "type": "Clinic"
+    },
+    {
+      "name": "Everwood Wellness Retreat & Spa",
+      "slug": "everwood-wellness-retreat-and-spa-hamilton",
+      "city": "Hamilton",
+      "address": "18 Short Rd, Dundas, ON L9H 5L7",
+      "website": "https://everwoodwellness.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Evolve Massage & Wellness",
+      "slug": "evolve-massage-and-wellness-hamilton",
+      "city": "Hamilton",
+      "address": "779 Upper Wentworth Street, Hamilton, ON L9A 4V7",
+      "website": "https://evolve-massage.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Forever Beauty Injectables",
+      "slug": "forever-beauty-injectables-hamilton",
+      "city": "Hamilton",
+      "address": "1160 Upper Paradise Rd, Unit 8, Hamilton, ON L9B 0A5",
+      "website": "https://www.foreverbeautyinjectables.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Hudson Integrative Healthcare",
+      "slug": "hudson-integrative-healthcare-hamilton",
+      "city": "Hamilton",
+      "address": "7 King St E, Unit 1, Stoney Creek, ON L8G 1J7",
+      "website": "https://hihealthcare.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Kaur Beauty Med Spa",
+      "slug": "kaur-beauty-med-spa-hamilton",
+      "city": "Hamilton",
+      "address": "21 Haskins Crt, Hamilton, ON L8K 6R1",
+      "website": "https://kaurbeautymedspa.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Kontur Medical Aesthetics",
+      "slug": "kontur-medical-aesthetics-hamilton",
+      "city": "Hamilton",
+      "address": null,
+      "website": "https://konturmedicalaesthetics.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Lococo Wellness Clinic",
+      "slug": "lococo-wellness-clinic-hamilton",
+      "city": "Hamilton",
+      "address": "2200 Rymal Rd E, Unit 2A, Hannon, ON L0R 1P0",
+      "website": "https://www.lococowellnessclinic.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Radiance Laser & Medical Aesthetics",
+      "slug": "radiance-laser-and-medical-aesthetics-hamilton",
+      "city": "Hamilton",
+      "address": "68 Centennial Pkwy S, Unit 205, Stoney Creek, ON L8G 2C5",
+      "website": "https://radiancelaserclinic.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "South Mount Health",
+      "slug": "south-mount-health-hamilton",
+      "city": "Hamilton",
+      "address": "35 Upper Centennial Pkwy, Suite 1A, Stoney Creek, ON L8J 3W2",
+      "website": "https://www.southmounthealth.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "thrIVe Infusion Clinic - Abundance Healthcare",
+      "slug": "thrive-infusion-clinic-abundance-healthcare-hamilton",
+      "city": "Hamilton",
+      "address": "150 Main Street West, Hamilton, ON L8P 1H8",
+      "website": "https://abundancehealthcare.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Visage Rejuvenation Medical Aesthetic Clinic",
+      "slug": "visage-rejuvenation-medical-aesthetic-clinic-hamilton",
+      "city": "Hamilton",
+      "address": "95 Hamilton Street North, Unit 7, Waterdown, ON L0R 2H6",
+      "website": "https://www.visagerejuvenation.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Niagara Medical Esthetics",
+      "slug": "niagara-medical-esthetics-niagara-falls",
+      "city": "Niagara Falls",
+      "address": "6700 Morrison St, Unit 1, Niagara Falls, ON",
+      "website": "https://niagaramedicalesthetics.ca",
+      "type": "Clinic"
+    }
+  ],
+  "halifax": [
+    {
+      "name": "Choice Health Centre",
+      "slug": "choice-health-centre-bedford",
+      "city": "Bedford",
+      "address": "1600 Bedford Highway, Bedford, NS B4A 1E8",
+      "website": "https://choicehealthcentre.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Dr. Colin MacLeod ND",
+      "slug": "dr-colin-macleod-nd-bedford",
+      "city": "Bedford",
+      "address": "1378 Bedford Hwy, Bedford, NS B4A 1E2",
+      "website": "https://drcolinmacleod.com",
+      "type": "Clinic"
+    },
+    {
+      "name": "Kinesis Health Associates",
+      "slug": "kinesis-health-associates-dartmouth",
+      "city": "Dartmouth",
+      "address": "155 Ochterloney Street, Dartmouth, NS B2Y 1C9",
+      "website": "https://www.kinesishealth.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Bright & Well",
+      "slug": "bright-and-well-halifax",
+      "city": "Halifax",
+      "address": null,
+      "website": "https://brightandwell.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Pure Drip",
+      "slug": "pure-drip-halifax",
+      "city": "Halifax",
+      "address": null,
+      "website": "https://www.puredrip.ca",
+      "type": "Clinic"
+    },
+    {
+      "name": "Youth Bar",
+      "slug": "youth-bar-halifax",
+      "city": "Halifax",
+      "address": "383 Herring Cove Road, Halifax, NS B3R 0H1",
+      "website": "https://youthbar.ca",
+      "type": "Clinic"
+    }
+  ]
+}

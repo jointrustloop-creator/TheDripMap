@@ -1,0 +1,64 @@
+{
+  "phase": "insert-winnipeg-halifax-9",
+  "timestamp": "2026-06-07T16:32:27.980Z",
+  "inserted": [
+    {
+      "id": "0382f94f-56be-4241-81d0-52faef509619",
+      "slug": "victoria-park-medispa-grosvenor-winnipeg",
+      "city": "Winnipeg",
+      "type": "Clinic"
+    },
+    {
+      "id": "560827fd-cdff-44e8-b0d8-19d04bb76f2d",
+      "slug": "dr-andrew-bryk-nd-natural-essentials-winnipeg",
+      "city": "Winnipeg",
+      "type": "Clinic"
+    },
+    {
+      "id": "4501c927-7e90-4f41-82cb-ce9d7da54ff6",
+      "slug": "centre-for-natural-medicine-winnipeg",
+      "city": "Winnipeg",
+      "type": "Clinic"
+    },
+    {
+      "id": "d971bb9e-e9a9-46a9-8989-aba9556fbb18",
+      "slug": "optimal-wellbeing-clinic-halifax",
+      "city": "Halifax",
+      "type": "Clinic"
+    },
+    {
+      "id": "103fd92b-c721-40b4-a0d3-1e1f181744b2",
+      "slug": "tbt-medical-halifax-halifax",
+      "city": "Halifax",
+      "type": "Clinic"
+    },
+    {
+      "id": "76a4bda1-873a-43b7-b0d1-2b1ec670c75e",
+      "slug": "luminate-co-wellness-centre-halifax",
+      "city": "Halifax",
+      "type": "Clinic"
+    },
+    {
+      "id": "525eda8a-bb56-48d8-9e21-62adb6156bf9",
+      "slug": "dermedical-esthetics-dartmouth",
+      "city": "Dartmouth",
+      "type": "Clinic"
+    },
+    {
+      "id": "b4e2e99b-5ca2-4a42-9c12-fd17c7551182",
+      "slug": "east-coast-naturopathic-clinic-bedford",
+      "city": "Bedford",
+      "type": "Clinic"
+    }
+  ],
+  "skipped_slug_exists": [],
+  "skipped_domain_exists": [
+    {
+      "candidate": "physigo-mobile-winnipeg",
+      "existing_slug": "physigo-mobile-calgary",
+      "existing_city": "Calgary",
+      "domain": "physigomobile.com"
+    }
+  ],
+  "errors": []
+}
