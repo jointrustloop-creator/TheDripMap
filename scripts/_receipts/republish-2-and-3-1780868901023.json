@@ -1,0 +1,20 @@
+{
+  "phase": "republish-2-and-3-from-drafts",
+  "timestamp": "2026-06-07T21:48:19.550Z",
+  "republished": [
+    {
+      "id": "c2e25c3b-3a2b-4649-b193-3d92b934b868",
+      "slug": "is-iv-therapy-a-scam-what-the-science-says",
+      "title": "Is IV Therapy a Scam? What the Science Actually Says",
+      "content_chars": 8402
+    },
+    {
+      "id": "fddd4719-062e-44cc-a55f-78521074d1eb",
+      "slug": "canadian-iv-clinic-regulations-2026",
+      "title": "Could Your Canadian IV Clinic Get Shut Down? The 2026 Rules Every Operator Needs to Know",
+      "content_chars": 10509
+    }
+  ],
+  "skipped_exists": [],
+  "errors": []
+}
