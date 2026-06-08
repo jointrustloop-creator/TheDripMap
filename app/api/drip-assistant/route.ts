@@ -6,7 +6,7 @@ import { getWhitelabelConfig } from '../../../src/lib/whitelabel-configs';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
-const MODEL = 'claude-sonnet-4-6';
+const MODEL = 'claude-haiku-4-5-20251001';
 const MAX_TOOL_ROUNDS = 5;
 
 interface InMsg { role: 'user' | 'assistant'; content: string }
