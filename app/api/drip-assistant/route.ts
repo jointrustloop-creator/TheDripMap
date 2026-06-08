@@ -6,26 +6,53 @@ import { getWhitelabelConfig } from '../../../src/lib/whitelabel-configs';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
-const MODEL = 'claude-sonnet-4-20250514';
+// Groq + Llama 3.3 70B. OpenAI-compatible API. Function calling supported.
+// Operator needs to set GROQ_API_KEY in Vercel env. Get a free key at
+// https://console.groq.com/keys (no card required for the free tier).
+const MODEL = 'llama-3.3-70b-versatile';
 const MAX_TOOL_ROUNDS = 5;
 
 interface InMsg { role: 'user' | 'assistant'; content: string }
 interface Coords { lat: number; lng: number }
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-async function callAnthropic(system: string, messages: any[]): Promise<any> {
-  const key = process.env.ANTHROPIC_API_KEY;
+// Translate the Anthropic-style TOOL_SCHEMAS to OpenAI's tools format.
+// Cached at module init.
+const GROQ_TOOLS = TOOL_SCHEMAS.map((t: any) => ({
+  type: 'function' as const,
+  function: {
+    name: t.name,
+    description: t.description,
+    parameters: t.input_schema,
+  },
+}));
+
+async function callGroq(systemPrompt: string, messages: any[]): Promise<any> {
+  const key = process.env.GROQ_API_KEY;
   if (!key) throw new Error('NO_KEY');
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 45000);
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       signal: controller.signal,
-      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-      body: JSON.stringify({ model: MODEL, max_tokens: 512, system, tools: TOOL_SCHEMAS, messages }),
+      headers: {
+        'Authorization': `Bearer ${key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...messages,
+        ],
+        tools: GROQ_TOOLS,
+        tool_choice: 'auto',
+        max_tokens: 1024,
+        temperature: 0.4,
+      }),
     });
-    if (!res.ok) throw new Error(`Anthropic ${res.status}: ${(await res.text()).slice(0, 200)}`);
+    if (!res.ok) throw new Error(`Groq ${res.status}: ${(await res.text()).slice(0, 200)}`);
     return await res.json();
   } finally {
     clearTimeout(timer);
@@ -100,7 +127,7 @@ export async function POST(req: Request) {
       ? { lat: Number(body.userCoords.lat), lng: Number(body.userCoords.lng) }
       : null;
 
-  // Keep the last 12 turns, normalize to Anthropic format.
+  // Keep the last 12 turns, normalize to OpenAI / Groq format.
   const messages: any[] = incoming
     .slice(-12)
     .filter((m) => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
@@ -111,7 +138,7 @@ export async function POST(req: Request) {
 
   // Pull the live clinic count so the system prompt's "N+ listed clinics"
   // phrasing stays accurate as inventory grows. Service-role count(*) on
-  // a small index is sub-30ms — cheap relative to the Anthropic call.
+  // a small index is sub-30ms — cheap relative to the LLM call.
   let clinicCount: number | undefined;
   try {
     const sb = getServiceSupabase();
@@ -131,32 +158,55 @@ export async function POST(req: Request) {
 
   try {
     for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
-      const resp = await callAnthropic(system, messages);
-      const content: any[] = resp?.content || [];
-      const toolUses = content.filter((b) => b.type === 'tool_use');
-      const text = content.filter((b) => b.type === 'text').map((b) => b.text).join('\n').trim();
+      const resp = await callGroq(system, messages);
+      const choice = resp?.choices?.[0];
+      const assistantMsg = choice?.message;
+      const toolCalls: any[] = Array.isArray(assistantMsg?.tool_calls) ? assistantMsg.tool_calls : [];
+      const text = typeof assistantMsg?.content === 'string' ? assistantMsg.content : '';
 
-      if (resp?.stop_reason === 'tool_use' && toolUses.length) {
-        messages.push({ role: 'assistant', content });
+      if (toolCalls.length > 0) {
+        // Push the assistant's response (with tool calls) onto the conversation.
+        messages.push({
+          role: 'assistant',
+          content: text || null,
+          tool_calls: toolCalls,
+        });
+
         const roundClinics: AssistantClinic[] = [];
-        const toolResults: any[] = [];
-        for (const tu of toolUses) {
-          const toolInput = { ...((tu.input || {}) as Record<string, unknown>) };
+        for (const tc of toolCalls) {
+          // Groq returns arguments as a JSON string.
+          let toolInput: Record<string, unknown> = {};
+          try {
+            toolInput = typeof tc.function?.arguments === 'string'
+              ? JSON.parse(tc.function.arguments)
+              : (tc.function?.arguments || {});
+          } catch {
+            // If the model produced malformed JSON, treat as empty args.
+            toolInput = {};
+          }
           // Apply the user's real location to clinic searches so "near me" works
-          // and the model can't accidentally search globally. If the model named a
-          // specific city, honor it; otherwise prefer precise coordinates (true
-          // distance ranking, incl. nearby suburbs) and fall back to the known city.
-          if (tu.name === 'search_providers' && !toolInput.city) {
-            if (userCoords) toolInput.near = userCoords;
+          // and the model can't accidentally search globally. If the model named
+          // a specific city, honor it; otherwise prefer precise coordinates and
+          // fall back to the known city.
+          if (tc.function?.name === 'search_providers' && !toolInput.city) {
+            if (userCoords) toolInput.near = userCoords as unknown as Record<string, unknown>;
             else if (userCity) toolInput.city = userCity;
           }
-          const outcome = await runTool(tu.name, toolInput);
+          const outcome = await runTool(tc.function?.name, toolInput as never);
           if (outcome.clinics?.length) roundClinics.push(...outcome.clinics);
           if (outcome.comparison) lastComparison = outcome.comparison;
-          toolResults.push({ type: 'tool_result', tool_use_id: tu.id, content: outcome.forModel });
+
+          // Tool result message
+          const resultContent = typeof outcome.forModel === 'string'
+            ? outcome.forModel
+            : JSON.stringify(outcome.forModel);
+          messages.push({
+            role: 'tool',
+            tool_call_id: tc.id,
+            content: resultContent,
+          });
         }
         if (roundClinics.length) lastClinics = roundClinics;
-        messages.push({ role: 'user', content: toolResults });
         continue;
       }
 
