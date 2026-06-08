@@ -87,6 +87,7 @@ type InspectResponse = { ok: boolean; rows?: InspectRow[]; error?: string };
 export function AdminToolsClient() {
   const [draftsState, setDraftsState] = useState<ButtonState<RegenerateResponse>>({ loading: false, result: null, error: null });
   const [cleanBatchState, setCleanBatchState] = useState<ButtonState<RegenerateResponse>>({ loading: false, result: null, error: null });
+  const [pendingClaimState, setPendingClaimState] = useState<ButtonState<{ ok: boolean; drafted?: number; failed?: number; deletedPriorDrafts?: number; recipients?: { to: string; subject: string }[]; error?: string }>>({ loading: false, result: null, error: null });
   const [ratingsState, setRatingsState] = useState<ButtonState<RefreshResponse>>({ loading: false, result: null, error: null });
   const [hoursState, setHoursState] = useState<ButtonState<EnrichHoursResponse>>({ loading: false, result: null, error: null });
   const [rescueState, setRescueState] = useState<ButtonState<Rescue404Response>>({ loading: false, result: null, error: null });
@@ -104,6 +105,18 @@ export function AdminToolsClient() {
       }
     } catch (err) {
       setDraftsState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
+    }
+  };
+
+  const queuePendingClaimDrafts = async () => {
+    setPendingClaimState({ loading: true, result: null, error: null });
+    try {
+      const r = await fetch('/api/admin/queue-pending-claim-drafts', { method: 'POST' });
+      const data = await r.json();
+      if (!r.ok) setPendingClaimState({ loading: false, result: null, error: data.error || `HTTP ${r.status}` });
+      else setPendingClaimState({ loading: false, result: data, error: null });
+    } catch (err) {
+      setPendingClaimState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
     }
   };
 
@@ -310,6 +323,47 @@ export function AdminToolsClient() {
                   ))}
                 </ul>
               </div>
+            )}
+          </div>
+        )}
+      </Card>
+
+      <Card
+        title="Queue 4 pending-claim follow-up drafts"
+        description="Saves 4 manual follow-up emails to Gmail Drafts for the 5 rows currently in claim_requests (Knead's two submissions deduped to one): BeYouty (expired token re-send ask), Tri-Health (1d remaining nudge), Insight (welcome / activation tips since claim is already verified), Knead (2d remaining nudge). Idempotent: re-running deletes prior copies first. Operator sends each manually after review."
+        icon={<Mail size={18} />}
+      >
+        <button
+          type="button"
+          onClick={queuePendingClaimDrafts}
+          disabled={pendingClaimState.loading}
+          className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
+        >
+          {pendingClaimState.loading ? (<><Loader2 size={16} className="animate-spin" />Saving 4 drafts…</>) : 'Queue 4 pending-claim drafts'}
+        </button>
+
+        {pendingClaimState.error && (
+          <div className="mt-5 px-4 py-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm font-bold">
+            Error: {pendingClaimState.error}
+          </div>
+        )}
+
+        {pendingClaimState.result && (
+          <div className="mt-5">
+            <div className="text-sm text-slate-700 font-bold mb-3">
+              Drafted {pendingClaimState.result.drafted ?? 0} · Deleted {pendingClaimState.result.deletedPriorDrafts ?? 0} prior copies
+              {pendingClaimState.result.failed ? ` · ${pendingClaimState.result.failed} failed` : ''}
+            </div>
+            {(pendingClaimState.result.recipients || []).length > 0 && (
+              <ol className="text-sm text-slate-700 space-y-1.5 list-decimal pl-5">
+                {(pendingClaimState.result.recipients || []).map((r, i) => (
+                  <li key={r.to + i} className="font-medium">
+                    <span className="text-slate-400 font-normal">{r.to}</span>
+                    {' · '}
+                    <span className="font-bold">{r.subject}</span>
+                  </li>
+                ))}
+              </ol>
             )}
           </div>
         )}
