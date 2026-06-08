@@ -15,7 +15,7 @@
 
 import { getServiceSupabase } from './supabase';
 
-const MODEL = 'claude-sonnet-4-20250514';
+const MODEL = 'claude-sonnet-4-6';
 
 export interface PasteReadyFix {
   /** Short label of the issue (e.g. "Title tag", "Meta description"). */

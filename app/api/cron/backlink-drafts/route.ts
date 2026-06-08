@@ -6,7 +6,7 @@ import { BACKLINK_TEMPLATES, BacklinkTargetType, getTemplate } from '../../../..
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
-const MODEL = 'claude-sonnet-4-20250514';
+const MODEL = 'claude-sonnet-4-6';
 const DAILY_MAX_DRAFTS = 5; // hard ceiling regardless of how many got researched
 
 interface ResearchRow {
