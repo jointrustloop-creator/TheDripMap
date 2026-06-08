@@ -1,7 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { MapPin, ArrowRight } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 // import remarkGfm from 'remark-gfm';
@@ -233,6 +233,30 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
         meta_description: null
       };
     } else {
+      // Safety net: if the slug is a treatment or symptom name typed into the
+      // /cities/ path (e.g. /cities/weight-loss), redirect to the correct hub
+      // instead of 404. Treatment slugs source: app/treatments/page.tsx.
+      // Symptom slugs source: src/lib/use-cases.ts. Keep this list in sync
+      // when those source files change.
+      const TREATMENT_SLUGS = new Set([
+        'nad-plus', 'hangover', 'hangover-recovery', 'immune-support',
+        'beauty-glow', 'weight-loss', 'glp-1-weight-loss', 'hydration',
+        'recovery', 'athletic-recovery', 'myers-cocktail', 'jet-lag',
+        'energy-boost', 'iron-infusion', 'vitamin-d', 'b12-shot',
+        'glutathione', 'high-dose-vitamin-c', 'vitamin-c', 'cold-and-flu',
+        'migraine-relief', 'hormone-therapy', 'mobile-iv',
+      ]);
+      const SYMPTOM_SLUGS = new Set([
+        'hangover', 'jet-lag', 'fatigue', 'cold-and-flu', 'sports-recovery',
+        'migraine', 'weight-loss', 'skin-glow', 'stress', 'stomach-flu',
+        'immunity', 'morning-sickness', 'event-prep',
+      ]);
+      if (TREATMENT_SLUGS.has(slug)) {
+        redirect(`/treatments/${slug}`);
+      }
+      if (SYMPTOM_SLUGS.has(slug)) {
+        redirect(`/symptoms/${slug}`);
+      }
       notFound();
     }
   }
