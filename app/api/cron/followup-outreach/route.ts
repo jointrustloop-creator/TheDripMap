@@ -275,6 +275,8 @@ export async function GET(req: Request) {
       replyTo: 'info@thedripmap.com',
       subject,
       text,
+      providerId: anchor.id,
+      templateId: providers.length > 1 ? 'followup_multi_v1' : 'followup_single_v1',
     };
   });
 

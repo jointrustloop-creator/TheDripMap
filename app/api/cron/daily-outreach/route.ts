@@ -5,8 +5,10 @@ import { saveDrafts, type DraftPayload } from '../../../../src/lib/draft-saver';
 import { isJunkEmail, isDomainMismatch } from '../../../../src/lib/outreach-quality';
 import {
   cleanName,
-  buildSingleLocationBody,
   buildMultiLocationBody,
+  pickSingleLocationBody,
+  getProviderViews7d,
+  TEMPLATE_MULTI_BASELINE_V1,
   isCanadian,
   outreachSubject,
   type ProviderRow,
@@ -171,20 +173,34 @@ export async function GET(req: Request) {
 
   const selected = groupArr.slice(0, DAILY_TARGET);
 
-  // Build draft payloads. saveDrafts opens one IMAP connection and appends each.
-  const drafts: DraftPayload[] = selected.map(({ email, providers }) => {
+  // Build draft payloads. saveDrafts opens one IMAP connection and appends
+  // each. For single-location sends we pick traffic-led vs baseline based on
+  // the anchor's trailing-7d view count (pickSingleLocationBody handles the
+  // selection + returns the matching templateId). Multi-location stays on
+  // the baseline multi template.
+  const drafts: DraftPayload[] = await Promise.all(selected.map(async ({ email, providers }) => {
     const anchor = providers[0];
-    const text = providers.length > 1
-      ? buildMultiLocationBody(providers, email)
-      : buildSingleLocationBody(anchor);
+    let text: string;
+    let templateId: string;
+    if (providers.length > 1) {
+      text = buildMultiLocationBody(providers, email);
+      templateId = TEMPLATE_MULTI_BASELINE_V1;
+    } else {
+      const views = await getProviderViews7d(supabase, anchor.id);
+      const picked = pickSingleLocationBody(anchor, views);
+      text = picked.body;
+      templateId = picked.templateId;
+    }
     return {
       from: 'TheDripMap <info@thedripmap.com>',
       to: email,
       replyTo: 'info@thedripmap.com',
       subject: outreachSubject(cleanName(anchor.name), providers.length),
       text,
+      providerId: anchor.id,
+      templateId,
     };
-  });
+  }));
 
   let draftResults;
   try {

@@ -27,8 +27,10 @@ import { isJunkEmail, isDomainMismatch } from '../../../../src/lib/outreach-qual
 import { applyOutreachCountryFilter } from '../../../../src/lib/outreach-config';
 import {
   cleanName,
-  buildSingleLocationBody,
   buildMultiLocationBody,
+  pickSingleLocationBody,
+  getProviderViews7d,
+  TEMPLATE_MULTI_BASELINE_V1,
   isCanadian,
   outreachSubject,
   type ProviderRow,
@@ -81,20 +83,34 @@ function groupByEmail(rows: ProviderRow[]): { email: string; providers: Provider
   return groupArr;
 }
 
-function buildDraftsForGroups(groups: { email: string; providers: ProviderRow[]; anchor: ProviderRow }[]): DraftPayload[] {
-  return groups.map(({ email, providers }) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function buildDraftsForGroups(
+  supabase: any,
+  groups: { email: string; providers: ProviderRow[]; anchor: ProviderRow }[]
+): Promise<DraftPayload[]> {
+  return Promise.all(groups.map(async ({ email, providers }) => {
     const anchor = providers[0];
-    const text = providers.length > 1
-      ? buildMultiLocationBody(providers, email)
-      : buildSingleLocationBody(anchor);
+    let text: string;
+    let templateId: string;
+    if (providers.length > 1) {
+      text = buildMultiLocationBody(providers, email);
+      templateId = TEMPLATE_MULTI_BASELINE_V1;
+    } else {
+      const views = await getProviderViews7d(supabase, anchor.id);
+      const picked = pickSingleLocationBody(anchor, views);
+      text = picked.body;
+      templateId = picked.templateId;
+    }
     return {
       from: 'TheDripMap <info@thedripmap.com>',
       to: email,
       replyTo: 'info@thedripmap.com',
       subject: outreachSubject(cleanName(anchor.name), providers.length),
       text,
+      providerId: anchor.id,
+      templateId,
     };
-  });
+  }));
 }
 
 export async function POST(req: Request) {
@@ -138,7 +154,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: `delete failed: ${err instanceof Error ? err.message : String(err)}` }, { status: 500 });
     }
 
-    const drafts = buildDraftsForGroups(groups);
+    const drafts = await buildDraftsForGroups(supabase, groups);
     let results;
     try {
       results = await saveDrafts(drafts);
@@ -190,7 +206,7 @@ export async function POST(req: Request) {
     }
 
     const groups = groupByEmail(candidates).slice(0, limit);
-    const drafts = buildDraftsForGroups(groups);
+    const drafts = await buildDraftsForGroups(supabase, groups);
 
     let results;
     try {

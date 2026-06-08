@@ -3,8 +3,15 @@
 //
 // Why: lets us pre-stage outreach emails so Hubert reviews + sends manually
 // from his Gmail inbox instead of firing 20 sends programmatically.
+//
+// 2026-06-08: outreach callers can now pass providerId + templateId on each
+// DraftPayload, and saveDrafts logs every saved draft to outbound_message_log
+// with provider_id, template_id, subject, body_preview, sent_at, message_id.
+// The log write is best-effort: a Supabase glitch never blocks the draft save.
 
 import { ImapFlow } from 'imapflow';
+import crypto from 'crypto';
+import { createClient } from '@supabase/supabase-js';
 
 export interface DraftPayload {
   from: string; // e.g. 'TheDripMap <info@thedripmap.com>'
@@ -12,15 +19,29 @@ export interface DraftPayload {
   replyTo?: string;
   subject: string;
   text: string;
+  // Optional outreach-attribution fields. When providerId is set, saveDrafts
+  // writes a row to outbound_message_log so the tally script (_ab-tally.cjs)
+  // can compare templates by reply rate / claim rate over time.
+  providerId?: string | null;
+  templateId?: string | null;
 }
 
 export interface DraftResult {
   ok: boolean;
   to: string;
+  messageId?: string;
   error?: string;
 }
 
-function buildRfc822(payload: DraftPayload): string {
+function generateMessageId(): string {
+  // RFC 5322 Message-ID: <random@domain>. We supply the ID at draft time so
+  // both Gmail and outbound_message_log see the same value.
+  const rand = crypto.randomBytes(16).toString('hex');
+  const ts = Date.now().toString(36);
+  return `<${ts}.${rand}@thedripmap.com>`;
+}
+
+function buildRfc822(payload: DraftPayload, messageId: string): string {
   // Minimal MIME message — Gmail accepts plain RFC822 just fine for drafts.
   const headers: string[] = [
     `From: ${payload.from}`,
@@ -28,11 +49,43 @@ function buildRfc822(payload: DraftPayload): string {
     ...(payload.replyTo ? [`Reply-To: ${payload.replyTo}`] : []),
     `Subject: ${payload.subject}`,
     `Date: ${new Date().toUTCString()}`,
+    `Message-ID: ${messageId}`,
     'MIME-Version: 1.0',
     'Content-Type: text/plain; charset=utf-8',
     'Content-Transfer-Encoding: 8bit',
   ];
   return headers.join('\r\n') + '\r\n\r\n' + payload.text;
+}
+
+function getServiceSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key);
+}
+
+async function logOutboundMessage(payload: DraftPayload, messageId: string): Promise<void> {
+  // Best-effort. Non-outreach sends (no providerId) skip. Any DB failure logs
+  // a warning but never fails the draft save.
+  if (!payload.providerId) return;
+  try {
+    const sb = getServiceSupabase();
+    if (!sb) return;
+    const bodyPreview = (payload.text || '').slice(0, 200);
+    const { error } = await sb.from('outbound_message_log').insert({
+      provider_id: payload.providerId,
+      template_id: payload.templateId || null,
+      subject: payload.subject,
+      body_preview: bodyPreview,
+      sent_at: new Date().toISOString(),
+      message_id: messageId,
+    });
+    if (error) {
+      console.warn('outbound_message_log insert failed (non-fatal):', error.message);
+    }
+  } catch (e) {
+    console.warn('outbound_message_log insert error (non-fatal):', e instanceof Error ? e.message : String(e));
+  }
 }
 
 // Batched saver: open one IMAP connection, save N drafts, close.
@@ -60,11 +113,14 @@ export async function saveDrafts(payloads: DraftPayload[]): Promise<DraftResult[
     await client.mailboxOpen('[Gmail]/Drafts');
 
     for (const payload of payloads) {
+      const messageId = generateMessageId();
       try {
-        const rfc822 = buildRfc822(payload);
+        const rfc822 = buildRfc822(payload, messageId);
         // The 4th arg can include flags — \\Draft is what Gmail expects
         await client.append('[Gmail]/Drafts', rfc822, ['\\Draft']);
-        results.push({ ok: true, to: payload.to });
+        // Log to outbound_message_log on success (best-effort, never blocks).
+        await logOutboundMessage(payload, messageId);
+        results.push({ ok: true, to: payload.to, messageId });
       } catch (err) {
         results.push({
           ok: false,

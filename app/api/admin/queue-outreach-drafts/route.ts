@@ -17,6 +17,7 @@ function cleanName(n: string): string {
 }
 
 interface ProviderRow {
+  id: string;
   name: string;
   slug: string;
   rating: number;
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
   // Country filter (see src/lib/outreach-config.ts) — current: Canada-only.
   const baseLegacyQuery = supabase
     .from('providers')
-    .select('name, slug, rating, reviews, email')
+    .select('id, name, slug, rating, reviews, email')
     .neq('availability', false)
     .eq('is_featured', false)
     .gte('rating', minRating)
@@ -106,6 +107,8 @@ ${claimUrl}
 Warmly,
 TheDripMap Team
 info@thedripmap.com`,
+      providerId: p.id,
+      templateId: 'legacy_queue_inline_v1',
     };
   });
 
