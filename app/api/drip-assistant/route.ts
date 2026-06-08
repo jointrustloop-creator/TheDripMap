@@ -169,7 +169,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'The assistant isn\'t configured yet. Please try again shortly, or browse clinics directly.' }, { status: 503 });
     }
     console.error('drip-assistant error:', msg);
-    return NextResponse.json({ error: 'I hit a snag — please try again in a moment.' }, { status: 502 });
+    return NextResponse.json({ error: 'I hit a snag — please try again in a moment.', _debug: msg.slice(0, 800) }, { status: 502 });
   }
 
   if (!finalText) {
