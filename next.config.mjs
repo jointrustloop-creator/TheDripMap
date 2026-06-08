@@ -129,6 +129,24 @@ const nextConfig = {
       // removed so the treatment x city matrix can own '/iv-therapy/[treatment]/[city]'.
       // Legacy /iv-therapy/{state}/{city} URLs are handled inside that route (a
       // non-treatment first segment that is a US state redirects to /cities/{city}).
+      //
+      // Single-hop treatment redirects MUST come before the generic
+      // /iv-therapy/:city catch-all below. Otherwise '/iv-therapy/nad-plus'
+      // gets matched as :city and sent to /cities/nad-plus, which then
+      // double-redirects via the treatment-slug safety net in
+      // app/cities/[slug]/page.tsx. SEO best practice is single-hop.
+      ...[
+        'nad-plus', 'hangover', 'hangover-recovery', 'immune-support',
+        'beauty-glow', 'weight-loss', 'glp-1-weight-loss', 'hydration',
+        'recovery', 'athletic-recovery', 'myers-cocktail', 'jet-lag',
+        'energy-boost', 'iron-infusion', 'vitamin-d', 'b12-shot',
+        'glutathione', 'high-dose-vitamin-c', 'vitamin-c', 'cold-and-flu',
+        'migraine-relief', 'hormone-therapy', 'mobile-iv',
+      ].map((slug) => ({
+        source: `/iv-therapy/${slug}`,
+        destination: `/treatments/${slug}`,
+        permanent: true,
+      })),
       {
         source: '/iv-therapy/:city',
         destination: '/cities/:city',

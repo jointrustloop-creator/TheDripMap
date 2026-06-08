@@ -38,6 +38,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  // Treatment hub pages — one per protocol. Source of truth is the TREATMENTS
+  // array in app/treatments/page.tsx. These are 200s in prod with full content
+  // (hero + glossary + city finder) but were never advertised in the sitemap,
+  // so Google couldn't crawl them. 22 pages added 2026-06-08 after an internal
+  // crawl flagged the gap.
+  const TREATMENT_HUB_SLUGS = [
+    'nad-plus', 'hangover', 'immune-support', 'beauty-glow', 'weight-loss',
+    'hydration', 'recovery', 'myers-cocktail', 'jet-lag', 'energy-boost',
+    'glp-1-weight-loss', 'iron-infusion', 'vitamin-d', 'b12-shot',
+    'glutathione', 'high-dose-vitamin-c', 'cold-and-flu', 'migraine-relief',
+    'hormone-therapy',
+  ];
+  const treatmentHubRoutes = TREATMENT_HUB_SLUGS.map((slug) => ({
+    url: `${baseUrl}/treatments/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.75,
+  }));
+
   const cities = await getAllCities();
   const cityRoutes = cities
     .filter((c) => c.count > 0 && c.city)
@@ -173,5 +192,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  return [...staticRoutes, ...audienceRoutes, ...symptomRoutes, ...stateRoutes, ...guideRoutes, ...cityRoutes, ...providerRoutes, ...blogRoutes, ...matrixRoutes];
+  return [...staticRoutes, ...audienceRoutes, ...symptomRoutes, ...treatmentHubRoutes, ...stateRoutes, ...guideRoutes, ...cityRoutes, ...providerRoutes, ...blogRoutes, ...matrixRoutes];
 }
