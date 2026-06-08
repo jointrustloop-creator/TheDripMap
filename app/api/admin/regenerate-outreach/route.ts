@@ -206,6 +206,23 @@ export async function POST(req: Request) {
     }
 
     const groups = groupByEmail(candidates).slice(0, limit);
+
+    // If clean=1: wipe ALL existing outreach drafts (initial + multi-location
+    // + 7-day follow-ups) before generating the new batch. Operator uses this
+    // when they want a fixed, hand-curated batch to send and don't want any
+    // residual drafts from previous runs left in the Drafts folder.
+    const cleanFirst = searchParams.get('clean') === '1';
+    let preDeleted = 0;
+    if (cleanFirst) {
+      try {
+        preDeleted += await deleteDraftsBySubject('listing on TheDripMap');
+        preDeleted += await deleteDraftsBySubject('locations on TheDripMap');
+        preDeleted += await deleteDraftsBySubject('Following up on your');
+      } catch (err) {
+        return NextResponse.json({ error: `clean-pre-delete failed: ${err instanceof Error ? err.message : String(err)}` }, { status: 500 });
+      }
+    }
+
     const drafts = await buildDraftsForGroups(supabase, groups);
 
     let results;
@@ -243,6 +260,8 @@ export async function POST(req: Request) {
       ok: true,
       mode,
       limit,
+      clean: cleanFirst,
+      preDeleted,
       drafted: saved,
       failed: failures.length,
       failures,

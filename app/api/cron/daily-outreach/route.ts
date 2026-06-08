@@ -33,11 +33,26 @@ function isEligibleEmail(email: string | null | undefined): boolean {
 //
 // Idempotent: if any outreach_sent_at already exists for today, this is a no-op
 // (so the cron is safe to re-trigger or to manually invoke).
+// PAUSED FLAG - toggle to false to resume daily outreach drafts.
+// Set 2026-06-08 per operator (directory-submission-quick-fills.md):
+// "Pause automatic generation. Disable or no-op the daily-outreach and
+// followup-outreach crons for now. I want a fixed batch I send by hand,
+// not a pile that refills every morning."
+const PAUSED = true;
+
 export async function GET(req: Request) {
   const expected = process.env.CRON_SECRET;
   if (!expected) return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
   if ((req.headers.get('authorization') || '') !== `Bearer ${expected}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (PAUSED) {
+    return NextResponse.json({
+      ok: true,
+      paused: true,
+      drafted: 0,
+      message: 'daily-outreach is paused (PAUSED = true in route.ts). Operator will batch-regenerate manually via /admin/tools.',
+    });
   }
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
     return NextResponse.json({ error: 'SMTP_USER/SMTP_PASS required' }, { status: 500 });

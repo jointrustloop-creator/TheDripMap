@@ -126,11 +126,23 @@ ${CASL_FOOTER}`;
 // daily-outreach cron.
 //
 // Idempotent: if any followup_sent_at exists for today, no-op.
+// PAUSED FLAG - toggle to false to resume 7-day follow-up drafts.
+// Set 2026-06-08 per operator alongside daily-outreach.
+const PAUSED = true;
+
 export async function GET(req: Request) {
   const expected = process.env.CRON_SECRET;
   if (!expected) return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
   if ((req.headers.get('authorization') || '') !== `Bearer ${expected}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (PAUSED) {
+    return NextResponse.json({
+      ok: true,
+      paused: true,
+      drafted: 0,
+      message: 'followup-outreach is paused (PAUSED = true in route.ts). Operator will batch-regenerate manually via /admin/tools.',
+    });
   }
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
     return NextResponse.json({ error: 'SMTP_USER/SMTP_PASS required' }, { status: 500 });

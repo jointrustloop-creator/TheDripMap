@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Loader2, Mail, Star, Clock, Link as LinkIcon, Search, MapPin } from 'lucide-react';
+import { Loader2, Mail, Star, Clock, Link as LinkIcon, Search, MapPin, Trash2 } from 'lucide-react';
 import { OUTREACH_COUNTRY_FILTER, outreachScopeLabel } from '@/src/lib/outreach-config';
 
 type RegenerateRecipient = {
@@ -20,6 +20,8 @@ type RegenerateResponse = {
   recipients?: RegenerateRecipient[];
   message?: string;
   error?: string;
+  clean?: boolean;
+  preDeleted?: number;
 };
 
 type RefreshUpdatedRow = {
@@ -84,6 +86,7 @@ type InspectResponse = { ok: boolean; rows?: InspectRow[]; error?: string };
 
 export function AdminToolsClient() {
   const [draftsState, setDraftsState] = useState<ButtonState<RegenerateResponse>>({ loading: false, result: null, error: null });
+  const [cleanBatchState, setCleanBatchState] = useState<ButtonState<RegenerateResponse>>({ loading: false, result: null, error: null });
   const [ratingsState, setRatingsState] = useState<ButtonState<RefreshResponse>>({ loading: false, result: null, error: null });
   const [hoursState, setHoursState] = useState<ButtonState<EnrichHoursResponse>>({ loading: false, result: null, error: null });
   const [rescueState, setRescueState] = useState<ButtonState<Rescue404Response>>({ loading: false, result: null, error: null });
@@ -101,6 +104,22 @@ export function AdminToolsClient() {
       }
     } catch (err) {
       setDraftsState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
+    }
+  };
+
+  const cleanRegenerate50 = async () => {
+    if (!window.confirm('This will DELETE every outreach draft currently in Gmail Drafts (initial sends + 7-day follow-ups) and rebuild exactly 50 Canadian unclaimed-clinic drafts. Continue?')) return;
+    setCleanBatchState({ loading: true, result: null, error: null });
+    try {
+      const r = await fetch('/api/admin/regenerate-outreach?mode=next&limit=50&clean=1', { method: 'POST' });
+      const data = (await r.json()) as RegenerateResponse;
+      if (!r.ok) {
+        setCleanBatchState({ loading: false, result: null, error: data.error || `HTTP ${r.status}` });
+      } else {
+        setCleanBatchState({ loading: false, result: data, error: null });
+      }
+    } catch (err) {
+      setCleanBatchState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
     }
   };
 
@@ -232,6 +251,61 @@ export function AdminToolsClient() {
                 <div className="text-xs font-black uppercase tracking-widest text-rose-600 mb-2">Failures</div>
                 <ul className="text-xs text-rose-700 space-y-1">
                   {(draftsState.result.failures || []).map((f, i) => (
+                    <li key={f.email + i}>{f.email}: {f.error}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+      </Card>
+
+      <Card
+        title="Clean regenerate 50 Canadian outreach drafts"
+        description="DESTRUCTIVE. Deletes every outreach draft currently in info@thedripmap.com Gmail Drafts (initial sends + 7-day follow-ups), then rebuilds exactly 50 Canadian unclaimed-clinic drafts using the current traffic-led template selector. Daily + follow-up crons are paused, so nothing will refill these overnight. Use this when you want a fixed, hand-curated batch to send out."
+        icon={<Trash2 size={18} />}
+      >
+        <button
+          type="button"
+          onClick={cleanRegenerate50}
+          disabled={cleanBatchState.loading}
+          className="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
+        >
+          {cleanBatchState.loading ? (<><Loader2 size={16} className="animate-spin" />Wiping drafts and rebuilding 50…</>) : 'Wipe drafts + rebuild 50 (Canada only)'}
+        </button>
+
+        {cleanBatchState.error && (
+          <div className="mt-5 px-4 py-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm font-bold">
+            Error: {cleanBatchState.error}
+          </div>
+        )}
+
+        {cleanBatchState.result && (
+          <div className="mt-5">
+            <div className="text-sm text-slate-700 font-bold mb-3">
+              Pre-deleted {cleanBatchState.result.preDeleted ?? 0} existing drafts · Drafted {cleanBatchState.result.drafted ?? 0} of {(cleanBatchState.result.recipients || []).length} target recipients
+              {cleanBatchState.result.failed ? ` · ${cleanBatchState.result.failed} failed` : ''}
+            </div>
+            {cleanBatchState.result.message && (
+              <div className="text-sm text-slate-500 font-medium mb-3">{cleanBatchState.result.message}</div>
+            )}
+            {(cleanBatchState.result.recipients || []).length > 0 && (
+              <ol className="text-sm text-slate-700 space-y-1.5 list-decimal pl-5">
+                {(cleanBatchState.result.recipients || []).map((r, i) => (
+                  <li key={r.email + i} className="font-medium">
+                    <span className="font-black">{r.brand}</span>
+                    {r.city ? ` · ${r.city}` : ''}{r.country ? ` (${r.country})` : ''}
+                    {r.locations > 1 ? ` · ${r.locations} locations` : ''}
+                    <span className="text-slate-400 font-normal"> · {r.email}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+            {(cleanBatchState.result.failures || []).length > 0 && (
+              <div className="mt-4">
+                <div className="text-xs font-black uppercase tracking-widest text-rose-600 mb-2">Failures</div>
+                <ul className="text-xs text-rose-700 space-y-1">
+                  {(cleanBatchState.result.failures || []).map((f, i) => (
                     <li key={f.email + i}>{f.email}: {f.error}</li>
                   ))}
                 </ul>
