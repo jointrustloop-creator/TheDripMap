@@ -5,7 +5,7 @@ import { AUTO_RESEARCH_TYPES, BacklinkTargetType, BACKLINK_TEMPLATES } from '../
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
-const MODEL = 'claude-sonnet-4-6';
+const MODEL = 'claude-sonnet-4-20250514';
 const DAILY_TARGET = 5;
 const MIN_DA = 20;
 

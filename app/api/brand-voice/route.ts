@@ -22,7 +22,7 @@ export interface BrandVoiceListing {
   city: string | null;
 }
 
-const MODEL = 'claude-sonnet-4-6';
+const MODEL = 'claude-sonnet-4-20250514';
 
 function buildPrompt(p: { clinicName: string; city: string; treatments: string[]; vibe: string; patient: string }) {
   return `Write a complete marketing copy kit for an IV therapy clinic.

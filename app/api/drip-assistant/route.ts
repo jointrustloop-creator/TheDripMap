@@ -6,7 +6,7 @@ import { getWhitelabelConfig } from '../../../src/lib/whitelabel-configs';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
-const MODEL = 'claude-haiku-4-5-20251001';
+const MODEL = 'claude-sonnet-4-20250514';
 const MAX_TOOL_ROUNDS = 5;
 
 interface InMsg { role: 'user' | 'assistant'; content: string }
@@ -169,7 +169,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'The assistant isn\'t configured yet. Please try again shortly, or browse clinics directly.' }, { status: 503 });
     }
     console.error('drip-assistant error:', msg);
-    return NextResponse.json({ error: 'I hit a snag — please try again in a moment.', _debug: msg.slice(0, 800) }, { status: 502 });
+    return NextResponse.json({ error: 'I hit a snag — please try again in a moment.' }, { status: 502 });
   }
 
   if (!finalText) {
