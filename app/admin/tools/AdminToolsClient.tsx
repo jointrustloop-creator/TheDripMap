@@ -84,6 +84,22 @@ type InspectRow = {
 };
 type InspectResponse = { ok: boolean; rows?: InspectRow[]; error?: string };
 
+type GscRow = { query?: string; page?: string; clicks: number; impressions: number; ctr: number; position: number };
+type GscReportOk = {
+  kind: 'ok';
+  property: string;
+  data: {
+    searchAnalytics: {
+      totals: { clicks: number; impressions: number; ctr: number; position: number };
+      wow: { clicks: number; impressions: number };
+      topQueries: GscRow[];
+      topPages: GscRow[];
+    };
+  };
+};
+type GscReportStub = { kind: 'stub'; message: string; setupSteps: string[] };
+type GscSnapshotResponse = { ok: boolean; report?: GscReportOk | GscReportStub; error?: string };
+
 export function AdminToolsClient() {
   const [draftsState, setDraftsState] = useState<ButtonState<RegenerateResponse>>({ loading: false, result: null, error: null });
   const [cleanBatchState, setCleanBatchState] = useState<ButtonState<RegenerateResponse>>({ loading: false, result: null, error: null });
@@ -92,6 +108,7 @@ export function AdminToolsClient() {
   const [hoursState, setHoursState] = useState<ButtonState<EnrichHoursResponse>>({ loading: false, result: null, error: null });
   const [rescueState, setRescueState] = useState<ButtonState<Rescue404Response>>({ loading: false, result: null, error: null });
   const [inspectState, setInspectState] = useState<ButtonState<InspectResponse>>({ loading: false, result: null, error: null });
+  const [gscState, setGscState] = useState<ButtonState<GscSnapshotResponse>>({ loading: false, result: null, error: null });
 
   const generateDrafts = async () => {
     setDraftsState({ loading: true, result: null, error: null });
@@ -105,6 +122,18 @@ export function AdminToolsClient() {
       }
     } catch (err) {
       setDraftsState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
+    }
+  };
+
+  const pullGscSnapshot = async () => {
+    setGscState({ loading: true, result: null, error: null });
+    try {
+      const r = await fetch('/api/admin/gsc-snapshot', { method: 'POST' });
+      const data = (await r.json()) as GscSnapshotResponse;
+      if (!r.ok) setGscState({ loading: false, result: null, error: data.error || `HTTP ${r.status}` });
+      else setGscState({ loading: false, result: data, error: null });
+    } catch (err) {
+      setGscState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
     }
   };
 
@@ -217,6 +246,123 @@ export function AdminToolsClient() {
           </div>
         </div>
       </div>
+
+      <Card
+        title="Pull live Google Search Console snapshot"
+        description="Hits the GSC API right now and shows totals (clicks, impressions, CTR, avg position) for the last 28 days, week-over-week deltas, top 10 queries, top 10 pages. Same source the Sunday digest email uses, just on demand. Requires GSC_SERVICE_ACCOUNT_KEY in Vercel env (already set)."
+        icon={<Search size={18} />}
+      >
+        <button
+          type="button"
+          onClick={pullGscSnapshot}
+          disabled={gscState.loading}
+          className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
+        >
+          {gscState.loading ? (<><Loader2 size={16} className="animate-spin" />Pulling GSC data…</>) : 'Pull live GSC snapshot'}
+        </button>
+
+        {gscState.error && (
+          <div className="mt-5 px-4 py-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm font-bold">
+            Error: {gscState.error}
+          </div>
+        )}
+
+        {gscState.result?.report?.kind === 'stub' && (
+          <div className="mt-5 px-4 py-3 bg-amber-50 border border-amber-100 rounded-xl text-amber-800 text-sm">
+            <div className="font-bold mb-2">GSC not configured</div>
+            <div className="text-xs font-medium">{gscState.result.report.message}</div>
+          </div>
+        )}
+
+        {gscState.result?.report?.kind === 'ok' && (() => {
+          const sa = gscState.result.report.data.searchAnalytics;
+          const wowClicks = sa.totals.clicks - sa.wow.clicks;
+          const wowImps = sa.totals.impressions - sa.wow.impressions;
+          const fmtPct = (n: number) => (n * 100).toFixed(2) + '%';
+          const fmtNum = (n: number) => n.toLocaleString();
+          const fmtDelta = (n: number) => (n > 0 ? '+' : '') + fmtNum(n);
+          return (
+            <div className="mt-5">
+              <div className="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Last 28 days totals</div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                <div className="bg-slate-50 rounded-xl p-4">
+                  <div className="text-2xl font-black text-slate-900">{fmtNum(sa.totals.clicks)}</div>
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Clicks</div>
+                  <div className={`text-xs font-bold mt-1 ${wowClicks >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>WoW {fmtDelta(wowClicks)}</div>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-4">
+                  <div className="text-2xl font-black text-slate-900">{fmtNum(sa.totals.impressions)}</div>
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Impressions</div>
+                  <div className={`text-xs font-bold mt-1 ${wowImps >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>WoW {fmtDelta(wowImps)}</div>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-4">
+                  <div className="text-2xl font-black text-slate-900">{fmtPct(sa.totals.ctr)}</div>
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">CTR</div>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-4">
+                  <div className="text-2xl font-black text-slate-900">{sa.totals.position.toFixed(1)}</div>
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Avg position</div>
+                </div>
+              </div>
+
+              <div className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Top 10 queries</div>
+              <div className="overflow-x-auto mb-6">
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-xs font-black uppercase tracking-widest text-slate-500 border-b border-slate-200">
+                      <th className="py-2 pr-4">Query</th>
+                      <th className="py-2 pr-4">Clicks</th>
+                      <th className="py-2 pr-4">Impressions</th>
+                      <th className="py-2 pr-4">CTR</th>
+                      <th className="py-2">Position</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sa.topQueries.map((q, i) => (
+                      <tr key={(q.query || '') + i} className="border-b border-slate-100">
+                        <td className="py-2 pr-4 font-bold text-slate-800">{q.query}</td>
+                        <td className="py-2 pr-4 text-slate-700">{q.clicks}</td>
+                        <td className="py-2 pr-4 text-slate-700">{fmtNum(q.impressions)}</td>
+                        <td className="py-2 pr-4 text-slate-700">{fmtPct(q.ctr)}</td>
+                        <td className="py-2 text-slate-700">{q.position.toFixed(1)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Top 10 pages</div>
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-xs font-black uppercase tracking-widest text-slate-500 border-b border-slate-200">
+                      <th className="py-2 pr-4">Page</th>
+                      <th className="py-2 pr-4">Clicks</th>
+                      <th className="py-2 pr-4">Impressions</th>
+                      <th className="py-2 pr-4">CTR</th>
+                      <th className="py-2">Position</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sa.topPages.map((p, i) => {
+                      const path = (p.page || '').replace('https://www.thedripmap.com', '').replace('https://thedripmap.com', '');
+                      return (
+                        <tr key={(p.page || '') + i} className="border-b border-slate-100">
+                          <td className="py-2 pr-4 font-bold text-slate-800 max-w-xs truncate" title={p.page}>{path || '/'}</td>
+                          <td className="py-2 pr-4 text-slate-700">{p.clicks}</td>
+                          <td className="py-2 pr-4 text-slate-700">{fmtNum(p.impressions)}</td>
+                          <td className="py-2 pr-4 text-slate-700">{fmtPct(p.ctr)}</td>
+                          <td className="py-2 text-slate-700">{p.position.toFixed(1)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          );
+        })()}
+      </Card>
 
       <Card
         title="Generate 10 outreach drafts"
