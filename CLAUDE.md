@@ -75,7 +75,27 @@ Full details in GOAL.md and DAILY_CHECKLIST.md
   during Phase 1/1b stay cleaned (those changes were operator-greenlit
   independent of the hide decision).
 
-## Today's Hard Lessons
+## Today's Hard Lessons (2026-06-08)
+- /cities/weight-loss returned 404 - no redirect safety net for treatment
+  or symptom slugs typed into /cities/ path. When adding new public route
+  categories, add a redirect catch for guessable misroutes.
+- /treatments/{slug} hub pages rendered 200 but were never in sitemap.ts
+  so Google could not crawl them. When adding any new public route, add
+  it to app/sitemap.ts in the same commit.
+- /iv-therapy/{treatment-slug} created a 2-hop redirect chain after the
+  /cities/ safety net landed. Specific redirect rules must come BEFORE
+  the generic /iv-therapy/:city catch-all in next.config.mjs, otherwise
+  treatment slugs get matched as cities first.
+- GSC ownership verification (meta tag) is NOT the same as GSC API
+  access. The API needs GSC_SERVICE_ACCOUNT_KEY in Vercel env, separate
+  from GOOGLE_PLACES_API_KEY. Confirm env vars are actually set before
+  building UI that assumes them.
+- Windows + Node v24 silently kills concurrent HTTPS scrape workers
+  (exit code 0, no error, partway through). Use sequential fetch +
+  AbortController + 600ms polite delay (the phase3 pattern). Always
+  write partial JSON every N rows so a death is resumable.
+
+## Earlier Hard Lessons
 - Invalid vercel.json property blocked all deploys for 1 hour
 - claim_requests FK pointed to wrong table - broke Kia's claim
 - Two automated emails sent to Kia by mistake
