@@ -384,10 +384,57 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
     ],
   };
 
+  // ItemList JSON-LD wrapping the visible clinic cards (top 12), each as a
+  // LocalBusiness entry with name, address, phone, url, and aggregateRating
+  // where present. This is the structured-data emission requested in the
+  // 2026-06-09 city-deepening spec.
+  type ListingRow = {
+    name: string;
+    slug?: string | null;
+    city?: string | null;
+    state?: string | null;
+    address?: string | null;
+    phone?: string | null;
+    website?: string | null;
+    rating?: number | null | string;
+    reviews?: number | null | string;
+  };
+  const itemListJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `IV therapy clinics in ${cityData.name}`,
+    numberOfItems: Math.min(listings.length, 12),
+    itemListElement: (listings as ListingRow[]).slice(0, 12).map((l, i) => {
+      const lb: Record<string, unknown> = {
+        '@type': 'MedicalBusiness',
+        name: l.name,
+        url: `https://www.thedripmap.com/providers/${l.slug || ''}`,
+        address: l.address || [l.city, l.state].filter(Boolean).join(', '),
+      };
+      if (l.phone) lb.telephone = l.phone;
+      if (l.website) lb.sameAs = l.website;
+      const rating = l.rating != null ? Number(l.rating) : null;
+      const reviews = l.reviews != null ? Number(l.reviews) : null;
+      if (rating && reviews) {
+        lb.aggregateRating = {
+          '@type': 'AggregateRating',
+          ratingValue: rating,
+          reviewCount: reviews,
+        };
+      }
+      return {
+        '@type': 'ListItem',
+        position: i + 1,
+        item: lb,
+      };
+    }),
+  };
+
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <Navbar />
       <main className="max-w-7xl mx-auto px-6 py-12">
         <BreadcrumbNav

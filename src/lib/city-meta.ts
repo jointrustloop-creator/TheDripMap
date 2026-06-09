@@ -233,7 +233,7 @@ const metas: Record<string, CityMeta> = {
     regulationNote: {
       headline: 'Who can legally administer IV therapy in British Columbia',
       body:
-        'IV administration is a regulated activity in British Columbia under the Health Professions Act. Physicians, registered nurses, nurse practitioners, and naturopathic physicians with the prescribing and infusion authority granted by the College of Complementary Health Professionals of BC (CCHPBC) can administer IV therapy in the province. Every clinic listed below operates with licensed clinical staff. This is general information, not legal or medical advice, and we recommend confirming credentials with the clinic before booking.',
+        'Vancouver is the second-largest IV therapy market on TheDripMap, with clinics serving Vancouver proper, the North Shore, Burnaby, and Richmond. The local mix runs across hydration, NAD+, immune support, glutathione, Myers cocktail, and beauty drips, and a notable share of listed clinics offer mobile in-home and hotel service. British Columbia reorganized its health professions regulation under the Health Professions and Occupations Act in 2026. The British Columbia College of Nurses and Midwives (BCCNM) regulates RNs, NPs, LPNs, and registered psychiatric nurses, and BC LPNs may perform IV therapy with the appropriate education within the BCCNM standards. The College of Physicians and Surgeons of BC (CPSBC) regulates physicians, who sign the directives nurse-led clinics follow. Naturopathic doctors in BC are regulated by the College of Complementary Health Professionals of BC (CCHPBC), the successor to the former CNPBC, and ND-led IV is common in Vancouver, Victoria, and Kelowna. The BC ND scope differs from Ontario, so confirm what a specific clinic is authorized to deliver. General information only, not legal or medical advice. Always confirm suitability and clinician credentials with the clinic before booking.',
       linkBlogSlug: 'who-can-legally-give-iv-canada-rules-by-province-2026',
       linkLabel: 'Read the full Canada IV therapy regulation guide',
     },
@@ -285,7 +285,7 @@ const metas: Record<string, CityMeta> = {
       {
         question: 'How much does IV therapy cost in Vancouver?',
         answer:
-          'Standard hydration and wellness drips in Vancouver typically run $200 to $400 CAD. NAD+ protocols generally range from $500 to over $1,000 CAD depending on dose. Mobile (in-home or hotel) service usually adds $50 to $100. Final pricing varies by clinic and protocol.',
+          'Each Vancouver clinic sets its own pricing, so check the individual clinic listing for current rates. As a general market guide, wellness drips like hydration and Myers cocktail tend to sit in the low to mid hundreds, with NAD+ protocols typically running higher because of the longer session and the dose. Always confirm with the clinic before booking.',
       },
       {
         question: 'Do Vancouver clinics offer mobile or in-home IV therapy?',
@@ -325,7 +325,7 @@ const metas: Record<string, CityMeta> = {
     regulationNote: {
       headline: 'Who can legally administer IV therapy in Ontario',
       body:
-        'IV administration is a controlled act under the Regulated Health Professions Act in Ontario. Registered nurses, nurse practitioners, physicians, and naturopaths with the appropriate IV infusion authorization can legally administer IV therapy in the province. Every clinic listed below operates with licensed clinical staff. This is general information, not legal or medical advice, and we recommend confirming credentials with the clinic before booking.',
+        'Toronto is the largest IV therapy market on TheDripMap, with clinics serving downtown Toronto, North York, Scarborough, Etobicoke, and the surrounding GTA. The local mix runs across hydration, hangover recovery, Myers cocktail, NAD+, immune support, and beauty drips, and a substantial subset of the listed clinics offer mobile in-home or hotel service across the GTA. Administering an IV is a regulated activity in Ontario. The College of Physicians and Surgeons of Ontario (CPSO) regulates physicians, the College of Nurses of Ontario (CNO) regulates RNs, NPs, and RPNs, and the College of Naturopaths of Ontario (CONO) authorizes naturopathic doctors who have passed the Intravenous Infusion Therapy (IVIT) Exam to administer a defined set of IV substances on inspected premises. Most wellness IV in Toronto is delivered either by an RN under a medical directive signed by a physician or NP, or by a CONO-authorized ND on CONO-inspected premises. Both models are legitimate. General information only, not legal or medical advice. Always confirm suitability and clinician credentials with the clinic before booking.',
       linkBlogSlug: 'who-can-legally-give-iv-canada-rules-by-province-2026',
       linkLabel: 'Read the full Canada IV therapy regulation guide',
     },
@@ -377,7 +377,7 @@ const metas: Record<string, CityMeta> = {
       {
         question: 'How much does IV therapy cost in Toronto?',
         answer:
-          'Standard hydration and wellness drips in Toronto typically run $175 to $350 CAD. NAD+ protocols generally range from $400 to over $1,000 CAD depending on dose. Mobile (in-home or hotel) service usually adds $50 to $100. Final pricing varies by clinic and protocol.',
+          'Each Toronto clinic sets its own pricing, so check the individual clinic listing for current rates. As a general market guide, wellness drips like hydration and Myers cocktail tend to sit in the low to mid hundreds, with NAD+ protocols typically running higher because of the longer session and the dose. Always confirm with the clinic before booking.',
       },
       {
         question: 'Do Toronto clinics offer mobile or in-home IV therapy?',
