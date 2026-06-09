@@ -34,23 +34,7 @@ export default async function ClinicOwnerPainsPage() {
   const updatedAt = r.data?.updated_at || null;
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-100 sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="text-sm font-black text-slate-900 hover:text-wellness-600">
-              TheDripMap
-            </Link>
-            <nav className="flex items-center gap-4 text-sm text-slate-500">
-              <Link href="/admin/insights" className="hover:text-slate-900">Insights</Link>
-              <Link href="/admin/opportunities" className="hover:text-slate-900">Opportunities</Link>
-              <Link href="/admin/clinic-owner-pains" className="text-slate-900 font-bold">Owner pains</Link>
-              <Link href="/admin/tools" className="hover:text-slate-900">Tools</Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-
+    <main>
       <div className="max-w-5xl mx-auto px-6 py-10">
         <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
           <div>
