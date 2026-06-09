@@ -64,16 +64,35 @@ async function isAuthorized(req: Request): Promise<boolean> {
   return auth === `Bearer ${expected}`;
 }
 
-// Catches em-dash, en-dash, figure dash, horizontal bar. Throws if any.
-function assertNoFancyDashes(label: string, s: string): void {
-  if (/[‒–—―]/.test(s)) throw new Error(`em/en-dash detected in ${label}`);
-}
-
 // Sanitize free-text inputs we render into the kit. Replace any em/en-dash
 // that slipped in upstream (e.g. from Place Details) with commas.
 function noDashes(s: string | null | undefined): string {
   if (!s) return '';
   return s.replace(/[‒–—―]/g, ', ');
+}
+
+// Post-render sanitizer for the composed markdown. Per the 2026-06-09
+// operator instruction the em-dash rule is enforced by REWRITING the
+// output rather than refusing the kit. Rules:
+//   - Dashes sitting between two numbers (e.g. 60–240) become " to "
+//     (range syntax: "60 to 240").
+//   - Every other em-dash, en-dash, figure dash, or horizontal bar
+//     becomes a comma.
+//   - Tidy up the resulting double spaces and doubled punctuation
+//     (", ,", " ,", "  ").
+function sanitizeDashes(s: string): string {
+  if (!s) return '';
+  let out = s;
+  // 1. Number RANGE syntax. " ?[dash] ?" between digits -> " to ".
+  out = out.replace(/(\d)\s*[‒–—―]\s*(\d)/g, '$1 to $2');
+  // 2. Everything else: dash -> comma. Preserve a leading space so we
+  //    don't fuse the previous word into the comma.
+  out = out.replace(/[‒–—―]/g, ',');
+  // 3. Tidy: collapse doubled punctuation and double spaces.
+  out = out.replace(/,\s*,/g, ',');
+  out = out.replace(/\s+,/g, ',');
+  out = out.replace(/[ \t]{2,}/g, ' ');
+  return out;
 }
 
 async function placeDetailsFromGbpUrl(url: string, apiKey: string): Promise<PlacesData | null> {
@@ -378,15 +397,17 @@ function buildMarkdown(input: ClinicInput, places: PlacesData | null, html: stri
   md.push(`Operator notes:`);
   md.push(`- This is marketing copy only. No medical or health-outcome claims have been added.`);
   md.push(`- Any [clinic to confirm] placeholders must be filled before delivery.`);
-  md.push(`- No em-dashes anywhere, commas and periods only.`);
+  md.push(`- No em-dashes anywhere, commas or periods only. The kit is auto-sanitized; number ranges are written "X to Y", every other dash is a comma.`);
   md.push(`- Do not auto-send. Default DRAFT.`);
 
-  const markdown = md.join('\n');
-  // Final em-dash sanity sweep on the composed document.
-  if (/[‒–—―]/.test(markdown)) {
-    warnings.push('em/en-dash detected in composed markdown, please scrub before delivery');
-  }
-
+  // Compose then SANITIZE. The em-dash rule (2026-06-09 operator update)
+  // is enforced by rewriting the output: number ranges become " to ",
+  // every other em or en dash becomes a comma. We do not refuse a kit
+  // over a punctuation preference. Hard-refusal stays reserved for
+  // things that need a human (health claims, fabricated data, leftover
+  // placeholders in fields that should have been filled from real data).
+  const rawMarkdown = md.join('\n');
+  const markdown = sanitizeDashes(rawMarkdown);
   return { markdown, warnings, placeholders };
 }
 
@@ -462,14 +483,14 @@ export async function POST(req: Request) {
 
   const { markdown, warnings, placeholders } = buildMarkdown(clinicInput, places, html);
 
-  try {
-    assertNoFancyDashes('markdown', markdown);
-  } catch (err) {
-    return NextResponse.json({
-      error: err instanceof Error ? err.message : String(err),
-      markdownPreview: markdown.slice(0, 500),
-    }, { status: 500 });
-  }
+  // Per the 2026-06-09 operator update: the em-dash check is enforced
+  // by sanitizing the markdown inside buildMarkdown(), not by refusing
+  // the kit. Hard-refusal is reserved for things that need a human:
+  // health or efficacy claims, fabricated or unverifiable data, and
+  // leftover [clinic to confirm] placeholders that should have been
+  // filled from real data. None of those are detected automatically
+  // today; warnings + placeholders are surfaced to the operator for
+  // review during the DRAFT step.
 
   return NextResponse.json({
     ok: true,
