@@ -1,9 +1,11 @@
 /**
  * POST /api/admin/queue-owner-followup
  *
- * Drafts personalised owner follow-up emails for newly-claimed clinics where
- * we need the operator to confirm hours, services, request real photos, and
- * answer three Safety Verified questions.
+ * Drafts personalised owner follow-up emails for newly-Claimed clinics where
+ * we need the operator to confirm hours, services, and request real photos.
+ * The Safety Verified attestation is presented as a separate, optional track
+ * the owner can opt into later (per the 2026-06-08 Claimed vs Safety Verified
+ * separation policy).
  *
  * Two trigger modes:
  *   1) Body-less call → endpoint queues the built-in batch (Insight Naturopathic
@@ -115,7 +117,7 @@ function buildBody(p: ProviderRow, ownerSalutation: string, regulator: string): 
   // Carefully written with no em/en dashes. Hyphens (-) and commas only.
   const body = `Hi ${ownerSalutation},
 
-Quick note from TheDripMap. I saw your new listing for ${cleanName} went live this week, congratulations on claiming it. I want to make sure the page reflects your clinic accurately, so I have a small list of asks below.
+Quick note from TheDripMap. I saw your listing for ${cleanName} is now Claimed, congratulations. Being Claimed means you can edit services, hours, photos, and respond to testimonials. I want to make sure the page reflects your clinic accurately, so I have a small list of asks below.
 
 1. Photos
 We have no real photos on file yet. Could you reply with 3 to 6 photos of your space, anything that shows the interior, the treatment rooms, or the IV lounge. Real photos only, please, no stock imagery.
@@ -134,16 +136,19 @@ ${services}
 
 If we are missing anything, or listing something you no longer offer, let me know.
 
-4. Safety Verified questions
-We are about to add a Safety Verified badge to qualifying clinics. To complete yours we need three quick answers:
+That is the full ask for Claimed. Reply with whatever you have and I will integrate it within a day.
 
-  a. Is your medical director or lead clinician licensed and on staff. (Yes, No, or a quick note with their name and credentials.)
-  b. Is your clinic's liability insurance currently active. (Yes or No.)
-  c. Are you in good standing with ${regulator}. (Yes, No, or a verifiable public profile link.)
+OPTIONAL, SEPARATE TRACK: Safety Verified
 
-A simple reply with answers a, b, c is perfect, no formal documents needed.
+Safety Verified is a different, optional step that earns a distinct badge on your public listing. It is NOT granted by claiming. To start that attestation, reply Yes to whichever of these you can confirm:
 
-That is the full ask. Reply with whatever you have and I will integrate it within a day.
+  a. Licensed medical director or lead clinician on staff (name and credentials).
+  b. IVs and injections administered by RNs, NPs, or physicians (not unlicensed staff).
+  c. Ingredients sourced from a licensed compounding pharmacy.
+  d. Active medical liability insurance covering IV therapy.
+  e. Operating in good standing with ${regulator}.
+
+All five are required to earn the Safety Verified badge. You can defer this entirely if you are not ready, your Claimed status is unaffected either way.
 
 Warmly,
 TheDripMap Team

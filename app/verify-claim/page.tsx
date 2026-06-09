@@ -150,12 +150,14 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
     from: 'TheDripMap <info@thedripmap.com>',
     to: claim.email,
     replyTo: 'info@thedripmap.com',
-    subject: `Your claim for ${provider.name} is verified`,
+    subject: `Your claim for ${provider.name} is now Claimed on TheDripMap`,
     text: `Hi ${claim.owner_name || 'there'},
 
-Your claim for ${provider.name} on TheDripMap has been verified.
+Your claim for ${provider.name} on TheDripMap is now Claimed. You can edit services, hours, photos, and respond to testimonials. Your free listing is live with your own logo, contact info, and map.
 
-Your free listing is now live with verified status, your own logo, hours, services, contact info, and a map. To unlock Featured benefits (top placement on city and treatment pages, full photo gallery, patient testimonials, and instant-book CTAs), see https://www.thedripmap.com/for-clinics/upgrade.
+A separate, optional step is Safety Verified. The Safety Verified badge is awarded only after we confirm your clinic's licensed medical director, licensed clinical staff, pharmaceutical-grade IV sourcing, active liability insurance, and good standing with the relevant medical or nursing regulator. Reply to this email when you are ready to start that attestation. Until then your listing is Claimed but not Safety Verified, which is the correct state.
+
+To unlock Featured benefits (top placement on city and treatment pages, full photo gallery, patient testimonials, and instant-book CTAs), see https://www.thedripmap.com/for-clinics/upgrade.
 
 View your listing: ${listingUrl}
 

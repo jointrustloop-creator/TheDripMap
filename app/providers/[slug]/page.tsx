@@ -277,12 +277,15 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   // Match on either camelCase or snake_case — DB stores clinic_id, type allows both.
   const profile = profiles.find(p => p.clinicId === provider.id || p.clinic_id === provider.id);
 
-  // Platform-wide safety verification (mirrors app/api/safety-check/route.ts).
-  // 5 operator-confirmed criteria stored in operator_profiles.profile_data.
-  // "Safety Verified" pill + detailed section render only when ALL 5 + claimed.
+  // Platform-wide safety verification. The badge gates on the providers
+  // .safety_verified column (added 2026-06-08) — a single operator-flipped
+  // boolean. Claimed is NOT enough; safety_verified is the explicit, separate
+  // attestation. The 5 sub-attestation breakdown below is kept for the
+  // transparency UI (so visitors see which specific checks were attested),
+  // but the badge itself fires only on the column.
   const SAFETY_CHECKS = [
     { key: 'verifiedMedicalDirector',     label: 'Licensed medical director', detail: 'A board-licensed physician or nurse practitioner oversees protocols and patient care.' },
-    { key: 'verifiedClinician',           label: 'Licensed clinical staff',   detail: 'IVs and injections are administered by RNs, NPs, or physicians — never unlicensed staff.' },
+    { key: 'verifiedClinician',           label: 'Licensed clinical staff',   detail: 'IVs and injections are administered by RNs, NPs, or physicians, never unlicensed staff.' },
     { key: 'verifiedCompoundingPharmacy', label: 'Pharmaceutical-grade IVs',  detail: 'Ingredients are sourced from a licensed compounding pharmacy and prepared under sterile conditions.' },
     { key: 'verifiedLiabilityInsurance',  label: 'Liability insurance',       detail: 'Active medical liability coverage for IV therapy and adjacent treatments.' },
     { key: 'verifiedStateBoard',          label: 'State / provincial board',  detail: 'Operating in good standing with the relevant medical or nursing regulator.' },
@@ -290,7 +293,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   const profileData = (profile?.profile_data || {}) as Record<string, unknown>;
   const safetyResults = SAFETY_CHECKS.map(c => ({ ...c, passed: profileData[c.key] === true }));
   const safetyVerifiedCount = safetyResults.filter(c => c.passed).length;
-  const safetyVerified = !!provider.is_claimed && safetyVerifiedCount === 5;
+  const safetyVerified = (provider as { safety_verified?: boolean }).safety_verified === true;
   const stateCode = provider.state || getStateFromProvider(provider);
   const timezone = TIMEZONE_MAP[stateCode] || 'America/New_York';
   const stateName = STATE_MAP[stateCode] || stateCode;

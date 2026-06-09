@@ -311,7 +311,10 @@ async function providerOutcome(p: ProviderRow, sb: ReturnType<typeof getServiceS
     const pd = (prof?.profile_data || {}) as Record<string, unknown>;
     verifiedCount = SAFETY_FLAGS.filter((f) => pd[f] === true).length;
   }
-  const verified = verifiedCount === 5;
+  // Badge gates on providers.safety_verified column only (2026-06-08).
+  // verifiedCount is retained so the assistant can still mention "N/5 checks"
+  // when describing where the clinic stands in the attestation flow.
+  const verified = (p as { safety_verified?: boolean }).safety_verified === true;
   const clinic = toClinic(p, verified);
   const forModel = JSON.stringify({
     found: true, name: p.name, city: p.city, state: p.state,
@@ -629,7 +632,7 @@ async function compareProviders(input: { slugs?: unknown }): Promise<ToolOutcome
   const sb = getServiceSupabase();
   const { data, error } = await sb
     .from('providers')
-    .select('id, name, slug, city, state, rating, reviews, is_featured, type, specialties, mobile_service, website, phone, description, working_hours, latitude, longitude, online_booking_url')
+    .select('id, name, slug, city, state, rating, reviews, is_featured, safety_verified, type, specialties, mobile_service, website, phone, description, working_hours, latitude, longitude, online_booking_url')
     .in('slug', slugs);
   if (error) return { forModel: JSON.stringify({ error: 'compare query failed' }) };
   const rows = (data as ProviderRow[]) || [];
@@ -637,18 +640,10 @@ async function compareProviders(input: { slugs?: unknown }): Promise<ToolOutcome
     return { forModel: JSON.stringify({ error: 'No providers found for those slugs', slugs }) };
   }
 
-  // Verified set lookup for the claimed ones.
-  const claimedIds = rows.filter((r) => r.is_featured).map((r) => r.id);
+  // Verified set sourced from the providers.safety_verified column (2026-06-08).
   const verifiedSet = new Set<string>();
-  if (claimedIds.length) {
-    const { data: profs } = await sb
-      .from('operator_profiles')
-      .select('clinic_id, profile_data')
-      .in('clinic_id', claimedIds);
-    for (const pr of (profs as { clinic_id: string; profile_data: Record<string, unknown> | null }[]) || []) {
-      const pd = pr.profile_data || {};
-      if (SAFETY_FLAGS.every((f) => pd[f] === true)) verifiedSet.add(pr.clinic_id);
-    }
+  for (const r of rows) {
+    if ((r as { safety_verified?: boolean }).safety_verified === true) verifiedSet.add(r.id);
   }
 
   // Best-effort price lookup from TREATMENT_CONTENT — uses each clinic's first

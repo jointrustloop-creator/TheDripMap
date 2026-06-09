@@ -33,6 +33,7 @@ interface Row {
   rating: number | string | null;
   reviews: number | string | null;
   is_featured: boolean | null;
+  safety_verified: boolean | null;
 }
 
 function toMatch(r: Row, verifiedCount: number): SafetyMatch {
@@ -46,7 +47,9 @@ function toMatch(r: Row, verifiedCount: number): SafetyMatch {
     reviews: r.reviews != null ? Number(r.reviews) : null,
     claimed,
     verifiedCount,
-    safetyVerified: claimed && verifiedCount === 5,
+    // Safety Verified gates on the providers.safety_verified column only
+    // (added 2026-06-08). verifiedCount is retained for the breakdown UI.
+    safetyVerified: r.safety_verified === true,
   };
 }
 
@@ -64,7 +67,7 @@ export async function POST(req: Request) {
   }
 
   const sb = getServiceSupabase();
-  const cols = 'id, name, slug, city, state, rating, reviews, is_featured';
+  const cols = 'id, name, slug, city, state, rating, reviews, is_featured, safety_verified';
 
   // 1. Find matching clinics by name (optionally narrowed to the city).
   let q = sb

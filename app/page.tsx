@@ -72,27 +72,12 @@ export default async function HomePage() {
   const featuredClinics = (await getFeaturedListings(4)) || [];
   const latestPosts = blogPosts.slice(0, 3);
 
-  // Build a per-clinic "Safety Verified" map for the featured shelf. Mirrors
-  // the platform definition used on app/providers/[slug]/page.tsx: a clinic is
-  // Safety Verified only when (a) it is claimed AND (b) all 5 operator-profile
-  // safety criteria are true. We compute this server-side so the badge never
-  // shows on a clinic that hasn't actually completed verification.
-  const SAFETY_KEYS = [
-    'verifiedMedicalDirector',
-    'verifiedClinician',
-    'verifiedCompoundingPharmacy',
-    'verifiedLiabilityInsurance',
-    'verifiedStateBoard',
-  ] as const;
-  const operatorProfiles = await getOperatorProfiles();
+  // Per-clinic Safety Verified map for the featured shelf. As of 2026-06-08
+  // the badge gates on providers.safety_verified (operator-set boolean) only.
+  // Claimed and Safety Verified are explicitly separate signals.
   const safetyVerifiedById = new Map<string, boolean>();
   for (const c of featuredClinics) {
-    const profile = operatorProfiles.find(
-      p => p.clinicId === c.id || p.clinic_id === c.id
-    );
-    const pd = (profile?.profile_data || {}) as Record<string, unknown>;
-    const allFive = SAFETY_KEYS.every(k => pd[k] === true);
-    safetyVerifiedById.set(String(c.id), !!c.is_claimed && allFive);
+    safetyVerifiedById.set(String(c.id), (c as { safety_verified?: boolean }).safety_verified === true);
   }
 
   // Initials helper for the small circular logo chip when a clinic has no
