@@ -49,7 +49,15 @@ function parseAssessment(md) {
 
     const toBullets = (text) => {
       if (!text) return [];
-      return text.split('\n').map((l) => l.trim()).filter((l) => l.startsWith('- ')).map((l) => l.slice(2).trim()).filter(Boolean);
+      return text
+        .split('\n')
+        .map((l) => l.trim())
+        .filter((l) => l.startsWith('- '))
+        .map((l) => l.slice(2).trim())
+        .filter(Boolean)
+        // Drop the "(none surfaced from free signals)" placeholder bullet
+        // so it never lands in clinic_opportunities.gaps as a real gap.
+        .filter((b) => !/^\(none/i.test(b));
     };
 
     out.push({
