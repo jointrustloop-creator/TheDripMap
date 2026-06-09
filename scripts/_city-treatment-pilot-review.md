@@ -31,26 +31,26 @@ General information only, not legal or medical advice. Always confirm suitabilit
    /providers/insight-naturopathic-clinic-toronto
 2. Signature Beauty Lounge Downtown [CLAIMED / FEATURED], 4.7 stars, 245 reviews
    /providers/signature-beauty-lounge-downtown-toronto
-3. Reviv Toronto, unrated
-   /providers/reviv-toronto
-4. Toronto Functional Medicine, unrated
-   /providers/toronto-functional-medicine
-5. Drip Hydration Toronto, unrated
-   /providers/drip-hydration-toronto
-6. Atheria Wellness, unrated
+3. Atheria Wellness, unrated
    /providers/atheria-wellness-toronto
-7. Timeless Health Clinic, unrated
-   /providers/timeless-health-clinic-toronto
-8. Signature Cosmetic Clinic Midtown, unrated
-   /providers/signature-cosmetic-clinic-midtown-toronto
-9. The Scene Medical Beauty Bar, unrated
+4. Reviv Toronto, unrated
+   /providers/reviv-toronto
+5. Novoskin Cosmetic Clinic, unrated, 0 reviews
+   /providers/novoskin-cosmetic-clinic-toronto
+6. The Scene Medical Beauty Bar, unrated
    /providers/scene-medical-beauty-bar-toronto
-10. KX Yorkville, unrated
-   /providers/kx-yorkville-toronto
-11. Yorkville Sports Medicine Clinic, unrated
-   /providers/yorkville-sports-medicine-clinic-toronto
-12. The IV Health Centre, unrated
-   /providers/the-iv-health-centre-toronto
+7. Beauty Bar Medical Clinic - Yorkville, unrated, 0 reviews
+   /providers/beauty-bar-medical-clinic-yorkville-toronto
+8. Care Clinic on Albion, unrated, 0 reviews
+   /providers/care-clinic-on-albion-toronto
+9. Soma and Soul Wellness, unrated, 0 reviews
+   /providers/soma-and-soul-wellness-toronto
+10. The Borough Health & Wellness, unrated, 0 reviews
+   /providers/the-borough-health-and-wellness-toronto
+11. The Mom Loft, unrated, 0 reviews
+   /providers/the-mom-loft-toronto
+12. Vita Ageless Medical Aesthetics and Wellness, unrated, 0 reviews
+   /providers/vita-ageless-medical-aesthetics-and-wellness-toronto
 
 ### Popular treatments in Toronto (linked back to /treatments/*)
 
@@ -66,7 +66,7 @@ General information only, not legal or medical advice. Always confirm suitabilit
 
 1. **Is IV therapy legal in Toronto?** Yes. IV administration is a controlled act in Ontario. Registered nurses, nurse practitioners, physicians, and CONO-authorized naturopathic doctors can legally administer IV therapy under the appropriate orders, directives, or college authorization. Confirm credentials with the clinic before booking.
 2. **Can a naturopathic doctor give an IV in Ontario?** Yes, but only one who has passed both the Ontario Prescribing and Therapeutics Exam and the Ontario IVIT Exam, and who practices on CONO-inspected premises. Confirm directly with the clinic if you specifically want an ND-led drip.
-3. **How much does IV therapy cost in Toronto?** Standard hydration and wellness drips typically run 175 to 350 CAD. NAD+ protocols generally range from 400 to over 1,000 CAD depending on dose. Mobile in-home or hotel service usually adds 50 to 100. Final pricing varies by clinic.
+3. **How much does IV therapy cost in Toronto?** Each Toronto clinic sets its own pricing, so check the individual clinic listing for current rates. As a general market guide, wellness drips like hydration and Myers cocktail tend to sit in the low to mid hundreds, with NAD+ protocols typically running higher because of the longer session and the dose. Always confirm with the clinic before booking.
 4. **Do Toronto clinics offer mobile or in-home IV therapy?** Yes. Mobile IV across the GTA is mature, with providers serving downtown Toronto, North York, Scarborough, Etobicoke, and the surrounding suburbs including Mississauga, Markham, Vaughan, Richmond Hill, Brampton, Oakville, and Burlington. Look for the Mobile Service tag in the listings.
 5. **How many IV therapy clinics are listed in Toronto?** TheDripMap lists 61 clinics in Toronto, covering both fixed-location clinics and mobile providers.
 
@@ -100,28 +100,28 @@ General information only, not legal or medical advice. Always confirm suitabilit
 
 1. Bay Wellness Centre [CLAIMED / FEATURED], 4.9 stars, 126 reviews
    /providers/bay-wellness-centre-vancouver
-2. Yaletown Integrative Clinic, unrated
-   /providers/yaletown-integrative-clinic-vancouver
-3. First Ave Medical Spa, unrated
-   /providers/first-ave-medical-spa-vancouver
-4. Men's Vitality Clinic, unrated, 0 reviews
-   /providers/men-s-vitality-clinic-vancouver
-5. Empower Health, unrated, 0 reviews
-   /providers/empower-health-vancouver
-6. Sparrow MD Advanced Medical Aesthetics, unrated, 0 reviews
-   /providers/sparrow-md-advanced-medical-aesthetics-vancouver
-7. Revolution Medical Clinic, unrated, 0 reviews
+2. Revolution Medical Clinic, unrated, 0 reviews
    /providers/revolution-medical-clinic-vancouver
-8. EnerChanges, unrated, 0 reviews
+3. Sparrow MD Advanced Medical Aesthetics, unrated, 0 reviews
+   /providers/sparrow-md-advanced-medical-aesthetics-vancouver
+4. EnerChanges, unrated, 0 reviews
    /providers/enerchanges-vancouver
+5. Men's Vitality Clinic, unrated, 0 reviews
+   /providers/men-s-vitality-clinic-vancouver
+6. First Ave Medical Spa, unrated
+   /providers/first-ave-medical-spa-vancouver
+7. Yaletown Integrative Clinic, unrated
+   /providers/yaletown-integrative-clinic-vancouver
+8. Empower Health, unrated, 0 reviews
+   /providers/empower-health-vancouver
 9. Skinnovate, 5 stars, 38 reviews
    /providers/skinnovate-vancouver
 10. ZipDrip Mobile IV Therapy, 5 stars, 110 reviews
    /providers/zipdrip-mobile-iv-therapy-vancouver
-11. Promethean Clinic, 4.9 stars, 85 reviews
-   /providers/promethean-clinic-vancouver
-12. Limelight Wellness Centre, 4.9 stars, 76 reviews
+11. Limelight Wellness Centre, 4.9 stars, 76 reviews
    /providers/limelight-wellness-centre-vancouver
+12. Luminary Health and Longevity Clinic, 4.9 stars, 42 reviews
+   /providers/luminary-health-and-longevity-clinic-vancouver
 
 ### Popular treatments in Vancouver
 
@@ -137,7 +137,7 @@ General information only, not legal or medical advice. Always confirm suitabilit
 
 1. **Is IV therapy legal in Vancouver?** Yes. IV administration is regulated in BC under the Health Professions and Occupations Act. Physicians, registered nurses, nurse practitioners, BCCNM-registered LPNs with appropriate training, and CCHPBC-authorized naturopathic doctors can legally administer IV therapy. Confirm credentials with the clinic before booking.
 2. **Can a naturopathic doctor give an IV in BC?** Yes. BC NDs are regulated by CCHPBC and have a provincial scope for prescribing and administering substances intravenously. The BC ND scope differs from Ontario, so always confirm what a specific clinic is authorized to deliver.
-3. **How much does IV therapy cost in Vancouver?** Standard hydration and wellness drips typically run 175 to 350 CAD. NAD+ protocols generally range from 400 to over 1,000 CAD. Mobile service usually adds 50 to 100. Final pricing varies by clinic.
+3. **How much does IV therapy cost in Vancouver?** Each Vancouver clinic sets its own pricing, so check the individual clinic listing for current rates. As a general market guide, wellness drips like hydration and Myers cocktail tend to sit in the low to mid hundreds, with NAD+ protocols typically running higher because of the longer session and the dose. Always confirm with the clinic before booking.
 4. **Do Vancouver clinics offer mobile or in-home IV therapy?** Yes. Mobile IV across the Lower Mainland is well-developed, with providers serving Vancouver, the North Shore, Burnaby, Richmond, and Surrey. Look for the Mobile Service tag in the listings.
 5. **How many IV therapy clinics are listed in Vancouver?** TheDripMap lists 25 clinics in Vancouver, covering both fixed-location and mobile providers.
 
@@ -154,14 +154,14 @@ General information only, not legal or medical advice. Always confirm suitabilit
 NAD+ IV Therapy Clinics Near Me | TheDripMap
 
 ### Meta description
-Compare NAD+ IV therapy providers across North America. 71 clinics on TheDripMap offer NAD+ protocols. Real ratings, real reviews, in-clinic and mobile.
+Compare NAD+ IV therapy providers across North America. 118 clinics on TheDripMap offer NAD+ protocols. Real ratings, real reviews, in-clinic and mobile.
 
 ### H1
 NAD+ IV Therapy Clinics
 
 ### 200-word intro
 
-NAD+ is the protocol most often described as a higher-dose IV alongside the standard hydration and Myers cocktail menus. 71 clinics on TheDripMap currently offer NAD+ protocols, with the deepest local markets in Toronto, Las Vegas, Markham, Mississauga, Calgary, and Montreal. NAD+ sessions are typically longer than standard wellness drips, often delivered in 60 to 240 minute sittings depending on dose, and ND-led, NP-led, and physician-led clinics all appear in the list.
+NAD+ is the protocol most often described as a higher-dose IV alongside the standard hydration and Myers cocktail menus. 118 clinics on TheDripMap currently offer NAD+ protocols, with the deepest local markets in Toronto, Las Vegas, Calgary, Markham, Mississauga, Richmond Hill, Burlington, Vaughan, Halifax, and Montreal. NAD+ sessions are typically longer than standard wellness drips, often delivered in 60 to 240 minute sittings depending on dose, and ND-led, NP-led, and physician-led clinics all appear in the list.
 
 What NAD+ is: nicotinamide adenine dinucleotide is a coenzyme present in every cell, and IV NAD+ delivers it directly into the bloodstream as opposed to oral supplementation. NAD+ IV therapy is regulated under the same provincial and state frameworks as other IVs, and any clinic offering it should have a clear named medical director or supervising clinician behind the protocol. Suitability, dose, and indications should be confirmed with a licensed clinician before booking.
 
@@ -169,43 +169,71 @@ General information only. No claim is made or implied about the medical efficacy
 
 ### Clinics offering NAD+, grouped by city (3+ providers per city)
 
-**Toronto, Ontario  (13 providers)**
+**Toronto, Ontario  (18 providers)**
 - Signature Beauty Lounge Downtown [CLAIMED / FEATURED], 4.7 stars, 245 reviews   /providers/signature-beauty-lounge-downtown-toronto
 - Atheria Wellness, unrated   /providers/atheria-wellness-toronto
 - The Mom Loft, unrated, 0 reviews   /providers/the-mom-loft-toronto
 - Skin Studio Toronto, unrated, 0 reviews   /providers/skin-studio-toronto-toronto
 - Signature Cosmetic Clinic Midtown, unrated   /providers/signature-cosmetic-clinic-midtown-toronto
-- + 8 more
+- + 13 more
 
-**Las Vegas, Nevada  (5 providers)**
+**Las Vegas, Nevada  (10 providers)**
 - Vital Infusions & Performance, unrated, 0 reviews   /providers/vital-infusions-and-performance-las-vegas
 - Advanced Mobile IV (AMIV), unrated, 0 reviews   /providers/advanced-mobile-iv-amiv-las-vegas
 - Hangover Heaven IV Hydration, unrated, 0 reviews   /providers/hangover-heaven-iv-hydration-las-vegas
 - LIV Wellness, unrated, 0 reviews   /providers/liv-wellness-las-vegas
 - Vitality Medical & Wellness Center, unrated, 0 reviews   /providers/vitality-medical-and-wellness-center-las-vegas
+- + 5 more
 
-**Markham, Ontario  (4 providers)**
+**Calgary, Alberta  (8 providers)**
+- Vitality BioMed, unrated, 0 reviews   /providers/vitality-biomed-calgary
+- Dr. Schlee / Paradigm Health Group, unrated   /providers/paradigm-health-group-dr-schlee-calgary
+- Aeon Future Health, unrated   /providers/aeon-future-health-calgary
+- Calgary Integrative Medicine, 4.9 stars, 39 reviews   /providers/calgary-integrative-medicine-calgary
+- Essence Wellness - Sage Hill, 4.9 stars   /providers/essence-wellness-sage-hill-calgary
+- + 3 more
+
+**Markham, Ontario  (6 providers)**
 - Serene Cosmetic Clinic, unrated, 0 reviews   /providers/serene-cosmetic-clinic-markham
 - METALAB - IV Therapy & Regenerative Medicine, unrated, 0 reviews   /providers/metalab-iv-therapy-and-regenerative-medicine-markham
 - Signature Cosmetic Clinic Markham, unrated   /providers/signature-cosmetic-clinic-markham
 - Ketamind Health, unrated   /providers/ketamind-health-markham
+- Centre for Advanced Medicine - Markham, unrated   /providers/centre-for-advanced-medicine-markham
+- + 1 more
 
-**Mississauga, Ontario  (3 providers)**
+**Mississauga, Ontario  (5 providers)**
 - NewM Clinic, unrated   /providers/newm-clinic-mississauga
 - Health Globe Wellness Clinic, unrated   /providers/health-globe-wellness-clinic-mississauga
 - Youthful Derma, unrated   /providers/youthful-derma-mississauga
+- MedCAiRE Health, 5 stars, 24 reviews   /providers/medcaire-health-mississauga
+- Revive Skin Medical Spa, 4.7 stars, 57 reviews   /providers/revive-skin-medical-spa-mississauga
 
-**Calgary, Alberta  (3 providers)**
-- Vitality BioMed, unrated, 0 reviews   /providers/vitality-biomed-calgary
-- Dr. Schlee / Paradigm Health Group, unrated   /providers/paradigm-health-group-dr-schlee-calgary
-- Aeon Future Health, unrated   /providers/aeon-future-health-calgary
+**Richmond Hill, Ontario  (3 providers)**
+- Signature Beauty Lounge Richmond Hill [CLAIMED / FEATURED], 4.9 stars, 268 reviews   /providers/signature-beauty-lounge-richmond-hill
+- Golden Glow Skin Clinic, unrated   /providers/golden-glow-skin-clinic-richmond-hill
+- Grand Genesis Plastic Surgery, unrated   /providers/grand-genesis-plastic-surgery-richmond-hill
+
+**Burlington, Ontario  (3 providers)**
+- Empact Wellness, unrated, 0 reviews   /providers/empact-wellness-burlington
+- PRIX Wellness, unrated, 0 reviews   /providers/prix-wellness-burlington
+- The Healing Path Chiropractic and Wellness Centre, unrated, 0 reviews   /providers/the-healing-path-chiropractic-and-wellness-centre-burlington
+
+**Vaughan, Ontario  (3 providers)**
+- Tri-Health Wellness Centre, unrated, 0 reviews   /providers/tri-health-wellness-centre-vaughan
+- Signature Cosmetic Clinic Vaughan, unrated   /providers/signature-cosmetic-clinic-vaughan
+- D'BestU Cosmetics, unrated, 0 reviews   /providers/d-bestu-cosmetics-vaughan
+
+**Halifax, Nova Scotia  (3 providers)**
+- Optimal Wellbeing Clinic, unrated   /providers/optimal-wellbeing-clinic-halifax
+- TBT Medical Halifax, unrated   /providers/tbt-medical-halifax-halifax
+- Bright & Well, unrated, 0 reviews   /providers/bright-and-well-halifax
 
 **Montreal, Quebec  (3 providers)**
 - XYd lab, unrated   /providers/xyd-lab-montreal
 - GTR Sante (Downtown Montreal), unrated   /providers/gtr-sante-downtown-montreal
 - TELUS Health Care Centre - Montreal Downtown, unrated   /providers/telus-health-montreal-downtown-montreal
 
-**Other locations**, 32 additional cities have 1 to 2 listed NAD+ providers. Browse the full /providers list filtered by NAD+ to see all locations.
+**Other locations**, 46 additional cities have 1 to 2 listed NAD+ providers. Browse the full /providers list filtered by NAD+ to see all locations.
 
 ### Links to related treatments + city pages
 - Related: /treatments/myers-cocktail, /treatments/hydration, /treatments/recovery, /treatments/energy-boost
@@ -213,7 +241,7 @@ General information only. No claim is made or implied about the medical efficacy
 
 ### Schema emissions
 - BreadcrumbList JSON-LD (NEW, treatment page does not currently emit this)
-- ItemList JSON-LD wrapping the 71 providers (NEW)
+- ItemList JSON-LD wrapping the 118 providers (NEW)
 - Each provider as LocalBusiness (NEW)
 - NOTE: treatment page is currently a client component; refactor to server component required before schema can be SSR-emitted. This is the gating implementation question, see end of doc.
 
@@ -225,14 +253,14 @@ General information only. No claim is made or implied about the medical efficacy
 IV Iron Infusion Clinics Near Me | TheDripMap
 
 ### Meta description
-Compare IV iron infusion providers on TheDripMap. 30 clinics across North America. Real ratings, real reviews. Iron deficiency suitability must be confirmed with a licensed clinician.
+Compare IV iron infusion providers on TheDripMap. 36 clinics across North America. Real ratings, real reviews. Iron deficiency suitability must be confirmed with a licensed clinician.
 
 ### H1
 IV Iron Infusion Clinics
 
 ### 200-word intro
 
-IV iron infusion is the protocol used to deliver elemental iron directly into the bloodstream. 30 clinics on TheDripMap currently offer IV iron, with the deepest local markets in Edmonton and Kelowna. IV iron is unlike most wellness drips: it is typically prescribed for diagnosed iron deficiency or iron deficiency anemia, requires bloodwork before and after the infusion, and is usually delivered in a clinical or hospital-affiliated setting rather than a wellness lounge. The brands and formulations vary, including iron sucrose, ferric derisomaltose, ferumoxytol, and ferric carboxymaltose, and the clinic will select the formulation appropriate to the indication.
+IV iron infusion is the protocol used to deliver elemental iron directly into the bloodstream. 36 clinics on TheDripMap currently offer IV iron, with the deepest local markets in Edmonton, Markham, New Westminster, and Kelowna. IV iron is unlike most wellness drips: it is typically prescribed for diagnosed iron deficiency or iron deficiency anemia, requires bloodwork before and after the infusion, and is usually delivered in a clinical or hospital-affiliated setting rather than a wellness lounge. The brands and formulations vary, including iron sucrose, ferric derisomaltose, ferumoxytol, and ferric carboxymaltose, and the clinic will select the formulation appropriate to the indication.
 
 IV iron in Canada is administered by physicians, nurse practitioners, or registered nurses under a prescription or written medical directive. Quebec, Ontario, BC, and Alberta each regulate the practice through their respective nursing and physician colleges. In the United States, IV iron is similarly administered by physicians, NPs, PAs, and RNs under appropriate orders.
 
@@ -246,12 +274,22 @@ Suitability, dose, and indications must be confirmed with a licensed clinician. 
 - Solis Medical Clinic, unrated   /providers/solis-medical-clinic-edmonton
 - NutriDrip & Wellness Inc., unrated   /providers/nutridrip-and-wellness-edmonton
 
+**Markham, Ontario  (3 providers)**
+- HealthyToDos - Markham Health & Rehab Clinic, unrated, 0 reviews   /providers/healthytodos-markham-health-and-rehab-clinic-markham
+- METALAB - IV Therapy & Regenerative Medicine, unrated, 0 reviews   /providers/metalab-iv-therapy-and-regenerative-medicine-markham
+- Centre for Advanced Medicine - Markham, unrated   /providers/centre-for-advanced-medicine-markham
+
+**New Westminster, British Columbia  (3 providers)**
+- Polo Health + Longevity Centre, unrated, 0 reviews   /providers/polo-health-longevity-centre-new-westminster
+- Catalyst Kinetics (CKG New Westminster), 4.9 stars, 380 reviews   /providers/catalyst-kinetics-new-westminster
+- Polo Health + Longevity Centre, 4.5 stars, 127 reviews   /providers/polo-health-and-longevity-centre-new-westminster
+
 **Kelowna, British Columbia  (3 providers)**
 - The Helix Clinic, unrated, 0 reviews   /providers/the-helix-clinic-kelowna
 - Momentum Health, unrated, 0 reviews   /providers/momentum-health-kelowna
 - Valeo Health Clinic, unrated, 0 reviews   /providers/valeo-health-clinic-kelowna
 
-**Other locations**, 18 additional cities have 1 to 2 listed IV iron providers (e.g. Markham, Abbotsford, Victoria, Calgary, and others). Full list available on the page.
+**Other locations**, 17 additional cities have 1 to 2 listed IV iron providers (e.g. Vancouver, Abbotsford, Mississauga, Victoria, and others). Full list available on the page.
 
 ### Links to related treatments + city pages
 - Related: /treatments/b12-shot, /treatments/hydration, /treatments/myers-cocktail
@@ -272,8 +310,8 @@ Suitability, dose, and indications must be confirmed with a licensed clinician. 
 - hydration (252), immune-support (170), weight-loss (182), mobile-iv (119), NAD+ (118), energy-boost (117), beauty-glow (109), myers-cocktail (72), glutathione (69), recovery (67), high-dose-vitamin-c (58), iron-infusion (36), hangover (35), b12-shot (12), jet-lag (5)
 
 **Cities-with-3+-providers for the per-city groupings inside each treatment page:**
-- NAD+: 6 cities pass (Toronto 13, Las Vegas 5, Markham 4, Mississauga 3, Calgary 3, Montreal 3). Remaining grouped as Other locations.
-- Iron infusion: 2 cities pass (Edmonton 4, Kelowna 3). Remaining grouped as Other locations.
+- NAD+: 10 cities pass (Toronto 18, Las Vegas 10, Calgary 8, Markham 6, Mississauga 5, Richmond Hill 3, Burlington 3, Vaughan 3, Halifax 3, Montreal 3). Remaining grouped as Other locations.
+- Iron infusion: 4 cities pass (Edmonton 4, Markham 3, New Westminster 3, Kelowna 3). Remaining grouped as Other locations.
 
 ---
 
