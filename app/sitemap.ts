@@ -58,8 +58,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const cities = await getAllCities();
+  // 3-provider gate (per the 2026-06-09 city-deepening spec). Cities with
+  // fewer than 3 providers are URL-reachable but excluded from the sitemap
+  // crawl-priority list AND emit robots:noindex on the page (see
+  // app/cities/[slug]/page.tsx). The pair keeps Google's index focused on
+  // the cities that actually have enough inventory to satisfy a searcher.
+  const CITY_PROVIDER_GATE = 3;
   const cityRoutes = cities
-    .filter((c) => c.count > 0 && c.city)
+    .filter((c) => (c.count ?? 0) >= CITY_PROVIDER_GATE && c.city)
     .map((c) => ({
       url: `${baseUrl}/cities/${slugify(c.city)}`,
       lastModified: new Date(),

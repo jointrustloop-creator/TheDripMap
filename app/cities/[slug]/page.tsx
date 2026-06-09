@@ -156,6 +156,12 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     cityData?.meta_description?.replace('{count}', String(count)) ||
     `Find and compare ${count} IV therapy clinics in ${name}. Read reviews, compare prices, and book hangover recovery, NAD+, immune support and hydration drips near you.`;
 
+  // 3-provider gate (per the 2026-06-09 city-deepening spec). City pages
+  // with fewer than 3 listed providers are URL-reachable but emit robots:
+  // noindex,follow so Google does not surface thin landing pages. The
+  // sitemap.ts gate filters them out of the crawl-priority list separately.
+  const passesProviderGate = count >= 3;
+
   return {
     title,
     description,
@@ -164,6 +170,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
       // (e.g. /cities/New-York) dedupe to the one true /cities/new-york.
       canonical: `https://www.thedripmap.com/cities/${cityData?.slug || slug}`,
     },
+    ...(passesProviderGate ? {} : { robots: { index: false, follow: true } }),
     openGraph: {
       title,
       description,
