@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Loader2, Mail, Star, Clock, Link as LinkIcon, Search, MapPin, Trash2 } from 'lucide-react';
+import { Loader2, Mail, Star, Clock, Link as LinkIcon, Search, MapPin, Trash2, Sparkles } from 'lucide-react';
 import { OUTREACH_COUNTRY_FILTER, outreachScopeLabel } from '@/src/lib/outreach-config';
 
 type RegenerateRecipient = {
@@ -100,6 +100,17 @@ type GscReportOk = {
 type GscReportStub = { kind: 'stub'; message: string; setupSteps: string[] };
 type GscSnapshotResponse = { ok: boolean; report?: GscReportOk | GscReportStub; error?: string };
 
+type KitResponse = {
+  ok: boolean;
+  clinic?: { name: string; city: string | null; website: string | null; slug: string | null };
+  placesFound?: boolean;
+  websiteFetched?: boolean;
+  placeholders?: string[];
+  warnings?: string[];
+  markdown?: string;
+  error?: string;
+};
+
 export function AdminToolsClient() {
   const [draftsState, setDraftsState] = useState<ButtonState<RegenerateResponse>>({ loading: false, result: null, error: null });
   const [cleanBatchState, setCleanBatchState] = useState<ButtonState<RegenerateResponse>>({ loading: false, result: null, error: null });
@@ -109,6 +120,8 @@ export function AdminToolsClient() {
   const [rescueState, setRescueState] = useState<ButtonState<Rescue404Response>>({ loading: false, result: null, error: null });
   const [inspectState, setInspectState] = useState<ButtonState<InspectResponse>>({ loading: false, result: null, error: null });
   const [gscState, setGscState] = useState<ButtonState<GscSnapshotResponse>>({ loading: false, result: null, error: null });
+  const [kitSlug, setKitSlug] = useState('');
+  const [kitState, setKitState] = useState<ButtonState<KitResponse>>({ loading: false, result: null, error: null });
 
   const generateDrafts = async () => {
     setDraftsState({ loading: true, result: null, error: null });
@@ -122,6 +135,27 @@ export function AdminToolsClient() {
       }
     } catch (err) {
       setDraftsState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
+    }
+  };
+
+  const generateKit = async () => {
+    const slug = kitSlug.trim();
+    if (!slug) {
+      setKitState({ loading: false, result: null, error: 'Enter a provider slug first.' });
+      return;
+    }
+    setKitState({ loading: true, result: null, error: null });
+    try {
+      const r = await fetch('/api/admin/generate-get-found-kit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug }),
+      });
+      const data = (await r.json()) as KitResponse;
+      if (!r.ok) setKitState({ loading: false, result: null, error: data.error || `HTTP ${r.status}` });
+      else setKitState({ loading: false, result: data, error: null });
+    } catch (err) {
+      setKitState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
     }
   };
 
@@ -362,6 +396,75 @@ export function AdminToolsClient() {
             </div>
           );
         })()}
+      </Card>
+
+      <Card
+        title="Generate Get Found Kit for a clinic (test)"
+        description="Operator test path for the Get Found Kit generator. Enter any provider slug from the DB and we'll pull their Google Places data, fetch their website, and produce a Markdown kit grounded only in real data. Hard guardrails: marketing copy only, no health claims, [clinic to confirm] placeholders for missing fields, no em-dashes. Default DRAFT, never auto-sends."
+        icon={<Sparkles size={18} />}
+      >
+        <div className="flex flex-col sm:flex-row gap-3 mb-4">
+          <input
+            type="text"
+            value={kitSlug}
+            onChange={(e) => setKitSlug(e.target.value)}
+            placeholder="provider slug, e.g. bay-wellness-centre-vancouver"
+            className="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-wellness-500 focus:border-transparent transition-all text-sm"
+          />
+          <button
+            type="button"
+            onClick={generateKit}
+            disabled={kitState.loading || !kitSlug.trim()}
+            className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
+          >
+            {kitState.loading ? (<><Loader2 size={16} className="animate-spin" />Generating…</>) : 'Generate kit'}
+          </button>
+        </div>
+
+        {kitState.error && (
+          <div className="mt-3 px-4 py-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm font-bold">
+            Error: {kitState.error}
+          </div>
+        )}
+
+        {kitState.result?.markdown && (
+          <div className="mt-3 space-y-3">
+            <div className="text-sm font-bold text-slate-700">
+              {kitState.result.clinic?.name} · {kitState.result.clinic?.city}
+              {' · '}Places {kitState.result.placesFound ? 'OK' : 'miss'}
+              {' · '}Website {kitState.result.websiteFetched ? 'OK' : 'miss'}
+            </div>
+            {(kitState.result.placeholders || []).length > 0 && (
+              <div className="px-4 py-3 bg-amber-50 border border-amber-100 rounded-xl text-amber-800 text-sm">
+                <div className="font-black text-xs uppercase tracking-widest mb-1">Placeholders to fill before delivery</div>
+                <ul className="list-disc pl-5">
+                  {(kitState.result.placeholders || []).map((p, i) => <li key={p + i}>{p}</li>)}
+                </ul>
+              </div>
+            )}
+            {(kitState.result.warnings || []).length > 0 && (
+              <div className="px-4 py-3 bg-amber-50 border border-amber-100 rounded-xl text-amber-800 text-sm">
+                <div className="font-black text-xs uppercase tracking-widest mb-1">Warnings</div>
+                <ul className="list-disc pl-5">
+                  {(kitState.result.warnings || []).map((w, i) => <li key={w + i}>{w}</li>)}
+                </ul>
+              </div>
+            )}
+            <details className="bg-slate-50 rounded-xl border border-slate-200" open>
+              <summary className="cursor-pointer px-4 py-2 text-xs font-black uppercase tracking-widest text-slate-700">
+                Generated kit Markdown
+              </summary>
+              <pre className="px-4 py-3 text-xs text-slate-800 overflow-x-auto whitespace-pre-wrap max-h-[600px] overflow-y-auto">{kitState.result.markdown}</pre>
+            </details>
+            <button
+              type="button"
+              onClick={() => navigator.clipboard.writeText(kitState.result?.markdown || '')}
+              className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-bold text-xs transition-all"
+            >
+              Copy Markdown
+            </button>
+          </div>
+        )}
       </Card>
 
       <Card
