@@ -259,30 +259,36 @@ export default async function HomePage() {
           }}
         />
         <div className="max-w-7xl mx-auto relative">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-            {/* Cinematic photo — soft drop shadow + tinted gradient frame so the
-                clinic-reception shot reads as the actual standard we hold ourselves to. */}
-            <div className="lg:col-span-6 order-2 lg:order-1">
-              <div className="relative aspect-[4/5] md:aspect-[5/6] lg:aspect-[4/5] rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-[0_40px_80px_-30px_rgba(15,40,30,0.35)]">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-stretch">
+            {/* Cinematic photo — fills its frame edge to edge with a subtle
+                inner gradient and an overlay verification badge sitting on
+                the image (not floating in dead space below it). */}
+            <div className="lg:col-span-6 order-2 lg:order-1 flex">
+              <div className="relative w-full min-h-[480px] md:min-h-[560px] lg:min-h-0 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-[0_40px_80px_-30px_rgba(15,40,30,0.35)] bg-[#0F2E25]">
                 <Image
                   src="/images/marketing/verified-clinic-thedripmap.png"
                   alt="TheDripMap Safety Verified clinic badge"
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-contain p-6 md:p-10"
+                  className="object-cover"
                   priority
                 />
-                {/* Editorial wash — soft warm overlay so the photo reads like a
-                    magazine spread, not a stock shot. */}
+                {/* Subtle warm overlay for editorial feel without washing the image */}
                 <div
                   className="absolute inset-0 pointer-events-none mix-blend-soft-light"
                   style={{
                     background:
-                      'linear-gradient(135deg, rgba(255,229,196,0.4) 0%, rgba(255,229,196,0) 50%, rgba(15,110,86,0.15) 100%)',
+                      'linear-gradient(135deg, rgba(255,229,196,0.30) 0%, rgba(255,229,196,0) 50%, rgba(15,110,86,0.18) 100%)',
                   }}
                 />
-                {/* Floating "since 2024" emblem — gives the photo provenance */}
-                <div className="absolute bottom-5 left-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-lg">
+                {/* Bottom gradient guarantees overlay-badge legibility on any image crop */}
+                <div
+                  className="absolute inset-x-0 bottom-0 h-24 pointer-events-none"
+                  style={{ background: 'linear-gradient(0deg, rgba(15,46,37,0.55) 0%, rgba(15,46,37,0) 100%)' }}
+                />
+                {/* Overlay verification badge — sits ON the image at the bottom,
+                    with the brass gold tint so it reads premium, not floating. */}
+                <div className="absolute bottom-5 left-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-lg border border-[#d8b878]/40">
                   <ShieldCheck size={14} className="text-[#0F6E56]" strokeWidth={2.5} />
                   <span className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-900">Safety Verified Standard</span>
                 </div>
@@ -298,15 +304,17 @@ export default async function HomePage() {
                 Earned,<br />
                 <span className="font-serif italic font-normal text-[#0F6E56]">never bought.</span>
               </h2>
-              <p className="text-base md:text-lg text-slate-500 leading-relaxed font-light max-w-xl mb-8 md:mb-10">
+              <p className="text-base md:text-lg text-slate-700 leading-relaxed font-normal max-w-xl mb-8 md:mb-10">
                 When a clinic carries the Safety Verified badge, it has answered our safety
                 questionnaire in writing. Who oversees care, who performs your insert, where its IV
                 solutions come from, and whether an intake is required before treatment. We don't
                 take a cent for placement, and we never buy or sell reviews.
               </p>
 
-              {/* Trust pillars — refined row, NOT a SaaS feature grid. */}
-              <div className="grid grid-cols-2 gap-3 md:gap-4 max-w-2xl">
+              {/* Trust pillars — considered cards with brass-gold accented icons,
+                  a checkmark-led treatment, hairline border, soft elevation, and
+                  consistent vertical rhythm. NOT a SaaS feature grid. */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4 max-w-2xl">
                 {[
                   { Icon: Stethoscope, label: 'Medical director on file',         detail: 'Clinic confirms a licensed physician oversees care' },
                   { Icon: UserCheck,   label: 'Licensed clinicians, not techs',   detail: 'Clinic confirms an RN or NP performs every insert' },
@@ -315,19 +323,24 @@ export default async function HomePage() {
                 ].map(({ Icon, label, detail }) => (
                   <div
                     key={label}
-                    className="flex items-start gap-3 p-3.5 md:p-4 rounded-2xl bg-white/70 backdrop-blur-sm border border-[#0F6E56]/10"
+                    className="relative flex items-start gap-3.5 p-5 rounded-2xl bg-white border border-slate-200/70 shadow-[0_2px_10px_-2px_rgba(15,40,30,0.05)] hover:shadow-[0_6px_20px_-4px_rgba(15,40,30,0.08)] hover:border-[#d8b878]/50 transition-all"
                   >
-                    <div className="w-9 h-9 rounded-xl bg-[#0F6E56]/10 text-[#0F6E56] flex items-center justify-center shrink-0">
-                      <Icon size={16} strokeWidth={2.25} />
+                    {/* Brass-gold tinted circle for the theme icon */}
+                    <div className="w-11 h-11 rounded-full bg-[#d8b878]/15 text-[#8a6f3e] flex items-center justify-center shrink-0 ring-1 ring-[#d8b878]/25">
+                      <Icon size={17} strokeWidth={2} />
                     </div>
-                    <div className="min-w-0">
-                      <div className="text-[12px] md:text-[13px] font-black text-slate-900 tracking-tight leading-tight">{label}</div>
-                      <div className="text-[10.5px] md:text-[11px] text-slate-500 font-medium leading-snug mt-1">{detail}</div>
+                    <div className="min-w-0 pt-0.5">
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        {/* Checkmark accent leads each card, reinforces the verification theme */}
+                        <Check size={13} className="text-[#0F6E56] shrink-0" strokeWidth={3} />
+                        <div className="text-[13px] md:text-[13.5px] font-black text-slate-900 tracking-tight leading-tight">{label}</div>
+                      </div>
+                      <div className="text-[11.5px] md:text-[12px] text-slate-600 font-medium leading-snug">{detail}</div>
                     </div>
                   </div>
                 ))}
               </div>
-              <p className="mt-5 md:mt-6 text-[11px] md:text-[12px] text-slate-500/80 leading-relaxed max-w-xl">
+              <p className="mt-5 md:mt-6 text-[11px] md:text-[12px] text-slate-600 leading-relaxed max-w-xl">
                 Safety Verified reflects each clinic's written answers to our questionnaire, not an independent medical audit. Always confirm credentials directly with your provider.
               </p>
             </div>
