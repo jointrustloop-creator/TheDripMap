@@ -43,6 +43,15 @@ interface RequestBody {
   contactEmail?: string;
 }
 
+interface PlacesPeriod {
+  open?: { day: number; time: string; hours?: number; minutes?: number } | null;
+  close?: { day: number; time: string; hours?: number; minutes?: number } | null;
+}
+interface PlacesAddressComponent {
+  long_name: string;
+  short_name: string;
+  types: string[];
+}
 interface PlacesData {
   name?: string | null;
   formatted_address?: string | null;
@@ -51,9 +60,13 @@ interface PlacesData {
   rating?: number | null;
   user_ratings_total?: number | null;
   types?: string[] | null;
-  opening_hours?: { weekday_text?: string[] } | null;
+  opening_hours?: {
+    weekday_text?: string[];
+    periods?: PlacesPeriod[];
+  } | null;
   business_status?: string | null;
   place_id?: string | null;
+  address_components?: PlacesAddressComponent[] | null;
 }
 
 async function isAuthorized(req: Request): Promise<boolean> {
@@ -72,27 +85,126 @@ function noDashes(s: string | null | undefined): string {
 }
 
 // Post-render sanitizer for the composed markdown. Per the 2026-06-09
-// operator instruction the em-dash rule is enforced by REWRITING the
-// output rather than refusing the kit. Rules:
-//   - Dashes sitting between two numbers (e.g. 60–240) become " to "
-//     (range syntax: "60 to 240").
-//   - Every other em-dash, en-dash, figure dash, or horizontal bar
+// operator instructions:
+//   - ANY range "X - Y" (not just digit-only) becomes "X to Y", so
+//     "8:00 AM - 5:00 PM", "Mon - Fri", "low - mid" all read as ranges.
+//   - Any remaining em-dash, en-dash, figure dash, or horizontal bar
 //     becomes a comma.
-//   - Tidy up the resulting double spaces and doubled punctuation
-//     (", ,", " ,", "  ").
+//   - Tidy doubled punctuation (", ,", " ,") and double spaces.
+// Hours are pre-formatted as "X to Y" upstream so they never reach the
+// dash-to-comma pass even if upstream upstreams later change.
 function sanitizeDashes(s: string): string {
   if (!s) return '';
   let out = s;
-  // 1. Number RANGE syntax. " ?[dash] ?" between digits -> " to ".
-  out = out.replace(/(\d)\s*[‒–—―]\s*(\d)/g, '$1 to $2');
-  // 2. Everything else: dash -> comma. Preserve a leading space so we
-  //    don't fuse the previous word into the comma.
+  // 1. Range syntax: non-whitespace on both sides separated by em/en/figure/horizontal-bar.
+  out = out.replace(/(\S)\s*[‒–—―]\s*(\S)/g, '$1 to $2');
+  // 2. Any leftover dashes (at start of line, between whitespace, etc).
   out = out.replace(/[‒–—―]/g, ',');
   // 3. Tidy: collapse doubled punctuation and double spaces.
   out = out.replace(/,\s*,/g, ',');
   out = out.replace(/\s+,/g, ',');
   out = out.replace(/[ \t]{2,}/g, ' ');
   return out;
+}
+
+// === Hours and address helpers ===
+// Google Places returns opening_hours.periods as { open, close } with
+// time as a 4-digit "HHMM" string (UTC for the place's timezone, but
+// the API returns it already adjusted to local time). We build BOTH a
+// human-readable "Monday: 8:00 AM to 5:00 PM" line for the GBP Q&A
+// and a schema.org openingHoursSpecification[] for the JSON-LD.
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const;
+const SCHEMA_DAY = ['https://schema.org/Sunday', 'https://schema.org/Monday', 'https://schema.org/Tuesday', 'https://schema.org/Wednesday', 'https://schema.org/Thursday', 'https://schema.org/Friday', 'https://schema.org/Saturday'] as const;
+
+function parseHHMM(time: string | undefined): { h: number; m: number } | null {
+  if (!time || !/^\d{4}$/.test(time)) return null;
+  const h = Number(time.slice(0, 2));
+  const m = Number(time.slice(2, 4));
+  if (Number.isNaN(h) || Number.isNaN(m)) return null;
+  return { h, m };
+}
+function fmt12(h: number, m: number): string {
+  const period = h >= 12 ? 'PM' : 'AM';
+  const hh = h === 0 ? 12 : h > 12 ? h - 12 : h;
+  const mm = m.toString().padStart(2, '0');
+  return `${hh}:${mm} ${period}`;
+}
+function fmt24(h: number, m: number): string {
+  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+}
+
+interface HoursOutput {
+  humanLines: string[];
+  schemaSpec: Array<{ '@type': 'OpeningHoursSpecification'; dayOfWeek: string; opens: string; closes: string }>;
+}
+function buildHours(periods: PlacesPeriod[] | null | undefined): HoursOutput {
+  const humanLines: string[] = [];
+  const schemaSpec: HoursOutput['schemaSpec'] = [];
+  if (!periods || periods.length === 0) return { humanLines, schemaSpec };
+  // periods is keyed by open day; close may roll to next day. We group
+  // by day and emit one line per day with the open/close pair.
+  const byDay: Record<number, { open: { h: number; m: number }; close: { h: number; m: number } }[]> = {};
+  for (const p of periods) {
+    if (!p.open) continue;
+    const o = parseHHMM(p.open.time);
+    const c = p.close ? parseHHMM(p.close.time) : null;
+    if (!o) continue;
+    if (!byDay[p.open.day]) byDay[p.open.day] = [];
+    byDay[p.open.day].push({ open: o, close: c || { h: 0, m: 0 } });
+  }
+  // Walk Monday..Sunday for the human block (more conventional than Sun first).
+  for (const dayIdx of [1, 2, 3, 4, 5, 6, 0]) {
+    const slots = byDay[dayIdx];
+    if (!slots || slots.length === 0) {
+      humanLines.push(`${DAY_NAMES[dayIdx]}: Closed`);
+      continue;
+    }
+    const formatted = slots.map((s) => `${fmt12(s.open.h, s.open.m)} to ${fmt12(s.close.h, s.close.m)}`).join(', ');
+    humanLines.push(`${DAY_NAMES[dayIdx]}: ${formatted}`);
+    for (const s of slots) {
+      schemaSpec.push({
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: SCHEMA_DAY[dayIdx],
+        opens: fmt24(s.open.h, s.open.m),
+        closes: fmt24(s.close.h, s.close.m),
+      });
+    }
+  }
+  return { humanLines, schemaSpec };
+}
+
+// Build a schema.org PostalAddress from Google's address_components.
+function buildPostalAddress(components: PlacesAddressComponent[] | null | undefined, fallbackFormatted: string | null | undefined): Record<string, string> | string | null {
+  if (!components || components.length === 0) {
+    return fallbackFormatted || null;
+  }
+  function pick(...wanted: string[]): string | undefined {
+    for (const c of components) {
+      if (c.types.some((t) => wanted.includes(t))) return c.long_name;
+    }
+    return undefined;
+  }
+  function pickShort(...wanted: string[]): string | undefined {
+    for (const c of components) {
+      if (c.types.some((t) => wanted.includes(t))) return c.short_name;
+    }
+    return undefined;
+  }
+  const streetNumber = pick('street_number');
+  const route = pick('route');
+  const streetAddress = [streetNumber, route].filter(Boolean).join(' ');
+  const locality = pick('locality', 'postal_town', 'sublocality_level_1', 'sublocality');
+  const region = pickShort('administrative_area_level_1');
+  const postalCode = pick('postal_code');
+  const country = pickShort('country');
+  if (!streetAddress && !locality && !region) return fallbackFormatted || null;
+  const addr: Record<string, string> = { '@type': 'PostalAddress' };
+  if (streetAddress) addr.streetAddress = streetAddress;
+  if (locality) addr.addressLocality = locality;
+  if (region) addr.addressRegion = region;
+  if (postalCode) addr.postalCode = postalCode;
+  if (country) addr.addressCountry = country;
+  return addr;
 }
 
 async function placeDetailsFromGbpUrl(url: string, apiKey: string): Promise<PlacesData | null> {
@@ -113,7 +225,7 @@ async function placeDetailsByQuery(query: string, apiKey: string): Promise<Place
   const findJson = await find.json();
   const placeId = findJson?.candidates?.[0]?.place_id;
   if (!placeId) return null;
-  const fields = ['name','formatted_address','formatted_phone_number','website','rating','user_ratings_total','types','opening_hours','business_status','place_id'].join(',');
+  const fields = ['name','formatted_address','address_components','formatted_phone_number','website','rating','user_ratings_total','types','opening_hours','current_opening_hours','business_status','place_id'].join(',');
   const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=${fields}&key=${apiKey}`;
   const d = await fetch(detailsUrl);
   if (!d.ok) return null;
@@ -190,6 +302,12 @@ function buildMarkdown(input: ClinicInput, places: PlacesData | null, html: stri
   const placeId = places?.place_id || '';
   const reviewLink = placeId ? `https://search.google.com/local/writereview?placeid=${placeId}` : '';
 
+  // Structured hours from Google Places periods. Pre-formatted as
+  // "8:00 AM to 5:00 PM" so the dash sanitizer never sees them. Schema
+  // openingHoursSpecification is built from the same source.
+  const hours = buildHours(places?.opening_hours?.periods);
+  const postalAddress = buildPostalAddress(places?.address_components, address || null);
+
   const websiteServices = detectServicesInHtml(html);
   const dbServices = (input.dbServices || []).filter(Boolean);
   const allServices = Array.from(new Set([...websiteServices, ...dbServices]));
@@ -201,77 +319,100 @@ function buildMarkdown(input: ClinicInput, places: PlacesData | null, html: stri
   const city = noDashes(input.city || '');
   const cityForCopy = city || placeholderIfMissing(null, 'city name', placeholders);
 
+  // Cheap on-page scrape signals so we drop speculative filler unless we
+  // saw the topic on the clinic's own site. "may be available" copy is
+  // gated on these. If we did not see a mention, omit the post or Q&A.
+  const websiteText = (html || '').toLowerCase();
+  const sawMobile = /mobile|in-home|at-home|home visit|concierge/.test(websiteText);
+  const sawGiftCards = /gift card|gift certificat/.test(websiteText);
+  const sawGroupCorp = /corporate|group|bachelorette|bridal|team/.test(websiteText);
+  const sawPackages = /package|membership|subscription/.test(websiteText);
+  const sawWalkIn = /walk.?in|same.?day/.test(websiteText);
+  const sawPricing = /\$\d|cad |usd /i.test(websiteText);
+
   const placesCategoryHints = (places?.types || []).filter(t => !['point_of_interest', 'establishment', 'health'].includes(t));
 
   // 1. Google Business Profile description, max 750 chars, no em-dashes,
   // no health-outcome claims. Marketing copy only.
   const gbpDescription = (() => {
-    const lead = `${name} is an IV therapy provider serving ${cityForCopy}.`;
+    const lead = `${name} is an IV therapy service serving ${cityForCopy}.`;
     const offering = allServices.length > 0
       ? ` Services include ${allServices.slice(0, 6).join(', ')}.`
-      : ' Service menu to be confirmed.';
+      : ' Service menu listed on the website.';
     const setup = phone
-      ? ` Same-day appointments may be available, call ${phone} or visit the website for current availability.`
-      : ' Same-day appointments may be available, visit the website for current availability.';
-    const close = ' Walk-ins, mobile visits, and packages depend on the clinic, see the booking page for details.';
+      ? ` Call ${phone} or visit the website for current availability.`
+      : ' Visit the website for current availability and to book.';
+    const extras: string[] = [];
+    if (sawMobile) extras.push('Mobile and in-home options where supported');
+    if (sawWalkIn) extras.push('Walk-ins subject to availability');
+    const close = extras.length ? ' ' + extras.join('. ') + '.' : '';
     let body = lead + offering + setup + close;
     if (body.length > 750) body = body.slice(0, 747) + '...';
     return body;
   })();
 
-  // 2. Recommended GBP categories — bias toward the most accurate IV therapy
-  // primary categories. We surface candidates the clinic should set; we DO
-  // NOT auto-set them.
-  const primaryCategory = 'IV therapy provider';
+  // 2. Recommended GBP categories. Operator-spec real Google taxonomy:
+  //    primary "IV therapy service" (Google added 2024-10-24),
+  //    "Naturopath" (not "Naturopathic practitioner"), Medical spa,
+  //    Wellness center are valid GBP categories.
+  const primaryCategory = 'IV therapy service';
   const secondaryCategories = [
     'Medical spa',
     'Wellness center',
-    'Naturopathic practitioner',
-    'Health consultant',
-  ].slice(0, 3);
+    'Naturopath',
+  ];
 
-  // 3. Ten GBP posts. Generic, no health claims, no medical advice.
+  // 3. GBP posts. We only emit posts whose topic is supported by the
+  // source data (website scrape, Places data). Speculative "may be
+  // available" filler is dropped per the 2026-06-09 operator polish ask.
   const gbpPosts: string[] = [
     `Now booking IV drip appointments at ${name} in ${cityForCopy}. View availability on our booking page.`,
     `New to IV therapy. Ask about our intake process and what to expect on your first visit.`,
-    `Hydration support sessions available. Walk-ins subject to availability, call ahead to confirm.`,
     `${name} offers ${allServices[0] || '[clinic to confirm signature drip]'} and other targeted IV menus. See full list on our website.`,
-    `Looking for a wellness gift. Gift cards may be available, contact the front desk for current options.`,
-    `Mobile IV may be available in select areas, check with our team for service zones and timing.`,
-    `Booking corporate or group wellness sessions, reach out to discuss group rates and on-site visits.`,
     `Pre-event and post-travel hydration sessions are popular requests, book ahead during peak weeks.`,
     `Have questions about ingredients or what is in each drip, our team is happy to walk you through the options.`,
     `Open today, see our website for current hours, services, and booking link.`,
   ];
+  if (sawWalkIn) gbpPosts.push(`Hydration support sessions available. Walk-ins subject to availability, call ahead to confirm.`);
+  if (sawGiftCards) gbpPosts.push(`Gift cards available, contact the front desk for current options.`);
+  if (sawMobile) gbpPosts.push(`Mobile IV available in select areas, check with our team for service zones and timing.`);
+  if (sawGroupCorp) gbpPosts.push(`Booking corporate or group wellness sessions, reach out to discuss group rates and on-site visits.`);
 
-  // 4. Eight GBP Q&A entries.
-  const gbpQAs: Array<{ q: string; a: string }> = [
-    { q: 'Do you take walk-ins?', a: 'Walk-ins are subject to availability. Calling ahead is recommended to confirm a time.' },
-    { q: 'Where are you located?', a: address || `[clinic to confirm: full street address]` },
-    { q: 'What are your hours?', a: places?.opening_hours?.weekday_text?.join(', ') || `[clinic to confirm: weekday hours]` },
-    { q: 'Do you offer mobile or in-home IV?', a: 'Mobile service availability varies, please call or message us to check current zones.' },
-    { q: 'How long does an IV session take?', a: 'Most sessions take about 30 to 60 minutes depending on the drip protocol selected.' },
-    { q: 'What payment methods do you accept?', a: '[clinic to confirm: accepted payment methods]' },
-    { q: 'Do I need a consultation first?', a: 'First-time visitors typically complete a brief intake, our team will walk you through the steps.' },
-    { q: 'Do you offer packages or memberships?', a: '[clinic to confirm: package or membership options]' },
-  ];
+  // 4. GBP Q&A. Same source-grounded rule: include the question only if we
+  // have a real answer. Q&As that would otherwise reduce to "[clinic to
+  // confirm]" are omitted, not surfaced as placeholders.
+  const hoursHumanText = hours.humanLines.length > 0 ? hours.humanLines.join('\n') : '';
+  const gbpQAs: Array<{ q: string; a: string }> = [];
+  if (sawWalkIn) gbpQAs.push({ q: 'Do you take walk-ins?', a: 'Walk-ins are subject to availability. Calling ahead is recommended to confirm a time.' });
+  if (address) gbpQAs.push({ q: 'Where are you located?', a: address });
+  if (hoursHumanText) gbpQAs.push({ q: 'What are your hours?', a: hoursHumanText });
+  if (sawMobile) gbpQAs.push({ q: 'Do you offer mobile or in-home IV?', a: 'Mobile service is offered, please call or message us to check current zones.' });
+  gbpQAs.push({ q: 'How long does an IV session take?', a: 'Most sessions take about 30 to 60 minutes depending on the drip protocol selected.' });
+  gbpQAs.push({ q: 'Do I need a consultation first?', a: 'First-time visitors typically complete a brief intake, our team will walk you through the steps.' });
+  if (sawPackages) gbpQAs.push({ q: 'Do you offer packages or memberships?', a: 'Packages and memberships are offered, contact the clinic for current options and pricing.' });
 
   // 5. Website on-page SEO.
   const onPageTitle = `IV Therapy in ${cityForCopy} | ${name}`.slice(0, 60);
   const onPageMeta = `${name} offers IV drips and hydration sessions in ${cityForCopy}. Book online or call for current availability.`.slice(0, 158);
   const onPageH1 = `IV therapy in ${cityForCopy}`;
-  const onPageIntro = `${name} provides IV drip sessions and hydration therapy in ${cityForCopy}. Our menu and pricing are listed below, view the full booking page to choose a time that works.`;
+  // Operator polish: do not claim pricing is shown unless we actually saw it.
+  const onPageIntro = sawPricing
+    ? `${name} provides IV drip sessions and hydration therapy in ${cityForCopy}. Our menu and pricing are listed below, view the full booking page to choose a time that works.`
+    : `${name} provides IV drip sessions and hydration therapy in ${cityForCopy}. Browse the menu, then view the booking page to choose a time that works.`;
 
-  // 6. JSON-LD LocalBusiness / MedicalBusiness schema.
+  // 6. JSON-LD LocalBusiness / MedicalBusiness schema. Address is a
+  // PostalAddress object, hours are openingHoursSpecification[] in
+  // 24-hour format. Strings are only used as fallback when structured
+  // data is missing.
   const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'MedicalBusiness',
     name,
     url: input.website || '[clinic to confirm: website URL]',
-    address: address || '[clinic to confirm: address]',
+    address: postalAddress || '[clinic to confirm: address]',
     telephone: phone || '[clinic to confirm: phone]',
   };
-  if (places?.opening_hours?.weekday_text?.length) schema.openingHours = places.opening_hours.weekday_text;
+  if (hours.schemaSpec.length > 0) schema.openingHoursSpecification = hours.schemaSpec;
   if (places?.rating != null && places?.user_ratings_total != null) {
     schema.aggregateRating = {
       '@type': 'AggregateRating',
@@ -343,7 +484,7 @@ function buildMarkdown(input: ClinicInput, places: PlacesData | null, html: stri
   }
   md.push('');
 
-  md.push(`## 4. Ten GBP posts (ready to publish)`);
+  md.push(`## 4. GBP posts (ready to publish, ${gbpPosts.length} total)`);
   md.push('');
   gbpPosts.forEach((p, i) => {
     md.push(`### Post ${i + 1}`);
@@ -351,11 +492,12 @@ function buildMarkdown(input: ClinicInput, places: PlacesData | null, html: stri
     md.push('');
   });
 
-  md.push(`## 5. Eight GBP Q&A entries`);
+  md.push(`## 5. GBP Q&A entries (${gbpQAs.length} grounded in source data)`);
   md.push('');
   gbpQAs.forEach((qa, i) => {
     md.push(`### Q${i + 1}: ${qa.q}`);
-    md.push(`A: ${qa.a}`);
+    md.push(`A:`);
+    md.push(qa.a);
     md.push('');
   });
 
