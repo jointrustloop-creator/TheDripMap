@@ -65,7 +65,7 @@ export default async function ClinicOwnerPainsPage() {
 
         {body && (
           <article className="bg-white rounded-2xl border border-slate-200 p-8 prose prose-slate max-w-none prose-headings:font-black prose-headings:tracking-tight prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-lg prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline">
-            <pre className="whitespace-pre-wrap text-sm text-slate-800 font-mono leading-relaxed">{body}</pre>
+            <pre className="not-prose whitespace-pre-wrap text-sm text-slate-800 font-mono leading-relaxed bg-transparent p-0 m-0">{body}</pre>
           </article>
         )}
       </div>
