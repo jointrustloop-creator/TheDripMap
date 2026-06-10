@@ -182,6 +182,30 @@ const nextConfig = {
         permanent: true,
       },
       // -----------------------------------------------------------------
+      // 2026-06-09: Polo Health + Longevity Centre dedup. The slug
+      // `polo-health-longevity-centre-new-westminster` was a duplicate of
+      // `polo-health-and-longevity-centre-new-westminster`. The duplicate
+      // row is soft-hidden (is_hidden=true). 301 the old slug to the
+      // canonical so any inbound link or crawled URL lands correctly.
+      // -----------------------------------------------------------------
+      {
+        source: '/providers/polo-health-longevity-centre-new-westminster',
+        destination: '/providers/polo-health-and-longevity-centre-new-westminster',
+        permanent: true,
+      },
+      // -----------------------------------------------------------------
+      // 2026-06-09: Vitality Integrative Medicine dedup. The slug
+      // `vitality-integrative-medicine-los-angeles` was a duplicate of
+      // `vitality-integrative-medicine-sherman-oaks` (same suite, same
+      // phone, same email). The LA slug was mis-labeled, the address is
+      // in Sherman Oaks. The LA row is soft-hidden. 301 to the canonical.
+      // -----------------------------------------------------------------
+      {
+        source: '/providers/vitality-integrative-medicine-los-angeles',
+        destination: '/providers/vitality-integrative-medicine-sherman-oaks',
+        permanent: true,
+      },
+      // -----------------------------------------------------------------
       // 2026-06-03: The 19 blog -> /cities/* and blog -> /iv-therapy/*
       // redirects added during the C1-C17 consolidation work
       // (2026-05-31) have been REMOVED. Those redirects suppressed
