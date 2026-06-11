@@ -1,3 +1,6 @@
+// Cache bust 2026-06-11: 36 new city pages went live overnight and 3
+// (columbus, whitby, halifax) didn't make it into the cached sitemap.
+// This deploy refreshes the edge cache so the full 112-city set crawls.
 import { MetadataRoute } from 'next';
 import { getAllListings, getBlogPosts, getAllCities, slugify } from '../src/lib/data';
 import { USE_CASES } from '../src/lib/use-cases';
