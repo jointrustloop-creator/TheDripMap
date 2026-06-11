@@ -8,9 +8,11 @@ import { Footer } from '../../src/components/Footer';
 import { BlogClientContent } from '../../src/components/BlogClientContent';
 import { getBlogPosts } from '../../src/lib/data';
 
-// 2026-06-11: redeploy to bust the index cache after publishing the
-// refreshed Canadian cost article. Index revalidate stays at 3600 (1 hour).
-export const revalidate = 3600;
+// 2026-06-11: revalidate every 10 min so newly-published posts surface
+// quickly on /blog. Matches the sitemap revalidate cycle. Previously
+// 3600 (1 hour), which left freshly-published posts invisible on the
+// index for up to an hour after going live.
+export const revalidate = 600;
 
 export const metadata: Metadata = {
   title: "Wellness Blog | IV Therapy Guides & Local Insights | TheDripMap",
