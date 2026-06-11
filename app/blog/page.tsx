@@ -8,6 +8,8 @@ import { Footer } from '../../src/components/Footer';
 import { BlogClientContent } from '../../src/components/BlogClientContent';
 import { getBlogPosts } from '../../src/lib/data';
 
+// 2026-06-11: redeploy to bust the index cache after publishing the
+// refreshed Canadian cost article. Index revalidate stays at 3600 (1 hour).
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
