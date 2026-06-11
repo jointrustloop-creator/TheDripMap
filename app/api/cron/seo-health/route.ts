@@ -28,6 +28,11 @@ import {
 } from '../../../../src/lib/seo-health-baseline';
 import { buildLayerAEmail, buildLayerASubject } from '../../../../src/lib/seo-health-email';
 import { sendMail } from '../../../../src/lib/mailer';
+import {
+  startRun,
+  finishRun,
+  recordFindings,
+} from '../../../../src/lib/seo-health-runs';
 
 export const maxDuration = 300;
 export const dynamic = 'force-dynamic';
@@ -58,11 +63,28 @@ export async function GET(req: Request) {
   const todayIso = new Date().toISOString().slice(0, 10);
   const weekly = forceWeekly || isMondayET();
 
+  // WS6 (2026-06-11): record one row per cron entry so we can later
+  // distinguish "cron fired and failed" from "cron never fired". Errors
+  // here are non-fatal — the existing crawl + baseline path is untouched.
+  const runStart = Date.now();
+  const { id: runId, error: runErr } = await startRun('A_crawl', {
+    forceTest,
+    forceWeekly,
+    todayIso,
+  });
+
   // 1. Sitemap
   const sitemapUrls = await fetchSitemapUrls();
   if (sitemapUrls.length === 0) {
+    if (runId) {
+      await finishRun(runId, {
+        status: 'error',
+        error_message: 'Sitemap returned 0 URLs',
+        duration_ms: Date.now() - runStart,
+      });
+    }
     return NextResponse.json(
-      { ok: false, error: 'Sitemap returned 0 URLs — refusing to run crawl.' },
+      { ok: false, error: 'Sitemap returned 0 URLs — refusing to run crawl.', runId, runErr },
       { status: 500 }
     );
   }
@@ -122,6 +144,31 @@ export async function GET(req: Request) {
   const newBaseline = buildNewBaseline(summary.totalUrls, issues, prior);
   const saveResult = await saveBaseline(newBaseline);
 
+  // 7. WS6 (2026-06-11): persist a run row + per-issue findings rows so
+  // we can trend issues over time. Best-effort: if either write fails,
+  // surface in the response but never throw.
+  let findingsResult: { ok: boolean; inserted: number; error?: string } | null = null;
+  let finishResult: { ok: boolean; error?: string } | null = null;
+  if (runId) {
+    findingsResult = await recordFindings(runId, 'A_crawl', issues);
+    const status = saveResult.savedTo === 'none' ? 'partial' : 'ok';
+    finishResult = await finishRun(runId, {
+      status,
+      total_urls: summary.totalUrls,
+      crawled_urls: summary.crawledUrls,
+      issue_count: issues.length,
+      duration_ms: Date.now() - runStart,
+      truncated: summary.truncated,
+      meta: {
+        new: diff.newIssues.length,
+        carried: diff.carriedIssues.length,
+        resolved: diff.resolvedIssues.length,
+        baseline_savedTo: saveResult.savedTo,
+        emailed: !!emailResult?.ok,
+      },
+    });
+  }
+
   return NextResponse.json({
     ok: true,
     today: todayIso,
@@ -143,5 +190,6 @@ export async function GET(req: Request) {
       ? { ...subjectMeta, ...emailResult }
       : { sent: false, reason: 'No new issues, not weekly, not test' },
     baseline: saveResult,
+    run: { runId, runErr, findingsResult, finishResult },
   });
 }
