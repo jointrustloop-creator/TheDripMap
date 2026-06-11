@@ -33,12 +33,18 @@ function isEligibleEmail(email: string | null | undefined): boolean {
 //
 // Idempotent: if any outreach_sent_at already exists for today, this is a no-op
 // (so the cron is safe to re-trigger or to manually invoke).
-// PAUSED FLAG - toggle to false to resume daily outreach drafts.
-// Set 2026-06-08 per operator (directory-submission-quick-fills.md):
-// "Pause automatic generation. Disable or no-op the daily-outreach and
-// followup-outreach crons for now. I want a fixed batch I send by hand,
-// not a pile that refills every morning."
-const PAUSED = true;
+// PAUSED FLAG - toggle to true to no-op the claim outreach draft cron.
+//
+// Intent (per 2026-06-11 operator instruction in WS4):
+//   - Claim outreach (asking clinic owners to claim their listing) RUNS.
+//   - Get Found Kit / Featured / selling pitches stay paused. Those are
+//     operator-clicked from /admin/tools and gated by not clicking, no
+//     code-side toggle is needed for them.
+//
+// Setting PAUSED=false on 2026-06-11 to honor the corrected intent.
+// Earlier 2026-06-08 the flag was true, but that paused both selling AND
+// claim outreach, which is not what was wanted.
+const PAUSED = false;
 
 export async function GET(req: Request) {
   const expected = process.env.CRON_SECRET;
@@ -128,11 +134,18 @@ export async function GET(req: Request) {
   );
   const suppressedSet = new Set<string>();
   if (candidateEmails.length > 0) {
-    const { data: suppressedRows } = await supabase
-      .from('email_suppressions')
-      .select('email')
-      .in('email', candidateEmails);
-    for (const row of (suppressedRows || []) as Array<{ email: string }>) {
+    // Read BOTH suppression tables. email_suppressions is the legacy
+    // CASL-driven list (mailer-daemon, unsubscribes from earlier sends).
+    // outreach_suppressions is the operator-curated list (hard bounces
+    // observed in inbox, etc., per 2026-06-11 WS4 spec).
+    const [legacy, current] = await Promise.all([
+      supabase.from('email_suppressions').select('email').in('email', candidateEmails),
+      supabase.from('outreach_suppressions').select('email').in('email', candidateEmails),
+    ]);
+    for (const row of (legacy.data || []) as Array<{ email: string }>) {
+      suppressedSet.add(row.email.toLowerCase());
+    }
+    for (const row of (current.data || []) as Array<{ email: string }>) {
       suppressedSet.add(row.email.toLowerCase());
     }
   }

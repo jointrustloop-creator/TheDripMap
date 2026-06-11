@@ -126,9 +126,15 @@ ${CASL_FOOTER}`;
 // daily-outreach cron.
 //
 // Idempotent: if any followup_sent_at exists for today, no-op.
-// PAUSED FLAG - toggle to false to resume 7-day follow-up drafts.
-// Set 2026-06-08 per operator alongside daily-outreach.
-const PAUSED = true;
+//
+// Intent (per 2026-06-11 operator instruction in WS4):
+//   - Claim follow-ups (nudging clinic owners who already received the
+//     initial claim outreach) RUN.
+//   - Get Found Kit / Featured / selling pitches stay paused. Those are
+//     operator-clicked from /admin/tools and gated by not clicking, no
+//     code-side toggle is needed for them.
+// To pause this cron again, flip PAUSED back to true.
+const PAUSED = false;
 
 export async function GET(req: Request) {
   const expected = process.env.CRON_SECRET;
@@ -212,11 +218,18 @@ export async function GET(req: Request) {
   );
   const suppressedSet = new Set<string>();
   if (candidateEmails.length > 0) {
-    const { data: suppressedRows } = await supabase
-      .from('email_suppressions')
-      .select('email')
-      .in('email', candidateEmails);
-    for (const row of (suppressedRows || []) as Array<{ email: string }>) {
+    // WS4 (2026-06-11): read BOTH email_suppressions (legacy) and
+    // outreach_suppressions (current). They exist in parallel and
+    // both are authoritative. Skipping either lets a previously
+    // suppressed email through and risks an embarrassing re-send.
+    const [legacy, current] = await Promise.all([
+      supabase.from('email_suppressions').select('email').in('email', candidateEmails),
+      supabase.from('outreach_suppressions').select('email').in('email', candidateEmails),
+    ]);
+    for (const row of ((legacy.data || []) as Array<{ email: string }>)) {
+      suppressedSet.add(row.email.toLowerCase());
+    }
+    for (const row of ((current.data || []) as Array<{ email: string }>)) {
       suppressedSet.add(row.email.toLowerCase());
     }
   }
