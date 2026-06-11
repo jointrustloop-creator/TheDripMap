@@ -25,13 +25,16 @@ Email: info@thedripmap.com
   10. signature-beauty-lounge-richmond-hill (2026-04-27, Eva, grandfathered) [FEATURED]
   11. blue-cypress-iv-and-wellness-georgetown (2026-04-19, Mechelle, grandfathered) [FEATURED]
 - Claim distribution: 8 of 11 (73%) are Canadian. 5 free, 6 featured.
-- 4 pending claim_requests as of 2026-06-11: BeYouty Medical Spa (Corinna Chin,
-  created 2026-06-01), Tri-Health Wellness Centre (Dr. Jason Granzotto ND,
-  created 2026-06-02), Insight Naturopathic Clinic (STALE row, is_claimed
-  already true on the listing, created 2026-06-03), Knead Therapy Clinic
-  (Dr. Tonia Winchester, created 2026-06-04, duplicate row was deleted
-  2026-06-09 cleanup batch). Manual follow-up drafts can be queued from
-  /admin/tools "Queue 4 pending-claim drafts" button.
+- 3 pending claim_requests as of 2026-06-11: BeYouty Medical Spa (Corinna Chin,
+  created 2026-06-01, token regenerated 2026-06-11 in WS1), Tri-Health Wellness
+  Centre (Dr. Jason Granzotto ND, created 2026-06-02, token regenerated
+  2026-06-11 in WS1), Knead Therapy Clinic (Dr. Tonia Winchester, created
+  2026-06-04, duplicate row was deleted 2026-06-09 cleanup batch, token
+  regenerated 2026-06-11 in WS1). The Insight Naturopathic Clinic stale
+  row was deleted 2026-06-11 (the listing's is_claimed was already true).
+  Manual follow-up drafts can be queued from /admin/tools (note: the
+  "Queue 4 pending-claim drafts" button label and its description are
+  now stale; they still reference the old count of 4 including Insight).
 - claimed_at column added 2026-06-05. Grandfathered dates were hand-set
   during the 2026-06-05 backfill; never overwrite an existing claimed_at
   from updated_at (enrichment touches updated_at).
