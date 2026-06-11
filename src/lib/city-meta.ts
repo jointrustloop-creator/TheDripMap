@@ -384,6 +384,16 @@ const metas: Record<string, CityMeta> = {
         answer:
           'Yes. Mobile IV therapy across the GTA is mature, with providers serving downtown Toronto, North York, Scarborough, Etobicoke, and the surrounding suburbs including Mississauga, Markham, Vaughan, Richmond Hill, Brampton, Oakville, and Burlington. Look for the Mobile Service tag in the listings.',
       },
+      {
+        question: 'How much does an iron infusion cost in Toronto?',
+        answer:
+          'Iron infusion pricing in Toronto varies meaningfully by clinic and by whether the infusion is delivered as a wellness service or as a medical service for diagnosed iron-deficiency anemia. As a general market guide, private iron infusions at IV clinics typically sit in the mid hundreds of CAD per session, with the exact price depending on the dose, the iron formulation, and whether a physician consult is bundled. If your family doctor has documented iron-deficiency anemia, ask whether an OHIP-covered hospital outpatient route is available before paying privately. Always confirm current pricing with the clinic.',
+      },
+      {
+        question: 'What does a bachelorette or group IV in Toronto cost?',
+        answer:
+          'Bachelorette and group IV bookings in Toronto are usually quoted per person with a minimum head count, typically three to six guests. Per-person rates are commonly discounted compared to the solo walk-in price for the same drip, particularly on hydration and Myers-style cocktails. Mobile providers add a travel and setup fee on top of the per-person drip, which scales with the distance from central Toronto. Confirm the minimum group size, the per-person rate, and any travel fee with the clinic before booking.',
+      },
     ],
     links: {
       blogPosts: [
@@ -403,6 +413,76 @@ const metas: Record<string, CityMeta> = {
         'athletic-recovery',
       ],
     },
+  },
+
+  'north-york': {
+    faqs: [
+      {
+        question: 'How much does an iron infusion cost in North York?',
+        answer:
+          'Iron infusion pricing in North York varies by clinic, by whether the session is delivered as a wellness or medical service, and by the iron formulation and dose. As a general market guide, private iron infusions at North York IV clinics tend to sit in the mid hundreds of CAD per session, with a physician or naturopath consult sometimes bundled. If you have a documented diagnosis of iron-deficiency anemia, ask your family doctor about an OHIP-covered hospital outpatient route before paying privately. Confirm current pricing with the clinic.',
+      },
+      {
+        question: 'What does a bachelorette or group IV in North York cost?',
+        answer:
+          'Group bookings in North York are usually quoted per person with a minimum head count, typically three to six guests. Per-person rates are commonly lower than solo walk-in pricing for the same drip, particularly on hydration and Myers-style cocktails. Mobile providers serving the north GTA add a travel and setup fee on top of the per-person rate. Confirm the minimum group size, per-person price, and any travel fee with the clinic.',
+      },
+    ],
+  },
+
+  mississauga: {
+    faqs: [
+      {
+        question: 'What does a bachelorette or group IV in Mississauga cost?',
+        answer:
+          'Group bookings in Mississauga are usually quoted per person with a minimum head count, typically three to six guests. Per-person rates are commonly lower than the solo walk-in price for the same drip, and Mississauga clinics often sit slightly below comparable Toronto pricing on hydration and Myers-style cocktails. Mobile providers serving Peel region add a travel and setup fee on top of the per-person rate, which scales with the venue distance. Confirm group minimum, per-person rate, and travel fee with the clinic before booking.',
+      },
+    ],
+  },
+
+  oakville: {
+    faqs: [
+      {
+        question: 'How much does an iron infusion cost in Oakville?',
+        answer:
+          'Iron infusion pricing in Oakville varies by clinic, by whether the session is delivered as a wellness or medical service, and by the iron formulation and dose. As a general market guide, private iron infusions at Oakville IV clinics tend to sit in the mid hundreds of CAD per session, often slightly above the broader GTA average given the local pricing landscape. If you have a documented diagnosis of iron-deficiency anemia, ask your family doctor about an OHIP-covered hospital outpatient route before paying privately. Always confirm current pricing with the clinic.',
+      },
+      {
+        question: 'What does a bachelorette or wedding-day IV in Oakville cost?',
+        answer:
+          'Group and wedding-day bookings in Oakville are usually quoted per person with a minimum head count, typically three to six guests. Per-person rates are commonly lower than solo walk-in pricing for the same drip. Mobile providers serving the Oakville and Burlington waterfront add a travel and setup fee on top of the per-person rate. Confirm group minimum, per-person price, and any travel fee with the clinic before booking.',
+      },
+    ],
+  },
+
+  'richmond-hill': {
+    faqs: [
+      {
+        question: 'How much does an iron infusion cost in Richmond Hill?',
+        answer:
+          'Iron infusion pricing in Richmond Hill varies by clinic, by whether the session is delivered as a wellness or medical service, and by the iron formulation and dose. As a general market guide, private iron infusions at Richmond Hill IV clinics tend to sit in the mid hundreds of CAD per session, broadly in line with the wider York region. If you have a documented diagnosis of iron-deficiency anemia, ask your family doctor about an OHIP-covered hospital outpatient route before paying privately. Confirm current pricing with the clinic.',
+      },
+      {
+        question: 'What does a bachelorette or wedding-day IV in Richmond Hill cost?',
+        answer:
+          'Group bookings in Richmond Hill are usually quoted per person with a minimum head count, typically three to six guests. Per-person rates are commonly lower than solo walk-in pricing for the same drip. Mobile providers serving north York region add a travel and setup fee on top of the per-person rate, which scales with the venue distance. Confirm group minimum, per-person price, and any travel fee with the clinic.',
+      },
+    ],
+  },
+
+  burlington: {
+    faqs: [
+      {
+        question: 'How much does an iron infusion cost in Burlington?',
+        answer:
+          'Iron infusion pricing in Burlington varies by clinic, by whether the session is delivered as a wellness or medical service, and by the iron formulation and dose. As a general market guide, private iron infusions at Burlington IV clinics tend to sit in the mid hundreds of CAD per session, broadly in line with the wider Halton region. If you have a documented diagnosis of iron-deficiency anemia, ask your family doctor about an OHIP-covered hospital outpatient route before paying privately. Confirm current pricing with the clinic.',
+      },
+      {
+        question: 'What does a bachelorette or wedding-day IV in Burlington cost?',
+        answer:
+          'Group bookings in Burlington are usually quoted per person with a minimum head count, typically three to six guests. Per-person rates are commonly lower than the solo walk-in price for the same drip. Mobile providers serving the Burlington and Oakville waterfront add a travel and setup fee on top of the per-person rate. Confirm group minimum, per-person price, and any travel fee with the clinic.',
+      },
+    ],
   },
 };
 
