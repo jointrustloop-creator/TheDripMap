@@ -5,30 +5,45 @@ URL: https://www.thedripmap.com
 Stack: Next.js, Supabase, Vercel, Tailwind CSS
 Email: info@thedripmap.com
 
-## Database (as of 2026-06-08)
-- 1,478 providers total (997 United States, 481 Canada, 0 null country)
-- 7 claimed (is_claimed = true), 6 featured (is_featured = true), 3 hidden (is_hidden = true)
+## Database (as of 2026-06-11)
+- 1,478 providers total (993 United States, 480 Canada, 0 null country, 5 hidden)
+- 11 claimed (is_claimed = true), 6 featured (is_featured = true), 5 hidden (is_hidden = true)
+- Active provider geographic top-5:
+  - CA-Ontario 222, US-California 181, US-Texas 164, US-Florida 116, CA-BC 115
+- Active provider top-5 cities:
+  - Toronto 61, New York 51, Dallas 36, Tampa/Atlanta/Houston 35 each, Calgary 32
 - Claimed roster ordered by claimed_at desc (newest first):
-  1. insight-naturopathic-clinic-toronto (2026-06-03, via claim flow)
-  2. bay-wellness-centre-vancouver (2026-06-01, via claim flow)
-  3. diamond-aesthetics-brampton (2026-06-01, via claim flow)
-  4. refresh-med-spa-la-los-angeles (2026-05-26, Kia, grandfathered)
-  5. signature-beauty-lounge-downtown-toronto (2026-04-27, Eva, grandfathered)
-  6. signature-beauty-lounge-richmond-hill (2026-04-27, Eva, grandfathered)
-  7. blue-cypress-iv-and-wellness-georgetown (2026-04-19, Mechelle, grandfathered)
-- 5 pending claim_requests as of 2026-06-08: BeYouty Medical Spa (Los Alamitos,
-  token EXPIRED 2026-06-07), Tri-Health Wellness Centre (Vaughan, expires
-  2026-06-09), Insight Naturopathic Clinic (Toronto, STALE row, is_claimed
-  already true), Knead Therapy Clinic (Nanaimo, 2 duplicate submissions
-  expiring 2026-06-11). Manual follow-up drafts can be queued from
+  1. purete-medical-spa-etobicoke (2026-06-10, via claim flow)
+  2. the-lift-bar-medspa-nicholasville (2026-06-09, via claim flow)
+  3. soma-and-soul-wellness-toronto (2026-06-09, via claim flow)
+  4. natures-touch-naturopathic-clinic-brampton (2026-06-09, via claim flow)
+  5. insight-naturopathic-clinic-toronto (2026-06-03, via claim flow)
+  6. bay-wellness-centre-vancouver (2026-06-01, via claim flow) [FEATURED]
+  7. diamond-aesthetics-brampton (2026-06-01, via claim flow) [FEATURED]
+  8. refresh-med-spa-la-los-angeles (2026-05-26, Kia, grandfathered) [FEATURED]
+  9. signature-beauty-lounge-downtown-toronto (2026-04-27, Eva, grandfathered) [FEATURED]
+  10. signature-beauty-lounge-richmond-hill (2026-04-27, Eva, grandfathered) [FEATURED]
+  11. blue-cypress-iv-and-wellness-georgetown (2026-04-19, Mechelle, grandfathered) [FEATURED]
+- Claim distribution: 8 of 11 (73%) are Canadian. 5 free, 6 featured.
+- 4 pending claim_requests as of 2026-06-11: BeYouty Medical Spa (Corinna Chin,
+  created 2026-06-01), Tri-Health Wellness Centre (Dr. Jason Granzotto ND,
+  created 2026-06-02), Insight Naturopathic Clinic (STALE row, is_claimed
+  already true on the listing, created 2026-06-03), Knead Therapy Clinic
+  (Dr. Tonia Winchester, created 2026-06-04, duplicate row was deleted
+  2026-06-09 cleanup batch). Manual follow-up drafts can be queued from
   /admin/tools "Queue 4 pending-claim drafts" button.
 - claimed_at column added 2026-06-05. Grandfathered dates were hand-set
   during the 2026-06-05 backfill; never overwrite an existing claimed_at
   from updated_at (enrichment touches updated_at).
-- 121 blog posts live
-- 794 + 28 = 822 high-quality emails (28 Canadian NULL-email providers
-  recovered via website scrape on 2026-06-08); 141 Canadian providers still
-  have NULL email
+- 121 blog posts live (100% have meta_title <=60 chars + meta_description
+  <=160 chars after 2026-06-10 Wins 2+3 cleanup)
+- 992 active providers with email, 481 without (33% Canada gap = 141 CA
+  active providers still NULL email)
+- 333 city rows in cities table (was 308 on 2026-06-10; +25 added during
+  the autonomous overnight build-out 2026-06-10/11). 36 city pages newly
+  populated with content (~4,700 chars each), all dash-clean and verified.
+- All 1,478 providers now have lat/lng (Win #4 geocoding completed
+  2026-06-10).
 - Verify the count live with `select id count exact` on providers, not from this file
 
 ## Hard Rules
@@ -74,6 +89,30 @@ Full details in GOAL.md and DAILY_CHECKLIST.md
   hidden for unrelated reasons, e.g. hijacked-domain). The 19 hybrids cleaned
   during Phase 1/1b stay cleaned (those changes were operator-greenlit
   independent of the hide decision).
+
+## Sleep Mode Hard Lessons (2026-06-10/11)
+- 25 autonomous city pages created from templates, 24 had a `${c.city}`
+  vs `row.name` field mismatch that left literal "undefined" in the body.
+  HTTP 200 checks + no-dash + no-"directory" pre-flight all passed.
+  Lesson: when auto-generating templated content, the pre-flight must
+  assert `row.name` appears in `content` at least 3 times. Spot checks
+  caught all 24; backups saved for rollback.
+- Region-specific framing assumptions baked into templates can be wrong
+  for outlier rows: the BC template assumed every BC city sits in the
+  Lower Mainland, but Victoria is on Vancouver Island. Hamilton template
+  inherited "in the Niagara region" framing which is wrong (Hamilton is
+  in the Golden Horseshoe). When templating, region-keyword phrases need
+  per-row verification.
+- Unverifiable superlatives slip through if not specifically scanned:
+  "one of the highest hydration-drip per-capita markets in the US" went
+  to prod on /cities/phoenix before being caught. Pre-flight should
+  flag superlatives (highest, largest, fastest, most) for human review.
+- Speculative service-area claims also need verification: my Halifax
+  copy said "providers serving selectively the Annapolis Valley" (90-min
+  drive west, cannot verify). Soften to "the broader HRM area".
+- Spot-checks beat automated audits at catching content quality issues.
+  3 rounds of spot-checks caught 32 fixes across 31 cities. Each round
+  surfaced a different class of issue the automated audits missed.
 
 ## Today's Hard Lessons (2026-06-08)
 - /cities/weight-loss returned 404 - no redirect safety net for treatment
