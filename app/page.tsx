@@ -43,7 +43,7 @@ export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getSiteStats();
-  const title = `IV Therapy Clinics Near Me — Find & Compare ${stats.total}+ Providers | TheDripMap`;
+  const title = `IV Therapy Clinics Near Me — Find & Compare ${stats.total}+ Providers | The Drip Map`;
   const description = `Find the best IV therapy clinic near you. Compare ${stats.total}+ verified providers across the US and Canada. Filter by treatment, price, and location. Book in 60 seconds.`;
 
   return {
@@ -54,8 +54,8 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       url: 'https://www.thedripmap.com',
-      siteName: 'TheDripMap',
-      images: [{ url: 'https://www.thedripmap.com/og-image.png', width: 1200, height: 630, alt: 'TheDripMap — Find Your IV Therapy Match' }],
+      siteName: 'The Drip Map',
+      images: [{ url: 'https://www.thedripmap.com/og-image.png', width: 1200, height: 630, alt: 'The Drip Map — Find Your IV Therapy Match' }],
       locale: 'en_US',
       type: 'website',
     },
@@ -111,8 +111,10 @@ export default async function HomePage() {
       '/images/clinic-logos/bay-wellness-centre-vancouver.webp',
   };
 
-  const websiteJsonLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'TheDripMap', url: 'https://www.thedripmap.com', potentialAction: { '@type': 'SearchAction', target: 'https://www.thedripmap.com/search?q={search_term_string}', 'query-input': 'required name=search_term_string' } };
-  const organizationJsonLd = { '@context': 'https://schema.org', '@type': 'Organization', name: 'TheDripMap', url: 'https://www.thedripmap.com', logo: 'https://www.thedripmap.com/logo.png', sameAs: ['https://www.instagram.com/thedripmap'] };
+  // Google Site Name signal: "The Drip Map" primary, "TheDripMap" as alternateName.
+  // The homepage's JSON-LD is the authoritative source per Google's Site Name docs.
+  const websiteJsonLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'The Drip Map', alternateName: 'TheDripMap', url: 'https://www.thedripmap.com', potentialAction: { '@type': 'SearchAction', target: 'https://www.thedripmap.com/search?q={search_term_string}', 'query-input': 'required name=search_term_string' } };
+  const organizationJsonLd = { '@context': 'https://schema.org', '@type': 'Organization', name: 'The Drip Map', alternateName: 'TheDripMap', url: 'https://www.thedripmap.com', logo: 'https://www.thedripmap.com/logo.png', sameAs: ['https://www.instagram.com/thedripmap'] };
 
   // Product-card data for the dark drip menu. Each card shows an actual IV-bag
   // / drip product photo (Supabase blog-images) with name, one-line "what it

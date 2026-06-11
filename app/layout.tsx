@@ -34,13 +34,23 @@ const hankenGrotesk = Hanken_Grotesk({
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thedripmap.com';
-const siteName = process.env.NEXT_PUBLIC_SITE_NAME || 'TheDripMap';
+
+// 2026-06-11: Google's "Site Name" feature (the bold name above URLs in
+// mobile search results) was displaying "thedripmap.com" because the
+// previous siteName ("TheDripMap", no space) was visually identical to the
+// domain. Switching the primary display name to "The Drip Map" with spaces
+// + adding "TheDripMap" as alternateName in the WebSite + Organization JSON-LD
+// gives Google a clear distinct display name to surface. Per Google's docs
+// at https://developers.google.com/search/docs/appearance/site-names this
+// can take 1 to 2 weeks to propagate in search results.
+const siteName = process.env.NEXT_PUBLIC_SITE_NAME || 'The Drip Map';
+const siteNameAlternate = 'TheDripMap';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     template: '%s',
-    default: 'TheDripMap | Find Your Perfect IV Therapy Match',
+    default: 'The Drip Map | Find Your Perfect IV Therapy Match',
   },
   description: 'Find and compare the best IV therapy clinics near you. Browse verified providers across hundreds of US cities or get matched in 60 seconds.',
   // NOTE: no global `alternates.canonical` here. A canonical set in the root
@@ -85,6 +95,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": siteName,
+    "alternateName": siteNameAlternate,
     "url": siteUrl,
     "logo": `${siteUrl}/logo.png`,
     "sameAs": [
@@ -96,6 +107,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": siteName,
+    "alternateName": siteNameAlternate,
     "url": siteUrl,
     "potentialAction": {
       "@type": "SearchAction",
