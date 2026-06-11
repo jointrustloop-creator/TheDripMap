@@ -588,17 +588,27 @@ export async function getAllCities(): Promise<{ city: string, state: string, sta
   if (!isSupabaseConfigured()) return getMockCities();
   
   try {
-    // Select only needed columns to keep payload small and fast
-    const response = await supabase
-      .from('providers')
-      .select('id, city, state')
-      .order('id');
-
-    if (response.error || !response.data || response.data.length === 0) {
-      return getMockCities();
+    // Paginate through all providers. PostgREST default caps single queries
+    // at 1,000 rows; without pagination this aggregation silently dropped
+    // every provider after row 1,000 from city counts, which excluded ~22
+    // cities from the sitemap despite passing the 3-provider gate
+    // (caught 2026-06-11 sitemap audit).
+    let data: { id: string; city: string | null; state: string | null }[] = [];
+    for (let offset = 0; ; offset += 1000) {
+      const response = await supabase
+        .from('providers')
+        .select('id, city, state')
+        .order('id')
+        .range(offset, offset + 999);
+      if (response.error) {
+        if (offset === 0) return getMockCities();
+        break;
+      }
+      if (!response.data || response.data.length === 0) break;
+      data = data.concat(response.data);
+      if (response.data.length < 1000) break;
     }
-
-    const data = response.data;
+    if (data.length === 0) return getMockCities();
     const seenIds = new Set<string>();
     const cityCounts = new Map<string, { city: string, stateAbbr: string, count: number }>();
     
