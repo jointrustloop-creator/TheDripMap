@@ -111,10 +111,10 @@ export default async function HomePage() {
       '/images/clinic-logos/bay-wellness-centre-vancouver.webp',
   };
 
-  // Google Site Name signal: "The Drip Map" primary, "TheDripMap" as alternateName.
-  // The homepage's JSON-LD is the authoritative source per Google's Site Name docs.
-  const websiteJsonLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'The Drip Map', alternateName: 'TheDripMap', url: 'https://www.thedripmap.com', potentialAction: { '@type': 'SearchAction', target: 'https://www.thedripmap.com/search?q={search_term_string}', 'query-input': 'required name=search_term_string' } };
-  const organizationJsonLd = { '@context': 'https://schema.org', '@type': 'Organization', name: 'The Drip Map', alternateName: 'TheDripMap', url: 'https://www.thedripmap.com', logo: 'https://www.thedripmap.com/logo.png', sameAs: ['https://www.instagram.com/thedripmap'] };
+  // WebSite + Organization JSON-LD are emitted once site-wide from
+  // app/layout.tsx with the canonical Site Name signal ("The Drip Map"
+  // primary, "TheDripMap" as alternateName). Removing the duplicate
+  // declaration here so Google sees a single consistent name.
 
   // Product-card data for the dark drip menu. Each card shows an actual IV-bag
   // / drip product photo (Supabase blog-images) with name, one-line "what it
@@ -180,8 +180,7 @@ export default async function HomePage() {
     <div className="min-h-screen bg-white">
       <Navbar />
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
+      {/* WebSite + Organization JSON-LD emitted once by app/layout.tsx */}
 
       {/* ─────────────────────────────────────────────────────────────
           1. HERO — light, airy, single emerald accent

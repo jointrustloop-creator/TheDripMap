@@ -43,7 +43,11 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thedripmap.com'
 // gives Google a clear distinct display name to surface. Per Google's docs
 // at https://developers.google.com/search/docs/appearance/site-names this
 // can take 1 to 2 weeks to propagate in search results.
-const siteName = process.env.NEXT_PUBLIC_SITE_NAME || 'The Drip Map';
+//
+// Hardcoded (not env-driven) on purpose: the brand display name should not
+// vary by environment. Vercel had NEXT_PUBLIC_SITE_NAME=TheDripMap set which
+// was overriding the default and re-introducing the bug on prod.
+const siteName = 'The Drip Map';
 const siteNameAlternate = 'TheDripMap';
 
 export const metadata: Metadata = {
