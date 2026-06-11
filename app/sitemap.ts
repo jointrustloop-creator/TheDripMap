@@ -1,8 +1,12 @@
-// Cache bust 2026-06-11: 36 new city pages went live overnight and 3
-// (columbus, whitby, halifax) didn't make it into the cached sitemap.
-// This deploy refreshes the edge cache so the full 112-city set crawls.
 import { MetadataRoute } from 'next';
 import { getAllListings, getBlogPosts, getAllCities, slugify } from '../src/lib/data';
+
+// 2026-06-11: revalidate every 10 minutes so newly-added providers + cities
+// surface in the sitemap quickly without a manual redeploy. Previously the
+// sitemap was statically prerendered at build time, so 22 cities (including
+// columbus, whitby, halifax + 19 pre-existing) were missing from the cached
+// XML despite passing the 3-provider gate.
+export const revalidate = 600;
 import { USE_CASES } from '../src/lib/use-cases';
 import { STATES } from '../src/lib/states';
 import { GUIDES } from '../src/lib/guides';
