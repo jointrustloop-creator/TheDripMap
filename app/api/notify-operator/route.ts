@@ -80,46 +80,79 @@ export async function POST(req: Request) {
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
-    // ORPHAN HANDLING: if no listingId was supplied, build a stub provider so
-    // the claim has a real target and the admin notification has a real slug.
+    // ORPHAN HANDLING: if no listingId was supplied, first try to fuzzy-match
+    // against existing providers by slug or by name + city. Only fall back to
+    // creating a stub when no match is found. Without this match step every
+    // /for-clinics/setup submission with no listingId spawned a stub even
+    // when the clinic already existed on TheDripMap, causing the orphan
+    // backlog the 2026-06-09 cleanup batch had to repair.
     let orphan = false;
     let stubInfo: { id: string; slug: string } | null = null;
+    let matched: { id: string; slug: string; name: string } | null = null;
     if (!listingId && supabase && clinicName) {
-      orphan = true;
-      const country = inferCountry(address || null, city || null);
       const baseSlug = city ? slugify(`${clinicName} ${city}`) : slugify(clinicName);
-      // Disambiguate against existing slug collisions.
-      let candidate = baseSlug;
-      for (let i = 2; i < 50; i++) {
-        const { data: hit } = await supabase.from('providers').select('id').eq('slug', candidate).maybeSingle();
-        if (!hit) break;
-        candidate = `${baseSlug}-${i}`;
-      }
-      const submitted_at = new Date().toISOString();
-      const { data: ins, error: insErr } = await supabase
+      // 1. exact slug match
+      const { data: bySlug } = await supabase
         .from('providers')
-        .insert({
-          name: clinicName,
-          slug: candidate,
-          address: address || null,
-          city: city || null,
-          state: state || null,
-          country,
-          email,
-          phone: ownerPhone || null,
-          is_claimed: false,
-          is_featured: false,
-          specialties: specialty ? [specialty] : [],
-          decision_drivers: { source: 'orphan_claim_stub', submitted_at },
-        })
-        .select('id, slug')
-        .single();
-      if (!insErr && ins) {
-        listingId = ins.id;
-        providerSlug = ins.slug;
-        stubInfo = ins;
-      } else if (insErr) {
-        console.error('orphan stub insert failed', insErr);
+        .select('id, slug, name')
+        .eq('slug', baseSlug)
+        .maybeSingle();
+      if (bySlug) {
+        matched = bySlug;
+      } else {
+        // 2. name + city ILIKE match (handles minor slug-generation differences)
+        const nameQuery = supabase
+          .from('providers')
+          .select('id, slug, name, city')
+          .ilike('name', clinicName.trim());
+        const { data: byName } = city
+          ? await nameQuery.ilike('city', city.trim()).limit(2)
+          : await nameQuery.limit(2);
+        if (byName && byName.length === 1) {
+          matched = byName[0];
+        }
+      }
+      if (matched) {
+        // Use the existing listing instead of creating a stub.
+        listingId = matched.id;
+        providerSlug = matched.slug;
+      } else {
+        // No match, create the orphan stub the old way.
+        orphan = true;
+        const country = inferCountry(address || null, city || null);
+        // Disambiguate against existing slug collisions.
+        let candidate = baseSlug;
+        for (let i = 2; i < 50; i++) {
+          const { data: hit } = await supabase.from('providers').select('id').eq('slug', candidate).maybeSingle();
+          if (!hit) break;
+          candidate = `${baseSlug}-${i}`;
+        }
+        const submitted_at = new Date().toISOString();
+        const { data: ins, error: insErr } = await supabase
+          .from('providers')
+          .insert({
+            name: clinicName,
+            slug: candidate,
+            address: address || null,
+            city: city || null,
+            state: state || null,
+            country,
+            email,
+            phone: ownerPhone || null,
+            is_claimed: false,
+            is_featured: false,
+            specialties: specialty ? [specialty] : [],
+            decision_drivers: { source: 'orphan_claim_stub', submitted_at },
+          })
+          .select('id, slug')
+          .single();
+        if (!insErr && ins) {
+          listingId = ins.id;
+          providerSlug = ins.slug;
+          stubInfo = ins;
+        } else if (insErr) {
+          console.error('orphan stub insert failed', insErr);
+        }
       }
     }
 
@@ -138,18 +171,37 @@ export async function POST(req: Request) {
         needNewClaim = !existing;
       }
       if (needNewClaim) {
-        token = token || crypto.randomUUID();
-        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-        const { error: cErr } = await supabase.from('claim_requests').insert({
-          listing_id: listingId,
-          email,
-          owner_name: ownerName || null,
-          owner_phone: ownerPhone || null,
-          token,
-          expires_at: expiresAt,
-          created_at: new Date().toISOString(),
-        });
-        if (cErr) console.error('claim_requests INSERT (server fallback) failed', cErr);
+        // DEDUPE GUARD: refuse to create a duplicate claim_request when the
+        // same email already has a pending or verified row for this listing.
+        // Prior behaviour spawned duplicate pending rows on race conditions
+        // (see Insight Naturopathic 2026-06-03 + Knead 2026-06-04 cases).
+        const { data: existingForListing } = await supabase
+          .from('claim_requests')
+          .select('id, token, status, expires_at')
+          .eq('listing_id', listingId)
+          .eq('email', email)
+          .in('status', ['pending', 'verified'])
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (existingForListing) {
+          // Reuse the existing row's token so the verification email
+          // points at the same link as the prior submission.
+          token = existingForListing.token;
+        } else {
+          token = token || crypto.randomUUID();
+          const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+          const { error: cErr } = await supabase.from('claim_requests').insert({
+            listing_id: listingId,
+            email,
+            owner_name: ownerName || null,
+            owner_phone: ownerPhone || null,
+            token,
+            expires_at: expiresAt,
+            created_at: new Date().toISOString(),
+          });
+          if (cErr) console.error('claim_requests INSERT (server fallback) failed', cErr);
+        }
       }
     }
 
