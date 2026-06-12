@@ -51,7 +51,16 @@ Warmly,
 TheDripMap
 info@thedripmap.com
 
-{{CASL_FOOTER}}
+--
+TheDripMap | info@thedripmap.com | Caledon, Ontario, Canada
+You're receiving this one-time note because your clinic is publicly listed
+as an IV therapy provider on our matching platform. If you'd rather not
+hear from us, reply 'unsubscribe' and you will never hear from us again.
+
+[The block above IS the CASL footer, fixed 2026-06-12 per operator: explicit
+identification + plain-words unsubscribe. It must appear verbatim at the
+bottom of every outreach email, Canadian and US alike. Canonical source:
+CASL_FOOTER in src/lib/outreach-quality.ts.]
 
 Notes for approval:
 - No Featured/paid language anywhere (pricing hidden per standing decision,
