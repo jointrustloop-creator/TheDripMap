@@ -1,6 +1,98 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../src/lib/mailer';
+import { isJunkEmail } from '../../../src/lib/outreach-quality';
+
+// 2026-06-12 auto-forward shadow mode.
+//
+// When ENABLE_AUTO_FORWARD=true, this route will additionally send the
+// lead body straight to the claimed clinic owner's email so they hear
+// from the patient with zero operator-in-the-middle delay.
+//
+// Right now we are in SHADOW MODE. No clinic emails fire. The route
+// computes what the forward decision WOULD have been (eligible vs
+// suppressed vs unclaimed vs no_email etc) and records the answer in
+// inquiries.forward_status. The admin /admin/leads page surfaces the
+// shadow status so we can audit a week or two of real traffic before
+// flipping the flag.
+//
+// Hard rule: do NOT flip ENABLE_AUTO_FORWARD to true without operator
+// approval in the same instruction.
+const ENABLE_AUTO_FORWARD = false;
+
+type ForwardStatus =
+  | 'sent'
+  | 'shadow_would_send'
+  | 'unclaimed'
+  | 'no_email'
+  | 'bounced'
+  | 'orphan_stub'
+  | 'suppressed'
+  | 'opted_out'
+  | 'no_provider'
+  | 'junk_patient';
+
+interface ProviderRow {
+  id: string;
+  name: string | null;
+  email: string | null;
+  email_bounced: boolean | null;
+  is_claimed: boolean | null;
+  decision_drivers: { source?: string } | null;
+  forward_leads: boolean | null;
+}
+
+async function computeForwardDecision(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  clinicId: string,
+  patientEmail: string
+): Promise<{
+  status: ForwardStatus;
+  clinicEmail: string | null;
+  provider: ProviderRow | null;
+}> {
+  // Patient-side junk check first; cheapest, applies to all clinics.
+  if (isJunkEmail(patientEmail)) {
+    return { status: 'junk_patient', clinicEmail: null, provider: null };
+  }
+  const { data: provider } = await supabase
+    .from('providers')
+    .select('id, name, email, email_bounced, is_claimed, decision_drivers, forward_leads')
+    .eq('id', clinicId)
+    .maybeSingle() as { data: ProviderRow | null };
+  if (!provider) {
+    return { status: 'no_provider', clinicEmail: null, provider: null };
+  }
+  if (provider.is_claimed !== true) {
+    return { status: 'unclaimed', clinicEmail: null, provider };
+  }
+  if (provider.decision_drivers?.source === 'orphan_claim_stub') {
+    return { status: 'orphan_stub', clinicEmail: null, provider };
+  }
+  if (provider.forward_leads === false) {
+    return { status: 'opted_out', clinicEmail: null, provider };
+  }
+  if (!provider.email) {
+    return { status: 'no_email', clinicEmail: null, provider };
+  }
+  if (provider.email_bounced === true) {
+    return { status: 'bounced', clinicEmail: provider.email, provider };
+  }
+  const lower = provider.email.toLowerCase().trim();
+  const [legacy, current] = await Promise.all([
+    supabase.from('email_suppressions').select('email').eq('email', lower).maybeSingle(),
+    supabase.from('outreach_suppressions').select('email').eq('email', lower).maybeSingle(),
+  ]);
+  if (legacy.data || current.data) {
+    return { status: 'suppressed', clinicEmail: provider.email, provider };
+  }
+  return {
+    status: ENABLE_AUTO_FORWARD ? 'sent' : 'shadow_would_send',
+    clinicEmail: provider.email,
+    provider,
+  };
+}
 
 export async function POST(req: Request) {
   try {
@@ -15,22 +107,51 @@ export async function POST(req: Request) {
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      // Use service role here so the suppression-table reads work and
+      // so we can update the inquiry row's forward_status post-insert.
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // FK now correctly points at providers (repointed 2026-05-30 via
-    // scripts/fix-inquiries-fk.sql). Setting listing_id lets us properly
-    // attribute leads to their clinic via a join, instead of regex-parsing
-    // the message body.
-    const { error: insertError } = await supabase.from('inquiries').insert({
+    // Shadow-mode decision: figure out what auto-forward WOULD have done.
+    const decision = await computeForwardDecision(supabase, data.clinicId, data.email);
+
+    const baseRow = {
       name: data.name,
       email: data.email,
       phone: data.phone || null,
       message: `[Lead for ${data.clinicName} · clinicId=${data.clinicId}] ${data.message}`,
       listing_id: data.clinicId,
       created_at: new Date().toISOString(),
-    });
-
+    };
+    // The 3 new columns are added in the same INSERT. If the SQL
+    // migration hasn't been applied yet, the INSERT will error and we
+    // fall back to the legacy row shape. Once the migration is in,
+    // future inserts populate these fields.
+    const shadowRow = {
+      ...baseRow,
+      forward_status: decision.status,
+      forwarded_to_clinic_email:
+        decision.status === 'sent' || decision.status === 'shadow_would_send'
+          ? decision.clinicEmail
+          : null,
+      forwarded_to_clinic_at: decision.status === 'sent' ? new Date().toISOString() : null,
+    };
+    let insertError;
+    let insertedInquiryId: string | null = null;
+    {
+      const r = await supabase.from('inquiries').insert(shadowRow).select('id').single();
+      insertError = r.error;
+      insertedInquiryId = (r.data?.id as string) || null;
+    }
+    if (insertError) {
+      const msg = insertError.message || '';
+      if (msg.includes('Could not find') || msg.includes('column') || msg.includes('schema cache')) {
+        // The auto-forward SQL migration hasn't landed yet. Fall back.
+        const r2 = await supabase.from('inquiries').insert(baseRow).select('id').single();
+        insertError = r2.error;
+        insertedInquiryId = (r2.data?.id as string) || null;
+      }
+    }
     if (insertError) {
       console.error('Supabase insert error:', insertError);
       return NextResponse.json(
@@ -43,6 +164,43 @@ export async function POST(req: Request) {
       ? `https://www.thedripmap.com/providers/${data.clinicSlug}`
       : 'https://www.thedripmap.com';
 
+    // SHADOW MODE: never send to the clinic owner directly until the
+    // operator flips ENABLE_AUTO_FORWARD. Even in non-shadow mode we
+    // still send the operator notification so info@thedripmap.com
+    // stays in the loop.
+    let clinicForwardError: string | null = null;
+    if (ENABLE_AUTO_FORWARD && decision.status === 'sent' && decision.clinicEmail) {
+      try {
+        await sendMail({
+          from: 'TheDripMap <info@thedripmap.com>',
+          to: decision.clinicEmail,
+          replyTo: data.email,
+          subject: `New patient lead from TheDripMap, ${data.clinicName}`,
+          text: `Hi ${data.clinicName} team,
+
+A patient on TheDripMap sent you a new lead. Reply to this email and your reply will go directly to ${data.name}.
+
+Patient details:
+Name: ${data.name}
+Email: ${data.email}
+Phone: ${data.phone || 'Not provided'}
+
+Message:
+${data.message}
+
+Listing on TheDripMap: ${clinicUrl}
+
+If you no longer want auto-forwarded leads, reply with the word UNSUBSCRIBE in the body.
+`,
+        });
+      } catch (err) {
+        clinicForwardError = err instanceof Error ? err.message : String(err);
+        console.error('Forward to clinic failed:', clinicForwardError);
+      }
+    }
+
+    // Operator notification (unchanged from prior behaviour, plus a
+    // single new line summarizing the shadow-mode decision).
     await sendMail({
       from: 'TheDripMap <info@thedripmap.com>',
       to: 'info@thedripmap.com',
@@ -60,12 +218,23 @@ Message:
 ${data.message}
 
 ---
+Auto-forward (shadow mode): ${decision.status}${
+        decision.clinicEmail ? ` · clinic email on file: ${decision.clinicEmail}` : ''
+      }${clinicForwardError ? ` · forward attempt FAILED: ${clinicForwardError}` : ''}
 This lead came through TheDripMap's "Message This Clinic" feature.
-Forward this to the clinic if they're claimed, or use it to drive a claim conversion if they're not.
+${
+  ENABLE_AUTO_FORWARD
+    ? 'Auto-forward is ON. If status above is "sent", the clinic already has this in their inbox.'
+    : 'Auto-forward is in SHADOW MODE. Forward to the clinic manually if appropriate.'
+}
 `,
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      inquiryId: insertedInquiryId,
+      forwardStatus: decision.status,
+    });
   } catch (error) {
     console.error('Message clinic error:', error);
     return NextResponse.json({ success: false }, { status: 500 });

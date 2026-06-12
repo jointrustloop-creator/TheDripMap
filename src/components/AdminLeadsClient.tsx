@@ -118,12 +118,41 @@ export function AdminLeadsClient({ initialLeads, counts }: Props) {
   );
 }
 
+// 2026-06-12: forward_status shown as a small pill on message-clinic
+// leads so the operator can audit shadow-mode behaviour at a glance.
+const FORWARD_STATUS_STYLE: Record<string, string> = {
+  sent: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+  shadow_would_send: 'bg-amber-100 text-amber-800 border-amber-200',
+  unclaimed: 'bg-slate-100 text-slate-600 border-slate-200',
+  no_email: 'bg-rose-50 text-rose-700 border-rose-100',
+  bounced: 'bg-rose-100 text-rose-800 border-rose-200',
+  orphan_stub: 'bg-orange-50 text-orange-700 border-orange-100',
+  suppressed: 'bg-purple-50 text-purple-700 border-purple-100',
+  opted_out: 'bg-slate-100 text-slate-600 border-slate-200',
+  no_provider: 'bg-slate-100 text-slate-600 border-slate-200',
+  junk_patient: 'bg-rose-50 text-rose-700 border-rose-100',
+};
+const FORWARD_STATUS_LABEL: Record<string, string> = {
+  sent: 'forwarded to clinic',
+  shadow_would_send: 'shadow: would forward',
+  unclaimed: 'not forwarded · unclaimed',
+  no_email: 'not forwarded · no email',
+  bounced: 'not forwarded · bounced',
+  orphan_stub: 'not forwarded · stub',
+  suppressed: 'not forwarded · suppressed',
+  opted_out: 'not forwarded · opted out',
+  no_provider: 'not forwarded · no provider',
+  junk_patient: 'not forwarded · junk patient email',
+};
+
 function LeadCard({ lead }: { lead: LeadRow }) {
   const meta = TAB_LABELS[lead.source];
   const phone = (lead.meta?.phone as string) || null;
   const status = (lead.meta?.status as string) || null;
   const rating = lead.meta?.rating as number | undefined;
   const listingId = (lead.meta?.listing_id as string) || null;
+  const forwardStatus = (lead.meta?.forward_status as string) || null;
+  const forwardedToClinicEmail = (lead.meta?.forwarded_to_clinic_email as string) || null;
 
   // Strip the marker prefixes for cleaner display
   let body = lead.message;
@@ -157,6 +186,20 @@ function LeadCard({ lead }: { lead: LeadRow }) {
           {rating !== undefined && (
             <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest">
               {rating}/5★
+            </span>
+          )}
+          {forwardStatus && lead.source === 'message-clinic' && (
+            <span
+              className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+                FORWARD_STATUS_STYLE[forwardStatus] || 'bg-slate-100 text-slate-600 border-slate-200'
+              }`}
+              title={
+                forwardedToClinicEmail
+                  ? `clinic email on file: ${forwardedToClinicEmail}`
+                  : undefined
+              }
+            >
+              {FORWARD_STATUS_LABEL[forwardStatus] || forwardStatus}
             </span>
           )}
         </div>

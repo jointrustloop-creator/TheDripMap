@@ -34,7 +34,11 @@ export default async function AdminLeadsPage() {
   const [inqRes, claimRes, testRes] = await Promise.all([
     supabase
       .from('inquiries')
-      .select('id, name, email, phone, message, listing_id, created_at')
+      // 2026-06-12: forward_status / forwarded_to_clinic_email /
+      // forwarded_to_clinic_at are recorded by /api/message-clinic in
+      // shadow mode so the admin can see what auto-forward WOULD have
+      // done. The select tolerates these columns being absent in dev.
+      .select('id, name, email, phone, message, listing_id, created_at, forward_status, forwarded_to_clinic_email, forwarded_to_clinic_at')
       .gte('created_at', since)
       .order('created_at', { ascending: false })
       .limit(500),
@@ -67,6 +71,9 @@ export default async function AdminLeadsPage() {
     message: string;
     listing_id: string | null;
     created_at: string;
+    forward_status?: string | null;
+    forwarded_to_clinic_email?: string | null;
+    forwarded_to_clinic_at?: string | null;
   }>) {
     const msg = r.message || '';
     let source: LeadRow['source'] = 'contact';
@@ -81,7 +88,13 @@ export default async function AdminLeadsPage() {
       name: r.name || '(none)',
       email: r.email,
       message: msg,
-      meta: { phone: r.phone, listing_id: r.listing_id },
+      meta: {
+        phone: r.phone,
+        listing_id: r.listing_id,
+        forward_status: r.forward_status || null,
+        forwarded_to_clinic_email: r.forwarded_to_clinic_email || null,
+        forwarded_to_clinic_at: r.forwarded_to_clinic_at || null,
+      },
       created_at: r.created_at,
     });
   }
