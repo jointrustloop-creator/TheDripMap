@@ -39,8 +39,8 @@ Claiming it is free and takes about two minutes:
 
 Once you verify, we fill in the page properly: your logo, photos, your most
 popular drips with your real prices, who is on your team, and the answers
-patients actually search for. Clinics with complete pages get several times
-the clicks of bare ones.
+patients actually search for. Clinics with complete pages get noticeably more
+clicks than bare ones, we see it in our own data.
 
 If you would rather we simply correct something on the listing, reply and
 tell me what to change. And if you want the listing removed, one reply does
