@@ -77,7 +77,11 @@ export const SplitListingView = ({ providers, cityName }: SplitListingViewProps)
                 isHovered ? 'ring-2 ring-wellness-400 ring-offset-2 ring-offset-[#FDFDFB]' : ''
               )}
             >
-              {provider.is_featured ? (
+              {/* 2026-06-12: route both featured AND free-tier claimed clinics
+                  through ProviderCardFeatured so they get the magazine-style
+                  treatment with logo + Verified badge, instead of falling
+                  through to the old greyed-out unclaimed card. */}
+              {(provider.is_featured === true || provider.is_claimed === true) ? (
                 <ProviderCardFeatured provider={provider} isPrimary={false} />
               ) : (
                 <ProviderCard provider={provider} />

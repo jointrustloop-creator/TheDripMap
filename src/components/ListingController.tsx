@@ -210,8 +210,11 @@ export function ListingController({ initialProviders, cityName }: ListingControl
           >
             {providers.map((provider) => (
               <div key={provider.id} className={cn(provider.is_featured ? "md:col-span-2 lg:col-span-3" : "")}>
-                {provider.is_featured ? (
-                  <ProviderCardFeatured provider={provider} isPrimary={true} />
+                {/* 2026-06-12: same fix as /search main grid. Route both
+                    featured and free-tier claimed clinics to the magazine
+                    card; reserve isPrimary for the paid-tier full-width row. */}
+                {(provider.is_featured === true || provider.is_claimed === true) ? (
+                  <ProviderCardFeatured provider={provider} isPrimary={provider.is_featured === true} />
                 ) : (
                   <ProviderCard provider={provider} />
                 )}

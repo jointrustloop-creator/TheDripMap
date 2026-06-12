@@ -5,6 +5,13 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
+    // 2026-06-12: allow SVG logos (VP Health uploaded an SVG). The CSP
+    // below disables JS in SVG and forces sandboxing, so an SVG cannot
+    // execute scripts. Logos are pre-scanned for <script> + on* handlers
+    // before upload in scripts/_apply-5-clinic-logos.cjs.
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       {
         protocol: 'https',
