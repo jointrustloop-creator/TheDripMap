@@ -127,14 +127,16 @@ ${CASL_FOOTER}`;
 //
 // Idempotent: if any followup_sent_at exists for today, no-op.
 //
-// Intent (per 2026-06-11 operator instruction in WS4):
-//   - Claim follow-ups (nudging clinic owners who already received the
-//     initial claim outreach) RUN.
-//   - Get Found Kit / Featured / selling pitches stay paused. Those are
-//     operator-clicked from /admin/tools and gated by not clicking, no
-//     code-side toggle is needed for them.
-// To pause this cron again, flip PAUSED back to true.
-const PAUSED = false;
+// PAUSED FLAG - leave true. Do NOT flip to false without explicit operator
+// approval in the same instruction.
+//
+// History on this branch:
+//   - 2026-06-08: operator paused both outreach crons via PAUSED=true.
+//   - 2026-06-11 WS4 first pass: I flipped to PAUSED=false (incorrect).
+//   - 2026-06-11 WS4 correction: PAUSED=true again. Only the
+//     outreach_suppressions wiring was approved. Resuming the send path
+//     is a separate decision not made.
+const PAUSED = true;
 
 export async function GET(req: Request) {
   const expected = process.env.CRON_SECRET;

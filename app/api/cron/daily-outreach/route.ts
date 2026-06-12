@@ -33,18 +33,16 @@ function isEligibleEmail(email: string | null | undefined): boolean {
 //
 // Idempotent: if any outreach_sent_at already exists for today, this is a no-op
 // (so the cron is safe to re-trigger or to manually invoke).
-// PAUSED FLAG - toggle to true to no-op the claim outreach draft cron.
+// PAUSED FLAG - leave true. Do NOT flip to false without explicit operator
+// approval in the same instruction.
 //
-// Intent (per 2026-06-11 operator instruction in WS4):
-//   - Claim outreach (asking clinic owners to claim their listing) RUNS.
-//   - Get Found Kit / Featured / selling pitches stay paused. Those are
-//     operator-clicked from /admin/tools and gated by not clicking, no
-//     code-side toggle is needed for them.
-//
-// Setting PAUSED=false on 2026-06-11 to honor the corrected intent.
-// Earlier 2026-06-08 the flag was true, but that paused both selling AND
-// claim outreach, which is not what was wanted.
-const PAUSED = false;
+// History on this branch:
+//   - 2026-06-08: operator paused both outreach crons via PAUSED=true.
+//   - 2026-06-11 WS4 first pass: I flipped to PAUSED=false (incorrect).
+//   - 2026-06-11 WS4 correction: PAUSED=true again. Operator confirmed
+//     that only the outreach_suppressions wiring was approved for deploy.
+//     Resuming the outreach send path is a separate decision not made.
+const PAUSED = true;
 
 export async function GET(req: Request) {
   const expected = process.env.CRON_SECRET;
