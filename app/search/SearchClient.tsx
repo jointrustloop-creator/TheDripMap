@@ -645,7 +645,16 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
                               NEW
                             </span>
                           )}
-                          <ProviderCard provider={p} />
+                          {/* 2026-06-12 Path 1B (strip): route claimed clinics
+                              through ProviderCardFeatured so the strip renders
+                              with logo + verified badge, matching the main grid.
+                              Always isPrimary={false} here because the strip
+                              has its own 3-col layout, no full-width row. */}
+                          {(p.is_featured || p.is_claimed) ? (
+                            <ProviderCardFeatured provider={p} isPrimary={false} />
+                          ) : (
+                            <ProviderCard provider={p} />
+                          )}
                         </div>
                       ))}
                     </div>
