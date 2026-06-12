@@ -82,7 +82,10 @@ const hasRealClinicImage = (provider: Provider): boolean => {
   const url = provider.imageUrl || provider.image_url || '';
   if (!url) return false;
   if (url.includes('unsplash.com')) return false;
-  if (url.includes('/blog-images/') && !provider.is_featured) return false;
+  // 2026-06-11 Path 1B: trust /blog-images/ URLs for both featured AND
+  // claimed clinics (e.g. Insight Naturopathic's logo). The bulk-misassigned
+  // blog/unsplash concern only applies to fully unclaimed listings.
+  if (url.includes('/blog-images/') && !(provider.is_featured || provider.is_claimed)) return false;
   if (url.includes('placeholder') || url.includes('picsum')) return false;
   return true;
 };
@@ -110,7 +113,10 @@ export const ProviderCardFeatured = ({
       whileHover={{ y: -4 }}
       className={cn(
         'group relative bg-white rounded-[2.5rem] overflow-hidden border transition-all duration-500',
-        provider.is_featured
+        // 2026-06-11 Path 1B: claimed clinics (free-tier or featured) get
+        // the premium teal shadow. Only fully unclaimed listings keep the
+        // plain treatment, which the directory now filters out anyway.
+        (provider.is_featured || provider.is_claimed)
           ? 'border-wellness-500/30 shadow-[0_30px_60px_-25px_rgba(20,184,166,0.25),0_8px_20px_-10px_rgba(15,23,42,0.1)] hover:shadow-[0_40px_80px_-25px_rgba(20,184,166,0.35),0_12px_25px_-10px_rgba(15,23,42,0.15)]'
           : 'border-slate-100 shadow-lg hover:shadow-xl'
       )}
@@ -173,7 +179,11 @@ export const ProviderCardFeatured = ({
                   )}
                 >
                   <span>{provider.name}</span>
-                  {provider.is_featured && (
+                  {/* 2026-06-11 Path 1B: "Verified" inline badge gates on the
+                      CLAIM signal (is_claimed for free tier, is_featured for
+                      grandfathered paid tier). It does NOT read safety_verified
+                      and should not be confused with that separate flag. */}
+                  {(provider.is_featured || provider.is_claimed) && (
                     <span className="inline-flex items-center gap-1 align-middle ml-2 bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full text-[10px] font-black tracking-[0.18em] uppercase border border-emerald-100 whitespace-nowrap">
                       <CheckCircle2 size={10} className="text-emerald-600" />
                       Verified
@@ -191,7 +201,11 @@ export const ProviderCardFeatured = ({
                     : `${provider.city}${provider.state ? `, ${provider.state}` : ''}`}
                 </span>
               </div>
-              {provider.is_featured && provider.rating > 0 && (
+              {/* 2026-06-11 Path 1B: show rating + reviewCount whenever the
+                  clinic is claimed (free tier or featured). Rating comes from
+                  the live Google data refresh; gating it on is_featured alone
+                  hid real ratings for free-tier claims. */}
+              {(provider.is_featured || provider.is_claimed) && provider.rating > 0 && (
                 <div className="flex items-center gap-1.5 text-sm font-black text-slate-900">
                   <StarIcon size={14} className="text-amber-500" fill="currentColor" />
                   {provider.rating}

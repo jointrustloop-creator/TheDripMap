@@ -656,8 +656,13 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredProviders.map((provider) => (
                   <div key={provider.id} className={cn(provider.is_featured ? "md:col-span-2 lg:col-span-3" : "")}>
-                    {provider.is_featured ? (
-                      <ProviderCardFeatured provider={provider} isPrimary={true} />
+                    {(provider.is_featured || provider.is_claimed) ? (
+                      // 2026-06-11 Path 1B: route claimed clinics (including
+                      // free-tier is_claimed=true, is_featured=false) through
+                      // the featured card so they don't render as greyed-out
+                      // UNCLAIMED LISTING. is_featured stays the trigger for
+                      // the full-width row layout (isPrimary).
+                      <ProviderCardFeatured provider={provider} isPrimary={provider.is_featured === true} />
                     ) : (
                       <ProviderCard provider={provider} />
                     )}
