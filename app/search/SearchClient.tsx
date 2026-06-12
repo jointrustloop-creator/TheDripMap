@@ -673,14 +673,14 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
                     3 strip cards when the strip is showing, so a clinic never
                     appears twice on the same page. */}
                 {mainGridProviders.map((provider) => (
-                  <div key={provider.id} className={cn(provider.is_featured ? "md:col-span-2 lg:col-span-3" : "")}>
+                  // 2026-06-12: all claimed cards in the main grid render at
+                  // the same 1-column width with isPrimary=false so featured
+                  // and free-tier-claimed visually match. Previously is_featured
+                  // got md:col-span-3 + isPrimary=true (full-width magazine),
+                  // which made paid-tier cards look ~3x larger than the rest.
+                  <div key={provider.id}>
                     {(provider.is_featured === true || provider.is_claimed === true) ? (
-                      // 2026-06-11 Path 1B: route claimed clinics (including
-                      // free-tier is_claimed=true, is_featured=false) through
-                      // the featured card so they don't render as greyed-out
-                      // UNCLAIMED LISTING. is_featured stays the trigger for
-                      // the full-width row layout (isPrimary).
-                      <ProviderCardFeatured provider={provider} isPrimary={provider.is_featured === true} />
+                      <ProviderCardFeatured provider={provider} isPrimary={false} />
                     ) : (
                       <ProviderCard provider={provider} />
                     )}

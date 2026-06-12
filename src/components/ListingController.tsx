@@ -209,12 +209,13 @@ export function ListingController({ initialProviders, cityName }: ListingControl
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
             {providers.map((provider) => (
-              <div key={provider.id} className={cn(provider.is_featured ? "md:col-span-2 lg:col-span-3" : "")}>
-                {/* 2026-06-12: same fix as /search main grid. Route both
-                    featured and free-tier claimed clinics to the magazine
-                    card; reserve isPrimary for the paid-tier full-width row. */}
+              // 2026-06-12: uniform card size across the grid. No col-span
+              // override for is_featured, and isPrimary=false for both
+              // paid-tier and free-tier claims so the row reads as a clean
+              // 3-up grid instead of a mix of giant + small cards.
+              <div key={provider.id}>
                 {(provider.is_featured === true || provider.is_claimed === true) ? (
-                  <ProviderCardFeatured provider={provider} isPrimary={provider.is_featured === true} />
+                  <ProviderCardFeatured provider={provider} isPrimary={false} />
                 ) : (
                   <ProviderCard provider={provider} />
                 )}
