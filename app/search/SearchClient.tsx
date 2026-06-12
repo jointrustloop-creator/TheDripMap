@@ -257,6 +257,18 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
     searchQuery.trim() === '' &&
     (activeChips.length === 0 || (activeChips.length === 1 && activeChips[0] === 'All'));
 
+  // 2026-06-12: lifted from inline so the "Recent additions" strip and the
+  // main grid share the same 3-card slice. We then dedupe the strip's rows
+  // out of the main grid so the same clinic doesn't appear twice on one page.
+  const recentStripCards = (isDefaultView && !showAllClinics)
+    ? filteredProviders.filter((p) => p.claimed_at).slice(0, 3)
+    : [];
+  const showRecentStrip = recentStripCards.length >= 3;
+  const recentStripIds = new Set(recentStripCards.map((p) => p.id));
+  const mainGridProviders = showRecentStrip
+    ? filteredProviders.filter((p) => !recentStripIds.has(p.id))
+    : filteredProviders;
+
   useEffect(() => {
     const fetchListings = async () => {
       // --- Default view: verified-only, sorted by claim date ---
@@ -619,53 +631,50 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
                   view when there are at least 3 verified clinics with claim dates.
                   Top 3 are still shown in the full grid below; this is a high-
                   visibility "spot what just claimed" surface. */}
-              {isDefaultView && !showAllClinics && (() => {
-                const newest = filteredProviders
-                  .filter((p) => p.claimed_at)
-                  .slice(0, 3);
-                if (newest.length < 3) return null;
-                return (
-                  <section className="mb-12">
-                    <div className="flex items-center justify-between mb-5">
-                      <div className="flex items-center gap-3">
-                        <span className="inline-flex items-center justify-center w-9 h-9 rounded-2xl bg-wellness-100 text-wellness-700">
-                          <Sparkles size={16} />
-                        </span>
-                        <div>
-                          <h3 className="text-lg font-black text-slate-900 tracking-tight">Recent additions</h3>
-                          <p className="text-xs font-bold text-slate-500">3 most recently verified clinics</p>
-                        </div>
+              {showRecentStrip && (
+                <section className="mb-12">
+                  <div className="flex items-center justify-between mb-5">
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex items-center justify-center w-9 h-9 rounded-2xl bg-wellness-100 text-wellness-700">
+                        <Sparkles size={16} />
+                      </span>
+                      <div>
+                        <h3 className="text-lg font-black text-slate-900 tracking-tight">Recent additions</h3>
+                        <p className="text-xs font-bold text-slate-500">3 most recently verified clinics</p>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {newest.map((p, idx) => (
-                        <div key={`new-${p.id}`} className="relative">
-                          {idx === 0 && (
-                            <span className="absolute -top-2 left-4 z-10 bg-wellness-600 text-white text-[10px] font-black uppercase tracking-[0.18em] px-3 py-1 rounded-full shadow-md shadow-wellness-200">
-                              NEW
-                            </span>
-                          )}
-                          {/* 2026-06-12 Path 1B (strip): route claimed clinics
-                              through ProviderCardFeatured so the strip renders
-                              with logo + verified badge, matching the main grid.
-                              Always isPrimary={false} here because the strip
-                              has its own 3-col layout, no full-width row. */}
-                          {(p.is_featured || p.is_claimed) ? (
-                            <ProviderCardFeatured provider={p} isPrimary={false} />
-                          ) : (
-                            <ProviderCard provider={p} />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                );
-              })()}
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {recentStripCards.map((p, idx) => (
+                      <div key={`new-${p.id}`} className="relative">
+                        {idx === 0 && (
+                          <span className="absolute -top-2 left-4 z-10 bg-wellness-600 text-white text-[10px] font-black uppercase tracking-[0.18em] px-3 py-1 rounded-full shadow-md shadow-wellness-200">
+                            NEW
+                          </span>
+                        )}
+                        {/* 2026-06-12 Path 1B (strip): route claimed clinics
+                            through ProviderCardFeatured so the strip renders
+                            with logo + Verified badge, matching the main grid.
+                            Strict `=== true` to guard against any provider
+                            object where the flag is missing or coerced. */}
+                        {(p.is_featured === true || p.is_claimed === true) ? (
+                          <ProviderCardFeatured provider={p} isPrimary={false} />
+                        ) : (
+                          <ProviderCard provider={p} />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredProviders.map((provider) => (
+                {/* 2026-06-12: mainGridProviders is filteredProviders minus the
+                    3 strip cards when the strip is showing, so a clinic never
+                    appears twice on the same page. */}
+                {mainGridProviders.map((provider) => (
                   <div key={provider.id} className={cn(provider.is_featured ? "md:col-span-2 lg:col-span-3" : "")}>
-                    {(provider.is_featured || provider.is_claimed) ? (
+                    {(provider.is_featured === true || provider.is_claimed === true) ? (
                       // 2026-06-11 Path 1B: route claimed clinics (including
                       // free-tier is_claimed=true, is_featured=false) through
                       // the featured card so they don't render as greyed-out
