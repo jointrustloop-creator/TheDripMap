@@ -8,6 +8,7 @@ import { Footer } from '../../src/components/Footer';
 import { slugify } from '../../src/lib/data';
 import { sendMail } from '../../src/lib/mailer';
 import { autoEnrichProvider } from '../../src/lib/auto-enrich';
+import { enqueueOnboarding } from '../../src/lib/onboarding';
 
 export const dynamic = 'force-dynamic';
 
@@ -76,7 +77,7 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
 
   const { data: provider, error: provErr } = await supabase
     .from('providers')
-    .select('id, name, slug, is_claimed')
+    .select('id, name, slug, city, is_claimed')
     .eq('id', claim.listing_id)
     .maybeSingle();
 
@@ -141,6 +142,27 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
     })
     .catch((err) => {
       console.error('auto-enrich crashed', err);
+    });
+
+  // W1 onboarding: enqueue the post-verification onboarding email. While the
+  // ONBOARDING_AUTOSEND gate is false this only inserts a queue row; once the
+  // operator approves the template and flips the gate, this also sends the
+  // 5-questions email with a copy to info@. Fire-and-forget: a queue failure
+  // must never break the owner's verification moment.
+  Promise.resolve()
+    .then(() =>
+      enqueueOnboarding(
+        supabase,
+        { id: provider.id, name: provider.name, slug: provider.slug || slugify(provider.name), city: provider.city },
+        claim.email,
+        claim.owner_name
+      )
+    )
+    .then((res) => {
+      console.log('onboarding enqueue', { providerId: provider.id, ...res });
+    })
+    .catch((err) => {
+      console.error('onboarding enqueue crashed', err);
     });
 
   const providerSlug = provider.slug || slugify(provider.name);
