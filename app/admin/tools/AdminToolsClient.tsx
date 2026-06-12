@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { Loader2, Mail, Star, Clock, Link as LinkIcon, Search, MapPin, Trash2, Sparkles } from 'lucide-react';
@@ -112,9 +112,6 @@ type KitResponse = {
 };
 
 export function AdminToolsClient() {
-  const [draftsState, setDraftsState] = useState<ButtonState<RegenerateResponse>>({ loading: false, result: null, error: null });
-  const [cleanBatchState, setCleanBatchState] = useState<ButtonState<RegenerateResponse>>({ loading: false, result: null, error: null });
-  const [pendingClaimState, setPendingClaimState] = useState<ButtonState<{ ok: boolean; drafted?: number; failed?: number; deletedPriorDrafts?: number; recipients?: { to: string; subject: string }[]; error?: string }>>({ loading: false, result: null, error: null });
   const [ratingsState, setRatingsState] = useState<ButtonState<RefreshResponse>>({ loading: false, result: null, error: null });
   const [hoursState, setHoursState] = useState<ButtonState<EnrichHoursResponse>>({ loading: false, result: null, error: null });
   const [rescueState, setRescueState] = useState<ButtonState<Rescue404Response>>({ loading: false, result: null, error: null });
@@ -123,20 +120,12 @@ export function AdminToolsClient() {
   const [kitSlug, setKitSlug] = useState('');
   const [kitState, setKitState] = useState<ButtonState<KitResponse>>({ loading: false, result: null, error: null });
 
-  const generateDrafts = async () => {
-    setDraftsState({ loading: true, result: null, error: null });
-    try {
-      const r = await fetch('/api/admin/regenerate-outreach?mode=next&limit=10', { method: 'POST' });
-      const data = (await r.json()) as RegenerateResponse;
-      if (!r.ok) {
-        setDraftsState({ loading: false, result: null, error: data.error || `HTTP ${r.status}` });
-      } else {
-        setDraftsState({ loading: false, result: data, error: null });
-      }
-    } catch (err) {
-      setDraftsState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
-    }
-  };
+  // 2026-06-12 admin audit: the old-template outreach draft buttons
+  // ("Generate 10", "Wipe drafts + rebuild 50") and the stale "Queue 4
+  // pending-claim drafts" button were retired. The endpoints behind the
+  // outreach ones are hard-paused by OUTREACH_DRAFTS_PAUSED; the AUTOPILOT
+  // morning routine owns new-template outreach drafts now, and W4 inbox
+  // triage owns pending-claim follow-ups.
 
   const generateKit = async () => {
     const slug = kitSlug.trim();
@@ -168,34 +157,6 @@ export function AdminToolsClient() {
       else setGscState({ loading: false, result: data, error: null });
     } catch (err) {
       setGscState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
-    }
-  };
-
-  const queuePendingClaimDrafts = async () => {
-    setPendingClaimState({ loading: true, result: null, error: null });
-    try {
-      const r = await fetch('/api/admin/queue-pending-claim-drafts', { method: 'POST' });
-      const data = await r.json();
-      if (!r.ok) setPendingClaimState({ loading: false, result: null, error: data.error || `HTTP ${r.status}` });
-      else setPendingClaimState({ loading: false, result: data, error: null });
-    } catch (err) {
-      setPendingClaimState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
-    }
-  };
-
-  const cleanRegenerate50 = async () => {
-    if (!window.confirm('This will DELETE every outreach draft currently in Gmail Drafts (initial sends + 7-day follow-ups) and rebuild exactly 50 Canadian unclaimed-clinic drafts. Continue?')) return;
-    setCleanBatchState({ loading: true, result: null, error: null });
-    try {
-      const r = await fetch('/api/admin/regenerate-outreach?mode=next&limit=50&clean=1', { method: 'POST' });
-      const data = (await r.json()) as RegenerateResponse;
-      if (!r.ok) {
-        setCleanBatchState({ loading: false, result: null, error: data.error || `HTTP ${r.status}` });
-      } else {
-        setCleanBatchState({ loading: false, result: data, error: null });
-      }
-    } catch (err) {
-      setCleanBatchState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
     }
   };
 
@@ -292,7 +253,7 @@ export function AdminToolsClient() {
           disabled={gscState.loading}
           className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
         >
-          {gscState.loading ? (<><Loader2 size={16} className="animate-spin" />Pulling GSC data…</>) : 'Pull live GSC snapshot'}
+          {gscState.loading ? (<><Loader2 size={16} className="animate-spin" />Pulling GSC dataâ€¦</>) : 'Pull live GSC snapshot'}
         </button>
 
         {gscState.error && (
@@ -417,7 +378,7 @@ export function AdminToolsClient() {
             disabled={kitState.loading || !kitSlug.trim()}
             className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
           >
-            {kitState.loading ? (<><Loader2 size={16} className="animate-spin" />Generating…</>) : 'Generate kit'}
+            {kitState.loading ? (<><Loader2 size={16} className="animate-spin" />Generatingâ€¦</>) : 'Generate kit'}
           </button>
         </div>
 
@@ -430,9 +391,9 @@ export function AdminToolsClient() {
         {kitState.result?.markdown && (
           <div className="mt-3 space-y-3">
             <div className="text-sm font-bold text-slate-700">
-              {kitState.result.clinic?.name} · {kitState.result.clinic?.city}
-              {' · '}Places {kitState.result.placesFound ? 'OK' : 'miss'}
-              {' · '}Website {kitState.result.websiteFetched ? 'OK' : 'miss'}
+              {kitState.result.clinic?.name} Â· {kitState.result.clinic?.city}
+              {' Â· '}Places {kitState.result.placesFound ? 'OK' : 'miss'}
+              {' Â· '}Website {kitState.result.websiteFetched ? 'OK' : 'miss'}
             </div>
             {(kitState.result.placeholders || []).length > 0 && (
               <div className="px-4 py-3 bg-amber-50 border border-amber-100 rounded-xl text-amber-800 text-sm">
@@ -468,159 +429,20 @@ export function AdminToolsClient() {
       </Card>
 
       <Card
-        title="Generate 10 outreach drafts"
-        description="Picks the next 10 candidates from the scrubbed pool (Canadian-first, grouped by shared email). Saves drafts to info@thedripmap.com Gmail Drafts, signed 'TheDripMap Team'. Marks outreach_sent_at so the 7-day follow-up cron picks them up."
+        title="Research: clinic owner pains"
+        description="Internal knowledge base of IV clinic owner pains, refreshed weekly by cron. Demoted out of the main nav 2026-06-12; lives here now. Old-template outreach buttons (Generate 10, Wipe + rebuild 50, Queue pending-claim drafts) were retired the same day: AUTOPILOT morning drafts + W4 triage replace them, and the server endpoints are pause-gated."
         icon={<Mail size={18} />}
       >
-        <button
-          type="button"
-          onClick={generateDrafts}
-          disabled={draftsState.loading}
-          className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
+        <a
+          href="/admin/clinic-owner-pains"
+          className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
         >
-          {draftsState.loading ? (<><Loader2 size={16} className="animate-spin" />Preparing 10 drafts…</>) : 'Generate 10 outreach drafts'}
-        </button>
-
-        {draftsState.error && (
-          <div className="mt-5 px-4 py-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm font-bold">
-            Error: {draftsState.error}
-          </div>
-        )}
-
-        {draftsState.result && (
-          <div className="mt-5">
-            <div className="text-sm text-slate-700 font-bold mb-3">
-              Drafted {draftsState.result.drafted ?? 0} of {(draftsState.result.recipients || []).length} target recipients
-              {draftsState.result.failed ? ` · ${draftsState.result.failed} failed` : ''}
-            </div>
-            {draftsState.result.message && (
-              <div className="text-sm text-slate-500 font-medium mb-3">{draftsState.result.message}</div>
-            )}
-            {(draftsState.result.recipients || []).length > 0 && (
-              <ol className="text-sm text-slate-700 space-y-1.5 list-decimal pl-5">
-                {(draftsState.result.recipients || []).map((r, i) => (
-                  <li key={r.email + i} className="font-medium">
-                    <span className="font-black">{r.brand}</span>
-                    {r.city ? ` — ${r.city}` : ''}{r.country ? ` (${r.country})` : ''}
-                    {r.locations > 1 ? ` · ${r.locations} locations` : ''}
-                    <span className="text-slate-400 font-normal"> · {r.email}</span>
-                  </li>
-                ))}
-              </ol>
-            )}
-            {(draftsState.result.failures || []).length > 0 && (
-              <div className="mt-4">
-                <div className="text-xs font-black uppercase tracking-widest text-rose-600 mb-2">Failures</div>
-                <ul className="text-xs text-rose-700 space-y-1">
-                  {(draftsState.result.failures || []).map((f, i) => (
-                    <li key={f.email + i}>{f.email}: {f.error}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        )}
+          Open owner pains research
+        </a>
       </Card>
-
-      <Card
-        title="Clean regenerate 50 Canadian outreach drafts"
-        description="DESTRUCTIVE. Deletes every outreach draft currently in info@thedripmap.com Gmail Drafts (initial sends + 7-day follow-ups), then rebuilds exactly 50 Canadian unclaimed-clinic drafts using the current traffic-led template selector. Daily + follow-up crons are paused, so nothing will refill these overnight. Use this when you want a fixed, hand-curated batch to send out."
-        icon={<Trash2 size={18} />}
-      >
-        <button
-          type="button"
-          onClick={cleanRegenerate50}
-          disabled={cleanBatchState.loading}
-          className="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
-        >
-          {cleanBatchState.loading ? (<><Loader2 size={16} className="animate-spin" />Wiping drafts and rebuilding 50…</>) : 'Wipe drafts + rebuild 50 (Canada only)'}
-        </button>
-
-        {cleanBatchState.error && (
-          <div className="mt-5 px-4 py-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm font-bold">
-            Error: {cleanBatchState.error}
-          </div>
-        )}
-
-        {cleanBatchState.result && (
-          <div className="mt-5">
-            <div className="text-sm text-slate-700 font-bold mb-3">
-              Pre-deleted {cleanBatchState.result.preDeleted ?? 0} existing drafts · Drafted {cleanBatchState.result.drafted ?? 0} of {(cleanBatchState.result.recipients || []).length} target recipients
-              {cleanBatchState.result.failed ? ` · ${cleanBatchState.result.failed} failed` : ''}
-            </div>
-            {cleanBatchState.result.message && (
-              <div className="text-sm text-slate-500 font-medium mb-3">{cleanBatchState.result.message}</div>
-            )}
-            {(cleanBatchState.result.recipients || []).length > 0 && (
-              <ol className="text-sm text-slate-700 space-y-1.5 list-decimal pl-5">
-                {(cleanBatchState.result.recipients || []).map((r, i) => (
-                  <li key={r.email + i} className="font-medium">
-                    <span className="font-black">{r.brand}</span>
-                    {r.city ? ` · ${r.city}` : ''}{r.country ? ` (${r.country})` : ''}
-                    {r.locations > 1 ? ` · ${r.locations} locations` : ''}
-                    <span className="text-slate-400 font-normal"> · {r.email}</span>
-                  </li>
-                ))}
-              </ol>
-            )}
-            {(cleanBatchState.result.failures || []).length > 0 && (
-              <div className="mt-4">
-                <div className="text-xs font-black uppercase tracking-widest text-rose-600 mb-2">Failures</div>
-                <ul className="text-xs text-rose-700 space-y-1">
-                  {(cleanBatchState.result.failures || []).map((f, i) => (
-                    <li key={f.email + i}>{f.email}: {f.error}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        )}
-      </Card>
-
-      <Card
-        title="Queue 4 pending-claim follow-up drafts"
-        description="Saves 4 manual follow-up emails to Gmail Drafts for the 5 rows currently in claim_requests (Knead's two submissions deduped to one): BeYouty (expired token re-send ask), Tri-Health (1d remaining nudge), Insight (welcome / activation tips since claim is already verified), Knead (2d remaining nudge). Idempotent: re-running deletes prior copies first. Operator sends each manually after review."
-        icon={<Mail size={18} />}
-      >
-        <button
-          type="button"
-          onClick={queuePendingClaimDrafts}
-          disabled={pendingClaimState.loading}
-          className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
-        >
-          {pendingClaimState.loading ? (<><Loader2 size={16} className="animate-spin" />Saving 4 drafts…</>) : 'Queue 4 pending-claim drafts'}
-        </button>
-
-        {pendingClaimState.error && (
-          <div className="mt-5 px-4 py-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm font-bold">
-            Error: {pendingClaimState.error}
-          </div>
-        )}
-
-        {pendingClaimState.result && (
-          <div className="mt-5">
-            <div className="text-sm text-slate-700 font-bold mb-3">
-              Drafted {pendingClaimState.result.drafted ?? 0} · Deleted {pendingClaimState.result.deletedPriorDrafts ?? 0} prior copies
-              {pendingClaimState.result.failed ? ` · ${pendingClaimState.result.failed} failed` : ''}
-            </div>
-            {(pendingClaimState.result.recipients || []).length > 0 && (
-              <ol className="text-sm text-slate-700 space-y-1.5 list-decimal pl-5">
-                {(pendingClaimState.result.recipients || []).map((r, i) => (
-                  <li key={r.to + i} className="font-medium">
-                    <span className="text-slate-400 font-normal">{r.to}</span>
-                    {' · '}
-                    <span className="font-bold">{r.subject}</span>
-                  </li>
-                ))}
-              </ol>
-            )}
-          </div>
-        )}
-      </Card>
-
       <Card
         title="Refresh verified ratings now"
-        description="Hits Google Places for every claimed/featured clinic and updates rating + review count + last_refreshed_at. Same endpoint the 2am ET cron calls — this just runs it on demand."
+        description="Hits Google Places for every claimed/featured clinic and updates rating + review count + last_refreshed_at. Same endpoint the 2am ET cron calls â€” this just runs it on demand."
         icon={<Star size={18} />}
       >
         <button
@@ -629,7 +451,7 @@ export function AdminToolsClient() {
           disabled={ratingsState.loading}
           className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
         >
-          {ratingsState.loading ? (<><Loader2 size={16} className="animate-spin" />Refreshing…</>) : 'Refresh verified ratings now'}
+          {ratingsState.loading ? (<><Loader2 size={16} className="animate-spin" />Refreshingâ€¦</>) : 'Refresh verified ratings now'}
         </button>
 
         {ratingsState.error && (
@@ -641,8 +463,8 @@ export function AdminToolsClient() {
         {ratingsState.result && (
           <div className="mt-5">
             <div className="text-sm text-slate-700 font-bold mb-3">
-              Checked {ratingsState.result.totalProviders ?? 0} clinics · {ratingsState.result.totalUpdated ?? 0} updated/no-change
-              {ratingsState.result.totalFailed ? ` · ${ratingsState.result.totalFailed} failed` : ''}
+              Checked {ratingsState.result.totalProviders ?? 0} clinics Â· {ratingsState.result.totalUpdated ?? 0} updated/no-change
+              {ratingsState.result.totalFailed ? ` Â· ${ratingsState.result.totalFailed} failed` : ''}
             </div>
             {(ratingsState.result.updated || []).length > 0 && (
               <div className="overflow-x-auto">
@@ -661,8 +483,8 @@ export function AdminToolsClient() {
                       return (
                         <tr key={u.slug} className="border-b border-slate-100">
                           <td className="py-2 pr-4 font-bold text-slate-800">{u.name}</td>
-                          <td className="py-2 pr-4 text-slate-500 font-medium">{u.oldRating ?? '–'} / {u.oldReviews ?? '–'}</td>
-                          <td className="py-2 pr-4 text-slate-800 font-bold">{u.newRating ?? '–'} / {u.newReviews ?? '–'}</td>
+                          <td className="py-2 pr-4 text-slate-500 font-medium">{u.oldRating ?? 'â€“'} / {u.oldReviews ?? 'â€“'}</td>
+                          <td className="py-2 pr-4 text-slate-800 font-bold">{u.newRating ?? 'â€“'} / {u.newReviews ?? 'â€“'}</td>
                           <td className="py-2">
                             <span className={'text-xs font-black uppercase tracking-wider ' + (changed ? 'text-emerald-700' : 'text-slate-400')}>
                               {changed ? 'changed' : 'no change'}
@@ -700,14 +522,14 @@ export function AdminToolsClient() {
           disabled={hoursState.loading}
           className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
         >
-          {hoursState.loading ? (<><Loader2 size={16} className="animate-spin" />Pulling hours…</>) : 'Backfill claimed clinic hours'}
+          {hoursState.loading ? (<><Loader2 size={16} className="animate-spin" />Pulling hoursâ€¦</>) : 'Backfill claimed clinic hours'}
         </button>
         {hoursState.error && (
           <div className="mt-5 px-4 py-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm font-bold">Error: {hoursState.error}</div>
         )}
         {hoursState.result && (
           <div className="mt-5">
-            <div className="text-sm text-slate-700 font-bold mb-3">Considered {hoursState.result.totalConsidered ?? 0} · Filled {hoursState.result.filled ?? 0}</div>
+            <div className="text-sm text-slate-700 font-bold mb-3">Considered {hoursState.result.totalConsidered ?? 0} Â· Filled {hoursState.result.filled ?? 0}</div>
             <ul className="text-sm text-slate-700 space-y-1.5">
               {(hoursState.result.rows || []).map((r) => (
                 <li key={r.slug} className="flex items-center gap-2">
@@ -737,7 +559,7 @@ export function AdminToolsClient() {
             disabled={rescueState.loading}
             className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
           >
-            {rescueState.loading ? (<><Loader2 size={16} className="animate-spin" />Rescuing batch…</>) : `Rescue next 50 (offset ${rescueOffset})`}
+            {rescueState.loading ? (<><Loader2 size={16} className="animate-spin" />Rescuing batchâ€¦</>) : `Rescue next 50 (offset ${rescueOffset})`}
           </button>
           <button
             type="button"
@@ -754,8 +576,8 @@ export function AdminToolsClient() {
         {rescueState.result && (
           <div className="mt-5">
             <div className="text-sm text-slate-700 font-bold mb-3">
-              Batch: offset {rescueState.result.offset} / total {rescueState.result.totalCandidates} · {rescueState.result.updated ?? 0} URL{(rescueState.result.updated ?? 0) === 1 ? '' : 's'} updated · {rescueState.result.noListing ?? 0} no Google listing
-              {rescueState.result.nextOffset === null ? ' · DONE' : ` · next offset ${rescueState.result.nextOffset}`}
+              Batch: offset {rescueState.result.offset} / total {rescueState.result.totalCandidates} Â· {rescueState.result.updated ?? 0} URL{(rescueState.result.updated ?? 0) === 1 ? '' : 's'} updated Â· {rescueState.result.noListing ?? 0} no Google listing
+              {rescueState.result.nextOffset === null ? ' Â· DONE' : ` Â· next offset ${rescueState.result.nextOffset}`}
             </div>
             <ul className="text-sm text-slate-700 space-y-1.5">
               {(rescueState.result.rows || []).map((r) => (
@@ -791,7 +613,7 @@ export function AdminToolsClient() {
           disabled={inspectState.loading}
           className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
         >
-          {inspectState.loading ? (<><Loader2 size={16} className="animate-spin" />Looking up on Places…</>) : 'Inspect 3 held clinics'}
+          {inspectState.loading ? (<><Loader2 size={16} className="animate-spin" />Looking up on Placesâ€¦</>) : 'Inspect 3 held clinics'}
         </button>
         {inspectState.error && (
           <div className="mt-5 px-4 py-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm font-bold">Error: {inspectState.error}</div>
@@ -813,13 +635,13 @@ export function AdminToolsClient() {
                 <div className="text-xs text-slate-500 mb-2"><strong>Listed website:</strong> {r.listedWebsite || '(none)'}</div>
                 {r.places ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1.5 text-xs text-slate-700">
-                    <div><strong>Places name:</strong> {r.places.name || '–'}</div>
-                    <div><strong>Status:</strong> {r.places.business_status || '–'}</div>
-                    <div className="md:col-span-2"><strong>Address:</strong> {r.places.address || '–'}</div>
-                    <div className="md:col-span-2"><strong>Website on Places:</strong> {r.places.website || '–'}</div>
-                    <div><strong>Phone:</strong> {r.places.phone || '–'}</div>
-                    <div><strong>Rating:</strong> {r.places.rating ?? '–'} ({r.places.user_ratings_total ?? 0} reviews)</div>
-                    <div className="md:col-span-2"><strong>Types:</strong> {r.places.types.join(', ') || '–'}</div>
+                    <div><strong>Places name:</strong> {r.places.name || 'â€“'}</div>
+                    <div><strong>Status:</strong> {r.places.business_status || 'â€“'}</div>
+                    <div className="md:col-span-2"><strong>Address:</strong> {r.places.address || 'â€“'}</div>
+                    <div className="md:col-span-2"><strong>Website on Places:</strong> {r.places.website || 'â€“'}</div>
+                    <div><strong>Phone:</strong> {r.places.phone || 'â€“'}</div>
+                    <div><strong>Rating:</strong> {r.places.rating ?? 'â€“'} ({r.places.user_ratings_total ?? 0} reviews)</div>
+                    <div className="md:col-span-2"><strong>Types:</strong> {r.places.types.join(', ') || 'â€“'}</div>
                   </div>
                 ) : (
                   <div className="text-xs text-rose-700 font-bold">No Google Places result.</div>

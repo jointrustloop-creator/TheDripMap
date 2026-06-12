@@ -5,10 +5,13 @@
  * needed — when the operator is logged into /admin, the same cookie
  * authorises the two endpoints behind these buttons.
  *
- * - Generate 10 outreach drafts (POST /api/admin/regenerate-outreach?mode=next&limit=10)
- * - Refresh verified ratings now (POST /api/admin/refresh-verified-ratings)
+ * Current buttons: GSC snapshot, Get Found Kit generator, refresh verified
+ * ratings, backfill hours, rescue 404 URLs, inspect held redirects, plus a
+ * link to the owner-pains research page (demoted from the nav 2026-06-12).
  *
- * Daily cron remains untouched; this is purely operator-triggered.
+ * 2026-06-12 admin audit: the old-template outreach buttons (Generate 10,
+ * Wipe + rebuild 50) and the stale Queue-pending-claim-drafts button were
+ * retired; AUTOPILOT morning drafts + W4 triage replace them.
  */
 import React from 'react';
 import { redirect } from 'next/navigation';
