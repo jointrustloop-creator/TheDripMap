@@ -7,12 +7,14 @@ Email: info@thedripmap.com
 
 ## Database (as of 2026-06-11)
 - 1,478 providers total (993 United States, 480 Canada, 0 null country, 5 hidden)
-- 11 claimed (is_claimed = true), 6 featured (is_featured = true), 5 hidden (is_hidden = true)
+- 13 claimed as of 2026-06-12 (is_claimed = true), 6 featured (is_featured = true), 5 hidden (is_hidden = true)
 - Active provider geographic top-5:
   - CA-Ontario 222, US-California 181, US-Texas 164, US-Florida 116, CA-BC 115
 - Active provider top-5 cities:
   - Toronto 61, New York 51, Dallas 36, Tampa/Atlanta/Houston 35 each, Calgary 32
 - Claimed roster ordered by claimed_at desc (newest first):
+  0a. vida-flow-penticton (2026-06-12, via claim flow)
+  0b. vp-health-lethbridge (2026-06-11, via claim flow)
   1. purete-medical-spa-etobicoke (2026-06-10, via claim flow)
   2. the-lift-bar-medspa-nicholasville (2026-06-09, via claim flow)
   3. soma-and-soul-wellness-toronto (2026-06-09, via claim flow)
@@ -58,6 +60,34 @@ Email: info@thedripmap.com
 6. Never delete or gitignore CLAUDE.md
 7. Never commit secrets to git
 8. Always test before enabling automated emails
+
+## AUTOPILOT v1 (stood up 2026-06-12)
+- Standing goal: see the /goal text. Operator reviews at 7am/7pm Toronto.
+- W1 Onboarding Engine MERGED to main 2026-06-12 (commit 513e732), gated:
+  ONBOARDING_AUTOSEND = false in src/lib/onboarding.ts. Claim verifies
+  enqueue onboarding_requests rows; nothing auto-sends until the gate
+  flips (separate PR, operator go). Operator sends via /admin/onboarding
+  "Send now". Day-7 nudge cron /api/cron/onboarding-nudge (gated, in
+  vercel.json). safety_verified flips ONLY via the operator's click on
+  /admin/onboarding.
+- PENDING OPERATOR PASTE: scripts/create-onboarding-engine-tables.sql
+  (onboarding_requests), scripts/create-seo-health-runs-findings.sql
+  (WS6, unlocks nightly SEO mechanic),
+  scripts/create-auto-forward-shadow-tables.sql (shadow lead-forward).
+- Templates A (outreach) + B (onboarding) operator-APPROVED 2026-06-12;
+  texts in scripts/_autopilot-templates-for-approval.md, flags in
+  scripts/_autopilot-approvals.md.
+- First run: scripts/_w1-first-run-enqueue.cjs enqueues 7 clinics (the 6
+  from the goal + vida-flow-penticton which verified pre-merge). Run it
+  AFTER the onboarding SQL paste. It sends nothing.
+- Safety evidence prep for the first run (registry links per clinic):
+  scripts/_w1-safety-evidence-prep.md. Note: Insight's lead ND is Jill
+  (not Tara) Shainhouse; Purete is NP-led so CNO applies, not CPSO.
+- 4 scheduled routines (Claude desktop scheduled tasks, run only while
+  the app is open): autopilot-morning ~6:15am (triage + W2 drafts +
+  digest), autopilot-evening ~6:15pm (triage + digest),
+  autopilot-seo-nightly ~2:30am (max 1 branch/night, logs to
+  scripts/_autopilot-seo-log.md), autopilot-weekly-analyst Sun 5pm.
 
 ## Crons
 Both outreach crons PAUSED 2026-06-08 per operator. They fire on schedule

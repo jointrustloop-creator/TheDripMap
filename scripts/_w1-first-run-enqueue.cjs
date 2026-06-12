@@ -11,13 +11,17 @@ const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config({ path: '.env.local' });
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-// 5 known slugs + VP Health resolved by name match below.
+// 6 known slugs + VP Health resolved by name match below.
+// vida-flow-penticton added 2026-06-12: claimed/verified the same day the
+// engine merged, so neither the verify-claim trigger nor the original
+// 6-clinic list covers it.
 const KNOWN_SLUGS = [
   'purete-medical-spa-etobicoke',
   'the-lift-bar-medspa-nicholasville',
   'soma-and-soul-wellness-toronto',
   'natures-touch-naturopathic-clinic-brampton',
   'insight-naturopathic-clinic-toronto',
+  'vida-flow-penticton',
 ];
 const NAME_MATCHES = ['vp health']; // resolved case-insensitively, must be claimed
 
@@ -50,8 +54,8 @@ const NAME_MATCHES = ['vp health']; // resolved case-insensitively, must be clai
     targets.push(data[0]);
   }
 
-  if (targets.length !== 6) { console.error(`ABORT: expected 6 targets, got ${targets.length}`); process.exit(1); }
-  console.log('Resolved 6 targets:');
+  if (targets.length !== 7) { console.error(`ABORT: expected 7 targets, got ${targets.length}`); process.exit(1); }
+  console.log('Resolved 7 targets:');
   targets.forEach(t => console.log(`  ${t.name} (${t.slug})`));
 
   // Owner email/name from the verified claim_requests row (newest verified).
@@ -81,7 +85,7 @@ const NAME_MATCHES = ['vp health']; // resolved case-insensitively, must be clai
     .in('provider_id', targets.map(t => t.id));
   if (exErr) { console.error('ABORT: onboarding_requests not readable (migration applied?)', exErr.message); process.exit(1); }
   if (existing && existing.length > 0) {
-    console.error(`ABORT: ${existing.length} of the 6 already have onboarding rows. Nothing inserted.`);
+    console.error(`ABORT: ${existing.length} of the 7 already have onboarding rows. Nothing inserted.`);
     process.exit(1);
   }
 
@@ -89,7 +93,7 @@ const NAME_MATCHES = ['vp health']; // resolved case-insensitively, must be clai
     .from('onboarding_requests')
     .insert(rows, { count: 'exact' });
   if (insErr) { console.error('ABORT: insert failed', insErr.message); process.exit(1); }
-  if (count !== 6) { console.error(`WARNING: expected insert count 6, got ${count}. Verify on /admin/onboarding.`); process.exit(1); }
-  console.log('Inserted 6 onboarding_requests rows with status pending_send.');
+  if (count !== 7) { console.error(`WARNING: expected insert count 7, got ${count}. Verify on /admin/onboarding.`); process.exit(1); }
+  console.log('Inserted 7 onboarding_requests rows with status pending_send.');
   console.log('No emails were sent. Send from /admin/onboarding after Template B approval.');
 })();
