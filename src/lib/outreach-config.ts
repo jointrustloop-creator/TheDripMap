@@ -20,6 +20,20 @@
 export const OUTREACH_COUNTRY_FILTER: readonly string[] = ['Canada'];
 
 /**
+ * Master pause for OLD-TEMPLATE outreach draft creation and batch sends
+ * across ALL paths: the two crons (which carry their own PAUSED consts)
+ * AND the admin endpoints (regenerate-outreach, queue-outreach-drafts,
+ * send-outreach-batch). Added 2026-06-12 after an unattended
+ * regenerate-outreach?mode=next call created 8 Gmail drafts at 12:08
+ * despite the cron pause: the admin endpoints were never gated.
+ *
+ * The W2 AUTOPILOT morning routine (approved new template, Gmail MCP
+ * drafts) is NOT affected by this flag; it is governed by
+ * scripts/_autopilot-approvals.md.
+ */
+export const OUTREACH_DRAFTS_PAUSED = true;
+
+/**
  * Apply OUTREACH_COUNTRY_FILTER to any providers query. Returns the
  * builder unchanged when the filter is empty (national mode).
  *

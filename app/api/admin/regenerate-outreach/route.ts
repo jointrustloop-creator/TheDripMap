@@ -24,7 +24,7 @@ import { createClient } from '@supabase/supabase-js';
 import { isAdminRequest } from '../../../../src/lib/admin-auth';
 import { saveDrafts, deleteDraftsBySubject, type DraftPayload } from '../../../../src/lib/draft-saver';
 import { isJunkEmail, isDomainMismatch } from '../../../../src/lib/outreach-quality';
-import { applyOutreachCountryFilter } from '../../../../src/lib/outreach-config';
+import { applyOutreachCountryFilter, OUTREACH_DRAFTS_PAUSED } from '../../../../src/lib/outreach-config';
 import {
   cleanName,
   buildMultiLocationBody,
@@ -116,6 +116,15 @@ async function buildDraftsForGroups(
 export async function POST(req: Request) {
   if (!(await isAuthorized(req))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (OUTREACH_DRAFTS_PAUSED) {
+    return NextResponse.json({
+      ok: true,
+      paused: true,
+      drafted: 0,
+      message:
+        'Outreach draft creation is paused (OUTREACH_DRAFTS_PAUSED in src/lib/outreach-config.ts). New-template outreach runs via the AUTOPILOT morning routine.',
+    });
   }
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
     return NextResponse.json({ error: 'SMTP_USER/SMTP_PASS required' }, { status: 500 });
