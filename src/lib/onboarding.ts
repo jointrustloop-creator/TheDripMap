@@ -17,7 +17,16 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { sendMail } from './mailer';
 
 // HARD GATE. Flip to true only after the operator approves Template B.
+// With SEND_5Q_WITH_CONFIRMATION below, the standalone auto-send path is not
+// used; the 5 questions ride along with the verification confirmation instead.
 export const ONBOARDING_AUTOSEND = false;
+
+// 2026-06-13 (operator-approved): merge the 5-questions onboarding email INTO
+// the claim verification confirmation email, so a freshly verified clinic gets
+// ONE email at the moment of verify instead of a separate follow-up. The
+// verify handler calls sendVerificationOnboardingEmail() below. Flip to false
+// to fall back to the old behaviour (bland confirmation + gated 5q).
+export const SEND_5Q_WITH_CONFIRMATION = true;
 
 const SITE_URL = 'https://www.thedripmap.com';
 const OPERATOR_EMAIL = 'info@thedripmap.com';
@@ -43,6 +52,8 @@ export function buildOnboardingEmail(p: OnboardingProvider, ownerName?: string |
     text: `Hi ${first},
 
 ${p.name} is now verified on TheDripMap. Nice to have you.
+
+Your listing is live now at ${SITE_URL}/providers/${p.slug}.
 
 Verified clinics with a complete profile get noticeably more clicks and calls than bare listings, so we'd like to fill yours in properly. Five questions. A few sentences each is plenty, and you can answer right in a reply to this email.
 
@@ -155,5 +166,65 @@ export async function enqueueOnboarding(
     const msg = err instanceof Error ? err.message : String(err);
     console.error('enqueueOnboarding failed', msg);
     return { queued: false, sent: false, error: msg };
+  }
+}
+
+/**
+ * Post-verification combined send: the verification confirmation email IS the
+ * 5-questions onboarding email (one touch at the moment of verify). Records the
+ * onboarding_requests row for W1 tracking, sends the email to the owner, and
+ * marks the row 'sent'. Used by verify-claim when SEND_5Q_WITH_CONFIRMATION is
+ * true.
+ *
+ * Never throws: claim verification must never fail because of onboarding.
+ *
+ * Idempotent: if a row already exists for this provider (e.g. a re-verify),
+ * we do NOT re-send. The verify handler also short-circuits on is_claimed
+ * before reaching here, so this is belt-and-suspenders.
+ */
+export async function sendVerificationOnboardingEmail(
+  sb: SupabaseClient,
+  provider: OnboardingProvider,
+  ownerEmail: string,
+  ownerName?: string | null
+): Promise<{ sent: boolean; error?: string }> {
+  try {
+    const { error: insErr } = await sb.from('onboarding_requests').insert({
+      provider_id: provider.id,
+      owner_email: ownerEmail,
+      owner_name: ownerName || null,
+      status: 'pending_send',
+    });
+    if (insErr && (insErr as { code?: string }).code === '23505') {
+      // Already queued/sent for this provider -> do not re-send.
+      return { sent: false, error: 'already queued' };
+    }
+    // Any other insert error (e.g. table missing pre-migration) is logged but
+    // we still send the email so a freshly verified owner is never left without
+    // their confirmation. The mark-sent update below simply no-ops if no row.
+    if (insErr) {
+      console.error('onboarding_requests insert non-fatal error', insErr.message);
+    }
+
+    const email = buildOnboardingEmail(provider, ownerName);
+    const res = await sendMail({
+      from: 'TheDripMap <info@thedripmap.com>',
+      to: ownerEmail,
+      replyTo: OPERATOR_EMAIL,
+      subject: email.subject,
+      text: email.text,
+    });
+    if (!res.ok) return { sent: false, error: res.error };
+
+    await sb
+      .from('onboarding_requests')
+      .update({ status: 'sent', sent_at: new Date().toISOString() })
+      .eq('provider_id', provider.id)
+      .eq('status', 'pending_send');
+    return { sent: true };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('sendVerificationOnboardingEmail failed', msg);
+    return { sent: false, error: msg };
   }
 }

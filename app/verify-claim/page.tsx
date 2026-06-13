@@ -8,7 +8,7 @@ import { Footer } from '../../src/components/Footer';
 import { slugify } from '../../src/lib/data';
 import { sendMail } from '../../src/lib/mailer';
 import { autoEnrichProvider } from '../../src/lib/auto-enrich';
-import { enqueueOnboarding } from '../../src/lib/onboarding';
+import { enqueueOnboarding, sendVerificationOnboardingEmail, SEND_5Q_WITH_CONFIRMATION } from '../../src/lib/onboarding';
 
 export const dynamic = 'force-dynamic';
 
@@ -144,48 +144,55 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
       console.error('auto-enrich crashed', err);
     });
 
-  // W1 onboarding: enqueue the post-verification onboarding email. While the
-  // ONBOARDING_AUTOSEND gate is false this only inserts a queue row; once the
-  // operator approves the template and flips the gate, this also sends the
-  // 5-questions email with a copy to info@. Fire-and-forget: a queue failure
-  // must never break the owner's verification moment.
-  Promise.resolve()
-    .then(() =>
-      enqueueOnboarding(
-        supabase,
-        { id: provider.id, name: provider.name, slug: provider.slug || slugify(provider.name), city: provider.city },
-        claim.email,
-        claim.owner_name
-      )
-    )
-    .then((res) => {
-      console.log('onboarding enqueue', { providerId: provider.id, ...res });
-    })
-    .catch((err) => {
-      console.error('onboarding enqueue crashed', err);
-    });
-
   const providerSlug = provider.slug || slugify(provider.name);
   const listingUrl = `${SITE_URL}/providers/${providerSlug}`;
+  const onboardingProvider = {
+    id: provider.id,
+    name: provider.name,
+    slug: providerSlug,
+    city: provider.city,
+  };
 
-  await sendMail({
-    from: 'TheDripMap <info@thedripmap.com>',
-    to: claim.email,
-    replyTo: 'info@thedripmap.com',
-    subject: `Your claim for ${provider.name} is now Claimed on TheDripMap`,
-    text: `Hi ${claim.owner_name || 'there'},
+  // W1 onboarding. Default (2026-06-13, operator-approved): the verification
+  // confirmation email IS the 5-questions onboarding email, so the owner gets
+  // one touch at the moment of verify. sendVerificationOnboardingEmail records
+  // the onboarding_requests row for W1 tracking, sends the combined email, and
+  // marks it sent. Awaited but never throws, so a mail/queue failure cannot
+  // break the owner's verification moment.
+  let onboardingNote = '';
+  if (SEND_5Q_WITH_CONFIRMATION) {
+    const res = await sendVerificationOnboardingEmail(
+      supabase,
+      onboardingProvider,
+      claim.email,
+      claim.owner_name
+    );
+    onboardingNote = res.sent
+      ? `The verification + 5-questions onboarding email was sent to ${claim.email}. Tracked in /admin/onboarding (status: sent), awaiting their reply.`
+      : `Onboarding email was NOT sent (${res.error || 'unknown'}). Check /admin/onboarding.`;
+    console.log('onboarding combined send', { providerId: provider.id, ...res });
+  } else {
+    // Legacy path: queue (gated) + bland confirmation email.
+    Promise.resolve()
+      .then(() => enqueueOnboarding(supabase, onboardingProvider, claim.email, claim.owner_name))
+      .then((res) => console.log('onboarding enqueue', { providerId: provider.id, ...res }))
+      .catch((err) => console.error('onboarding enqueue crashed', err));
+    await sendMail({
+      from: 'TheDripMap <info@thedripmap.com>',
+      to: claim.email,
+      replyTo: 'info@thedripmap.com',
+      subject: `Your claim for ${provider.name} is now Claimed on TheDripMap`,
+      text: `Hi ${claim.owner_name || 'there'},
 
-Your claim for ${provider.name} on TheDripMap is now Claimed. You can edit services, hours, photos, and respond to testimonials. Your free listing is live with your own logo, contact info, and map.
-
-A separate, optional step is Safety Verified. The Safety Verified badge is awarded only after we confirm your clinic's licensed medical director, licensed clinical staff, pharmaceutical-grade IV sourcing, active liability insurance, and good standing with the relevant medical or nursing regulator. Reply to this email when you are ready to start that attestation. Until then your listing is Claimed but not Safety Verified, which is the correct state.
-
-To unlock Featured benefits (top placement on city and treatment pages, full photo gallery, patient testimonials, and instant-book CTAs), see https://www.thedripmap.com/for-clinics/upgrade.
+Your claim for ${provider.name} on TheDripMap is now Claimed. Your free listing is live with your own logo, contact info, and map.
 
 View your listing: ${listingUrl}
 
 TheDripMap Team
 `,
-  });
+    });
+    onboardingNote = 'Legacy confirmation sent; 5-questions onboarding is queued (gated).';
+  }
 
   await sendMail({
     from: 'TheDripMap <info@thedripmap.com>',
@@ -201,6 +208,8 @@ Owner phone: ${claim.owner_phone || 'Not provided'}
 
 Listing ID: ${provider.id}
 Public listing: ${listingUrl}
+
+${onboardingNote}
 
 Status: claimed (free tier). Manually set is_featured=true if approved for a Featured upgrade.
 `,
@@ -245,7 +254,7 @@ export default async function VerifyClaimPage({ searchParams }: VerifyClaimPageP
               .
             </p>
             <p className="text-base text-slate-500 leading-relaxed mb-10 max-w-xl mx-auto">
-              To add your photos, services, hours and description, just reply to your verification email and we will update everything for you personally.
+              Check your inbox: we just emailed you five quick questions. Reply with a few details and your logo, and we will build out your full page for you, usually within two business days.
             </p>
             {outcome.providerSlug && (
               <Link
