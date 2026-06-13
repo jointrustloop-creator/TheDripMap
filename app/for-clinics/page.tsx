@@ -142,91 +142,151 @@ export default async function ForClinicsPage() {
           <ClinicAudit />
         </div>
 
-        {/* Comparison Section — claimed vs unclaimed, live from the directory */}
+        {/* Comparison Section — claimed vs unclaimed, redesigned 2026-06-12.
+            Editorial framing (serif italic accent, homepage palette), value
+            copy written from the patient's point of view, our measured-traffic
+            evidence, and a claim-to-live timeline. Both cards remain pulled
+            LIVE from the matching platform — never hardcoded clinic data. */}
         <div className="mb-32">
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-xs font-black uppercase tracking-[0.25em] text-wellness-600 mb-4">Claimed vs Unclaimed</p>
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-5 tracking-tight leading-[1.05]">
-              The same clinic, two very different listings
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <p className="text-xs font-black uppercase tracking-[0.25em] text-wellness-600 mb-5">Claimed vs Unclaimed</p>
+            <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1.02] text-[clamp(2.25rem,5vw,4rem)] mb-6">
+              Patients see both.<br />
+              <span className="font-serif italic font-normal text-[#0F6E56]">They book one.</span>
             </h2>
-            <p className="text-lg text-slate-500 leading-relaxed">
-              Both cards below are pulled live from the matching platform — exactly what patients see today, and what changes the moment you claim.
+            <p className="text-lg text-slate-500 leading-relaxed max-w-2xl mx-auto">
+              The two cards below are pulled live from the platform right now, not mockups.
+              One is a grey placeholder a patient scrolls past in two seconds. The other is
+              where the booking happens. The only difference is two minutes of your time.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch">
-            {/* Unclaimed panel */}
-            <div className="flex flex-col h-full rounded-[2.5rem] border border-slate-200 bg-slate-50/70 p-6 md:p-8">
-              <div className="flex items-center justify-between mb-7">
+          <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-stretch">
+            {/* Center hinge — the "claim" moment, desktop only */}
+            <div className="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+              <span className="inline-flex items-center gap-2 bg-slate-900 text-white text-[11px] font-black uppercase tracking-[0.16em] px-5 py-3 rounded-full shadow-2xl border border-white/10">
+                2 minutes <ArrowRight size={13} className="text-wellness-300" />
+              </span>
+            </div>
+
+            {/* Unclaimed panel — the before. Deliberately muted: this is the
+                listing nobody chose. */}
+            <div className="flex flex-col h-full rounded-[2.5rem] border border-slate-200 bg-slate-50/80 p-6 md:p-9 relative overflow-hidden">
+              <div
+                className="absolute inset-0 pointer-events-none opacity-60"
+                style={{ background: 'radial-gradient(ellipse at 20% 0%, rgba(148,163,184,0.12) 0%, transparent 55%)' }}
+              />
+              <div className="relative flex items-center justify-between mb-7">
                 <span className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
-                  <span className="w-2 h-2 rounded-full bg-slate-300" /> Unclaimed
+                  <span className="w-2 h-2 rounded-full bg-slate-300" /> Today: unclaimed
                 </span>
-                <span className="text-[11px] font-bold text-slate-400">Free — but easy to miss</span>
+                <span className="text-[11px] font-bold text-slate-400">What patients skip</span>
               </div>
               {unclaimedSample && (
-                <div className="mx-auto w-full max-w-[330px]">
+                <div className="relative mx-auto w-full max-w-[330px] saturate-[0.85]">
                   <ProviderCard provider={unclaimedSample} />
                 </div>
               )}
-              <ul className="mt-8 space-y-3.5 flex-1">
+              <ul className="relative mt-9 space-y-4 flex-1">
                 {[
-                  'Grey placeholder — no clinic photo',
-                  'No rating or reviews shown',
-                  'No booking or call-to-action button',
-                  'Sits below claimed clinics in every search',
+                  { head: 'A grey square where your clinic should be', sub: 'No photos, no logo. To a patient, an empty card reads like a closed door.' },
+                  { head: 'No prices, no menu', sub: 'Patients comparing three clinics book the one whose prices they can see.' },
+                  { head: 'Nothing to click', sub: 'No booking button, no call button. Even an interested patient drifts to the next card.' },
+                  { head: 'Outranked in your own city', sub: 'Every claimed clinic in your city sits above you, every single search.' },
                 ].map((t) => (
-                  <li key={t} className="flex items-start gap-3 text-sm text-slate-500">
-                    <span className="mt-0.5 w-5 h-5 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center shrink-0">
-                      <X size={12} strokeWidth={3} />
+                  <li key={t.head} className="flex items-start gap-3.5">
+                    <span className="mt-0.5 w-6 h-6 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center shrink-0">
+                      <X size={13} strokeWidth={3} />
                     </span>
-                    {t}
+                    <div>
+                      <div className="text-[14.5px] font-bold text-slate-600 leading-snug">{t.head}</div>
+                      <div className="text-[12.5px] text-slate-400 leading-snug mt-0.5">{t.sub}</div>
+                    </div>
                   </li>
                 ))}
               </ul>
+              <p className="relative mt-8 pt-5 border-t border-slate-200 text-[12px] text-slate-400 font-medium leading-relaxed">
+                On our measured traffic, bare listings earn almost zero patient clicks.
+                The views happen anyway. They just convert for someone else.
+              </p>
             </div>
 
-            {/* Claimed panel — the winner */}
-            <div className="relative flex flex-col h-full rounded-[2.5rem] border-2 border-wellness-500 bg-white p-6 md:p-8 shadow-2xl shadow-wellness-100/60">
-              <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-wellness-600 text-white text-[10px] font-black uppercase tracking-[0.18em] px-4 py-1.5 rounded-full shadow-lg shadow-wellness-200">
-                Recommended
+            {/* Claimed panel — the after. Premium treatment: emerald ring,
+                lifted shadow, evidence line, timeline, CTA. */}
+            <div className="relative flex flex-col h-full rounded-[2.5rem] border-2 border-wellness-500 bg-white p-6 md:p-9 shadow-[0_40px_90px_-40px_rgba(15,110,86,0.45)] overflow-hidden">
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{ background: 'radial-gradient(ellipse at 80% 0%, rgba(15,110,86,0.07) 0%, transparent 55%)' }}
+              />
+              <span className="absolute -top-px left-1/2 -translate-x-1/2 bg-wellness-600 text-white text-[10px] font-black uppercase tracking-[0.18em] px-5 py-2 rounded-b-2xl shadow-lg shadow-wellness-200">
+                After you claim · still free
               </span>
-              <div className="flex items-center justify-between mb-7">
+              <div className="relative flex items-center justify-between mb-7 mt-4">
                 <span className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-wellness-600">
                   <ShieldCheck size={14} /> Claimed &amp; Verified
                 </span>
-                <span className="text-[11px] font-bold text-wellness-600">Free · 2 minutes</span>
+                <span className="text-[11px] font-bold text-wellness-600">Where bookings happen</span>
               </div>
               {claimedSample && (
-                <div className="mx-auto w-full max-w-[330px]">
+                <div className="relative mx-auto w-full max-w-[330px]">
                   <ProviderCard provider={claimedSample} />
                 </div>
               )}
-              <ul className="mt-8 space-y-3.5 flex-1">
+              <ul className="relative mt-9 space-y-4 flex-1">
                 {[
-                  'Your real photos and drip menu',
-                  'Verified badge, rating & reviews',
-                  'Direct "Book" and call buttons',
-                  'Pinned above unclaimed clinics in your city',
+                  { head: 'Your clinic, recognisably yours', sub: 'Logo, real photos, and your drip menu with your real prices. Patients trust what they can see.' },
+                  { head: 'Your people, named', sub: 'Practitioners and credentials on the page. The single strongest trust signal patients tell us they look for.' },
+                  { head: 'One tap to you', sub: 'Book and call buttons go straight to your clinic. We never sit between you and your patient.' },
+                  { head: 'Top of your city, plus the badge path', sub: 'Claimed clinics rank above unclaimed ones, and claiming opens the Safety Verified badge. Earned, never bought.' },
                 ].map((t) => (
-                  <li key={t} className="flex items-start gap-3 text-sm font-medium text-slate-700">
-                    <span className="mt-0.5 w-5 h-5 rounded-full bg-wellness-100 text-wellness-600 flex items-center justify-center shrink-0">
-                      <Check size={12} strokeWidth={3} />
+                  <li key={t.head} className="flex items-start gap-3.5">
+                    <span className="mt-0.5 w-6 h-6 rounded-full bg-wellness-100 text-wellness-600 flex items-center justify-center shrink-0">
+                      <Check size={13} strokeWidth={3} />
                     </span>
-                    {t}
+                    <div>
+                      <div className="text-[14.5px] font-black text-slate-900 leading-snug">{t.head}</div>
+                      <div className="text-[12.5px] text-slate-500 leading-snug mt-0.5">{t.sub}</div>
+                    </div>
                   </li>
                 ))}
               </ul>
+              <p className="relative mt-8 pt-5 border-t border-wellness-100 text-[12px] text-slate-500 font-medium leading-relaxed">
+                Listings with real prices and named practitioners earn{' '}
+                <span className="font-black text-wellness-700">many times more patient clicks</span>{' '}
+                on our own measured traffic. Not a projection. Our data.
+              </p>
               <a
                 href="/for-clinics/setup"
-                className="mt-8 inline-flex items-center justify-center gap-2 w-full bg-wellness-600 text-white px-6 py-4 rounded-2xl font-black hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-200"
+                className="relative mt-6 inline-flex items-center justify-center gap-2 w-full bg-wellness-600 text-white px-6 py-4 rounded-2xl font-black hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-200"
               >
                 Claim your free listing <ArrowRight size={18} />
               </a>
+              <p className="relative mt-3 text-center text-[11px] font-bold text-slate-400">
+                2 minutes · no credit card · free forever
+              </p>
             </div>
           </div>
-          <p className="mt-6 text-center text-[11px] text-slate-400 font-medium italic">
-            Real listings pulled live from the matching platform, not mockups.
-          </p>
+
+          {/* Claim-to-live timeline — sets the expectation that a complete
+              page costs one reply email, not an afternoon of homework. */}
+          <div className="mt-12 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-0 sm:divide-x divide-slate-200 rounded-3xl border border-slate-200 bg-white py-6 px-2">
+              {[
+                { step: '01', head: 'Claim in 2 minutes', sub: 'Verify you own the clinic. Free, no card.' },
+                { step: '02', head: 'Reply to five questions', sub: 'Your team, drips, prices, and a few photos. One email.' },
+                { step: '03', head: 'Live in 2 business days', sub: 'We build your complete page and send you the link first.' },
+              ].map((s) => (
+                <div key={s.step} className="px-6 text-center sm:text-left">
+                  <div className="font-serif italic text-2xl text-wellness-600/50 mb-1.5">{s.step}</div>
+                  <div className="text-[14px] font-black text-slate-900 tracking-tight">{s.head}</div>
+                  <div className="text-[12px] text-slate-500 leading-snug mt-1">{s.sub}</div>
+                </div>
+              ))}
+            </div>
+            <p className="mt-5 text-center text-[11px] text-slate-400 font-medium italic">
+              Both cards above are real listings rendered live from the matching platform, exactly as patients see them.
+            </p>
+          </div>
         </div>
 
         {/* Featured waitlist — soft mention, no pricing, no oversell */}
