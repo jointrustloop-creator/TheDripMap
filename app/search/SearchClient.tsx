@@ -652,34 +652,44 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
                             NEW
                           </span>
                         )}
-                        {/* 2026-06-12 Path 1B (strip): route claimed clinics
-                            through ProviderCardFeatured so the strip renders
-                            with logo + Verified badge, matching the main grid.
-                            Strict `=== true` to guard against any provider
-                            object where the flag is missing or coerced. */}
-                        {(p.is_featured === true || p.is_claimed === true) ? (
-                          <ProviderCardFeatured provider={p} isPrimary={false} />
-                        ) : (
-                          <ProviderCard provider={p} />
-                        )}
+                        {/* 2026-06-13: render the strip with the same ProviderCard
+                            design used by the Recently Viewed section below, for
+                            visual consistency across the page (operator request). */}
+                        <ProviderCard provider={p} />
                       </div>
                     ))}
                   </div>
                 </section>
               )}
 
+              {/* 2026-06-13 (operator request): in the default verified view, the
+                  remaining claimed clinics (everything past the 3 recent additions)
+                  get an honoured section title and the SAME ProviderCard design as
+                  Recent additions and Recently Viewed, for page-wide consistency.
+                  Other views (search / browse-all) keep their existing treatment.
+                  Card design + section title only; no data/logic changed. */}
+              {showRecentStrip && mainGridProviders.length > 0 && (
+                <div className="flex items-center gap-3 mb-5 mt-2">
+                  <span className="inline-flex items-center justify-center w-9 h-9 rounded-2xl bg-wellness-100 text-wellness-700">
+                    <ShieldCheck size={16} />
+                  </span>
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900 tracking-tight">Founding clinics</h3>
+                    <p className="text-xs font-bold text-slate-500">The verified clinics who claimed their place early</p>
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {/* 2026-06-12: mainGridProviders is filteredProviders minus the
                     3 strip cards when the strip is showing, so a clinic never
                     appears twice on the same page. */}
                 {mainGridProviders.map((provider) => (
-                  // 2026-06-12: all claimed cards in the main grid render at
-                  // the same 1-column width with isPrimary=false so featured
-                  // and free-tier-claimed visually match. Previously is_featured
-                  // got md:col-span-3 + isPrimary=true (full-width magazine),
-                  // which made paid-tier cards look ~3x larger than the rest.
                   <div key={provider.id}>
-                    {(provider.is_featured === true || provider.is_claimed === true) ? (
+                    {showRecentStrip ? (
+                      // Founding clinics: same ProviderCard design as the strip
+                      // and Recently Viewed.
+                      <ProviderCard provider={provider} />
+                    ) : (provider.is_featured === true || provider.is_claimed === true) ? (
                       <ProviderCardFeatured provider={provider} isPrimary={false} />
                     ) : (
                       <ProviderCard provider={provider} />
