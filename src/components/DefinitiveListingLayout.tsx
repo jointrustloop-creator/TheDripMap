@@ -28,6 +28,7 @@ import {
   Heart,
   ShieldCheck,
   Calendar,
+  ChevronRight,
 } from 'lucide-react';
 import { ResilientImage } from './ResilientImage';
 import { MessageClinicButton } from './MessageClinicButton';
@@ -304,6 +305,61 @@ export default function DefinitiveListingLayout({
   // Sticky booking head subtitle: city + province only.
   const stickySubtitle = `${cityLabel}, ${stateCode}`;
 
+  // ── Showcase modules (2026-06-12) ──────────────────────────────────────
+  // New patient/owner-value sections previewed on Blue Cypress only, pending
+  // operator approval before rollout to all claimed listings. Every value is
+  // derived from real provider fields (no medical claims, generic cost
+  // framing) so the same code generalizes once the gate is lifted.
+  const isShowcase = provider.slug === 'blue-cypress-iv-and-wellness-georgetown';
+
+  // Care team — data-driven from provider.medical_team.
+  type TeamMember = { name?: string; role?: string; bio?: string; photo?: string };
+  const team: TeamMember[] = Array.isArray(provider.medical_team)
+    ? (provider.medical_team as TeamMember[]).filter((m) => m && typeof m.name === 'string' && m.name.trim())
+    : [];
+  const isRnLed = team.some((m) => /\bRN\b|registered nurse/i.test(`${m.name} ${m.role}`));
+
+  // First-visit walkthrough — logistics only, reassuring, no medical claims.
+  const sessionLength = '30 to 60 minutes';
+  const firstVisitSteps: { head: string; sub: string }[] = [
+    { head: 'Check in', sub: 'Share your goals and a quick health history so your visit can be tailored to you.' },
+    { head: 'Get comfortable', sub: `Settle into a lounge chair. Most visits take about ${sessionLength}.` },
+    { head: 'Your session', sub: isRnLed ? 'A licensed nurse looks after you and stays close through the session.' : 'Licensed clinical staff look after you through the session.' },
+    { head: 'Back to your day', sub: 'Most guests head straight back to work or their plans afterward.' },
+  ];
+
+  // Common questions — grounded in real fields. FAQPage schema mirrors these.
+  const careLine = isRnLed
+    ? `Blue Cypress is founded and led by ${team[0]?.name || 'a registered nurse'}, and visits are overseen by licensed clinical staff.`
+    : 'Visits are overseen by licensed clinical staff.';
+  const faqItems: { q: string; a: string }[] = [
+    provider.price_range ? {
+      q: 'How much does a visit cost?',
+      a: `Most drips at ${displayName} fall in the ${provider.price_range} range. Pricing depends on the drip you choose, so ask when you book.`,
+    } : null,
+    { q: 'Who looks after me during my visit?', a: careLine },
+    bookingHref ? {
+      q: 'Do I need an appointment?',
+      a: 'Booking online is the fastest way to reserve a chair, and it only takes a moment. You can also call the clinic directly.',
+    } : null,
+    { q: 'How long does a session take?', a: `Plan for about ${sessionLength}, depending on the drip you choose.` },
+    provider.address ? {
+      q: 'Where are you located?',
+      a: `${displayName} is at ${provider.address}. Directions are one tap away in the booking panel.`,
+    } : null,
+    { q: 'Can I use my HSA or FSA card?', a: 'Many guests pay with an HSA or FSA card. Check with the clinic about your specific plan before your visit.' },
+  ].filter(Boolean) as { q: string; a: string }[];
+
+  const showcaseFaqJsonLd = isShowcase && faqItems.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqItems.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  } : null;
+
   return (
     <div className="bg-[#f8f5ee] text-[#19241c] font-[var(--font-hanken)] antialiased">
       {/* ───────────────────────── STAGE ─────────────────────────
@@ -506,6 +562,39 @@ export default function DefinitiveListingLayout({
               </section>
             )}
 
+            {/* ── Meet your provider (data-driven; gated to showcase for now) ── */}
+            {isShowcase && team.length > 0 && (
+              <section className="mb-[46px]">
+                <div className="text-[11.5px] tracking-[0.18em] uppercase text-[#b08a3e] font-semibold inline-flex items-center gap-[10px] mb-[14px] before:content-[''] before:w-[22px] before:h-[1px] before:bg-[#b08a3e]">Your care team</div>
+                <h2 className="font-[var(--font-fraunces)] text-[28px] font-normal tracking-tight mb-5 leading-[1.15]">The people who look after you</h2>
+                <div className="grid gap-[14px]">
+                  {team.map((m, i) => (
+                    <div key={(m.name || '') + i} className="flex gap-[18px] items-start bg-[#fffefa] border border-[rgba(25,36,28,0.09)] rounded-[18px] p-[22px] shadow-[0_10px_30px_-20px_rgba(25,40,28,0.4)]">
+                      <div className="flex-none w-[58px] h-[58px] rounded-full bg-[#1f3a27] text-[#d8b878] flex items-center justify-center font-[var(--font-fraunces)] text-[22px] font-light overflow-hidden border border-[rgba(216,184,120,0.4)]">
+                        {m.photo ? (
+                          <ResilientImage src={m.photo} fallbackSrc={DEFAULT_CLINIC_IMAGE} alt={m.name || 'Team member'} width={58} height={58} fill={false} className="w-full h-full object-cover" />
+                        ) : (
+                          <span>{getInitials(m.name)}</span>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <b className="font-semibold text-[16px] text-[#19241c]">{m.name}</b>
+                          {/\bRN\b|registered nurse/i.test(`${m.name} ${m.role}`) && (
+                            <span className="inline-flex items-center gap-[5px] text-[11px] font-semibold py-[3px] px-[9px] rounded-full bg-[#ebf1e5] text-[#2f5436] border border-[rgba(47,84,54,0.15)]">
+                              <ShieldCheck size={12} /> Licensed clinician
+                            </span>
+                          )}
+                        </div>
+                        {m.role && <div className="text-[12.5px] text-[#b08a3e] font-semibold mt-[3px] uppercase tracking-[0.06em]">{m.role}</div>}
+                        {m.bio && <p className="text-[14.5px] text-[#5c685e] leading-[1.6] mt-[10px]">{m.bio}</p>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
             {/* ── Safety Verified ── */}
             {safetyVerified && (
               <section id="safety-verified" className="mb-[46px] scroll-mt-24">
@@ -567,6 +656,25 @@ export default function DefinitiveListingLayout({
               </section>
             )}
 
+            {/* ── Your first visit (logistics walkthrough; gated to showcase) ── */}
+            {isShowcase && (
+              <section className="mb-[46px]">
+                <div className="text-[11.5px] tracking-[0.18em] uppercase text-[#b08a3e] font-semibold inline-flex items-center gap-[10px] mb-[14px] before:content-[''] before:w-[22px] before:h-[1px] before:bg-[#b08a3e]">Your first visit</div>
+                <h2 className="font-[var(--font-fraunces)] text-[28px] font-normal tracking-tight mb-5 leading-[1.15]">What to expect, start to finish</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-[14px]">
+                  {firstVisitSteps.map((s, i) => (
+                    <div key={s.head} className="flex gap-[16px] items-start bg-[#fffefa] border border-[rgba(25,36,28,0.09)] rounded-[16px] p-[20px] shadow-[0_8px_24px_-18px_rgba(25,40,28,0.35)]">
+                      <div className="flex-none w-[34px] h-[34px] rounded-full bg-[#ebf1e5] text-[#1f3a27] flex items-center justify-center font-[var(--font-fraunces)] text-[17px] border border-[rgba(47,84,54,0.14)]">{i + 1}</div>
+                      <div className="min-w-0 pt-[3px]">
+                        <b className="font-semibold text-[15.5px] text-[#19241c] block leading-snug">{s.head}</b>
+                        <p className="text-[13.5px] text-[#5c685e] leading-[1.6] mt-[5px]">{s.sub}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
             {/* ── Reviews ── */}
             {(displayRating > 0 && displayReviewCount > 0) && (
               <section className="mb-[46px]">
@@ -588,6 +696,30 @@ export default function DefinitiveListingLayout({
                       label="Share your experience"
                     />
                   </div>
+                </div>
+              </section>
+            )}
+
+            {/* ── Common questions (FAQ + FAQPage schema; gated to showcase) ── */}
+            {isShowcase && faqItems.length > 0 && (
+              <section className="mb-[46px]">
+                {showcaseFaqJsonLd && (
+                  <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(showcaseFaqJsonLd) }} />
+                )}
+                <div className="text-[11.5px] tracking-[0.18em] uppercase text-[#b08a3e] font-semibold inline-flex items-center gap-[10px] mb-[14px] before:content-[''] before:w-[22px] before:h-[1px] before:bg-[#b08a3e]">Good to know</div>
+                <h2 className="font-[var(--font-fraunces)] text-[28px] font-normal tracking-tight mb-5 leading-[1.15]">Common questions</h2>
+                <div className="space-y-[10px]">
+                  {faqItems.map((f) => (
+                    <details key={f.q} className="group bg-[#fffefa] border border-[rgba(25,36,28,0.09)] rounded-[14px] px-[20px] py-[16px] open:shadow-[0_10px_30px_-20px_rgba(25,40,28,0.4)] transition-shadow">
+                      <summary className="cursor-pointer list-none flex items-center justify-between gap-4">
+                        <b className="font-semibold text-[15.5px] text-[#19241c]">{f.q}</b>
+                        <span className="flex-none w-[26px] h-[26px] rounded-full bg-[#ebf1e5] text-[#2f5436] flex items-center justify-center group-open:rotate-90 transition-transform">
+                          <ChevronRight size={15} />
+                        </span>
+                      </summary>
+                      <p className="text-[14px] text-[#5c685e] leading-[1.65] mt-[12px]">{f.a}</p>
+                    </details>
+                  ))}
                 </div>
               </section>
             )}
