@@ -11,6 +11,7 @@ interface Prefill {
   sourcing?: string[];
   payment?: string[];
   about?: string;
+  offer?: { title?: string; code?: string; expires?: string };
 }
 
 interface Props {
@@ -86,6 +87,10 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
   const [logo, setLogo] = useState<File | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
 
+  const [offerTitle, setOfferTitle] = useState<string>(pf.offer?.title || '');
+  const [offerCode, setOfferCode] = useState<string>(pf.offer?.code || '');
+  const [offerExpires, setOfferExpires] = useState<string>(pf.offer?.expires || '');
+
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState('');
@@ -115,6 +120,7 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
         sourcing,
         payment,
         about: about.trim(),
+        offer: { title: offerTitle.trim(), code: offerCode.trim(), expires: offerExpires },
       };
       const fd = new FormData();
       fd.append('answers', JSON.stringify(answers));
@@ -290,6 +296,46 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
               className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#0F6E56] focus:ring-2 focus:ring-[#0F6E56]/20 outline-none text-sm"
             />
           </SectionCard>
+
+          {/* Bonus: slow-time offer. Optional, not counted toward the 6. Shows
+              as a banner on your listing and on the deals feed until it expires. */}
+          <section className="bg-gradient-to-br from-[#1f3a27] to-[#14352a] text-[#f3efe2] rounded-[1.75rem] p-6 md:p-8 shadow-[0_12px_34px_-22px_rgba(25,40,28,0.5)]">
+            <div className="flex items-start gap-3.5 mb-2">
+              <span className="flex-none w-8 h-8 rounded-full bg-[rgba(216,184,120,0.18)] text-[#d8b878] flex items-center justify-center">★</span>
+              <div>
+                <h2 className="text-lg font-black tracking-tight leading-tight">Slow week? Post an offer</h2>
+                <p className="text-[13px] text-[#c4c9b8] mt-0.5">Optional. Fill quiet days. It shows on your listing and the local deals feed, and disappears on its own when it expires.</p>
+              </div>
+            </div>
+            <div className="mt-4 space-y-3">
+              <input
+                value={offerTitle}
+                onChange={(e) => setOfferTitle(e.target.value)}
+                placeholder="Your offer, e.g. $20 off any drip this week"
+                maxLength={90}
+                className="w-full px-4 py-3 rounded-xl bg-white/95 text-slate-900 placeholder-slate-400 outline-none text-sm font-semibold"
+              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <input
+                  value={offerCode}
+                  onChange={(e) => setOfferCode(e.target.value)}
+                  placeholder="Promo code (optional)"
+                  maxLength={24}
+                  className="w-full px-4 py-3 rounded-xl bg-white/95 text-slate-900 placeholder-slate-400 outline-none text-sm"
+                />
+                <div>
+                  <label className="block text-[11px] font-bold text-[#c4c9b8] uppercase tracking-wide mb-1">Ends on</label>
+                  <input
+                    type="date"
+                    value={offerExpires}
+                    onChange={(e) => setOfferExpires(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/95 text-slate-900 outline-none text-sm"
+                  />
+                </div>
+              </div>
+              <p className="text-[11px] text-[#c4c9b8]">Keep it about the deal, not medical claims. Leave the date blank for an open-ended offer, or clear the title to remove it.</p>
+            </div>
+          </section>
         </div>
 
         {error && (

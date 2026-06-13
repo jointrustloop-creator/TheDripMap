@@ -39,6 +39,7 @@ interface Answers {
   sourcing?: string[];
   payment?: string[];
   about?: string;
+  offer?: { title?: string; code?: string; expires?: string };
 }
 
 // Light scrub: trim, cap length, drop obvious medical-claim verbs so owner free
@@ -206,6 +207,18 @@ export async function POST(req: NextRequest) {
     update.photos = [...newPhotoUrls, ...existingPhotos].slice(0, 12);
   }
 
+  // Slow-time offer -> special_offers (rendered on the listing + deals feed).
+  // A blank title clears any existing offer. Scrubbed for medical claims; code
+  // and expiry are sanitized. Expiry is enforced at render time.
+  const offerTitle = scrub(answers.offer?.title, 90);
+  if (offerTitle) {
+    const code = (answers.offer?.code || '').toString().replace(/[^A-Za-z0-9\-]/g, '').slice(0, 24);
+    const expires = /^\d{4}-\d{2}-\d{2}$/.test(answers.offer?.expires || '') ? answers.offer!.expires : undefined;
+    update.special_offers = [{ title: offerTitle, description: '', ...(code ? { code } : {}), ...(expires ? { expires } : {}) }];
+  } else {
+    update.special_offers = [];
+  }
+
   const { error: updErr } = await supabase.from('providers').update(update).eq('id', providerId);
   if (updErr) {
     console.error('finish-listing update error', updErr.message);
@@ -236,6 +249,7 @@ Who places IVs: ${whoPlaces}
 Medical oversight: ${oversight || 'not specified'}
 Ingredient sourcing: ${sourcing}
 Logo uploaded: ${newLogoUrl ? 'yes' : 'no'} | Photos uploaded: ${newPhotoUrls.length}
+Slow-time offer: ${offerTitle ? offerTitle + (answers.offer?.expires ? ` (ends ${answers.offer.expires})` : '') : 'none'}
 
 Safety evidence for your badge decision is above (team + sourcing). Review and, if it holds, flip safety_verified in /admin/onboarding.
 

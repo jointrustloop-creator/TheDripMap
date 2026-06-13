@@ -78,6 +78,7 @@ function step(name, ok, detail = '') {
       sourcing: ['Licensed compounding pharmacy'],
       payment: ['HSA/FSA', 'Pay per visit'],
       about: 'E2E test about line.',
+      offer: { title: '$20 off any drip this week', code: 'E2E20', expires: '2099-12-31' },
     };
     const fd = new FormData();
     fd.append('answers', JSON.stringify(answers));
@@ -95,7 +96,7 @@ function step(name, ok, detail = '') {
 
     // STEP 5: DB reflects the answers.
     const { data: after } = await s.from('providers')
-      .select('services, specialties, price_range, description, medical_team, decision_drivers')
+      .select('services, specialties, price_range, description, medical_team, decision_drivers, special_offers')
       .eq('id', prov.id).maybeSingle();
     const svcNames = (after?.services || []).map((x) => x.name);
     results.push(step('services saved (Hydration + NAD+)', svcNames.includes('Hydration') && svcNames.includes('NAD+'), svcNames.join(',')));
@@ -103,6 +104,7 @@ function step(name, ok, detail = '') {
     results.push(step('medical_team lead saved', (after?.medical_team || [])[0]?.name === 'E2E Test Lead, RN'));
     results.push(step('description composed', typeof after?.description === 'string' && after.description.includes('Hydration')));
     results.push(step('answers stashed for re-edit', !!after?.decision_drivers?.manage));
+    results.push(step('slow-time offer saved to special_offers', (after?.special_offers || [])[0]?.title === '$20 off any drip this week' && (after?.special_offers || [])[0]?.code === 'E2E20'));
 
   } catch (err) {
     console.log(`\n!!! UNEXPECTED ERROR: ${err.message}`);

@@ -102,7 +102,10 @@ export const ProviderCardFeatured = ({
   const credentialLine = deriveCredentialLine(provider);
   const openStatus = deriveOpenStatus(provider);
   const dripMenu = deriveDripMenu(provider);
-  const firstTimeOffer = provider.special_offers?.[0];
+  // Only show a non-expired offer (expiry set by the owner via /finish).
+  const firstTimeOffer = provider.special_offers?.find(
+    (o) => o && o.title && (!o.expires || o.expires >= new Date().toISOString().slice(0, 10))
+  );
   const bookingUrl = (provider as { online_booking_url?: string }).online_booking_url;
   const lead = provider.medical_team?.[0];
 

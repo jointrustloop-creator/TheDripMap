@@ -29,6 +29,7 @@ import {
   ShieldCheck,
   Calendar,
   ChevronRight,
+  Gift,
 } from 'lucide-react';
 import { ResilientImage } from './ResilientImage';
 import { MessageClinicButton } from './MessageClinicButton';
@@ -305,6 +306,15 @@ export default function DefinitiveListingLayout({
   // Sticky booking head subtitle: city + province only.
   const stickySubtitle = `${cityLabel}, ${stateCode}`;
 
+  // Slow-time offer (operator-approved feature). Show the first non-expired
+  // offer the owner set via /finish. Expiry enforced here at render time.
+  const todayIso = new Date().toISOString().slice(0, 10);
+  type Offer = { title?: string; code?: string; expires?: string };
+  const rawOffers = (provider as { special_offers?: Offer[] }).special_offers;
+  const activeOffer = Array.isArray(rawOffers)
+    ? rawOffers.find((o) => o && typeof o.title === 'string' && o.title.trim() && (!o.expires || o.expires >= todayIso))
+    : null;
+
   // ── Showcase modules (2026-06-12) ──────────────────────────────────────
   // New patient/owner-value sections previewed on Blue Cypress only, pending
   // operator approval before rollout to all claimed listings. Every value is
@@ -516,6 +526,23 @@ export default function DefinitiveListingLayout({
         <div className={`grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_372px] gap-[32px] lg:gap-[54px] items-start ${hasGallery ? 'pt-[46px]' : 'pt-[40px]'} pb-[80px]`}>
 
           <main>
+            {/* ── Slow-time offer banner (owner-set via /finish) ── */}
+            {activeOffer && (
+              <div className="mb-[34px] flex items-start gap-3.5 rounded-[18px] p-[18px_22px] bg-[#fdf6e7] border border-[#e7cf93]">
+                <div className="flex-none w-[42px] h-[42px] rounded-full bg-[#d8b878]/20 text-[#a9772a] flex items-center justify-center">
+                  <Gift size={20} />
+                </div>
+                <div className="min-w-0 pt-[2px]">
+                  <div className="text-[10.5px] tracking-[0.14em] uppercase text-[#a9772a] font-bold mb-[3px]">Limited-time offer</div>
+                  <div className="text-[16px] font-bold text-[#5a4310] leading-snug">{activeOffer.title}</div>
+                  <div className="text-[12.5px] text-[#8a6f3e] mt-[3px] flex flex-wrap gap-x-3">
+                    {activeOffer.code && <span>Use code <b className="font-bold">{activeOffer.code}</b></span>}
+                    {activeOffer.expires && <span>Ends {activeOffer.expires}</span>}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* ── At a glance ── */}
             {glanceCells.length > 0 && (
               <section className="mb-[46px]">
