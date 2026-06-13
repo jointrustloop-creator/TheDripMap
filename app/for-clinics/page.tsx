@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { ClinicAudit } from '../../src/components/ClinicAudit';
-import { ArrowRight, BarChart, Users, Globe, Check, X, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BarChart, Users, Globe, Check, X, ShieldCheck, Clock, Wallet, Zap } from 'lucide-react';
 import { getSiteStats, getFeaturedListings, getListingsByCity, getAllListings } from '../../src/lib/data';
 import { ProviderCard } from '../../src/components/ProviderCard';
 import { Provider } from '../../src/types';
@@ -65,31 +65,29 @@ export default async function ForClinicsPage() {
       <Navbar />
       
       <main className="max-w-7xl mx-auto px-6 py-20">
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <h1 className="text-5xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
-            Your clinic is already on <span className="text-wellness-600">TheDripMap</span>. Make it work for you.
+        {/* HERO — loss-aversion hook (your listing already exists) + a primary
+            claim CTA above the fold + friction-killing microtrust. The old
+            off-funnel SEO-audit CTA was removed 2026-06-12 so the page has a
+            single job: claim. */}
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-wellness-600 mb-5">For clinic owners</p>
+          <h1 className="font-black text-slate-900 tracking-[-0.03em] leading-[0.98] text-[clamp(2.75rem,7vw,5rem)] mb-6">
+            Your clinic is already<br />on The Drip Map.<br />
+            <span className="font-serif italic font-normal text-[#0F6E56]">Take the keys.</span>
           </h1>
-          <p className="text-xl text-slate-500 leading-relaxed">
-            {stats.total.toLocaleString()}+ clinics listed across the US and Canada. Patients are actively searching. Claim your free listing in 2 minutes.
+          <p className="text-lg md:text-xl text-slate-500 leading-relaxed max-w-2xl mx-auto mb-9">
+            It is listed right now as a blank placeholder that patients scroll past. Claiming puts your photos, prices, team, and booking link on the page, so the patients already viewing it book you instead of the clinic next door.
           </p>
+          <div className="flex flex-col items-center gap-4">
+            <a
+              href="/for-clinics/setup"
+              className="group inline-flex items-center gap-2 bg-wellness-600 hover:bg-wellness-700 text-white px-9 py-4 rounded-2xl font-black text-base shadow-xl shadow-wellness-200 transition-all hover:-translate-y-0.5"
+            >
+              Claim your free listing <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </a>
+            <p className="text-[12px] font-bold text-slate-400 uppercase tracking-[0.12em]">2 minutes · no credit card · free forever</p>
+          </div>
         </div>
-
-        {/* SEO audit CTA — run the free audit before diving in */}
-        <Link
-          href="/tools/seo-audit"
-          className="group flex flex-col sm:flex-row items-center gap-5 bg-white border-2 border-wellness-600 rounded-3xl p-6 md:p-7 mb-12 max-w-3xl mx-auto shadow-sm hover:shadow-xl hover:shadow-wellness-100/60 transition-all"
-        >
-          <div className="w-12 h-12 rounded-2xl bg-wellness-50 flex items-center justify-center shrink-0 text-wellness-600">
-            <BarChart size={24} />
-          </div>
-          <div className="flex-1 text-center sm:text-left">
-            <div className="font-black text-slate-900 text-lg">Not sure how your clinic ranks?</div>
-            <div className="text-slate-500 text-sm">Run a free SEO audit first — see your score in 60 seconds.</div>
-          </div>
-          <span className="inline-flex items-center gap-2 font-black text-sm text-wellness-700 shrink-0">
-            Run free audit <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-          </span>
-        </Link>
 
         {/* Real-numbers stat strip. Every figure is queried live from the
             database at render time; no hardcoded market claims. (The previous
@@ -119,26 +117,21 @@ export default async function ForClinicsPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-32">
-          {[
-            { icon: <Users size={32} />, title: 'Patients, not impressions', desc: 'High-intent patients comparing IV clinics in your city land on your listing at the exact moment they decide where to book.' },
-            { icon: <BarChart size={32} />, title: 'Your page, complete', desc: 'Your drip menu with your real prices, your team and their credentials, photos, hours, and a direct booking link. We build it with you from one reply email.' },
-            { icon: <Globe size={32} />, title: 'The Safety Verified badge', desc: 'Answer our safety questionnaire in writing and earn the badge patients look for. It is never sold, only earned, and it stays free.' }
-          ].map((item, idx) => (
-            <div key={idx} className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl text-center">
-              <div className="w-16 h-16 bg-wellness-50 rounded-2xl flex items-center justify-center text-wellness-600 mx-auto mb-8">
-                {item.icon}
-              </div>
-              <h3 className="text-2xl font-black text-slate-900 mb-4">{item.title}</h3>
-              <p className="text-slate-500 leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Listing audit — clinic owner types their name, sees their actual listing vs claimed,
-            plus top competitors in their city. Replaces a tepid ROI calculator with a personal,
-            actionable conversion tool. */}
-        <div className="mb-24">
+        {/* Listing audit, moved up 2026-06-12 to sit right after the stat
+            strip. Nothing converts like a clinic owner seeing their OWN blank
+            listing load next to the polished claimed clinics in their city.
+            Self-contained interactive component; owner types their name. */}
+        <div className="mb-32">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <p className="text-xs font-black uppercase tracking-[0.25em] text-wellness-600 mb-4">See it for yourself</p>
+            <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1.05] text-[clamp(2rem,4.5vw,3.25rem)] mb-5">
+              Look up your clinic.<br />
+              <span className="font-serif italic font-normal text-[#0F6E56]">See what patients see.</span>
+            </h2>
+            <p className="text-lg text-slate-500 leading-relaxed">
+              Type your clinic name and watch your real listing load, exactly as a patient finds it today, beside the top claimed clinics in your city.
+            </p>
+          </div>
           <ClinicAudit />
         </div>
 
@@ -289,40 +282,63 @@ export default async function ForClinicsPage() {
           </div>
         </div>
 
-        {/* Featured waitlist — soft mention, no pricing, no oversell */}
-        <Link
-          href="/for-clinics/featured-waitlist"
-          className="group flex flex-col sm:flex-row items-center gap-5 bg-slate-900 text-white rounded-3xl p-6 md:p-7 mb-20 max-w-3xl mx-auto hover:bg-slate-800 transition-all"
-        >
-          <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0 text-wellness-300">
-            <ShieldCheck size={24} />
+        {/* WHAT CLAIMING GETS YOU — the three outcomes, positive frame.
+            (Relocated below the comparison 2026-06-12; the old Featured
+            waitlist and the redundant third stat row were removed so the page
+            keeps one job: claim.) */}
+        <div className="mb-32">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <p className="text-xs font-black uppercase tracking-[0.25em] text-wellness-600 mb-4">What claiming gets you</p>
+            <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1.05] text-[clamp(2rem,4.5vw,3.25rem)]">
+              Three things every<br />
+              <span className="font-serif italic font-normal text-[#0F6E56]">claimed listing earns.</span>
+            </h2>
           </div>
-          <div className="flex-1 text-center sm:text-left">
-            <div className="font-black text-white text-lg">Want first dibs when we open Featured placement in your city?</div>
-            <div className="text-slate-300 text-sm">Three slots per city, max. No pricing today, no commitment. Just a heads up when your city opens.</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            {[
+              { icon: <Users size={28} />, title: 'Patients, not impressions', desc: 'High-intent patients comparing IV clinics in your city land on your listing at the exact moment they decide where to book.' },
+              { icon: <BarChart size={28} />, title: 'Your page, complete', desc: 'Your drip menu with your real prices, your team and their credentials, photos, hours, and a direct booking link. We build it with you from one reply email.' },
+              { icon: <Globe size={28} />, title: 'The Safety Verified badge', desc: 'Answer our safety questionnaire in writing and earn the badge patients look for. It is never sold, only earned, and it stays free.' }
+            ].map((item, idx) => (
+              <div key={idx} className="bg-white p-8 md:p-9 rounded-[2.5rem] border border-slate-100 shadow-xl">
+                <div className="w-14 h-14 bg-wellness-50 rounded-2xl flex items-center justify-center text-wellness-600 mb-7">
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-black text-slate-900 mb-3 tracking-tight">{item.title}</h3>
+                <p className="text-slate-500 leading-relaxed text-[15px]">{item.desc}</p>
+              </div>
+            ))}
           </div>
-          <span className="inline-flex items-center gap-2 font-black text-sm text-wellness-300 shrink-0">
-            Join the waitlist <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-          </span>
-        </Link>
+        </div>
 
-        {/* Social Proof Row */}
-        <div className="py-12 border-y border-slate-100 mb-20">
-          <div className="flex flex-wrap justify-center gap-x-12 gap-y-6 text-center">
-            <div className="space-y-1">
-              <div className="text-2xl font-black text-slate-900">{stats.total.toLocaleString()}</div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">clinics listed</div>
-            </div>
-            <div className="space-y-1 text-slate-200 text-2xl font-light">·</div>
-            <div className="space-y-1">
-              <div className="text-2xl font-black text-slate-900">{stats.cities.toLocaleString()}</div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">cities covered</div>
-            </div>
-            <div className="space-y-1 text-slate-200 text-2xl font-light">·</div>
-            <div className="space-y-1">
-              <div className="text-2xl font-black text-slate-900">{stats.states.toLocaleString()}</div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">states</div>
-            </div>
+        {/* OBJECTION KILLERS — risk reversal. Every reason an owner stalls,
+            dismantled. This is the "stupid not to claim" core: time, cost,
+            delay, reversibility. */}
+        <div className="mb-32">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <p className="text-xs font-black uppercase tracking-[0.25em] text-wellness-600 mb-4">No reason to wait</p>
+            <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1.05] text-[clamp(2rem,4.5vw,3.25rem)]">
+              Every reason to put this off,<br />
+              <span className="font-serif italic font-normal text-[#0F6E56]">answered.</span>
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {[
+              { Icon: Clock, objection: '"I don’t have time."', answer: 'Claiming takes two minutes. After that, one reply email with your drips, prices, and a few photos, and we build the whole page for you. Total effort on your side is about ten minutes, once.' },
+              { Icon: Wallet, objection: '"What is the catch?"', answer: 'There is none. Claiming is free and stays free, with no card and no trial. Your verified listing never costs a cent. That is the offer, in full.' },
+              { Icon: Zap, objection: '"I’ll do it later."', answer: 'The listing is already live and already getting views. Every week it stays blank, those patients book a clinic that claimed. Later is the one option that quietly costs you.' },
+              { Icon: Check, objection: '"What if I change my mind?"', answer: 'One email edits or removes anything, anytime. You are simply taking control of a page that already exists, with or without you.' },
+            ].map((o) => (
+              <div key={o.objection} className="flex items-start gap-5 bg-white rounded-[2rem] border border-slate-200 p-7 md:p-8 shadow-sm hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 rounded-2xl bg-wellness-50 text-wellness-600 flex items-center justify-center shrink-0">
+                  <o.Icon size={22} strokeWidth={2} />
+                </div>
+                <div>
+                  <div className="text-lg font-black text-slate-900 tracking-tight mb-2">{o.objection}</div>
+                  <p className="text-[14.5px] text-slate-500 leading-relaxed">{o.answer}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -397,9 +413,9 @@ export default async function ForClinicsPage() {
           <div className="absolute top-0 right-0 w-1/2 h-full bg-black/5 skew-x-12 translate-x-1/4" />
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">Ready to claim your listing?</h2>
+              <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight leading-[1.05]">Your listing is live either way.</h2>
               <p className="text-lg text-emerald-50 mb-10 leading-relaxed font-medium">
-                It takes 2 minutes and it&apos;s completely free.
+                The only choice is whether it works for you or for the clinic down the street. Claiming is free and takes two minutes.
               </p>
               <Link
                 href="/for-clinics/setup"
@@ -407,13 +423,14 @@ export default async function ForClinicsPage() {
               >
                 Claim Your Free Listing <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </Link>
+              <p className="mt-4 text-[13px] font-bold text-emerald-100/80 uppercase tracking-[0.12em]">2 minutes · no credit card · free forever</p>
             </div>
             <div className="space-y-6">
               {[
-                'Free to claim and manage',
-                'Add your photos and specialties',
-                'Rank higher in match results',
-                'See how many patients view your listing'
+                'Free forever. No card, no trial.',
+                'We build your page from one email.',
+                'Live within two business days.',
+                'Outrank unclaimed clinics in your city.'
               ].map((item, idx) => (
                 <div key={idx} className="flex items-center gap-4 bg-white/10 backdrop-blur-md p-5 rounded-3xl border border-white/10 group hover:border-white/20 transition-colors">
                   <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0">
