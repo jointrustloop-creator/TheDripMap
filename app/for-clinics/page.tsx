@@ -11,8 +11,8 @@ import { Provider } from '../../src/types';
 
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getSiteStats();
-  const title = "List Your IV Therapy Clinic — Reach More Patients | TheDripMap";
-  const description = `Join the nation's #1 IV therapy matching platform with ${stats.total.toLocaleString()}+ listed clinics. Claim your free listing to reach thousands of patients searching for wellness drips in your city every month.`;
+  const title = 'List Your IV Therapy Clinic Free | The Drip Map';
+  const description = `Claim your free listing on North America's IV therapy matching platform. ${stats.total.toLocaleString()}+ clinics listed across the US and Canada. Add your drips, prices, team, and photos, and reach patients searching in your city.`;
 
   return {
     title,
@@ -91,13 +91,12 @@ export default async function ForClinicsPage() {
           </span>
         </Link>
 
-        {/* Real-numbers stat strip — concrete proof that traffic is real */}
+        {/* Real-numbers stat strip. Every figure is queried live from the
+            database at render time; no hardcoded market claims. (The previous
+            "19,700 monthly searches" / "+83% WoW" / "12.5x" figures were
+            static and unverifiable, removed 2026-06-12 copy audit.) */}
         <div className="bg-slate-900 text-white rounded-[2rem] py-8 px-6 md:px-12 mb-20">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 text-center">
-            <div>
-              <div className="text-3xl md:text-4xl font-black text-wellness-400 mb-1">19,700</div>
-              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">monthly patient searches</div>
-            </div>
             <div>
               <div className="text-3xl md:text-4xl font-black text-wellness-400 mb-1">{stats.total.toLocaleString()}</div>
               <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">clinics listed</div>
@@ -107,20 +106,24 @@ export default async function ForClinicsPage() {
               <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">cities covered</div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-black text-wellness-400 mb-1">+83%</div>
-              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">week-over-week search growth</div>
+              <div className="text-3xl md:text-4xl font-black text-wellness-400 mb-1">{stats.states.toLocaleString()}</div>
+              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">states &amp; provinces</div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-black text-wellness-400 mb-1">$0</div>
+              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">to claim, forever</div>
             </div>
           </div>
           <p className="text-center text-xs text-slate-400 mt-6 font-medium italic">
-            Live patient demand across the US and Canada. Canadian markets are converting at <span className="text-wellness-400 font-bold not-italic">12.5×</span> the US rate — Canadian clinics, this is your moment.
+            On our own measured traffic, listings with real prices and named practitioners earn <span className="text-wellness-400 font-bold not-italic">many times</span> more patient clicks than bare listings. That gap is what claiming closes.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-32">
           {[
-            { icon: <Users size={32} />, title: 'New Patient Leads', desc: 'Connect with high-intent patients specifically looking for IV treatments in your area.' },
-            { icon: <BarChart size={32} />, title: 'Market Insights', desc: 'Access data on local demand, popular services, and competitive pricing in your city.' },
-            { icon: <Globe size={32} />, title: 'SEO Dominance', desc: 'Leverage our high-authority matching platform to boost your own clinical presence online.' }
+            { icon: <Users size={32} />, title: 'Patients, not impressions', desc: 'High-intent patients comparing IV clinics in your city land on your listing at the exact moment they decide where to book.' },
+            { icon: <BarChart size={32} />, title: 'Your page, complete', desc: 'Your drip menu with your real prices, your team and their credentials, photos, hours, and a direct booking link. We build it with you from one reply email.' },
+            { icon: <Globe size={32} />, title: 'The Safety Verified badge', desc: 'Answer our safety questionnaire in writing and earn the badge patients look for. It is never sold, only earned, and it stays free.' }
           ].map((item, idx) => (
             <div key={idx} className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl text-center">
               <div className="w-16 h-16 bg-wellness-50 rounded-2xl flex items-center justify-center text-wellness-600 mx-auto mb-8">
@@ -262,6 +265,73 @@ export default async function ForClinicsPage() {
             </div>
           </div>
         </div>
+
+        {/* Clinic-owner FAQ — answer-first copy for search + AI engines.
+            FAQPage JSON-LD mirrors the visible text exactly. */}
+        {(() => {
+          const ownerFaqs: Array<{ q: string; a: string }> = [
+            {
+              q: 'Is listing my clinic on The Drip Map free?',
+              a: 'Yes. Claiming and managing your listing is free, with no time limit and no credit card. Your clinic is likely already listed; claiming simply puts you in control of it.',
+            },
+            {
+              q: 'What changes when I claim my listing?',
+              a: 'Your page swaps the grey placeholder for your real photos and logo, shows your drip menu with your prices, displays your rating and reviews, adds direct booking and call buttons, and ranks above unclaimed clinics in your city.',
+            },
+            {
+              q: 'How do I earn the Safety Verified badge?',
+              a: 'After you verify, we send five short questions covering who administers your IVs, your medical oversight, and where your ingredients come from. Answer in writing and we corroborate against public registries. The badge is never sold, only earned.',
+            },
+            {
+              q: 'Can I update my prices and services later?',
+              a: 'Yes. Reply to any email from us with changes and we update your listing, usually within two business days, and send you the link to review.',
+            },
+            {
+              q: 'How do patients contact my clinic?',
+              a: 'Your listing carries your phone number, website, directions, and a booking link if you have online booking. Patients go straight to you; we never sit between you and your patient.',
+            },
+            {
+              q: 'How do I correct or remove my listing?',
+              a: 'One email to info@thedripmap.com does either. Tell us what to fix and we fix it, or ask for removal and we take the listing down.',
+            },
+          ];
+          const ownerFaqJsonLd = {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: ownerFaqs.map((f) => ({
+              '@type': 'Question',
+              name: f.q,
+              acceptedAnswer: { '@type': 'Answer', text: f.a },
+            })),
+          };
+          return (
+            <div className="mb-24 max-w-3xl mx-auto">
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(ownerFaqJsonLd) }}
+              />
+              <div className="text-center mb-10">
+                <p className="text-xs font-black uppercase tracking-[0.25em] text-wellness-600 mb-4">Clinic owner FAQ</p>
+                <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+                  Straight answers, before you claim
+                </h2>
+              </div>
+              <div className="space-y-4">
+                {ownerFaqs.map((f) => (
+                  <details key={f.q} className="group bg-white rounded-2xl border border-slate-200 px-6 py-5 open:shadow-md transition-all">
+                    <summary className="cursor-pointer list-none flex items-center justify-between gap-4">
+                      <h3 className="font-black text-slate-900 text-base md:text-lg tracking-tight">{f.q}</h3>
+                      <span className="w-7 h-7 rounded-full bg-wellness-50 text-wellness-600 flex items-center justify-center shrink-0 group-open:rotate-90 transition-transform">
+                        <ArrowRight size={14} />
+                      </span>
+                    </summary>
+                    <p className="mt-4 text-[15px] text-slate-600 leading-relaxed">{f.a}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         <div className="bg-[#0F6E56] text-white rounded-[4rem] p-12 md:p-20 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-1/2 h-full bg-black/5 skew-x-12 translate-x-1/4" />

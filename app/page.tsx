@@ -43,8 +43,10 @@ export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getSiteStats();
-  const title = `IV Therapy Clinics Near Me — Find & Compare ${stats.total}+ Providers | The Drip Map`;
-  const description = `Find the best IV therapy clinic near you. Compare ${stats.total}+ verified providers across the US and Canada. Filter by treatment, price, and location. Book in 60 seconds.`;
+  // Title kept under ~60 visible chars so it never truncates in SERPs.
+  // "Verified" is the differentiator word; the live count is the proof.
+  const title = `IV Therapy Near Me: Compare ${stats.total}+ Verified Clinics | The Drip Map`;
+  const description = `Find the right IV therapy clinic near you. Compare ${stats.total}+ clinics across the US and Canada, see real drip menus and safety credentials, and match in 60 seconds.`;
 
   return {
     title,
@@ -856,6 +858,110 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          7.5. BEFORE-YOU-BOOK FAQ — answer-first copy for search + AI
+              engines. Six questions patients actually ask pre-booking
+              (sourced from the Phase 0 intent research), each answered
+              in 2-3 plain sentences with generic cost framing and no
+              medical claims. FAQPage JSON-LD mirrors the visible copy
+              exactly — never emit schema for content that isn't on the
+              page.
+          ───────────────────────────────────────────────────────────── */}
+      {(() => {
+        const faqs: Array<{ q: string; a: string; href?: string; hrefLabel?: string }> = [
+          {
+            q: 'How much does IV therapy cost?',
+            a: `Most clinics charge between $100 and $400 per drip depending on the formula: basic hydration sits at the low end, vitamin cocktails in the middle, and NAD+ at the top. Published menus in Canadian metros typically run $120 to $350 in Vancouver, $150 to $200 in Calgary, and $190 to $400 in Toronto. Listings on The Drip Map show each clinic's own menu and prices where the clinic has provided them.`,
+            href: '/guide/iv-therapy-cost-guide',
+            hrefLabel: 'Read the full cost guide',
+          },
+          {
+            q: 'Is IV therapy safe?',
+            a: `IV therapy is generally well tolerated when a licensed clinician places the line, a medical director oversees protocols, and ingredients come from a licensed pharmacy. Those are exactly the practices our Safety Verified badge asks clinics to confirm in writing. Always tell the clinic about medications and health conditions before any infusion.`,
+            href: '/guide/how-to-choose-iv-therapy-clinic',
+            hrefLabel: 'How to choose a clinic',
+          },
+          {
+            q: 'Who should administer an IV drip?',
+            a: `A registered nurse, nurse practitioner, physician, or, in Canada, a naturopathic doctor holding their province's IV authorization. If a clinic cannot tell you who places the line and who provides medical oversight, that is the single biggest warning sign to walk away.`,
+          },
+          {
+            q: 'How long does an IV therapy session take?',
+            a: `Plan for 30 to 60 minutes in the chair for most drips, plus intake paperwork on a first visit. High-dose formulas like NAD+ can take two hours or more, and many clinics ask new patients to complete a short health screening first.`,
+            href: '/guide/first-time-iv-therapy-what-to-expect',
+            hrefLabel: 'Your first session, step by step',
+          },
+          {
+            q: 'Does insurance cover IV therapy?',
+            a: `Provincial health plans and most US insurers do not cover wellness IV drips. In Canada, drips administered by a licensed naturopathic doctor can often be claimed under the naturopathic benefit of an extended health plan, so ask the clinic whether they issue eligible receipts. In the US, some clinics accept HSA and FSA payment.`,
+            href: '/blog/iv-therapy-insurance-coverage-canada',
+            hrefLabel: 'Insurance coverage in Canada',
+          },
+          {
+            q: 'How do I find a good IV therapy clinic near me?',
+            a: `Compare clinics on who administers the drips, whether prices are published, and what real patients say in reviews. The Drip Map lists ${stats.total.toLocaleString()} clinics across ${stats.cities} cities in the US and Canada and matches you by goal, location, and budget in under 60 seconds.`,
+            href: '/quiz',
+            hrefLabel: 'Take the 60-second match quiz',
+          },
+        ];
+        const faqJsonLd = {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: faqs.map((f) => ({
+            '@type': 'Question',
+            name: f.q,
+            acceptedAnswer: { '@type': 'Answer', text: f.a },
+          })),
+        };
+        return (
+          <section className="bg-white py-20 md:py-28 px-6 border-t border-slate-100">
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+            />
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-12 md:mb-16">
+                <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] mb-6 block">Quick Answers</span>
+                <h2 className="font-black text-slate-900 tracking-[-0.025em] leading-[1.05] text-[clamp(2rem,5vw,3.5rem)]">
+                  Before you book,<br />
+                  <span className="font-serif italic font-normal text-[#0F6E56]">know these six things.</span>
+                </h2>
+                <p className="mt-6 text-base text-slate-500 max-w-2xl mx-auto leading-relaxed">
+                  The Drip Map is North America&apos;s IV therapy matching platform. We list{' '}
+                  {stats.total.toLocaleString()} clinics across {stats.cities} cities in the US and
+                  Canada, ask clinics to confirm their safety practices in writing, and match you to
+                  the right clinic and drip in under 60 seconds.
+                </p>
+              </div>
+              <div className="space-y-4">
+                {faqs.map((f) => (
+                  <details
+                    key={f.q}
+                    className="group bg-[#F8F7F3] rounded-2xl border border-slate-200/70 px-6 py-5 open:bg-white open:shadow-sm transition-all"
+                  >
+                    <summary className="cursor-pointer list-none flex items-center justify-between gap-4">
+                      <h3 className="font-black text-slate-900 text-base md:text-lg tracking-tight">{f.q}</h3>
+                      <span className="w-7 h-7 rounded-full bg-white border border-slate-200 text-[#0F6E56] flex items-center justify-center shrink-0 group-open:rotate-90 transition-transform">
+                        <ArrowRight size={14} />
+                      </span>
+                    </summary>
+                    <p className="mt-4 text-[15px] text-slate-600 leading-relaxed">{f.a}</p>
+                    {f.href && (
+                      <Link
+                        href={f.href}
+                        className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-bold text-[#0F6E56] hover:text-[#0A5742]"
+                      >
+                        {f.hrefLabel} <ArrowRight size={12} />
+                      </Link>
+                    )}
+                  </details>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      })()}
 
       {/* ─────────────────────────────────────────────────────────────
           8. TRUST SIGNALS — keeps the existing component but lets it
