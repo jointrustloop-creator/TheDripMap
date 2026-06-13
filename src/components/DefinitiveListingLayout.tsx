@@ -308,7 +308,13 @@ export default function DefinitiveListingLayout({
     <div className="bg-[#f8f5ee] text-[#19241c] font-[var(--font-hanken)] antialiased">
       {/* ───────────────────────── STAGE ───────────────────────── */}
       <div className="bg-[#1f3a27] text-[#f3efe2] relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(120% 100% at 88% -20%, rgba(216,184,120,.15), transparent 58%)' }} />
+        {/* Layered ambient: warm gold key light upper-right, cool depth lower-left */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(120% 100% at 88% -20%, rgba(216,184,120,.16), transparent 58%)' }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(90% 90% at 0% 120%, rgba(47,84,54,.55), transparent 60%)' }} />
+        {/* Fine dot texture, masked to fade at edges */}
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #f3efe2 1px, transparent 1px)', backgroundSize: '30px 30px', maskImage: 'radial-gradient(ellipse 80% 70% at 50% 40%, black, transparent 78%)', WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at 50% 40%, black, transparent 78%)' }} />
+        {/* Hairline gold rule along the bottom edge for a finished transition */}
+        <div className="absolute inset-x-0 bottom-0 h-px pointer-events-none" style={{ background: 'linear-gradient(90deg, transparent, rgba(216,184,120,.5), transparent)' }} />
         <section className="relative z-[2] max-w-[1140px] mx-auto px-[30px] pt-[26px] pb-[40px]">
           {/* Breadcrumb */}
           <nav className="text-[12.5px] text-[#c4c9b8] mb-7">
@@ -322,20 +328,24 @@ export default function DefinitiveListingLayout({
           </nav>
 
           {/* Identity */}
-          <div className="flex gap-6 items-center">
-            <div className="flex-none w-[88px] h-[88px] rounded-full bg-[#142619] text-[#d8b878] flex items-center justify-center font-[var(--font-fraunces)] text-[38px] font-light border border-[rgba(216,184,120,0.4)] overflow-hidden">
+          <div className="flex gap-6 md:gap-7 items-center">
+            {/* Logo card: cream surface + object-contain so wordmark logos show
+                in full instead of being cropped into a circle. Gold ring +
+                soft drop shadow read premium. Initials fallback for clinics
+                with no logo asset stays in brand green. */}
+            <div className="flex-none w-[92px] h-[92px] md:w-[104px] md:h-[104px] rounded-[24px] bg-[#fffefa] flex items-center justify-center border border-[rgba(216,184,120,0.5)] ring-1 ring-[rgba(216,184,120,0.18)] shadow-[0_20px_44px_-20px_rgba(0,0,0,0.6)] overflow-hidden">
               {provider.imageUrl ? (
                 <ResilientImage
                   src={provider.imageUrl}
                   fallbackSrc={DEFAULT_CLINIC_IMAGE}
                   alt={`${provider.name} logo`}
-                  width={88}
-                  height={88}
+                  width={104}
+                  height={104}
                   fill={false}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain p-[11px]"
                 />
               ) : (
-                <span>{initials || getInitials(provider.name)}</span>
+                <span className="font-[var(--font-fraunces)] text-[40px] font-light text-[#1f3a27]">{initials || getInitials(provider.name)}</span>
               )}
             </div>
             <div className="flex-1 min-w-0">
@@ -420,16 +430,18 @@ export default function DefinitiveListingLayout({
             {/* ── At a glance ── */}
             {glanceCells.length > 0 && (
               <section className="mb-[46px]">
-                <div className={`grid grid-cols-2 md:grid-cols-${Math.max(glanceCells.length, 2)} gap-3 pb-[46px] border-b border-[rgba(25,36,28,0.09)]`} style={{ gridTemplateColumns: `repeat(${Math.min(glanceCells.length, 4)}, minmax(0, 1fr))` }}>
-                  {glanceCells.map(({ key, value, icon: Icon }) => (
-                    <div key={key} className="min-w-0">
-                      <div className="text-[10.5px] tracking-[0.1em] uppercase text-[#b08a3e] font-semibold mb-2">{key}</div>
-                      <div className="text-[15px] font-semibold flex items-start gap-2 leading-snug break-words">
-                        <Icon size={18} className="text-[#2f5436] flex-none mt-[1px]" />
-                        <span>{value}</span>
+                <div className="bg-[#fffefa] border border-[rgba(25,36,28,0.09)] rounded-[20px] shadow-[0_12px_34px_-20px_rgba(25,40,28,0.4)] overflow-hidden">
+                  <div className="grid" style={{ gridTemplateColumns: `repeat(${Math.min(glanceCells.length, 4)}, minmax(0, 1fr))` }}>
+                    {glanceCells.map(({ key, value, icon: Icon }, i) => (
+                      <div key={key} className={`min-w-0 px-[22px] py-[21px] ${i > 0 ? 'border-l border-[rgba(25,36,28,0.07)]' : ''}`}>
+                        <div className="text-[10.5px] tracking-[0.12em] uppercase text-[#b08a3e] font-semibold mb-[10px]">{key}</div>
+                        <div className="text-[15px] font-semibold flex items-start gap-2 leading-snug break-words">
+                          <Icon size={18} className="text-[#2f5436] flex-none mt-[1px]" />
+                          <span>{value}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </section>
             )}
@@ -653,10 +665,16 @@ export default function DefinitiveListingLayout({
                     <span className="text-[12.5px] text-[#919a8d]">{stickySubtitle}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 my-[18px] text-[13.5px]">
+                <div className="flex items-center gap-2 mt-[18px] mb-[14px] text-[13.5px]">
                   <span className={`w-[7px] h-[7px] rounded-full inline-block ${status.isOpen ? 'bg-emerald-500' : 'bg-[#d8b878]'}`} />
                   <span className="font-semibold text-[#b08a3e]">{status.text}</span>
                 </div>
+                {provider.price_range && (
+                  <div className="flex items-baseline justify-between gap-2 mb-[18px] py-[12px] px-[15px] rounded-[13px] bg-[#ebf1e5] border border-[rgba(47,84,54,0.12)]">
+                    <span className="text-[12px] uppercase tracking-[0.1em] font-semibold text-[#2f5436]">Typical visit</span>
+                    <span className="font-[var(--font-fraunces)] text-[20px] font-normal text-[#1f3a27] leading-none">{provider.price_range}</span>
+                  </div>
+                )}
                 {bookingHref ? (
                   <TrackedLink
                     providerId={provider.id}
