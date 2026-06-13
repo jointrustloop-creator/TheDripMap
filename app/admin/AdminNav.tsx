@@ -10,12 +10,15 @@ interface NavItem {
   label: string;
 }
 
+// 2026-06-12 admin audit: Onboarding added (W1 queue is now the core daily
+// surface). Owner pains demoted out of the nav (internal research; still
+// reachable via the Tools page link and direct URL).
 const NAV: NavItem[] = [
   { href: '/admin', label: 'Home' },
+  { href: '/admin/onboarding', label: 'Onboarding' },
   { href: '/admin/opportunities', label: 'Opportunities' },
   { href: '/admin/insights', label: 'Insights' },
   { href: '/admin/tools', label: 'Tools' },
-  { href: '/admin/clinic-owner-pains', label: 'Owner pains' },
   { href: '/admin/testimonials', label: 'Testimonials' },
   { href: '/admin/leads', label: 'Leads' },
   { href: '/admin/replies', label: 'Replies' },
