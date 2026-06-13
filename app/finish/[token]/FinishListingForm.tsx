@@ -93,6 +93,16 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
   const toggle = (arr: string[], setArr: (v: string[]) => void, val: string) =>
     setArr(arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]);
 
+  // Live completion across the 6 sections, to nudge owners to finish.
+  const sectionsDone =
+    (whoPlaces.length || oversight || leadName.trim() ? 1 : 0) +
+    (selectedDrips.length ? 1 : 0) +
+    (consult || length || booking ? 1 : 0) +
+    (sourcing.length ? 1 : 0) +
+    (payment.length ? 1 : 0) +
+    (logo || photos.length || about.trim() || hasLogo || photoCount > 0 ? 1 : 0);
+  const pctDone = Math.round((sectionsDone / 6) * 100);
+
   async function save() {
     setSaving(true);
     setError('');
@@ -173,6 +183,16 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
           <p className="text-slate-500 mt-3 leading-relaxed">
             All quick taps, about two minutes. Everything you set publishes to your live listing the moment you save, and you can come back to change it anytime.
           </p>
+          {/* Completion progress */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[12px] font-black uppercase tracking-[0.12em] text-[#0F6E56]">{sectionsDone} of 6 complete</span>
+              <span className="text-[12px] font-bold text-slate-400">{pctDone}%</span>
+            </div>
+            <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
+              <div className="h-full bg-[#0F6E56] rounded-full transition-all duration-500" style={{ width: `${pctDone}%` }} />
+            </div>
+          </div>
         </div>
 
         <div className="space-y-5">
