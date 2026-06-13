@@ -5,7 +5,7 @@ import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { ClinicAudit } from '../../src/components/ClinicAudit';
 import { ArrowRight, BarChart, Users, Globe, Check, X, ShieldCheck, Clock, Wallet, Zap } from 'lucide-react';
-import { getSiteStats, getFeaturedListings, getListingsByCity, getAllListings } from '../../src/lib/data';
+import { getSiteStats, getFeaturedListings, getAllListings } from '../../src/lib/data';
 import { ProviderCard } from '../../src/components/ProviderCard';
 import { Provider } from '../../src/types';
 
@@ -47,18 +47,31 @@ export default async function ForClinicsPage() {
   const stats = await getSiteStats();
 
   // Use REAL listings so the comparison shows exactly how claimed vs unclaimed
-  // listings render on the site (never hardcoded clinic data).
-  const featured = await getFeaturedListings(3);
-  const claimedSample: Provider | null = (featured[0] as Provider) || null;
-  let unclaimedSample: Provider | null = null;
-  if (claimedSample) {
-    const cityList = await getListingsByCity(claimedSample.city);
-    unclaimedSample = (cityList.find((p) => !p.is_featured) as Provider) || null;
-  }
-  if (!unclaimedSample) {
-    const all = await getAllListings();
-    unclaimedSample = (all.find((p) => !p.is_featured) as Provider) || null;
-  }
+  // listings render on the site (never hardcoded clinic data). Both cards are
+  // the real ProviderCard component; the contrast IS the component's own
+  // claimed-vs-unclaimed states, so it is true to what patients see.
+  //
+  // 2026-06-13 fix: the claimed card must be a genuinely claimed/featured
+  // clinic and the unclaimed card a GENUINELY unclaimed one. The old code
+  // selected the "unclaimed" sample with `!is_featured`, which let free-tier
+  // CLAIMED clinics (is_claimed=true, is_featured=false) through. ProviderCard
+  // lights up the verified treatment for is_claimed OR is_featured, so both
+  // cards rendered "Verified & Claimed" and looked identical. We now require
+  // is_claimed=false AND is_featured=false for the unclaimed sample.
+  const featured = await getFeaturedListings(6);
+  const claimedSample: Provider | null =
+    (featured.find((p) => p.imageUrl && Number(p.rating) > 0 && (p.specialties?.length || 0) > 0) as Provider) ||
+    (featured[0] as Provider) || null;
+
+  const all = await getAllListings();
+  const unclaimedSample: Provider | null =
+    (all.find((p) =>
+      p.is_claimed !== true && p.is_featured !== true &&
+      !!p.name && !!p.city && p.slug !== claimedSample?.slug &&
+      Array.isArray(p.specialties) && p.specialties.length >= 2
+    ) as Provider) ||
+    (all.find((p) => p.is_claimed !== true && p.is_featured !== true && p.slug !== claimedSample?.slug) as Provider) ||
+    null;
 
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
