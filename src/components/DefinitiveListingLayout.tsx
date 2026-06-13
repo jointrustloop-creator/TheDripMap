@@ -306,14 +306,47 @@ export default function DefinitiveListingLayout({
 
   return (
     <div className="bg-[#f8f5ee] text-[#19241c] font-[var(--font-hanken)] antialiased">
-      {/* ───────────────────────── STAGE ───────────────────────── */}
-      <div className="bg-[#1f3a27] text-[#f3efe2] relative overflow-hidden">
-        {/* Layered ambient: warm gold key light upper-right, cool depth lower-left */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(120% 100% at 88% -20%, rgba(216,184,120,.16), transparent 58%)' }} />
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(90% 90% at 0% 120%, rgba(47,84,54,.55), transparent 60%)' }} />
-        {/* Fine dot texture, masked to fade at edges */}
-        <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #f3efe2 1px, transparent 1px)', backgroundSize: '30px 30px', maskImage: 'radial-gradient(ellipse 80% 70% at 50% 40%, black, transparent 78%)', WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at 50% 40%, black, transparent 78%)' }} />
-        {/* Hairline gold rule along the bottom edge for a finished transition */}
+      {/* ───────────────────────── STAGE ─────────────────────────
+          IV-therapy themed hero: a deep emerald-to-teal fluid gradient with a
+          hydration glow, a faint droplet field, and slow IV-drip droplets
+          falling from the top. Replaces the former flat solid green.
+          All motion respects prefers-reduced-motion. */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes dlhFall { 0% { transform: translateY(-10px) rotate(45deg); opacity: 0 } 16% { opacity: .62 } 78% { opacity: .26 } 100% { transform: translateY(160px) rotate(45deg); opacity: 0 } }
+        @keyframes dlhFloat { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
+        @keyframes dlhGlow { 0%,100% { box-shadow: 0 0 0 1px rgba(94,234,212,.5), 0 0 14px rgba(94,234,212,.28) } 50% { box-shadow: 0 0 0 1px rgba(94,234,212,.85), 0 0 26px rgba(94,234,212,.5) } }
+        .dlh-chip { animation: dlhGlow 3.2s ease-in-out infinite }
+        .dlh-drip { position: absolute; width: 7px; height: 7px; border-radius: 0 50% 50% 50%; background: linear-gradient(135deg, rgba(174,247,228,.92), rgba(45,212,191,.35)); filter: blur(.3px) }
+        .dlh-bub { position: absolute; border-radius: 9999px; background: radial-gradient(circle at 35% 30%, rgba(190,242,225,.5), rgba(45,212,191,.06) 70%); animation: dlhFloat 7s ease-in-out infinite }
+        @media (prefers-reduced-motion: reduce) { .dlh-chip, .dlh-drip, .dlh-bub { animation: none !important; opacity: .3 } }
+      ` }} />
+      <div className="relative overflow-hidden text-[#f3efe2]" style={{ background: 'linear-gradient(168deg, #0b211a 0%, #123a2c 48%, #0b3633 100%)' }}>
+        {/* Teal hydration key light, upper-left */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(72% 86% at 14% -12%, rgba(45,212,191,.22), transparent 60%)' }} />
+        {/* Warm gold accent glow, upper-right (brand) */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(78% 92% at 92% -16%, rgba(216,184,120,.16), transparent 58%)' }} />
+        {/* Soft droplet field, masked to fade at edges */}
+        <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: [
+          'radial-gradient(circle at 20% 28%, rgba(190,242,225,.10) 0 5px, transparent 6px)',
+          'radial-gradient(circle at 34% 70%, rgba(190,242,225,.07) 0 3px, transparent 4px)',
+          'radial-gradient(circle at 58% 22%, rgba(190,242,225,.06) 0 4px, transparent 5px)',
+          'radial-gradient(circle at 70% 60%, rgba(190,242,225,.05) 0 6px, transparent 7px)',
+          'radial-gradient(circle at 47% 48%, rgba(190,242,225,.05) 0 2px, transparent 3px)',
+        ].join(','), maskImage: 'radial-gradient(ellipse 90% 80% at 50% 30%, black, transparent 85%)', WebkitMaskImage: 'radial-gradient(ellipse 90% 80% at 50% 30%, black, transparent 85%)' }} />
+        {/* Floating bubbles + falling IV drips */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <span className="dlh-bub" style={{ left: '8%', top: '32%', width: '14px', height: '14px', animationDelay: '0s' }} />
+          <span className="dlh-bub" style={{ left: '26%', top: '60%', width: '9px', height: '9px', animationDelay: '1.4s' }} />
+          <span className="dlh-bub" style={{ left: '83%', top: '42%', width: '11px', height: '11px', animationDelay: '.7s' }} />
+          <span className="dlh-drip" style={{ left: '64%', top: 0, animation: 'dlhFall 7s linear infinite', animationDelay: '0s' }} />
+          <span className="dlh-drip" style={{ left: '76%', top: 0, animation: 'dlhFall 8.5s linear infinite', animationDelay: '2.2s' }} />
+          <span className="dlh-drip" style={{ left: '88%', top: 0, animation: 'dlhFall 6.5s linear infinite', animationDelay: '4s' }} />
+          <span className="dlh-drip" style={{ left: '52%', top: 0, animation: 'dlhFall 9s linear infinite', animationDelay: '3.1s' }} />
+        </div>
+        {/* Fine texture, masked */}
+        <div className="absolute inset-0 opacity-[0.035] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #f3efe2 1px, transparent 1px)', backgroundSize: '30px 30px', maskImage: 'radial-gradient(ellipse 80% 70% at 50% 40%, black, transparent 78%)', WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at 50% 40%, black, transparent 78%)' }} />
+        {/* Bottom fluid edge: faint teal lift + gold hairline for a finished transition */}
+        <div className="absolute inset-x-0 bottom-0 h-24 pointer-events-none" style={{ background: 'linear-gradient(0deg, rgba(12,54,51,.5), transparent)' }} />
         <div className="absolute inset-x-0 bottom-0 h-px pointer-events-none" style={{ background: 'linear-gradient(90deg, transparent, rgba(216,184,120,.5), transparent)' }} />
         <section className="relative z-[2] max-w-[1140px] mx-auto px-[30px] pt-[26px] pb-[40px]">
           {/* Breadcrumb */}
@@ -350,8 +383,8 @@ export default function DefinitiveListingLayout({
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex gap-2 mb-[15px] flex-wrap">
-                <span className="inline-flex items-center gap-[7px] text-xs font-medium py-[6px] px-[13px] rounded-full border border-[rgba(243,239,226,0.25)] text-[#f3efe2]">
-                  <CheckCircle2 size={14} /> Verified &amp; claimed
+                <span className="dlh-chip inline-flex items-center gap-[7px] text-xs font-semibold py-[6px] px-[13px] rounded-full border border-[#5eead4] text-[#aef7e4]" style={{ background: 'rgba(45,212,191,0.10)' }}>
+                  <CheckCircle2 size={14} className="text-[#5eead4]" /> Verified &amp; claimed
                 </span>
                 {safetyVerified && (
                   <a href="#safety-verified" className="inline-flex items-center gap-[7px] text-xs font-medium py-[6px] px-[13px] rounded-full border border-[rgba(216,184,120,0.55)] text-[#d8b878] hover:bg-[rgba(216,184,120,0.08)] transition-colors">
