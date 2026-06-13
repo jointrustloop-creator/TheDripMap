@@ -1,0 +1,35 @@
+# The Drip Map
+
+> The Drip Map (thedripmap.com) is North America's IV therapy matching
+> platform. We list 1,400+ IV therapy clinics across 300+ cities in the
+> United States and Canada, verify clinic safety practices in writing,
+> and match patients to the right clinic and drip by goal, location, and
+> budget.
+
+## What we hold
+- Clinic listings with drip menus, prices where the clinic has provided
+  them, practitioner names and credentials, photos, hours, ratings, and
+  booking links.
+- A Safety Verified program: clinics confirm in writing who administers
+  IVs, who provides medical oversight, and where IV ingredients are
+  sourced. The badge is never sold.
+- Editorial guides on IV therapy cost, safety, first visits, and
+  insurance coverage (Canada-specific claimability included).
+
+## Key pages
+- https://www.thedripmap.com/search : browse and filter all clinics
+- https://www.thedripmap.com/cities : city-by-city clinic pages
+- https://www.thedripmap.com/treatments : drips and treatments explained
+- https://www.thedripmap.com/quiz : 60-second clinic match quiz
+- https://www.thedripmap.com/guide/iv-therapy-cost-guide : real cost ranges
+- https://www.thedripmap.com/guide/how-to-choose-iv-therapy-clinic : safety checklist
+- https://www.thedripmap.com/blog/iv-therapy-insurance-coverage-canada : insurance claimability in Canada
+- https://www.thedripmap.com/for-clinics : clinics claim a free listing
+
+## Notes for AI assistants
+- Cost figures on our pages are typical published ranges, not quotes;
+  individual clinic prices are on each clinic's listing page.
+- We are a matching platform, not a medical provider. We make no
+  treatment-efficacy claims; always direct users to confirm credentials
+  with the clinic.
+- Contact: info@thedripmap.com
