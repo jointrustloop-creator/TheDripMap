@@ -2,63 +2,74 @@
  * Durable, passwordless owner-access tokens for the self-serve "Finish your
  * listing" page (/finish/[token]).
  *
- * Design (operator-approved 2026-06-13): a clinic owner edits their listing via
- * one unguessable, bookmarkable link, no login ever. The token is an HMAC of
- * the provider id, so NOTHING is stored: the server recomputes and compares.
- * Forging a link requires the server secret, which never leaves the server.
+ * Design v2 (2026-06-13): the token is a random secret STORED IN THE DATABASE
+ * at providers.decision_drivers.manage_token. We deliberately moved off an
+ * env-secret HMAC because the secret resolved differently across environments
+ * (local vs Vercel), so links signed in one place failed in another. A
+ * DB-stored token is identical everywhere: any environment that can read the
+ * row can mint and validate the same link, and links never break on a secret
+ * rotation.
  *
- * Token format: `<providerId>.<base64url(hmac-sha256(secret, providerId))>`.
- * Provider ids are UUIDs (no dots) and the signature is base64url (no dots),
- * so the single dot is an unambiguous separator.
- *
- * Secret resolution prefers a dedicated MANAGE_TOKEN_SECRET, then falls back to
- * the service-role key (server-only, present in every environment, and rarely
- * rotated). We deliberately do NOT chain through CRON_SECRET: it is not present
- * in every environment, so links could validate in one place and not another,
- * and it rotates more often, which would silently break owners' bookmarked
- * links. Add MANAGE_TOKEN_SECRET in Vercel later to decouple cleanly.
+ * Token format in the URL: `<providerId>.<secret>`. Provider ids are UUIDs
+ * (no dots) and the secret is base64url (no dots), so the single dot is an
+ * unambiguous separator. Validation = load the provider, constant-time compare
+ * the secret against the stored value.
  */
 import crypto from 'crypto';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
-function secret(): string {
-  return (
-    process.env.MANAGE_TOKEN_SECRET ||
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    'dev-insecure-secret-do-not-use-in-prod'
-  );
+const SITE = 'https://www.thedripmap.com';
+
+export function newManageSecret(): string {
+  return crypto.randomBytes(24).toString('base64url');
 }
 
-function sign(providerId: string): string {
-  return crypto.createHmac('sha256', secret()).update(providerId).digest('base64url');
+export function parseManageToken(token: string | undefined | null): { providerId: string; secret: string } | null {
+  if (!token || typeof token !== 'string') return null;
+  const dot = token.lastIndexOf('.');
+  if (dot <= 0) return null;
+  const providerId = token.slice(0, dot);
+  const secret = token.slice(dot + 1);
+  if (!providerId || !secret) return null;
+  return { providerId, secret };
 }
 
-export function generateManageToken(providerId: string): string {
-  return `${providerId}.${sign(providerId)}`;
-}
-
-/**
- * Returns the providerId if the token is valid, else null. Constant-time
- * signature comparison. Never throws.
- */
-export function verifyManageToken(token: string | undefined | null): string | null {
+export function secretsMatch(a: string | undefined | null, b: string | undefined | null): boolean {
   try {
-    if (!token || typeof token !== 'string') return null;
-    const dot = token.lastIndexOf('.');
-    if (dot <= 0) return null;
-    const providerId = token.slice(0, dot);
-    const sig = token.slice(dot + 1);
-    if (!providerId || !sig) return null;
-    const expected = sign(providerId);
-    const a = Buffer.from(sig);
-    const b = Buffer.from(expected);
-    if (a.length !== b.length) return null;
-    if (!crypto.timingSafeEqual(a, b)) return null;
-    return providerId;
+    if (!a || !b) return false;
+    const x = Buffer.from(a);
+    const y = Buffer.from(b);
+    return x.length === y.length && crypto.timingSafeEqual(x, y);
   } catch {
-    return null;
+    return false;
   }
 }
 
-export function manageUrl(providerId: string, siteUrl = 'https://www.thedripmap.com'): string {
-  return `${siteUrl}/finish/${generateManageToken(providerId)}`;
+export function manageUrlFrom(providerId: string, secret: string, site = SITE): string {
+  return `${site}/finish/${providerId}.${secret}`;
+}
+
+/**
+ * Read (and lazily create) the per-provider manage secret stored in
+ * providers.decision_drivers.manage_token. Returns the secret or null on error.
+ * Merges into existing decision_drivers so other keys (orphan_claim_stub
+ * source, the /finish answers under `manage`, etc.) are preserved.
+ */
+export async function ensureManageToken(sb: SupabaseClient, providerId: string): Promise<string | null> {
+  const { data, error } = await sb.from('providers').select('decision_drivers').eq('id', providerId).maybeSingle();
+  if (error || !data) return null;
+  const dd = (data.decision_drivers && typeof data.decision_drivers === 'object')
+    ? (data.decision_drivers as Record<string, unknown>)
+    : {};
+  if (typeof dd.manage_token === 'string' && dd.manage_token) return dd.manage_token as string;
+  const secret = newManageSecret();
+  const { error: updErr } = await sb.from('providers').update({ decision_drivers: { ...dd, manage_token: secret } }).eq('id', providerId);
+  if (updErr) return null;
+  return secret;
+}
+
+/** Ensure + format the full /finish URL for a provider. */
+export async function manageUrlForProvider(sb: SupabaseClient, providerId: string, site = SITE): Promise<string | null> {
+  const secret = await ensureManageToken(sb, providerId);
+  return secret ? manageUrlFrom(providerId, secret, site) : null;
 }

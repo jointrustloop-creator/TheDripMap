@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { AlertCircle } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
-import { verifyManageToken } from '../../../src/lib/manage-token';
+import { parseManageToken, secretsMatch } from '../../../src/lib/manage-token';
 import { FinishListingForm } from './FinishListingForm';
 
 export const dynamic = 'force-dynamic';
@@ -40,8 +40,8 @@ interface FinishPageProps {
 
 export default async function FinishPage({ params }: FinishPageProps) {
   const { token } = await params;
-  const providerId = verifyManageToken(token);
-  if (!providerId) return <InvalidLink />;
+  const parsed = parseManageToken(token);
+  if (!parsed) return <InvalidLink />;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -51,13 +51,17 @@ export default async function FinishPage({ params }: FinishPageProps) {
   const { data: p } = await supabase
     .from('providers')
     .select('id, name, slug, city, image_url, photos, decision_drivers')
-    .eq('id', providerId)
+    .eq('id', parsed.providerId)
     .maybeSingle();
   if (!p) return <InvalidLink />;
 
   const dd = (p.decision_drivers && typeof p.decision_drivers === 'object')
     ? (p.decision_drivers as Record<string, unknown>)
     : {};
+  // Validate the URL secret against the stored manage_token.
+  if (!secretsMatch(parsed.secret, typeof dd.manage_token === 'string' ? dd.manage_token : null)) {
+    return <InvalidLink />;
+  }
   const prefill = (dd.manage && typeof dd.manage === 'object') ? (dd.manage as Record<string, unknown>) : null;
 
   return (

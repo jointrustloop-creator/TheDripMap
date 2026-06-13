@@ -8,10 +8,14 @@ const { createClient } = require('@supabase/supabase-js');
 const s = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 const SITE = 'https://www.thedripmap.com';
 
-function manageToken(providerId) {
-  const secret = process.env.MANAGE_TOKEN_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || 'x';
-  const sig = crypto.createHmac('sha256', secret).update(providerId).digest('base64url');
-  return `${providerId}.${sig}`;
+// DB-stored manage token: read providers.decision_drivers.manage_token, or
+// create one. Matches the app's ensureManageToken so the token is valid on prod.
+async function ensureToken(prov) {
+  const dd = (prov.decision_drivers && typeof prov.decision_drivers === 'object') ? prov.decision_drivers : {};
+  if (dd.manage_token) return `${prov.id}.${dd.manage_token}`;
+  const secret = crypto.randomBytes(24).toString('base64url');
+  await s.from('providers').update({ decision_drivers: { ...dd, manage_token: secret } }).eq('id', prov.id);
+  return `${prov.id}.${secret}`;
 }
 function step(name, ok, detail = '') {
   console.log(`${ok ? '✓ PASS' : '✗ FAIL'} — ${name}${detail ? ' — ' + detail : ''}`);
@@ -38,8 +42,8 @@ function step(name, ok, detail = '') {
     }));
     console.log(`[0] Test provider: ${prov.name} (${prov.slug})`);
 
-    const token = manageToken(prov.id);
-    const badToken = `${prov.id}.deadbeefdeadbeef`;
+    const token = await ensureToken(prov);
+    const badToken = `${prov.id}.deadbeefdeadbeefdeadbeef`;
 
     // STEP 1: GET /finish/{token} renders the owner page.
     const pageRes = await fetch(`${SITE}/finish/${encodeURIComponent(token)}`, { headers: { 'User-Agent': 'E2E-Bot' } });

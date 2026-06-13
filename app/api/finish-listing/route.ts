@@ -19,7 +19,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../src/lib/mailer';
-import { verifyManageToken } from '../../../src/lib/manage-token';
+import { parseManageToken, secretsMatch } from '../../../src/lib/manage-token';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -140,8 +140,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'invalid answers json' }, { status: 400 });
   }
 
-  const providerId = verifyManageToken(answers.token || String(form.get('token') || ''));
-  if (!providerId) return NextResponse.json({ error: 'invalid or missing token' }, { status: 401 });
+  const parsed = parseManageToken(answers.token || String(form.get('token') || ''));
+  if (!parsed) return NextResponse.json({ error: 'invalid or missing token' }, { status: 401 });
+  const providerId = parsed.providerId;
 
   const supabase = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 
@@ -151,6 +152,14 @@ export async function POST(req: NextRequest) {
     .eq('id', providerId)
     .maybeSingle();
   if (provErr || !provider) return NextResponse.json({ error: 'listing not found' }, { status: 404 });
+
+  // Validate the URL secret against the stored manage_token.
+  const ddStored = (provider.decision_drivers && typeof provider.decision_drivers === 'object')
+    ? (provider.decision_drivers as Record<string, unknown>)
+    : {};
+  if (!secretsMatch(parsed.secret, typeof ddStored.manage_token === 'string' ? ddStored.manage_token : null)) {
+    return NextResponse.json({ error: 'invalid or missing token' }, { status: 401 });
+  }
 
   // ---- Map constrained answers -> real listing fields ----
   const drips = (answers.drips || []).filter((d) => d && typeof d.name === 'string' && d.name.trim());

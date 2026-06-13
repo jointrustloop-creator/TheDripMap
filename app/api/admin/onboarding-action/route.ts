@@ -22,6 +22,7 @@ import { createClient } from '@supabase/supabase-js';
 import { isAdminRequest } from '../../../../src/lib/admin-auth';
 import { sendMail } from '../../../../src/lib/mailer';
 import { buildOnboardingEmail } from '../../../../src/lib/onboarding';
+import { manageUrlForProvider } from '../../../../src/lib/manage-token';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -68,7 +69,8 @@ export async function POST(req: NextRequest) {
     if (provider.is_claimed !== true) {
       return NextResponse.json({ error: 'provider is not claimed; refusing to send' }, { status: 400 });
     }
-    const email = buildOnboardingEmail(provider, row.owner_name);
+    const finishUrl = (await manageUrlForProvider(sb, provider.id)) || `https://www.thedripmap.com/providers/${provider.slug}`;
+    const email = buildOnboardingEmail(provider, row.owner_name, finishUrl);
     const res = await sendMail({
       from: 'TheDripMap <info@thedripmap.com>',
       to: row.owner_email,

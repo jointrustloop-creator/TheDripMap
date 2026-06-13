@@ -15,7 +15,7 @@
  */
 import { SupabaseClient } from '@supabase/supabase-js';
 import { sendMail } from './mailer';
-import { manageUrl } from './manage-token';
+import { manageUrlForProvider } from './manage-token';
 
 // HARD GATE. Flip to true only after the operator approves Template B.
 // With SEND_5Q_WITH_CONFIRMATION below, the standalone auto-send path is not
@@ -42,13 +42,12 @@ export interface OnboardingProvider {
   city?: string | null;
 }
 
-export function buildOnboardingEmail(p: OnboardingProvider, ownerName?: string | null): {
+export function buildOnboardingEmail(p: OnboardingProvider, ownerName: string | null | undefined, finishUrl: string): {
   subject: string;
   text: string;
 } {
   const first = (ownerName || '').trim().split(/\s+/)[0] || 'there';
   const city = (p.city || '').trim() || 'your area';
-  const finishUrl = manageUrl(p.id, SITE_URL);
   return {
     subject: `You're verified on TheDripMap. Finish your listing in two minutes`,
     text: `Hi ${first},
@@ -69,12 +68,11 @@ ${OPERATOR_EMAIL}
   };
 }
 
-export function buildOnboardingNudge(p: OnboardingProvider, ownerName?: string | null): {
+export function buildOnboardingNudge(p: OnboardingProvider, ownerName: string | null | undefined, finishUrl: string): {
   subject: string;
   text: string;
 } {
   const first = (ownerName || '').trim().split(/\s+/)[0] || 'there';
-  const finishUrl = manageUrl(p.id, SITE_URL);
   return {
     subject: `Finish your TheDripMap listing in two minutes`,
     text: `Hi ${first},
@@ -126,7 +124,8 @@ export async function enqueueOnboarding(
       return { queued: true, sent: false };
     }
 
-    const email = buildOnboardingEmail(provider, ownerName);
+    const finishUrl = (await manageUrlForProvider(sb, provider.id)) || `${SITE_URL}/providers/${provider.slug}`;
+    const email = buildOnboardingEmail(provider, ownerName, finishUrl);
     const res = await sendMail({
       from: 'TheDripMap <info@thedripmap.com>',
       to: ownerEmail,
@@ -195,7 +194,8 @@ export async function sendVerificationOnboardingEmail(
       console.error('onboarding_requests insert non-fatal error', insErr.message);
     }
 
-    const email = buildOnboardingEmail(provider, ownerName);
+    const finishUrl = (await manageUrlForProvider(sb, provider.id)) || `${SITE_URL}/providers/${provider.slug}`;
+    const email = buildOnboardingEmail(provider, ownerName, finishUrl);
     const res = await sendMail({
       from: 'TheDripMap <info@thedripmap.com>',
       to: ownerEmail,

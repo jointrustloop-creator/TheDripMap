@@ -21,6 +21,7 @@ import {
   ONBOARDING_AUTOSEND,
   buildOnboardingNudge,
 } from '../../../../src/lib/onboarding';
+import { manageUrlForProvider } from '../../../../src/lib/manage-token';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -77,7 +78,8 @@ export async function GET(req: Request) {
       results.push({ provider_id: row.provider_id, ok: false, error: 'provider missing' });
       continue;
     }
-    const email = buildOnboardingNudge(provider, row.owner_name);
+    const finishUrl = (await manageUrlForProvider(supabase, provider.id)) || `https://www.thedripmap.com/providers/${provider.slug}`;
+    const email = buildOnboardingNudge(provider, row.owner_name, finishUrl);
     const res = await sendMail({
       from: 'TheDripMap <info@thedripmap.com>',
       to: row.owner_email,
