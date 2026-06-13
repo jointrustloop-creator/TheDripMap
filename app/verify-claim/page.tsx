@@ -254,7 +254,7 @@ export default async function VerifyClaimPage({ searchParams }: VerifyClaimPageP
               .
             </p>
             <p className="text-base text-slate-500 leading-relaxed mb-10 max-w-xl mx-auto">
-              Check your inbox: we just emailed you five quick questions. Reply with a few details and your logo, and we will build out your full page for you, usually within two business days.
+              Check your inbox: we just emailed you a private link to finish your listing. It is all quick taps, about two minutes, and the page is always yours to update.
             </p>
             {outcome.providerSlug && (
               <Link

@@ -15,6 +15,7 @@
  */
 import { SupabaseClient } from '@supabase/supabase-js';
 import { sendMail } from './mailer';
+import { manageUrl } from './manage-token';
 
 // HARD GATE. Flip to true only after the operator approves Template B.
 // With SEND_5Q_WITH_CONFIRMATION below, the standalone auto-send path is not
@@ -47,38 +48,23 @@ export function buildOnboardingEmail(p: OnboardingProvider, ownerName?: string |
 } {
   const first = (ownerName || '').trim().split(/\s+/)[0] || 'there';
   const city = (p.city || '').trim() || 'your area';
+  const finishUrl = manageUrl(p.id, SITE_URL);
   return {
-    subject: `You're verified on TheDripMap. Five quick questions to finish your listing`,
+    subject: `You're verified on TheDripMap. Finish your listing in two minutes`,
     text: `Hi ${first},
 
-${p.name} is now verified on TheDripMap. Nice to have you.
+${p.name} is now verified on TheDripMap, and your listing is live at ${SITE_URL}/providers/${p.slug}.
 
-Your listing is live now at ${SITE_URL}/providers/${p.slug}.
+You're confirmed as the owner. To finish your listing (your photos, your drips and prices, and who patients will meet), tap through your own private page here:
 
-Verified clinics with a complete profile get noticeably more clicks and calls than bare listings, so we'd like to fill yours in properly. Five questions. A few sentences each is plenty, and you can answer right in a reply to this email.
+${finishUrl}
 
-1. Who will patients meet? Who places the IVs, and who provides the medical oversight? Names and credentials (RN, NP, ND, MD), with one line of background per person. Something like "Dr. Megan Maycher, ND, 10 years in IV nutrient therapy" is perfect.
-
-2. What are your three most popular drips, and what do they typically cost? Name, a rough or "from" price, and how long a session usually takes. A range is fine. We never hold you to exact pricing.
-
-3. What does a first visit look like? Do new patients get a consultation or health screening first, how long should they budget, and what do most first-timers not expect?
-
-4. Where do your IV ingredients come from, and how are they prepared? For example, a licensed compounding pharmacy or pharmaceutical wholesaler, prepared fresh on site. Patients ask us this more than anything except price.
-
-5. How do patients pay, and what can they claim? Do you issue receipts for extended health benefits, do you direct bill, and do you take HSA/FSA? Is there a membership or package, or simply pay per visit?
-
-Two more things while you're at it:
-
-- Your logo (PNG or SVG is ideal)
-- Two or three photos: your treatment space, your team at work, your front door. Real photos beat stock every time, and listings with photos get far more bookings.
-
-Reply whenever suits you this week. We'll have your updated listing live within two business days of hearing back, and we'll send you the link to review before anything else changes.
+It is all quick multiple choice, it takes about two minutes, and the page is always yours. Bookmark it and update anything anytime. There is nothing to write up and nothing to reply to.
 
 Thanks again for verifying. Patients in ${city} are already finding you.
 
 TheDripMap
 ${OPERATOR_EMAIL}
-${SITE_URL}/providers/${p.slug}
 `,
   };
 }
@@ -88,13 +74,16 @@ export function buildOnboardingNudge(p: OnboardingProvider, ownerName?: string |
   text: string;
 } {
   const first = (ownerName || '').trim().split(/\s+/)[0] || 'there';
+  const finishUrl = manageUrl(p.id, SITE_URL);
   return {
-    subject: `Still want your TheDripMap listing filled in?`,
+    subject: `Finish your TheDripMap listing in two minutes`,
     text: `Hi ${first},
 
-Quick nudge on the five questions I sent last week for ${p.name}. A few sentences and a couple of photos is all we need, and your listing goes from placeholder to complete within two business days.
+Quick nudge to finish your listing for ${p.name}. It is all quick multiple choice and a few photos, about two minutes, on your own private page:
 
-If now is a bad time, no problem, your verified listing stays live either way. Reply whenever you're ready.
+${finishUrl}
+
+If now is a bad time, no problem, your verified listing stays live either way. The page is always there when you're ready.
 
 TheDripMap
 ${OPERATOR_EMAIL}

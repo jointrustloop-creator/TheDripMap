@@ -86,8 +86,8 @@ function step(name, ok, detail = '') {
       verifyHtml.includes('now live') && !verifyHtml.includes('24 hours')));
     results.push(step('verify-claim page shows clickable listing URL on success',
       verifyHtml.includes(`thedripmap.com/providers/${testProvider.slug}`)));
-    results.push(step('verify-claim page invites email reply with the 5 questions',
-      verifyHtml.includes('five quick questions') || verifyHtml.includes('we just emailed you')));
+    results.push(step('verify-claim page points owner to the emailed finish-listing link',
+      verifyHtml.includes('finish your listing') || verifyHtml.includes('we just emailed you')));
 
     // STEP 4: Verify DB state after verification
     console.log('\n[STEP 4] Verify DB state changed...');
