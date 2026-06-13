@@ -86,8 +86,8 @@ function step(name, ok, detail = '') {
       verifyHtml.includes('now live') && !verifyHtml.includes('24 hours')));
     results.push(step('verify-claim page shows clickable listing URL on success',
       verifyHtml.includes(`thedripmap.com/providers/${testProvider.slug}`)));
-    results.push(step('verify-claim page invites email reply for photos/services',
-      verifyHtml.includes('reply to your verification email')));
+    results.push(step('verify-claim page invites email reply with the 5 questions',
+      verifyHtml.includes('five quick questions') || verifyHtml.includes('we just emailed you')));
 
     // STEP 4: Verify DB state after verification
     console.log('\n[STEP 4] Verify DB state changed...');
@@ -102,6 +102,15 @@ function step(name, ok, detail = '') {
     // manually when a clinic upgrades to the paid tier.
     results.push(step('providers.is_featured = false (free tier)', provAfter?.is_featured === false,
       `actual is_featured=${provAfter?.is_featured}`));
+
+    // Merged onboarding (2026-06-13): verify now sends the combined
+    // confirmation + 5-questions email and records an onboarding_requests row,
+    // marking it 'sent'. Confirm that happened.
+    const { data: onbAfter } = await s.from('onboarding_requests')
+      .select('status, sent_at').eq('provider_id', testProvider.id).maybeSingle();
+    results.push(step('onboarding_requests row created + marked sent on verify',
+      !!onbAfter && onbAfter.status === 'sent' && !!onbAfter.sent_at,
+      `status=${onbAfter?.status} sent_at=${onbAfter?.sent_at}`));
 
     // STEP 5: Re-fire verify-claim with same token to confirm "already verified" path
     console.log('\n[STEP 5] Hit /verify-claim again — should be "already_verified"...');
@@ -127,6 +136,10 @@ function step(name, ok, detail = '') {
       step('Verified rollback: provider back to is_claimed=false, is_featured=false',
         final?.is_claimed === false && final?.is_featured === false,
         `is_claimed=${final?.is_claimed} is_featured=${final?.is_featured}`);
+      // Clean the onboarding_requests row the merged verify flow created, so
+      // repeat e2e runs don't accumulate rows or hit the dedupe guard.
+      const { error: onbErr } = await s.from('onboarding_requests').delete().eq('provider_id', testProvider.id);
+      step('Deleted test onboarding_requests row', !onbErr, onbErr?.message);
     }
 
     const passed = results.filter(r => r).length;
