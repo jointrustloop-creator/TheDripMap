@@ -104,7 +104,7 @@ export const ProviderCardFeatured = ({
   const dripMenu = deriveDripMenu(provider);
   // Only show a non-expired offer (expiry set by the owner via /finish).
   const firstTimeOffer = provider.special_offers?.find(
-    (o) => o && o.title && (!o.expires || o.expires >= new Date().toISOString().slice(0, 10))
+    (o) => o && o.title && o.active !== false && (!o.expires || o.expires >= new Date().toISOString().slice(0, 10))
   );
   const bookingUrl = (provider as { online_booking_url?: string }).online_booking_url;
   const lead = provider.medical_team?.[0];

@@ -309,10 +309,10 @@ export default function DefinitiveListingLayout({
   // Slow-time offer (operator-approved feature). Show the first non-expired
   // offer the owner set via /finish. Expiry enforced here at render time.
   const todayIso = new Date().toISOString().slice(0, 10);
-  type Offer = { title?: string; code?: string; expires?: string };
+  type Offer = { title?: string; code?: string; expires?: string; active?: boolean };
   const rawOffers = (provider as { special_offers?: Offer[] }).special_offers;
   const activeOffer = Array.isArray(rawOffers)
-    ? rawOffers.find((o) => o && typeof o.title === 'string' && o.title.trim() && (!o.expires || o.expires >= todayIso))
+    ? rawOffers.find((o) => o && typeof o.title === 'string' && o.title.trim() && o.active !== false && (!o.expires || o.expires >= todayIso))
     : null;
 
   // ── Showcase modules (2026-06-12) ──────────────────────────────────────
@@ -527,6 +527,19 @@ export default function DefinitiveListingLayout({
 
           <main>
             {/* ── Slow-time offer banner (owner-set via /finish) ── */}
+            {activeOffer && (
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                  '@context': 'https://schema.org',
+                  '@type': 'Offer',
+                  name: activeOffer.title,
+                  url: `https://www.thedripmap.com/providers/${provider.slug}`,
+                  seller: { '@type': 'MedicalBusiness', name: provider.name },
+                  ...(activeOffer.expires ? { availabilityEnds: activeOffer.expires } : {}),
+                }) }}
+              />
+            )}
             {activeOffer && (
               <div className="mb-[34px] flex items-start gap-3.5 rounded-[18px] p-[18px_22px] bg-[#fdf6e7] border border-[#e7cf93]">
                 <div className="flex-none w-[42px] h-[42px] rounded-full bg-[#d8b878]/20 text-[#a9772a] flex items-center justify-center">

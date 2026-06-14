@@ -40,7 +40,7 @@ interface Answers {
   sourcing?: string[];
   payment?: string[];
   about?: string;
-  offer?: { title?: string; code?: string; expires?: string };
+  offer?: { title?: string; code?: string; expires?: string; active?: boolean };
 }
 
 // Light scrub: trim, cap length, drop obvious medical-claim verbs so owner free
@@ -215,7 +215,8 @@ export async function POST(req: NextRequest) {
   if (offerTitle) {
     const code = (answers.offer?.code || '').toString().replace(/[^A-Za-z0-9\-]/g, '').slice(0, 24);
     const expires = /^\d{4}-\d{2}-\d{2}$/.test(answers.offer?.expires || '') ? answers.offer!.expires : undefined;
-    update.special_offers = [{ title: offerTitle, description: '', ...(code ? { code } : {}), ...(expires ? { expires } : {}) }];
+    const active = answers.offer?.active !== false; // default ON when an offer is set
+    update.special_offers = [{ title: offerTitle, description: '', active, ...(code ? { code } : {}), ...(expires ? { expires } : {}) }];
   } else {
     update.special_offers = [];
   }
@@ -226,9 +227,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'could not save, please try again' }, { status: 500 });
   }
 
-  // Bust the ISR cache for this listing so the owner's changes (and offer)
-  // appear immediately instead of waiting out the 5-minute revalidate window.
-  try { revalidatePath(`/providers/${provider.slug}`); } catch { /* non-fatal */ }
+  // Bust the ISR cache for this listing + the deals hub so the owner's changes
+  // (and offer) appear immediately instead of waiting out the revalidate window.
+  try { revalidatePath(`/providers/${provider.slug}`); revalidatePath('/deals'); } catch { /* non-fatal */ }
 
   // Mark the onboarding row submitted (non-fatal).
   try {

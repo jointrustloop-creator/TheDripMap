@@ -81,6 +81,7 @@ export interface Provider {
     description: string;
     code?: string;
     expires?: string;
+    active?: boolean;
   }[];
 }
 

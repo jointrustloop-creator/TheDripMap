@@ -11,7 +11,7 @@ interface Prefill {
   sourcing?: string[];
   payment?: string[];
   about?: string;
-  offer?: { title?: string; code?: string; expires?: string };
+  offer?: { title?: string; code?: string; expires?: string; active?: boolean };
 }
 
 interface Props {
@@ -90,6 +90,20 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
   const [offerTitle, setOfferTitle] = useState<string>(pf.offer?.title || '');
   const [offerCode, setOfferCode] = useState<string>(pf.offer?.code || '');
   const [offerExpires, setOfferExpires] = useState<string>(pf.offer?.expires || '');
+  const [offerActive, setOfferActive] = useState<boolean>(pf.offer?.active !== false);
+  const [offerSavedTitle] = useState<string>(pf.offer?.title || '');
+
+  // One-tap ON/OFF for an already-saved offer (no full form save needed).
+  async function toggleOffer(next: boolean) {
+    setOfferActive(next);
+    try {
+      await fetch('/api/offer-toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, active: next }),
+      });
+    } catch { /* optimistic; the next full save will reconcile */ }
+  }
 
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
@@ -120,7 +134,7 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
         sourcing,
         payment,
         about: about.trim(),
-        offer: { title: offerTitle.trim(), code: offerCode.trim(), expires: offerExpires },
+        offer: { title: offerTitle.trim(), code: offerCode.trim(), expires: offerExpires, active: offerActive },
       };
       const fd = new FormData();
       fd.append('answers', JSON.stringify(answers));
@@ -302,11 +316,26 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
           <section className="bg-gradient-to-br from-[#1f3a27] to-[#14352a] text-[#f3efe2] rounded-[1.75rem] p-6 md:p-8 shadow-[0_12px_34px_-22px_rgba(25,40,28,0.5)]">
             <div className="flex items-start gap-3.5 mb-2">
               <span className="flex-none w-8 h-8 rounded-full bg-[rgba(216,184,120,0.18)] text-[#d8b878] flex items-center justify-center">★</span>
-              <div>
+              <div className="flex-1">
                 <h2 className="text-lg font-black tracking-tight leading-tight">Slow week? Post an offer</h2>
-                <p className="text-[13px] text-[#c4c9b8] mt-0.5">Optional. Fill quiet days. It shows on your listing and the local deals feed, and disappears on its own when it expires.</p>
+                <p className="text-[13px] text-[#c4c9b8] mt-0.5">Optional. Fill quiet days. When it is ON it shows on your listing and our deals page, and disappears on its own when it expires.</p>
               </div>
             </div>
+
+            {/* One-tap ON/OFF for an existing offer */}
+            {offerSavedTitle && (
+              <div className="flex items-center justify-between gap-3 mb-4 rounded-xl bg-white/10 px-4 py-3">
+                <span className="text-sm font-bold">{offerActive ? 'Your offer is LIVE on the site' : 'Your offer is hidden'}</span>
+                <button
+                  type="button"
+                  onClick={() => toggleOffer(!offerActive)}
+                  className={'relative w-[52px] h-[28px] rounded-full transition-colors ' + (offerActive ? 'bg-[#d8b878]' : 'bg-white/25')}
+                  aria-label="Toggle offer on or off"
+                >
+                  <span className={'absolute top-[3px] w-[22px] h-[22px] rounded-full bg-white transition-all ' + (offerActive ? 'left-[27px]' : 'left-[3px]')} />
+                </button>
+              </div>
+            )}
             <div className="mt-4 space-y-3">
               <input
                 value={offerTitle}
