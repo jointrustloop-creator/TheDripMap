@@ -37,9 +37,18 @@ type ViewMode = 'split' | 'grid' | 'map';
 interface ListingControllerProps {
   initialProviders: Provider[];
   cityName: string;
+  /**
+   * Suppress the internal "Providers in {cityName}" heading + subtitle.
+   * Use when the parent renders its own descriptive heading above the
+   * controller (e.g. the Toronto two-tier render in app/cities/[slug]/
+   * page.tsx, where the wrapper headings "IV therapy in Toronto" and
+   * "Nearby in the Greater Toronto Area" already say everything). The
+   * view-toggle row stays visible and right-aligned.
+   */
+  hideHeading?: boolean;
 }
 
-export function ListingController({ initialProviders, cityName }: ListingControllerProps) {
+export function ListingController({ initialProviders, cityName, hideHeading = false }: ListingControllerProps) {
   // Default to grid for SSR (so initial paint matches), then upgrade to split on lg+ after mount.
   const [view, setView] = useState<ViewMode>('grid');
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
@@ -138,10 +147,14 @@ export function ListingController({ initialProviders, cityName }: ListingControl
     <section className="mb-24">
       {/* Header with View Toggle */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-6">
-        <div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Providers in {cityName}</h2>
-          <p className="text-slate-500 font-medium">Compare the best IV therapy and hydration services near you.</p>
-        </div>
+        {hideHeading ? (
+          <div />
+        ) : (
+          <div>
+            <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Providers in {cityName}</h2>
+            <p className="text-slate-500 font-medium">Compare the best IV therapy and hydration services near you.</p>
+          </div>
+        )}
 
         <div className="flex items-center gap-1 p-1.5 bg-slate-100 rounded-2xl">
           {viewButtons.map((b) => (
