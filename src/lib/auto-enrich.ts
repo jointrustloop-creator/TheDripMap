@@ -318,29 +318,42 @@ export async function autoEnrichProvider(providerId: string): Promise<Enrichment
     }
   }
 
-  // Always set the source flag (additive, preserves prior contents).
-  const priorDrivers =
-    row.decision_drivers && typeof row.decision_drivers === 'object'
-      ? (row.decision_drivers as Record<string, unknown>)
-      : {};
-  const priorFields = Array.isArray((priorDrivers as { enriched_fields?: unknown }).enriched_fields)
-    ? ((priorDrivers as { enriched_fields: string[] }).enriched_fields)
-    : [];
-  update.decision_drivers = {
-    ...priorDrivers,
-    enrichment_source: 'public_enrichment',
-    enriched_at: new Date().toISOString(),
-    enriched_fields: Array.from(new Set([...priorFields, ...filled])),
-  };
-
-  if (filled.length === 0 && Object.keys(update).length === 1) {
-    // Only decision_drivers in the payload and nothing actually filled —
-    // skip the write so we don't churn the row needlessly.
+  // If nothing was actually filled, skip the write entirely — no churn and no
+  // risk of clobbering a concurrent write for zero gain.
+  if (filled.length === 0) {
     result.ok = true;
     result.filled = [];
     result.skipped = skipped;
     return result;
   }
+
+  // Re-read decision_drivers IMMEDIATELY before writing and merge into the
+  // freshest value. This runs as a slow fire-and-forget at the exact moment an
+  // owner verifies, while the verify handler writes `manage_token` (the /finish
+  // link) and the owner may submit their /finish answers (decision_drivers.manage).
+  // Merging the stale snapshot we read at the top of this function would clobber
+  // those concurrent writes (this is what silently broke a real owner's finish
+  // link). Re-reading here makes the JSONB read-modify-write safe.
+  const { data: fresh } = await supabase
+    .from('providers')
+    .select('decision_drivers')
+    .eq('id', providerId)
+    .maybeSingle();
+  const freshDrivers =
+    fresh?.decision_drivers && typeof fresh.decision_drivers === 'object'
+      ? (fresh.decision_drivers as Record<string, unknown>)
+      : row.decision_drivers && typeof row.decision_drivers === 'object'
+        ? (row.decision_drivers as Record<string, unknown>)
+        : {};
+  const priorFields = Array.isArray((freshDrivers as { enriched_fields?: unknown }).enriched_fields)
+    ? ((freshDrivers as { enriched_fields: string[] }).enriched_fields)
+    : [];
+  update.decision_drivers = {
+    ...freshDrivers,
+    enrichment_source: 'public_enrichment',
+    enriched_at: new Date().toISOString(),
+    enriched_fields: Array.from(new Set([...priorFields, ...filled])),
+  };
 
   const { error: upErr } = await supabase.from('providers').update(update).eq('id', providerId);
   if (upErr) {

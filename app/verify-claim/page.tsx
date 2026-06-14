@@ -9,6 +9,7 @@ import { slugify } from '../../src/lib/data';
 import { sendMail } from '../../src/lib/mailer';
 import { autoEnrichProvider } from '../../src/lib/auto-enrich';
 import { enqueueOnboarding, sendVerificationOnboardingEmail, SEND_5Q_WITH_CONFIRMATION } from '../../src/lib/onboarding';
+import { ensureManageToken } from '../../src/lib/manage-token';
 
 export const dynamic = 'force-dynamic';
 
@@ -113,6 +114,13 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
     .update({ claimed_at: new Date().toISOString() })
     .eq('id', provider.id)
     .is('claimed_at', null);
+
+  // Create the durable /finish manage-token NOW, before the fire-and-forget
+  // enrichment below reads the row. ensureManageToken is idempotent (the
+  // onboarding email reuses it), so doing it up front guarantees the token is
+  // present in decision_drivers before autoEnrichProvider's read — belt-and-
+  // suspenders with the re-read merge inside autoEnrichProvider. Non-fatal.
+  await ensureManageToken(supabase, provider.id);
 
   const { error: updClaimErr } = await supabase
     .from('claim_requests')
