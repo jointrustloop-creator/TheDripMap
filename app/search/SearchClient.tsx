@@ -31,14 +31,15 @@ interface SearchClientProps {
   totalCount: number;
 }
 
+// Only the treatments that actually DIFFERENTIATE clinic-to-clinic. The
+// universal drips (hydration / immune / hangover / Myers) were removed as
+// filters — every IV clinic offers them, so they segmented nothing. Keywords
+// kept tight so a chip means something.
 const GOAL_KEYWORDS: Record<string, string[]> = {
-  'SkinGlow': ['beauty', 'glow', 'skin', 'hair', 'nails', 'collagen', 'glutathione', 'skin glow', 'brightening', 'complexion'],
-  'WeightLoss': ['weight', 'metabolism', 'fat', 'slim', 'semaglutide', 'tirzepatide', 'mic', 'lipo', 'fat burn', 'metabolic'],
-  'NAD': ['nad', 'nicotinamide', 'anti-aging', 'energy', 'longevity', 'cellular', 'rejuvenation'],
-  'Immune': ['immune', 'wellness', 'vitamin c', 'zinc', 'immunity', 'shield', 'defense', 'defender', 'glutathione', 'tri-immune'],
-  'Hangover': ['hangover', 'hydration', 'recovery', 'rehydrate', 'detox', 'cleanse', 'saline', 'fluids'],
-  'Hydration': ['hydration', 'rehydrate', 'fluids', 'saline', 'electrolyte', 'quench'],
-  'JetLag': ['jet', 'lag', 'travel', 'fatigue', 'energy', 'recovery', 'timezone', 'flight', 'international'],
+  'NAD': ['nad+', 'nad ', 'nicotinamide', 'longevity'],
+  'WeightLoss': ['weight loss', 'semaglutide', 'tirzepatide', 'ozempic', 'wegovy', 'mounjaro', 'lipotropic', 'mic injection', 'fat burn'],
+  'Peptides': ['peptide'],
+  'SkinGlow': ['glutathione', 'beauty drip', 'beauty + glow', 'beauty and glow', 'skin glow', 'brightening'],
 };
 
 export default function SearchClient({ initialProviders, cities: initialCities, initialStats, totalCount }: SearchClientProps) {
@@ -130,19 +131,20 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [isLoading, setIsLoading] = useState(false); // Start as false since we have initial data
 
+  // Chips reduced to filters that genuinely differentiate IV clinics AND have
+  // data behind them: delivery (Mobile), medical oversight, the premium
+  // treatments that actually vary, plus reputation/availability/value.
   const filterChips = [
     { id: 'All', label: 'All' },
     { id: 'Mobile', label: 'Mobile IV' },
-    { id: 'Value', label: 'Best Value' },
-    { id: 'SkinGlow', label: 'Skin Glow' },
+    { id: 'Oversight', label: 'MD / NP on staff' },
+    { id: 'NAD', label: 'NAD+' },
     { id: 'WeightLoss', label: 'Weight Loss' },
-    { id: 'NAD', label: 'Energy / NAD+' },
-    { id: 'Immune', label: 'Immune Support' },
-    { id: 'Hangover', label: 'Hangover' },
-    { id: 'Hydration', label: 'Hydration' },
-    { id: 'JetLag', label: 'Jet Lag' },
-    { id: 'Open', label: 'Open Now' },
+    { id: 'Peptides', label: 'Peptides' },
+    { id: 'SkinGlow', label: 'Beauty / Glutathione' },
     { id: 'TopRated', label: 'Top Rated' },
+    { id: 'Open', label: 'Open Now' },
+    { id: 'Value', label: 'Best Value' },
   ];
 
   const toggleChip = (id: string) => {
@@ -216,6 +218,16 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
   // rating >= 4.7 AND at least 20 reviews so we don't surface fluke 5-star/1-review listings.
   const isTopRated = (p: Provider): boolean => {
     return (p.rating ?? 0) >= 4.7 && (p.reviewCount ?? 0) >= 20;
+  };
+
+  // Medical-oversight signal — the single most important thing for IV safety.
+  // True when the clinic lists a medical team, or names a clinician credential
+  // in its name/description/specialties.
+  const hasOversight = (p: Provider): boolean => {
+    const mt = (p as { medical_team?: unknown[] }).medical_team;
+    if (Array.isArray(mt) && mt.length > 0) return true;
+    const hay = `${p.name || ''} ${p.description || ''} ${(p.specialties || []).join(' ')}`;
+    return /\bMD\b|\bDO\b|\bNP\b|\bRN\b|physician|nurse practitioner|naturopath|registered nurse/i.test(hay);
   };
 
   useEffect(() => {
@@ -316,6 +328,9 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
         if (activeChips.includes('TopRated')) {
           results = results.filter(isTopRated);
         }
+        if (activeChips.includes('Oversight')) {
+          results = results.filter(hasOversight);
+        }
 
         const activeGoalChips = Object.keys(GOAL_KEYWORDS).filter(id => activeChips.includes(id));
         if (activeGoalChips.length > 0) {
@@ -356,8 +371,12 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
         if (sortBy === 'value') {
           return calculateValueMetrics(b).score - calculateValueMetrics(a).score;
         }
-        // 'best' or anything else: rating
-        return (b.rating ?? 0) - (a.rating ?? 0);
+        // 'best' (default): clinics with a real rating rise above the long tail
+        // of un-rated listings (85% have none), then by rating, then reviews.
+        const ra = a.rating ?? 0, rb = b.rating ?? 0;
+        if ((rb > 0) !== (ra > 0)) return rb > 0 ? 1 : -1;
+        if (rb !== ra) return rb - ra;
+        return (b.reviewCount ?? 0) - (a.reviewCount ?? 0);
       };
       sorted.sort((a, b) => {
         if (a.is_claimed !== b.is_claimed) return a.is_claimed ? -1 : 1;

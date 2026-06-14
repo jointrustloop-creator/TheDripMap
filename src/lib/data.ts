@@ -80,18 +80,6 @@ export const getStateFromProvider = (provider: Provider): string => {
   return cityMap[provider.city] || 'Unknown';
 };
 
-const UNIVERSAL_IV_SERVICES = [
-  'Hangover Relief',
-  'NAD+ Therapy',
-  'Immune Support',
-  'Weight Loss',
-  'Beauty & Glow',
-  'Hydration',
-  'Jet Lag Relief',
-  'Myers\' Cocktail',
-  'Athletic Recovery'
-];
-
 // Helper to enrich provider with detailed mock data for UI sections
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function enrichProvider(p: any): Provider {
@@ -103,8 +91,12 @@ export function enrichProvider(p: any): Provider {
     : (typeof p.specialties === 'string' ? p.specialties.split(',').map((s: string) => s.trim()) : []))
     .filter(s => typeof s === 'string');
     
-  // Automatically qualify all providers for standard IV services by appending them to any specific ones
-  const specialties = [...new Set([...rawSpecialties, ...UNIVERSAL_IV_SERVICES])];
+  // Use the clinic's REAL specialties for filtering/matching. We deliberately do
+  // NOT blanket every clinic with a universal service list anymore — that made
+  // every treatment filter match every clinic (NAD+ == Weight Loss == everyone).
+  // Fall back to a single honest generic tag only when a clinic has none, so
+  // cards/pages are never empty (every provider here IS an IV therapy clinic).
+  const specialties = rawSpecialties.length > 0 ? [...new Set(rawSpecialties)] : ['IV Therapy'];
     
   const amenities = (Array.isArray(p.amenities) 
     ? p.amenities 
@@ -807,22 +799,10 @@ export async function getAllStates() {
 
 function getServiceFilter(service: string): string {
   const s = service.toLowerCase();
-  
-  // Broad list of keywords for core IV services that all providers offer
-  const coreServices = [
-    'hangover', 'nad', 'immune', 'beauty', 'glow', 'hydration', 'hydrate',
-    'recovery', 'myers', 'weight', 'jet lag', 'travel', 'fatigue', 
-    'wellness', 'drip', 'iv', 'vitamin', 'shot', 'boost', 'nutrient'
-  ];
-  
-  const isCore = coreServices.some(kw => s.includes(kw));
 
-  if (isCore) {
-    // If it's a core service, we want to match all providers 
-    // because they are all automatically qualified to provide these services.
-    // Return a filter that matches any provider record (ID and Name are always present).
-    return `id.not.is.null,name.not.is.null,rating.gte.0,description.ilike.%${s}%,name.ilike.%${s}%`;
-  }
+  // NOTE: previously any "core" IV service short-circuited to a match-everyone
+  // filter, so service search returned the entire catalog. We now match on the
+  // clinic's real name/description so a service query actually narrows results.
 
   if (s.includes('hangover')) {
     return "name.ilike.%hangover%,description.ilike.%hangover%,name.ilike.%rehydrate%,description.ilike.%rehydrate%,name.ilike.%detox%,description.ilike.%detox%,subtypes.cs.{\"Hangover\"},subtypes.cs.{\"Hydration\"},subtypes.cs.{\"Wellness\"},description.ilike.%hydration%,description.ilike.%fluids%,description.ilike.%saline%,name.ilike.%wellness%,name.ilike.%drip%,description.ilike.%drip%";

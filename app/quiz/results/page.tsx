@@ -190,6 +190,19 @@ function ResultsContent() {
     if (!recommendation || listings.length === 0) return [];
     const keywords = treatmentMatchKeywords(recommendation.name);
 
+    // Honor the visitor's delivery choice — the quiz asks Mobile vs In-Clinic,
+    // so the results must reflect it. Mobile -> mobile providers; In-Clinic ->
+    // exclude mobile-only. If a filter would empty the set, ignore it rather
+    // than dead-end the visitor.
+    const isMobile = (p: Provider) =>
+      p.type === 'Mobile' || p.type === 'Both' ||
+      (p as { mobile_service?: boolean }).mobile_service === true ||
+      /\bmobile\b|concierge|in[\s-]home|come to you/i.test(`${p.name || ''} ${p.description || ''}`);
+    const pref = surveyData.locationPreference;
+    let pool = listings;
+    if (pref === 'Mobile') { const m = listings.filter(isMobile); if (m.length) pool = m; }
+    else if (pref === 'In-Clinic') { const c = listings.filter((p) => p.type !== 'Mobile'); if (c.length) pool = c; }
+
     const hasTreatmentMatch = (p: Provider) => {
       const haystacks = [
         ...(p.specialties || []),
@@ -209,14 +222,14 @@ function ResultsContent() {
       return (b.rating || 0) - (a.rating || 0);
     };
 
-    const treatmentMatches = listings.filter(hasTreatmentMatch).sort(sortFn);
+    const treatmentMatches = pool.filter(hasTreatmentMatch).sort(sortFn);
     if (treatmentMatches.length >= 3) return treatmentMatches.slice(0, 3);
 
     // Top up with claimed-first remaining listings if we don't have 3.
     const seen = new Set(treatmentMatches.map((p) => p.id));
-    const remaining = listings.filter((p) => !seen.has(p.id)).sort(sortFn);
+    const remaining = pool.filter((p) => !seen.has(p.id)).sort(sortFn);
     return [...treatmentMatches, ...remaining].slice(0, 3);
-  }, [recommendation, listings]);
+  }, [recommendation, listings, surveyData.locationPreference]);
 
   if (isLoading) {
     return (

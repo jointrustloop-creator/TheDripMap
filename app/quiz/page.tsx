@@ -78,16 +78,6 @@ const STEPS = [
     ],
   },
   {
-    id: 'firstTime',
-    question: 'Is this your first time with IV therapy?',
-    description: 'First-timers get a quick safety walkthrough and what to ask before booking.',
-    options: [
-      { id: 'first-time', label: "Yes, my first time", icon: <Sparkles size={24} />, desc: "We'll walk you through it" },
-      { id: 'a-few', label: "I've done it a few times", icon: <Activity size={24} />, desc: 'Comfortable with the basics' },
-      { id: 'regular', label: "I'm a regular", icon: <Heart size={24} />, desc: 'Just show me the best match' },
-    ],
-  },
-  {
     id: 'locationPreference',
     question: 'How would you like to receive treatment?',
     description: 'Visit a clinic, or have a licensed nurse come to you.',
@@ -95,37 +85,6 @@ const STEPS = [
       { id: 'In-Clinic', label: 'Visit a Clinic', icon: <Building2 size={24} />, desc: 'Relax in a medical lounge' },
       { id: 'Mobile', label: 'Mobile IV', icon: <Home size={24} />, desc: 'Home, office, hotel' },
       { id: 'Both', label: 'No Preference', icon: <MapPin size={24} />, desc: 'Show me all options' },
-    ],
-  },
-  {
-    id: 'budget',
-    question: 'What\'s your budget for this session?',
-    description: 'We\'ll match you with clinics in your price range. You can always upgrade in-clinic.',
-    options: [
-      { id: 'Under $100', label: 'Under $100', icon: <DollarSign size={24} />, desc: 'Basic hydration' },
-      { id: '$100 – $200', label: '$100 – $200', icon: <DollarSign size={24} />, desc: 'Standard wellness drips' },
-      { id: '$200 – $400', label: '$200 – $400', icon: <DollarSign size={24} />, desc: 'Premium with add-ons' },
-      { id: '$400+', label: '$400+', icon: <DollarSign size={24} />, desc: 'Concierge / NAD+' },
-    ],
-  },
-  {
-    id: 'hsaFsa',
-    question: 'Do you want to pay with an HSA or FSA?',
-    description: 'Some clinics provide the paperwork to reimburse eligible treatments. We\'ll flag which ones.',
-    options: [
-      { id: 'yes', label: 'Yes, HSA/FSA eligible', icon: <ShieldCheck size={24} />, desc: 'Prioritize clinics that support it' },
-      { id: 'no', label: "No, I'll pay out of pocket", icon: <DollarSign size={24} />, desc: 'Not a factor for me' },
-      { id: 'unsure', label: 'Not sure', icon: <HelpCircle size={24} />, desc: 'Show me the options' },
-    ],
-  },
-  {
-    id: 'priceTransparency',
-    question: 'How important is upfront, transparent pricing?',
-    description: 'We surface clinics that publish real per-drip prices instead of "call for pricing".',
-    options: [
-      { id: 'must-have', label: 'Must-have', icon: <DollarSign size={24} />, desc: 'No surprises — prices upfront' },
-      { id: 'nice-to-have', label: 'Nice to have', icon: <CheckCircle2 size={24} />, desc: 'Prefer it, not a dealbreaker' },
-      { id: 'dont-care', label: "Doesn't matter", icon: <Sparkles size={24} />, desc: "I'll ask at the clinic" },
     ],
   },
 ];
