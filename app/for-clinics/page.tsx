@@ -7,6 +7,7 @@ import { ClinicAudit } from '../../src/components/ClinicAudit';
 import { ArrowRight, BarChart, Users, Globe, Check, X, ShieldCheck, Clock, Wallet, Zap } from 'lucide-react';
 import { getSiteStats, getFeaturedListings, getAllListings } from '../../src/lib/data';
 import { ProviderCard } from '../../src/components/ProviderCard';
+import { ProviderCardFeatured } from '../../src/components/ProviderCardFeatured';
 import { Provider } from '../../src/types';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -47,9 +48,10 @@ export default async function ForClinicsPage() {
   const stats = await getSiteStats();
 
   // Use REAL listings so the comparison shows exactly how claimed vs unclaimed
-  // listings render on the site (never hardcoded clinic data). Both cards are
-  // the real ProviderCard component; the contrast IS the component's own
-  // claimed-vs-unclaimed states, so it is true to what patients see.
+  // listings render on the site (never hardcoded clinic data). The unclaimed
+  // card uses the muted ProviderCard; the claimed card uses the premium
+  // ProviderCardFeatured — each exactly as patients see that state in
+  // search/quiz, so the contrast is true and the value gap is maximal.
   //
   // 2026-06-13 fix: the claimed card must be a genuinely claimed/featured
   // clinic and the unclaimed card a GENUINELY unclaimed one. The old code
@@ -234,8 +236,12 @@ export default async function ForClinicsPage() {
                 <span className="text-[11px] font-bold text-wellness-600">Where bookings happen</span>
               </div>
               {claimedSample && (
-                <div className="relative mx-auto w-full max-w-[330px]">
-                  <ProviderCard provider={claimedSample} />
+                <div className="relative mx-auto w-full max-w-[360px]">
+                  {/* Render the genuinely premium card claimed clinics get in
+                      search/quiz (drip menu, credential strip, rating, book/call
+                      buttons) so the "after" reflects reality and the value gap
+                      vs the bare unclaimed card is as big as it truly is. */}
+                  <ProviderCardFeatured provider={claimedSample} isPrimary={false} />
                 </div>
               )}
               <ul className="relative mt-9 space-y-4 flex-1">
