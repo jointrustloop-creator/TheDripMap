@@ -106,6 +106,12 @@ function step(name, ok, detail = '') {
     results.push(step('answers stashed for re-edit', !!after?.decision_drivers?.manage));
     results.push(step('slow-time offer saved to special_offers', (after?.special_offers || [])[0]?.title === '$20 off any drip this week' && (after?.special_offers || [])[0]?.code === 'E2E20'));
 
+    // The save revalidated the listing's ISR cache, so the offer banner should
+    // render on the public page right away.
+    const pg = await fetch(`${SITE}/providers/${prov.slug}`);
+    const pgHtml = await pg.text();
+    results.push(step('offer banner renders on the live listing', pgHtml.includes('Limited-time offer') || pgHtml.includes('$20 off any drip this week')));
+
   } catch (err) {
     console.log(`\n!!! UNEXPECTED ERROR: ${err.message}`);
     results.push(step('No unexpected error thrown', false, err.message));
