@@ -567,6 +567,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
                 <ListingController
                   initialProviders={torontoCore}
                   cityName={cityData.name}
+                  hideHeading
                 />
               </section>
             )}
@@ -586,6 +587,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
                 <ListingController
                   initialProviders={torontoNearby}
                   cityName={cityData.name}
+                  hideHeading
                 />
               </section>
             )}
