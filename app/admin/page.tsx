@@ -14,6 +14,8 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { createClient } from '@supabase/supabase-js';
+import { getPerProviderCounts } from '../../src/lib/analytics-query';
 import {
   Target,
   Sparkles,
@@ -31,6 +33,39 @@ export const metadata: Metadata = {
   title: 'Admin | TheDripMap',
   robots: { index: false, follow: false },
 };
+
+export const dynamic = 'force-dynamic';
+
+// Real, live stats for the dashboard header. Best-effort: never throws, so a
+// transient analytics hiccup can't break the admin home. 30-day window matches
+// the default on /admin/insights.
+async function loadStats() {
+  try {
+    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+    const sinceIso = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const [provTotal, claimed, featured, per] = await Promise.all([
+      supabase.from('providers').select('id', { count: 'exact', head: true }),
+      supabase.from('providers').select('id', { count: 'exact', head: true }).eq('is_claimed', true),
+      supabase.from('providers').select('id', { count: 'exact', head: true }).eq('is_featured', true),
+      getPerProviderCounts({ sinceIso, client: supabase }),
+    ]);
+    const views30 = per.reduce((s, p) => s + p.counts.view, 0);
+    const clicks30 = per.reduce(
+      (s, p) => s + p.counts.book_click + p.counts.call_click + p.counts.website_click + p.counts.directions_click + p.counts.message_click,
+      0,
+    );
+    return {
+      providers: provTotal.count ?? 0,
+      claimed: claimed.count ?? 0,
+      featured: featured.count ?? 0,
+      views30,
+      clicks30,
+      active30: per.length,
+    };
+  } catch {
+    return null;
+  }
+}
 
 interface Tile {
   href: string;
@@ -66,13 +101,14 @@ const GROUPS: Group[] = [
   {
     title: 'Clinics and Data',
     tiles: [
-      { href: '/admin/insights', Icon: LineChart, label: 'Per-clinic engagement insights', description: 'Monthly views, book / call / website / directions clicks per claimed clinic.' },
+      { href: '/admin/insights', Icon: LineChart, label: 'Per-clinic engagement insights', description: 'Views + book / call / website / directions / message clicks per clinic. Filter by last 30 days / month / all-time and claimed vs unclaimed.' },
       { href: '/admin/testimonials', Icon: Star, label: 'Testimonials moderation', description: 'Approve, edit, or reject patient testimonials submitted on claimed listings.' },
     ],
   },
 ];
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+  const stats = await loadStats();
   return (
     <main className="max-w-7xl mx-auto px-6 py-12">
       <div className="mb-10">
@@ -83,6 +119,30 @@ export default function AdminDashboardPage() {
           Every admin surface is reachable from this page. The top nav stays with you across all admin pages.
         </p>
       </div>
+
+      {stats && (
+        <Link href="/admin/insights?window=30d" className="block mb-12 group">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-[11px] font-black uppercase tracking-[0.22em] text-[#0F6E56]">Live stats · last 30 days</h2>
+            <span className="text-xs font-bold text-slate-400 group-hover:text-[#0F6E56]">Full insights &rarr;</span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {([
+              ['Providers', stats.providers],
+              ['Claimed', stats.claimed],
+              ['Featured', stats.featured],
+              ['Views (30d)', stats.views30],
+              ['Clicks (30d)', stats.clicks30],
+              ['Active listings', stats.active30],
+            ] as [string, number][]).map(([label, n]) => (
+              <div key={label} className="bg-white border border-slate-200 rounded-2xl p-4 group-hover:border-[#0F6E56]/30 transition-colors">
+                <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</div>
+                <div className="text-2xl font-black text-slate-900 mt-1 tabular-nums">{n.toLocaleString()}</div>
+              </div>
+            ))}
+          </div>
+        </Link>
+      )}
 
       <div className="space-y-12">
         {GROUPS.map((group) => (
