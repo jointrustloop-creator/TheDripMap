@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { CheckCircle2, ShieldCheck, Upload, ArrowRight, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Logo } from '../../../src/components/Logo';
 
 interface PrefillDrip { name?: string; price?: string | null }
 interface Prefill {
@@ -161,6 +162,7 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
     return (
       <div className="min-h-screen bg-[#f8f5ee] flex items-center justify-center px-6 py-16">
         <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl p-12 text-center max-w-lg">
+          <div className="flex justify-center mb-6"><Logo imgClassName="h-10" /></div>
           <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 text-emerald-600">
             <CheckCircle2 size={32} />
           </div>
@@ -183,11 +185,11 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
 
   return (
     <div className="min-h-screen bg-[#f8f5ee] pb-32">
-      {/* Slim branded header */}
-      <header className="bg-[#1f3a27] text-[#f3efe2]">
-        <div className="max-w-2xl mx-auto px-6 py-3 flex items-center gap-2">
-          <span className="font-serif italic text-[#d8b878] text-lg">TheDripMap</span>
-          <span className="text-[10px] uppercase tracking-[0.2em] text-[#c4c9b8] font-bold">Owner portal</span>
+      {/* Slim branded header with the real logo */}
+      <header className="bg-white border-b border-slate-200">
+        <div className="max-w-2xl mx-auto px-6 h-14 flex items-center justify-between gap-2">
+          <Logo imgClassName="h-9" />
+          <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold">Owner portal</span>
         </div>
       </header>
 

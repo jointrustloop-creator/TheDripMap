@@ -10,9 +10,12 @@ const LOGO_URL =
 interface LogoProps {
   className?: string;
   iconOnly?: boolean;
+  // Override the rendered image height (defaults to the nav size). Pass e.g.
+  // "h-9" for tighter placements like the owner portal or admin bar.
+  imgClassName?: string;
 }
 
-export const Logo = ({ className, iconOnly = false }: LogoProps) => {
+export const Logo = ({ className, iconOnly = false, imgClassName }: LogoProps) => {
   // Icon-only fallback: keep the simple mark for tiny placements (favicons, mobile fold)
   if (iconOnly) {
     return (
@@ -38,7 +41,7 @@ export const Logo = ({ className, iconOnly = false }: LogoProps) => {
         width={1500}
         height={350}
         priority
-        className="h-14 md:h-16 w-auto -ml-2 md:-ml-3 mix-blend-multiply"
+        className={cn('w-auto -ml-2 md:-ml-3 mix-blend-multiply', imgClassName || 'h-14 md:h-16')}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { AlertCircle } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { parseManageToken, secretsMatch } from '../../../src/lib/manage-token';
+import { Logo } from '../../../src/components/Logo';
 import { FinishListingForm } from './FinishListingForm';
 
 export const dynamic = 'force-dynamic';
@@ -18,6 +19,7 @@ function InvalidLink() {
   return (
     <div className="min-h-screen bg-[#f8f5ee] flex items-center justify-center px-6">
       <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl p-12 text-center max-w-lg">
+        <div className="flex justify-center mb-6"><Logo imgClassName="h-10" /></div>
         <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-600">
           <AlertCircle size={32} />
         </div>

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LogOut, Menu, X } from 'lucide-react';
+import { Logo } from '../../src/components/Logo';
 
 interface NavItem {
   href: string;
@@ -48,9 +49,9 @@ export function AdminNav() {
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between h-14">
           {/* Brand */}
-          <Link href="/admin" className="flex items-center gap-2 text-sm font-black text-slate-900 hover:text-[#0F6E56] transition-colors">
-            <span className="font-serif italic text-[#0F6E56]">TheDripMap</span>
-            <span className="text-slate-400 font-normal text-xs uppercase tracking-[0.2em]">Admin</span>
+          <Link href="/admin" className="flex items-center gap-2 group">
+            <Logo imgClassName="h-8" />
+            <span className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.2em] group-hover:text-[#0F6E56] transition-colors">Admin</span>
           </Link>
 
           {/* Desktop nav */}
