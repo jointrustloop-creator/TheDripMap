@@ -17,6 +17,7 @@
  * choices, so there is nothing to review before it goes live.
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../src/lib/mailer';
 import { parseManageToken, secretsMatch } from '../../../src/lib/manage-token';
@@ -224,6 +225,10 @@ export async function POST(req: NextRequest) {
     console.error('finish-listing update error', updErr.message);
     return NextResponse.json({ error: 'could not save, please try again' }, { status: 500 });
   }
+
+  // Bust the ISR cache for this listing so the owner's changes (and offer)
+  // appear immediately instead of waiting out the 5-minute revalidate window.
+  try { revalidatePath(`/providers/${provider.slug}`); } catch { /* non-fatal */ }
 
   // Mark the onboarding row submitted (non-fatal).
   try {
