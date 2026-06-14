@@ -1,6 +1,5 @@
 import React from 'react';
 import Image from 'next/image';
-import { Droplets } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 // Official TheDripMap logo — high-res "largerlogo", hosted in Supabase storage.
@@ -12,6 +11,11 @@ const LOGO_URL =
   'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/largerlogo-transparent.png';
 const LOGO_URL_WHITE =
   'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/largerlogo-white.png';
+// Icon-only brand mark (the map-pin + IV bag), no wordmark — for tight spots.
+const LOGO_MARK_URL =
+  'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/largerlogo-mark.png';
+const LOGO_MARK_WHITE =
+  'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/largerlogo-mark-white.png';
 
 interface LogoProps {
   className?: string;
@@ -24,13 +28,18 @@ interface LogoProps {
 }
 
 export const Logo = ({ className, iconOnly = false, imgClassName, variant = 'dark' }: LogoProps) => {
-  // Icon-only fallback: keep the simple mark for tiny placements (favicons, mobile fold)
+  // Icon-only: the real brand mark (map-pin + IV bag) for tight placements.
   if (iconOnly) {
     return (
       <div className={cn('flex items-center select-none', className)}>
-        <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-xl shadow-slate-200">
-          <Droplets size={20} className="text-wellness-400" />
-        </div>
+        <Image
+          src={variant === 'white' ? LOGO_MARK_WHITE : LOGO_MARK_URL}
+          alt="TheDripMap"
+          width={160}
+          height={260}
+          priority
+          className={cn('w-auto', imgClassName || 'h-12')}
+        />
       </div>
     );
   }
