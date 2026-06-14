@@ -263,7 +263,7 @@ export async function getListingsByCity(city: string, state?: string) {
         .select('*')
         .neq('availability', false)
         .ilike('address', `%${searchCity.substring(0, 5)}%`)
-        .order('is_featured', { ascending: false })
+        .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
         .order('rating', { ascending: false, nullsFirst: false })
         .limit(100);
       
@@ -287,8 +287,10 @@ export async function getListingsByCity(city: string, state?: string) {
       if (isGTABucket) {
         query = query.in('city', GTA_CITIES).eq('country', 'Canada');
       } else {
-        // HARD FILTER: City must match
-        query = query.ilike('city', `%${cityName}%`);
+        // HARD FILTER: exact city match (case-insensitive). A substring match
+        // here over-matched (e.g. "York" pulling in "New York"); the
+        // state-broaden fallback below covers any exact miss.
+        query = query.ilike('city', cityName);
         
         if (stateName) {
           // Resolve BOTH the full name and the abbreviation so we match providers
@@ -319,7 +321,7 @@ export async function getListingsByCity(city: string, state?: string) {
       }
       
       return query
-        .order('is_featured', { ascending: false })
+        .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
         .order('rating', { ascending: false, nullsFirst: false })
         .limit(200);
     };
@@ -411,7 +413,7 @@ export async function getTorontoGtaTieredListings(): Promise<{
         .neq('availability', false)
         .in('city', TORONTO_CORE_CITIES)
         .or('state.ilike.Ontario,state.ilike.ON')
-        .order('is_featured', { ascending: false })
+        .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
         .order('rating', { ascending: false, nullsFirst: false })
         .limit(200),
       supabase
@@ -420,7 +422,7 @@ export async function getTorontoGtaTieredListings(): Promise<{
         .neq('availability', false)
         .in('city', TORONTO_GTA_NEARBY_CITIES)
         .or('state.ilike.Ontario,state.ilike.ON')
-        .order('is_featured', { ascending: false })
+        .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
         .order('rating', { ascending: false, nullsFirst: false })
         .limit(200),
     ]);
@@ -428,10 +430,10 @@ export async function getTorontoGtaTieredListings(): Promise<{
     const core = (coreRes.data || []).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
     const nearby = (nearRes.data || []).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
 
-    // Tier 2 ordering: verified first; within each bucket, closest first.
+    // Tier 2 ordering: claimed first; within each bucket, closest first.
     nearby.sort((a, b) => {
-      const fa = a.is_featured ? 1 : 0;
-      const fb = b.is_featured ? 1 : 0;
+      const fa = a.is_claimed ? 1 : 0;
+      const fb = b.is_claimed ? 1 : 0;
       if (fa !== fb) return fb - fa;
       const da = distKm(Number(a.latitude), Number(a.longitude));
       const db = distKm(Number(b.latitude), Number(b.longitude));
@@ -475,7 +477,7 @@ export async function getListingsByState(state: string) {
     }
 
     const { data, error } = await query
-      .order('is_featured', { ascending: false })
+      .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
       .order('rating', { ascending: false, nullsFirst: false })
       .limit(300);
 
@@ -545,7 +547,7 @@ export async function getListingBySlug(slug: string) {
     const { data: widerCandidates, error: widerError } = await supabase
       .from('providers')
       .select('*')
-      .order('is_featured', { ascending: false })
+      .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
       .order('rating', { ascending: false, nullsFirst: false })
       .limit(1000);
 
@@ -866,7 +868,7 @@ export async function getListingsByService(service: string, limit: number = 4) {
       .select('*')
       .neq('availability', false)
       .or(filter)
-      .order('is_featured', { ascending: false })
+      .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
       .order('rating', { ascending: false, nullsFirst: false })
       .limit(2000);
 
@@ -913,10 +915,12 @@ export async function searchListings(query: string, city?: string) {
       if (isGTABucket) {
         q = q.in('city', GTA_CITIES).eq('country', 'Canada');
       } else {
-        q = q.ilike('city', `%${city}%`);
+        // Exact city match (case-insensitive) — avoids substring over-match
+        // like "York" → "New York".
+        q = q.ilike('city', city);
       }
     }
-    
+
     if (query && query.trim() !== '') {
       const searchTerm = `%${query.trim()}%`;
       const serviceFilter = getServiceFilter(query.trim());
@@ -924,7 +928,7 @@ export async function searchListings(query: string, city?: string) {
     }
 
     const { data, error } = await q
-      .order('is_featured', { ascending: false })
+      .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
       .order('rating', { ascending: false, nullsFirst: false })
       .limit(2000);
     if (error) throw error;
@@ -950,7 +954,7 @@ export async function searchListings(query: string, city?: string) {
   }
 }
 
-export async function getFeaturedListings(limit: number = 6, city?: string) {
+export async function getFeaturedListings(limit: number = 6, city?: string, country?: string) {
   const isCityMatch = (pCity: string, search: string | undefined) => {
     if (!search || search === 'All') return true;
     const s = search.toLowerCase().trim();
@@ -958,13 +962,29 @@ export async function getFeaturedListings(limit: number = 6, city?: string) {
     return pc === s || slugify(pc) === slugify(s) || pc.includes(s) || s.includes(pc);
   };
 
+  // Normalize a loose country hint ("US"/"USA"/"Canada"/"CA") to the canonical
+  // DB value(s). Returns null for unknown — meaning "do not country-filter".
+  // Used so location fallbacks never cross the border (no Chicago for Toronto).
+  const normCountry = (c?: string): string[] | null => {
+    if (!c) return null;
+    const lc = c.toLowerCase().trim();
+    if (['us', 'usa', 'united states'].includes(lc)) return ['United States'];
+    if (['ca', 'canada'].includes(lc)) return ['Canada'];
+    return null;
+  };
+  const countryFilter = normCountry(country);
+  const matchCountry = (pCountry: string | null | undefined) => {
+    if (!countryFilter) return true;
+    return !!pCountry && countryFilter.map(c => c.toLowerCase()).includes(pCountry.toLowerCase());
+  };
+
   if (!isSupabaseConfigured()) {
     return MOCK_LISTINGS
-      .filter(p => p.is_featured && isCityMatch(p.city, city))
+      .filter(p => p.is_featured && isCityMatch(p.city, city) && matchCountry(p.country))
       .slice(0, limit)
       .filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
   }
-  
+
   try {
     let q = supabase
       .from('providers')
@@ -975,9 +995,12 @@ export async function getFeaturedListings(limit: number = 6, city?: string) {
     if (city && city !== 'All') {
       q = q.ilike('city', `%${city}%`);
     }
+    if (countryFilter) {
+      q = q.in('country', countryFilter);
+    }
 
     const { data, error } = await q
-      .order('is_featured', { ascending: false })
+      .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
       .order('rating', { ascending: false, nullsFirst: false })
       .limit(limit);
 
@@ -989,13 +1012,13 @@ export async function getFeaturedListings(limit: number = 6, city?: string) {
     
     // Fallback to mock if no DB results
     return MOCK_LISTINGS
-      .filter(p => p.is_featured && isCityMatch(p.city, city))
+      .filter(p => p.is_featured && isCityMatch(p.city, city) && matchCountry(p.country))
       .slice(0, limit)
       .filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
   } catch (err) {
     console.warn('Supabase error in getFeaturedListings:', err);
     return MOCK_LISTINGS
-      .filter(p => p.is_featured && isCityMatch(p.city, city))
+      .filter(p => p.is_featured && isCityMatch(p.city, city) && matchCountry(p.country))
       .slice(0, limit)
       .filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
   }
@@ -1359,7 +1382,7 @@ export async function getAllListings() {
         .from('providers')
         .select('*')
         .neq('availability', false)
-        .order('is_featured', { ascending: false })
+        .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
         .order('rating', { ascending: false, nullsFirst: false })
     );
 
@@ -1378,7 +1401,7 @@ export async function getListingsByIds(ids: string[]) {
       .select('*')
       .neq('availability', false)
       .in('id', ids)
-      .order('is_featured', { ascending: false })
+      .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
       .order('rating', { ascending: false, nullsFirst: false });
 
     if (error) throw error;
@@ -1403,7 +1426,7 @@ export async function getListingsByServiceAndCity(service: string, city: string,
       .neq('availability', false)
       .ilike('city', cityPattern)
       .or(filter)
-      .order('is_featured', { ascending: false })
+      .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
       .order('rating', { ascending: false, nullsFirst: false })
       .limit(2000);
 
@@ -1422,7 +1445,7 @@ export async function getListingsByServiceAndCity(service: string, city: string,
         .neq('availability', false)
         .ilike('city', cityPattern)
         .or(broadFilter)
-        .order('is_featured', { ascending: false })
+        .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
         .order('rating', { ascending: false, nullsFirst: false })
         .limit(2000);
       
@@ -1525,7 +1548,7 @@ export async function getSimilarClinics(currentSlug: string, city: string, state
       .neq('availability', false)
       .eq('city', city)
       .neq('slug', currentSlug)
-      .order('is_featured', { ascending: false })
+      .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
       .order('rating', { ascending: false, nullsFirst: false })
       .limit(limit);
 
@@ -1543,7 +1566,7 @@ export async function getSimilarClinics(currentSlug: string, city: string, state
         .eq('state', state)
         .neq('city', city) // Don't pick up city clinics again
         .neq('slug', currentSlug)
-        .order('is_featured', { ascending: false })
+        .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
         .order('rating', { ascending: false, nullsFirst: false })
         .limit(remaining);
 

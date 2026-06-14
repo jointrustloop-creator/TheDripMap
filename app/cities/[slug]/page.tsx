@@ -309,7 +309,12 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
     }
   }
   if (!isToronto && listings.length < 3) {
-    const featured = await getFeaturedListings(24);
+    // Keep the national fallback in THIS city's country (our data is US + Canada
+    // only) so a thin Canadian city page never lists US clinics, and vice versa.
+    const st = (cityData.state || '').trim();
+    const caSet = ['on', 'ontario', 'bc', 'british columbia', 'ab', 'alberta', 'mb', 'manitoba', 'sk', 'saskatchewan', 'qc', 'quebec', 'ns', 'nova scotia', 'nb', 'new brunswick', 'nl', 'newfoundland', 'pe', 'prince edward island', 'nt', 'northwest territories', 'yt', 'yukon', 'nu', 'nunavut'];
+    const ccHint = st ? (caSet.includes(st.toLowerCase()) ? 'Canada' : 'US') : undefined;
+    const featured = await getFeaturedListings(24, undefined, ccHint);
     const existingIds = new Set(listings.map(p => p.id));
     for (const p of featured) {
       if (listings.length >= 24) break;

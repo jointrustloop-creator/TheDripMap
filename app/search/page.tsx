@@ -42,6 +42,7 @@ export default async function SearchPage() {
     supabase
       .from('providers')
       .select('*')
+      .order('is_claimed', { ascending: false })
       .order('is_featured', { ascending: false })
       .order('rating', { ascending: false, nullsFirst: false })
   );

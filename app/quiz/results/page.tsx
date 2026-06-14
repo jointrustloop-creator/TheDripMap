@@ -52,6 +52,20 @@ const GOAL_TO_TREATMENT: Record<string, string> = {
   'jet-lag': 'Hydration + Immune IV',
 };
 
+// Derive a country hint ("US"/"Canada") from a state/province so location
+// fallbacks never cross the border (no Chicago for Toronto). 'CA' = California
+// (US); Canada the country arrives via the explicit country param.
+function deriveCountry(state?: string | null): string | undefined {
+  if (!state) return undefined;
+  const up = state.trim().toUpperCase();
+  const caProv = ['ON', 'BC', 'AB', 'MB', 'SK', 'QC', 'NS', 'NB', 'NL', 'PE', 'NT', 'YT', 'NU'];
+  const caNames = ['ontario', 'british columbia', 'alberta', 'manitoba', 'saskatchewan', 'quebec', 'nova scotia', 'new brunswick', 'newfoundland', 'prince edward island', 'northwest territories', 'yukon', 'nunavut'];
+  if (caProv.includes(up) || caNames.includes(state.trim().toLowerCase())) return 'Canada';
+  const usAbbr = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY', 'DC'];
+  if (usAbbr.includes(up)) return 'US';
+  return undefined;
+}
+
 // Maps a treatment name to substrings we look for inside `provider.specialties`
 // (or the provider name) so we can pick clinics that actually offer it.
 function treatmentMatchKeywords(treatmentName: string): string[] {
@@ -83,10 +97,12 @@ function ResultsContent() {
       try {
         const city = searchParams.get('city');
         const state = searchParams.get('state');
+        // Country hint keeps the featured fallback in the visitor's own country.
+        const country = searchParams.get('country') || deriveCountry(state);
 
         const [profilesRes, locationListingsRes] = await Promise.allSettled([
           getOperatorProfiles(),
-          city ? getListingsByCity(city, state || undefined) : getFeaturedListings(12),
+          city ? getListingsByCity(city, state || undefined) : getFeaturedListings(12, undefined, country || undefined),
         ]);
 
         let initialListings: Provider[] = [];
@@ -94,11 +110,12 @@ function ResultsContent() {
           initialListings = locationListingsRes.value as Provider[];
         }
 
-        // If a city search returned nothing, fall back to featured (claimed) clinics
-        // so the visitor always sees verified results.
+        // If a city search returned nothing, fall back to featured (claimed)
+        // clinics IN THE SAME COUNTRY so the visitor always sees verified
+        // results — never cross-border (no US clinics for a Canadian, etc.).
         if (city && initialListings.length === 0) {
           try {
-            initialListings = (await getFeaturedListings(12)) as Provider[];
+            initialListings = (await getFeaturedListings(12, undefined, country || undefined)) as Provider[];
           } catch {
             /* empty */
           }
@@ -185,8 +202,9 @@ function ResultsContent() {
     };
 
     const sortFn = (a: Provider, b: Provider) => {
-      if (!!b.is_featured !== !!a.is_featured) {
-        return b.is_featured ? 1 : -1;
+      // Claimed clinics always pin first; rating breaks ties within each group.
+      if (!!b.is_claimed !== !!a.is_claimed) {
+        return b.is_claimed ? 1 : -1;
       }
       return (b.rating || 0) - (a.rating || 0);
     };

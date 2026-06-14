@@ -366,11 +366,24 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
       });
 
       // Hard floor: if the user's filter combo produced 0 results and there
-      // is a city filter active, drop the city and retry — better to show
-      // top-rated nationwide options than a dead-end empty state.
+      // is a city filter active, broaden — better to show top-rated options
+      // than a dead-end empty state. We keep the broaden in the SAME COUNTRY as
+      // the selected city (our data is US + Canada only) so we never surface
+      // cross-border clinics as if they were nearby (no Chicago for Toronto).
       if (sorted.length === 0 && selectedCity !== 'All' && selectedCity !== '') {
         const broadened = await searchListings(searchQuery, 'All');
-        const fallback = broadened.slice().sort((a, b) => {
+        const cityProv = initialProviders.find(
+          (p) => (p.city || '').toLowerCase() === String(selectedCity).toLowerCase(),
+        );
+        const cityCountry = (cityProv as { country?: string } | undefined)?.country;
+        const normC = (x?: string | null) =>
+          !x ? '' : /^(us|usa|united states)$/i.test(x.trim()) ? 'us'
+            : /^(ca|canada)$/i.test(x.trim()) ? 'ca' : x.toLowerCase().trim();
+        const scoped = cityCountry
+          ? broadened.filter((p) => normC((p as { country?: string }).country) === normC(cityCountry))
+          : broadened;
+        const pool = scoped.length > 0 ? scoped : broadened;
+        const fallback = pool.slice().sort((a, b) => {
           if (a.is_claimed !== b.is_claimed) return a.is_claimed ? -1 : 1;
           if (a.is_claimed && b.is_claimed) return claimDateMs(b) - claimDateMs(a);
           return (b.rating ?? 0) - (a.rating ?? 0);
