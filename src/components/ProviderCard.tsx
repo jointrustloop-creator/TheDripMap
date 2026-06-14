@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Star as StarIcon, Navigation } from 'lucide-react';
+import { ArrowRight, Star as StarIcon, Navigation, ShieldCheck } from 'lucide-react';
 import { Provider } from '../types';
 import { slugify } from '../lib/data';
 import { cn } from '../lib/utils';
@@ -36,6 +36,15 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
   // to render greyed out + "UNCLAIMED LISTING" + no logo across every page
   // (search strip, cities, treatments, iv-therapy, etc).
   const isClaimed = provider.is_claimed === true || provider.is_featured === true;
+
+  // Medical-oversight signal — the #1 thing patients should check for IV safety.
+  // True when the clinic lists a medical team, or names a clinician credential.
+  const hasOversight = (() => {
+    const mt = (provider as { medical_team?: unknown[] }).medical_team;
+    if (Array.isArray(mt) && mt.length > 0) return true;
+    const hay = `${provider.name || ''} ${provider.description || ''} ${(provider.specialties || []).join(' ')}`;
+    return /\bMD\b|\bDO\b|\bNP\b|\bRN\b|physician|nurse practitioner|naturopath|registered nurse/i.test(hay);
+  })();
 
   const getInitials = (name: string) => {
     if (!name) return 'IV';
@@ -175,6 +184,15 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
               </span>
             )}
           </div>
+
+          {/* Medical oversight badge — the safety signal patients care about most */}
+          {hasOversight && (
+            <div className="mb-4 -mt-1">
+              <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight">
+                <ShieldCheck size={11} /> MD / NP on staff
+              </span>
+            </div>
+          )}
 
           {/* Service Pills */}
           <div className="flex flex-wrap gap-1.5 mt-auto pt-4 border-t border-slate-100/50">

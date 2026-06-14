@@ -41,6 +41,17 @@ function deriveCredentialLine(provider: Provider): string | null {
   // Anything mentioning a specific year established
   const yearLine = amenities.find((a) => /\bsince\s+\d{4}\b/i.test(a));
   if (yearLine) return yearLine;
+  // Broader medical-oversight signal — the safety differentiator patients care
+  // about most. Looks at a listed medical team and clinician credentials in the
+  // clinic's name/description/specialties/team roles, not just amenities.
+  const team = (provider.medical_team || []) as Array<{ name?: string; role?: string }>;
+  const teamBlob = team.map((t) => `${t?.name || ''} ${t?.role || ''}`).join(' ');
+  const hay = `${provider.name || ''} ${provider.description || ''} ${(provider.specialties || []).join(' ')} ${teamBlob}`;
+  if (/\bMD\b|\bD\.?O\.?\b|physician|medical director/i.test(hay)) return 'MD-led practice';
+  if (/nurse practitioner|\bNP\b/i.test(hay)) return 'NP on staff';
+  if (/registered nurse|\bRN\b/i.test(hay)) return 'RN on staff';
+  if (/naturopath/i.test(hay)) return 'Naturopath-led';
+  if (team.length > 0) return 'Medically supervised';
   return null;
 }
 
