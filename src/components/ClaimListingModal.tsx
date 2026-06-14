@@ -204,6 +204,25 @@ export const ClaimListingModal = ({
                 </div>
               ) : (
               <form onSubmit={handleSubmit} className="p-8 pt-4">
+                {/* Claim-to-unlock: make the (free) benefits concrete right at
+                    the decision moment — this is what converts an owner. */}
+                <div className="mb-6 rounded-2xl border border-wellness-100 bg-wellness-50/60 p-4">
+                  <p className="text-[11px] font-black uppercase tracking-[0.16em] text-wellness-700 mb-3">Claiming (free) unlocks</p>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                    {[
+                      'Your logo, photos & prices',
+                      'Your team & credentials',
+                      'Book & call buttons to you',
+                      'Top placement in your city',
+                      'A limited-time offer',
+                      'Respond to reviews + your stats',
+                    ].map((b) => (
+                      <li key={b} className="flex items-center gap-2 text-[12px] font-semibold text-slate-700">
+                        <Check size={13} className="text-wellness-600 shrink-0" /> {b}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
                 <div className="space-y-4 mb-8">
                   {/* Read-only fields */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

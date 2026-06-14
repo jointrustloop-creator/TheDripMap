@@ -862,8 +862,28 @@ export default function DefinitiveListingLayout({
               <div className="h-[4px]" style={{ background: 'linear-gradient(90deg, #b08a3e, #d8b878)' }} />
               <div className="p-6">
                 <div className="flex gap-3 items-center pb-[18px] border-b border-[rgba(25,36,28,0.09)]">
-                  <div className="w-[42px] h-[42px] rounded-full bg-[#1f3a27] text-[#d8b878] flex items-center justify-center font-[var(--font-fraunces)] text-lg">
-                    {initials || getInitials(provider.name)}
+                  <div className="w-[42px] h-[42px] rounded-full overflow-hidden flex items-center justify-center shrink-0">
+                    {provider.imageUrl ? (
+                      // Show the clinic's logo here too (the hero already does).
+                      // Cream circle + object-contain so a wordmark logo reads
+                      // cleanly instead of being cropped; initials only when
+                      // there's genuinely no logo asset.
+                      <span className="w-full h-full bg-[#fffefa] border border-[rgba(216,184,120,0.45)] flex items-center justify-center">
+                        <ResilientImage
+                          src={provider.imageUrl}
+                          fallbackSrc={DEFAULT_CLINIC_IMAGE}
+                          alt={`${provider.name} logo`}
+                          width={42}
+                          height={42}
+                          fill={false}
+                          className="w-full h-full object-contain p-[5px]"
+                        />
+                      </span>
+                    ) : (
+                      <span className="w-full h-full bg-[#1f3a27] text-[#d8b878] flex items-center justify-center font-[var(--font-fraunces)] text-lg">
+                        {initials || getInitials(provider.name)}
+                      </span>
+                    )}
                   </div>
                   <div>
                     <b className="font-semibold text-[15px] block leading-tight">{displayName}</b>

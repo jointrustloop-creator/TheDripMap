@@ -1143,7 +1143,23 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               <section className="pt-8 border-t border-slate-100">
                 <div className="bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200 p-10">
                   <h3 className="text-2xl font-black text-slate-900 mb-2">This listing is unclaimed</h3>
-                  <p className="text-slate-500 font-bold mb-8 text-lg">Claim it free to add photos and update your clinic story</p>
+                  <p className="text-slate-500 font-bold mb-6 text-lg">Claim it free to unlock your full profile:</p>
+
+                  {/* Claim-to-unlock checklist — the free benefits made concrete */}
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 mb-8 max-w-xl">
+                    {[
+                      'Your logo, photos & drip menu with prices',
+                      'Your team & credentials shown',
+                      'Book & call buttons straight to you',
+                      'Top placement above unclaimed clinics',
+                      'Turn on a limited-time offer',
+                      'Respond to reviews + see your visit stats',
+                    ].map((b) => (
+                      <li key={b} className="flex items-center gap-2.5 text-sm font-semibold text-slate-700">
+                        <CheckCircle2 size={16} className="text-wellness-600 shrink-0" /> {b}
+                      </li>
+                    ))}
+                  </ul>
 
                   <ClaimListingTrigger
                     provider={provider}
