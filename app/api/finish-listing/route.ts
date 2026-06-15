@@ -150,16 +150,19 @@ export async function POST(req: NextRequest) {
 
   const { data: provider, error: provErr } = await supabase
     .from('providers')
-    .select('id, name, slug, city, state, email, photos, image_url, decision_drivers')
+    .select('*')
     .eq('id', providerId)
     .maybeSingle();
   if (provErr || !provider) return NextResponse.json({ error: 'listing not found' }, { status: 404 });
 
-  // Validate the URL secret against the stored manage_token.
+  // Validate the URL secret against the durable manage_token column OR the
+  // legacy decision_drivers copy (accept either through the migration window).
   const ddStored = (provider.decision_drivers && typeof provider.decision_drivers === 'object')
     ? (provider.decision_drivers as Record<string, unknown>)
     : {};
-  if (!secretsMatch(parsed.secret, typeof ddStored.manage_token === 'string' ? ddStored.manage_token : null)) {
+  const colTokenStored = typeof (provider as { manage_token?: unknown }).manage_token === 'string' ? (provider as { manage_token: string }).manage_token : null;
+  const ddTokenStored = typeof ddStored.manage_token === 'string' ? (ddStored.manage_token as string) : null;
+  if (!secretsMatch(parsed.secret, colTokenStored) && !secretsMatch(parsed.secret, ddTokenStored)) {
     return NextResponse.json({ error: 'invalid or missing token' }, { status: 401 });
   }
 

@@ -52,7 +52,7 @@ export default async function FinishPage({ params }: FinishPageProps) {
 
   const { data: p } = await supabase
     .from('providers')
-    .select('id, name, slug, city, image_url, photos, decision_drivers')
+    .select('*')
     .eq('id', parsed.providerId)
     .maybeSingle();
   if (!p) return <InvalidLink />;
@@ -60,8 +60,11 @@ export default async function FinishPage({ params }: FinishPageProps) {
   const dd = (p.decision_drivers && typeof p.decision_drivers === 'object')
     ? (p.decision_drivers as Record<string, unknown>)
     : {};
-  // Validate the URL secret against the stored manage_token.
-  if (!secretsMatch(parsed.secret, typeof dd.manage_token === 'string' ? dd.manage_token : null)) {
+  // Validate the URL secret against the durable manage_token column OR the
+  // legacy decision_drivers copy, accepting either through the migration window.
+  const colToken = typeof (p as { manage_token?: unknown }).manage_token === 'string' ? (p as { manage_token: string }).manage_token : null;
+  const ddToken = typeof dd.manage_token === 'string' ? (dd.manage_token as string) : null;
+  if (!secretsMatch(parsed.secret, colToken) && !secretsMatch(parsed.secret, ddToken)) {
     return <InvalidLink />;
   }
   const prefill = (dd.manage && typeof dd.manage === 'object') ? (dd.manage as Record<string, unknown>) : null;

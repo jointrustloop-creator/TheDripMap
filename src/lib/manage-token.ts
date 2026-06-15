@@ -56,15 +56,34 @@ export function manageUrlFrom(providerId: string, secret: string, site = SITE): 
  * source, the /finish answers under `manage`, etc.) are preserved.
  */
 export async function ensureManageToken(sb: SupabaseClient, providerId: string): Promise<string | null> {
-  const { data, error } = await sb.from('providers').select('decision_drivers').eq('id', providerId).maybeSingle();
+  // select('*') so the dedicated `manage_token` column is read when it exists,
+  // but this never errors before add-manage-token-column.sql has been applied.
+  const { data, error } = await sb.from('providers').select('*').eq('id', providerId).maybeSingle();
   if (error || !data) return null;
-  const dd = (data.decision_drivers && typeof data.decision_drivers === 'object')
-    ? (data.decision_drivers as Record<string, unknown>)
+  const row = data as Record<string, unknown>;
+  const colToken = typeof row.manage_token === 'string' ? (row.manage_token as string) : '';
+  const dd = (row.decision_drivers && typeof row.decision_drivers === 'object')
+    ? (row.decision_drivers as Record<string, unknown>)
     : {};
-  if (typeof dd.manage_token === 'string' && dd.manage_token) return dd.manage_token as string;
+  const ddToken = typeof dd.manage_token === 'string' ? (dd.manage_token as string) : '';
+  const existing = colToken || ddToken;
+  if (existing) {
+    // If the durable column exists but is missing the token, backfill it so the
+    // token becomes clobber-proof. Best-effort; ignored if not yet migrated.
+    if (!colToken && ddToken) {
+      const { error: bfErr } = await sb.from('providers').update({ manage_token: ddToken }).eq('id', providerId);
+      if (bfErr) { /* column not migrated yet — the decision_drivers copy still validates */ }
+    }
+    return existing;
+  }
   const secret = newManageSecret();
-  const { error: updErr } = await sb.from('providers').update({ decision_drivers: { ...dd, manage_token: secret } }).eq('id', providerId);
-  if (updErr) return null;
+  // Prefer the dedicated column: a JSONB enrichment write can never clobber it.
+  // Fall back to decision_drivers if the column does not exist yet, so links
+  // keep working before the migration is applied.
+  const colRes = await sb.from('providers').update({ manage_token: secret }).eq('id', providerId);
+  if (!colRes.error) return secret;
+  const { error: ddErr } = await sb.from('providers').update({ decision_drivers: { ...dd, manage_token: secret } }).eq('id', providerId);
+  if (ddErr) return null;
   return secret;
 }
 
