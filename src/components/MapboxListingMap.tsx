@@ -91,8 +91,10 @@ export const MapboxListingMap = ({ providers, hoveredProviderId, onMarkerClick, 
               <div
                 className={cn(
                   'rounded-full border-2 border-white shadow-md cursor-pointer transition-all',
-                  // Featured pins are green/larger; unclaimed are blue/smaller
-                  p.is_featured ? 'bg-emerald-500' : 'bg-blue-500',
+                  // Verified clinics (free-tier claimed OR featured) get the green
+                  // pin; unclaimed listings stay blue. Mirrors the is_claimed ||
+                  // is_featured "verified" signal used on cards/listings sitewide.
+                  (p.is_claimed === true || p.is_featured === true) ? 'bg-emerald-500' : 'bg-blue-500',
                   // Hover state: bigger, white-ringed, elevated z
                   isHovered
                     ? 'w-10 h-10 ring-4 ring-wellness-300 z-10 scale-110'
