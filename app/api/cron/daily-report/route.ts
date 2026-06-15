@@ -57,6 +57,13 @@ interface OnboardingAuditRow {
   detail: string;
 }
 
+interface QuestionnaireRow {
+  clinic: string;
+  days: number;
+  status: string;
+  linkOk: boolean;
+}
+
 // Grandfather date for the C1-tier claimed-listings backfill (Eva, Mechelle,
 // Kia etc.). Any provider row created before this AND flagged is_claimed or
 // is_featured did NOT go through claim_requests — that's expected and not an
@@ -365,6 +372,52 @@ export async function GET(req: Request) {
     }
   }
 
+  // 5d. Onboarding questionnaire completion audit (READ-ONLY, additive).
+  // "Completed" = providers.decision_drivers.manage exists (written only by
+  // /api/finish-listing when the owner submits). A claimed clinic with no
+  // decision_drivers.manage_token has a BROKEN /finish link — the owner cannot
+  // open the questionnaire at all; that is surfaced loudly in DATA CHECK. This
+  // block ONLY reads; it never sends, modifies, or writes anything.
+  const questionnaireAwaiting: QuestionnaireRow[] = [];
+  {
+    const { data: claimedQ } = await supabase
+      .from('providers')
+      .select('id, name, city, state, claimed_at, decision_drivers')
+      .eq('is_claimed', true);
+    const claimedRows = (claimedQ || []) as Array<{ id: string; name: string | null; city: string | null; state: string | null; claimed_at: string | null; decision_drivers: Record<string, unknown> | null }>;
+    const obStatusByProvider = new Map<string, string>();
+    {
+      const { data: obAll } = await supabase.from('onboarding_requests').select('provider_id, status');
+      for (const r of (obAll || []) as Array<{ provider_id: string; status: string | null }>) {
+        obStatusByProvider.set(r.provider_id, r.status || '');
+      }
+    }
+    for (const p of claimedRows) {
+      const dd = (p.decision_drivers && typeof p.decision_drivers === 'object') ? (p.decision_drivers as Record<string, unknown>) : {};
+      const linkOk = typeof dd.manage_token === 'string' && (dd.manage_token as string).length > 0;
+      const completed = !!(dd.manage && typeof dd.manage === 'object');
+      const status = obStatusByProvider.get(p.id) || '(no onboarding row)';
+      // Alarm: a claimed clinic whose /finish link cannot work. This is the
+      // exact failure that silently broke a fresh signup's questionnaire link.
+      if (!linkOk) {
+        dataCheck.push({
+          clinic: p.name || '(no name)',
+          problem: 'FINISH LINK BROKEN - no decision_drivers.manage_token, owner cannot open the questionnaire',
+          action: 'mint a manage_token (ensureManageToken) then resend the finish email',
+        });
+      }
+      // Awaiting-response: received the questionnaire (onboarding row exists) but
+      // has not submitted. Grandfathered clinics (no onboarding row) are excluded.
+      if (!completed && obStatusByProvider.has(p.id) && status !== 'submitted') {
+        const claimed = p.claimed_at ? new Date(p.claimed_at) : null;
+        const days = claimed ? daysBetween(now, claimed) : 0;
+        const loc = [p.city, p.state].filter(Boolean).join(', ');
+        questionnaireAwaiting.push({ clinic: `${p.name || '(no name)'}${loc ? ' (' + loc + ')' : ''}`, days, status, linkOk });
+      }
+    }
+    questionnaireAwaiting.sort((a, b) => b.days - a.days);
+  }
+
   // 6. Resolve provider rows referenced by today's claims + pending claims
   const listingIds = Array.from(
     new Set(
@@ -434,6 +487,21 @@ export async function GET(req: Request) {
       }
     }
     lines.push(`  ${onboardingAudit.length - onboardingMissing.length}/${onboardingAudit.length} confirmed within 5 min; ${onboardingMissing.length} missing.`);
+  }
+  lines.push('');
+
+  // Questionnaire completion (read-only): verified clinics that received the
+  // onboarding questionnaire but have not submitted it yet. A [FINISH LINK
+  // BROKEN] tag means their /finish link cannot open (no manage_token).
+  lines.push(`ONBOARDING QUESTIONNAIRE NOT COMPLETED (${questionnaireAwaiting.length})`);
+  if (questionnaireAwaiting.length === 0) {
+    lines.push('  None — every verified clinic that received it has responded.');
+  } else {
+    for (const q of questionnaireAwaiting) {
+      const wait = q.days === 0 ? 'verified today' : `verified ${pluralize(q.days, 'day')} ago`;
+      const broken = q.linkOk ? '' : '  [FINISH LINK BROKEN]';
+      lines.push(`  - ${q.clinic} — ${wait} — onboarding ${q.status}${broken}`);
+    }
   }
   lines.push('');
 
@@ -595,6 +663,8 @@ export async function GET(req: Request) {
       dataCheckIssues: dataCheck.length,
       onboardingVerified24h: onboardingAudit.length,
       onboardingMissing: onboardingAudit.filter((a) => !a.ok).length,
+      questionnaireNotCompleted: questionnaireAwaiting.length,
+      finishLinksBroken: dataCheck.filter((i) => i.problem.startsWith('FINISH LINK BROKEN')).length,
     },
     mail: mailResult,
     telegram: tgResult,
