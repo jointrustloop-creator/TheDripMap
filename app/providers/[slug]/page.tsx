@@ -194,8 +194,6 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     .split(' - Drip')[0]
     .trim() || 'IV Therapy Clinic';
   const cityLabel = (provider.city && String(provider.city).trim()) || 'the US or Canada';
-  const stateLabel = (provider.state && String(provider.state).trim()) || '';
-  const locationLabel = stateLabel ? `${cityLabel}, ${stateLabel}` : cityLabel;
 
   const specialtyList = Array.isArray(provider.specialties)
     ? provider.specialties.filter((s): s is string => typeof s === 'string' && s.length > 0)
@@ -210,12 +208,17 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   const canonicalSlug = provider.slug || slugify(providerName) || safeSlug;
   const canonicalUrl = `https://www.thedripmap.com/providers/${canonicalSlug}`;
 
-  // Title format locked to: "<Name> | IV Therapy in <City>, <Region> | TheDripMap"
-  // Pipe separators (no em-dash) per the site-wide copy rule.
-  const title = `${displayName} | IV Therapy in ${locationLabel} | TheDripMap`;
+  // Title: "<Name> | IV Therapy in <City> | TheDripMap" — region dropped
+  // 2026-06-15 so titles stay near/under 60 chars (78% previously exceeded 65
+  // once the full state name was appended). Pipe separators, no em-dash.
+  const title = `${displayName} | IV Therapy in ${cityLabel} | TheDripMap`;
+  // Descriptions clamp to <=155 chars (98% previously exceeded 165 and were
+  // truncated by Google). Written short, then hard-cut at a word boundary.
+  const clampDesc = (str: string, max = 155): string =>
+    str.length <= max ? str : `${str.slice(0, max).replace(/\s+\S*$/, '').trim()}…`;
   const description = provider.is_featured && Number(provider.reviewCount) > 0
-    ? `Read reviews for ${displayName} in ${locationLabel}. ${provider.rating} stars, ${provider.reviewCount} reviews. IV therapy treatments include ${topSpecialties}. Book your session today.`
-    : `Find ${displayName} in ${locationLabel}. IV therapy treatments include ${topSpecialties}. Compare prices and book your drip session today on TheDripMap.`;
+    ? clampDesc(`${displayName} in ${cityLabel}: ${provider.rating} stars from ${provider.reviewCount} reviews. IV drips include ${topSpecialties}. Book on TheDripMap.`)
+    : clampDesc(`${displayName} in ${cityLabel}. IV drips include ${topSpecialties}. Compare prices and book your session on TheDripMap.`);
 
   // Orphan-claim stubs are placeholders created when a setup-form submission
   // doesn't match any existing listing. They have no real content until the
