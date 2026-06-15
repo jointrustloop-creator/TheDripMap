@@ -190,6 +190,21 @@ export async function GET(req: Request) {
     // ignore — surface as the default line
   }
 
+  // Onboarding funnel (lifetime): verified -> completed questionnaire -> safety
+  // badge. Completed = decision_drivers.manage (written only by /api/finish-listing).
+  const { data: claimedForFunnel } = await supabase
+    .from('providers')
+    .select('id, safety_verified, decision_drivers')
+    .eq('is_claimed', true);
+  const funnelRows = (claimedForFunnel || []) as Array<{ safety_verified: boolean | null; decision_drivers: Record<string, unknown> | null }>;
+  const verifiedCount = funnelRows.length;
+  const completedQuestionnaire = funnelRows.filter((p) => {
+    const dd = (p.decision_drivers && typeof p.decision_drivers === 'object') ? (p.decision_drivers as Record<string, unknown>) : {};
+    return !!(dd.manage && typeof dd.manage === 'object');
+  }).length;
+  const safetyBadge = funnelRows.filter((p) => p.safety_verified === true).length;
+  const pctOf = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 100) : 0);
+
   const lines: string[] = [];
   lines.push(`TheDripMap weekly summary — week of ${fmtDate(weekStart)}`);
   lines.push('');
@@ -209,6 +224,11 @@ export async function GET(req: Request) {
   lines.push(`  Response rate: ${respRate}`);
   lines.push(`  Opt-out rate:  ${optRate}`);
   lines.push(`  Bounce rate:   ${bounceRate}`);
+  lines.push('');
+  lines.push('ONBOARDING FUNNEL (lifetime)');
+  lines.push(`  Verified clinics:        ${verifiedCount}`);
+  lines.push(`  Completed questionnaire: ${completedQuestionnaire} (${pctOf(completedQuestionnaire, verifiedCount)}% of verified)`);
+  lines.push(`  Safety Verified badge:   ${safetyBadge} (${pctOf(safetyBadge, verifiedCount)}% of verified)`);
   lines.push('');
   lines.push('TOTALS');
   lines.push(`  Verified clinics: ${totalVerified || 0}`);
@@ -258,6 +278,8 @@ export async function GET(req: Request) {
       repliesThis: repliesThis.length,
       optOutsThis,
       bouncesThis,
+      completedQuestionnaire,
+      safetyBadge,
     },
     mail: mailResult,
     telegram: tgResult,

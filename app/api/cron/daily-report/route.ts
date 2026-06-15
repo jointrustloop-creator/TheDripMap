@@ -418,6 +418,28 @@ export async function GET(req: Request) {
     questionnaireAwaiting.sort((a, b) => b.days - a.days);
   }
 
+  // 5e. Cron heartbeat (READ-ONLY). The inbox watcher (process-replies, every
+  // 2h) stamps email_replies_cursor.last_run_at on each run. If that is stale,
+  // replies are piling up unseen -> surface it loudly in DATA CHECK.
+  {
+    const { data: cur } = await supabase
+      .from('email_replies_cursor')
+      .select('last_run_at')
+      .eq('id', 1)
+      .maybeSingle();
+    const lastRun = cur?.last_run_at ? new Date(cur.last_run_at as string) : null;
+    const hoursSince = lastRun ? (now.getTime() - lastRun.getTime()) / 3_600_000 : Infinity;
+    if (!lastRun || hoursSince > 4) {
+      dataCheck.push({
+        clinic: 'process-replies cron (inbox watcher)',
+        problem: lastRun
+          ? `last ran ${hoursSince.toFixed(1)}h ago (runs every 2h) - inbound replies may be going unseen`
+          : 'no recorded run - the inbox watcher may be down',
+        action: 'check /api/cron/process-replies in the Vercel cron dashboard',
+      });
+    }
+  }
+
   // 6. Resolve provider rows referenced by today's claims + pending claims
   const listingIds = Array.from(
     new Set(
