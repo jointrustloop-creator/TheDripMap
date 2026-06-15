@@ -90,7 +90,7 @@ export default async function ForClinicsPage() {
             <span className="font-serif italic font-normal text-[#0F6E56]">Take the keys.</span>
           </h1>
           <p className="text-lg md:text-xl text-slate-500 leading-relaxed max-w-2xl mx-auto mb-9">
-            It is listed right now as a blank placeholder that patients scroll past. Claiming puts your photos, prices, team, and booking link on the page, so the patients already viewing it book you instead of the clinic next door.
+            It is listed right now as a blank placeholder that patients scroll past. Claiming puts your photos, prices, team, and booking link on the page, and lets you post a limited-time deal whenever you have openings, so the patients already viewing it book you instead of the clinic next door.
           </p>
           <div className="flex flex-col items-center gap-4">
             <a
@@ -279,13 +279,13 @@ export default async function ForClinicsPage() {
           </div>
 
           {/* Claim-to-live timeline — sets the expectation that a complete
-              page costs one reply email, not an afternoon of homework. */}
+              page costs two self-serve minutes, not an afternoon of homework. */}
           <div className="mt-12 max-w-4xl mx-auto">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-0 sm:divide-x divide-slate-200 rounded-3xl border border-slate-200 bg-white py-6 px-2">
               {[
                 { step: '01', head: 'Claim in 2 minutes', sub: 'Verify you own the clinic. Free, no card.' },
-                { step: '02', head: 'Reply to five questions', sub: 'Your team, drips, prices, and a few photos. One email.' },
-                { step: '03', head: 'Live in 2 business days', sub: 'We build your complete page and send you the link first.' },
+                { step: '02', head: 'Fill your questionnaire', sub: 'Your private link opens a 2-minute form: team, drips, prices, photos, even a deal.' },
+                { step: '03', head: 'Live the instant you save', sub: 'It publishes straight to your page. Reopen and edit anytime.' },
               ].map((s) => (
                 <div key={s.step} className="px-6 text-center sm:text-left">
                   <div className="font-serif italic text-2xl text-wellness-600/50 mb-1.5">{s.step}</div>
@@ -315,8 +315,8 @@ export default async function ForClinicsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {[
               { icon: <Users size={28} />, title: 'Patients, not impressions', desc: 'High-intent patients comparing IV clinics in your city land on your listing at the exact moment they decide where to book.' },
-              { icon: <BarChart size={28} />, title: 'Your page, complete', desc: 'Your drip menu with your real prices, your team and their credentials, photos, hours, and a direct booking link. We build it with you from one reply email.' },
-              { icon: <Globe size={28} />, title: 'The Safety Verified badge', desc: 'Answer our safety questionnaire in writing and earn the badge patients look for. It is never sold, only earned, and it stays free.' }
+              { icon: <BarChart size={28} />, title: 'Your page, complete', desc: 'Your drip menu with your real prices, your team and their credentials, photos, hours, and a direct booking link, plus limited-time deals you can post anytime. You set it all in a two-minute questionnaire that publishes the moment you save.' },
+              { icon: <Globe size={28} />, title: 'The Safety Verified badge', desc: 'Answer our safety questionnaire — who starts your IVs, your oversight, your sourcing — and earn the badge patients look for. It is never sold, only earned, and it stays free.' }
             ].map((item, idx) => (
               <div key={idx} className="bg-white p-8 md:p-9 rounded-[2.5rem] border border-slate-100 shadow-xl">
                 <div className="w-14 h-14 bg-wellness-50 rounded-2xl flex items-center justify-center text-wellness-600 mb-7">
@@ -342,10 +342,10 @@ export default async function ForClinicsPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {[
-              { Icon: Clock, objection: '"I don’t have time."', answer: 'Claiming takes two minutes. After that, one reply email with your drips, prices, and a few photos, and we build the whole page for you. Total effort on your side is about ten minutes, once.' },
+              { Icon: Clock, objection: '"I don’t have time."', answer: 'Claiming takes two minutes. Your private link then opens a quick questionnaire: tap your drips, prices, and a few photos, and it publishes the moment you save. About ten minutes, once, and it is done.' },
               { Icon: Wallet, objection: '"What is the catch?"', answer: 'There is none. Claiming is free and stays free, with no card and no trial. Your verified listing never costs a cent. That is the offer, in full.' },
               { Icon: Zap, objection: '"I’ll do it later."', answer: 'The listing is already live and already getting views. Every week it stays blank, those patients book a clinic that claimed. Later is the one option that quietly costs you.' },
-              { Icon: Check, objection: '"What if I change my mind?"', answer: 'One email edits or removes anything, anytime. You are simply taking control of a page that already exists, with or without you.' },
+              { Icon: Check, objection: '"What if I change my mind?"', answer: 'Your private link edits anything instantly, and one email to us removes the listing entirely, anytime. You are simply taking control of a page that already exists, with or without you.' },
             ].map((o) => (
               <div key={o.objection} className="flex items-start gap-5 bg-white rounded-[2rem] border border-slate-200 p-7 md:p-8 shadow-sm hover:shadow-lg transition-shadow">
                 <div className="w-12 h-12 rounded-2xl bg-wellness-50 text-wellness-600 flex items-center justify-center shrink-0">
@@ -370,15 +370,19 @@ export default async function ForClinicsPage() {
             },
             {
               q: 'What changes when I claim my listing?',
-              a: 'Your page swaps the grey placeholder for your real photos and logo, shows your drip menu with your prices, displays your rating and reviews, adds direct booking and call buttons, and ranks above unclaimed clinics in your city.',
+              a: 'Your page swaps the grey placeholder for your real photos and logo, shows your drip menu with your prices, displays your rating and reviews, adds direct booking and call buttons, lets you post limited-time deals when you have openings, and ranks above unclaimed clinics in your city.',
             },
             {
               q: 'How do I earn the Safety Verified badge?',
-              a: 'After you verify, we send five short questions covering who administers your IVs, your medical oversight, and where your ingredients come from. Answer in writing and we corroborate against public registries. The badge is never sold, only earned.',
+              a: 'After you verify, your private link opens a short questionnaire covering who administers your IVs, your medical oversight, and where your ingredients come from. We corroborate your answers against public registries. The badge is never sold, only earned.',
             },
             {
               q: 'Can I update my prices and services later?',
-              a: 'Yes. Reply to any email from us with changes and we update your listing, usually within two business days, and send you the link to review.',
+              a: 'Yes. Your private link is always yours. Reopen it anytime to change your drips, prices, team, or photos, and it republishes the moment you save.',
+            },
+            {
+              q: 'Can I run a promotion or deal?',
+              a: 'Yes. From your private link you can flip on a limited-time deal, name it and set an end date, and it appears on your listing and our public deals page. It turns itself off when it expires, so you never leave a stale offer up.',
             },
             {
               q: 'How do patients contact my clinic?',
@@ -386,7 +390,7 @@ export default async function ForClinicsPage() {
             },
             {
               q: 'How do I correct or remove my listing?',
-              a: 'One email to info@thedripmap.com does either. Tell us what to fix and we fix it, or ask for removal and we take the listing down.',
+              a: 'Edits are instant from your private link, reopen it and your changes publish the moment you save. For removal, one email to info@thedripmap.com and we take the listing down.',
             },
           ];
           const ownerFaqJsonLd = {
@@ -446,8 +450,8 @@ export default async function ForClinicsPage() {
             <div className="space-y-6">
               {[
                 'Free forever. No card, no trial.',
-                'We build your page from one email.',
-                'Live within two business days.',
+                'You set up your page in two minutes.',
+                'Live the instant you save, edit anytime.',
                 'Outrank unclaimed clinics in your city.'
               ].map((item, idx) => (
                 <div key={idx} className="flex items-center gap-4 bg-white/10 backdrop-blur-md p-5 rounded-3xl border border-white/10 group hover:border-white/20 transition-colors">
