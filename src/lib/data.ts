@@ -797,7 +797,7 @@ export async function getAllStates() {
   return [];
 }
 
-function getServiceFilter(service: string): string {
+export function getServiceFilter(service: string): string {
   const s = service.toLowerCase();
 
   // NOTE: previously any "core" IV service short-circuited to a match-everyone

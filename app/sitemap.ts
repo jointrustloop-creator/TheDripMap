@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { getAllListings, getBlogPosts, getAllCities, slugify } from '../src/lib/data';
+import { getAllListings, getBlogPosts, getAllCities, slugify, getServiceFilter } from '../src/lib/data';
 
 // 2026-06-11: revalidate every 10 minutes so newly-added providers + cities
 // surface in the sitemap quickly without a manual redeploy. Previously the
@@ -130,13 +130,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  // Treatment x city matrix: 10 treatments × (Canada-first + top US cities by
-  // provider count). Canada is our uncontested lane so it leads.
-  const MATRIX_TREATMENT_SLUGS = [
-    'hydration', 'nad-plus', 'myers-cocktail', 'hangover-recovery', 'immune-support',
-    'beauty-glow', 'athletic-recovery', 'mobile-iv', 'weight-loss', 'vitamin-c',
-    'glutathione', 'glp-1-weight-loss', 'iron-infusion',
-  ];
+  // Treatment x city matrix. The page app/iv-therapy/[treatment]/[city] counts
+  // clinics via getListingsByServiceAndCity(filter, city) and emits robots:noindex
+  // when that count < 3. The sitemap MUST mirror that exact count so it never
+  // advertises a noindexed URL (the "Unexpected noindex / Excluded by noindex"
+  // GSC flag) and never hides an indexable one. We replicate the page's matcher
+  // in-memory: getServiceFilter(filter) parsed into an OR-predicate over the
+  // already-loaded providers, plus the same broad fallback the data layer uses
+  // when a city has zero specific matches. Validated 1:1 against the live query
+  // 2026-06-15 (.audit-tmp/_seo-matrix-analysis.cjs): removes 96 noindex-in-
+  // sitemap mismatches and surfaces 47 indexable pages the old "any 3 providers
+  // in the city" heuristic wrongly hid (mostly glutathione / iron / mobile-iv).
+  const MATRIX_TREATMENT_FILTERS: Record<string, string> = {
+    'hydration': 'Hydration', 'nad-plus': 'NAD+', 'myers-cocktail': 'Myers Cocktail',
+    'hangover-recovery': 'Hangover', 'immune-support': 'Immune Support', 'beauty-glow': 'Beauty Glow',
+    'athletic-recovery': 'Recovery', 'mobile-iv': 'Mobile', 'weight-loss': 'Weight Loss',
+    'vitamin-c': 'Vitamin C', 'glutathione': 'Glutathione', 'glp-1-weight-loss': 'Peptide',
+    'iron-infusion': 'Iron',
+  };
+  // Mirrors the zero-result fallback inside getListingsByServiceAndCity.
+  const BROAD_FALLBACK_FILTER = 'name.ilike.%hydration%,description.ilike.%hydration%,name.ilike.%wellness%,description.ilike.%wellness%,name.ilike.%drip%,description.ilike.%iv%';
   const CANADA_MATRIX_CITIES = ['Toronto', 'Vancouver', 'Calgary', 'Ottawa', 'Mississauga', 'Richmond Hill', 'North York', 'Oakville', 'Edmonton', 'Montreal', 'Quebec City', 'Winnipeg', 'Halifax', 'Victoria', 'Kelowna', 'Red Deer'];
   const topUSMatrixCities = cities
     .filter((c) => c.count > 0 && c.city && !CANADA_MATRIX_CITIES.includes(c.city))
@@ -145,60 +158,54 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .map((c) => c.city);
   const matrixCities = [...CANADA_MATRIX_CITIES, ...topUSMatrixCities];
 
-  // Gate each treatment × city pair on having at least 1 matching provider.
-  // The page (app/iv-therapy/[treatment]/[city]/page.tsx:120) noindexes when
-  // count === 0, which created sitemap entries that GSC flagged as
-  // "Excluded by noindex tag." Sitemap must list only indexable URLs.
-  //
-  // Most matrix treatments are "core" services every IV clinic offers —
-  // for those, the existing cityRoutes filter (count > 0) already guarantees
-  // at least one provider in the city. The non-core treatments below need
-  // an explicit per-treatment keyword check against the provider's
-  // specialties / services / description / mobile flag.
-  type ProviderLike = {
-    city?: string | null;
-    specialties?: unknown;
-    services?: unknown;
-    description?: string | null;
-    mobile_service?: boolean;
-    type?: string | null;
+  // Parse a PostgREST .or() filter (only the ilike.%x% and cs.{"x"} forms that
+  // getServiceFilter emits) into an in-memory OR-predicate. enrichProvider does
+  // not alter name/description/subtypes/category, so matching the loaded
+  // providers equals matching the raw rows the page queries.
+  const normTxt = (x: unknown): string => (x == null ? '' : String(x)).toLowerCase();
+  type MatrixProvider = { name?: unknown; description?: unknown; category?: unknown; subtypes?: unknown; specialties?: unknown; city?: unknown };
+  const buildOrPredicate = (orStr: string): ((p: MatrixProvider) => boolean) => {
+    const conds = orStr
+      .split(',')
+      .map((c) => c.trim())
+      .map((c) => {
+        let m = c.match(/^(\w+)\.ilike\.%(.*)%$/);
+        if (m) return { field: m[1], op: 'ilike' as const, val: normTxt(m[2]) };
+        m = c.match(/^(\w+)\.cs\.\{"(.*)"\}$/);
+        if (m) return { field: m[1], op: 'cs' as const, val: m[2] };
+        return null;
+      })
+      .filter((x): x is { field: string; op: 'ilike' | 'cs'; val: string } => x !== null);
+    const asArr = (v: unknown): unknown[] => (Array.isArray(v) ? v : []);
+    return (p: MatrixProvider) =>
+      conds.some((cd) => {
+        if (cd.op === 'ilike') {
+          if (cd.field === 'name') return normTxt(p.name).includes(cd.val);
+          if (cd.field === 'description') return normTxt(p.description).includes(cd.val);
+          if (cd.field === 'category') return normTxt(p.category).includes(cd.val);
+          if (cd.field === 'subtypes') return asArr(p.subtypes).some((x) => normTxt(x).includes(cd.val));
+          if (cd.field === 'specialties') return asArr(p.specialties).some((x) => normTxt(x).includes(cd.val));
+          return false;
+        }
+        if (cd.field === 'subtypes') return asArr(p.subtypes).some((x) => normTxt(x) === normTxt(cd.val));
+        return false;
+      });
   };
-  const providersByCityKey = new Map<string, ProviderLike[]>();
-  for (const p of providers as ProviderLike[]) {
-    const key = (p.city || '').toLowerCase().trim();
-    if (!key) continue;
-    if (!providersByCityKey.has(key)) providersByCityKey.set(key, []);
-    providersByCityKey.get(key)!.push(p);
-  }
-  const treatmentBlob = (p: ProviderLike): string => {
-    const specs = Array.isArray(p.specialties) ? p.specialties.filter((s): s is string => typeof s === 'string') : [];
-    const services = Array.isArray(p.services)
-      ? p.services.map((s) => typeof s === 'string' ? s : (s && typeof s === 'object' && 'name' in s ? String((s as { name: unknown }).name) : '')).filter(Boolean)
-      : [];
-    return [...specs, ...services, p.description || ''].join(' ').toLowerCase();
-  };
-  // Non-core treatments require an explicit keyword/feature match.
-  const NON_CORE_TREATMENT_CHECK: Record<string, (p: ProviderLike) => boolean> = {
-    'mobile-iv': (p) => p.mobile_service === true || (p.type || '').toLowerCase() === 'mobile',
-    'glutathione': (p) => treatmentBlob(p).includes('glutathione'),
-    'iron-infusion': (p) => /\biron\b/.test(treatmentBlob(p)),
-  };
+  const broadPred = buildOrPredicate(BROAD_FALLBACK_FILTER);
+  const cityContains = (pCity: unknown, city: string): boolean => normTxt(pCity).includes(normTxt(city));
 
-  // Sitemap thin-page guard: only advertise matrix routes when there are
-  // genuinely 3+ relevant providers in the city. The page itself emits
-  // robots:noindex for count < 3 (see app/iv-therapy/[treatment]/[city]/page.tsx),
-  // so sitemap and page-level robots stay in sync. Pages stay reachable via
-  // direct URL, just not crawl-prioritized.
+  // Same gate the page applies: list the URL only when 3+ clinics match.
   const MIN_PROVIDERS_FOR_SITEMAP = 3;
   const matrixRoutes: MetadataRoute.Sitemap = [];
-  for (const t of MATRIX_TREATMENT_SLUGS) {
-    const checker = NON_CORE_TREATMENT_CHECK[t];
+  for (const [slug, filter] of Object.entries(MATRIX_TREATMENT_FILTERS)) {
+    const specificPred = buildOrPredicate(getServiceFilter(filter));
     for (const city of matrixCities) {
-      const cityProviders = providersByCityKey.get(city.toLowerCase().trim()) || [];
-      if (cityProviders.length < MIN_PROVIDERS_FOR_SITEMAP) continue;
-      if (checker && cityProviders.filter(checker).length < MIN_PROVIDERS_FOR_SITEMAP) continue;
+      const inCity = (providers as MatrixProvider[]).filter((p) => cityContains(p.city, city));
+      let matches = inCity.filter(specificPred).length;
+      if (matches === 0) matches = inCity.filter(broadPred).length;
+      if (matches < MIN_PROVIDERS_FOR_SITEMAP) continue;
       matrixRoutes.push({
-        url: `${baseUrl}/iv-therapy/${t}/${slugify(city)}`,
+        url: `${baseUrl}/iv-therapy/${slug}/${slugify(city)}`,
         lastModified: new Date(),
         changeFrequency: 'weekly' as const,
         priority: 0.8,
