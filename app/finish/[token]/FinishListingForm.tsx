@@ -1,18 +1,21 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CheckCircle2, ShieldCheck, Upload, ArrowRight, Loader2, Image as ImageIcon } from 'lucide-react';
+import { CheckCircle2, ShieldCheck, Upload, ArrowRight, Loader2, Image as ImageIcon, Sparkles } from 'lucide-react';
 import { Logo } from '../../../src/components/Logo';
 
 interface PrefillDrip { name?: string; price?: string | null }
 interface Prefill {
   team?: { whoPlaces?: string[]; oversight?: string; leadName?: string };
-  drips?: PrefillDrip[];
-  firstVisit?: { consult?: string; length?: string; booking?: string };
   sourcing?: string[];
+  drips?: PrefillDrip[];
+  boosters?: string[];
+  delivery?: string[];
+  firstVisit?: { consult?: string; length?: string; booking?: string };
   payment?: string[];
   about?: string;
   offer?: { title?: string; code?: string; expires?: string; active?: boolean };
+  slowWindows?: string[];
 }
 
 interface Props {
@@ -25,16 +28,63 @@ interface Props {
   prefill: Record<string, unknown> | null;
 }
 
-const GREEN = '#0F6E56';
+// Who can legally start the line. ND kept (most of our claimed roster is
+// Canada, where NDs run IV clinics); MD/DO + PA cover the US.
+const WHO_PLACES = ['RN', 'NP', 'ND', 'MD / DO', 'PA', 'Paramedic'];
+const OVERSIGHT = ['Medical director', 'On-site physician', 'NP-led', 'ND-led'];
+// "Licensed compounding pharmacy" covers a US 503A or a provincial pharmacy;
+// "503B outsourcing facility" is the US sterile-batch signal. Either reads as
+// in-the-know to the owner.
+const SOURCING = ['Licensed compounding pharmacy', '503B outsourcing facility', 'Prepared on site'];
 
-const WHO_PLACES = ['RN', 'NP', 'ND', 'MD', 'Paramedic'];
-const OVERSIGHT = ['On-site physician', 'Medical director (off-site)', 'Nurse practitioner', 'Naturopathic doctor'];
-const DRIPS = ['Hydration', 'Myers Cocktail', 'NAD+', 'Immune', 'Glutathione / Beauty', 'Hangover', 'Energy / B12', 'Athletic recovery', 'Weight loss'];
+// The real menu, pre-loaded and grouped, each with its true formula. Owners tap
+// what they offer; the grouping is UI only (data is still a flat list).
+const DRIP_MENU: { group: string; items: { name: string; hint: string }[] }[] = [
+  { group: 'Core', items: [
+    { name: "Myers' Cocktail", hint: 'B-complex, B12, vitamin C, magnesium, calcium' },
+    { name: 'Hydration', hint: "Saline or lactated Ringer's + electrolytes" },
+  ] },
+  { group: 'Signature', items: [
+    { name: 'NAD+', hint: 'Nicotinamide adenine dinucleotide - slow 2-4h push' },
+    { name: 'Glutathione', hint: 'The master antioxidant - push or add-on' },
+    { name: 'High-Dose Vitamin C', hint: 'Ascorbic acid - G6PD screen over 15g' },
+  ] },
+  { group: 'Recovery', items: [
+    { name: 'Hangover Relief', hint: 'Fluids, anti-nausea, B12, electrolytes' },
+    { name: 'Athletic Recovery', hint: 'Amino acids, B-complex, magnesium' },
+    { name: 'Immune / Cold & Flu', hint: 'High-dose vitamin C, zinc, B vitamins' },
+  ] },
+  { group: 'Beauty & Targeted', items: [
+    { name: 'Beauty / Glow', hint: 'Biotin, glutathione, vitamin C' },
+    { name: 'Energy / B12', hint: 'B12, B-complex, amino blend' },
+    { name: 'Iron Infusion', hint: 'Iron sucrose / ferric - needs bloodwork' },
+    { name: 'Weight-Loss Support', hint: 'MIC / lipotropic + B12' },
+  ] },
+];
+
+// A-la-carte add-ons real IV bars upsell. No generic directory asks this.
+const BOOSTERS = ['Glutathione', 'Extra B12', 'Vitamin C', 'Biotin', 'Magnesium', 'Amino acids', 'Zinc', 'Anti-nausea (Zofran)', 'Toradol', 'NAD+ boost'];
+
+const DELIVERY = ['In-clinic', 'Mobile / at-home', 'Memberships & packages'];
 const CONSULT = ['Required', 'Optional', 'No'];
 const LENGTH = ['30 min', '45 min', '60 min', '90+ min'];
 const BOOKING = ['By appointment', 'Walk-ins welcome', 'Both'];
-const SOURCING = ['Licensed compounding pharmacy', 'Pharmaceutical wholesaler', 'Prepared on site'];
 const PAYMENT = ['Receipts for extended health benefits', 'Direct billing', 'HSA/FSA', 'Memberships / packages', 'Pay per visit'];
+
+// When-are-you-slow windows -> we write the deal for them.
+const SLOW_WINDOWS = ['Mid-afternoon (1-4pm)', 'Weekday mornings', 'Early week (Mon-Tue)', 'Lunch lull', 'Seasonal dip', 'Same-day openings'];
+
+function suggestedDeals(windows: string[]): string[] {
+  const s: string[] = [];
+  if (windows.includes('Mid-afternoon (1-4pm)')) s.push('Happy Hour Drip - 20% off all drips, Tue-Thu 2-4pm');
+  if (windows.includes('Weekday mornings')) s.push('Early Bird Drip - $25 off any drip before 11am');
+  if (windows.includes('Early week (Mon-Tue)')) s.push('Recovery Hour - 20% off drips, Mon & Tue');
+  if (windows.includes('Lunch lull')) s.push('Lunch-Break Express - $20 off the 20-min B12 push');
+  if (windows.includes('Seasonal dip')) s.push('Reset Package - 25% off a 3-drip series');
+  if (windows.includes('Same-day openings')) s.push('Same-Day Seat - 15% off when you book today');
+  if (s.length === 0) s.push('Happy Hour Drip - 20% off all drips, Tue-Thu 2-4pm');
+  return s.slice(0, 4);
+}
 
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
@@ -73,21 +123,24 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
   const [whoPlaces, setWhoPlaces] = useState<string[]>(pf.team?.whoPlaces || []);
   const [oversight, setOversight] = useState<string>(pf.team?.oversight || '');
   const [leadName, setLeadName] = useState<string>(pf.team?.leadName || '');
+  const [sourcing, setSourcing] = useState<string[]>(pf.sourcing || []);
   const [selectedDrips, setSelectedDrips] = useState<string[]>((pf.drips || []).map((d) => d.name || '').filter(Boolean));
   const [prices, setPrices] = useState<Record<string, string>>(() => {
     const m: Record<string, string> = {};
     (pf.drips || []).forEach((d) => { if (d.name && d.price) m[d.name] = String(d.price).replace('$', ''); });
     return m;
   });
+  const [boosters, setBoosters] = useState<string[]>(pf.boosters || []);
+  const [delivery, setDelivery] = useState<string[]>(pf.delivery || []);
   const [consult, setConsult] = useState<string>(pf.firstVisit?.consult || '');
   const [length, setLength] = useState<string>(pf.firstVisit?.length || '');
   const [booking, setBooking] = useState<string>(pf.firstVisit?.booking || '');
-  const [sourcing, setSourcing] = useState<string[]>(pf.sourcing || []);
   const [payment, setPayment] = useState<string[]>(pf.payment || []);
   const [about, setAbout] = useState<string>(pf.about || '');
   const [logo, setLogo] = useState<File | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
 
+  const [slowWindows, setSlowWindows] = useState<string[]>(pf.slowWindows || []);
   const [offerTitle, setOfferTitle] = useState<string>(pf.offer?.title || '');
   const [offerCode, setOfferCode] = useState<string>(pf.offer?.code || '');
   const [offerExpires, setOfferExpires] = useState<string>(pf.offer?.expires || '');
@@ -113,15 +166,17 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
   const toggle = (arr: string[], setArr: (v: string[]) => void, val: string) =>
     setArr(arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]);
 
-  // Live completion across the 6 sections, to nudge owners to finish.
+  // Live completion across the 5 substantive sections (boosters + offer are
+  // bonus, not counted), to nudge owners to finish.
   const sectionsDone =
-    (whoPlaces.length || oversight || leadName.trim() ? 1 : 0) +
+    (whoPlaces.length || oversight || sourcing.length || leadName.trim() ? 1 : 0) +
     (selectedDrips.length ? 1 : 0) +
-    (consult || length || booking ? 1 : 0) +
-    (sourcing.length ? 1 : 0) +
+    (delivery.length || consult || length || booking ? 1 : 0) +
     (payment.length ? 1 : 0) +
     (logo || photos.length || about.trim() || hasLogo || photoCount > 0 ? 1 : 0);
-  const pctDone = Math.round((sectionsDone / 6) * 100);
+  const pctDone = Math.round((sectionsDone / 5) * 100);
+
+  const dealSuggestions = suggestedDeals(slowWindows);
 
   async function save() {
     setSaving(true);
@@ -130,12 +185,15 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
       const answers = {
         token,
         team: { whoPlaces, oversight, leadName: leadName.trim() },
-        drips: selectedDrips.map((n) => ({ name: n, price: prices[n] ? prices[n].trim() : null })),
-        firstVisit: { consult, length, booking },
         sourcing,
+        drips: selectedDrips.map((n) => ({ name: n, price: prices[n] ? prices[n].trim() : null })),
+        boosters,
+        delivery,
+        firstVisit: { consult, length, booking },
         payment,
         about: about.trim(),
         offer: { title: offerTitle.trim(), code: offerCode.trim(), expires: offerExpires, active: offerActive },
+        slowWindows,
       };
       const fd = new FormData();
       fd.append('answers', JSON.stringify(answers));
@@ -208,7 +266,7 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
           {/* Completion progress */}
           <div className="mt-6">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[12px] font-black uppercase tracking-[0.12em] text-[#0F6E56]">{sectionsDone} of 6 complete</span>
+              <span className="text-[12px] font-black uppercase tracking-[0.12em] text-[#0F6E56]">{sectionsDone} of 5 complete</span>
               <span className="text-[12px] font-bold text-slate-400">{pctDone}%</span>
             </div>
             <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
@@ -218,8 +276,10 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
         </div>
 
         <div className="space-y-5">
-          <SectionCard step={1} title="Who will patients meet?" hint="The single biggest trust signal for patients choosing a clinic.">
-            <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Who places the IVs?</div>
+          {/* 1 - SAFETY FIRST. The #1 thing patients (and Google's medical
+              ranking) check, and what earns the Safety Verified badge. */}
+          <SectionCard step={1} title="Who keeps patients safe?" hint="The first thing patients check, and what earns your Safety Verified badge.">
+            <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Who starts the IV?</div>
             <div className="flex flex-wrap gap-2 mb-5">
               {WHO_PLACES.map((o) => <Chip key={o} active={whoPlaces.includes(o)} onClick={() => toggle(whoPlaces, setWhoPlaces, o)}>{o}</Chip>)}
             </div>
@@ -227,6 +287,11 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
             <div className="flex flex-wrap gap-2 mb-5">
               {OVERSIGHT.map((o) => <Chip key={o} active={oversight === o} onClick={() => setOversight(oversight === o ? '' : o)}>{o}</Chip>)}
             </div>
+            <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Where do your IVs come from?</div>
+            <div className="flex flex-wrap gap-2 mb-1.5">
+              {SOURCING.map((o) => <Chip key={o} active={sourcing.includes(o)} onClick={() => toggle(sourcing, setSourcing, o)}>{o}</Chip>)}
+            </div>
+            <p className="text-[11.5px] text-slate-400 mb-5">A 503A pharmacy, a 503B outsourcing facility, or mixed on site, however your bags are made.</p>
             <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Lead practitioner (optional)</div>
             <input
               value={leadName}
@@ -237,41 +302,68 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
             />
           </SectionCard>
 
-          <SectionCard step={2} title="Your drips and prices" hint="Tap the drips you offer. Add a from price if you like, it is optional.">
-            <div className="space-y-2.5">
-              {DRIPS.map((d) => {
-                const on = selectedDrips.includes(d);
-                return (
-                  <div key={d} className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => toggle(selectedDrips, setSelectedDrips, d)}
-                      className={'flex-1 text-left px-4 py-3 rounded-xl text-sm font-bold border transition-all ' + (on ? 'bg-[#ebf1e5] text-[#1f3a27] border-[#0F6E56]/40' : 'bg-white text-slate-600 border-slate-200 hover:border-[#0F6E56]/30')}
-                    >
-                      <span className={'inline-flex items-center justify-center w-5 h-5 rounded-md mr-2 align-middle ' + (on ? 'bg-[#0F6E56] text-white' : 'bg-slate-100 text-transparent')}>
-                        <CheckCircle2 size={13} />
-                      </span>
-                      {d}
-                    </button>
-                    {on && (
-                      <div className="flex items-center gap-1 w-[120px]">
-                        <span className="text-slate-400 font-bold text-sm">from $</span>
-                        <input
-                          inputMode="numeric"
-                          value={prices[d] || ''}
-                          onChange={(e) => setPrices({ ...prices, [d]: e.target.value.replace(/[^\d]/g, '') })}
-                          placeholder="—"
-                          className="w-full px-2 py-2 rounded-lg border border-slate-200 focus:border-[#0F6E56] outline-none text-sm text-center"
-                        />
+          {/* 2 - THE REAL MENU, pre-loaded with true formulas. */}
+          <SectionCard step={2} title="Your drip menu" hint="We pre-loaded the real menu. Tap what you offer, add a from price if you like.">
+            {DRIP_MENU.map((grp) => (
+              <div key={grp.group} className="mt-4 first:mt-0">
+                <div className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 mb-2">{grp.group}</div>
+                <div className="space-y-2.5">
+                  {grp.items.map((it) => {
+                    const on = selectedDrips.includes(it.name);
+                    return (
+                      <div key={it.name} className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => toggle(selectedDrips, setSelectedDrips, it.name)}
+                          className={'flex-1 text-left px-4 py-2.5 rounded-xl border transition-all ' + (on ? 'bg-[#ebf1e5] border-[#0F6E56]/40' : 'bg-white border-slate-200 hover:border-[#0F6E56]/30')}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className={'inline-flex items-center justify-center w-5 h-5 rounded-md flex-none ' + (on ? 'bg-[#0F6E56] text-white' : 'bg-slate-100 text-transparent')}>
+                              <CheckCircle2 size={13} />
+                            </span>
+                            <span className={'text-sm font-bold ' + (on ? 'text-[#1f3a27]' : 'text-slate-700')}>{it.name}</span>
+                          </div>
+                          <div className="text-[11.5px] text-slate-400 mt-0.5 pl-7">{it.hint}</div>
+                        </button>
+                        {on && (
+                          <div className="flex items-center gap-1 w-[112px] flex-none">
+                            <span className="text-slate-400 font-bold text-sm">from $</span>
+                            <input
+                              inputMode="numeric"
+                              value={prices[it.name] || ''}
+                              onChange={(e) => setPrices({ ...prices, [it.name]: e.target.value.replace(/[^\d]/g, '') })}
+                              placeholder="-"
+                              className="w-full px-2 py-2 rounded-lg border border-slate-200 focus:border-[#0F6E56] outline-none text-sm text-center"
+                            />
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </SectionCard>
 
-          <SectionCard step={3} title="A first visit">
+          {/* Bonus - boosters & pushes. Not counted toward the 5; pure expertise
+              signal + richer listing data. */}
+          <section className="bg-white rounded-[1.75rem] border border-slate-200 shadow-[0_12px_34px_-22px_rgba(25,40,28,0.4)] p-6 md:p-8">
+            <div className="flex items-start gap-3.5 mb-5">
+              <span className="flex-none w-8 h-8 rounded-full bg-[#ebf1e5] text-[#0F6E56] flex items-center justify-center"><Sparkles size={16} /></span>
+              <div>
+                <h2 className="text-lg font-black text-slate-900 tracking-tight leading-tight">Boosters & pushes</h2>
+                <p className="text-[13px] text-slate-500 mt-0.5">The a-la-carte add-ons you offer alongside a drip. Optional.</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {BOOSTERS.map((o) => <Chip key={o} active={boosters.includes(o)} onClick={() => toggle(boosters, setBoosters, o)}>{o}</Chip>)}
+            </div>
+          </section>
+
+          {/* 3 - how you run visits */}
+          <SectionCard step={3} title="How you run visits">
+            <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">How do patients get their drip?</div>
+            <div className="flex flex-wrap gap-2 mb-5">{DELIVERY.map((o) => <Chip key={o} active={delivery.includes(o)} onClick={() => toggle(delivery, setDelivery, o)}>{o}</Chip>)}</div>
             <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Do first-timers get a consultation?</div>
             <div className="flex flex-wrap gap-2 mb-5">{CONSULT.map((o) => <Chip key={o} active={consult === o} onClick={() => setConsult(consult === o ? '' : o)}>{o}</Chip>)}</div>
             <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Typical session length</div>
@@ -280,15 +372,13 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
             <div className="flex flex-wrap gap-2">{BOOKING.map((o) => <Chip key={o} active={booking === o} onClick={() => setBooking(booking === o ? '' : o)}>{o}</Chip>)}</div>
           </SectionCard>
 
-          <SectionCard step={4} title="Safety and sourcing" hint="This helps you earn the Safety Verified badge patients look for.">
-            <div className="flex flex-wrap gap-2">{SOURCING.map((o) => <Chip key={o} active={sourcing.includes(o)} onClick={() => toggle(sourcing, setSourcing, o)}>{o}</Chip>)}</div>
-          </SectionCard>
-
-          <SectionCard step={5} title="Payment">
+          {/* 4 - payment */}
+          <SectionCard step={4} title="Payment & coverage">
             <div className="flex flex-wrap gap-2">{PAYMENT.map((o) => <Chip key={o} active={payment.includes(o)} onClick={() => toggle(payment, setPayment, o)}>{o}</Chip>)}</div>
           </SectionCard>
 
-          <SectionCard step={6} title="Make it yours" hint="Real photos beat stock every time. Listings with photos get far more bookings.">
+          {/* 5 - make it yours */}
+          <SectionCard step={5} title="Make it yours" hint="Real photos beat stock every time. Listings with photos get far more bookings.">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <label className="cursor-pointer border-2 border-dashed border-slate-200 rounded-2xl p-5 text-center hover:border-[#0F6E56]/40 transition-all">
                 <ImageIcon size={22} className="mx-auto text-[#0F6E56] mb-2" />
@@ -313,36 +403,74 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
             />
           </SectionCard>
 
-          {/* Bonus: slow-time offer. Optional, not counted toward the 6. Shows
-              as a banner on your listing and on the deals feed until it expires. */}
+          {/* Bonus - slow-time deal builder. We tell them when they're slow and
+              write the deal; it shows on the listing + /deals and expires itself. */}
           <section className="bg-gradient-to-br from-[#1f3a27] to-[#14352a] text-[#f3efe2] rounded-[1.75rem] p-6 md:p-8 shadow-[0_12px_34px_-22px_rgba(25,40,28,0.5)]">
             <div className="flex items-start gap-3.5 mb-2">
-              <span className="flex-none w-8 h-8 rounded-full bg-[rgba(216,184,120,0.18)] text-[#d8b878] flex items-center justify-center">★</span>
+              <span className="flex-none w-8 h-8 rounded-full bg-[rgba(216,184,120,0.18)] text-[#d8b878] flex items-center justify-center"><Sparkles size={16} /></span>
               <div className="flex-1">
-                <h2 className="text-lg font-black tracking-tight leading-tight">Slow week? Post an offer</h2>
-                <p className="text-[13px] text-[#c4c9b8] mt-0.5">Optional. Fill quiet days. When it is ON it shows on your listing and our deals page, and disappears on its own when it expires.</p>
+                <h2 className="text-lg font-black tracking-tight leading-tight">Slow week? We'll fill it.</h2>
+                <p className="text-[13px] text-[#c4c9b8] mt-0.5">Tell us when you're quiet and we'll write the deal. It shows on your listing and our deals page, and turns off on its own when it ends.</p>
               </div>
             </div>
 
             {/* One-tap ON/OFF for an existing offer */}
             {offerSavedTitle && (
-              <div className="flex items-center justify-between gap-3 mb-4 rounded-xl bg-white/10 px-4 py-3">
+              <div className="flex items-center justify-between gap-3 mb-4 mt-4 rounded-xl bg-white/10 px-4 py-3">
                 <span className="text-sm font-bold">{offerActive ? 'Your offer is LIVE on the site' : 'Your offer is hidden'}</span>
                 <button
                   type="button"
                   onClick={() => toggleOffer(!offerActive)}
-                  className={'relative w-[52px] h-[28px] rounded-full transition-colors ' + (offerActive ? 'bg-[#d8b878]' : 'bg-white/25')}
+                  className={'relative w-[52px] h-[28px] rounded-full transition-colors flex-none ' + (offerActive ? 'bg-[#d8b878]' : 'bg-white/25')}
                   aria-label="Toggle offer on or off"
                 >
                   <span className={'absolute top-[3px] w-[22px] h-[22px] rounded-full bg-white transition-all ' + (offerActive ? 'left-[27px]' : 'left-[3px]')} />
                 </button>
               </div>
             )}
-            <div className="mt-4 space-y-3">
+
+            {/* When are you slow? */}
+            <div className="text-[11px] font-black uppercase tracking-[0.14em] text-[#c4c9b8] mt-5 mb-2">When are you slow?</div>
+            <div className="flex flex-wrap gap-2">
+              {SLOW_WINDOWS.map((w) => {
+                const on = slowWindows.includes(w);
+                return (
+                  <button
+                    key={w}
+                    type="button"
+                    onClick={() => toggle(slowWindows, setSlowWindows, w)}
+                    className={'px-3.5 py-2 rounded-full text-[13px] font-bold transition-all ' + (on ? 'bg-[#d8b878] text-[#1f3a27]' : 'bg-white/10 text-[#e7e3d5] hover:bg-white/20')}
+                  >
+                    {w}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Suggested deals, tap to use */}
+            <div className="text-[11px] font-black uppercase tracking-[0.14em] text-[#c4c9b8] mt-5 mb-2">Suggested for you, tap to use</div>
+            <div className="space-y-2">
+              {dealSuggestions.map((s) => {
+                const chosen = offerTitle.trim() === s;
+                return (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setOfferTitle(s)}
+                    className={'w-full text-left rounded-xl px-4 py-3 text-[13.5px] font-bold transition-all ' + (chosen ? 'bg-white/10 ring-2 ring-[#d8b878] text-white' : 'bg-white/5 text-[#e7e3d5] hover:bg-white/10')}
+                  >
+                    {s}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Editable offer fields */}
+            <div className="mt-5 space-y-3">
               <input
                 value={offerTitle}
                 onChange={(e) => setOfferTitle(e.target.value)}
-                placeholder="Your offer, e.g. $20 off any drip this week"
+                placeholder="Or write your own, e.g. $20 off any drip this week"
                 maxLength={90}
                 className="w-full px-4 py-3 rounded-xl bg-white/95 text-slate-900 placeholder-slate-400 outline-none text-sm font-semibold"
               />
@@ -383,7 +511,7 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
             disabled={saving}
             className="inline-flex items-center justify-center gap-2 bg-[#0F6E56] text-white px-8 py-3.5 rounded-xl font-black text-sm hover:bg-[#0A5742] disabled:opacity-60 transition-all shadow-lg shadow-emerald-200 w-full sm:w-auto"
           >
-            {saving ? (<><Loader2 size={16} className="animate-spin" /> Saving…</>) : (<>Save and publish <ArrowRight size={16} /></>)}
+            {saving ? (<><Loader2 size={16} className="animate-spin" /> Saving...</>) : (<>Save and publish <ArrowRight size={16} /></>)}
           </button>
         </div>
       </div>

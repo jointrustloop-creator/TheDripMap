@@ -36,11 +36,14 @@ interface Answers {
   token?: string;
   team?: { whoPlaces?: string[]; oversight?: string; leadName?: string };
   drips?: Drip[];
+  boosters?: string[];
+  delivery?: string[];
   firstVisit?: { consult?: string; length?: string; booking?: string };
   sourcing?: string[];
   payment?: string[];
   about?: string;
   offer?: { title?: string; code?: string; expires?: string; active?: boolean };
+  slowWindows?: string[];
 }
 
 // Light scrub: trim, cap length, drop obvious medical-claim verbs so owner free
@@ -81,6 +84,10 @@ function composeDescription(name: string, city: string, a: Answers): string {
   } else {
     parts.push(`${name}${where} offers IV therapy and wellness drips.`);
   }
+  const delivery = a.delivery || [];
+  if (delivery.includes('Mobile / at-home')) parts.push('Mobile and at-home appointments are available.');
+  const boosters = (a.boosters || []).filter(Boolean);
+  if (boosters.length) parts.push(`Add-on boosters include ${boosters.slice(0, 6).join(', ')}.`);
   const consult = a.firstVisit?.consult;
   if (consult === 'Required') parts.push('New patients start with a consultation.');
   else if (consult === 'Optional') parts.push('A consultation is available for new patients.');
@@ -169,7 +176,10 @@ export async function POST(req: NextRequest) {
   // ---- Map constrained answers -> real listing fields ----
   const drips = (answers.drips || []).filter((d) => d && typeof d.name === 'string' && d.name.trim());
   const services = drips.map((d) => ({ name: d.name.trim(), price: normalizePrice(d.price) }));
-  const specialties = drips.map((d) => d.name.trim());
+  const boosterNames = (answers.boosters || []).filter((b): b is string => typeof b === 'string' && b.trim().length > 0).map((b) => b.trim());
+  // Boosters round out the offered-treatments list (deduped against drips) but
+  // are not priced services.
+  const specialties = Array.from(new Set([...drips.map((d) => d.name.trim()), ...boosterNames]));
 
   const leadName = scrub(answers.team?.leadName, 80);
   const oversight = (answers.team?.oversight || '').toString().slice(0, 60);
@@ -244,6 +254,9 @@ export async function POST(req: NextRequest) {
   try {
     const whoPlaces = (answers.team?.whoPlaces || []).join(', ') || 'not specified';
     const sourcing = (answers.sourcing || []).join(', ') || 'not specified';
+    const dripList = drips.map((d) => d.name.trim()).join(', ') || 'none';
+    const boosterList = boosterNames.join(', ') || 'none';
+    const deliveryList = (answers.delivery || []).join(', ') || 'not specified';
     await sendMail({
       from: 'TheDripMap <info@thedripmap.com>',
       to: OPERATOR_EMAIL,
@@ -251,7 +264,9 @@ export async function POST(req: NextRequest) {
       subject: `Listing updated by owner: ${provider.name}`,
       text: `${provider.name} (${provider.city || ''}) just updated their listing via the Finish page.
 
-Drips: ${specialties.join(', ') || 'none'}
+Drips: ${dripList}
+Boosters: ${boosterList}
+Delivery: ${deliveryList}
 Price range: ${price_range || 'not set'}
 Lead practitioner: ${leadName || 'not provided'}
 Who places IVs: ${whoPlaces}
