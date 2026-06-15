@@ -63,6 +63,23 @@ function categoryToReplyStatus(cat: ReplyCategory): string {
   }
 }
 
+// A bounce DSN is sent BY mailer-daemon; the address that actually failed is
+// named in the body ("...wasn't delivered to <email>...", "Final-Recipient:
+// rfc822; <email>", or "X-Failed-Recipients: <email>"). Return that address
+// (lowercased), or null if it can't be found or resolves to our own / the
+// daemon address. Validated against live Gmail DSNs 2026-06-15.
+function extractBouncedRecipient(body: string | null | undefined): string | null {
+  const t = body || '';
+  const m =
+    t.match(/delivered to\s+<?([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})>?/i) ||
+    t.match(/Final-Recipient:\s*rfc822;\s*<?([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})>?/i) ||
+    t.match(/X-Failed-Recipients?:\s*<?([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})>?/i);
+  if (!m) return null;
+  const e = m[1].toLowerCase();
+  if (/mailer-daemon|googlemail|@thedripmap\.com/.test(e)) return null;
+  return e;
+}
+
 export async function GET(req: Request) {
   const expected = process.env.CRON_SECRET;
   if (!expected) {
@@ -212,19 +229,29 @@ export async function GET(req: Request) {
           .in('id', match.providerIds);
       }
     } else if (classification.category === 'bounce') {
+      // The DSN is FROM mailer-daemon; the address that actually failed is named
+      // in the body. Suppress THAT address and flag the provider whose email
+      // matches it (the outreach builder excludes on providers.email_bounced).
+      // Falls back to the sender if extraction fails (no worse than before).
+      const bounced = extractBouncedRecipient(reply.body) || lowerEmail;
       const { error: supErr } = await supabase
         .from('email_suppressions')
         .insert({
-          email: lowerEmail,
+          email: bounced,
           reason: 'hard_bounce',
           source: 'reply',
           notes: classification.reason,
           source_message_id: reply.messageId,
         });
       if (!supErr || /duplicate|unique/i.test(supErr.message)) {
-        if (!supErr) newSuppressions.push({ email: lowerEmail, reason: 'hard_bounce' });
+        if (!supErr) newSuppressions.push({ email: bounced, reason: 'hard_bounce' });
       } else {
         console.error('email_suppressions insert (bounce) failed', supErr.message);
+      }
+      // Flag the provider whose email matches the failed recipient, plus any
+      // thread-matched providers, so outreach never re-emails a dead address.
+      if (bounced.includes('@') && !/mailer-daemon|googlemail/.test(bounced)) {
+        await supabase.from('providers').update({ email_bounced: true }).ilike('email', bounced);
       }
       if (match.providerIds.length > 0) {
         await supabase
