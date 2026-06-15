@@ -18,6 +18,7 @@
 // Always returns — never throws — so the caller can fire-and-forget.
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { ensureManageToken } from './manage-token';
 
 const USER_AGENT = 'TheDripMap-AutoEnrich/1.0 (info@thedripmap.com)';
 const FETCH_TIMEOUT_MS = 12000;
@@ -359,6 +360,18 @@ export async function autoEnrichProvider(providerId: string): Promise<Enrichment
   if (upErr) {
     result.errors.push(`Provider update failed: ${upErr.message}`);
     return result;
+  }
+
+  // Safety net (2026-06-15): immediately after writing decision_drivers, re-ensure
+  // the /finish manage-token exists. The re-read merge above preserves it in the
+  // normal case, but a bad-order write previously left a freshly verified owner
+  // with no token and a dead questionnaire link. ensureManageToken is idempotent
+  // (a no-op when the token is already present), so this only heals the rare
+  // clobbered case and never churns a working token. Non-fatal.
+  try {
+    await ensureManageToken(supabase, providerId);
+  } catch {
+    /* non-fatal: the daily report's FINISH LINK BROKEN alarm catches any miss */
   }
 
   result.ok = true;
