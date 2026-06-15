@@ -18,7 +18,6 @@ import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { TrustSignals } from '../../src/components/TrustSignals';
 import { ProviderCard } from '../../src/components/ProviderCard';
-import { ProviderCardFeatured } from '../../src/components/ProviderCardFeatured';
 import { cn } from '../../src/lib/utils';
 import { searchListings, getCitiesWithListings, slugify } from '../../src/lib/data';
 import { getUserLocation, UserLocation } from '../../src/lib/geo';
@@ -716,16 +715,11 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
                     3 strip cards when the strip is showing, so a clinic never
                     appears twice on the same page. */}
                 {mainGridProviders.map((provider) => (
+                  // 2026-06-14: one card component for the whole grid. ProviderCard's
+                  // claimed branch is the premium per-clinic-distinct card; unclaimed
+                  // stays muted. No more mixing in the taller featured card.
                   <div key={provider.id}>
-                    {showRecentStrip ? (
-                      // Founding clinics: same ProviderCard design as the strip
-                      // and Recently Viewed.
-                      <ProviderCard provider={provider} />
-                    ) : (provider.is_featured === true || provider.is_claimed === true) ? (
-                      <ProviderCardFeatured provider={provider} isPrimary={false} />
-                    ) : (
-                      <ProviderCard provider={provider} />
-                    )}
+                    <ProviderCard provider={provider} />
                   </div>
                 ))}
               </div>

@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import { Map as MapIcon, Star } from 'lucide-react';
 import { Provider } from '../types';
 import { ProviderCard } from './ProviderCard';
-import { ProviderCardFeatured } from './ProviderCardFeatured';
 import { cn } from '../lib/utils';
 
 // Dynamically import map to avoid SSR issues
@@ -77,15 +76,10 @@ export const SplitListingView = ({ providers, cityName }: SplitListingViewProps)
                 isHovered ? 'ring-2 ring-wellness-400 ring-offset-2 ring-offset-[#FDFDFB]' : ''
               )}
             >
-              {/* 2026-06-12: route both featured AND free-tier claimed clinics
-                  through ProviderCardFeatured so they get the magazine-style
-                  treatment with logo + Verified badge, instead of falling
-                  through to the old greyed-out unclaimed card. */}
-              {(provider.is_featured === true || provider.is_claimed === true) ? (
-                <ProviderCardFeatured provider={provider} isPrimary={false} />
-              ) : (
-                <ProviderCard provider={provider} />
-              )}
+              {/* 2026-06-14: every listing renders through ProviderCard. Its
+                  claimed branch is the premium, per-clinic-distinct card; the
+                  unclaimed branch stays muted. */}
+              <ProviderCard provider={provider} />
             </div>
           );
         })}

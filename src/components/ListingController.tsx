@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { Columns, LayoutGrid, Map as MapIcon, Navigation } from 'lucide-react';
 import { Provider } from '../types';
 import { ProviderCard } from './ProviderCard';
-import { ProviderCardFeatured } from './ProviderCardFeatured';
 import dynamic from 'next/dynamic';
 import { calculateDistance, getUserLocation } from '../lib/geo';
 import { motion, AnimatePresence } from 'motion/react';
@@ -222,16 +221,12 @@ export function ListingController({ initialProviders, cityName, hideHeading = fa
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
             {providers.map((provider) => (
-              // 2026-06-12: uniform card size across the grid. No col-span
-              // override for is_featured, and isPrimary=false for both
-              // paid-tier and free-tier claims so the row reads as a clean
-              // 3-up grid instead of a mix of giant + small cards.
+              // 2026-06-14: every listing (claimed + unclaimed) renders through
+              // ProviderCard. The claimed branch carries the premium, per-clinic
+              // distinct treatment; the unclaimed branch stays muted. One card
+              // component = a consistent grid and no two claimed cards alike.
               <div key={provider.id}>
-                {(provider.is_featured === true || provider.is_claimed === true) ? (
-                  <ProviderCardFeatured provider={provider} isPrimary={false} />
-                ) : (
-                  <ProviderCard provider={provider} />
-                )}
+                <ProviderCard provider={provider} />
               </div>
             ))}
           </motion.div>
