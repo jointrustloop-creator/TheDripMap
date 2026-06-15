@@ -51,6 +51,12 @@ interface DataCheckIssue {
   action: string;
 }
 
+interface OnboardingAuditRow {
+  clinic: string;
+  ok: boolean;
+  detail: string;
+}
+
 // Grandfather date for the C1-tier claimed-listings backfill (Eva, Mechelle,
 // Kia etc.). Any provider row created before this AND flagged is_claimed or
 // is_featured did NOT go through claim_requests — that's expected and not an
@@ -279,6 +285,86 @@ export async function GET(req: Request) {
     }
   }
 
+  // 5c. Onboarding email audit (READ-ONLY, additive — verification check only).
+  // For every claim VERIFIED in the last 24h, confirm the "finish your listing"
+  // onboarding email was sent to the owner's email within 5 minutes of
+  // verified_at. The send is recorded by sendVerificationOnboardingEmail()
+  // (src/lib/onboarding.ts) as onboarding_requests.status='sent' + sent_at.
+  // This block ONLY reads; it never sends, modifies, or writes anything, and it
+  // does not touch the existing send logic or templates.
+  const onboardingAudit: OnboardingAuditRow[] = [];
+  {
+    const last24hIso = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: verified24hRaw } = await supabase
+      .from('claim_requests')
+      .select('id, listing_id, email, owner_name, verified_at')
+      .eq('status', 'verified')
+      .gte('verified_at', last24hIso)
+      .order('verified_at', { ascending: true });
+    const verified24h = (verified24hRaw || []) as Array<{
+      id: string;
+      listing_id: string;
+      email: string | null;
+      owner_name: string | null;
+      verified_at: string | null;
+    }>;
+
+    const auditProvIds = Array.from(
+      new Set(verified24h.map((c) => c.listing_id).filter(Boolean)),
+    );
+    const obByProvider = new Map<string, { owner_email: string | null; status: string | null; sent_at: string | null }>();
+    const auditNameById = new Map<string, { name: string | null; city: string | null; state: string | null }>();
+    if (auditProvIds.length) {
+      const { data: obRows } = await supabase
+        .from('onboarding_requests')
+        .select('provider_id, owner_email, status, sent_at')
+        .in('provider_id', auditProvIds);
+      for (const r of (obRows || []) as Array<{ provider_id: string; owner_email: string | null; status: string | null; sent_at: string | null }>) {
+        obByProvider.set(r.provider_id, { owner_email: r.owner_email, status: r.status, sent_at: r.sent_at });
+      }
+      const { data: provs } = await supabase
+        .from('providers')
+        .select('id, name, city, state')
+        .in('id', auditProvIds);
+      for (const p of (provs || []) as Array<{ id: string; name: string | null; city: string | null; state: string | null }>) {
+        auditNameById.set(p.id, { name: p.name, city: p.city, state: p.state });
+      }
+    }
+
+    const FIVE_MIN_MS = 5 * 60 * 1000;
+    const normEmail = (e: string | null | undefined) => (e || '').trim().toLowerCase();
+    for (const c of verified24h) {
+      const p = c.listing_id ? auditNameById.get(c.listing_id) : undefined;
+      const locParts = [p?.city, p?.state].filter(Boolean);
+      const clinic = `${p?.name || c.owner_name || '(unknown clinic)'}${locParts.length ? ' (' + locParts.join(', ') + ')' : ''}`;
+      const ob = c.listing_id ? obByProvider.get(c.listing_id) : undefined;
+      let ok = false;
+      let detail = '';
+      if (!c.listing_id) {
+        detail = 'claim has no listing_id';
+      } else if (!ob) {
+        detail = 'no onboarding_requests row for this clinic';
+      } else if (ob.status !== 'sent' || !ob.sent_at) {
+        detail = `onboarding not marked sent (status=${ob.status || 'none'})`;
+      } else if (!c.verified_at) {
+        detail = 'claim missing verified_at';
+      } else {
+        const delayMs = new Date(ob.sent_at).getTime() - new Date(c.verified_at).getTime();
+        const delaySec = Math.round(delayMs / 1000);
+        const emailMatch = !c.email || normEmail(ob.owner_email) === normEmail(c.email);
+        if (delayMs < -60 * 1000 || delayMs > FIVE_MIN_MS) {
+          detail = `sent ${delaySec}s from verify, outside the 5 min window`;
+        } else if (!emailMatch) {
+          detail = `sent to ${ob.owner_email || '(none)'}, not owner ${c.email}`;
+        } else {
+          ok = true;
+          detail = `sent ${delaySec}s after verify to ${ob.owner_email}`;
+        }
+      }
+      onboardingAudit.push({ clinic, ok, detail });
+    }
+  }
+
   // 6. Resolve provider rows referenced by today's claims + pending claims
   const listingIds = Array.from(
     new Set(
@@ -329,6 +415,25 @@ export async function GET(req: Request) {
       const loc = [p?.city, p?.state].filter(Boolean).join(', ');
       lines.push(`  - ${name}${loc ? ' (' + loc + ')' : ''}`);
     }
+  }
+  lines.push('');
+
+  // Onboarding email audit (read-only): confirm the finish-listing email went
+  // out within 5 min of each verification in the last 24h. Missing sends are
+  // flagged loudly so a silently-dropped confirmation never goes unnoticed.
+  const onboardingMissing = onboardingAudit.filter((a) => !a.ok);
+  lines.push(`ONBOARDING EMAIL AUDIT — claims verified last 24h (${onboardingAudit.length})`);
+  if (onboardingAudit.length === 0) {
+    lines.push('  No verifications in the last 24h.');
+  } else {
+    for (const a of onboardingAudit) {
+      if (a.ok) {
+        lines.push(`  - ${a.clinic}: onboarding email confirmed (${a.detail})`);
+      } else {
+        lines.push(`  - ${a.clinic}: ONBOARDING EMAIL MISSING — ${a.detail}`);
+      }
+    }
+    lines.push(`  ${onboardingAudit.length - onboardingMissing.length}/${onboardingAudit.length} confirmed within 5 min; ${onboardingMissing.length} missing.`);
   }
   lines.push('');
 
@@ -488,6 +593,8 @@ export async function GET(req: Request) {
       totalVerified: totalVerified || 0,
       totalListings: totalListings || 0,
       dataCheckIssues: dataCheck.length,
+      onboardingVerified24h: onboardingAudit.length,
+      onboardingMissing: onboardingAudit.filter((a) => !a.ok).length,
     },
     mail: mailResult,
     telegram: tgResult,
