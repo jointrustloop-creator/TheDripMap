@@ -124,6 +124,26 @@ export async function GET(req: Request) {
     return `process-replies ran ${hrs.toFixed(1)}h ago`;
   }));
 
+  results.push(await runCheck('search-page', async () => {
+    const { status, text } = await fetchText(`${SITE}/search`);
+    if (status !== 200) throw new Error(`/search HTTP ${status}`);
+    if (!/<title>/i.test(text)) throw new Error('/search missing a title');
+    return '/search: 200';
+  }));
+
+  results.push(await runCheck('quiz-page', async () => {
+    const { status } = await fetchText(`${SITE}/quiz`);
+    if (status !== 200) throw new Error(`/quiz HTTP ${status}`);
+    return '/quiz: 200';
+  }));
+
+  results.push(await runCheck('city-page', async () => {
+    const { status, text } = await fetchText(`${SITE}/cities/toronto`);
+    if (status !== 200) throw new Error(`/cities/toronto HTTP ${status}`);
+    if (!/<title>[^<]*Toronto/i.test(text)) throw new Error('/cities/toronto title missing or wrong');
+    return '/cities/toronto: 200 + title';
+  }));
+
   const failures = results.filter((r) => !r.ok);
   if (failures.length > 0) {
     const body = [

@@ -152,13 +152,19 @@ function extractBookingUrl(html: string): string | null {
 }
 
 function extractHoursHint(html: string): string | null {
-  // Look for the first "Mon...Sun" or "Hours" snippet. We don't try to
-  // parse it perfectly — the operator's review pass + Places fallback
-  // do the real work. This just gives the daily report a soft signal.
+  // Require a day name on a WORD BOUNDARY followed (within a short, tag-free
+  // window) by a real clock time or "closed". The old loose /(Monday|Mon|...)/
+  // matched "Mon" inside "Montserrat", "monConfig", "mond:ital,wght@..." and
+  // stored CSS/JS font-stack junk as a clinic's hours. A final guard rejects any
+  // residual CSS/JS. The operator review pass + questionnaire do the real work;
+  // this is only a soft signal.
   const m = html.match(
-    /(Monday|Mon|Hours)[^<]{5,120}(Sunday|Sun|Closed|AM|PM|appointment)/i,
+    /\b(Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?|Hours)\b[^<{}]{2,100}?(\d{1,2}\s*(?::\d{2})?\s*(?:am|pm)\b|closed)/i,
   );
-  return m ? m[0].replace(/\s+/g, ' ').trim().slice(0, 200) : null;
+  if (!m) return null;
+  const snippet = m[0].replace(/\s+/g, ' ').trim();
+  if (/!important|sans-serif|:ital|wght@|font-/i.test(snippet)) return null;
+  return snippet.slice(0, 200);
 }
 
 async function scrapeWebsite(website: string | null): Promise<ScrapeResult> {
