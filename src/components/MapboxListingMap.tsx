@@ -77,6 +77,8 @@ export const MapboxListingMap = ({ providers, hoveredProviderId, onMarkerClick, 
         {providers.map(p => {
           if (!p.latitude || !p.longitude) return null;
           const isHovered = hoveredProviderId === p.id;
+          // Verified = free-tier claimed OR featured (the sitewide signal).
+          const isVerified = p.is_claimed === true || p.is_featured === true;
           return (
             <Marker
               key={p.id}
@@ -91,14 +93,15 @@ export const MapboxListingMap = ({ providers, hoveredProviderId, onMarkerClick, 
               <div
                 className={cn(
                   'rounded-full border-2 border-white shadow-md cursor-pointer transition-all',
-                  // Verified clinics (free-tier claimed OR featured) get the green
-                  // pin; unclaimed listings stay blue. Mirrors the is_claimed ||
-                  // is_featured "verified" signal used on cards/listings sitewide.
-                  (p.is_claimed === true || p.is_featured === true) ? 'bg-emerald-500' : 'bg-blue-500',
-                  // Hover state: bigger, white-ringed, elevated z
+                  // Verified clinics get the green pin; unclaimed listings stay blue.
+                  isVerified ? 'bg-emerald-500' : 'bg-blue-500',
+                  // Size: hovered pins are largest; otherwise verified pins are
+                  // larger than unclaimed (and sit above them) so the green stands out.
                   isHovered
                     ? 'w-10 h-10 ring-4 ring-wellness-300 z-10 scale-110'
-                    : 'w-7 h-7 hover:scale-110'
+                    : isVerified
+                      ? 'w-9 h-9 z-[1] hover:scale-110'
+                      : 'w-7 h-7 hover:scale-110'
                 )}
                 title={p.name}
               />
@@ -134,7 +137,7 @@ export const MapboxListingMap = ({ providers, hoveredProviderId, onMarkerClick, 
                 </div>
               )}
               <h4 className="font-black text-sm text-slate-900 line-clamp-2 mb-1.5 leading-snug">{selectedProvider.name}</h4>
-              {selectedProvider.is_featured && selectedProvider.rating > 0 && (
+              {(selectedProvider.is_claimed || selectedProvider.is_featured) && selectedProvider.rating > 0 && (
                 <div className="flex items-center gap-1 mb-2">
                   <Star size={12} className="text-amber-400 fill-amber-400" />
                   <span className="text-[10px] font-bold text-slate-600">
