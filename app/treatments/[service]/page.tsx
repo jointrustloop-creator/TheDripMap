@@ -35,7 +35,18 @@ export async function generateMetadata({ params }: { params: Promise<{ service: 
 
   // Compliant, matching-platform, Canada-first framing. No medical or efficacy
   // claims, generic cost language only. Unique per treatment via serviceName.
-  const title = `${serviceName} IV Therapy Clinics | Compare and Book | TheDripMap`;
+  //
+  // Title-only display-name overrides. These shorten redundant or duplicative
+  // names in the <title> ONLY. The H1 (rendered by ServicePageClient from its
+  // own SERVICES list) and the meta description below keep the full display name.
+  //   nad-plus:        "NAD+ Plus" to "NAD+" (Plus is redundant in a title)
+  //   hormone-therapy: "Hormone Therapy" to "Hormone" (avoids saying Therapy twice)
+  const TITLE_NAME_OVERRIDES: Record<string, string> = {
+    'nad-plus': 'NAD+',
+    'hormone-therapy': 'Hormone',
+  };
+  const titleName = service && TITLE_NAME_OVERRIDES[service.slug] ? TITLE_NAME_OVERRIDES[service.slug] : serviceName;
+  const title = `${titleName} IV Therapy Clinics | TheDripMap`;
   const description = `Compare ${serviceName} IV therapy clinics across Canada and the US, see typical pricing, and book on TheDripMap, the IV therapy matching platform.`;
   const siteUrl = 'https://www.thedripmap.com';
   const canonicalUrl = `${siteUrl}/treatments/${service ? service.slug : serviceSlug}`;
