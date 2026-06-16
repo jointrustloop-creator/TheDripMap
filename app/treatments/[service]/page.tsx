@@ -33,8 +33,10 @@ export async function generateMetadata({ params }: { params: Promise<{ service: 
   const service = SERVICES.find(s => s.slug === serviceSlug || (s.aliases && s.aliases.includes(serviceSlug)));
   const serviceName = service ? service.name : serviceSlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
-  const title = `${serviceName} IV Therapy Clinics Near Me | TheDripMap`;
-  const description = `Find ${serviceName} IV therapy clinics near you. Compare top-rated providers, see pricing, and book your ${serviceName} drip session in-clinic or mobile.`;
+  // Compliant, matching-platform, Canada-first framing. No medical or efficacy
+  // claims, generic cost language only. Unique per treatment via serviceName.
+  const title = `${serviceName} IV Therapy Clinics | Compare and Book | TheDripMap`;
+  const description = `Compare ${serviceName} IV therapy clinics across Canada and the US, see typical pricing, and book on TheDripMap, the IV therapy matching platform.`;
   const siteUrl = 'https://www.thedripmap.com';
   const canonicalUrl = `${siteUrl}/treatments/${service ? service.slug : serviceSlug}`;
 

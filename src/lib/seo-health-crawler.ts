@@ -9,11 +9,19 @@
 // - Concurrency cap of CRAWL_CONCURRENCY (default 24)
 // - HEAD-only for redirect/status detection
 // - GET only for 2xx where we need the <head>
-// - Per-request timeout of 8s; total wall clock guard at TOTAL_BUDGET_MS
-
+// - Per-request timeout of 15s plus one retry; total wall clock guard at TOTAL_BUDGET_MS
+//
+// 2026-06-16: bumped the per-request timeout from 8s to 15s and added a single
+// retry. Under crawl concurrency, cold ISR renders (treatment and city pages
+// that run DB queries) could exceed 8s and abort. An aborted request surfaced
+// as a false non_200 ("operation was aborted") and, when a GET aborted after a
+// 2xx HEAD, as false missing_title / missing_meta / missing_canonical. The
+// 2026-06-16 run flagged 19 healthy /treatments pages and 12 reachable
+// /cities pages this way. Higher timeout plus retry plus the r.error guard in
+// detectIssues stop the false findings.
 const SITE_URL = 'https://www.thedripmap.com';
 const CRAWL_CONCURRENCY = 24;
-const REQUEST_TIMEOUT_MS = 8000;
+const REQUEST_TIMEOUT_MS = 15000;
 // Leave ~30s headroom under Vercel's 300s cap for diffing + email.
 const DEFAULT_TOTAL_BUDGET_MS = 270_000;
 
@@ -115,6 +123,28 @@ function extractLocs(xml: string): string[] {
 
 // ---------- per-URL probe ----------
 
+// Single fetch guarded by an abort timeout.
+async function timedFetch(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: ctl.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// One retry on abort or network error. Cold ISR renders under crawl concurrency
+// can blow a single timeout; a second attempt almost always hits a warm page.
+async function retryFetch(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
+  try {
+    return await timedFetch(url, init, timeoutMs);
+  } catch {
+    await new Promise((r) => setTimeout(r, 600));
+    return await timedFetch(url, init, timeoutMs);
+  }
+}
+
 async function probeUrl(url: string): Promise<CrawlResult> {
   const base: CrawlResult = {
     url,
@@ -134,15 +164,11 @@ async function probeUrl(url: string): Promise<CrawlResult> {
   let lastRes: Response | null = null;
   try {
     for (let i = 0; i < 6; i++) {
-      const ctl = new AbortController();
-      const timer = setTimeout(() => ctl.abort(), REQUEST_TIMEOUT_MS);
-      lastRes = await fetch(current, {
+      lastRes = await retryFetch(current, {
         method: 'HEAD',
         redirect: 'manual',
-        signal: ctl.signal,
         headers: { 'User-Agent': 'TheDripMap-SEO-Health/1.0' },
-      });
-      clearTimeout(timer);
+      }, REQUEST_TIMEOUT_MS);
 
       if (lastRes.status >= 300 && lastRes.status < 400) {
         const loc = lastRes.headers.get('location');
@@ -176,13 +202,9 @@ async function probeUrl(url: string): Promise<CrawlResult> {
 
   // Get the HTML body for head-tag inspection.
   try {
-    const ctl = new AbortController();
-    const timer = setTimeout(() => ctl.abort(), REQUEST_TIMEOUT_MS);
-    const getRes = await fetch(current, {
-      signal: ctl.signal,
+    const getRes = await retryFetch(current, {
       headers: { 'User-Agent': 'TheDripMap-SEO-Health/1.0' },
-    });
-    clearTimeout(timer);
+    }, REQUEST_TIMEOUT_MS);
     if (!getRes.ok) return base;
     const html = await getRes.text();
     parseHead(html, base);
@@ -323,26 +345,33 @@ export function detectIssues(summary: CrawlSummary): Issue[] {
         detail: 'noindex on indexable page',
       });
     }
-    if (!r.canonical) {
-      issues.push({
-        type: 'missing_canonical',
-        url: r.url,
-        detail: 'no <link rel="canonical">',
-      });
-    }
-    if (!r.title) {
-      issues.push({
-        type: 'missing_title',
-        url: r.url,
-        detail: 'no <title>',
-      });
-    }
-    if (!r.metaDescription) {
-      issues.push({
-        type: 'missing_meta',
-        url: r.url,
-        detail: 'no <meta name="description">',
-      });
+    // Only judge head tags when we actually read the body. A GET that timed out
+    // or errored leaves title / description / canonical null without meaning
+    // they are absent. Without this guard, an aborted GET on a 2xx page produced
+    // false missing_title + missing_meta + missing_canonical all at once (the
+    // 2026-06-16 run flagged 19 healthy /treatments pages exactly this way).
+    if (!r.error) {
+      if (!r.canonical) {
+        issues.push({
+          type: 'missing_canonical',
+          url: r.url,
+          detail: 'no <link rel="canonical">',
+        });
+      }
+      if (!r.title) {
+        issues.push({
+          type: 'missing_title',
+          url: r.url,
+          detail: 'no <title>',
+        });
+      }
+      if (!r.metaDescription) {
+        issues.push({
+          type: 'missing_meta',
+          url: r.url,
+          detail: 'no <meta name="description">',
+        });
+      }
     }
   }
   return issues;
