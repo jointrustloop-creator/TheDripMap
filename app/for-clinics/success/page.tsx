@@ -32,12 +32,12 @@ export default function SuccessPage() {
           </div>
 
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight">
-            Thank you!
+            Check your inbox
           </h1>
-          
+
           <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm mb-10 text-left">
             <p className="text-lg text-slate-600 leading-relaxed mb-6">
-              Your clinic profile has been received. Our team will review and activate your listing within 24 hours.
+              We just emailed you a link to confirm you own this clinic. Click it to verify, and we will send your private link to finish the listing yourself. It takes about two minutes and goes live the instant you save.
             </p>
             
             {email && (
@@ -46,14 +46,14 @@ export default function SuccessPage() {
                   <Mail size={18} />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-0.5">Confirmation sent to</p>
+                  <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-0.5">Verification link sent to</p>
                   <p className="font-bold text-slate-900">{email}</p>
                 </div>
               </div>
             )}
             
             <p className="text-slate-500 mt-6 text-sm">
-              We will contact you with next steps for completing your clinic dashboard and verifying your clinical protocols.
+              No email after a few minutes? Check your spam folder, or write to info@thedripmap.com and we will help.
             </p>
           </div>
 
@@ -75,7 +75,7 @@ export default function SuccessPage() {
       </main>
 
       <footer className="py-8 px-6 text-center border-t border-slate-50">
-        <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">© 2024 DripMap Clinical Network</p>
+        <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">© 2026 TheDripMap</p>
       </footer>
     </div>
   );
