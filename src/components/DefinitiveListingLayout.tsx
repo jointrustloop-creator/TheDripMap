@@ -12,6 +12,8 @@
  */
 import React from 'react';
 import Link from 'next/link';
+import { ClinicMedia } from './ClinicMedia';
+import { ClinicTrustBadge } from './ClinicTrustBadge';
 import {
   CheckCircle2,
   Star,
@@ -835,16 +837,20 @@ export default function DefinitiveListingLayout({
                 <h2 className="font-[var(--font-fraunces)] text-[28px] font-normal tracking-tight mb-4 leading-[1.15]">Other IV clinics in {cityLabel}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-[14px]">
                   {similarClinics.slice(0, 4).map((c) => (
-                    <Link key={c.slug} href={`/providers/${c.slug}`} className="bg-[#fffefa] border border-[rgba(25,36,28,0.09)] rounded-[15px] p-[18px] hover:border-[#d4e0cb] transition">
-                      <div className="font-semibold text-[15px]">{c.name}</div>
-                      <div className="text-[12.5px] text-[#919a8d] mt-[3px] mb-[11px]">{c.city}{c.state ? `, ${c.state}` : ''}</div>
-                      {Array.isArray(c.specialties) && c.specialties.length > 0 && (
-                        <div className="flex gap-[6px] flex-wrap">
-                          {dedupeCi(c.specialties).slice(0, 3).map((tag) => (
-                            <span key={tag} className="text-[11px] bg-[#ebf1e5] text-[#1f3a27] py-1 px-[10px] rounded-full font-semibold">{tag}</span>
-                          ))}
-                        </div>
-                      )}
+                    <Link key={c.slug} href={`/providers/${c.slug}`} className="flex gap-[13px] bg-[#fffefa] border border-[rgba(25,36,28,0.09)] rounded-[15px] p-[13px] hover:border-[#d4e0cb] transition">
+                      <ClinicMedia provider={c} className="w-[80px] h-[80px] rounded-[11px] shrink-0" sizes="80px" initialsClassName="text-base" logoBoxClassName="w-[80%] h-[80%]" />
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold text-[15px] leading-tight">{c.name}</div>
+                        <ClinicTrustBadge provider={c} className="mt-[5px]" />
+                        <div className="text-[12.5px] text-[#919a8d] mt-[5px] mb-[9px]">{c.city}{c.state ? `, ${c.state}` : ''}</div>
+                        {Array.isArray(c.specialties) && c.specialties.length > 0 && (
+                          <div className="flex gap-[6px] flex-wrap">
+                            {dedupeCi(c.specialties).slice(0, 3).map((tag) => (
+                              <span key={tag} className="text-[11px] bg-[#ebf1e5] text-[#1f3a27] py-1 px-[10px] rounded-full font-semibold">{tag}</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </Link>
                   ))}
                 </div>

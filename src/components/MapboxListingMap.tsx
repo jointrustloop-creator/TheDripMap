@@ -2,12 +2,13 @@
 import React, { useState, useMemo } from 'react';
 import Map, { Marker, Popup, NavigationControl } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Phone, Star } from 'lucide-react';
 import { Provider } from '../types';
 import { slugify } from '../lib/data';
 import { cn } from '../lib/utils';
+import { ClinicMedia } from './ClinicMedia';
+import { ClinicTrustBadge } from './ClinicTrustBadge';
 
 interface MapboxListingMapProps {
   providers: Provider[];
@@ -21,22 +22,10 @@ interface MapboxListingMapProps {
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
 
-// Filter out misleading stock photos / blog hero images. Unclaimed listings
-// got blog/unsplash URLs misassigned to them in bulk imports — those should
-// never display. Claimed clinics with legacy /blog-images/ logos are trusted
-// because we placed those files there deliberately.
-const isRealClinicImage = (provider: Provider): boolean => {
-  const url = provider.imageUrl || provider.image_url || '';
-  if (!url) return false;
-  if (url.includes('unsplash.com')) return false;
-  if (url.includes('/blog-images/') && !provider.is_featured) return false;
-  return true;
-};
+// Photo/logo/initials resolution now lives in the shared ClinicMedia primitive,
+// so the popup can never diverge from the other card surfaces.
 
-const initialsOf = (name: string): string =>
-  name.split(/\s+/).slice(0, 2).map(w => w[0] || '').join('').toUpperCase() || 'IV';
-
-export const MapboxListingMap = ({ providers, hoveredProviderId, onMarkerClick, bare = false }: MapboxListingMapProps) => {
+export const MapboxListingMap =({ providers, hoveredProviderId, onMarkerClick, bare = false }: MapboxListingMapProps) => {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
 
   const center = useMemo(() => {
@@ -120,22 +109,18 @@ export const MapboxListingMap = ({ providers, hoveredProviderId, onMarkerClick, 
             maxWidth="240px"
           >
             <div className="p-1 max-w-[220px]">
-              {isRealClinicImage(selectedProvider) ? (
-                <div className="relative h-24 w-full mb-2 rounded-lg overflow-hidden bg-slate-50">
-                  <Image
-                    src={selectedProvider.imageUrl || selectedProvider.image_url!}
-                    alt={selectedProvider.name}
-                    fill
-                    className="object-cover"
-                  />
+              {/* Media + trust badge via the shared primitives. No gradient. */}
+              <div className="relative mb-2">
+                <ClinicMedia
+                  provider={selectedProvider}
+                  className="aspect-[3/2] rounded-lg"
+                  sizes="220px"
+                  initialsClassName="text-xl"
+                />
+                <div className="absolute top-1.5 left-1.5">
+                  <ClinicTrustBadge provider={selectedProvider} />
                 </div>
-              ) : (
-                <div className="h-16 w-full mb-2 rounded-lg overflow-hidden bg-gradient-to-br from-wellness-100 via-white to-emerald-50 flex items-center justify-center border border-wellness-100/60">
-                  <span className="text-xl font-black text-wellness-700 tracking-tight">
-                    {initialsOf(selectedProvider.name)}
-                  </span>
-                </div>
-              )}
+              </div>
               <h4 className="font-black text-sm text-slate-900 line-clamp-2 mb-1.5 leading-snug">{selectedProvider.name}</h4>
               {(selectedProvider.is_claimed || selectedProvider.is_featured) && selectedProvider.rating > 0 && (
                 <div className="flex items-center gap-1 mb-2">

@@ -15,7 +15,8 @@ import {
 } from 'lucide-react';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
-import { ResilientImage } from '../../src/components/ResilientImage';
+import { ClinicMedia } from '../../src/components/ClinicMedia';
+import { ClinicTrustBadge } from '../../src/components/ClinicTrustBadge';
 import { getListingsByIds } from '../../src/lib/data';
 import { Provider } from '../../src/types';
 import { getStatus } from '../../src/lib/hours';
@@ -28,17 +29,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-const DEFAULT_CLINIC_IMAGE =
-  'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/iv-therapy-group-clinic.jpg';
-
-function getInitials(name: string): string {
-  if (!name) return 'IV';
-  let words = name.trim().split(/\s+/);
-  if (words.length > 1 && ['the', 'a', 'an'].includes(words[0].toLowerCase())) {
-    words = words.slice(1);
-  }
-  return ((words[0]?.[0] || '') + (words[1]?.[0] || '')).toUpperCase().slice(0, 2);
-}
+// Media + initials resolution now lives in the shared ClinicMedia primitive.
 
 type SearchParams = Promise<{ ids?: string | string[] }>;
 
@@ -305,23 +296,18 @@ function Cell({ children }: { children: React.ReactNode }) {
 }
 
 function ClinicHeader({ provider }: { provider: Provider }) {
-  const initials = getInitials(provider.name);
   return (
     <div className="border-b border-slate-100 pb-5">
-      <div className="w-full h-32 rounded-2xl overflow-hidden bg-slate-100 mb-4 relative">
-        {provider.is_featured && provider.imageUrl ? (
-          <ResilientImage
-            src={provider.imageUrl}
-            fallbackSrc={DEFAULT_CLINIC_IMAGE}
-            alt={provider.name}
-            fill
-            className="object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-300 font-black text-4xl">
-            {initials}
-          </div>
-        )}
+      <div className="relative w-full mb-4">
+        <ClinicMedia
+          provider={provider}
+          className="aspect-[3/2] rounded-2xl"
+          sizes="(max-width: 768px) 50vw, 240px"
+          initialsClassName="text-4xl"
+        />
+        <div className="absolute top-2 left-2">
+          <ClinicTrustBadge provider={provider} />
+        </div>
       </div>
       <h2 className="text-lg font-black text-slate-900 tracking-tight leading-tight mb-1">
         {provider.name}
@@ -334,24 +320,19 @@ function ClinicHeader({ provider }: { provider: Provider }) {
 }
 
 function MobileCompareCard({ provider }: { provider: Provider }) {
-  const initials = getInitials(provider.name);
   const status = getStatus(provider.hours);
   return (
     <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-      <div className="w-full h-40 bg-slate-100 relative">
-        {provider.is_featured && provider.imageUrl ? (
-          <ResilientImage
-            src={provider.imageUrl}
-            fallbackSrc={DEFAULT_CLINIC_IMAGE}
-            alt={provider.name}
-            fill
-            className="object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-300 font-black text-5xl">
-            {initials}
-          </div>
-        )}
+      <div className="relative w-full">
+        <ClinicMedia
+          provider={provider}
+          className="aspect-[16/10]"
+          sizes="100vw"
+          initialsClassName="text-5xl"
+        />
+        <div className="absolute top-3 left-3">
+          <ClinicTrustBadge provider={provider} />
+        </div>
       </div>
       <div className="p-5 space-y-4">
         <div>

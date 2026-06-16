@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ResilientImage } from './ResilientImage';
 import {
   MapPin,
   ArrowRight,
@@ -16,6 +15,9 @@ import {
 } from 'lucide-react';
 import { Provider, OperatorProfile } from '../types';
 import { ServicePill } from './ServicePill';
+import { ClinicMedia } from './ClinicMedia';
+import { ClinicTrustBadge } from './ClinicTrustBadge';
+import { isSafetyVerified, bookingUrlOf } from '../lib/clinic-media';
 import { slugify } from '../lib/data';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
@@ -84,22 +86,8 @@ function deriveDripMenu(provider: Provider) {
   return realPriced.slice(0, 3);
 }
 
-const initialsOf = (name: string): string =>
-  name.split(/\s+/).slice(0, 2).map((w) => w[0] || '').join('').toUpperCase() || 'IV';
-
-// Trust an image URL only if it's not a known-bad source. Claimed clinics may
-// have logos legitimately stored under /blog-images/, so trust those.
-const hasRealClinicImage = (provider: Provider): boolean => {
-  const url = provider.imageUrl || provider.image_url || '';
-  if (!url) return false;
-  if (url.includes('unsplash.com')) return false;
-  // 2026-06-11 Path 1B: trust /blog-images/ URLs for both featured AND
-  // claimed clinics (e.g. Insight Naturopathic's logo). The bulk-misassigned
-  // blog/unsplash concern only applies to fully unclaimed listings.
-  if (url.includes('/blog-images/') && !(provider.is_featured || provider.is_claimed)) return false;
-  if (url.includes('placeholder') || url.includes('picsum')) return false;
-  return true;
-};
+// Image / logo / initials resolution now lives in the shared ClinicMedia
+// primitive, so the hero can never diverge from the other card surfaces.
 
 export const ProviderCardFeatured = ({
   provider,
@@ -107,7 +95,6 @@ export const ProviderCardFeatured = ({
   isPrimary = true,
 }: ProviderCardFeaturedProps) => {
   const slug = provider.slug || slugify(provider.name);
-  const hasImage = hasRealClinicImage(provider);
 
   // Real, derived signals only — no fabricated prices.
   const credentialLine = deriveCredentialLine(provider);
@@ -117,7 +104,7 @@ export const ProviderCardFeatured = ({
   const firstTimeOffer = provider.special_offers?.find(
     (o) => o && o.title && o.active !== false && (!o.expires || o.expires >= new Date().toISOString().slice(0, 10))
   );
-  const bookingUrl = (provider as { online_booking_url?: string }).online_booking_url;
+  const bookingUrl = bookingUrlOf(provider);
   const lead = provider.medical_team?.[0];
 
   return (
@@ -143,29 +130,21 @@ export const ProviderCardFeatured = ({
             isPrimary ? 'md:w-96 h-72 md:h-auto md:min-h-[420px]' : 'h-56'
           )}
         >
-          <Link href={`/providers/${slug}`} className="block h-full relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-wellness-50/40" />
-            {hasImage ? (
-              <div className="absolute inset-0 flex items-center justify-center p-8 md:p-12">
-                <ResilientImage
-                  src={provider.imageUrl || provider.image_url!}
-                  alt={`${provider.name} IV therapy clinic in ${provider.city}`}
-                  width={400}
-                  height={400}
-                  className="max-h-[60%] max-w-[60%] w-auto h-auto object-contain group-hover:scale-105 transition-transform duration-700"
-                  fallbackSrc=""
-                />
-              </div>
-            ) : (
-              // No real photo — render the gradient + clinic initials. Guaranteed
-              // to always display something clean; no broken-image alt text.
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-5xl md:text-6xl font-black text-wellness-700/80 tracking-tight">
-                  {initialsOf(provider.name)}
-                </span>
-              </div>
-            )}
+          <Link href={`/providers/${slug}`} aria-label={provider.name} className="block h-full">
+            <ClinicMedia
+              provider={provider}
+              className="h-full w-full"
+              sizes={isPrimary ? '(max-width: 768px) 100vw, 384px' : '(max-width: 768px) 100vw, 50vw'}
+              priority={isPrimary}
+              initialsClassName="text-5xl md:text-6xl"
+              logoBoxClassName="w-[58%] h-[58%]"
+            />
           </Link>
+
+          {/* Trust badge, top-left */}
+          <div className="absolute top-4 left-4 z-10">
+            <ClinicTrustBadge provider={provider} />
+          </div>
 
           {/* Bottom-left: optional distance chip */}
           {provider.distance !== undefined && (
@@ -193,15 +172,15 @@ export const ProviderCardFeatured = ({
                   )}
                 >
                   <span>{provider.name}</span>
-                  {/* 2026-06-11 Path 1B: "Verified" inline badge gates on the
-                      CLAIM signal (is_claimed for free tier, is_featured for
-                      grandfathered paid tier). It does NOT read safety_verified
-                      and should not be confused with that separate flag. */}
-                  {(provider.is_featured || provider.is_claimed) && (
-                    <span className="inline-flex items-center gap-1 align-middle ml-2 bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full text-[10px] font-black tracking-[0.18em] uppercase border border-emerald-100 whitespace-nowrap">
-                      <CheckCircle2 size={10} className="text-emerald-600" />
-                      Verified
-                    </span>
+                  {/* Inline verified check gates on safety_verified only (never
+                      the claim signal), matching the shared standard card. The
+                      Claimed / Safety-verified state shows on the media badge. */}
+                  {isSafetyVerified(provider) && (
+                    <CheckCircle2
+                      size={16}
+                      className="inline-block align-middle ml-2 text-[#0F6E56]"
+                      aria-label="Safety verified"
+                    />
                   )}
                 </h3>
               </Link>
@@ -250,7 +229,7 @@ export const ProviderCardFeatured = ({
 
           {/* Operator one-liner if available */}
           {operatorProfile?.profile_data.oneLiner && (
-            <div className="mb-5 bg-gradient-to-br from-wellness-50 to-sky-50/60 p-4 rounded-2xl border border-wellness-100/60">
+            <div className="mb-5 bg-wellness-50 p-4 rounded-2xl border border-wellness-100/60">
               <p className="text-sm text-slate-700 font-bold italic leading-relaxed">
                 &ldquo;{operatorProfile.profile_data.oneLiner}&rdquo;
               </p>
@@ -333,14 +312,14 @@ export const ProviderCardFeatured = ({
                 href={bookingUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 bg-gradient-to-br from-wellness-500 to-wellness-700 hover:from-wellness-400 hover:to-wellness-600 text-white px-6 py-3.5 rounded-2xl font-black text-sm transition-all shadow-[0_15px_30px_-10px_rgba(20,184,166,0.5)] hover:shadow-[0_20px_40px_-10px_rgba(20,184,166,0.65)] hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                className="flex-1 bg-[#0F6E56] hover:bg-[#0A5742] text-white px-6 py-3.5 rounded-2xl font-black text-sm transition-colors flex items-center justify-center gap-2"
               >
                 Book Online <ArrowRight size={18} />
               </a>
             ) : (
               <Link
                 href={`/providers/${slug}`}
-                className="flex-1 bg-gradient-to-br from-wellness-500 to-wellness-700 hover:from-wellness-400 hover:to-wellness-600 text-white px-6 py-3.5 rounded-2xl font-black text-sm transition-all shadow-[0_15px_30px_-10px_rgba(20,184,166,0.5)] hover:shadow-[0_20px_40px_-10px_rgba(20,184,166,0.65)] hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                className="flex-1 bg-[#0F6E56] hover:bg-[#0A5742] text-white px-6 py-3.5 rounded-2xl font-black text-sm transition-colors flex items-center justify-center gap-2"
               >
                 View Details <ArrowRight size={18} />
               </Link>

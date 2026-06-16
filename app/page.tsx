@@ -14,11 +14,11 @@ import {
   Check,
   FlaskConical,
   UserCheck,
-  MapPin,
 } from 'lucide-react';
 import { Navbar } from '../src/components/Navbar';
 import { Footer } from '../src/components/Footer';
 import { BlogCard } from '../src/components/BlogCard';
+import { ProviderCard } from '../src/components/ProviderCard';
 import { QuickMatch } from '../src/components/QuickMatch';
 import { ClinicianSection } from '../src/components/ClinicianSection';
 import { TrustSignals } from '../src/components/TrustSignals';
@@ -74,44 +74,10 @@ export default async function HomePage() {
   const featuredClinics = (await getFeaturedListings(4)) || [];
   const latestPosts = blogPosts.slice(0, 3);
 
-  // Per-clinic Safety Verified map for the featured shelf. As of 2026-06-08
-  // the badge gates on providers.safety_verified (operator-set boolean) only.
-  // Claimed and Safety Verified are explicitly separate signals.
-  const safetyVerifiedById = new Map<string, boolean>();
-  for (const c of featuredClinics) {
-    safetyVerifiedById.set(String(c.id), (c as { safety_verified?: boolean }).safety_verified === true);
-  }
-
-  // Initials helper for the small circular logo chip when a clinic has no
-  // standalone logo asset. "Signature Beauty Lounge, Downtown" -> "SBL".
-  // Falls back to the first letter if only one word survives.
-  const clinicInitials = (name: string): string => {
-    const words = (name || '')
-      .replace(/[^A-Za-z0-9\s'-]/g, ' ')
-      .split(/\s+/)
-      .filter(Boolean)
-      .filter(w => !['and', 'the', 'of', 'at', 'in'].includes(w.toLowerCase()));
-    if (words.length === 0) return '?';
-    if (words.length === 1) return words[0][0].toUpperCase();
-    return (words[0][0] + words[1][0]).toUpperCase();
-  };
-
-  // Real clinic-logo files placed under /public/images/clinic-logos/.
-  // Mapping is hardcoded so we don't pay an fs probe per request — when
-  // we onboard a new logo, add the slug here. Render with object-contain
-  // on a white chip; the initials chip is only the fallback.
-  const logoBySlug: Record<string, string> = {
-    'blue-cypress-iv-and-wellness-georgetown':
-      '/images/clinic-logos/blue-cypress-iv-and-wellness-georgetown.jpg',
-    'signature-beauty-lounge-downtown-toronto':
-      '/images/clinic-logos/signature-beauty-lounge-downtown-toronto.jpg',
-    'signature-beauty-lounge-richmond-hill':
-      '/images/clinic-logos/signature-beauty-lounge-richmond-hill.jpg',
-    'diamond-aesthetics-brampton':
-      '/images/clinic-logos/diamond-aesthetics-brampton.png',
-    'bay-wellness-centre-vancouver':
-      '/images/clinic-logos/bay-wellness-centre-vancouver.webp',
-  };
+  // The featured shelf now renders the shared ProviderCard, so the per-clinic
+  // safety map, the initials helper, and the hardcoded logo lookup were removed.
+  // ProviderCard resolves the logo, photo, safety badge, and initials via the
+  // shared ClinicMedia / ClinicTrustBadge primitives.
 
   // WebSite + Organization JSON-LD are emitted once site-wide from
   // app/layout.tsx with the canonical Site Name signal ("The Drip Map"
@@ -593,117 +559,9 @@ export default async function HomePage() {
               image_url we render a branded deep-green panel with the
               initials centered — never flat grey. */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
-            {featuredClinics.slice(0, 4).map((c) => {
-              const cityLine = [c.city, c.state].filter(Boolean).join(', ');
-              const isSafetyVerified = safetyVerifiedById.get(String(c.id)) === true;
-              const initials = clinicInitials(c.name);
-              const logoUrl = c.slug ? logoBySlug[c.slug] || null : null;
-              const rating = Number(c.rating) || 0;
-              const reviewCount = Number(c.reviewCount) || 0;
-              const fullStars = Math.round(rating);
-              return (
-                <Link
-                  key={c.slug || c.name}
-                  href={`/providers/${c.slug}`}
-                  className="group relative overflow-hidden rounded-3xl bg-white border border-slate-200/80 shadow-[0_8px_24px_-12px_rgba(15,40,30,0.10)] hover:shadow-[0_26px_50px_-30px_rgba(15,40,30,0.45)] hover:-translate-y-1 hover:border-[#d3dfca] transition-all duration-300 flex flex-col"
-                >
-                  {/* Photo hero — uniform aspect-[16/10] across all 4 cards,
-                      object-cover keeps a centered focal point with no
-                      stretching or letterbox. The hero is NOT clipped by
-                      the chip overflow because the chip sits absolutely
-                      below the hero base and the card's overflow-hidden
-                      crops only the chip's outer edge softly. */}
-                  <div className="relative aspect-[16/10] overflow-hidden">
-                    {c.image_url ? (
-                      <Image
-                        src={c.image_url}
-                        alt={c.name}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-[700ms] ease-out"
-                      />
-                    ) : (
-                      // Branded deep-green fallback panel for clinics without
-                      // a photo (radial gradient mirrors the design ref). If
-                      // the clinic has a real logo we center it inside a
-                      // padded white pill (object-contain so it's never
-                      // cropped). Otherwise we fall back to the clinic's
-                      // initials in italic serif so the panel still feels
-                      // designed, not empty.
-                      <div
-                        className="absolute inset-0 flex items-center justify-center group-hover:scale-[1.03] transition-transform duration-[700ms] ease-out"
-                        style={{ background: 'radial-gradient(120% 120% at 30% 20%, #2f5436, #142619)' }}
-                      >
-                        {logoUrl ? (
-                          <div className="relative w-[58%] h-[58%] rounded-2xl bg-white shadow-[0_8px_24px_-10px_rgba(0,0,0,0.4)] p-4 flex items-center justify-center">
-                            <Image
-                              src={logoUrl}
-                              alt={c.name}
-                              fill
-                              sizes="(max-width: 640px) 60vw, (max-width: 1024px) 30vw, 15vw"
-                              className="object-contain p-2"
-                            />
-                          </div>
-                        ) : (
-                          <span className="text-[#e8efe4] font-serif italic font-normal text-4xl tracking-[0.02em]">
-                            {initials}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                    {/* Safety Verified badge — only on truly verified clinics. */}
-                    {isSafetyVerified && (
-                      <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1f3a27] text-white text-[10px] font-bold uppercase tracking-[0.06em] shadow-[0_4px_12px_rgba(20,38,25,0.35)]">
-                        <Check size={11} strokeWidth={3} /> Safety Verified
-                      </span>
-                    )}
-                    {/* Logo chip — small white circle overlapping the hero base.
-                        When the clinic has a real logo file under
-                        /public/images/clinic-logos/{slug}.{ext} we render it
-                        with object-contain + small padding so the FULL logo
-                        shows and never gets cropped. When no logo file
-                        exists we fall back to the clinic's initials in
-                        serif (matching the design reference). */}
-                    {logoUrl ? (
-                      <span className="absolute -bottom-5 left-4 w-12 h-12 rounded-full bg-white border-[3px] border-white shadow-[0_6px_16px_-6px_rgba(25,36,28,0.5)] overflow-hidden z-[2]">
-                        <Image
-                          src={logoUrl}
-                          alt={c.name}
-                          width={48}
-                          height={48}
-                          className="w-full h-full object-contain p-1"
-                        />
-                      </span>
-                    ) : (
-                      <span className="absolute -bottom-5 left-4 w-12 h-12 rounded-full bg-white border-[3px] border-white shadow-[0_6px_16px_-6px_rgba(25,36,28,0.5)] flex items-center justify-center font-serif text-[18px] text-[#142619] z-[2]">
-                        {initials}
-                      </span>
-                    )}
-                  </div>
-                  <div className="px-5 pt-8 pb-5 flex flex-col flex-1">
-                    <div className="font-serif text-[19px] leading-[1.15] tracking-[-0.01em] text-[#142619]">
-                      {c.name}
-                    </div>
-                    <div className="mt-1.5 flex items-center gap-1.5 text-[13px] text-slate-500">
-                      <MapPin size={12} className="text-slate-400 shrink-0" strokeWidth={2} />
-                      <span className="truncate">{cityLine}</span>
-                    </div>
-                    {rating > 0 && (
-                      <div className="mt-3 flex items-center gap-2">
-                        <span className="text-[#c89a3c] text-[13px] tracking-[1px]" aria-hidden="true">
-                          {'★'.repeat(fullStars)}{'☆'.repeat(5 - fullStars)}
-                        </span>
-                        <span className="text-[13.5px] font-bold text-[#142619]">{rating.toFixed(1)}</span>
-                        <span className="text-[12.5px] text-slate-400">({reviewCount})</span>
-                      </div>
-                    )}
-                    <div className="mt-auto pt-4 border-t border-slate-100 flex items-center gap-1.5 text-[13px] font-semibold text-[#2f5436] group-hover:gap-2.5 transition-[gap] duration-200">
-                      View clinic <ArrowRight size={14} strokeWidth={2.25} />
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
+            {featuredClinics.slice(0, 4).map((c) => (
+              <ProviderCard key={c.slug || c.name} provider={c} />
+            ))}
           </div>
 
           <div className="text-center mt-10 md:hidden">
