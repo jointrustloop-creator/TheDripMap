@@ -176,6 +176,12 @@ function isClosedHours(value: string | undefined | null): boolean {
   return /^closed$/i.test(value.trim());
 }
 
+// Display a time range with "to", never an en or em dash or a bare hyphen, per
+// the content rules. "10:00 AM – 5:00 PM" renders as "10:00 AM to 5:00 PM".
+function formatHoursRange(value: string): string {
+  return value.replace(/\s*[–—-]\s*/g, ' to ').replace(/\s+/g, ' ').trim();
+}
+
 function bestForLabel(provider: Provider, profile: OperatorProfile | undefined): string | null {
   const pd = (profile?.profile_data || {}) as Record<string, unknown>;
   const primary = pd.primarySpecialty;
@@ -279,14 +285,23 @@ export default function DefinitiveListingLayout({
   // Current weekday for hours highlighting (lowercased).
   const todayKey = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase() as typeof FACT_HOURS_ORDER[number];
 
-  // Hours: build today-first ordered list, only days the operator provided.
+  // Hours: render all seven days, Monday to Sunday, every day present and in
+  // order. Today is highlighted in place (see isToday in the render), never
+  // pulled out of the array or reordered to the front. A missing or malformed
+  // day renders as "Closed" so a bad day can never collapse the list. Open-now
+  // is derived separately, from this same data, by getStatus on the page, not
+  // by removing the current day.
   const hoursMap = (provider.hours || {}) as Record<string, string>;
-  const orderedDays: typeof FACT_HOURS_ORDER[number][] = todayKey && FACT_HOURS_ORDER.includes(todayKey)
-    ? [todayKey, ...FACT_HOURS_ORDER.filter((d) => d !== todayKey)]
-    : [...FACT_HOURS_ORDER];
-  const hoursToRender = orderedDays
-    .filter((d) => hoursMap[d] !== undefined && hoursMap[d] !== null && String(hoursMap[d]).trim() !== '')
-    .map((d) => ({ key: d, label: DAY_LABEL[d], value: hoursMap[d] }));
+  const hasAnyHours = Object.values(hoursMap).some(
+    (v) => typeof v === 'string' && v.trim() !== ''
+  );
+  const hoursToRender = hasAnyHours
+    ? FACT_HOURS_ORDER.map((d) => {
+        const raw = hoursMap[d];
+        const value = typeof raw === 'string' && raw.trim() !== '' ? raw.trim() : 'Closed';
+        return { key: d, label: DAY_LABEL[d], value };
+      })
+    : [];
 
   // Directions URL (Google Maps). Prefer lat/lng if both, else address string.
   const addressLine = provider.address || '';
@@ -778,7 +793,7 @@ export default function DefinitiveListingLayout({
                           <div key={key} className={`flex justify-between py-3 px-4 rounded-[10px] text-[14.5px] ${isToday ? 'bg-[#ebf1e5] font-semibold' : ''}`}>
                             <span>{label}</span>
                             <span className={isToday ? 'text-[#1f3a27]' : 'text-[#5c685e]'}>
-                              {closed ? 'Closed' : value}
+                              {closed ? 'Closed' : formatHoursRange(value)}
                             </span>
                           </div>
                         );
