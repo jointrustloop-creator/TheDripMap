@@ -296,6 +296,13 @@ export default function DefinitiveListingLayout({
   const quote = ownerQuote(profile);
   const headline = aboutHeadline(provider, profile);
 
+  // Safety: render only the fields the clinic actually confirmed (passed=true),
+  // sourced from profile_data. Never the fields it did not confirm, never a
+  // default full set, and hide the block entirely if a verified clinic has
+  // confirmed none.
+  const confirmedSafety = safetyResults.filter((c) => c.passed);
+  const showSafety = safetyVerified && confirmedSafety.length > 0;
+
   // Current weekday for hours highlighting (lowercased).
   const todayKey = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase() as typeof FACT_HOURS_ORDER[number];
 
@@ -481,9 +488,9 @@ export default function DefinitiveListingLayout({
                 <span className="dlh-chip inline-flex items-center gap-[7px] text-xs font-semibold py-[6px] px-[13px] rounded-full border border-[#5eead4] text-[#aef7e4]" style={{ background: 'rgba(45,212,191,0.10)' }}>
                   <CheckCircle2 size={14} className="text-[#5eead4]" /> Verified &amp; claimed
                 </span>
-                {safetyVerified && (
+                {showSafety && (
                   <a href="#safety-verified" className="inline-flex items-center gap-[7px] text-xs font-medium py-[6px] px-[13px] rounded-full border border-[rgba(216,184,120,0.55)] text-[#d8b878] hover:bg-[rgba(216,184,120,0.08)] transition-colors">
-                    <ShieldCheck size={14} /> Safety verified · 5 of 5
+                    <ShieldCheck size={14} /> Safety verified
                   </a>
                 )}
               </div>
@@ -665,7 +672,7 @@ export default function DefinitiveListingLayout({
             )}
 
             {/* ── Safety Verified ── */}
-            {safetyVerified && (
+            {showSafety && (
               <section id="safety-verified" className="mb-[46px] scroll-mt-24">
                 <div className="bg-[#1f3a27] text-[#f3efe2] rounded-[22px] p-[30px_32px] relative overflow-hidden">
                   <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(90% 120% at 100% 0, rgba(216,184,120,.14), transparent 55%)' }} />
@@ -674,19 +681,19 @@ export default function DefinitiveListingLayout({
                       <ShieldCheck size={22} />
                     </div>
                     <div>
-                      <h2 className="font-[var(--font-fraunces)] text-white text-[24px] font-normal leading-tight">Safety verified · 5 of 5</h2>
-                      <small className="text-[12.5px] text-[#c4c9b8] block mt-[2px]">The standard every clinic confirms before earning this badge</small>
+                      <h2 className="font-[var(--font-fraunces)] text-white text-[24px] font-normal leading-tight">Safety verified</h2>
+                      <small className="text-[12.5px] text-[#c4c9b8] block mt-[2px]">What {displayName} confirmed on our safety review</small>
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-[14px_26px] mt-[22px] relative">
-                    {safetyResults.map((c, idx) => {
+                    {confirmedSafety.map((c) => {
                       const regOverride = (provider as unknown as { regulator_override?: string | null }).regulator_override;
                       const label = c.key === 'verifiedStateBoard' ? regulatorLine(stateCode, regOverride) : c.label;
                       return (
                         <div key={c.key} className="flex gap-[11px] items-start">
                           <CheckCircle2 size={18} className="text-[#d8b878] flex-none mt-[2px]" />
                           <div>
-                            <b className="font-medium text-sm text-white block">{idx === 4 ? 'Provincial board standing' : c.label}</b>
+                            <b className="font-medium text-sm text-white block">{c.key === 'verifiedStateBoard' ? 'Provincial board standing' : c.label}</b>
                             <span className="text-[12.5px] text-[#c4c9b8] leading-[1.45]">
                               {c.key === 'verifiedStateBoard' ? `In good standing with ${label}.` : c.detail}
                             </span>
