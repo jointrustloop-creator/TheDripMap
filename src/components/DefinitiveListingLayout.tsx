@@ -148,6 +148,20 @@ function serviceDisplayName(name: string): string {
   return name.split(/\s+[-–—]\s+/)[0].replace(/\s+/g, ' ').trim();
 }
 
+// A real uploaded logo, not a scraped stock photo. Stock images fall back to
+// the monogram instead of being shown as if they were the clinic's own logo.
+function isRealLogo(url: string | null | undefined): url is string {
+  return !!url && !/unsplash\.com|picsum\.photos|placeholder|loremflickr|pravatar/i.test(url);
+}
+
+// IV-first menu split: a service counts as IV (leads the menu, with a
+// definition and price) if it has a treatment definition or matches an IV
+// keyword. Everything else collapses into "Also offered".
+const IV_SERVICE_RE = /\b(iv|drips?|infus|nad|myers|glutathion|hydrat|vitamin|nutrient|booster|push|cocktail|b-?12|iron|immun|hangover|saline|fluid|ozone|chelation|amino|magnesium|zinc|antioxidant)\b/i;
+function isIvService(name: string, hasDefinition: boolean): boolean {
+  return hasDefinition || IV_SERVICE_RE.test(name);
+}
+
 function buildDripMenu(provider: Provider): DripItem[] {
   type ServiceItem = { name?: string; price?: string | null };
   const rawServices = (provider as { services?: unknown }).services;
@@ -279,8 +293,9 @@ export default function DefinitiveListingLayout({
   const hasGallery = galleryPhotos.length >= 3;
 
   const drips = buildDripMenu(provider);
-  const dripNames = dedupeCi(drips.map((d) => d.name));
-  const dripByName = new Map(drips.map((d) => [d.name.trim().toLowerCase(), d]));
+  const dripDefs = new Map(drips.map((d) => [d.name, findDefinition(d.name)]));
+  const ivDrips = drips.filter((d) => isIvService(d.name, !!dripDefs.get(d.name)));
+  const otherServices = drips.filter((d) => !isIvService(d.name, !!dripDefs.get(d.name)));
 
   const bestFor = bestForLabel(provider, profile);
   const administeredBy = administeredByLabel(profile);
@@ -342,21 +357,19 @@ export default function DefinitiveListingLayout({
   // Sticky booking head subtitle: city + province only.
   const stickySubtitle = `${cityLabel}, ${stateCode}`;
 
-  // Slow-time offer (operator-approved feature). Show the first non-expired
-  // offer the owner set via /finish. Expiry enforced here at render time.
+  // Slow-time offers (operator-approved feature). Render every non-expired
+  // offer the owner set via /finish, stacked. Expiry enforced here at render.
   const todayIso = new Date().toISOString().slice(0, 10);
   type Offer = { title?: string; code?: string; expires?: string; active?: boolean };
   const rawOffers = (provider as { special_offers?: Offer[] }).special_offers;
-  const activeOffer = Array.isArray(rawOffers)
-    ? rawOffers.find((o) => o && typeof o.title === 'string' && o.title.trim() && o.active !== false && (!o.expires || o.expires >= todayIso))
-    : null;
+  const activeOffers: Offer[] = Array.isArray(rawOffers)
+    ? rawOffers.filter((o) => o && typeof o.title === 'string' && o.title.trim() && o.active !== false && (!o.expires || o.expires >= todayIso))
+    : [];
 
-  // ── Showcase modules (2026-06-12) ──────────────────────────────────────
-  // New patient/owner-value sections previewed on Blue Cypress only, pending
-  // operator approval before rollout to all claimed listings. Every value is
-  // derived from real provider fields (no medical claims, generic cost
-  // framing) so the same code generalizes once the gate is lifted.
-  const isShowcase = provider.slug === 'blue-cypress-iv-and-wellness-georgetown';
+  // Patient/owner-value modules (care team, first-visit walkthrough, FAQ),
+  // rolled out to every claimed listing. Each value is derived from real
+  // provider fields (no medical claims, generic cost framing), and each
+  // section renders only when its own data exists.
 
   // Care team — data-driven from provider.medical_team.
   type TeamMember = { name?: string; role?: string; bio?: string; photo?: string };
@@ -375,8 +388,8 @@ export default function DefinitiveListingLayout({
   ];
 
   // Common questions — grounded in real fields. FAQPage schema mirrors these.
-  const careLine = isRnLed
-    ? `Blue Cypress is founded and led by ${team[0]?.name || 'a registered nurse'}, and visits are overseen by licensed clinical staff.`
+  const careLine = isRnLed && team[0]?.name
+    ? `${displayName} is led by ${team[0].name}, and visits are overseen by licensed clinical staff.`
     : 'Visits are overseen by licensed clinical staff.';
   const faqItems: { q: string; a: string }[] = [
     provider.price_range ? {
@@ -396,7 +409,7 @@ export default function DefinitiveListingLayout({
     { q: 'Can I use my HSA or FSA card?', a: 'Many guests pay with an HSA or FSA card. Check with the clinic about your specific plan before your visit.' },
   ].filter(Boolean) as { q: string; a: string }[];
 
-  const showcaseFaqJsonLd = isShowcase && faqItems.length > 0 ? {
+  const showcaseFaqJsonLd = faqItems.length > 0 ? {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: faqItems.map((f) => ({
@@ -469,7 +482,7 @@ export default function DefinitiveListingLayout({
                 soft drop shadow read premium. Initials fallback for clinics
                 with no logo asset stays in brand green. */}
             <div className="flex-none w-[92px] h-[92px] md:w-[104px] md:h-[104px] rounded-[24px] bg-[#fffefa] flex items-center justify-center border border-[rgba(216,184,120,0.5)] ring-1 ring-[rgba(216,184,120,0.18)] shadow-[0_20px_44px_-20px_rgba(0,0,0,0.6)] overflow-hidden">
-              {provider.imageUrl ? (
+              {isRealLogo(provider.imageUrl) ? (
                 <ResilientImage
                   src={provider.imageUrl}
                   fallbackSrc={DEFAULT_CLINIC_IMAGE}
@@ -557,38 +570,63 @@ export default function DefinitiveListingLayout({
         </div>
       )}
 
+      {/* Gallery fallback: a branded cover when the clinic has no photos yet, so the page never shows an empty grid. */}
+      {!hasGallery && (
+        <div className="relative z-[3] -mt-[22px]">
+          <div className="max-w-[1140px] mx-auto px-[30px]">
+            <div className="flex items-center gap-6 rounded-[20px] p-[26px_30px] border border-[rgba(216,184,120,0.4)]" style={{ background: 'linear-gradient(120deg, #14342a 0%, #1f4a39 100%)' }}>
+              <div className="flex-none w-[72px] h-[72px] rounded-[16px] bg-[#fffefa] flex items-center justify-center overflow-hidden border border-[rgba(216,184,120,0.45)]">
+                {isRealLogo(provider.imageUrl) ? (
+                  <ResilientImage src={provider.imageUrl} fallbackSrc={DEFAULT_CLINIC_IMAGE} alt={`${provider.name} logo`} width={72} height={72} fill={false} className="w-full h-full object-contain p-[9px]" />
+                ) : (
+                  <span className="font-[var(--font-fraunces)] text-[22px] font-light text-[#1f3a27]">{initials || getInitials(provider.name)}</span>
+                )}
+              </div>
+              <div className="min-w-0">
+                <h3 className="font-[var(--font-fraunces)] text-white text-[20px] font-normal leading-tight">{cityLabel}, {stateCode}</h3>
+                <p className="text-[14px] text-[#b6ccbc] leading-[1.55] mt-[5px] max-w-[540px]">Photos of {displayName} are on the way. The page stays complete without them, and they drop straight into this space once the clinic adds them.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ───────────────────────── MAIN GRID ───────────────────────── */}
       <div className="max-w-[1140px] mx-auto px-[30px]">
         <div className={`grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_372px] gap-[32px] lg:gap-[54px] items-start ${hasGallery ? 'pt-[46px]' : 'pt-[40px]'} pb-[80px]`}>
 
           <main>
-            {/* ── Slow-time offer banner (owner-set via /finish) ── */}
-            {activeOffer && (
+            {/* ── Slow-time offers (owner-set via /finish, one strip each) ── */}
+            {activeOffers.length > 0 && (
               <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(activeOffers.map((o) => ({
                   '@context': 'https://schema.org',
                   '@type': 'Offer',
-                  name: activeOffer.title,
+                  name: o.title,
                   url: `https://www.thedripmap.com/providers/${provider.slug}`,
                   seller: { '@type': 'MedicalBusiness', name: provider.name },
-                  ...(activeOffer.expires ? { availabilityEnds: activeOffer.expires } : {}),
-                }) }}
+                  ...(o.expires ? { availabilityEnds: o.expires } : {}),
+                }))) }}
               />
             )}
-            {activeOffer && (
-              <div className="mb-[34px] flex items-start gap-3.5 rounded-[18px] p-[18px_22px] bg-[#fdf6e7] border border-[#e7cf93]">
-                <div className="flex-none w-[42px] h-[42px] rounded-full bg-[#d8b878]/20 text-[#a9772a] flex items-center justify-center">
-                  <Gift size={20} />
-                </div>
-                <div className="min-w-0 pt-[2px]">
-                  <div className="text-[10.5px] tracking-[0.14em] uppercase text-[#a9772a] font-bold mb-[3px]">Limited-time offer</div>
-                  <div className="text-[16px] font-bold text-[#5a4310] leading-snug">{activeOffer.title}</div>
-                  <div className="text-[12.5px] text-[#8a6f3e] mt-[3px] flex flex-wrap gap-x-3">
-                    {activeOffer.code && <span>Use code <b className="font-bold">{activeOffer.code}</b></span>}
-                    {activeOffer.expires && <span>Ends {activeOffer.expires}</span>}
+            {activeOffers.length > 0 && (
+              <div className="mb-[34px] flex flex-col gap-[10px]">
+                {activeOffers.map((o, i) => (
+                  <div key={(o.title || '') + i} className="flex items-start gap-3.5 rounded-[18px] p-[18px_22px] bg-[#fdf6e7] border border-[#e7cf93]">
+                    <div className="flex-none w-[42px] h-[42px] rounded-full bg-[#d8b878]/20 text-[#a9772a] flex items-center justify-center">
+                      <Gift size={20} />
+                    </div>
+                    <div className="min-w-0 pt-[2px]">
+                      <div className="text-[10.5px] tracking-[0.14em] uppercase text-[#a9772a] font-bold mb-[3px]">Limited-time offer</div>
+                      <div className="text-[16px] font-bold text-[#5a4310] leading-snug">{o.title}</div>
+                      <div className="text-[12.5px] text-[#8a6f3e] mt-[3px] flex flex-wrap gap-x-3">
+                        {o.code && <span>Use code <b className="font-bold">{o.code}</b></span>}
+                        {o.expires && <span>Ends {o.expires}</span>}
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
             )}
 
@@ -639,7 +677,7 @@ export default function DefinitiveListingLayout({
             )}
 
             {/* ── Meet your provider (data-driven; gated to showcase for now) ── */}
-            {isShowcase && team.length > 0 && (
+            {team.length > 0 && (
               <section className="mb-[46px]">
                 <div className="text-[11.5px] tracking-[0.18em] uppercase text-[#b08a3e] font-semibold inline-flex items-center gap-[10px] mb-[14px] before:content-[''] before:w-[22px] before:h-[1px] before:bg-[#b08a3e]">Your care team</div>
                 <h2 className="font-[var(--font-fraunces)] text-[28px] font-normal tracking-tight mb-5 leading-[1.15]">The people who look after you</h2>
@@ -710,30 +748,41 @@ export default function DefinitiveListingLayout({
             )}
 
             {/* ── Drip menu ── */}
-            {dripNames.length > 0 && (
+            {(ivDrips.length > 0 || otherServices.length > 0) && (
               <section className="mb-[46px]">
                 <div className="text-[11.5px] tracking-[0.18em] uppercase text-[#b08a3e] font-semibold inline-flex items-center gap-[10px] mb-[14px] before:content-[''] before:w-[22px] before:h-[1px] before:bg-[#b08a3e]">Drip menu</div>
-                <h2 className="font-[var(--font-fraunces)] text-[28px] font-normal tracking-tight mb-4 leading-[1.15]">Treatments offered</h2>
-                <div className="grid gap-[10px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(185px, 1fr))' }}>
-                  {dripNames.map((name) => {
-                    const meta = dripByName.get(name.trim().toLowerCase());
-                    const def = findDefinition(name);
-                    return (
+                <h2 className="font-[var(--font-fraunces)] text-[28px] font-normal tracking-tight mb-4 leading-[1.15]">{ivDrips.length > 0 ? 'IV therapy at this clinic' : 'Services offered'}</h2>
+                {ivDrips.length > 0 && (
+                  <div className="grid gap-[10px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(185px, 1fr))' }}>
+                    {ivDrips.map((d) => (
                       <TreatmentDefinitionDisclosure
-                        key={name}
-                        name={name}
-                        definition={def}
-                        price={meta?.price ?? null}
+                        key={d.name}
+                        name={d.name}
+                        definition={dripDefs.get(d.name) || null}
+                        price={d.price ?? null}
                         variant="claimed"
                       />
-                    );
-                  })}
-                </div>
+                    ))}
+                  </div>
+                )}
+                {otherServices.length > 0 && (
+                  <details className="group mt-[18px]">
+                    <summary className="cursor-pointer list-none inline-flex items-center gap-2 text-[14px] font-semibold text-[#5c685e] hover:text-[#1f3a27]">
+                      Also offered at this clinic
+                      <ChevronRight size={15} className="group-open:rotate-90 transition-transform" />
+                    </summary>
+                    <div className="flex flex-wrap gap-2 mt-[12px]">
+                      {otherServices.map((d) => (
+                        <span key={d.name} className="text-[13.5px] text-[#5c685e] border border-[rgba(25,36,28,0.12)] bg-[#fffefa] rounded-[9px] py-[8px] px-[13px]">{d.name}</span>
+                      ))}
+                    </div>
+                  </details>
+                )}
               </section>
             )}
 
             {/* ── Your first visit (logistics walkthrough; gated to showcase) ── */}
-            {isShowcase && (
+            {firstVisitSteps.length > 0 && (
               <section className="mb-[46px]">
                 <div className="text-[11.5px] tracking-[0.18em] uppercase text-[#b08a3e] font-semibold inline-flex items-center gap-[10px] mb-[14px] before:content-[''] before:w-[22px] before:h-[1px] before:bg-[#b08a3e]">Your first visit</div>
                 <h2 className="font-[var(--font-fraunces)] text-[28px] font-normal tracking-tight mb-5 leading-[1.15]">What to expect, start to finish</h2>
@@ -777,7 +826,7 @@ export default function DefinitiveListingLayout({
             )}
 
             {/* ── Common questions (FAQ + FAQPage schema; gated to showcase) ── */}
-            {isShowcase && faqItems.length > 0 && (
+            {faqItems.length > 0 && (
               <section className="mb-[46px]">
                 {showcaseFaqJsonLd && (
                   <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(showcaseFaqJsonLd) }} />
@@ -903,7 +952,7 @@ export default function DefinitiveListingLayout({
               <div className="p-6">
                 <div className="flex gap-3 items-center pb-[18px] border-b border-[rgba(25,36,28,0.09)]">
                   <div className="w-[42px] h-[42px] rounded-full overflow-hidden flex items-center justify-center shrink-0">
-                    {provider.imageUrl ? (
+                    {isRealLogo(provider.imageUrl) ? (
                       // Show the clinic's logo here too (the hero already does).
                       // Cream circle + object-contain so a wordmark logo reads
                       // cleanly instead of being cropped; initials only when
