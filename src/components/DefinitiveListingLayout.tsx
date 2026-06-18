@@ -141,6 +141,13 @@ function dedupeCi(items: string[]): string[] {
 
 interface DripItem { name: string; price?: string | null }
 
+// Display form of a service name: drop a trailing variant suffix after a
+// dash so "Medical Aesthetics - Botox", "Medical Aesthetics - PRP", etc. all
+// collapse to a single "Medical Aesthetics" entry. The menu de-dupes by this.
+function serviceDisplayName(name: string): string {
+  return name.split(/\s+[-–—]\s+/)[0].replace(/\s+/g, ' ').trim();
+}
+
 function buildDripMenu(provider: Provider): DripItem[] {
   type ServiceItem = { name?: string; price?: string | null };
   const rawServices = (provider as { services?: unknown }).services;
@@ -150,17 +157,24 @@ function buildDripMenu(provider: Provider): DripItem[] {
       )
     : [];
 
-  // Merge structured services + plain specialty strings, key on lowercased name.
+  // Merge structured services + plain specialty strings, de-duped by display
+  // name (case-insensitive) so identical service names collapse to one entry.
   const seen = new Map<string, DripItem>();
   for (const s of structured) {
     if (!s.name) continue;
-    const k = s.name.trim().toLowerCase();
-    if (!seen.has(k)) seen.set(k, { name: s.name.trim(), price: s.price || null });
+    const display = serviceDisplayName(s.name);
+    const k = display.toLowerCase();
+    if (!k) continue;
+    const existing = seen.get(k);
+    if (!existing) seen.set(k, { name: display, price: s.price || null });
+    else if (!existing.price && s.price) existing.price = s.price;
   }
   for (const sp of provider.specialties || []) {
     if (typeof sp !== 'string') continue;
-    const k = sp.trim().toLowerCase();
-    if (!seen.has(k)) seen.set(k, { name: sp.trim() });
+    const display = serviceDisplayName(sp);
+    const k = display.toLowerCase();
+    if (!k) continue;
+    if (!seen.has(k)) seen.set(k, { name: display });
   }
   return Array.from(seen.values());
 }
@@ -843,8 +857,12 @@ export default function DefinitiveListingLayout({
               </section>
             )}
 
-            {/* ── Nearby ── */}
-            {similarClinics.length > 0 && (
+            {/* ── Nearby (unclaimed pages only) ──
+                Competitor cards are suppressed on any claimed or verified
+                provider page. This editorial template only ever renders
+                claimed listings, so the !is_claimed guard keeps the nearby
+                competitor section from showing here at all. */}
+            {!provider.is_claimed && similarClinics.length > 0 && (
               <section>
                 <div className="text-[11.5px] tracking-[0.18em] uppercase text-[#b08a3e] font-semibold inline-flex items-center gap-[10px] mb-[14px] before:content-[''] before:w-[22px] before:h-[1px] before:bg-[#b08a3e]">Nearby</div>
                 <h2 className="font-[var(--font-fraunces)] text-[28px] font-normal tracking-tight mb-4 leading-[1.15]">Other IV clinics in {cityLabel}</h2>
