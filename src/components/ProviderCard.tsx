@@ -196,6 +196,20 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
             <span className="shrink-0">{isMobile ? 'Mobile' : 'Clinic'}</span>
           </div>
 
+          {/* Trust signal, visible in EVERY card mode. Safety Verified leads as
+              a prominent gold badge; Claimed shows subtly only on its own. */}
+          {isSafetyVerified ? (
+            <div className="mt-2.5">
+              <span title="Completed TheDripMap's safety questionnaire" className="inline-flex items-center gap-1.5 bg-amber-400 text-amber-950 border border-amber-500 px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-tight shadow-sm">
+                <ShieldCheck size={12} /> Safety Verified
+              </span>
+            </div>
+          ) : isClaimed ? (
+            <div className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-tight text-slate-400">
+              <CheckCircle2 size={11} /> Claimed
+            </div>
+          ) : null}
+
           <div className="my-3 h-px bg-slate-100" />
 
           {/* Adaptive body — each card leads with its strongest real asset */}
@@ -251,20 +265,9 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
             )}
 
             {mode === 'basic' && (
-              <>
-                {isSafetyVerified ? (
-                  <span title="Completed TheDripMap's safety questionnaire" className="inline-flex items-center gap-1.5 bg-amber-400 text-amber-950 border border-amber-500 px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-tight shadow-sm">
-                    <ShieldCheck size={12} /> Safety Verified
-                  </span>
-                ) : (
-                  <span title="Ownership confirmed by the clinic" className="inline-flex items-center gap-1.5 bg-slate-50 text-slate-500 border border-slate-200 px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-tight">
-                    <CheckCircle2 size={12} /> Claimed
-                  </span>
-                )}
-                <p className="mt-2.5 text-[13px] font-semibold text-slate-500">
-                  IV therapy in {provider.city}{provider.state ? `, ${provider.state}` : ''}
-                </p>
-              </>
+              <p className="text-[13px] font-semibold text-slate-500">
+                IV therapy in {provider.city}{provider.state ? `, ${provider.state}` : ''}
+              </p>
             )}
           </div>
 
