@@ -253,11 +253,11 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
             {mode === 'basic' && (
               <>
                 {isSafetyVerified ? (
-                  <span title="Completed TheDripMap's safety questionnaire" className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-tight">
+                  <span title="Completed TheDripMap's safety questionnaire" className="inline-flex items-center gap-1.5 bg-amber-400 text-amber-950 border border-amber-500 px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-tight shadow-sm">
                     <ShieldCheck size={12} /> Safety Verified
                   </span>
                 ) : (
-                  <span title="Ownership confirmed by the clinic" className="inline-flex items-center gap-1.5 bg-slate-50 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-tight">
+                  <span title="Ownership confirmed by the clinic" className="inline-flex items-center gap-1.5 bg-slate-50 text-slate-500 border border-slate-200 px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-tight">
                     <CheckCircle2 size={12} /> Claimed
                   </span>
                 )}

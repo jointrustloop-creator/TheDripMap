@@ -194,21 +194,20 @@ export const ProviderCardFeatured = ({
                   )}
                 >
                   <span>{provider.name}</span>
-                  {/* Two independent badges (2026-06-19). Safety Verified (gold
-                      shield) renders ONLY on safety_verified; Claimed (subtle
-                      slate check) renders on the claim signal. Never merged. */}
-                  {provider.safety_verified === true && (
-                    <span title="Completed TheDripMap's safety questionnaire" className="inline-flex items-center gap-1 align-middle ml-2 bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full text-[10px] font-black tracking-[0.16em] uppercase border border-amber-300 whitespace-nowrap">
-                      <ShieldCheck size={10} className="text-amber-700" />
+                  {/* One badge per card, by priority (2026-06-19). Safety
+                      Verified (prominent gold shield) wins when present; it
+                      implies Claimed, so Claimed shows only on its own. */}
+                  {provider.safety_verified === true ? (
+                    <span title="Completed TheDripMap's safety questionnaire" className="inline-flex items-center gap-1 align-middle ml-2 bg-amber-400 text-amber-950 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-[0.14em] uppercase border border-amber-500 shadow-sm whitespace-nowrap">
+                      <ShieldCheck size={11} className="text-amber-900" />
                       Safety Verified
                     </span>
-                  )}
-                  {(provider.is_featured || provider.is_claimed) && (
-                    <span title="Ownership confirmed by the clinic" className="inline-flex items-center gap-1 align-middle ml-2 bg-slate-50 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-[0.16em] uppercase border border-slate-200 whitespace-nowrap">
+                  ) : (provider.is_featured || provider.is_claimed) ? (
+                    <span title="Ownership confirmed by the clinic" className="inline-flex items-center gap-1 align-middle ml-2 bg-slate-50 text-slate-500 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-[0.16em] uppercase border border-slate-200 whitespace-nowrap">
                       <CheckCircle2 size={10} className="text-slate-400" />
                       Claimed
                     </span>
-                  )}
+                  ) : null}
                 </h3>
               </Link>
             </div>
