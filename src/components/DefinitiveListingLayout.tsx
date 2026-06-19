@@ -497,18 +497,19 @@ export default function DefinitiveListingLayout({
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex gap-2 mb-[15px] flex-wrap items-center">
-                {/* Safety Verified is the trust signal: prominent, gold, and
-                    visually distinct from Claimed. Renders only when the safety
+              <div className="flex gap-[10px] mb-[15px] flex-wrap items-center">
+                {/* Safety Verified is THE trust signal: large, gold, glowing, and
+                    clearly dominant over Claimed. Renders only when the safety
                     questionnaire is complete (safety_verified -> showSafety). */}
                 {showSafety && (
-                  <a href="#safety-verified" title="Completed TheDripMap's safety questionnaire" className="dlh-chip inline-flex items-center gap-[8px] text-[13px] md:text-sm font-bold py-[8px] px-[16px] rounded-full text-[#3a2c06]" style={{ background: 'linear-gradient(180deg,#f0d28a 0%,#d8b878 100%)', boxShadow: '0 8px 22px -8px rgba(216,184,120,0.7), inset 0 1px 0 rgba(255,255,255,0.45)' }}>
-                    <ShieldCheck size={17} className="text-[#3a2c06]" /> Safety Verified
+                  <a href="#safety-verified" title="Completed TheDripMap's safety questionnaire" className="dlh-chip inline-flex items-center gap-[9px] text-sm md:text-[15px] font-bold py-[10px] px-[20px] rounded-full text-[#3a2c06]" style={{ background: 'linear-gradient(180deg,#f3d690 0%,#d8b878 100%)', boxShadow: '0 12px 30px -8px rgba(216,184,120,0.85), inset 0 1px 0 rgba(255,255,255,0.55)' }}>
+                    <ShieldCheck size={19} className="text-[#3a2c06]" /> Safety Verified
                   </a>
                 )}
-                {/* Claimed = ownership confirmed. Deliberately subtle. */}
-                <span title="Ownership confirmed by the clinic" className="inline-flex items-center gap-[6px] text-[12px] font-medium py-[5px] px-[12px] rounded-full border border-[rgba(243,239,226,0.28)] text-[#c4c9b8]">
-                  <CheckCircle2 size={13} /> Claimed
+                {/* Claimed = ownership confirmed. Deliberately small and muted so
+                    it never competes with the Safety Verified mark. */}
+                <span title="Ownership confirmed by the clinic" className="inline-flex items-center gap-[5px] text-[11px] font-medium py-[4px] px-[11px] rounded-full text-[#aeb5a6]" style={{ background: 'rgba(243,239,226,0.06)' }}>
+                  <CheckCircle2 size={12} /> Claimed
                 </span>
               </div>
               <h1 className="font-[var(--font-fraunces)] text-[34px] md:text-[46px] leading-[1.03] font-light tracking-tight text-[#fefdf8]">{displayName}</h1>
