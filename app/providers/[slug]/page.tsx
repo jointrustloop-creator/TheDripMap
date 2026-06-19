@@ -294,7 +294,22 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
     { key: 'verifiedStateBoard',          label: 'State / provincial board',  detail: 'Operating in good standing with the relevant medical or nursing regulator.' },
   ] as const;
   const profileData = (profile?.profile_data || {}) as Record<string, unknown>;
-  const safetyResults = SAFETY_CHECKS.map(c => ({ ...c, passed: profileData[c.key] === true }));
+  // Some claimed clinics don't fit the default physician/NP framing (e.g. an
+  // ND-led naturopathic clinic). When the operator profile records who actually
+  // administers IVs or provides oversight, render THAT verbatim instead of the
+  // generic physician/NP copy, so the Safety Verified block never overstates the
+  // clinical model. Falls back to the generic detail when no context is present.
+  const administerType = typeof profileData.administerType === 'string' ? profileData.administerType.trim() : '';
+  const medicalDirectorName = typeof profileData.medicalDirectorName === 'string' ? profileData.medicalDirectorName.trim() : '';
+  const safetyResults = SAFETY_CHECKS.map(c => {
+    let detail: string = c.detail;
+    if (c.key === 'verifiedClinician' && administerType) {
+      detail = `Administered by ${administerType}. IVs and injections are never handled by unlicensed staff.`;
+    } else if (c.key === 'verifiedMedicalDirector' && medicalDirectorName) {
+      detail = `${medicalDirectorName} provides medical oversight of protocols and patient care.`;
+    }
+    return { ...c, detail, passed: profileData[c.key] === true };
+  });
   const safetyVerifiedCount = safetyResults.filter(c => c.passed).length;
   const safetyVerified = (provider as { safety_verified?: boolean }).safety_verified === true;
   const stateCode = provider.state || getStateFromProvider(provider);
