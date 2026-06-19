@@ -30,6 +30,7 @@ import {
   Calendar,
   ChevronRight,
   Gift,
+  BadgeCheck,
 } from 'lucide-react';
 import { ResilientImage } from './ResilientImage';
 import { MessageClinicButton } from './MessageClinicButton';
@@ -498,8 +499,8 @@ export default function DefinitiveListingLayout({
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex gap-2 mb-[15px] flex-wrap">
-                <span className="dlh-chip inline-flex items-center gap-[7px] text-xs font-semibold py-[6px] px-[13px] rounded-full border border-[#5eead4] text-[#aef7e4]" style={{ background: 'rgba(45,212,191,0.10)' }}>
-                  <CheckCircle2 size={14} className="text-[#5eead4]" /> Verified &amp; claimed
+                <span className="dlh-chip inline-flex items-center gap-[8px] text-[13px] md:text-sm font-bold py-[8px] px-[16px] rounded-full text-[#04231b]" style={{ background: 'linear-gradient(180deg,#7df3df 0%,#2dd4bf 100%)', boxShadow: '0 8px 22px -8px rgba(45,212,191,0.7), inset 0 1px 0 rgba(255,255,255,0.4)' }}>
+                  <BadgeCheck size={17} className="text-[#04231b]" /> Verified
                 </span>
                 {showSafety && (
                   <a href="#safety-verified" className="inline-flex items-center gap-[7px] text-xs font-medium py-[6px] px-[13px] rounded-full border border-[rgba(216,184,120,0.55)] text-[#d8b878] hover:bg-[rgba(216,184,120,0.08)] transition-colors">
@@ -555,7 +556,9 @@ export default function DefinitiveListingLayout({
                       src={photo}
                       fallbackSrc={DEFAULT_CLINIC_IMAGE}
                       alt={`${provider.name} photo ${idx + 1}`}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="(max-width: 768px) 50vw, 33vw"
+                      className="object-cover"
                     />
                   </div>
                 );
