@@ -67,6 +67,24 @@ export default async function FinishPage({ params }: FinishPageProps) {
   if (!secretsMatch(parsed.secret, colToken) && !secretsMatch(parsed.secret, ddToken)) {
     return <InvalidLink />;
   }
+
+  // The owner clicked their private finish link and passed token validation, so
+  // this is a genuine open of their onboarding page. Record it on the provider's
+  // decision_drivers JSONB (merge-preserving, so it never clobbers the saved form
+  // answers under `manage`). Fully swallowed: tracking must NEVER break the page.
+  try {
+    const opens = typeof dd.finishOpenCount === 'number' ? (dd.finishOpenCount as number) : 0;
+    const nowIso = new Date().toISOString();
+    await supabase.from('providers').update({
+      decision_drivers: {
+        ...dd,
+        finishOpenCount: opens + 1,
+        lastFinishOpenAt: nowIso,
+        ...(typeof dd.firstFinishOpenAt === 'string' ? {} : { firstFinishOpenAt: nowIso }),
+      },
+    }).eq('id', parsed.providerId);
+  } catch { /* non-fatal */ }
+
   const prefill = (dd.manage && typeof dd.manage === 'object') ? (dd.manage as Record<string, unknown>) : null;
 
   return (
