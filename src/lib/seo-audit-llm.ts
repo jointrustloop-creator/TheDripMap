@@ -17,6 +17,13 @@ import { getServiceSupabase } from './supabase';
 
 const MODEL = 'claude-sonnet-4-20250514';
 
+// Shown to the clinic on ANY AI-layer failure (missing key, billing/credits,
+// timeout, malformed response). This is a public lead-gen tool, so we never
+// leak the raw provider error (e.g. "credit balance is too low") to the user —
+// the real cause is logged server-side for the operator to see in Vercel logs.
+const AI_UNAVAILABLE =
+  'Our AI recommendations are temporarily unavailable right now. Your full on-page audit and local-visibility checks are below, and you can re-run the AI section shortly.';
+
 export interface PasteReadyFix {
   /** Short label of the issue (e.g. "Title tag", "Meta description"). */
   field: string;
@@ -288,9 +295,10 @@ export async function runLlmAudit(input: LlmAuditInput): Promise<LlmAuditResult>
     : "Your homepage isn't optimized for the highest-intent IV therapy searches in your area.";
 
   if (!key) {
+    console.warn('[seo-audit] ANTHROPIC_API_KEY is not configured on the server.');
     return {
       state: 'stubbed',
-      reason: 'ANTHROPIC_API_KEY is not configured on the server. The paste-ready fixes, missing-page recommendations, and patient-voice questions need the AI layer to generate.',
+      reason: AI_UNAVAILABLE,
       pasteReadyFixes: [],
       missingPages: [],
       patientQuestions: [],
@@ -320,10 +328,11 @@ export async function runLlmAudit(input: LlmAuditInput): Promise<LlmAuditResult>
     });
 
     if (!res.ok) {
-      const errText = (await res.text()).slice(0, 200);
+      const errText = (await res.text()).slice(0, 300);
+      console.error('[seo-audit] Anthropic API error', res.status, errText);
       return {
         state: 'error',
-        reason: `Anthropic ${res.status}: ${errText}`,
+        reason: AI_UNAVAILABLE,
         pasteReadyFixes: [],
         missingPages: [],
         patientQuestions: [],
@@ -334,9 +343,10 @@ export async function runLlmAudit(input: LlmAuditInput): Promise<LlmAuditResult>
     const data = await res.json();
     const text = data?.content?.[0]?.text;
     if (!text) {
+      console.error('[seo-audit] Empty response from Anthropic.');
       return {
         state: 'error',
-        reason: 'Empty response from AI layer.',
+        reason: AI_UNAVAILABLE,
         pasteReadyFixes: [],
         missingPages: [],
         patientQuestions: [],
@@ -346,9 +356,10 @@ export async function runLlmAudit(input: LlmAuditInput): Promise<LlmAuditResult>
 
     const parsed = safeJsonParse<RawLlmShape>(text);
     if (!parsed) {
+      console.error('[seo-audit] Anthropic returned malformed JSON.');
       return {
         state: 'error',
-        reason: 'AI returned malformed JSON.',
+        reason: AI_UNAVAILABLE,
         pasteReadyFixes: [],
         missingPages: [],
         patientQuestions: [],
@@ -358,9 +369,10 @@ export async function runLlmAudit(input: LlmAuditInput): Promise<LlmAuditResult>
 
     return coerce(parsed, fallbackHeadline);
   } catch (err) {
+    console.error('[seo-audit] Anthropic call failed', err instanceof Error ? err.message : err);
     return {
       state: 'error',
-      reason: err instanceof Error ? err.message : String(err),
+      reason: AI_UNAVAILABLE,
       pasteReadyFixes: [],
       missingPages: [],
       patientQuestions: [],
