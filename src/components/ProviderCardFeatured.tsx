@@ -10,6 +10,7 @@ import {
   Clock,
   Globe,
   CheckCircle2,
+  ShieldCheck,
   Stethoscope,
   Gift,
   Star as StarIcon,
@@ -193,14 +194,19 @@ export const ProviderCardFeatured = ({
                   )}
                 >
                   <span>{provider.name}</span>
-                  {/* 2026-06-11 Path 1B: "Verified" inline badge gates on the
-                      CLAIM signal (is_claimed for free tier, is_featured for
-                      grandfathered paid tier). It does NOT read safety_verified
-                      and should not be confused with that separate flag. */}
+                  {/* Two independent badges (2026-06-19). Safety Verified (gold
+                      shield) renders ONLY on safety_verified; Claimed (subtle
+                      slate check) renders on the claim signal. Never merged. */}
+                  {provider.safety_verified === true && (
+                    <span title="Completed TheDripMap's safety questionnaire" className="inline-flex items-center gap-1 align-middle ml-2 bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full text-[10px] font-black tracking-[0.16em] uppercase border border-amber-300 whitespace-nowrap">
+                      <ShieldCheck size={10} className="text-amber-700" />
+                      Safety Verified
+                    </span>
+                  )}
                   {(provider.is_featured || provider.is_claimed) && (
-                    <span className="inline-flex items-center gap-1 align-middle ml-2 bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full text-[10px] font-black tracking-[0.18em] uppercase border border-emerald-100 whitespace-nowrap">
-                      <CheckCircle2 size={10} className="text-emerald-600" />
-                      Verified
+                    <span title="Ownership confirmed by the clinic" className="inline-flex items-center gap-1 align-middle ml-2 bg-slate-50 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-[0.16em] uppercase border border-slate-200 whitespace-nowrap">
+                      <CheckCircle2 size={10} className="text-slate-400" />
+                      Claimed
                     </span>
                   )}
                 </h3>

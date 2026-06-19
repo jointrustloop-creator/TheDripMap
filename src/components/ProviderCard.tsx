@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Star as StarIcon, Navigation, ShieldCheck, MapPin, Stethoscope, Phone, Calendar } from 'lucide-react';
+import { ArrowRight, Star as StarIcon, Navigation, ShieldCheck, CheckCircle2, MapPin, Stethoscope, Phone, Calendar } from 'lucide-react';
 import { Provider } from '../types';
 import { slugify } from '../lib/data';
 import { cn } from '../lib/utils';
@@ -87,6 +87,9 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
   // A clinic is "claimed/verified-looking" if EITHER is_claimed (free-tier or
   // grandfathered) OR is_featured (paid tier).
   const isClaimed = provider.is_claimed === true || provider.is_featured === true;
+  // Safety Verified is a separate, stronger signal than Claimed. The shield is
+  // reserved for it; Claimed gets only a subtle check.
+  const isSafetyVerified = provider.safety_verified === true;
 
   const initials = getInitials(provider.name);
 
@@ -167,9 +170,15 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
             ) : (
               <span className={cn('text-2xl font-black', accent.monoText)}>{initials}</span>
             )}
-            <span className="absolute -bottom-1.5 -right-1.5 h-6 w-6 rounded-full bg-emerald-500 ring-2 ring-white flex items-center justify-center text-white">
-              <ShieldCheck size={12} />
-            </span>
+            {isSafetyVerified ? (
+              <span title="Completed TheDripMap's safety questionnaire" className="absolute -bottom-1.5 -right-1.5 h-6 w-6 rounded-full bg-amber-400 ring-2 ring-white flex items-center justify-center text-amber-950 shadow">
+                <ShieldCheck size={12} />
+              </span>
+            ) : (
+              <span title="Ownership confirmed by the clinic" className="absolute -bottom-1.5 -right-1.5 h-5 w-5 rounded-full bg-slate-200 ring-2 ring-white flex items-center justify-center text-slate-500">
+                <CheckCircle2 size={11} />
+              </span>
+            )}
           </div>
 
           {/* Name + location */}
@@ -243,9 +252,15 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
 
             {mode === 'basic' && (
               <>
-                <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-tight">
-                  <ShieldCheck size={12} /> Verified clinic
-                </span>
+                {isSafetyVerified ? (
+                  <span title="Completed TheDripMap's safety questionnaire" className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-tight">
+                    <ShieldCheck size={12} /> Safety Verified
+                  </span>
+                ) : (
+                  <span title="Ownership confirmed by the clinic" className="inline-flex items-center gap-1.5 bg-slate-50 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-tight">
+                    <CheckCircle2 size={12} /> Claimed
+                  </span>
+                )}
                 <p className="mt-2.5 text-[13px] font-semibold text-slate-500">
                   IV therapy in {provider.city}{provider.state ? `, ${provider.state}` : ''}
                 </p>

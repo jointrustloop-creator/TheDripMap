@@ -40,6 +40,9 @@ export interface Provider {
   is_verified?: boolean;
   is_top_rated?: boolean;
   is_claimed?: boolean;
+  // Safety Verified badge. Independent of is_claimed. True only when the clinic
+  // completed TheDripMap's safety questionnaire (see src/lib/safety.ts).
+  safety_verified?: boolean;
   is_hidden?: boolean;
   claimed_at?: string;
   subscription_tier?: string;

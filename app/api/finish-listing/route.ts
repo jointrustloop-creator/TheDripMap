@@ -21,6 +21,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../src/lib/mailer';
 import { parseManageToken, secretsMatch } from '../../../src/lib/manage-token';
+import { isSafetyComplete, deriveSafetyFlags } from '../../../src/lib/safety';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -240,6 +241,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'could not save, please try again' }, { status: 500 });
   }
 
+  // Badge rule (2026-06-19): completing the safety section of the questionnaire
+  // (who administers IVs + medical oversight) earns the Safety Verified badge.
+  // Derive the attestation flags into the operator profile and flip
+  // safety_verified so the badge renders. This is independent of Claimed
+  // (ownership / is_claimed). The revalidatePath below makes it appear at once.
+  if (isSafetyComplete(answers)) {
+    try {
+      const derived = deriveSafetyFlags(answers);
+      const { data: prof } = await supabase
+        .from('operator_profiles').select('id, profile_data').eq('clinic_id', providerId).maybeSingle();
+      const mergedPd = { ...((prof?.profile_data as Record<string, unknown>) || {}), ...derived };
+      if (prof) await supabase.from('operator_profiles').update({ profile_data: mergedPd }).eq('id', prof.id);
+      else await supabase.from('operator_profiles').insert({ clinic_id: providerId, profile_data: mergedPd });
+      if ((provider as { safety_verified?: boolean }).safety_verified !== true) {
+        await supabase.from('providers').update({ safety_verified: true }).eq('id', providerId);
+      }
+    } catch (e) {
+      console.error('finish-listing safety badge set failed', e instanceof Error ? e.message : e);
+    }
+  }
+
   // Bust the ISR cache for this listing + the deals hub so the owner's changes
   // (and offer) appear immediately instead of waiting out the revalidate window.
   try { revalidatePath(`/providers/${provider.slug}`); revalidatePath('/deals'); } catch { /* non-fatal */ }
@@ -275,7 +297,7 @@ Ingredient sourcing: ${sourcing}
 Logo uploaded: ${newLogoUrl ? 'yes' : 'no'} | Photos uploaded: ${newPhotoUrls.length}
 Slow-time offer: ${offerTitle ? offerTitle + (answers.offer?.expires ? ` (ends ${answers.offer.expires})` : '') : 'none'}
 
-Safety evidence for your badge decision is above (team + sourcing). Review and, if it holds, flip safety_verified in /admin/onboarding.
+Safety evidence is above (team + sourcing). The Safety Verified badge auto-sets when the safety section (who administers + oversight) is completed; this submission ${isSafetyComplete(answers) ? 'COMPLETED it, so the badge is now live' : 'did not complete it, so no safety badge'}.
 
 Live listing: ${SITE_URL}/providers/${provider.slug}
 `,

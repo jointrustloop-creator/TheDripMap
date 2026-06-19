@@ -1092,7 +1092,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
 
             {/* SAFETY VERIFIED — 5-check breakdown for clinics that pass all 5.
                 Mirrors the platform-wide model used by /api/safety-check. */}
-            {safetyVerified && (
+            {safetyVerified && safetyResults.some((c) => c.passed) && (
               <section id="safety-verified" className="pt-8 border-t border-slate-100 scroll-mt-24">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-10 h-10 rounded-2xl bg-sky-500 text-white flex items-center justify-center shadow-md">
@@ -1100,14 +1100,14 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   </div>
                   <div>
                     <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-tight">Safety Verified</h2>
-                    <p className="text-sm font-bold text-sky-700 uppercase tracking-widest mt-0.5">All 5 of 5 criteria · operator confirmed</p>
+                    <p className="text-sm font-bold text-sky-700 uppercase tracking-widest mt-0.5">Completed TheDripMap's safety questionnaire</p>
                   </div>
                 </div>
                 <p className="text-sm text-slate-500 font-medium mb-8 max-w-2xl">
-                  Every clinic on TheDripMap is asked to confirm five operational safety standards. {provider.name} has confirmed all five.
+                  {provider.name} completed TheDripMap's safety questionnaire. Here is what they confirmed.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {safetyResults.map((c) => (
+                  {safetyResults.filter((c) => c.passed).map((c) => (
                     <div key={c.key} className="flex items-start gap-3 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                       <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
                         <CheckCircle2 size={16} strokeWidth={2.5} />
