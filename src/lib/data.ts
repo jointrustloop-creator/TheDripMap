@@ -103,11 +103,20 @@ export function enrichProvider(p: any): Provider {
     : (typeof p.amenities === 'string' ? p.amenities.split(',').map((s: string) => s.trim()) : []))
     .filter(s => typeof s === 'string');
 
-  const imageUrl = (p.imageUrl as string) || (p.image_url as string) || (p.ImageURL as string);
-  // Remove picsum fallback, let ClinicImage handle missing images
-  const finalImageUrl = imageUrl && !imageUrl.includes('picsum.photos') && !imageUrl.includes('unsplash.com')
-    ? imageUrl 
-    : null;
+  // Pick the first REAL (non-stock) image across all column variants. Taking the
+  // first truthy value instead silently shadowed an uploaded logo sitting in
+  // image_url whenever imageUrl still held a scraped Unsplash/picsum default,
+  // so the card (which re-checks image_url) showed the logo but the detail page
+  // (which only reads provider.imageUrl) showed nothing. Affected drs-mobile and
+  // knead. Resolving here fixes every consumer at once.
+  const finalImageUrl =
+    [p.imageUrl, p.image_url, p.ImageURL].find(
+      (u): u is string =>
+        typeof u === 'string' &&
+        u.length > 0 &&
+        !u.includes('picsum.photos') &&
+        !u.includes('unsplash.com')
+    ) || null;
 
   // Map working_hours to hours if available
   const rawHours = p.working_hours || p.workingHours || p.hours || {};
@@ -738,9 +747,33 @@ export async function getPopularCities() {
     { slug: 'washington',  name: 'Washington DC',  cityArg: 'Washington',   stateArg: 'District of Columbia' },
   ];
 
+  // Top GTA suburbs surfaced as their own footer links under Toronto. Each has
+  // a real /cities/<slug> page; counts use the same exact-city query the satellite
+  // pages use, so the pill matches the page the user lands on.
+  const GTA_SUBURBS = ['Mississauga', 'Richmond Hill', 'Vaughan', 'Markham', 'Brampton'];
+
   const results = await Promise.all(
     popular.map(async (p) => {
       try {
+        // Toronto is the one metro whose footer pill must read as "& GTA": use the
+        // SAME two-tier source the /cities/toronto page renders (Toronto core +
+        // surrounding GTA) so the footer number matches the page, not a
+        // Toronto-proper-only undercount.
+        if (p.slug === 'toronto') {
+          const { core, nearby } = await getTorontoGtaTieredListings();
+          const suburbs = await Promise.all(
+            GTA_SUBURBS.map(async (city) => {
+              const l = await getListingsByCity(city, 'Ontario');
+              return { name: city, slug: slugify(city), count: l.length };
+            })
+          );
+          return {
+            name: p.name,
+            slug: p.slug,
+            count: core.length + nearby.length,
+            suburbs: suburbs.filter((su) => su.count > 0),
+          };
+        }
         const listings = await getListingsByCity(p.cityArg, p.stateArg);
         return { name: p.name, slug: p.slug, count: listings.length };
       } catch {
