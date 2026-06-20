@@ -78,6 +78,36 @@ const intros: Record<string, CityIntro> = {
     metaTitle: 'IV Therapy San Carlos CA — Bay Area Peninsula Clinics & Mobile Drips | TheDripMap',
     metaDescription: 'IV therapy in San Carlos, CA. Compare Bay Area Peninsula clinics for NAD+, hydration, immune support and recovery drips. In-clinic and mobile providers serving San Carlos, Redwood City, Belmont, and San Ramon.',
   },
+  'calgary': {
+    localContext: `Calgary is the largest IV therapy market in Alberta, with clinics across the downtown core, the Beltline, and the suburban communities out toward the foothills. Local demand leans toward recovery and hydration around the city's active outdoor culture and the energy-sector work schedule, and bookings spike around Stampede season when same-day and mobile slots fill fast. Mobile in-home and hotel service is widely available across the city and into Airdrie and Cochrane.`,
+    pricing: `Most Calgary clinics run about $150 to $300 CAD for a standard hydration or wellness drip, with NAD+ protocols typically $350 to $900 depending on dose. Mobile in-home service usually adds $50 to $100. These are typical ranges, so confirm the current price with the clinic.`,
+    popularTreatments: ['Hydration', 'Hangover Recovery', 'Myers Cocktail', 'Energy Boost'],
+    metaDescription: `Compare IV therapy clinics in Calgary, Alberta. Typical costs, mobile and in-clinic options, and FAQs on hydration, NAD+, hangover and Myers cocktail drips.`,
+  },
+  'edmonton': {
+    localContext: `Edmonton is one of Alberta's two major IV therapy markets, with clinics serving the downtown core, Whyte Avenue, and the suburban communities across the river valley. Demand mixes everyday wellness and recovery with the festival and event calendar that fills the city through the warmer months, and immune-support bookings rise through the colder season. Mobile in-home and hotel service is widely available across Edmonton and into Sherwood Park and St. Albert.`,
+    pricing: `Most Edmonton clinics run about $150 to $300 CAD for a standard hydration or wellness drip, with NAD+ protocols typically $350 to $900 depending on dose. Mobile in-home service usually adds $50 to $100. These are typical ranges, so confirm the current price with the clinic.`,
+    popularTreatments: ['Hydration', 'Immune Support', 'Myers Cocktail', 'Hangover Recovery'],
+    metaDescription: `Compare IV therapy clinics in Edmonton, Alberta. Typical costs, mobile and in-clinic options, and FAQs on hydration, NAD+, immune support and Myers cocktail drips.`,
+  },
+  'vancouver': {
+    localContext: `Vancouver anchors the IV therapy market in British Columbia, with a strong wellness and longevity culture across downtown, the West End, Kitsilano, and out toward Burnaby and Richmond. Demand skews toward maintenance wellness, immune support, and beauty drips alongside the recovery bookings common to any major city, and the active outdoor population drives steady athletic-recovery interest. Mobile in-home and hotel service is widely available across Metro Vancouver.`,
+    pricing: `Most Vancouver clinics run about $160 to $340 CAD for a standard hydration or wellness drip, with NAD+ protocols typically $400 to $1,000 depending on dose. Mobile in-home service usually adds $50 to $100. These are typical ranges, so confirm the current price with the clinic.`,
+    popularTreatments: ['Beauty Glow', 'Immune Support', 'Hydration', 'NAD+ Plus'],
+    metaDescription: `Compare IV therapy clinics in Vancouver, BC. Typical costs, mobile and in-clinic options, and FAQs on hydration, NAD+, beauty glow and immune support drips.`,
+  },
+  'ottawa': {
+    localContext: `Ottawa is one of Ontario's larger IV therapy markets outside the GTA, with clinics serving the downtown and ByWard Market core and the suburban communities in Kanata, Nepean, and Orleans. Demand mixes everyday wellness and recovery with immune-support bookings through the long winter, alongside steady traffic from the government, tech, and university sectors. Mobile in-home and hotel service is widely available across the National Capital Region.`,
+    pricing: `Most Ottawa clinics run about $160 to $330 CAD for a standard hydration or wellness drip, with NAD+ protocols typically $400 to $1,000 depending on dose. Mobile in-home service usually adds $50 to $100. These are typical ranges, so confirm the current price with the clinic.`,
+    popularTreatments: ['Hydration', 'Immune Support', 'Myers Cocktail', 'Energy Boost'],
+    metaDescription: `Compare IV therapy clinics in Ottawa, Ontario. Typical costs, mobile and in-clinic options, and FAQs on hydration, NAD+, immune support and Myers cocktail drips.`,
+  },
+  'mississauga': {
+    localContext: `Mississauga is one of the largest IV therapy markets in the Greater Toronto Area outside Toronto itself, with clinics across the city centre near Square One, the Port Credit and Streetsville areas, and the corporate corridor near Pearson. Demand mixes everyday wellness, recovery, and beauty drips with the steady traveller flow through the airport. Mobile in-home and hotel service is widely available across Mississauga and into Oakville and Brampton.`,
+    pricing: `Most Mississauga clinics run about $160 to $330 CAD for a standard hydration or wellness drip, with NAD+ protocols typically $400 to $1,000 depending on dose. Mobile in-home service usually adds $50 to $100. These are typical ranges, so confirm the current price with the clinic.`,
+    popularTreatments: ['Hydration', 'Beauty Glow', 'Myers Cocktail', 'Hangover Recovery'],
+    metaDescription: `Compare IV therapy clinics in Mississauga, Ontario. Typical costs, mobile and in-clinic options, and FAQs on hydration, NAD+, beauty glow and Myers cocktail drips.`,
+  },
 };
 
 // Slug aliases — some cities are referenced by multiple slugs in the wild
