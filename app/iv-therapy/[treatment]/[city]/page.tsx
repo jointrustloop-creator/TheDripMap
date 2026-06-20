@@ -77,6 +77,60 @@ async function resolveCity(citySlug: string): Promise<ResolvedCity> {
   return { name: humanized, state: null, stateAbbr: null };
 }
 
+// Mobile detection mirrors the data layer (enriched flag first, then the raw
+// type/specialty signals) so the count matches what the cards actually show.
+function clinicIsMobile(c: Provider): boolean {
+  if (c.mobile_service) return true;
+  const ty = (c.type || '').toLowerCase();
+  if (ty === 'mobile' || ty === 'both') return true;
+  const blob = [c.category, (c.specialties || []).join(' '), (c.subtypes || []).join(' '), c.description]
+    .join(' ')
+    .toLowerCase();
+  return blob.includes('mobile') || blob.includes('in-home') || blob.includes('at-home') || blob.includes('concierge');
+}
+
+// House style: no en/em/figure dashes in generated copy. Belt-and-suspenders in
+// case a clinic name or price_range carries one.
+const noDash = (str: string): string => str.replace(/[‒-―−]/g, '-');
+
+interface CityStats {
+  count: number;
+  mobileCount: number;
+  mobileNames: string[];
+  inClinicCount: number;
+  ratedCount: number;
+  avgRating: number;
+  topRated: Provider | null;
+  claimedCount: number;
+  verifiedCount: number;
+  priced: Provider | null;
+}
+
+// Compute real, per-(treatment x city) stats from the loaded clinic set. Every
+// figure is sourced from live provider data so each page reads uniquely instead
+// of swapping a name into a shared template.
+function computeCityStats(clinics: Provider[]): CityStats {
+  const mob = clinics.filter(clinicIsMobile);
+  const rated = clinics.filter((c) => Number(c.rating) > 0 && Number(c.reviewCount) > 0);
+  const avg = rated.length ? rated.reduce((sum, c) => sum + Number(c.rating), 0) / rated.length : 0;
+  const top = rated
+    .slice()
+    .sort((a, b) => (Number(b.rating) - Number(a.rating)) || (Number(b.reviewCount) - Number(a.reviewCount)))[0] || null;
+  const priced = clinics.find((c) => typeof c.price_range === 'string' && /\d/.test(c.price_range)) || null;
+  return {
+    count: clinics.length,
+    mobileCount: mob.length,
+    mobileNames: mob.slice(0, 2).map((c) => c.name).filter(Boolean),
+    inClinicCount: clinics.length - mob.length,
+    ratedCount: rated.length,
+    avgRating: avg,
+    topRated: top,
+    claimedCount: clinics.filter((c) => c.is_claimed === true).length,
+    verifiedCount: clinics.filter((c) => c.is_featured === true).length,
+    priced,
+  };
+}
+
 export async function generateStaticParams() {
   try {
     const cities = await getAllCities();
@@ -182,6 +236,30 @@ export default async function TreatmentCityPage({ params }: PageProps) {
   const verifiedCount = clinics.filter((c) => c.is_featured).length;
   const content = t.content ? getTreatmentContent(t.content) : undefined;
 
+  // Real per-(treatment x city) stats. Powers the "by the numbers" snapshot and
+  // the data-driven FAQs below so each page carries facts unique to this city.
+  const cityStats = computeCityStats(clinics);
+
+  // City snapshot — every figure is live data, so this paragraph differs on
+  // every treatment x city page.
+  const cs = cityStats;
+  const tl = t.name.toLowerCase();
+  const prov = cs.count === 1 ? 'provider' : 'providers';
+  const snapshotParts: string[] = [`TheDripMap lists ${cs.count} ${tl} ${prov} in ${cityLabel}.`];
+  if (cs.mobileCount > 0 && cs.inClinicCount > 0) snapshotParts.push(`${cs.inClinicCount} ${cs.inClinicCount === 1 ? 'works' : 'work'} from a clinic and ${cs.mobileCount} ${cs.mobileCount === 1 ? 'offers' : 'offer'} mobile or in-home visits.`);
+  else if (cs.mobileCount > 0) snapshotParts.push(`${cs.mobileCount === cs.count ? 'All' : cs.mobileCount} of them offer mobile or in-home visits.`);
+  else snapshotParts.push(`All of them work from a physical clinic.`);
+  if (cs.ratedCount > 0) snapshotParts.push(`${cs.ratedCount} ${cs.ratedCount === 1 ? 'has' : 'have'} public reviews, averaging ${cs.avgRating.toFixed(1)} stars.`);
+  if (cs.claimedCount > 0) snapshotParts.push(`${cs.claimedCount} ${cs.claimedCount === 1 ? 'is' : 'are'} claimed and Safety Verified.`);
+  const citySnapshot = noDash(snapshotParts.join(' '));
+
+  // Trim the shared treatment definition to a 2-sentence lede on the matrix page;
+  // the full education lives on the linked /treatments hub, so this keeps the
+  // page useful without carrying a long block that is identical across cities.
+  const contextLede = content
+    ? noDash(content.description.split('\n\n')[0].split('. ').slice(0, 2).join('. ').replace(/\s*\.?\s*$/, '.'))
+    : '';
+
   // Data-driven (non-templated) intro — woven from the real count, named clinics,
   // and treatment specifics so each combination reads uniquely.
   const topNames = clinics.slice(0, 3).map((c) => c.name).filter(Boolean);
@@ -190,27 +268,37 @@ export default async function TreatmentCityPage({ params }: PageProps) {
     ? `There ${count === 1 ? 'is' : 'are'} ${count} ${t.name.toLowerCase()} ${count === 1 ? 'provider' : 'providers'} in ${cityLabel} on TheDripMap${verifiedCount > 0 ? `, ${verifiedCount} of them claimed (Safety Verified)` : ''}.${topNames.length ? ` Options include ${topNames.join(', ')}.` : ''} ${summarySentence ? summarySentence + '.' : ''} Compare what each clinic offers below, then book directly.`
     : `We're still adding ${t.name.toLowerCase()} providers in ${cityLabel}. ${summarySentence ? summarySentence + '.' : ''} In the meantime, browse nearby clinics or explore the treatment guide below.`;
 
-  // Treatment-and-city-specific FAQs.
-  const costRange = content?.costRange;
+  // Data-driven FAQs. Each answer leads with a fact computed from the live clinic
+  // set (mobile split, named providers, the real top-rated clinic, claimed count)
+  // so the FAQPage content is unique per city instead of a name-swapped template.
+  let costA = `Across the ${cs.count} ${tl} ${cs.count === 1 ? 'clinic' : 'clinics'} listed in ${resolved.name}, each sets its own pricing${content?.costRange ? `, and ${content.costRange} is the typical range for ${tl}` : ''}.`;
+  if (cs.priced) costA += ` ${cs.priced.name} lists ${cs.priced.price_range}.`;
+  costA += ` Mobile visits usually add a delivery fee. Confirm the current price with the clinic before booking.`;
+
+  let mobileA: string;
+  if (cs.mobileCount > 0) {
+    mobileA = `Yes. ${cs.mobileCount} of the ${cs.count} ${tl} ${prov} in ${resolved.name} offer mobile or in-home service`;
+    if (cs.mobileNames.length) mobileA += `, including ${cs.mobileNames.join(' and ')}`;
+    mobileA += `. Check that the service area covers your address when you book.`;
+  } else {
+    mobileA = `The ${cs.count} ${tl} ${cs.count === 1 ? 'clinic' : 'clinics'} listed in ${resolved.name} work from a physical location rather than offering mobile visits. For at-home drips, browse mobile IV options nearby.`;
+  }
+
+  let chooseA = `Compare credentials, transparent ingredients and pricing, and reviews.`;
+  if (cs.topRated) chooseA += ` In ${resolved.name}, ${cs.topRated.name} is currently the highest-rated option at ${Number(cs.topRated.rating).toFixed(1)} stars across ${cs.topRated.reviewCount} reviews.`;
+  if (cs.claimedCount > 0) chooseA += ` ${cs.claimedCount} ${resolved.name} ${cs.claimedCount === 1 ? 'clinic has' : 'clinics have'} claimed and verified ${cs.claimedCount === 1 ? 'its' : 'their'} listing on TheDripMap.`;
+  else chooseA += ` Look for clinics that have claimed and verified their listing.`;
+
+  let bookA = `Most ${resolved.name} clinics work by appointment, and some in-clinic locations also take walk-ins.`;
+  if (cs.mobileCount > 0) bookA += ` The ${cs.mobileCount} mobile ${cs.mobileCount === 1 ? 'option is' : 'options are'} appointment-based, so book the visit ahead.`;
+  else bookA += ` Check each listing for current hours and booking details.`;
+  bookA += ` Weekends and holidays tend to fill up fastest.`;
+
   const faqs = [
-    {
-      q: `How much does ${t.name.toLowerCase()} cost in ${resolved.name}?`,
-      a: costRange
-        ? `${t.name} typically runs ${costRange} in most US and Canadian markets. ${resolved.name} pricing varies by clinic, add-ons, and whether you choose in-clinic or mobile service — confirm current pricing directly with the provider.`
-        : `Pricing for ${t.name.toLowerCase()} in ${resolved.name} varies by clinic and add-ons. Confirm current pricing directly with the provider before booking.`,
-    },
-    {
-      q: `Are there mobile ${t.name.toLowerCase()} options in ${resolved.name}?`,
-      a: `Some ${resolved.name} providers offer mobile or in-home service in addition to a clinic. Look for the "Mobile" tag on the clinic cards above, and confirm the service area covers your address.`,
-    },
-    {
-      q: `How do I choose a safe ${t.name.toLowerCase()} clinic in ${resolved.name}?`,
-      a: `Look for licensed medical oversight, transparent ingredients and pricing, and verification. On TheDripMap, claimed ${resolved.name} clinics carry a Safety Verified badge. ${content?.safety ? content.safety.split('. ')[0] + '.' : 'Always confirm suitability with a licensed clinician.'}`,
-    },
-    {
-      q: `Do I need an appointment for ${t.name.toLowerCase()} in ${resolved.name}?`,
-      a: `Many ${resolved.name} clinics take both walk-ins and appointments, while mobile services are appointment-based. Check each listing for hours and booking details, and book ahead during busy periods.`,
-    },
+    { q: `How much does ${tl} cost in ${resolved.name}?`, a: noDash(costA) },
+    { q: `Can you get mobile ${tl} in ${resolved.name}?`, a: noDash(mobileA) },
+    { q: `How do I choose a ${tl} clinic in ${resolved.name}?`, a: noDash(chooseA) },
+    { q: `Do you need an appointment for ${tl} in ${resolved.name}?`, a: noDash(bookA) },
   ];
 
   // One-line definition from the shared map. Falls back to null when no
@@ -289,7 +377,7 @@ export default async function TreatmentCityPage({ params }: PageProps) {
             <MapPin size={14} /> {cityLabel}
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-[1.02]">
-            {t.name} in {resolved.name} — Find Clinics
+            {t.name} in {resolved.name}
           </h1>
           {oneLineDef && (
             <div className="bg-wellness-50/60 border border-wellness-100 rounded-2xl px-5 py-4 mb-5">
@@ -343,11 +431,22 @@ export default async function TreatmentCityPage({ params }: PageProps) {
           </section>
         )}
 
+        {/* City snapshot — real, per-city stats. Renders on every page with clinics,
+            including treatments (mobile-iv, glp-1, iron) that have no education block. */}
+        {count > 0 && (
+          <section className="bg-wellness-50/40 border border-wellness-100 rounded-3xl p-6 md:p-8 mb-12">
+            <h2 className="text-lg md:text-xl font-black text-slate-900 mb-3 tracking-tight">
+              {t.name.replace(/ IV$/, '')} in {resolved.name}: by the numbers
+            </h2>
+            <p className="text-slate-700 leading-relaxed">{citySnapshot}</p>
+          </section>
+        )}
+
         {/* Treatment context */}
         {content && (
           <section className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8 md:p-10 mb-12">
             <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-4 tracking-tight">What is {t.name.replace(/ IV$/, '')}?</h2>
-            <p className="text-slate-600 leading-relaxed mb-6 whitespace-pre-wrap">{content.description.split('\n\n')[0]}</p>
+            <p className="text-slate-600 leading-relaxed mb-6">{contextLede}</p>
             <div className="flex flex-wrap gap-6 text-sm">
               {content.costRange && (
                 <div><div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Typical cost</div><div className="font-bold text-slate-900">{content.costRange}</div></div>
@@ -365,7 +464,7 @@ export default async function TreatmentCityPage({ params }: PageProps) {
         {/* FAQ */}
         <section className="mb-12">
           <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-6 tracking-tight flex items-center gap-3">
-            <HelpCircle size={24} className="text-wellness-600" /> {t.name} in {resolved.name} — FAQ
+            <HelpCircle size={24} className="text-wellness-600" /> {t.name} in {resolved.name} FAQ
           </h2>
           <div className="space-y-4">
             {faqs.map((f, i) => (
