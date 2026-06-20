@@ -84,6 +84,12 @@ const intros: Record<string, CityIntro> = {
     popularTreatments: ['Hydration', 'Hangover Recovery', 'Myers Cocktail', 'Energy Boost'],
     metaDescription: `Compare IV therapy clinics in Calgary, Alberta. Typical costs, mobile and in-clinic options, and FAQs on hydration, NAD+, hangover and Myers cocktail drips.`,
   },
+  'edmonton': {
+    localContext: `Edmonton is one of Alberta's two major IV therapy markets, with clinics serving the downtown core, Whyte Avenue, and the suburban communities across the river valley. Demand mixes everyday wellness and recovery with the festival and event calendar that fills the city through the warmer months, and immune-support bookings rise through the colder season. Mobile in-home and hotel service is widely available across Edmonton and into Sherwood Park and St. Albert.`,
+    pricing: `Most Edmonton clinics run about $150 to $300 CAD for a standard hydration or wellness drip, with NAD+ protocols typically $350 to $900 depending on dose. Mobile in-home service usually adds $50 to $100. These are typical ranges, so confirm the current price with the clinic.`,
+    popularTreatments: ['Hydration', 'Immune Support', 'Myers Cocktail', 'Hangover Recovery'],
+    metaDescription: `Compare IV therapy clinics in Edmonton, Alberta. Typical costs, mobile and in-clinic options, and FAQs on hydration, NAD+, immune support and Myers cocktail drips.`,
+  },
 };
 
 // Slug aliases — some cities are referenced by multiple slugs in the wild
