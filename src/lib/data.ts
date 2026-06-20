@@ -730,21 +730,26 @@ export async function getCitiesFromListings() {
 }
 
 export async function getPopularCities() {
-  // Use the SAME query as the city page (getListingsByCity) so the count shown
-  // in the footer matches the count the user sees when they click through.
-  // For major metros this is metro-inclusive (Houston includes Tomball/Cypress,
-  // NYC includes outer boroughs, Toronto/GTA includes Mississauga/Oakville/etc).
-  // Curated by actual provider density. Chicago (5) dropped in favor of Las Vegas (15)
-  // which also has the highest hangover-IV search intent of any US city.
+  // Footer + homepage city hubs, Canada-first (matching the platform's focus)
+  // and led by the Toronto & GTA hub, then each country's strongest markets by
+  // provider density. Counts use the SAME query as the city page
+  // (getListingsByCity) so each pill matches the page it links to. Toronto is
+  // special-cased to the two-tier GTA total (core + surrounding GTA) so it reads
+  // as "& GTA", with the top suburbs nested beneath it. The `country` tag lets
+  // the footer group these into Canada / United States sections.
   const popular = [
-    { slug: 'new-york',    name: 'New York',       cityArg: 'New York',     stateArg: 'New York' },
-    { slug: 'houston',     name: 'Houston',        cityArg: 'Houston',      stateArg: 'Texas' },
-    { slug: 'san-diego',   name: 'San Diego',      cityArg: 'San Diego',    stateArg: 'California' },
-    { slug: 'clearwater',  name: 'Clearwater',     cityArg: 'Clearwater',   stateArg: 'Florida' },
-    { slug: 'los-angeles', name: 'Los Angeles',    cityArg: 'Los Angeles',  stateArg: 'California' },
-    { slug: 'toronto',     name: 'Toronto & GTA',  cityArg: 'Toronto',      stateArg: 'Ontario' },
-    { slug: 'las-vegas',   name: 'Las Vegas',      cityArg: 'Las Vegas',    stateArg: 'Nevada' },
-    { slug: 'washington',  name: 'Washington DC',  cityArg: 'Washington',   stateArg: 'District of Columbia' },
+    { slug: 'toronto',   name: 'Toronto & GTA', cityArg: 'Toronto',   stateArg: 'Ontario',          country: 'Canada' },
+    { slug: 'calgary',   name: 'Calgary',       cityArg: 'Calgary',   stateArg: 'Alberta',          country: 'Canada' },
+    { slug: 'edmonton',  name: 'Edmonton',      cityArg: 'Edmonton',  stateArg: 'Alberta',          country: 'Canada' },
+    { slug: 'vancouver', name: 'Vancouver',     cityArg: 'Vancouver', stateArg: 'British Columbia', country: 'Canada' },
+    { slug: 'ottawa',    name: 'Ottawa',        cityArg: 'Ottawa',    stateArg: 'Ontario',          country: 'Canada' },
+    { slug: 'montreal',  name: 'Montreal',      cityArg: 'Montreal',  stateArg: 'Quebec',           country: 'Canada' },
+    { slug: 'new-york',  name: 'New York',      cityArg: 'New York',  stateArg: 'New York',         country: 'United States' },
+    { slug: 'dallas',    name: 'Dallas',        cityArg: 'Dallas',    stateArg: 'Texas',            country: 'United States' },
+    { slug: 'tampa',     name: 'Tampa',         cityArg: 'Tampa',     stateArg: 'Florida',          country: 'United States' },
+    { slug: 'atlanta',   name: 'Atlanta',       cityArg: 'Atlanta',   stateArg: 'Georgia',          country: 'United States' },
+    { slug: 'houston',   name: 'Houston',       cityArg: 'Houston',   stateArg: 'Texas',            country: 'United States' },
+    { slug: 'phoenix',   name: 'Phoenix',       cityArg: 'Phoenix',   stateArg: 'Arizona',          country: 'United States' },
   ];
 
   // Top GTA suburbs surfaced as their own footer links under Toronto. Each has
@@ -771,13 +776,14 @@ export async function getPopularCities() {
             name: p.name,
             slug: p.slug,
             count: core.length + nearby.length,
+            country: p.country,
             suburbs: suburbs.filter((su) => su.count > 0),
           };
         }
         const listings = await getListingsByCity(p.cityArg, p.stateArg);
-        return { name: p.name, slug: p.slug, count: listings.length };
+        return { name: p.name, slug: p.slug, count: listings.length, country: p.country };
       } catch {
-        return { name: p.name, slug: p.slug, count: 0 };
+        return { name: p.name, slug: p.slug, count: 0, country: p.country };
       }
     })
   );
