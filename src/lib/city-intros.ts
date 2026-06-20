@@ -102,6 +102,12 @@ const intros: Record<string, CityIntro> = {
     popularTreatments: ['Hydration', 'Immune Support', 'Myers Cocktail', 'Energy Boost'],
     metaDescription: `Compare IV therapy clinics in Ottawa, Ontario. Typical costs, mobile and in-clinic options, and FAQs on hydration, NAD+, immune support and Myers cocktail drips.`,
   },
+  'mississauga': {
+    localContext: `Mississauga is one of the largest IV therapy markets in the Greater Toronto Area outside Toronto itself, with clinics across the city centre near Square One, the Port Credit and Streetsville areas, and the corporate corridor near Pearson. Demand mixes everyday wellness, recovery, and beauty drips with the steady traveller flow through the airport. Mobile in-home and hotel service is widely available across Mississauga and into Oakville and Brampton.`,
+    pricing: `Most Mississauga clinics run about $160 to $330 CAD for a standard hydration or wellness drip, with NAD+ protocols typically $400 to $1,000 depending on dose. Mobile in-home service usually adds $50 to $100. These are typical ranges, so confirm the current price with the clinic.`,
+    popularTreatments: ['Hydration', 'Beauty Glow', 'Myers Cocktail', 'Hangover Recovery'],
+    metaDescription: `Compare IV therapy clinics in Mississauga, Ontario. Typical costs, mobile and in-clinic options, and FAQs on hydration, NAD+, beauty glow and Myers cocktail drips.`,
+  },
 };
 
 // Slug aliases — some cities are referenced by multiple slugs in the wild
