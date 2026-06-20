@@ -96,6 +96,12 @@ const intros: Record<string, CityIntro> = {
     popularTreatments: ['Beauty Glow', 'Immune Support', 'Hydration', 'NAD+ Plus'],
     metaDescription: `Compare IV therapy clinics in Vancouver, BC. Typical costs, mobile and in-clinic options, and FAQs on hydration, NAD+, beauty glow and immune support drips.`,
   },
+  'ottawa': {
+    localContext: `Ottawa is one of Ontario's larger IV therapy markets outside the GTA, with clinics serving the downtown and ByWard Market core and the suburban communities in Kanata, Nepean, and Orleans. Demand mixes everyday wellness and recovery with immune-support bookings through the long winter, alongside steady traffic from the government, tech, and university sectors. Mobile in-home and hotel service is widely available across the National Capital Region.`,
+    pricing: `Most Ottawa clinics run about $160 to $330 CAD for a standard hydration or wellness drip, with NAD+ protocols typically $400 to $1,000 depending on dose. Mobile in-home service usually adds $50 to $100. These are typical ranges, so confirm the current price with the clinic.`,
+    popularTreatments: ['Hydration', 'Immune Support', 'Myers Cocktail', 'Energy Boost'],
+    metaDescription: `Compare IV therapy clinics in Ottawa, Ontario. Typical costs, mobile and in-clinic options, and FAQs on hydration, NAD+, immune support and Myers cocktail drips.`,
+  },
 };
 
 // Slug aliases — some cities are referenced by multiple slugs in the wild
