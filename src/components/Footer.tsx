@@ -18,9 +18,10 @@ const POPULAR_CITIES_STATIC: FooterCity[] = [
     slug: 'toronto',
     suburbs: [
       { name: 'Mississauga', slug: 'mississauga' },
-      { name: 'Brampton', slug: 'brampton' },
+      { name: 'Richmond Hill', slug: 'richmond-hill' },
       { name: 'Vaughan', slug: 'vaughan' },
       { name: 'Markham', slug: 'markham' },
+      { name: 'Brampton', slug: 'brampton' },
     ],
   },
   { name: 'Las Vegas', slug: 'las-vegas' },
