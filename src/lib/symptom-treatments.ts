@@ -54,7 +54,7 @@ export const SYMPTOMS: SymptomOption[] = [
     recommendedTreatment: {
       name: 'High-Dose Vitamin C + Zinc',
       what: 'High-dose vitamin C with zinc and often glutathione for immune support.',
-      why: 'Oral vitamin C tops out around 200 mg absorbed at once. IV delivery hits therapeutic blood levels orals can\'t reach.',
+      why: 'This protocol centers on higher-dose vitamin C with zinc, often alongside glutathione. Dosing varies by clinic, so ask the provider what is right for you.',
       askBeforeBooking: [
         'What is the vitamin C dose in grams?',
         'Do you screen for G6PD deficiency before high-dose vitamin C?',
@@ -72,7 +72,7 @@ export const SYMPTOMS: SymptomOption[] = [
     recommendedTreatment: {
       name: 'Hangover Recovery Drip',
       what: '1L saline + anti-nausea (Zofran), B-complex, and toradol or similar for headache.',
-      why: 'Alcohol depletes B vitamins and severely dehydrates you. IV rehydration + anti-nausea works faster than oral.',
+      why: 'A common choice the morning after drinking. It pairs fluids with anti-nausea and B-complex; what is included varies by clinic.',
       askBeforeBooking: [
         'Is anti-nausea (Zofran) included or add-on?',
         'How quickly can you arrive if mobile?',
@@ -90,7 +90,7 @@ export const SYMPTOMS: SymptomOption[] = [
     recommendedTreatment: {
       name: 'Beauty + Glow IV',
       what: 'Glutathione, biotin, vitamin C, and often a B-complex for skin/hair/nails.',
-      why: 'Glutathione is the body\'s master antioxidant — most visible "glow" claims come from this. Hydration alone reduces under-eye puffiness too.',
+      why: 'Built around glutathione, biotin, and vitamin C. People often book it ahead of an event; what is included and how it is dosed varies by clinic.',
       askBeforeBooking: [
         'Is glutathione given IV or as a push at the end?',
         'How long before the event should I book — 24h, 48h, week-of?',
@@ -108,7 +108,7 @@ export const SYMPTOMS: SymptomOption[] = [
     recommendedTreatment: {
       name: 'Hydration + Immune IV',
       what: 'Generous fluids with vitamin C, zinc, and B-complex.',
-      why: 'Cabin air dehydrates you and exposes you to recycled pathogens. Pre-flight hydration plus immune support is the most evidence-backed jet-lag protocol.',
+      why: 'Air travel is dehydrating, so this drip leans on generous fluids plus vitamin C, zinc, and B-complex. What is included varies by clinic.',
       askBeforeBooking: [
         'Can you do mobile so I don\'t have to drive to a clinic?',
         'What time slots are open before my flight?',
@@ -126,7 +126,7 @@ export const SYMPTOMS: SymptomOption[] = [
     recommendedTreatment: {
       name: 'Athletic Recovery IV',
       what: 'Saline, B-complex, amino acids (sometimes including BCAAs or taurine), and magnesium.',
-      why: 'Replenishes electrolytes and supports muscle repair faster than oral hydration. Magnesium specifically helps with soreness.',
+      why: 'A hydration-and-electrolyte blend athletes commonly choose after hard training. It typically centers on fluids, B-complex, amino acids, and magnesium; the exact mix, and whether it fits your goals, varies by clinic.',
       askBeforeBooking: [
         'Do you include amino acids/BCAAs or is that an add-on?',
         'What\'s the magnesium dose?',
@@ -144,7 +144,7 @@ export const SYMPTOMS: SymptomOption[] = [
     recommendedTreatment: {
       name: 'NAD+ Therapy',
       what: 'NAD+ (a coenzyme involved in cellular energy and DNA repair) infused slowly, usually 250-500 mg.',
-      why: 'NAD+ levels decline with age. Many users report improved mental clarity within 24-48h. Note: requires a slow drip — expect to be there 2+ hours.',
+      why: 'NAD+ levels decline with age, which is part of the appeal for anti-aging and longevity clinics. It requires a slow drip, so plan on being there 2+ hours.',
       askBeforeBooking: [
         'What dose are you administering? (250, 500, 750 mg)',
         'How slow is your drip — too fast can cause chest tightness',

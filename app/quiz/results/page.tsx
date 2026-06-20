@@ -18,6 +18,7 @@ import {
   hasSafetyFlag,
   SAFETY_FLAGS,
 } from '../../../src/lib/symptom-treatments';
+import { practitionerType } from '../../../src/lib/practitioner';
 
 export default function ResultsPage() {
   return (
@@ -82,6 +83,45 @@ function treatmentMatchKeywords(treatmentName: string): string[] {
     return ['energy', 'b12', 'b-complex', 'wellness', 'myers'];
   if (t.includes('iron')) return ['iron', 'anemia', 'medical'];
   return [t.split(' ')[0]];
+}
+
+// Title-case a raw location/treatment token so headings never read "toronto".
+function titleCase(s?: string | null): string {
+  if (!s) return '';
+  return s.trim().toLowerCase().replace(/\b[a-z]/g, (c) => c.toUpperCase());
+}
+
+// Operator de-duplication. There is NO operator/owner column in the data, so we
+// derive a best-effort key: the brand stem of the name (generic clinic words,
+// directional words, and the clinic's own city stripped out), falling back to
+// the root website domain. This collapses e.g. "Signature Beauty Lounge" and
+// "Signature Cosmetic Clinic" (same operator, two domains) to one card. Small
+// over-merge risk on a short, generic shared stem — acceptable for a 3-card set.
+const OP_GENERIC = new Set(['clinic', 'clinics', 'cosmetic', 'beauty', 'lounge', 'medical', 'medi', 'spa', 'medspa', 'wellness', 'centre', 'center', 'health', 'aesthetics', 'aesthetic', 'group', 'the', 'and', 'iv', 'therapy', 'drip', 'drips', 'hydration', 'infusion', 'infusions', 'co', 'inc', 'ltd', 'care', 'of', 'for', 'at', 'mobile']);
+const OP_DIR = new Set(['downtown', 'midtown', 'uptown', 'north', 'south', 'east', 'west', 'central']);
+function rootDomain(url?: string | null): string {
+  if (!url) return '';
+  try {
+    const h = new URL(url.startsWith('http') ? url : `https://${url}`).hostname.replace(/^www\./, '');
+    const parts = h.split('.');
+    return parts.length > 2 ? parts.slice(-2).join('.') : h;
+  } catch {
+    return '';
+  }
+}
+function operatorKey(p: Provider): string {
+  const cityTokens = new Set((p.city || '').toLowerCase().split(/\s+/).filter(Boolean));
+  const tokens = (p.name || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .filter((t) => !OP_GENERIC.has(t) && !OP_DIR.has(t) && !cityTokens.has(t));
+  const stem = tokens.slice(0, 2).join(' ').trim();
+  if (stem) return `brand:${stem}`;
+  const dom = rootDomain((p as { website?: string }).website);
+  if (dom) return `dom:${dom}`;
+  return `id:${p.id || p.slug || p.name}`;
 }
 
 function ResultsContent() {
@@ -164,7 +204,7 @@ function ResultsContent() {
     return {
       name,
       what: 'A clinically common IV protocol for this goal.',
-      why: 'Based on the goal you selected, this is the protocol most clinics in our matching platform forfer for this concern.',
+      why: 'Based on the goal you selected, this is a protocol clinics on our matching platform commonly offer for this goal.',
       askBeforeBooking: [],
       typicalCost: '',
       duration: '',
@@ -186,14 +226,12 @@ function ResultsContent() {
   // claimed (is_featured) first, then by rating descending. Take top 3.
   // If no clinics match the specialty keyword, fall back to claimed-first
   // rating-sorted across the whole result set.
-  const matchedClinics = useMemo<Provider[]>(() => {
+  const matchedClinics = useMemo<(Provider & { offersRecommended?: boolean })[]>(() => {
     if (!recommendation || listings.length === 0) return [];
     const keywords = treatmentMatchKeywords(recommendation.name);
 
-    // Honor the visitor's delivery choice — the quiz asks Mobile vs In-Clinic,
-    // so the results must reflect it. Mobile -> mobile providers; In-Clinic ->
-    // exclude mobile-only. If a filter would empty the set, ignore it rather
-    // than dead-end the visitor.
+    // Honor the visitor's delivery choice — the quiz asks Mobile vs In-Clinic.
+    // If a filter would empty the set, ignore it rather than dead-end the visitor.
     const isMobile = (p: Provider) =>
       p.type === 'Mobile' || p.type === 'Both' ||
       (p as { mobile_service?: boolean }).mobile_service === true ||
@@ -204,32 +242,65 @@ function ResultsContent() {
     else if (pref === 'In-Clinic') { const c = listings.filter((p) => p.type !== 'Mobile'); if (c.length) pool = c; }
 
     const hasTreatmentMatch = (p: Provider) => {
-      const haystacks = [
-        ...(p.specialties || []),
-        ...(p.subtypes || []),
-        p.name || '',
-        p.description || '',
-      ]
+      const haystacks = [...(p.specialties || []), ...(p.subtypes || []), p.name || '', p.description || '']
         .map((s) => (s || '').toLowerCase());
       return keywords.some((kw) => haystacks.some((h) => h.includes(kw)));
     };
 
-    const sortFn = (a: Provider, b: Provider) => {
-      // Claimed clinics always pin first; rating breaks ties within each group.
-      if (!!b.is_claimed !== !!a.is_claimed) {
-        return b.is_claimed ? 1 : -1;
+    // Annotate each clinic with whether it actually offers the recommended
+    // treatment — the card shows an honest "Offers …" chip only when true, and
+    // the header only claims the treatment when at least one clinic confirms it.
+    const annotated = pool.map((p) => ({ ...p, offersRecommended: hasTreatmentMatch(p) }));
+
+    // Safety-aware ranking: when the visitor flagged a contraindication, MD / NP
+    // / DO-led clinics rise to the TOP (sort, never hard-filter, so thin markets
+    // still return results). Then confirmed-treatment, then claimed, then rating.
+    const sortFn = (a: typeof annotated[number], b: typeof annotated[number]) => {
+      if (safetyTriggered) {
+        const diff = practitionerType(b).rank - practitionerType(a).rank;
+        if (diff !== 0) return diff;
       }
+      if (!!b.offersRecommended !== !!a.offersRecommended) return b.offersRecommended ? 1 : -1;
+      if (!!b.is_claimed !== !!a.is_claimed) return b.is_claimed ? 1 : -1;
       return (b.rating || 0) - (a.rating || 0);
     };
 
-    const treatmentMatches = pool.filter(hasTreatmentMatch).sort(sortFn);
-    if (treatmentMatches.length >= 3) return treatmentMatches.slice(0, 3);
+    // One card per operator (no data operator key exists; see operatorKey()).
+    const sorted = annotated.sort(sortFn);
+    const seenOperators = new Set<string>();
+    const deduped: typeof annotated = [];
+    for (const p of sorted) {
+      const key = operatorKey(p);
+      if (seenOperators.has(key)) continue;
+      seenOperators.add(key);
+      deduped.push(p);
+    }
+    return deduped.slice(0, 3);
+  }, [recommendation, listings, surveyData.locationPreference, safetyTriggered]);
 
-    // Top up with claimed-first remaining listings if we don't have 3.
-    const seen = new Set(treatmentMatches.map((p) => p.id));
-    const remaining = pool.filter((p) => !seen.has(p.id)).sort(sortFn);
-    return [...treatmentMatches, ...remaining].slice(0, 3);
-  }, [recommendation, listings, surveyData.locationPreference]);
+  // Location transparency: getListingsByCity silently broadens an empty city to
+  // state level, so detect when nothing in the shown set is actually in the
+  // requested city and surface it (banner) instead of pretending.
+  const inCityCount = useMemo(() => {
+    const city = (surveyData.city || '').toLowerCase().trim();
+    if (!city) return -1;
+    return listings.filter((l) => (l.city || '').toLowerCase().trim() === city).length;
+  }, [listings, surveyData.city]);
+  const isBroadened = Boolean(surveyData.city) && inCityCount === 0 && matchedClinics.length > 0;
+  const fallbackRegion = (() => {
+    if (surveyData.state) return surveyData.state;
+    const tally = new Map<string, number>();
+    matchedClinics.forEach((c) => { if (c.state) tally.set(c.state, (tally.get(c.state) || 0) + 1); });
+    let best = ''; let n = 0;
+    tally.forEach((v, k) => { if (v > n) { best = k; n = v; } });
+    return best || 'your area';
+  })();
+
+  // Honest header wording: only call the set "verified" when every shown clinic
+  // carries a real badge, and only claim the treatment when one actually offers it.
+  const anyConfirmed = matchedClinics.some((c) => c.offersRecommended);
+  const allVerified = matchedClinics.length > 0 && matchedClinics.every((c) => c.is_claimed || c.is_featured || c.safety_verified);
+  const clinicNoun = allVerified ? 'Verified clinics' : 'Clinics';
 
   if (isLoading) {
     return (
@@ -333,19 +404,47 @@ function ResultsContent() {
           </motion.div>
         )}
 
-        {/* 3. Clinic-grid header */}
-        <div className="mb-8 text-center">
+        {/* Transparent radius expansion — never silently jump markets */}
+        {isBroadened && (
+          <div className="max-w-3xl mx-auto mb-8 bg-sky-50 border border-sky-200 rounded-2xl p-4 flex items-start gap-3">
+            <MapPin size={18} className="text-sky-600 shrink-0 mt-0.5" />
+            <p className="text-sm text-sky-900 font-semibold leading-relaxed">
+              No verified clinics in{' '}
+              <span className="font-black">{titleCase(surveyData.city)}</span> yet. Showing the
+              nearest verified clinics in {fallbackRegion}.
+            </p>
+          </div>
+        )}
+
+        {/* 3. Clinic-grid header — honest about verification, location, treatment */}
+        <div className="mb-6 text-center">
           <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
-            Top verified clinics{' '}
-            {surveyData.city ? (
+            {isBroadened ? (
               <>
-                near <span className="text-wellness-700">{surveyData.city}</span>
+                Nearest {clinicNoun.toLowerCase()}
+                {anyConfirmed && (
+                  <> for <span className="text-wellness-700">{recommendation.name}</span></>
+                )}
               </>
             ) : (
-              'near you'
-            )}{' '}
-            offering {recommendation.name}
+              <>
+                {clinicNoun}{' '}
+                {surveyData.city ? (
+                  <>near <span className="text-wellness-700">{titleCase(surveyData.city)}</span></>
+                ) : (
+                  'near you'
+                )}
+                {anyConfirmed && (
+                  <> for <span className="text-wellness-700">{recommendation.name}</span></>
+                )}
+              </>
+            )}
           </h2>
+          {!anyConfirmed && matchedClinics.length > 0 && (
+            <p className="text-sm text-slate-500 font-semibold mt-2 max-w-xl mx-auto">
+              These are the closest matches we can show. Confirm they offer {recommendation.name} when you reach out.
+            </p>
+          )}
         </div>
 
         {/* 4. Top 3 matching clinic cards */}
@@ -357,6 +456,7 @@ function ResultsContent() {
                 provider={provider}
                 operatorProfile={operatorProfiles.find((op) => op.clinicId === provider.id)}
                 isPrimary={false}
+                recommendedTreatment={recommendation.name}
               />
             ))}
           </div>
@@ -366,7 +466,7 @@ function ResultsContent() {
               <MapPin size={28} />
             </div>
             <h3 className="text-xl font-black text-slate-900 mb-2">
-              No verified clinics found in {surveyData.city || 'your area'} yet.
+              No verified clinics found in {surveyData.city ? titleCase(surveyData.city) : 'your area'} yet.
             </h3>
             <p className="text-slate-500 mb-8 max-w-md mx-auto">
               Browse all clinics nationwide or retake the quiz with a different location.
