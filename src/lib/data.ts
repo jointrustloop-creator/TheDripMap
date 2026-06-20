@@ -738,9 +738,33 @@ export async function getPopularCities() {
     { slug: 'washington',  name: 'Washington DC',  cityArg: 'Washington',   stateArg: 'District of Columbia' },
   ];
 
+  // Top GTA suburbs surfaced as their own footer links under Toronto. Each has
+  // a real /cities/<slug> page; counts use the same exact-city query the satellite
+  // pages use, so the pill matches the page the user lands on.
+  const GTA_SUBURBS = ['Mississauga', 'Brampton', 'Vaughan', 'Markham'];
+
   const results = await Promise.all(
     popular.map(async (p) => {
       try {
+        // Toronto is the one metro whose footer pill must read as "& GTA": use the
+        // SAME two-tier source the /cities/toronto page renders (Toronto core +
+        // surrounding GTA) so the footer number matches the page, not a
+        // Toronto-proper-only undercount.
+        if (p.slug === 'toronto') {
+          const { core, nearby } = await getTorontoGtaTieredListings();
+          const suburbs = await Promise.all(
+            GTA_SUBURBS.map(async (city) => {
+              const l = await getListingsByCity(city, 'Ontario');
+              return { name: city, slug: slugify(city), count: l.length };
+            })
+          );
+          return {
+            name: p.name,
+            slug: p.slug,
+            count: core.length + nearby.length,
+            suburbs: suburbs.filter((su) => su.count > 0),
+          };
+        }
         const listings = await getListingsByCity(p.cityArg, p.stateArg);
         return { name: p.name, slug: p.slug, count: listings.length };
       } catch {

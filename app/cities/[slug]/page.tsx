@@ -110,6 +110,12 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     }
   }
   const count = listings.length;
+  // Real in-city count: getListingsByCity broadens to state level when a city
+  // has zero exact matches, so filter back to this city for honest metadata
+  // (the title/description must not promise clinics that are actually nearby).
+  const localCount = listings.filter(
+    (l) => ((l as { city?: string }).city || '').toLowerCase() === name.toLowerCase()
+  ).length;
 
   // Even for a totally unknown city slug, emit title + description + canonical
   // so the page is never tagless. Mark noindex when there is literally no data
@@ -150,11 +156,16 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     resolvedState = best;
   }
   const cityStateLabel = resolvedState ? `${name}, ${resolvedState}` : name;
-  const title = `IV Therapy in ${cityStateLabel} (${titleYear}) | ${count} Clinics`;
+  const title =
+    localCount > 0
+      ? `IV Therapy in ${cityStateLabel} (${titleYear}) | ${localCount} ${localCount === 1 ? 'Clinic' : 'Clinics'}`
+      : `IV Therapy in ${cityStateLabel} (${titleYear}) | Nearby Clinics`;
   const description =
     intro?.metaDescription ||
-    cityData?.meta_description?.replace('{count}', String(count)) ||
-    `Find and compare ${count} IV therapy clinics in ${name}. Read reviews, compare prices, and book hangover recovery, NAD+, immune support and hydration drips near you.`;
+    cityData?.meta_description?.replace('{count}', String(localCount || count)) ||
+    (localCount > 0
+      ? `Find and compare ${localCount} IV therapy ${localCount === 1 ? 'clinic' : 'clinics'} in ${name}. Read reviews, compare prices, and book hangover recovery, NAD+, immune support and hydration drips near you.`
+      : `Explore IV therapy clinics near ${name}. Compare reviews and prices for hangover recovery, NAD+, immune support and hydration drips in the surrounding area.`);
 
   // 3-provider gate (per the 2026-06-09 city-deepening spec). City pages
   // with fewer than 3 listed providers are URL-reachable but emit robots:
@@ -330,6 +341,11 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   }
 
   const count = listings.length;
+  // Honest count phrasing: when the grid was padded with nearby/state clinics
+  // (isBroadened), keep those extras out of the in-city number so headlines and
+  // the FAQ never imply more clinics are physically in this city than there are.
+  // exactCityCount is the real in-city total; nearbyAdded is everything else.
+  const nearbyAdded = Math.max(0, count - exactCityCount);
 
   // If a "best-iv-therapy-{city}-2026" blog post exists, surface it as a
   // contextual CTA. Internal link from city page → blog post pushes PageRank
@@ -361,7 +377,11 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   const genericFaqs = [
     {
       question: `How many IV therapy clinics are in ${cityData.name}?`,
-      answer: `There are currently ${count} IV therapy providers in ${cityData.name} listed on TheDripMap, including both clinic locations and mobile services.`
+      answer: isBroadened
+        ? (exactCityCount > 0
+            ? `There are ${exactCityCount} IV therapy ${exactCityCount === 1 ? 'provider' : 'providers'} listed directly in ${cityData.name}, plus ${nearbyAdded} more in nearby areas, including both clinic locations and mobile services.`
+            : `We do not have a clinic listed directly in ${cityData.name} yet, but there are ${count} IV therapy providers in nearby areas, including mobile services that may travel to you.`)
+        : `There are currently ${count} IV therapy providers in ${cityData.name} listed on TheDripMap, including both clinic locations and mobile services.`
     },
     {
       question: `Do clinics in ${cityData.name} offer mobile services?`,
@@ -478,7 +498,11 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           <p className="text-lg md:text-xl text-slate-500 font-medium mt-3">
             {isToronto
               ? `Compare ${torontoCore.length} ${torontoCore.length === 1 ? 'clinic' : 'clinics'} in Toronto plus ${torontoNearby.length} more across the surrounding GTA. In-clinic and mobile.`
-              : `Compare ${count} ${count === 1 ? 'clinic' : 'clinics'}. In-clinic and mobile.`
+              : isBroadened
+                ? (exactCityCount > 0
+                    ? `Compare ${exactCityCount} ${exactCityCount === 1 ? 'clinic' : 'clinics'} in ${cityData.name} plus ${nearbyAdded} more nearby. In-clinic and mobile.`
+                    : `No clinics in ${cityData.name} yet. Showing ${count} top-rated nearby. In-clinic and mobile.`)
+                : `Compare ${count} ${count === 1 ? 'clinic' : 'clinics'}. In-clinic and mobile.`
             }
           </p>
           {cityGuidePost && (
@@ -505,7 +529,11 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
               <section className="mb-12 max-w-4xl space-y-4">
                 <p className="text-lg text-slate-600 leading-relaxed">{intro.localContext}</p>
                 <p className="text-lg text-slate-600 leading-relaxed">
-                  With {count} {count === 1 ? 'clinic' : 'clinics'} in {cityData.name}, popular treatments include {intro.popularTreatments.join(', ')}. {intro.pricing}
+                  With {isBroadened
+                    ? (exactCityCount > 0
+                        ? `${exactCityCount} ${exactCityCount === 1 ? 'clinic' : 'clinics'} in ${cityData.name} and more nearby`
+                        : `top-rated clinics near ${cityData.name}`)
+                    : `${count} ${count === 1 ? 'clinic' : 'clinics'} in ${cityData.name}`}, popular treatments include {intro.popularTreatments.join(', ')}. {intro.pricing}
                 </p>
               </section>
             );
@@ -513,7 +541,11 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           return (
             <section className="mb-12 max-w-4xl">
               <p className="text-lg text-slate-600 leading-relaxed">
-                Looking for IV therapy in {cityData.name}? Compare {count === 1 ? '1 top-rated clinic' : `${count} top-rated clinics`} offering hydration drips, NAD+, immune support, hangover recovery, and beauty treatments. Read reviews, see prices, and book your session in-clinic or mobile, whichever you prefer.
+                Looking for IV therapy in {cityData.name}? Compare {isBroadened
+                  ? (exactCityCount > 0
+                      ? `${exactCityCount} top-rated ${exactCityCount === 1 ? 'clinic' : 'clinics'} in ${cityData.name} plus ${nearbyAdded} more nearby`
+                      : `${count} top-rated ${count === 1 ? 'clinic' : 'clinics'} near ${cityData.name}`)
+                  : (count === 1 ? '1 top-rated clinic' : `${count} top-rated clinics`)} offering hydration drips, NAD+, immune support, hangover recovery, and beauty treatments. Read reviews, see prices, and book your session in-clinic or mobile, whichever you prefer.
               </p>
             </section>
           );

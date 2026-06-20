@@ -5,19 +5,30 @@ import { Instagram, Facebook, Linkedin, Twitter } from 'lucide-react';
 import { Logo } from './Logo';
 import { MedicalDisclaimer } from './MedicalDisclaimer';
 
-const POPULAR_CITIES_STATIC = [
+type FooterCity = { name: string; slug: string; count?: number; suburbs?: FooterCity[] };
+
+const POPULAR_CITIES_STATIC: FooterCity[] = [
   { name: 'New York', slug: 'new-york' },
   { name: 'Houston', slug: 'houston' },
   { name: 'San Diego', slug: 'san-diego' },
   { name: 'Clearwater', slug: 'clearwater' },
   { name: 'Los Angeles', slug: 'los-angeles' },
-  { name: 'Toronto & GTA', slug: 'toronto' },
+  {
+    name: 'Toronto & GTA',
+    slug: 'toronto',
+    suburbs: [
+      { name: 'Mississauga', slug: 'mississauga' },
+      { name: 'Brampton', slug: 'brampton' },
+      { name: 'Vaughan', slug: 'vaughan' },
+      { name: 'Markham', slug: 'markham' },
+    ],
+  },
   { name: 'Las Vegas', slug: 'las-vegas' },
   { name: 'Washington DC', slug: 'washington' },
 ];
 
 export const Footer = () => {
-  const [citiesWithCounts, setCitiesWithCounts] = useState<{name: string, slug: string, count?: number}[]>(POPULAR_CITIES_STATIC);
+  const [citiesWithCounts, setCitiesWithCounts] = useState<FooterCity[]>(POPULAR_CITIES_STATIC);
 
   useEffect(() => {
     const fetchCounts = async () => {
@@ -93,17 +104,38 @@ export const Footer = () => {
           <h4 className="font-bold mb-6 text-sm uppercase tracking-wider text-slate-400">Popular Hubs</h4>
           <ul className="space-y-4 text-slate-600 text-sm">
             {citiesWithCounts.map((city, idx) => (
-              <li key={idx} className="flex items-center justify-between group max-w-[200px]">
-                <Link 
-                  href={`/cities/${city.slug}`} 
-                  className="hover:text-wellness-600 transition-colors"
-                >
-                  {city.name}
-                </Link>
-                {city.count !== undefined && city.count > 0 && (
-                  <span className="text-[10px] bg-slate-50 text-[#0F6E56] px-1.5 py-0.5 rounded-full font-bold group-hover:bg-wellness-50 group-hover:text-wellness-700 transition-colors">
-                    {city.count}
-                  </span>
+              <li key={idx}>
+                <div className="flex items-center justify-between group max-w-[200px]">
+                  <Link
+                    href={`/cities/${city.slug}`}
+                    className="hover:text-wellness-600 transition-colors"
+                  >
+                    {city.name}
+                  </Link>
+                  {city.count !== undefined && city.count > 0 && (
+                    <span className="text-[10px] bg-slate-50 text-[#0F6E56] px-1.5 py-0.5 rounded-full font-bold group-hover:bg-wellness-50 group-hover:text-wellness-700 transition-colors">
+                      {city.count}
+                    </span>
+                  )}
+                </div>
+                {city.suburbs && city.suburbs.length > 0 && (
+                  <ul className="mt-3 ml-1 pl-3 border-l-2 border-wellness-100 space-y-2.5">
+                    {city.suburbs.map((su, i) => (
+                      <li key={i} className="flex items-center justify-between group max-w-[190px]">
+                        <Link
+                          href={`/cities/${su.slug}`}
+                          className="text-[13px] text-slate-500 hover:text-wellness-600 transition-colors"
+                        >
+                          {su.name}
+                        </Link>
+                        {su.count !== undefined && su.count > 0 && (
+                          <span className="text-[10px] bg-slate-50 text-[#0F6E56] px-1.5 py-0.5 rounded-full font-bold group-hover:bg-wellness-50 group-hover:text-wellness-700 transition-colors">
+                            {su.count}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </li>
             ))}
