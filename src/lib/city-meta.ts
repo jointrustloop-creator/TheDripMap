@@ -484,6 +484,27 @@ const metas: Record<string, CityMeta> = {
       },
     ],
   },
+  'calgary': {
+    regulationNote: {
+      headline: `Who can administer IV therapy in Alberta`,
+      body: `In Alberta, IV therapy is provided by licensed clinicians under the province's health-profession colleges: physicians, nurse practitioners and registered nurses, and naturopathic doctors who hold intravenous certification. The clinics listed here operate with licensed clinical staff. This is general information, not legal or medical advice, so confirm credentials with the clinic before booking.`,
+    },
+    useCases: [
+      { key: 'recovery', title: `Best for hangover and athletic recovery`, blurb: `Same-day and mobile drips for recovery after a night out, Stampede, or a hard training block.`, matchAny: ['hangover', 'recovery', 'rehydrate', 'athletic', 'amino'], maxResults: 5 },
+      { key: 'wellness', title: `Best for ongoing wellness and immunity`, blurb: `Maintenance protocols, Myers cocktails, and immune-support drips for regular use.`, matchAny: ['myers', 'immune', 'wellness', 'vitamin', 'glutathione'], maxResults: 5 },
+      { key: 'energy', title: `Best for energy and NAD+`, blurb: `Higher-dose energy and longevity protocols, including NAD+ and B-complex drips.`, matchAny: ['nad', 'energy', 'b12', 'b-complex'], maxResults: 5 },
+      { key: 'mobile', title: `Best for in-home and hotel mobile drips`, blurb: `Bring the drip to your home, office, or hotel across Calgary and nearby communities.`, matchAny: ['mobile', 'in-home', 'concierge', 'hotel'], maxResults: 5 },
+    ],
+    faqs: [
+      { question: `How much does IV therapy cost in Calgary?`, answer: `Most Calgary clinics charge about $150 to $300 CAD for a standard hydration or wellness drip. NAD+ protocols typically run $350 to $900 depending on dose, and mobile in-home service usually adds $50 to $100. These are typical ranges, so confirm the current price directly with the clinic.` },
+      { question: `Is IV therapy legal in Calgary?`, answer: `Yes. In Alberta, IV therapy is administered by licensed physicians, nurse practitioners, registered nurses, and naturopathic doctors with intravenous certification, working under the province's health-profession colleges. Every clinic listed here operates with licensed clinical staff. Confirm credentials with the clinic before booking.` },
+      { question: `Is mobile IV therapy available in Calgary?`, answer: `Yes. Many Calgary providers offer mobile service that brings the drip to your home, office, or hotel, including nearby communities like Airdrie and Cochrane. Look for the mobile option in the listings and confirm the service area and any travel fee when you book.` },
+      { question: `How do I choose the best IV therapy in Calgary?`, answer: `Start with your goal. Recovery and hydration drips suit a night out or hard training, Myers cocktails and immune drips suit ongoing wellness, and NAD+ suits energy and longevity goals. Compare the clinics listed here by what they offer and their reviews, then confirm the protocol with the clinic. TheDripMap is a matching platform, not a medical provider.` },
+    ],
+    links: {
+      treatments: ['hydration', 'nad-plus', 'hangover', 'myers-cocktail'],
+    },
+  },
 };
 
 export function getCityMeta(slug: string): CityMeta | undefined {

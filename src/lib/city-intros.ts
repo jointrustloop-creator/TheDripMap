@@ -78,6 +78,12 @@ const intros: Record<string, CityIntro> = {
     metaTitle: 'IV Therapy San Carlos CA — Bay Area Peninsula Clinics & Mobile Drips | TheDripMap',
     metaDescription: 'IV therapy in San Carlos, CA. Compare Bay Area Peninsula clinics for NAD+, hydration, immune support and recovery drips. In-clinic and mobile providers serving San Carlos, Redwood City, Belmont, and San Ramon.',
   },
+  'calgary': {
+    localContext: `Calgary is the largest IV therapy market in Alberta, with clinics across the downtown core, the Beltline, and the suburban communities out toward the foothills. Local demand leans toward recovery and hydration around the city's active outdoor culture and the energy-sector work schedule, and bookings spike around Stampede season when same-day and mobile slots fill fast. Mobile in-home and hotel service is widely available across the city and into Airdrie and Cochrane.`,
+    pricing: `Most Calgary clinics run about $150 to $300 CAD for a standard hydration or wellness drip, with NAD+ protocols typically $350 to $900 depending on dose. Mobile in-home service usually adds $50 to $100. These are typical ranges, so confirm the current price with the clinic.`,
+    popularTreatments: ['Hydration', 'Hangover Recovery', 'Myers Cocktail', 'Energy Boost'],
+    metaDescription: `Compare IV therapy clinics in Calgary, Alberta. Typical costs, mobile and in-clinic options, and FAQs on hydration, NAD+, hangover and Myers cocktail drips.`,
+  },
 };
 
 // Slug aliases — some cities are referenced by multiple slugs in the wild
