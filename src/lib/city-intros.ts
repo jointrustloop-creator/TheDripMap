@@ -90,6 +90,12 @@ const intros: Record<string, CityIntro> = {
     popularTreatments: ['Hydration', 'Immune Support', 'Myers Cocktail', 'Hangover Recovery'],
     metaDescription: `Compare IV therapy clinics in Edmonton, Alberta. Typical costs, mobile and in-clinic options, and FAQs on hydration, NAD+, immune support and Myers cocktail drips.`,
   },
+  'vancouver': {
+    localContext: `Vancouver anchors the IV therapy market in British Columbia, with a strong wellness and longevity culture across downtown, the West End, Kitsilano, and out toward Burnaby and Richmond. Demand skews toward maintenance wellness, immune support, and beauty drips alongside the recovery bookings common to any major city, and the active outdoor population drives steady athletic-recovery interest. Mobile in-home and hotel service is widely available across Metro Vancouver.`,
+    pricing: `Most Vancouver clinics run about $160 to $340 CAD for a standard hydration or wellness drip, with NAD+ protocols typically $400 to $1,000 depending on dose. Mobile in-home service usually adds $50 to $100. These are typical ranges, so confirm the current price with the clinic.`,
+    popularTreatments: ['Beauty Glow', 'Immune Support', 'Hydration', 'NAD+ Plus'],
+    metaDescription: `Compare IV therapy clinics in Vancouver, BC. Typical costs, mobile and in-clinic options, and FAQs on hydration, NAD+, beauty glow and immune support drips.`,
+  },
 };
 
 // Slug aliases — some cities are referenced by multiple slugs in the wild

@@ -526,6 +526,27 @@ const metas: Record<string, CityMeta> = {
       treatments: ['hydration', 'immune-support', 'nad-plus', 'myers-cocktail'],
     },
   },
+  'vancouver': {
+    regulationNote: {
+      headline: `Who can administer IV therapy in British Columbia`,
+      body: `In British Columbia, IV therapy is provided by licensed clinicians under the province's health-profession colleges: physicians (College of Physicians and Surgeons of BC), nurse practitioners and registered nurses (BC College of Nurses and Midwives), and naturopathic physicians who hold intravenous certification. The clinics listed here operate with licensed clinical staff. This is general information, not legal or medical advice, so confirm credentials with the clinic before booking.`,
+    },
+    useCases: [
+      { key: 'wellness', title: `Best for ongoing wellness and immunity`, blurb: `Maintenance protocols, Myers cocktails, and immune-support drips for regular use.`, matchAny: ['myers', 'immune', 'wellness', 'vitamin', 'glutathione'], maxResults: 5 },
+      { key: 'beauty', title: `Best for beauty and glow`, blurb: `Glutathione, biotin, and vitamin-focused drips for skin and pre-event prep.`, matchAny: ['beauty', 'glow', 'glutathione', 'biotin', 'skin'], maxResults: 5 },
+      { key: 'energy', title: `Best for energy, NAD+, and recovery`, blurb: `Higher-dose energy and longevity protocols, including NAD+ and athletic-recovery drips.`, matchAny: ['nad', 'energy', 'athletic', 'amino', 'recovery'], maxResults: 5 },
+      { key: 'mobile', title: `Best for in-home and hotel mobile drips`, blurb: `Bring the drip to your home, office, or hotel across Metro Vancouver, Burnaby, and Richmond.`, matchAny: ['mobile', 'in-home', 'concierge', 'hotel'], maxResults: 5 },
+    ],
+    faqs: [
+      { question: `How much does IV therapy cost in Vancouver?`, answer: `Most Vancouver clinics charge about $160 to $340 CAD for a standard hydration or wellness drip. NAD+ protocols typically run $400 to $1,000 depending on dose, and mobile in-home service usually adds $50 to $100. These are typical ranges, so confirm the current price directly with the clinic.` },
+      { question: `Is IV therapy legal in Vancouver?`, answer: `Yes. In British Columbia, IV therapy is administered by licensed physicians, nurse practitioners, registered nurses, and naturopathic physicians with intravenous certification, working under the province's health-profession colleges. Every clinic listed here operates with licensed clinical staff. Confirm credentials with the clinic before booking.` },
+      { question: `Is mobile IV therapy available in Vancouver?`, answer: `Yes. Many Vancouver providers offer mobile service that brings the drip to your home, office, or hotel across Metro Vancouver, including Burnaby and Richmond. Look for the mobile option in the listings and confirm the service area and any travel fee when you book.` },
+      { question: `How do I choose the best IV therapy in Vancouver?`, answer: `Start with your goal. Beauty and glow drips suit pre-event prep, immune and wellness drips suit regular maintenance, and NAD+ and recovery drips suit energy and training goals. Compare the clinics listed here by what they offer and their reviews, then confirm the protocol with the clinic. TheDripMap is a matching platform, not a medical provider.` },
+    ],
+    links: {
+      treatments: ['hydration', 'beauty-glow', 'immune-support', 'nad-plus'],
+    },
+  },
 };
 
 export function getCityMeta(slug: string): CityMeta | undefined {
