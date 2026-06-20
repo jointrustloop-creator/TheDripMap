@@ -12,53 +12,53 @@ import {
   CheckCircle2,
   ShieldCheck,
   Stethoscope,
+  Leaf,
   Gift,
+  Calendar,
   Star as StarIcon,
 } from 'lucide-react';
 import { Provider, OperatorProfile } from '../types';
-import { ServicePill } from './ServicePill';
 import { slugify } from '../lib/data';
+import { practitionerType } from '../lib/practitioner';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
 
 interface ProviderCardFeaturedProps {
-  provider: Provider & { matchScore?: number };
+  provider: Provider & { matchScore?: number; offersRecommended?: boolean };
   operatorProfile?: OperatorProfile;
   rank?: number;
   isPrimary?: boolean;
+  // Treatment the quiz recommended, shown as an "Offers …" chip ONLY when this
+  // clinic actually matched it (offersRecommended). Never claimed otherwise.
+  recommendedTreatment?: string;
 }
 
-// Pull a one-line "credential" / differentiator from amenities (preferred),
-// then fall back to the first amenity, then to a derived credibility line.
-function deriveCredentialLine(provider: Provider): string | null {
-  const amenities = (provider.amenities || []) as string[];
-  // Look for the most authoritative-sounding amenity first
-  const mdLine = amenities.find((a) =>
-    /medical director|md\b|doctor|m\.d\.|physician|md-led/i.test(a)
-  );
-  if (mdLine) return 'MD-led practice';
-  const rnLine = amenities.find((a) => /registered nurse|rn\b|nurse practitioner/i.test(a));
-  if (rnLine) return 'RN-led practice';
-  // Anything mentioning a specific year established
-  const yearLine = amenities.find((a) => /\bsince\s+\d{4}\b/i.test(a));
-  if (yearLine) return yearLine;
-  // Broader medical-oversight signal — the safety differentiator patients care
-  // about most. Looks at a listed medical team and clinician credentials in the
-  // clinic's name/description/specialties/team roles, not just amenities.
-  const team = (provider.medical_team || []) as Array<{ name?: string; role?: string }>;
-  const teamBlob = team.map((t) => `${t?.name || ''} ${t?.role || ''}`).join(' ');
-  const hay = `${provider.name || ''} ${provider.description || ''} ${(provider.specialties || []).join(' ')} ${teamBlob}`;
-  if (/\bMD\b|\bD\.?O\.?\b|physician|medical director/i.test(hay)) return 'MD-led practice';
-  if (/nurse practitioner|\bNP\b/i.test(hay)) return 'NP on staff';
-  if (/registered nurse|\bRN\b/i.test(hay)) return 'RN on staff';
-  if (/naturopath/i.test(hay)) return 'Naturopath-led';
-  if (team.length > 0) return 'Medically supervised';
-  return null;
-}
+const isStock = (url?: string | null): boolean =>
+  !url || /unsplash\.com|picsum|placeholder/i.test(url);
 
-// Open-now check based on working_hours JSON. Returns "Open till HH:MM"
-// or null if closed / no hours data. Robust to either {Mon: "9am-5pm"} or
-// {Mon: ["09:00", "17:00"]} shapes.
+// A genuine clinic PHOTO (not a logo, not stock) to anchor the card. Logos live
+// in imageUrl; real photography, when present, lives in `photos`.
+const firstRealPhoto = (provider: Provider): string | null => {
+  const photos = Array.isArray((provider as { photos?: unknown }).photos)
+    ? ((provider as { photos?: string[] }).photos as string[])
+    : [];
+  const photo = photos.find((p) => typeof p === 'string' && !isStock(p));
+  return photo || null;
+};
+
+// A real uploaded logo (claimed clinics store these under /blog-images/). Stock
+// Unsplash fillers are never treated as brand imagery.
+const realLogo = (provider: Provider): string | null => {
+  const url = provider.imageUrl || provider.image_url || '';
+  if (isStock(url)) return null;
+  if (url.includes('/blog-images/') && !(provider.is_featured || provider.is_claimed)) return null;
+  return url;
+};
+
+const initialsOf = (name: string): string =>
+  name.split(/\s+/).slice(0, 2).map((w) => w[0] || '').join('').toUpperCase() || 'IV';
+
+// Open-now from working_hours JSON. Robust to {Mon:"9am-5pm"} or {Mon:["09:00","17:00"]}.
 function deriveOpenStatus(provider: Provider): string | null {
   const wh = (provider as { working_hours?: Record<string, string | string[]> }).working_hours || provider.hours;
   if (!wh || typeof wh !== 'object') return null;
@@ -68,312 +68,247 @@ function deriveOpenStatus(provider: Provider): string | null {
   if (!todayValue) return null;
   const raw = Array.isArray(todayValue) ? todayValue.join(' - ') : String(todayValue);
   if (/closed/i.test(raw)) return null;
-  // Extract closing time (last hh:mm or hAM/PM mentioned)
-  const closingMatch = raw.match(/(\d{1,2}:?\d{0,2}\s*[ap]?m?)(?=\s*$|\s*\)|\s*$)/i);
-  return closingMatch ? `Open today till ${closingMatch[1].trim()}` : 'Open today';
+  const closingMatch = raw.match(/(\d{1,2}:?\d{0,2}\s*[ap]?m?)(?=\s*$|\s*\))/i);
+  return closingMatch ? `Open till ${closingMatch[1].trim()}` : 'Open today';
 }
 
-// Pull top drips from provider.services if real prices exist, else null.
+// Top drips with REAL prices, else null (no fabricated pricing).
 function deriveDripMenu(provider: Provider) {
   const services = provider.services;
   if (!services || services.length === 0) return null;
-  // Only use entries that have a real price (not empty, not "Call for pricing" or "TBD")
-  const realPriced = services.filter(
-    (s) => s.price && !/call|tbd|contact|inquire/i.test(s.price)
-  );
-  if (realPriced.length === 0) return null;
-  return realPriced.slice(0, 3);
+  const realPriced = services.filter((s) => s.price && !/call|tbd|contact|inquire/i.test(s.price));
+  return realPriced.length ? realPriced.slice(0, 3) : null;
 }
-
-const initialsOf = (name: string): string =>
-  name.split(/\s+/).slice(0, 2).map((w) => w[0] || '').join('').toUpperCase() || 'IV';
-
-// Trust an image URL only if it's not a known-bad source. Claimed clinics may
-// have logos legitimately stored under /blog-images/, so trust those.
-const hasRealClinicImage = (provider: Provider): boolean => {
-  const url = provider.imageUrl || provider.image_url || '';
-  if (!url) return false;
-  if (url.includes('unsplash.com')) return false;
-  // 2026-06-11 Path 1B: trust /blog-images/ URLs for both featured AND
-  // claimed clinics (e.g. Insight Naturopathic's logo). The bulk-misassigned
-  // blog/unsplash concern only applies to fully unclaimed listings.
-  if (url.includes('/blog-images/') && !(provider.is_featured || provider.is_claimed)) return false;
-  if (url.includes('placeholder') || url.includes('picsum')) return false;
-  return true;
-};
 
 export const ProviderCardFeatured = ({
   provider,
   operatorProfile,
-  isPrimary = true,
+  isPrimary = false,
+  recommendedTreatment,
 }: ProviderCardFeaturedProps) => {
   const slug = provider.slug || slugify(provider.name);
-  const hasImage = hasRealClinicImage(provider);
-
-  // Real, derived signals only — no fabricated prices.
-  const credentialLine = deriveCredentialLine(provider);
+  const photo = firstRealPhoto(provider);
+  const logo = realLogo(provider);
   const openStatus = deriveOpenStatus(provider);
   const dripMenu = deriveDripMenu(provider);
-  // Only show a non-expired offer (expiry set by the owner via /finish).
+  const prac = practitionerType(provider);
+
   const firstTimeOffer = provider.special_offers?.find(
     (o) => o && o.title && o.active !== false && (!o.expires || o.expires >= new Date().toISOString().slice(0, 10))
   );
   const bookingUrl = (provider as { online_booking_url?: string }).online_booking_url;
-  const lead = provider.medical_team?.[0];
+  const isClaimed = provider.is_claimed === true || provider.is_featured === true;
+  const isSafety = provider.safety_verified === true;
+  const oneLiner = operatorProfile?.profile_data?.oneLiner;
+
+  // Status badge — EVERY card carries exactly one, by priority. Safety Verified
+  // (prominent) implies Claimed; unclaimed gets a neutral "Listed" pill so no
+  // card is ever statusless.
+  const badge = isSafety ? (
+    <span title="Completed TheDripMap's safety questionnaire" className="inline-flex items-center gap-1 shrink-0 bg-amber-400 text-amber-950 px-2.5 py-1 rounded-full text-[10px] font-black tracking-[0.12em] uppercase border border-amber-500 shadow-sm whitespace-nowrap">
+      <ShieldCheck size={12} className="text-amber-900" /> Safety Verified
+    </span>
+  ) : isClaimed ? (
+    <span title="Ownership confirmed by the clinic" className="inline-flex items-center gap-1 shrink-0 bg-slate-50 text-slate-500 px-2 py-1 rounded-full text-[10px] font-bold tracking-[0.14em] uppercase border border-slate-200 whitespace-nowrap">
+      <CheckCircle2 size={10} className="text-slate-400" /> Claimed
+    </span>
+  ) : (
+    <span title="Public listing not yet claimed by the clinic" className="inline-flex items-center gap-1 shrink-0 bg-slate-50 text-slate-400 px-2 py-1 rounded-full text-[10px] font-bold tracking-[0.14em] uppercase border border-slate-100 whitespace-nowrap">
+      Listed
+    </span>
+  );
+
+  // Practitioner chip — scannable, and colour-coded by oversight level since it
+  // now drives safety ranking. Prescriber-level (MD/NP) reads green; a
+  // naturopath reads distinctly (leaf, amber) so it never looks equivalent.
+  const pracChip = prac.label && (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-tight border',
+        prac.isPrescriberLevel
+          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+          : prac.tier === 'naturopath'
+            ? 'bg-amber-50 text-amber-800 border-amber-200'
+            : 'bg-slate-50 text-slate-600 border-slate-200'
+      )}
+    >
+      {prac.tier === 'naturopath' ? <Leaf size={12} /> : <Stethoscope size={12} />}
+      {prac.label}
+    </span>
+  );
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4 }}
       className={cn(
-        'group relative bg-white rounded-[2.5rem] overflow-hidden border transition-all duration-500',
-        // 2026-06-11 Path 1B: claimed clinics (free-tier or featured) get
-        // the premium teal shadow. Only fully unclaimed listings keep the
-        // plain treatment, which the directory now filters out anyway.
-        (provider.is_featured || provider.is_claimed)
-          ? 'border-wellness-500/30 shadow-[0_30px_60px_-25px_rgba(20,184,166,0.25),0_8px_20px_-10px_rgba(15,23,42,0.1)] hover:shadow-[0_40px_80px_-25px_rgba(20,184,166,0.35),0_12px_25px_-10px_rgba(15,23,42,0.15)]'
-          : 'border-slate-100 shadow-lg hover:shadow-xl'
+        'group relative bg-white rounded-3xl overflow-hidden border transition-all duration-300',
+        isClaimed
+          ? 'border-wellness-500/30 shadow-[0_22px_48px_-26px_rgba(20,184,166,0.28),0_6px_16px_-10px_rgba(15,23,42,0.1)] hover:shadow-[0_30px_60px_-26px_rgba(20,184,166,0.38)]'
+          : 'border-slate-200 shadow-sm hover:shadow-md'
       )}
     >
-      <div className={cn('flex flex-col', isPrimary ? 'md:flex-row' : '')}>
-        {/* Image Section */}
-        <div
+      <div className={cn('flex flex-col', isPrimary && 'md:flex-row')}>
+        {/* Visual anchor: photo cover -> logo panel -> initials panel. Solid
+            brand-tinted panel (no washy gradient dead space). */}
+        <Link
+          href={`/providers/${slug}`}
           className={cn(
-            'relative overflow-hidden',
-            isPrimary ? 'md:w-96 h-72 md:h-auto md:min-h-[420px]' : 'h-56'
+            'relative block shrink-0 overflow-hidden',
+            isPrimary ? 'h-48 md:h-auto md:w-72' : 'h-40'
           )}
         >
-          <Link href={`/providers/${slug}`} className="block h-full relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-wellness-50/40" />
-            {hasImage ? (
-              <div className="absolute inset-0 flex items-center justify-center p-8 md:p-12">
-                <ResilientImage
-                  src={provider.imageUrl || provider.image_url!}
-                  alt={`${provider.name} IV therapy clinic in ${provider.city}`}
-                  width={400}
-                  height={400}
-                  className="max-h-[60%] max-w-[60%] w-auto h-auto object-contain group-hover:scale-105 transition-transform duration-700"
-                  fallbackSrc=""
-                />
-              </div>
-            ) : (
-              // No real photo — render the gradient + clinic initials. Guaranteed
-              // to always display something clean; no broken-image alt text.
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-5xl md:text-6xl font-black text-wellness-700/80 tracking-tight">
-                  {initialsOf(provider.name)}
-                </span>
-              </div>
-            )}
-          </Link>
-
-          {/* Bottom-left: optional distance chip */}
-          {provider.distance !== undefined && (
-            <div className="absolute bottom-4 left-4 z-10 bg-white/90 backdrop-blur-md text-slate-900 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg">
-              {provider.distance} miles away
-            </div>
-          )}
-        </div>
-
-        {/* Content Section */}
-        <div
-          className={cn(
-            'flex-1 flex flex-col',
-            isPrimary ? 'p-8 md:p-10' : 'p-6'
-          )}
-        >
-          {/* Title + Location + inline VERIFIED + rating */}
-          <div className="mb-5">
-            <div className="flex items-start justify-between gap-3 mb-2">
-              <Link href={`/providers/${slug}`} className="block min-w-0 flex-1">
-                <h3
-                  className={cn(
-                    'font-black text-slate-900 group-hover:text-wellness-700 transition-colors leading-[1.1] tracking-tight',
-                    isPrimary ? 'text-2xl md:text-3xl' : 'text-xl'
-                  )}
-                >
-                  <span>{provider.name}</span>
-                  {/* One badge per card, by priority (2026-06-19). Safety
-                      Verified (prominent gold shield) wins when present; it
-                      implies Claimed, so Claimed shows only on its own. */}
-                  {provider.safety_verified === true ? (
-                    <span title="Completed TheDripMap's safety questionnaire" className="inline-flex items-center gap-1 align-middle ml-2 bg-amber-400 text-amber-950 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-[0.14em] uppercase border border-amber-500 shadow-sm whitespace-nowrap">
-                      <ShieldCheck size={11} className="text-amber-900" />
-                      Safety Verified
-                    </span>
-                  ) : (provider.is_featured || provider.is_claimed) ? (
-                    <span title="Ownership confirmed by the clinic" className="inline-flex items-center gap-1 align-middle ml-2 bg-slate-50 text-slate-500 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-[0.16em] uppercase border border-slate-200 whitespace-nowrap">
-                      <CheckCircle2 size={10} className="text-slate-400" />
-                      Claimed
-                    </span>
-                  ) : null}
-                </h3>
-              </Link>
-            </div>
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <div className="flex items-center gap-1.5 text-sm text-slate-500 font-semibold">
-                <MapPin size={13} className="text-slate-400" />
-                <span>
-                  {provider.address && provider.address.length < 60
-                    ? provider.address.split(',').slice(0, 2).join(',')
-                    : `${provider.city}${provider.state ? `, ${provider.state}` : ''}`}
-                </span>
-              </div>
-              {/* 2026-06-11 Path 1B: show rating + reviewCount whenever the
-                  clinic is claimed (free tier or featured). Rating comes from
-                  the live Google data refresh; gating it on is_featured alone
-                  hid real ratings for free-tier claims. */}
-              {(provider.is_featured || provider.is_claimed) && provider.rating > 0 && (
-                <div className="flex items-center gap-1.5 text-sm font-black text-slate-900">
-                  <StarIcon size={14} className="text-amber-500" fill="currentColor" />
-                  {provider.rating}
-                  <span className="text-slate-300 font-bold">·</span>
-                  <span className="text-slate-500 font-bold">{provider.reviewCount || 0}</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Credential + Open status strip */}
-          {(credentialLine || openStatus) && (
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5 pb-5 border-b border-slate-100">
-              {credentialLine && (
-                <div className="flex items-center gap-1.5 text-xs font-black text-wellness-700">
-                  <Stethoscope size={13} />
-                  {credentialLine}
-                </div>
-              )}
-              {openStatus && (
-                <div className="flex items-center gap-1.5 text-xs font-black text-emerald-600">
-                  <Clock size={13} />
-                  {openStatus}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Operator one-liner if available */}
-          {operatorProfile?.profile_data.oneLiner && (
-            <div className="mb-5 bg-gradient-to-br from-wellness-50 to-sky-50/60 p-4 rounded-2xl border border-wellness-100/60">
-              <p className="text-sm text-slate-700 font-bold italic leading-relaxed">
-                &ldquo;{operatorProfile.profile_data.oneLiner}&rdquo;
-              </p>
-            </div>
-          )}
-
-          {/* Drip menu with real prices — only if data exists */}
-          {dripMenu && dripMenu.length > 0 ? (
-            <div className="mb-5">
-              <div className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 mb-3">
-                Popular Drips
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {dripMenu.map((drip, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-slate-50 hover:bg-wellness-50 transition-colors p-3 rounded-2xl border border-slate-100"
-                  >
-                    <div className="text-[11px] font-black text-slate-900 leading-tight mb-1.5 line-clamp-2">
-                      {drip.name}
-                    </div>
-                    <div className="text-sm font-black text-wellness-700">
-                      {drip.price}
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {photo ? (
+            <ResilientImage
+              src={photo}
+              alt={`${provider.name} IV therapy clinic in ${provider.city}`}
+              width={600}
+              height={400}
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-700"
+              fallbackSrc=""
+            />
+          ) : logo ? (
+            <div className="absolute inset-0 bg-wellness-50 flex items-center justify-center p-6">
+              <ResilientImage
+                src={logo}
+                alt={`${provider.name} logo`}
+                width={240}
+                height={240}
+                unoptimized
+                className="max-h-[78%] max-w-[78%] w-auto h-auto object-contain"
+                fallbackSrc=""
+              />
             </div>
           ) : (
-            // Fallback: top 3 specialties as pills
-            (provider.specialties || []).length > 0 && (
-              <div className="mb-5">
-                <div className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 mb-3">
-                  Specialties
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {(provider.specialties || []).slice(0, 4).map((specialty, idx) => (
-                    <ServicePill key={idx} service={specialty} />
-                  ))}
-                </div>
-              </div>
-            )
-          )}
-
-          {/* Description (slimmed to 2 lines) */}
-          {provider.description && (
-            <p className="text-slate-600 text-sm leading-relaxed mb-5 line-clamp-2">
-              {provider.description}
-            </p>
-          )}
-
-          {/* First-time offer if present */}
-          {firstTimeOffer && (
-            <div className="mb-5 flex items-center gap-2 px-3 py-2.5 bg-amber-50 border border-amber-200/60 rounded-2xl">
-              <Gift size={14} className="text-amber-600 shrink-0" />
-              <span className="text-[12px] font-black text-amber-800">
-                {firstTimeOffer.title}
+            <div className="absolute inset-0 bg-wellness-600 flex items-center justify-center">
+              <span className="text-4xl md:text-5xl font-black text-white/90 tracking-tight">
+                {initialsOf(provider.name)}
               </span>
             </div>
           )}
+        </Link>
 
-          {/* Practitioner name (text-only — photo handled on detail page) */}
-          {lead && (
-            <div className="mb-5 flex items-center gap-2 text-[11px] font-semibold text-slate-500">
-              <span className="text-slate-400">Led by</span>
-              <span className="font-black text-slate-700">{lead.name}</span>
-              {lead.role && (
-                <>
-                  <span className="text-slate-300">·</span>
-                  <span>{lead.role}</span>
-                </>
+        {/* Content */}
+        <div className={cn('flex-1 flex flex-col min-w-0', isPrimary ? 'p-6 md:p-8' : 'p-5 md:p-6')}>
+          {/* Name + status badge */}
+          <div className="flex items-start justify-between gap-3 mb-1.5">
+            <Link href={`/providers/${slug}`} className="min-w-0">
+              <h3 className={cn('font-black text-slate-900 group-hover:text-wellness-700 transition-colors leading-tight tracking-tight', isPrimary ? 'text-xl md:text-2xl' : 'text-lg md:text-xl')}>
+                {provider.name}
+              </h3>
+            </Link>
+            {badge}
+          </div>
+
+          {/* Location + rating */}
+          <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
+            <div className="flex items-center gap-1.5 text-sm text-slate-500 font-semibold min-w-0">
+              <MapPin size={13} className="text-slate-400 shrink-0" />
+              <span className="truncate">{provider.city}{provider.state ? `, ${provider.state}` : ''}</span>
+            </div>
+            {isClaimed && provider.rating > 0 && (
+              <div className="flex items-center gap-1.5 text-sm font-black text-slate-900 shrink-0">
+                <StarIcon size={14} className="text-amber-500" fill="currentColor" />
+                {provider.rating}
+                <span className="text-slate-500 font-bold">({provider.reviewCount || 0})</span>
+              </div>
+            )}
+          </div>
+
+          {/* Scannable signal row: practitioner type + offers-treatment + open */}
+          {(pracChip || provider.offersRecommended || openStatus) && (
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              {pracChip}
+              {provider.offersRecommended && recommendedTreatment && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-tight bg-wellness-50 text-wellness-700 border border-wellness-200">
+                  <CheckCircle2 size={12} /> Offers {recommendedTreatment}
+                </span>
+              )}
+              {openStatus && (
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-emerald-600">
+                  <Clock size={12} /> {openStatus}
+                </span>
               )}
             </div>
           )}
 
-          {/* CTA row — primary depends on whether booking URL exists */}
-          <div className="flex flex-col sm:flex-row items-stretch gap-3 mt-auto">
-            {bookingUrl ? (
+          {/* One body block only (priority: owner one-liner -> priced drips ->
+              specialties), to keep three cards from becoming an endless scroll. */}
+          {oneLiner ? (
+            <p className="text-sm text-slate-700 font-semibold italic leading-relaxed mb-5 line-clamp-2">
+              &ldquo;{oneLiner}&rdquo;
+            </p>
+          ) : dripMenu ? (
+            <div className="grid grid-cols-3 gap-2 mb-5">
+              {dripMenu.map((drip, idx) => (
+                <div key={idx} className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <div className="text-[11px] font-black text-slate-900 leading-tight mb-1 line-clamp-2">{drip.name}</div>
+                  <div className="text-sm font-black text-wellness-700">{drip.price}</div>
+                </div>
+              ))}
+            </div>
+          ) : (provider.specialties || []).length > 0 ? (
+            <div className="flex flex-wrap gap-1.5 mb-5">
+              {(provider.specialties || []).slice(0, 4).map((s, idx) => (
+                <span key={idx} className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-50 text-slate-600 border border-slate-200 truncate max-w-[150px]">
+                  {s}
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          {/* Offer */}
+          {firstTimeOffer && (
+            <div className="mb-5 flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200/60 rounded-xl">
+              <Gift size={14} className="text-amber-600 shrink-0" />
+              <span className="text-[12px] font-black text-amber-800 line-clamp-1">{firstTimeOffer.title}</span>
+            </div>
+          )}
+
+          {/* CTA row — ONE consistent primary across every card ("View clinic"),
+              then identically-styled secondary actions when the data exists. */}
+          <div className="flex items-stretch gap-2 mt-auto">
+            <Link
+              href={`/providers/${slug}`}
+              className="flex-1 bg-gradient-to-br from-wellness-500 to-wellness-700 hover:from-wellness-400 hover:to-wellness-600 text-white px-5 py-3 rounded-2xl font-black text-sm transition-all shadow-[0_14px_28px_-12px_rgba(20,184,166,0.55)] hover:-translate-y-0.5 flex items-center justify-center gap-2"
+            >
+              View clinic <ArrowRight size={17} />
+            </Link>
+            {bookingUrl && (
               <a
                 href={bookingUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 bg-gradient-to-br from-wellness-500 to-wellness-700 hover:from-wellness-400 hover:to-wellness-600 text-white px-6 py-3.5 rounded-2xl font-black text-sm transition-all shadow-[0_15px_30px_-10px_rgba(20,184,166,0.5)] hover:shadow-[0_20px_40px_-10px_rgba(20,184,166,0.65)] hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                className="bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 px-4 py-3 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2"
+                aria-label="Book online"
+                title="Book online"
               >
-                Book Online <ArrowRight size={18} />
+                <Calendar size={16} />
               </a>
-            ) : (
-              <Link
-                href={`/providers/${slug}`}
-                className="flex-1 bg-gradient-to-br from-wellness-500 to-wellness-700 hover:from-wellness-400 hover:to-wellness-600 text-white px-6 py-3.5 rounded-2xl font-black text-sm transition-all shadow-[0_15px_30px_-10px_rgba(20,184,166,0.5)] hover:shadow-[0_20px_40px_-10px_rgba(20,184,166,0.65)] hover:-translate-y-0.5 flex items-center justify-center gap-2"
-              >
-                View Details <ArrowRight size={18} />
-              </Link>
             )}
-            <div className="flex items-center gap-2">
-              {provider.phone && (
-                <a
-                  href={`tel:${provider.phone}`}
-                  className="flex-1 sm:flex-none bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 px-5 py-3.5 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2"
-                  aria-label="Call"
-                >
-                  <Phone size={16} />
-                  <span className="sm:hidden md:inline">Call</span>
-                </a>
-              )}
-              {provider.website && (
-                <a
-                  href={provider.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 sm:flex-none bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 px-5 py-3.5 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2"
-                  aria-label="Website"
-                >
-                  <Globe size={16} />
-                  <span className="sm:hidden md:inline">Website</span>
-                </a>
-              )}
-            </div>
+            {provider.phone && (
+              <a
+                href={`tel:${provider.phone}`}
+                className="bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 px-4 py-3 rounded-2xl font-black text-sm transition-all flex items-center justify-center"
+                aria-label="Call"
+                title="Call"
+              >
+                <Phone size={16} />
+              </a>
+            )}
+            {provider.website && (
+              <a
+                href={provider.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 px-4 py-3 rounded-2xl font-black text-sm transition-all flex items-center justify-center"
+                aria-label="Website"
+                title="Website"
+              >
+                <Globe size={16} />
+              </a>
+            )}
           </div>
         </div>
       </div>
