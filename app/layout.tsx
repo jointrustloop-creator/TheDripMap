@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     template: '%s',
     default: 'The Drip Map | Find Your Perfect IV Therapy Match',
   },
-  description: 'Find and compare the best IV therapy clinics near you. Browse verified providers across hundreds of US cities or get matched in 60 seconds.',
+  description: 'Find and compare the best IV therapy clinics near you. Browse verified IV therapy providers across Canada, or get matched in 60 seconds.',
   // NOTE: no global `alternates.canonical` here. A canonical set in the root
   // layout is inherited by every child page that doesn't override it, which made
   // pages without their own canonical declare the homepage as canonical — the

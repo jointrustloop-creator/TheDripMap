@@ -46,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
   // Title kept under ~60 visible chars so it never truncates in SERPs.
   // "Verified" is the differentiator word; the live count is the proof.
   const title = `IV Therapy Near Me: Compare ${stats.total}+ Verified Clinics | The Drip Map`;
-  const description = `Find the right IV therapy clinic near you. Compare ${stats.total}+ clinics across the US and Canada, see real drip menus and safety credentials, and match in 60 seconds.`;
+  const description = `Find the right IV therapy clinic near you. Compare ${stats.total}+ IV therapy clinics across Canada and the US, see real drip menus and safety credentials, and match in 60 seconds.`;
 
   return {
     title,
