@@ -16,6 +16,7 @@ import { SupabaseUnreachableError } from '@/src/lib/supabase-health';
 import { TemporarilyUnavailable } from '@/src/components/TemporarilyUnavailable';
 import { getCityIntro } from '@/src/lib/city-intros';
 import { getCityMeta, filterByUseCase } from '@/src/lib/city-meta';
+import { normalizeCountry, isNoindexedUSPage } from '@/src/lib/market';
 import { MapTrigger } from '@/src/components/MapTrigger';
 import { FAQSection } from '@/src/components/FAQSection';
 import { NearbyCities } from '@/src/components/NearbyCities';
@@ -173,6 +174,18 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   // sitemap.ts gate filters them out of the crawl-priority list separately.
   const passesProviderGate = count >= 3;
 
+  // US market off: noindex US city pages. The city's market is read from its
+  // listings' country field (primary) with the province/state as fallback, so
+  // Canadian cities are never affected. Reversible via US_MARKET_ENABLED.
+  const ctyTally = { US: 0, CA: 0 };
+  for (const l of listings) {
+    const m = normalizeCountry((l as { country?: string }).country);
+    if (m === 'US') ctyTally.US++;
+    else if (m === 'CA') ctyTally.CA++;
+  }
+  const cityModalCountry = ctyTally.US > ctyTally.CA ? 'United States' : ctyTally.CA > 0 ? 'Canada' : '';
+  const cityUSNoindex = isNoindexedUSPage({ country: cityModalCountry, state: resolvedState });
+
   return {
     title,
     description,
@@ -181,7 +194,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
       // (e.g. /cities/New-York) dedupe to the one true /cities/new-york.
       canonical: `https://www.thedripmap.com/cities/${cityData?.slug || slug}`,
     },
-    ...(passesProviderGate ? {} : { robots: { index: false, follow: true } }),
+    ...((passesProviderGate && !cityUSNoindex) ? {} : { robots: { index: false, follow: true } }),
     openGraph: {
       title,
       description,

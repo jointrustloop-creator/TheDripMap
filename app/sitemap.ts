@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { getAllListings, getBlogPosts, getAllCities, slugify, getServiceFilter } from '../src/lib/data';
+import { US_MARKET_ENABLED, marketOf } from '../src/lib/market';
 
 // 2026-06-11: revalidate every 10 minutes so newly-added providers + cities
 // surface in the sitemap quickly without a manual redeploy. Previously the
@@ -21,6 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/search`,                 priority: 0.9, changeFrequency: 'daily',   lastModified: new Date() },
     { url: `${baseUrl}/deals`,                  priority: 0.85, changeFrequency: 'daily',  lastModified: new Date() },
     { url: `${baseUrl}/cities`,                 priority: 0.9, changeFrequency: 'daily',   lastModified: new Date() },
+    { url: `${baseUrl}/canada`,                 priority: 0.9, changeFrequency: 'weekly',  lastModified: new Date() },
     { url: `${baseUrl}/states`,                 priority: 0.85, changeFrequency: 'weekly', lastModified: new Date() },
     { url: `${baseUrl}/guide`,                  priority: 0.85, changeFrequency: 'monthly', lastModified: new Date() },
     { url: `${baseUrl}/quiz`,                   priority: 0.8, changeFrequency: 'monthly', lastModified: new Date() },
@@ -73,7 +75,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // the cities that actually have enough inventory to satisfy a searcher.
   const CITY_PROVIDER_GATE = 3;
   const cityRoutes = cities
-    .filter((c) => (c.count ?? 0) >= CITY_PROVIDER_GATE && c.city)
+    // US market off: keep US city pages out of the sitemap (they also emit
+    // robots:noindex). Canadian cities are unaffected. Reversible via the flag.
+    .filter((c) => (c.count ?? 0) >= CITY_PROVIDER_GATE && c.city && (US_MARKET_ENABLED || marketOf({ state: c.state }) !== 'US'))
     .map((c) => ({
       url: `${baseUrl}/cities/${slugify(c.city)}`,
       lastModified: new Date(),
@@ -114,7 +118,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return dd?.source === 'orphan_claim_stub' && p.is_claimed !== true;
   };
   const providerRoutes = providers
-    .filter((p) => p.name && !isOrphanStub(p as { is_claimed?: boolean; decision_drivers?: unknown }))
+    // US market off: keep US provider pages out of the sitemap. Reversible via the flag.
+    .filter((p) => p.name && !isOrphanStub(p as { is_claimed?: boolean; decision_drivers?: unknown }) && (US_MARKET_ENABLED || marketOf({ country: (p as { country?: string }).country, state: p.state }) !== 'US'))
     .map((p) => ({
       url: `${baseUrl}/providers/${p.slug || slugify(p.name)}`,
       lastModified: new Date(),

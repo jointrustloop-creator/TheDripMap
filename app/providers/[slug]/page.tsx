@@ -20,6 +20,7 @@ import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { ProviderCredentialBlock } from '../../../src/components/ProviderCredentialBlock';
+import { isNoindexedUSPage } from '../../../src/lib/market';
 import { ClinicImage } from '../../../src/components/ClinicImage';
 import { ResilientImage } from '../../../src/components/ResilientImage';
 import { ClaimListingTrigger } from '../../../src/components/ClaimListingTrigger';
@@ -227,13 +228,17 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   const dd = (provider as { decision_drivers?: { source?: string } | null }).decision_drivers;
   const isOrphanStub = dd?.source === 'orphan_claim_stub' && provider.is_claimed !== true;
 
+  // US market off: noindex US provider pages. Reversible via US_MARKET_ENABLED;
+  // Canadian providers are never affected (country=Canada => not US).
+  const usNoindex = isNoindexedUSPage({ country: provider.country, state: provider.state });
+
   return {
     title,
     description,
     alternates: {
       canonical: canonicalUrl,
     },
-    robots: isOrphanStub
+    robots: (isOrphanStub || usNoindex)
       ? { index: false, follow: true, googleBot: { index: false, follow: true } }
       : { index: true, follow: true, googleBot: { index: true, follow: true } },
     openGraph: {
