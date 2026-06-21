@@ -64,6 +64,17 @@ export default async function StatePage({ params }: StatePageProps) {
     isPartOf: { '@type': 'WebSite', name: 'TheDripMap', url: SITE_URL },
   };
 
+  // Real, per-state signals so the cost + mobile answers differ by state instead
+  // of repeating a shared template. Mobile detection mirrors the data layer.
+  const stMobileCount = providers.filter((c) => {
+    if (c.mobile_service) return true;
+    const ty = (c.type || '').toLowerCase();
+    if (ty === 'mobile' || ty === 'both') return true;
+    const blob = [c.category, (c.specialties || []).join(' '), (c.subtypes || []).join(' '), c.description].join(' ').toLowerCase();
+    return blob.includes('mobile') || blob.includes('in-home') || blob.includes('at-home') || blob.includes('concierge');
+  }).length;
+  const stTopCity = cities[0];
+
   const faqs = [
     {
       question: `How many IV therapy clinics are in ${state.name}?`,
@@ -71,11 +82,13 @@ export default async function StatePage({ params }: StatePageProps) {
     },
     {
       question: `What does IV therapy cost in ${state.name}?`,
-      answer: `Most standard hydration and wellness drips in ${state.name} range from $150 to $300. Specialized treatments like NAD+ therapy typically start at $400. Pricing varies by city and clinic.`,
+      answer: `Across the ${total} ${state.name} ${total === 1 ? 'clinic' : 'clinics'} listed, each sets its own pricing. Most standard hydration and wellness drips run $150 to $300, and higher-dose options like NAD+ start around $400.${stTopCity ? ` ${stTopCity.city} has the most listings with ${stTopCity.count}.` : ''} Confirm current pricing with the clinic.`,
     },
     {
       question: `Are mobile IV therapy services available in ${state.name}?`,
-      answer: `Yes, many clinics in ${state.name} offer mobile IV therapy where medical professionals bring treatments directly to your home, office, or hotel. Filter by "Mobile Service" on individual city pages to find them.`,
+      answer: stMobileCount > 0
+        ? `${stMobileCount} of the ${total} IV therapy ${total === 1 ? 'clinic' : 'clinics'} in ${state.name} offer mobile or in-home service, bringing the drip to your home, office, or hotel. Open a city page and filter by "Mobile Service" to find them.`
+        : `Most ${state.name} clinics work from a physical location. Check individual city pages for any mobile or in-home options.`,
     },
   ];
 
@@ -109,7 +122,7 @@ export default async function StatePage({ params }: StatePageProps) {
 
         <section className="mb-16 max-w-4xl">
           <p className="text-lg text-slate-600 leading-relaxed">
-            Compare {total} IV therapy clinics across {state.name}. From hydration drips to NAD+ and beauty protocols, find top-rated providers in {topCityNames.join(', ')} and {cityCount > 3 ? `${cityCount - 3} more ${cityCount - 3 === 1 ? 'city' : 'cities'}` : 'beyond'}. Read reviews, see pricing, and book your session — in-clinic or mobile.
+            Compare {total} IV therapy clinics across {state.name}. From hydration drips to NAD+ and beauty protocols, find top-rated providers in {topCityNames.join(', ')} and {cityCount > 3 ? `${cityCount - 3} more ${cityCount - 3 === 1 ? 'city' : 'cities'}` : 'beyond'}. Read reviews, see pricing, and book your session, in-clinic or mobile.
           </p>
         </section>
 
