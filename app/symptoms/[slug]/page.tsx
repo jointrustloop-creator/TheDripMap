@@ -68,12 +68,10 @@ export default async function UseCasePage({ params }: PageProps) {
     { label: useCase.title, href: `/symptoms/${useCase.slug}` },
   ];
 
-  const allFaqs = [
-    ...useCase.faqs,
-    { question: `How much does IV therapy for ${useCase.title.toLowerCase()} cost?`, answer: `Standard IV therapy sessions typically range from $150 to $350. Specialized treatments may cost more. Prices vary by clinic and city — check individual provider listings for exact pricing.` },
-    { question: `How soon will I feel better?`, answer: `Most people feel relief within 15 to 60 minutes of starting their IV treatment. Effects can last anywhere from a few hours to several days depending on the formula and your individual response.` },
-    { question: `Does insurance cover IV therapy?`, answer: `IV therapy is generally considered elective and is not covered by most insurance plans. Some HSA and FSA accounts may cover treatments with a medical necessity. Confirm with the clinic and your insurance provider.` },
-  ];
+  // Each use case ships 8 symptom-specific FAQs, so the page renders those alone.
+  // The old generic cost/speed/insurance trio was identical across all 16 symptom
+  // pages (a shared-content tail) and is dropped to keep every page unique.
+  const allFaqs = useCase.faqs;
 
   const faqSchema = {
     "@context": "https://schema.org",

@@ -394,6 +394,35 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   ];
   const faqs = [...curatedFaqs, ...genericFaqs].slice(0, 6);
 
+  // Data-driven city snapshot. ~260 city rows shared a near-identical "what is IV
+  // therapy" template body; this replaces that shared block (on any city without
+  // bespoke copy) with real figures computed from the city's own listings, so no
+  // two city pages carry a duplicate body. Bespoke city copy is left untouched.
+  type SnapClinic = { city?: string; name?: string; rating?: number | string; reviewCount?: number | string; mobile_service?: boolean; type?: string; category?: string; specialties?: string[]; subtypes?: string[]; description?: string; is_claimed?: boolean };
+  const isTemplatedBody = typeof cityData.content === 'string' && cityData.content.includes('short for intravenous therapy');
+  const snapInCity = (listings as SnapClinic[]).filter((l) => (l.city || '').toLowerCase() === cityData.name.toLowerCase());
+  const snapPool: SnapClinic[] = snapInCity.length ? snapInCity : (listings as SnapClinic[]);
+  const snapMobile = snapPool.filter((c) => {
+    if (c.mobile_service) return true;
+    const ty = (c.type || '').toLowerCase();
+    if (ty === 'mobile' || ty === 'both') return true;
+    const blob = [c.category, (c.specialties || []).join(' '), (c.subtypes || []).join(' '), c.description].join(' ').toLowerCase();
+    return blob.includes('mobile') || blob.includes('in-home') || blob.includes('at-home') || blob.includes('concierge');
+  }).length;
+  const snapRated = snapPool.filter((c) => Number(c.rating) > 0 && Number(c.reviewCount) > 0);
+  const snapAvg = snapRated.length ? snapRated.reduce((s, c) => s + Number(c.rating), 0) / snapRated.length : 0;
+  const snapTop = snapRated.slice().sort((a, b) => (Number(b.rating) - Number(a.rating)) || (Number(b.reviewCount) - Number(a.reviewCount)))[0] || null;
+  const snapClaimed = snapPool.filter((c) => c.is_claimed === true).length;
+  const snapCount = snapPool.length;
+  const snapInClinic = snapCount - snapMobile;
+  const snapParts: string[] = [`TheDripMap lists ${snapCount} IV therapy ${snapCount === 1 ? 'provider' : 'providers'} in ${cityData.name}.`];
+  if (snapMobile > 0 && snapInClinic > 0) snapParts.push(`${snapInClinic} ${snapInClinic === 1 ? 'works' : 'work'} from a clinic and ${snapMobile} ${snapMobile === 1 ? 'offers' : 'offer'} mobile or in-home visits.`);
+  else if (snapMobile > 0) snapParts.push(`${snapMobile === snapCount ? 'All' : snapMobile} of them offer mobile or in-home visits.`);
+  else snapParts.push(`All of them work from a physical clinic.`);
+  if (snapRated.length > 0) snapParts.push(`${snapRated.length} ${snapRated.length === 1 ? 'has' : 'have'} public reviews, averaging ${snapAvg.toFixed(1)} stars${snapTop && snapTop.name ? `, led by ${snapTop.name} at ${Number(snapTop.rating).toFixed(1)}` : ''}.`);
+  if (snapClaimed > 0) snapParts.push(`${snapClaimed} ${snapClaimed === 1 ? 'is' : 'are'} claimed and Safety Verified.`);
+  const citySnapshot = snapParts.join(' ').replace(/[‒-―−]/g, '-');
+
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -702,8 +731,10 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           subtitle={`Answer 5 quick questions and we'll match you to the best IV therapy clinic in ${cityData.name}.`}
         />
 
-        {/* 6. SEO content (all the written content about IV therapy in the city) */}
-        {cityData.content ? (
+        {/* 6. SEO content. Bespoke per-city copy renders as written. Cities that
+            only ever carried the shared template body now render a data-driven
+            snapshot instead, so no two city pages share a near-identical block. */}
+        {cityData.content && !isTemplatedBody ? (
           <section className="mb-24">
             <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline bg-white p-12 rounded-[3.5rem] border border-slate-100 shadow-sm">
               <ReactMarkdown>
@@ -712,6 +743,19 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
                   .replace(/\{count\}/g, String(count))
                   .replace(/\{city\}/g, cityData.name)}
               </ReactMarkdown>
+            </div>
+          </section>
+        ) : snapCount > 0 ? (
+          <section className="mb-24">
+            <div className="bg-white p-12 rounded-[3.5rem] border border-slate-100 shadow-sm">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-4 tracking-tight">IV therapy in {cityData.name}: by the numbers</h2>
+              <p className="text-lg text-slate-600 leading-relaxed">{citySnapshot}</p>
+              <p className="text-sm text-slate-500 leading-relaxed mt-5">
+                Compare each clinic above for the treatments offered, pricing, and booking. New to IV drips? See our{' '}
+                <Link href="/guide/first-time-iv-therapy-what-to-expect" className="text-wellness-600 font-bold hover:underline">first-time guide</Link>{' '}
+                and the{' '}
+                <Link href="/guide/iv-therapy-cost-guide" className="text-wellness-600 font-bold hover:underline">cost guide</Link>.
+              </p>
             </div>
           </section>
         ) : (
