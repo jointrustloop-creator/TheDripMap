@@ -501,6 +501,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
         <BreadcrumbNav
           items={[
             { label: 'Cities', href: '/cities' },
+            ...(cityData.state ? [{ label: cityData.state }] : []),
             { label: cityData.name }
           ]}
         />

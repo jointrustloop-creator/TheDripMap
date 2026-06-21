@@ -9,7 +9,6 @@ import {
   MapPin,
   ArrowDown,
   ArrowUp,
-  Sparkles,
   ShieldCheck,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -17,7 +16,9 @@ import { Provider, City, TreatmentType, ListingStats } from '../../src/types';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { TrustSignals } from '../../src/components/TrustSignals';
-import { ProviderCard } from '../../src/components/ProviderCard';
+import { ExploreResults } from '../../src/components/explore/ExploreResults';
+import { BreadcrumbNav } from '../../src/components/BreadcrumbNav';
+import { isVerifiedClinic } from '../../src/lib/clinic-display';
 import { cn } from '../../src/lib/utils';
 import { searchListings, getCitiesWithListings, slugify } from '../../src/lib/data';
 import { getUserLocation, UserLocation } from '../../src/lib/geo';
@@ -114,7 +115,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
     setTypeFilter(state.typeFilter);
   }, [getInitialState]);
   
-  const [sortBy, setSortBy] = useState<'best' | 'rating' | 'reviews' | 'distance' | 'value'>('best');
+  const [sortBy, setSortBy] = useState<'best' | 'rating' | 'reviews' | 'distance' | 'value' | 'verified'>('best');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   // Default-view behavior (no city, no query, no chips): show ONLY verified
   // clinics sorted by claim date. The toggles flip the sort direction and let
@@ -268,17 +269,9 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
     searchQuery.trim() === '' &&
     (activeChips.length === 0 || (activeChips.length === 1 && activeChips[0] === 'All'));
 
-  // 2026-06-12: lifted from inline so the "Recent additions" strip and the
-  // main grid share the same 3-card slice. We then dedupe the strip's rows
-  // out of the main grid so the same clinic doesn't appear twice on one page.
-  const recentStripCards = (isDefaultView && !showAllClinics)
-    ? filteredProviders.filter((p) => p.claimed_at).slice(0, 3)
-    : [];
-  const showRecentStrip = recentStripCards.length >= 3;
-  const recentStripIds = new Set(recentStripCards.map((p) => p.id));
-  const mainGridProviders = showRecentStrip
-    ? filteredProviders.filter((p) => !recentStripIds.has(p.id))
-    : filteredProviders;
+  // The recent-additions strip + manual grid were replaced by the map-aware
+  // ExploreResults shell (list / map / split). Default ordering still surfaces
+  // newly verified clinics first via the verified-by-claim-date sort below.
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -362,6 +355,12 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
       // claim.
       const sorted = [...results];
       const tiebreaker = (a: Provider, b: Provider): number => {
+        if (sortBy === 'verified') {
+          const va = isVerifiedClinic(a) ? 1 : 0;
+          const vb = isVerifiedClinic(b) ? 1 : 0;
+          if (va !== vb) return vb - va;
+          return (b.rating ?? 0) - (a.rating ?? 0);
+        }
         if (sortBy === 'rating') return (b.rating ?? 0) - (a.rating ?? 0);
         if (sortBy === 'reviews') return (b.reviewCount ?? 0) - (a.reviewCount ?? 0);
         if (sortBy === 'distance' && userLocation) {
@@ -425,6 +424,11 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
       {/* Search Header */}
       <section className="bg-white border-b border-slate-100 pt-12 pb-8 px-6 text-center md:text-left">
         <div className="max-w-7xl mx-auto">
+          <BreadcrumbNav
+            items={selectedCity !== 'All'
+              ? [{ label: 'Cities', href: '/cities' }, { label: String(selectedCity) }]
+              : [{ label: 'Explore Clinics' }]}
+          />
           {/* SEO H1 and Intro */}
           <div className="mb-12">
             <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-4">
@@ -494,14 +498,15 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
               
               <select 
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'best' | 'rating' | 'reviews' | 'distance' | 'value')}
+                onChange={(e) => setSortBy(e.target.value as 'best' | 'rating' | 'reviews' | 'distance' | 'value' | 'verified')}
                 className="w-full sm:w-auto bg-white border border-slate-100 rounded-2xl px-4 py-3 text-sm font-bold text-slate-600 focus:outline-none focus:ring-2 focus:ring-wellness-600/20 transition-all cursor-pointer"
               >
                 <option value="best">Best Match</option>
-                <option value="value">Best Value</option>
+                <option value="verified">Verified First</option>
                 <option value="rating">Highest Rated</option>
-                <option value="reviews">Most Reviewed</option>
                 <option value="distance">Nearest First</option>
+                <option value="value">Best Value</option>
+                <option value="reviews">Most Reviewed</option>
               </select>
 
               <button 
@@ -658,71 +663,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
                 </div>
               )}
 
-              {/* Recent Additions strip — only renders in the default verified-only
-                  view when there are at least 3 verified clinics with claim dates.
-                  Top 3 are still shown in the full grid below; this is a high-
-                  visibility "spot what just claimed" surface. */}
-              {showRecentStrip && (
-                <section className="mb-12">
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="flex items-center gap-3">
-                      <span className="inline-flex items-center justify-center w-9 h-9 rounded-2xl bg-wellness-100 text-wellness-700">
-                        <Sparkles size={16} />
-                      </span>
-                      <div>
-                        <h3 className="text-lg font-black text-slate-900 tracking-tight">Recent additions</h3>
-                        <p className="text-xs font-bold text-slate-500">3 most recently verified clinics</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {recentStripCards.map((p, idx) => (
-                      <div key={`new-${p.id}`} className="relative">
-                        {idx === 0 && (
-                          <span className="absolute -top-2 left-4 z-10 bg-wellness-600 text-white text-[10px] font-black uppercase tracking-[0.18em] px-3 py-1 rounded-full shadow-md shadow-wellness-200">
-                            NEW
-                          </span>
-                        )}
-                        {/* 2026-06-13: render the strip with the same ProviderCard
-                            design used by the Recently Viewed section below, for
-                            visual consistency across the page (operator request). */}
-                        <ProviderCard provider={p} />
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* 2026-06-13 (operator request): in the default verified view, the
-                  remaining claimed clinics (everything past the 3 recent additions)
-                  get an honoured section title and the SAME ProviderCard design as
-                  Recent additions and Recently Viewed, for page-wide consistency.
-                  Other views (search / browse-all) keep their existing treatment.
-                  Card design + section title only; no data/logic changed. */}
-              {showRecentStrip && mainGridProviders.length > 0 && (
-                <div className="flex items-center gap-3 mb-5 mt-2">
-                  <span className="inline-flex items-center justify-center w-9 h-9 rounded-2xl bg-wellness-100 text-wellness-700">
-                    <ShieldCheck size={16} />
-                  </span>
-                  <div>
-                    <h3 className="text-lg font-black text-slate-900 tracking-tight">Founding clinics</h3>
-                    <p className="text-xs font-bold text-slate-500">The verified clinics who claimed their place early</p>
-                  </div>
-                </div>
-              )}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {/* 2026-06-12: mainGridProviders is filteredProviders minus the
-                    3 strip cards when the strip is showing, so a clinic never
-                    appears twice on the same page. */}
-                {mainGridProviders.map((provider) => (
-                  // 2026-06-14: one card component for the whole grid. ProviderCard's
-                  // claimed branch is the premium per-clinic-distinct card; unclaimed
-                  // stays muted. No more mixing in the taller featured card.
-                  <div key={provider.id}>
-                    <ProviderCard provider={provider} />
-                  </div>
-                ))}
-              </div>
+              <ExploreResults providers={filteredProviders} />
             </>
           ) : (
             <div className="text-center py-32 bg-white rounded-[3rem] border border-slate-100 shadow-xl">
@@ -741,29 +682,6 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
           )}
         </div>
       </section>
-
-      {/* Recently Viewed (Simulated) */}
-      {filteredProviders.length > 3 && (
-        <section className="py-16 px-6 border-t border-slate-100 bg-slate-50/30">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-10">
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Recently Viewed</h2>
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                <span className="w-2 h-2 bg-slate-300 rounded-full" /> Personal results
-              </span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 opacity-60 hover:opacity-100 transition-all duration-500">
-              {filteredProviders.slice().reverse().slice(0, 4).map((provider) => (
-                <div key={`recent-${provider.id}`} className="scale-95 origin-center">
-                  <ProviderCard 
-                    provider={provider} 
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Browse by City Section */}
       <section className="py-16 px-6 border-t border-slate-100">
