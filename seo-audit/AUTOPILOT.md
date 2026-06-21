@@ -1,10 +1,13 @@
-# SEO Autopilot — standing spec
+# SEO Autopilot: standing spec
 
-Version 2. Rewritten 2026-06-20 on real GSC data (last 3 months). Canada-first,
-fully autonomous, self-verifying. The next scheduled or dispatched run reads THIS
-file as its operating spec. It audits, fixes, self-verifies, ships through the
-guardian, and reports, with zero review steps. It never queues work for a human;
-it logs or flags instead.
+Version 3. Updated 2026-06-21 on the final Canada plan. Adds the Canadian
+city-priority tier order (Section 2.2), hard granularity rules (Section 2.3),
+demographic tuning (Section 2.4), and bakes in the now-shipped US-noindexed
+reality (Section 3). All safety machinery from v2 is preserved exactly. Canada-
+first, fully autonomous, self-verifying. The next scheduled or dispatched run
+reads THIS file as its operating spec. It audits, fixes, self-verifies, ships
+through the guardian, and reports, with zero review steps. It never queues work
+for a human; it logs or flags instead.
 
 Do not run a pass just because this file changed. A pass runs only when scheduled
 or dispatched.
@@ -27,15 +30,45 @@ or dispatched.
 ### 2.1 GEO: Canada only
 Optimize Canadian pages only. Do NOT spend optimization cycles on US pages or
 provider pages. Log all US work for a future US phase. Canada-first is now
-data-confirmed.
+data-confirmed. Within Canada, target cities in the tier order in Section 2.2.
 
-### 2.2 Format bias: editorial first
+### 2.2 City priority order (work top-down)
+Target cities in this tier order. Exhaust the high-value targets in a tier before
+moving to the next.
+- Tier 1: Toronto and the GTA, including the affluent suburbs Mississauga,
+  Vaughan, Markham, Richmond Hill, Oakville, Burlington.
+- Tier 2: Vancouver and the Lower Mainland (Burnaby, Richmond, Surrey, North
+  Vancouver).
+- Tier 3: Calgary.
+- Tier 4: Ottawa.
+- Tier 5: Edmonton.
+- Tier 6: Montreal, ENGLISH-segment content only. Do NOT auto-generate French
+  content. Flag French as a separate future project.
+- Tier 7 (demand-led, later): Hamilton, Kitchener-Waterloo, Victoria, Halifax,
+  London, Winnipeg.
+
+### 2.3 Granularity rules (hard)
+- Build and optimize substantive editorial guides at CITY and MAJOR AFFLUENT
+  SUBURB level only.
+- Treat neighbourhoods as in-content depth: name affluent neighbourhoods and the
+  clinics serving them INSIDE existing city or suburb guides for local Information
+  Gain. Do NOT create neighbourhood pages.
+- Do NOT create new thin city or suburb template pages. All clinics belong on the
+  map and the /canada index, never as new thin pages. The kill-list holds.
+
+### 2.4 Demographic tuning
+IV therapy skews to two affluent segments. Tune each city guide's emphasis toward
+its dominant one:
+- Affluent 25 to 55 professionals: hangover, energy, beauty, recovery.
+- Affluent 55-plus longevity: NAD+, anti-aging.
+
+### 2.5 Format bias: editorial first
 Prefer editorial blog/guide pages. They are the proven page-1 winners. When a
 city has both an editorial guide and a thin /cities/ template page competing for
 the same query, strengthen the guide and treat the template as a deprioritized
 consolidation candidate: log it, do NOT delete or noindex it.
 
-### 2.3 Concentration (beat the US dead weight without removing it)
+### 2.6 Concentration (beat the US dead weight without removing it)
 We do NOT deindex US pages. We concentrate every signal on Canada so the US
 footprint naturally sinks in priority while staying warm for the future US phase.
 Each run:
@@ -49,11 +82,13 @@ Each run:
   edit it; log it instead.
 - Never add links that point optimization weight at US or provider pages.
 
-### 2.4 Two-track targeting (core change)
+### 2.7 Two-track targeting (applied in city-priority order)
+Within both tracks, select targets top-down by the city tier order in Section 2.2:
+exhaust a tier before the next.
 - TRACK 1, striking distance (keep): optimize Canadian pages at position 3 to 15
   on high-value queries via metadata, schema, and copy. Up to the normal per-run
   cap.
-- TRACK 2, buried high-value lift (NEW): for strategic Canadian demand terms at
+- TRACK 2, buried high-value lift: for strategic Canadian demand terms at
   position 16 to 50 (cost, price, "how much", comparison, best-of,
   treatment-by-city) where an existing page is thin, apply real content lift to
   pull them into striking distance: aggregated cost ranges across multiple
@@ -61,7 +96,7 @@ Each run:
   not meta tweaks. Cap Track 2 at 3 pages per run (heavier work, higher
   regression risk). Add lifted pages to the ledger.
 
-### 2.5 Proven clusters to expand (Canada, EXISTING pages per the kill-list; log net-new)
+### 2.8 Proven clusters to expand (Canada, EXISTING pages per the kill-list; log net-new)
 - Safety/regulatory: the "who can legally give IV" guide is page-1. Replicate the
   pattern for more provinces/cities.
 - Insurance/coverage (page-1 winner): deepen to city and treatment variants.
@@ -71,15 +106,23 @@ Each run:
   question-format guides, subject to the medical tier gate.
 - Cost / comparison / best-of: the Track 2 lift targets.
 
-### 2.6 Structured data push (NEW)
+### 2.9 Structured data push
 Search Appearance is empty, so we earn no rich or AI surfaces. Add FAQPage,
 Article, and MedicalBusiness or LocalBusiness JSON-LD to EVERY priority Canadian
 page touched, to start qualifying for rich results and AI citations. Count it in
 the report.
 
-## 3. US decay watch (passive monitoring only, replaces any prune logic; NEVER act)
-We do not deindex, delete, or noindex anything. Each run, monitor whether the US
-dead weight is starting to suppress Canada, and flag ONLY if a trigger fires:
+## 3. US reality: noindexed and parked (autopilot does ZERO US work)
+The US market is noindexed and parked. As of 2026-06-21 the `US_MARKET_ENABLED`
+flag (`src/lib/market.ts`) is false, so every US city page and US provider page
+emits robots:noindex,follow and is excluded from the sitemap. This is one-switch
+reversible (set the flag true). While this stands, the autopilot does ZERO US
+work: no optimization, no content, no links pointing weight at US pages. Log any
+US ideas for the future US phase only; never act on them. The crawler reporting
+"unexpected noindex" on US pages is BY DESIGN, not a defect, so never "fix" it.
+
+US decay watch (passive monitoring only; NEVER act): each run, monitor whether
+the US dead weight is suppressing Canada, and flag ONLY if a trigger fires:
 - TRIGGER A: Canadian priority pages plateau or decline in average position
   across 3+ consecutive runs despite being optimized.
 - TRIGGER B: a known Google core-update window correlates with a Canadian
@@ -94,12 +137,16 @@ decision. Take no action either way.
 2. Audit (read-only): inventory indexable Canadian pages from repo + sitemap;
    pull Canadian cities, treatments, and verified-clinic counts from Supabase;
    build the demand-intent query universe (Canada only, exclude "near me"); bucket
-   by position; score by intent x proximity x demand. Use GSC API positions if
+   by position; score by intent x proximity x demand; then order candidates
+   top-down by the city tier in Section 2.2. Use GSC API positions if
    `GSC_SERVICE_ACCOUNT_KEY` is set, else proceed ESTIMATED and label it. Save the
    artifact to `seo-audit/`.
 3. Fix on branch `seo/canada-autopilot`: Track 1 (cap = velocity cap) + Track 2
    (cap 3) + concentration internal links + structured data on every touched
-   page. Allowlist-only. One commit per page with a clear message.
+   page, taking targets top-down by city tier (exhaust a tier before the next).
+   Respect the granularity rules (Section 2.3): city and affluent-suburb guides
+   only, neighbourhoods as in-content depth, no new thin pages. Allowlist-only.
+   One commit per page with a clear message.
 4. Guardian (Section 5). All checks must pass.
 5. Ship or revert (Section 5).
 6. Report (Section 8). Update the ledger.
@@ -196,6 +243,7 @@ observation when a decay-watch trigger fires.
 ## 10. Reporting (weekly Telegram message)
 Send one message. Lines:
 - SHIPPED (n pages) or NO CHANGES (reason).
+- city-tier progress: current tier <n>, pages remaining in tier <n>.
 - Track 1 striking-distance optimized (n).
 - Track 2 buried pages lifted (n).
 - Internal links added between Canadian guides (n).
