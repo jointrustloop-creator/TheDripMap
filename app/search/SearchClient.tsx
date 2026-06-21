@@ -431,7 +431,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
               IV Therapy Clinics Near You
             </h1>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto md:mx-0 font-medium leading-relaxed">
-              Browse {siteStats?.totalListings?.toLocaleString() || '...'} verified IV therapy clinics across {siteStats?.totalCities || '...'} US cities. Filter by city, service, or delivery preference — or take the quiz to get matched in 60 seconds.
+              Browse verified IV therapy clinics across Canada. Filter by city, service, or delivery preference, or take the quiz to get matched in 60 seconds.
             </p>
           </div>
 
@@ -536,7 +536,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
 
 
           <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 text-left">
-            Showing {filteredProviders.length} {activeChips.includes('Mobile') ? 'mobile IV ' : ''}clinics {selectedCity === 'All' ? 'nationwide' : `in ${selectedCity}`}
+            Showing {filteredProviders.length} {activeChips.includes('Mobile') ? 'mobile IV ' : ''}clinics {selectedCity === 'All' ? 'across Canada and the US' : `in ${selectedCity}`}
           </div>
 
           <AnimatePresence>
@@ -643,7 +643,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-black text-amber-900 mb-1">
-                      No matches for your filters in {selectedCity}, showing top-rated nationwide.
+                      No matches for your filters in {selectedCity}, showing top-rated nearby.
                     </p>
                     <p className="text-xs text-amber-800 font-medium leading-relaxed">
                       Adjust the city, clear a chip, or pick a different sort to narrow down.
