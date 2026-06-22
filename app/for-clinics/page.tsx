@@ -8,6 +8,7 @@ import { ArrowRight, BarChart, Users, Globe, Check, X, ShieldCheck, Clock, Walle
 import { getSiteStats, getFeaturedListings, getAllListings } from '../../src/lib/data';
 import { ProviderCard } from '../../src/components/ProviderCard';
 import { Provider } from '../../src/types';
+import { marketOf } from '../../src/lib/market';
 
 export async function generateMetadata(): Promise<Metadata> {
   const title = 'List Your IV Therapy Clinic Free | The Drip Map';
@@ -58,19 +59,36 @@ export default async function ForClinicsPage() {
   // lights up the verified treatment for is_claimed OR is_featured, so both
   // cards rendered "Verified & Claimed" and looked identical. We now require
   // is_claimed=false AND is_featured=false for the unclaimed sample.
-  const featured = await getFeaturedListings(6);
+  // Canada-first: both comparison cards must be Canadian (the platform is now
+  // positioned as Canada's). The claimed "after" card is our most COMPLETE
+  // Canadian featured clinic — photo, rating, reviews, specialties, services —
+  // so the premium claimed state shows at its best. Score by completeness
+  // rather than take the first, so the strongest listing leads regardless of
+  // the rating-desc query order.
+  const isCanadian = (p: Provider) => marketOf({ country: p.country, state: p.state }) === 'CA';
+  const completeness = (p: Provider) =>
+    (p.imageUrl ? 3 : 0) + (Number(p.rating) > 0 ? 1 : 0) + ((p.reviewCount || 0) > 0 ? 1 : 0) +
+    ((p.specialties?.length || 0) > 0 ? 1 : 0) + ((p.services?.length || 0) > 0 ? 2 : 0);
+  const featuredCA = (await getFeaturedListings(6, undefined, 'Canada')) as Provider[];
   const claimedSample: Provider | null =
-    (featured.find((p) => p.imageUrl && Number(p.rating) > 0 && (p.specialties?.length || 0) > 0) as Provider) ||
-    (featured[0] as Provider) || null;
+    [...featuredCA].sort((a, b) => completeness(b) - completeness(a))
+      .find((p) => p.imageUrl && Number(p.rating) > 0 && (p.specialties?.length || 0) > 0) ||
+    (featuredCA[0] || null);
 
+  // Unclaimed "before" card: a GENUINELY unclaimed Canadian clinic
+  // (is_claimed=false AND is_featured=false), so ProviderCard renders its muted
+  // unclaimed branch and the contrast with the claimed card is true and maximal.
   const all = await getAllListings();
   const unclaimedSample: Provider | null =
     (all.find((p) =>
-      p.is_claimed !== true && p.is_featured !== true &&
+      p.is_claimed !== true && p.is_featured !== true && isCanadian(p as Provider) &&
       !!p.name && !!p.city && p.slug !== claimedSample?.slug &&
       Array.isArray(p.specialties) && p.specialties.length >= 2
     ) as Provider) ||
-    (all.find((p) => p.is_claimed !== true && p.is_featured !== true && p.slug !== claimedSample?.slug) as Provider) ||
+    (all.find((p) =>
+      p.is_claimed !== true && p.is_featured !== true && isCanadian(p as Provider) &&
+      p.slug !== claimedSample?.slug
+    ) as Provider) ||
     null;
 
   return (
