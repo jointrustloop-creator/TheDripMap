@@ -81,7 +81,8 @@ function flag(name) {
   agg._byProvider = byProvider; // for the per-clinic section of the review doc
 
   if (!agg.rows.length) {
-    console.log(`\nNothing clears the publish threshold for ${cityName} yet. Scrape more clinics or lower coverage expectations.`);
+    console.log(`\nNothing clears the publish threshold for ${cityName} yet (scraped ${agg.clinicsScraped}, priced ${agg.clinicsWithAnyPrice}). Scrape more clinics, then re-run --from-cache.`);
+    process.exit(0);
   }
 
   const ctx = { citySlug, cityName, currency, asOf, agg };

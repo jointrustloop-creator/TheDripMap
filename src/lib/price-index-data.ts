@@ -52,6 +52,20 @@ export const PRICE_INDEX: Record<string, CityPriceIndex> = {
     ],
     note: 'Energy and weight-loss drips had too few published prices in this round to report a reliable range. Glutathione and B12 ranges span both add-on pushes and full drips.',
   },
+  edmonton: {
+    city: 'Edmonton',
+    citySlug: 'edmonton',
+    asOf: 'June 2026',
+    currency: 'CAD',
+    clinicCount: 8,
+    headline: { treatment: 'Standard IV vitamin drip', clinics: 7, low: 75, median: 150, high: 295 },
+    rows: [
+      { treatment: 'Standard IV vitamin drip', clinics: 7, low: 75, median: 150, high: 295 },
+      { treatment: 'Hydration', clinics: 4, low: 125, median: 160, high: 175 },
+      { treatment: 'Beauty / glow', clinics: 4, low: 60, median: 160, high: 200 },
+    ],
+    note: "Immune support, Myers' Cocktail, Glutathione, NAD+ and B12 injection drips had too few published prices in this round to report a reliable range. Some ranges span both add-on pushes and full drips.",
+  },
 };
 
 export function getCityPriceIndex(slug: string): CityPriceIndex | null {
