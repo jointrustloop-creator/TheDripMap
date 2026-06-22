@@ -23,6 +23,7 @@ import { QuickMatch } from '../src/components/QuickMatch';
 import { ClinicianSection } from '../src/components/ClinicianSection';
 import { TrustSignals } from '../src/components/TrustSignals';
 import { getBlogPosts, getSiteStats, getPopularCities, getFeaturedListings, getOperatorProfiles } from '../src/lib/data';
+import { US_MARKET_ENABLED } from '../src/lib/market';
 import { Metadata } from 'next';
 
 export const revalidate = 60;
@@ -69,6 +70,13 @@ export default async function HomePage() {
   const stats = await getSiteStats();
   const blogPosts = await getBlogPosts();
   const popularCities = await getPopularCities();
+  // Canada-only plan: the "Major metros" grid shows Canadian metros only while
+  // US_MARKET_ENABLED is off. Reversible — flip the flag and US metros return.
+  // Sliced to a multiple of the 4-column grid so it always renders flush
+  // (8 Canada-only -> 4x2; 12 when the US is enabled -> 4x3).
+  const metroCities = (
+    US_MARKET_ENABLED ? popularCities : popularCities.filter((c) => c.country === 'Canada')
+  ).slice(0, US_MARKET_ENABLED ? 12 : 8);
   // Featured Verified Clinics — pull the 4 claimed listings live from Supabase
   // so the homepage always reflects current claimed-and-verified status.
   const featuredClinics = (await getFeaturedListings(4)) || [];
@@ -734,7 +742,7 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-slate-200/60 border border-slate-200/60 rounded-3xl overflow-hidden">
-            {popularCities.map((city) => (
+            {metroCities.map((city) => (
               <Link
                 key={city.slug}
                 href={`/cities/${city.slug}`}

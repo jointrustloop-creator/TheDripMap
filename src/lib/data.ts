@@ -730,13 +730,15 @@ export async function getCitiesFromListings() {
 }
 
 export async function getPopularCities() {
-  // Footer + homepage city hubs, Canada-first (matching the platform's focus)
+  // Homepage "Major metros" grid, Canada-first (matching the platform's focus)
   // and led by the Toronto & GTA hub, then each country's strongest markets by
   // provider density. Counts use the SAME query as the city page
   // (getListingsByCity) so each pill matches the page it links to. Toronto is
   // special-cased to the two-tier GTA total (core + surrounding GTA) so it reads
   // as "& GTA", with the top suburbs nested beneath it. The `country` tag lets
-  // the footer group these into Canada / United States sections.
+  // the homepage show Canada only while US_MARKET_ENABLED is off (the footer is
+  // now a separate static Canada-only component). The 8 Canadian metros fill
+  // the 4-column grid flush (4x2) when the US is disabled.
   const popular = [
     { slug: 'toronto',   name: 'Toronto & GTA', cityArg: 'Toronto',   stateArg: 'Ontario',          country: 'Canada' },
     { slug: 'calgary',   name: 'Calgary',       cityArg: 'Calgary',   stateArg: 'Alberta',          country: 'Canada' },
@@ -744,6 +746,8 @@ export async function getPopularCities() {
     { slug: 'vancouver', name: 'Vancouver',     cityArg: 'Vancouver', stateArg: 'British Columbia', country: 'Canada' },
     { slug: 'ottawa',    name: 'Ottawa',        cityArg: 'Ottawa',    stateArg: 'Ontario',          country: 'Canada' },
     { slug: 'montreal',  name: 'Montreal',      cityArg: 'Montreal',  stateArg: 'Quebec',           country: 'Canada' },
+    { slug: 'winnipeg',  name: 'Winnipeg',      cityArg: 'Winnipeg',  stateArg: 'Manitoba',         country: 'Canada' },
+    { slug: 'hamilton',  name: 'Hamilton',      cityArg: 'Hamilton',  stateArg: 'Ontario',          country: 'Canada' },
     { slug: 'new-york',  name: 'New York',      cityArg: 'New York',  stateArg: 'New York',         country: 'United States' },
     { slug: 'dallas',    name: 'Dallas',        cityArg: 'Dallas',    stateArg: 'Texas',            country: 'United States' },
     { slug: 'tampa',     name: 'Tampa',         cityArg: 'Tampa',     stateArg: 'Florida',          country: 'United States' },
