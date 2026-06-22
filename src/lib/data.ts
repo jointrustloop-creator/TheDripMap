@@ -3,6 +3,7 @@ import { supabase, isSupabaseConfigured, fetchAllRows } from './supabase';
 import { SupabaseUnreachableError, isSupabaseConnectionError } from './supabase-health';
 import { MOCK_BLOG_POSTS, MOCK_LISTINGS, MOCK_CITIES } from './mock-data';
 import { htmlToMarkdown, containsHtml } from './blog-utils';
+import { US_MARKET_ENABLED } from './market';
 
 // Helper to slugify strings
 export const slugify = (text: string | null | undefined) => {
@@ -1205,6 +1206,23 @@ export const ARCHIVED_BLOG_SLUGS = new Set<string>([
   'peptide-therapy-guide-2026',
 ]);
 
+// US-city blog posts. While US_MARKET_ENABLED is off (Canada-only plan) these
+// are noindexed (see app/blog/[slug]/page.tsx) and excluded from the /blog
+// index, sitemap, and generateStaticParams via getBlogPosts below — but stay
+// resolvable at /blog/<slug>. Nothing is deleted: flip US_MARKET_ENABLED on
+// and they return to the index automatically. Reversible, mirrors how US
+// city/provider pages are handled in src/lib/market.ts.
+export const US_MARKET_BLOG_SLUGS = new Set<string>([
+  'best-iv-therapy-new-york-2026', 'best-iv-therapy-los-angeles-2026', 'best-iv-therapy-chicago-2026',
+  'best-iv-therapy-dallas-2026', 'best-iv-therapy-houston-2026', 'best-iv-therapy-miami-2026',
+  'best-iv-therapy-atlanta-2026', 'best-iv-therapy-phoenix-2026', 'best-iv-therapy-seattle-2026',
+  'best-iv-therapy-denver-2026', 'best-iv-therapy-san-diego-2026', 'best-iv-therapy-san-francisco-2026',
+  'best-iv-therapy-boston-2026', 'best-iv-therapy-las-vegas-2026', 'best-iv-therapy-washington-dc-2026',
+  'best-iv-therapy-philadelphia-2026',
+  'hangover-iv-therapy-nyc', 'nad-plus-therapy-nyc', 'mobile-iv-therapy-nyc', 'iv-drip-nyc',
+  'myers-cocktail-nyc', 'iv-therapy-manhattan', 'iv-therapy-brooklyn', 'iv-therapy-upper-east-side',
+]);
+
 export async function getBlogPosts() {
   const configured = isSupabaseConfigured();
 
@@ -1223,6 +1241,9 @@ export async function getBlogPosts() {
           // A draft is still reachable directly at /blog/<slug> for preview.
           .filter(post => post.category !== 'Draft' && !(post.slug || '').startsWith('_draft-'))
           .filter(post => !ARCHIVED_BLOG_SLUGS.has(post.slug || ''))
+          // Canada-only plan: drop US-city posts from index/sitemap/static
+          // params while the US market is disabled (still resolvable directly).
+          .filter(post => US_MARKET_ENABLED || !US_MARKET_BLOG_SLUGS.has(post.slug || ''))
           .map(post => {
           let content = post.content || post.body || post.markdown || '';
 

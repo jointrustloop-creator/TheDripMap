@@ -21,7 +21,8 @@ import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { BlogCard } from '../../../src/components/BlogCard';
-import { getBlogPostBySlug, getBlogPosts, slugify, getListingsByIds, getAllCities } from '../../../src/lib/data';
+import { getBlogPostBySlug, getBlogPosts, slugify, getListingsByIds, getAllCities, US_MARKET_BLOG_SLUGS } from '../../../src/lib/data';
+import { US_MARKET_ENABLED } from '../../../src/lib/market';
 import { cn } from '../../../src/lib/utils';
 
 export const revalidate = 3600;
@@ -77,12 +78,15 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   const description = post.metaDescription || post.excerpt || `Read our latest guide on ${safeTitle.toLowerCase()}. Expert insights from TheDripMap Team.`;
 
   const isArchived = ARCHIVED_POSTS[slug];
+  // Canada-only plan: US-city posts are noindex,follow while the US market is
+  // off (reversible — flip US_MARKET_ENABLED). Still resolvable for direct links.
+  const isUsMarketHidden = !US_MARKET_ENABLED && US_MARKET_BLOG_SLUGS.has(slug);
 
   return {
     title,
     description,
     alternates: { canonical },
-    ...(isArchived ? { robots: { index: false, follow: true } } : {}),
+    ...((isArchived || isUsMarketHidden) ? { robots: { index: false, follow: true } } : {}),
     openGraph: {
       title,
       description,

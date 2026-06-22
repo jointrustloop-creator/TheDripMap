@@ -902,13 +902,13 @@ export default async function HomePage() {
           },
           {
             q: 'Does insurance cover IV therapy?',
-            a: `Provincial health plans and most US insurers do not cover wellness IV drips. In Canada, drips administered by a licensed naturopathic doctor can often be claimed under the naturopathic benefit of an extended health plan, so ask the clinic whether they issue eligible receipts. In the US, some clinics accept HSA and FSA payment.`,
+            a: `Provincial health plans do not cover wellness IV drips. That said, drips administered by a licensed naturopathic doctor can often be claimed under the naturopathic benefit of an extended health plan, so ask the clinic whether they issue eligible receipts.`,
             href: '/blog/iv-therapy-insurance-coverage-canada',
             hrefLabel: 'Insurance coverage in Canada',
           },
           {
             q: 'How do I find a good IV therapy clinic near me?',
-            a: `Compare clinics on who administers the drips, whether prices are published, and what real patients say in reviews. The Drip Map lists ${stats.total.toLocaleString()} clinics across ${stats.cities} cities in the US and Canada and matches you by goal, location, and budget in under 60 seconds.`,
+            a: `Compare clinics on who administers the drips, whether prices are published, and what real patients say in reviews. The Drip Map lists IV therapy clinics in cities across Canada and matches you by goal, location, and budget in under 60 seconds.`,
             href: '/quiz',
             hrefLabel: 'Take the 60-second match quiz',
           },
