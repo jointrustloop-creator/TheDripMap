@@ -60,17 +60,20 @@ export default async function ForClinicsPage() {
   // cards rendered "Verified & Claimed" and looked identical. We now require
   // is_claimed=false AND is_featured=false for the unclaimed sample.
   // Canada-first: both comparison cards must be Canadian (the platform is now
-  // positioned as Canada's). The claimed "after" card is our most COMPLETE
-  // Canadian featured clinic — photo, rating, reviews, specialties, services —
-  // so the premium claimed state shows at its best. Score by completeness
-  // rather than take the first, so the strongest listing leads regardless of
-  // the rating-desc query order.
+  // positioned as Canada's). The claimed "after" card is our designated
+  // showcase, Signature Beauty Lounge (Richmond Hill) — the most-reviewed
+  // Canadian listing (4.9 / 268 reviews). Pinned by slug so the strongest
+  // listing always leads, with a graceful fallback to the most COMPLETE
+  // Canadian featured clinic (photo, rating, reviews, specialties, services)
+  // if the showcase is ever unavailable.
+  const SHOWCASE_SLUG = 'signature-beauty-lounge-richmond-hill';
   const isCanadian = (p: Provider) => marketOf({ country: p.country, state: p.state }) === 'CA';
   const completeness = (p: Provider) =>
     (p.imageUrl ? 3 : 0) + (Number(p.rating) > 0 ? 1 : 0) + ((p.reviewCount || 0) > 0 ? 1 : 0) +
     ((p.specialties?.length || 0) > 0 ? 1 : 0) + ((p.services?.length || 0) > 0 ? 2 : 0);
   const featuredCA = (await getFeaturedListings(6, undefined, 'Canada')) as Provider[];
   const claimedSample: Provider | null =
+    featuredCA.find((p) => p.slug === SHOWCASE_SLUG && p.imageUrl) ||
     [...featuredCA].sort((a, b) => completeness(b) - completeness(a))
       .find((p) => p.imageUrl && Number(p.rating) > 0 && (p.specialties?.length || 0) > 0) ||
     (featuredCA[0] || null);
