@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { ShieldCheck, Star, Clock, Navigation, Bookmark, Share2, Zap, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Star, Clock, Navigation, Bookmark, Share2, ArrowRight } from 'lucide-react';
 import { Provider } from '../../types';
 import { cn } from '../../lib/utils';
 import {
@@ -27,7 +26,6 @@ interface ExploreCardProps {
 }
 
 export function ExploreCard({ provider: p, active, onHover, onSelect }: ExploreCardProps) {
-  const router = useRouter();
   const verified = isVerifiedClinic(p);
   const sv = (p as { safety_verified?: boolean }).safety_verified === true;
   const open = isOpenNow(p.working_hours);
@@ -156,17 +154,17 @@ export function ExploreCard({ provider: p, active, onHover, onSelect }: ExploreC
         </div>
       )}
 
-      {/* CTAs: Get Matched (primary) + Directions / detail */}
+      {/* CTAs: View clinic (primary) + Directions. A clinic card should drive
+          to THAT clinic, not bounce to a generic quiz — the "Get Matched" quiz
+          CTA lives at the Explore page level instead. */}
       <div className="flex items-center gap-2 mt-4">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            router.push('/quiz');
-          }}
+        <Link
+          href={href}
+          onClick={(e) => e.stopPropagation()}
           className="flex-1 inline-flex items-center justify-center gap-1.5 bg-wellness-600 hover:bg-wellness-700 text-white text-xs font-black py-2.5 rounded-xl transition-colors"
         >
-          <Zap size={14} /> Get Matched
-        </button>
+          View clinic <ArrowRight size={14} />
+        </Link>
         <a
           href={directionsUrl(p)}
           target="_blank"
@@ -177,14 +175,6 @@ export function ExploreCard({ provider: p, active, onHover, onSelect }: ExploreC
         >
           <Navigation size={15} />
         </a>
-        <Link
-          href={href}
-          onClick={(e) => e.stopPropagation()}
-          aria-label="View clinic details"
-          className="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-slate-200 text-slate-500 hover:border-wellness-300 hover:text-wellness-600 transition-colors"
-        >
-          <ArrowRight size={15} />
-        </Link>
       </div>
     </div>
   );
