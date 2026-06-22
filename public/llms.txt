@@ -1,10 +1,9 @@
 # The Drip Map
 
-> The Drip Map (thedripmap.com) is North America's IV therapy matching
-> platform. We list 1,400+ IV therapy clinics across 300+ cities in the
-> United States and Canada, verify clinic safety practices in writing,
-> and match patients to the right clinic and drip by goal, location, and
-> budget.
+> The Drip Map (thedripmap.com) is Canada's IV therapy matching
+> platform. We list IV therapy clinics across cities nationwide in
+> Canada, verify clinic safety practices in writing, and match patients
+> to the right clinic and drip by goal, location, and budget.
 
 ## What we hold
 - Clinic listings with drip menus, prices where the clinic has provided

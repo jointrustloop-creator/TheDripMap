@@ -40,7 +40,7 @@ export async function GET() {
             lineHeight: 1.2,
           }}
         >
-          North America&apos;s IV Therapy Clinic Matching Platform
+          Canada&apos;s IV Therapy Clinic Matching Platform
         </div>
         <div
           style={{

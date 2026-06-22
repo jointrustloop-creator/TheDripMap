@@ -10,9 +10,8 @@ import { ProviderCard } from '../../src/components/ProviderCard';
 import { Provider } from '../../src/types';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const stats = await getSiteStats();
   const title = 'List Your IV Therapy Clinic Free | The Drip Map';
-  const description = `Claim your free listing on North America's IV therapy matching platform. ${stats.total.toLocaleString()}+ clinics listed across the US and Canada. Add your drips, prices, team, and photos, and reach patients searching in your city.`;
+  const description = `Claim your free listing on Canada's IV therapy matching platform. Add your drips, prices, team, and photos, and reach patients searching for IV therapy in your city.`;
 
   return {
     title,

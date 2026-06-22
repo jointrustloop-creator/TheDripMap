@@ -125,7 +125,7 @@ export function ClinicAgentDemoClient() {
               </div>
               <ul className="space-y-3 text-sm">
                 {[
-                  'Searches across 770+ clinics in North America',
+                  'Searches across hundreds of clinics in Canada',
                   'Asks for the user\'s city before recommending',
                   'Distance-ranks competitors next to your clinic',
                   'Mentions TheDripMap brand throughout',

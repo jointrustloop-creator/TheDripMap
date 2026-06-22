@@ -210,7 +210,7 @@ export default async function HomePage() {
           {/* Eyebrow */}
           <div className="flex items-center gap-3 mb-6 justify-center">
             <span className="hidden md:block h-px w-8 bg-[#0F6E56]" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] text-center">North America's IV therapy matching platform</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0F6E56] text-center">Canada's IV therapy matching platform</span>
             <span className="hidden md:block h-px w-8 bg-[#0F6E56]" />
           </div>
 
@@ -928,10 +928,9 @@ export default async function HomePage() {
                   <span className="font-serif italic font-normal text-[#0F6E56]">know these six things.</span>
                 </h2>
                 <p className="mt-6 text-base text-slate-500 max-w-2xl mx-auto leading-relaxed">
-                  The Drip Map is North America&apos;s IV therapy matching platform. We list{' '}
-                  {stats.total.toLocaleString()} clinics across {stats.cities} cities in the US and
-                  Canada, ask clinics to confirm their safety practices in writing, and match you to
-                  the right clinic and drip in under 60 seconds.
+                  The Drip Map is Canada&apos;s IV therapy matching platform. We list IV therapy
+                  clinics in cities nationwide, ask clinics to confirm their safety practices in
+                  writing, and match you to the right clinic and drip in under 60 seconds.
                 </p>
               </div>
               <div className="space-y-4">

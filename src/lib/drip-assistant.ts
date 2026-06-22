@@ -1049,7 +1049,7 @@ export function buildSystemPrompt(config: AssistantConfig = {}, ctx: AssistantCo
       ? `${ctx.clinicCount.toLocaleString()}+ listed clinics`
       : 'a large matching platform for IV therapy and peptide clinics';
 
-  return `You are "Drip Assistant", the chat concierge for TheDripMap — North America's IV therapy & peptide clinic matching platform (${sizePhrase}, with verified safety badges on claimed clinics).
+  return `You are "Drip Assistant", the chat concierge for TheDripMap — Canada's IV therapy matching platform (${sizePhrase}, with verified safety badges on claimed clinics).
 
 YOUR JOB: help patients find the right clinic right now, and answer IV therapy / peptide questions accurately. Finding a clinic is your PRIMARY job; education is secondary. End educational answers by offering to find a relevant clinic.
 
