@@ -12,12 +12,17 @@
 // Bot-safe: ~250ms throttle between Places calls so we stay under quota.
 
 import { createClient } from '@supabase/supabase-js';
+import { marketOf } from './market';
 
 const THROTTLE_MS = 250;
 
 export interface RefreshOptions {
   dryRun?: boolean;
   limit?: number | null;
+  // 'verified' (default): claimed/featured clinics, the daily-cron behaviour.
+  // 'canada-missing': every Canadian provider with no rating yet — the one-time
+  // backfill that lifts trust signal + review snippets across the whole CA map.
+  scope?: 'verified' | 'canada-missing';
 }
 
 interface ProviderRow {
@@ -30,6 +35,7 @@ interface ProviderRow {
   rating: number | null;
   reviews: string | number | null;
   decision_drivers: Record<string, unknown> | null;
+  is_hidden?: boolean | null;
 }
 
 export interface UpdatedRow {
@@ -165,22 +171,51 @@ export async function refreshVerifiedRatings(
   const dryRun = opts.dryRun === true;
   const limit = typeof opts.limit === 'number' && opts.limit > 0 ? opts.limit : null;
 
+  const scope: 'verified' | 'canada-missing' = opts.scope === 'canada-missing' ? 'canada-missing' : 'verified';
+
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
 
-  const baseQuery = supabase
-    .from('providers')
-    .select('id, name, slug, city, state, country, rating, reviews, decision_drivers')
-    .or('is_claimed.eq.true,is_featured.eq.true')
-    .order('slug', { ascending: true });
+  const SELECT = 'id, name, slug, city, state, country, rating, reviews, decision_drivers, is_hidden';
+  let rows: ProviderRow[];
 
-  const { data, error } = limit ? await baseQuery.limit(limit) : await baseQuery;
-  if (error) {
-    return { ok: false, status: 500, error: `Supabase select failed: ${error.message}` };
+  if (scope === 'canada-missing') {
+    // Every provider with no rating yet (null or 0). The missing-rating set
+    // spans both countries and can exceed the 1000-row gateway cap, so paginate,
+    // then filter to Canada in JS (marketOf) — we only spend Places quota on CA
+    // clinics. limit (if set) trims the final CA list, handy for a dry-run.
+    let acc: ProviderRow[] = [];
+    for (let from = 0; ; from += 1000) {
+      const { data, error } = await supabase
+        .from('providers')
+        .select(SELECT)
+        .or('rating.is.null,rating.eq.0')
+        .order('slug', { ascending: true })
+        .range(from, from + 999);
+      if (error) {
+        return { ok: false, status: 500, error: `Supabase select failed: ${error.message}` };
+      }
+      const batch = (data || []) as ProviderRow[];
+      acc = acc.concat(batch);
+      if (batch.length < 1000) break;
+    }
+    rows = acc.filter((p) => !p.is_hidden && marketOf({ country: p.country, state: p.state }) === 'CA');
+    if (limit) rows = rows.slice(0, limit);
+  } else {
+    const baseQuery = supabase
+      .from('providers')
+      .select(SELECT)
+      .or('is_claimed.eq.true,is_featured.eq.true')
+      .order('slug', { ascending: true });
+    const { data, error } = limit ? await baseQuery.limit(limit) : await baseQuery;
+    if (error) {
+      return { ok: false, status: 500, error: `Supabase select failed: ${error.message}` };
+    }
+    rows = (data || []) as ProviderRow[];
   }
-  const rows = (data || []) as ProviderRow[];
+
   if (rows.length === 0) {
     return {
       ok: true,
@@ -190,7 +225,7 @@ export async function refreshVerifiedRatings(
       totalFailed: 0,
       updated: [],
       failed: [],
-      message: 'No claimed or featured providers found.',
+      message: scope === 'canada-missing' ? 'No Canadian providers missing a rating.' : 'No claimed or featured providers found.',
     };
   }
 

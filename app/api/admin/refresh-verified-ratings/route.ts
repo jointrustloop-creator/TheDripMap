@@ -26,6 +26,9 @@ export const maxDuration = 300;
 interface RefreshRequest {
   dry_run?: boolean;
   limit?: number;
+  // 'canada-missing' runs the one-time backfill across all Canadian providers
+  // with no rating yet; omit (or 'verified') for the default claimed-only set.
+  scope?: 'verified' | 'canada-missing';
 }
 
 async function isAuthorized(req: Request): Promise<boolean> {
@@ -54,6 +57,7 @@ export async function POST(req: Request) {
   const result = await refreshVerifiedRatings({
     dryRun: body.dry_run === true,
     limit: typeof body.limit === 'number' && body.limit > 0 ? body.limit : null,
+    scope: body.scope === 'canada-missing' ? 'canada-missing' : 'verified',
   });
 
   if ('error' in result) {
