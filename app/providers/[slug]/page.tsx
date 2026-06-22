@@ -641,7 +641,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               </div>
               <div className="bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 shadow-md">
                 <span className={status.isOpen ? 'text-emerald-500' : 'text-amber-500'}>●</span>
-                {status.isOpen ? 'Open now' : 'Closed'}
+                {status.isOpen ? 'Open now' : status.known ? 'Closed' : 'Hours not listed'}
               </div>
               {provider.price_range && (
                 <div className="bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 shadow-md">
@@ -859,7 +859,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                       <div className="text-slate-400 font-bold text-xs uppercase mb-1">Availability</div>
                       <div className="text-xl font-black text-slate-900 flex items-center gap-2">
                         <span className={status.isOpen ? "text-emerald-500" : "text-amber-500"}>●</span>
-                        {status.isOpen ? 'Open Now' : 'Closed'}
+                        {status.isOpen ? 'Open Now' : status.known ? 'Closed' : 'Hours not listed'}
                       </div>
                     </div>
                   </div>
@@ -1667,7 +1667,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                         'text-xs font-black uppercase tracking-widest',
                         status.isOpen ? 'text-emerald-600' : 'text-amber-600'
                       )}>
-                        {status.isOpen ? 'Open now' : 'Currently closed'}
+                        {status.isOpen ? 'Open now' : status.known ? 'Currently closed' : 'Hours not listed'}
                       </div>
                       <div className="text-sm font-bold text-slate-900">{status.todayHours}</div>
                     </div>

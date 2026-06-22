@@ -1,13 +1,18 @@
 
 export interface StatusResult {
   isOpen: boolean;
+  known: boolean; // false when no hours are on file — show "Hours not listed", never "Closed"
   text: string;
   todayHours: string;
 }
 
 export function getStatus(hours: Record<string, string> | undefined, timezone?: string): StatusResult {
-  if (!hours) return { isOpen: false, text: 'Closed', todayHours: 'Closed' };
-  
+  // No hours on file is NOT the same as closed. Showing "Closed" on a listing
+  // whose owner simply hasn't entered hours is misleading (and a support ticket).
+  if (!hours || Object.keys(hours).length === 0) {
+    return { isOpen: false, known: false, text: 'Hours not listed', todayHours: '' };
+  }
+
   // Use provided timezone or fallback to America/New_York (Eastern Time)
   const tz = timezone || 'America/New_York';
   
@@ -19,13 +24,13 @@ export function getStatus(hours: Record<string, string> | undefined, timezone?: 
   const todayHours = hours[today];
   
   if (!todayHours || typeof todayHours !== 'string' || todayHours.toLowerCase() === 'closed') {
-    return { isOpen: false, text: 'Closed', todayHours: 'Closed' };
+    return { isOpen: false, known: true, text: 'Closed', todayHours: 'Closed' };
   }
   
   try {
     const parts = todayHours.split('-');
     if (parts.length < 2) {
-      return { isOpen: true, text: todayHours, todayHours };
+      return { isOpen: true, known: true, text: todayHours, todayHours };
     }
     
     const [start, end] = parts.map(t => t.trim());
@@ -50,15 +55,15 @@ export function getStatus(hours: Record<string, string> | undefined, timezone?: 
     const endTime = parseTime(end);
     
     if (!startTime || !endTime) {
-      return { isOpen: true, text: todayHours, todayHours };
+      return { isOpen: true, known: true, text: todayHours, todayHours };
     }
     
     if (now >= startTime && now <= endTime) {
-      return { isOpen: true, text: 'Open Now', todayHours };
+      return { isOpen: true, known: true, text: 'Open Now', todayHours };
     } else {
-      return { isOpen: false, text: `Closed · Opens ${start}`, todayHours };
+      return { isOpen: false, known: true, text: `Closed · Opens ${start}`, todayHours };
     }
   } catch {
-    return { isOpen: false, text: 'Closed', todayHours: 'Closed' };
+    return { isOpen: false, known: true, text: 'Closed', todayHours: 'Closed' };
   }
 }
