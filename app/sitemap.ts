@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { getAllListings, getBlogPosts, getAllCities, slugify, getServiceFilter } from '../src/lib/data';
 import { US_MARKET_ENABLED, marketOf } from '../src/lib/market';
+import { priceIndexCitySlugs } from '../src/lib/price-index-data';
 
 // 2026-06-11: revalidate every 10 minutes so newly-added providers + cities
 // surface in the sitemap quickly without a manual redeploy. Previously the
@@ -135,6 +136,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  // IV Price Index — one citable page per covered city. Driven off the dataset
+  // so adding a city to price-index-data.ts auto-adds it here.
+  const priceRoutes = priceIndexCitySlugs().map((slug) => ({
+    url: `${baseUrl}/iv-prices/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.8,
+  }));
+
   // Treatment x city matrix. The page app/iv-therapy/[treatment]/[city] counts
   // clinics via getListingsByServiceAndCity(filter, city) and emits robots:noindex
   // when that count < 3. The sitemap MUST mirror that exact count so it never
@@ -218,5 +228,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  return [...staticRoutes, ...audienceRoutes, ...symptomRoutes, ...treatmentHubRoutes, ...stateRoutes, ...guideRoutes, ...cityRoutes, ...providerRoutes, ...blogRoutes, ...matrixRoutes];
+  return [...staticRoutes, ...audienceRoutes, ...symptomRoutes, ...treatmentHubRoutes, ...stateRoutes, ...guideRoutes, ...cityRoutes, ...providerRoutes, ...blogRoutes, ...matrixRoutes, ...priceRoutes];
 }

@@ -95,6 +95,14 @@ const nextConfig = {
         destination: '/providers/:slug*',
         permanent: true,
       },
+      // Bare /iv-prices -> the flagship city index. Exact source, so it never
+      // shadows the per-city /iv-prices/<slug> pages (which render directly).
+      // Temporary (307) because the flagship city may change as coverage grows.
+      {
+        source: '/iv-prices',
+        destination: '/iv-prices/toronto',
+        permanent: false,
+      },
       // -----------------------------------------------------------------
       // GSC 404 cleanup — 2026-05-30
       // -----------------------------------------------------------------
