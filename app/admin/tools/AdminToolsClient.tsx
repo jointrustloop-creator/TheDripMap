@@ -113,6 +113,7 @@ type KitResponse = {
 
 export function AdminToolsClient() {
   const [ratingsState, setRatingsState] = useState<ButtonState<RefreshResponse>>({ loading: false, result: null, error: null });
+  const [caRatingsState, setCaRatingsState] = useState<ButtonState<RefreshResponse>>({ loading: false, result: null, error: null });
   const [hoursState, setHoursState] = useState<ButtonState<EnrichHoursResponse>>({ loading: false, result: null, error: null });
   const [rescueState, setRescueState] = useState<ButtonState<Rescue404Response>>({ loading: false, result: null, error: null });
   const [inspectState, setInspectState] = useState<ButtonState<InspectResponse>>({ loading: false, result: null, error: null });
@@ -217,6 +218,22 @@ export function AdminToolsClient() {
       }
     } catch (err) {
       setRatingsState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
+    }
+  };
+
+  const backfillCanadaRatings = async () => {
+    setCaRatingsState({ loading: true, result: null, error: null });
+    try {
+      const r = await fetch('/api/admin/refresh-verified-ratings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scope: 'canada-missing', limit: 200 }),
+      });
+      const data = (await r.json()) as RefreshResponse;
+      if (!r.ok) setCaRatingsState({ loading: false, result: null, error: data.error || `HTTP ${r.status}` });
+      else setCaRatingsState({ loading: false, result: data, error: null });
+    } catch (err) {
+      setCaRatingsState({ loading: false, result: null, error: err instanceof Error ? err.message : String(err) });
     }
   };
 
@@ -506,6 +523,49 @@ export function AdminToolsClient() {
                   ))}
                 </ul>
               </div>
+            )}
+          </div>
+        )}
+      </Card>
+
+      <Card
+        title="Backfill Canadian ratings (all unrated)"
+        description="One-time Canada-wide rating backfill: hits Google Places for every Canadian provider with no rating yet (not just claimed/featured) and writes rating + review count. Runs 200 per click to stay under the time limit; clinics drop out of the set as they get a rating, so click again until 'checked' drops to ~0. Spends Google Places quota."
+        icon={<Star size={18} />}
+      >
+        <button
+          type="button"
+          onClick={backfillCanadaRatings}
+          disabled={caRatingsState.loading}
+          className="inline-flex items-center gap-2 bg-[#0F6E56] hover:bg-[#0c5a47] disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all"
+        >
+          {caRatingsState.loading ? (<><Loader2 size={16} className="animate-spin" />Backfilling Canada (200)â€¦</>) : 'Backfill 200 Canadian ratings'}
+        </button>
+
+        {caRatingsState.error && (
+          <div className="mt-5 px-4 py-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm font-bold">Error: {caRatingsState.error}</div>
+        )}
+
+        {caRatingsState.result && (
+          <div className="mt-5">
+            <div className="text-sm text-slate-700 font-bold mb-3">
+              Checked {caRatingsState.result.totalProviders ?? 0} Â· {caRatingsState.result.totalUpdated ?? 0} updated/no-change
+              {caRatingsState.result.totalFailed ? ` Â· ${caRatingsState.result.totalFailed} failed` : ''}
+            </div>
+            {(caRatingsState.result.totalProviders ?? 0) === 0 ? (
+              <div className="px-4 py-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 text-sm font-bold">Done â€” no Canadian providers missing a rating.</div>
+            ) : (
+              <>
+                <div className="text-xs font-bold text-slate-500 mb-2">Sample (first 12). Click again to do the next 200.</div>
+                <ul className="text-sm text-slate-700 space-y-1">
+                  {(caRatingsState.result.updated || []).slice(0, 12).map((u) => (
+                    <li key={u.slug} className="flex items-center gap-2">
+                      <span className="font-bold text-slate-800">{u.name}</span>
+                      <span className="text-slate-500">{u.oldRating ?? 'â€“'} â†’ <span className="font-bold text-slate-800">{u.newRating ?? 'â€“'}</span> ({u.newReviews ?? 0} reviews)</span>
+                    </li>
+                  ))}
+                </ul>
+              </>
             )}
           </div>
         )}

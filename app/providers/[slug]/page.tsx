@@ -46,6 +46,7 @@ import { cn } from '../../../src/lib/utils';
 import { getStatus } from '../../../src/lib/hours';
 import SmartSummary from '../../../src/components/SmartSummary';
 import { calculateValueMetrics } from '../../../src/lib/price-utils';
+import { getCityPriceIndex } from '../../../src/lib/price-index-data';
 import DefinitiveListingLayout from '../../../src/components/DefinitiveListingLayout';
 import ListingAnalytics from '../../../src/components/ListingAnalytics';
 import TrackedLink from '../../../src/components/TrackedLink';
@@ -321,6 +322,10 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   const timezone = TIMEZONE_MAP[stateCode] || 'America/New_York';
   const stateName = STATE_MAP[stateCode] || stateCode;
   const citySlug = slugify(provider.city);
+  // City price context from the IV Price Index. Lights up only for cities we
+  // actually cover, so a listing with no prices of its own still shows real,
+  // city-wide ranges and links to the citable index.
+  const cityPrices = getCityPriceIndex(citySlug);
   const cityLabel = provider.city;
   
   const status = getStatus(provider.hours, timezone);
@@ -449,7 +454,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
         "name": `How much does IV therapy cost at ${provider.name}?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": `Pricing at ${provider.name} is classified as ${provider.price_range || 'competitive'}. For exact pricing on specific drips like NAD+ or Myers' Cocktail, it is best to visit their website or call the clinic directly.`
+          "text": `Pricing at ${provider.name} is classified as ${provider.price_range || 'competitive'}.${cityPrices ? ` Across ${provider.city} clinics with published menus, a standard IV vitamin drip runs a median of $${cityPrices.headline.median}.` : ''} For exact pricing on specific drips like NAD+ or Myers' Cocktail, it is best to visit their website or call the clinic directly.`
         }
       }
     ]
@@ -661,6 +666,33 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 { label: provider.name }
               ]}
             />
+          </div>
+        )}
+
+        {/* Typical city prices from the IV Price Index. Fills the gap for the
+            many listings without their own published prices, and cross-links the
+            citable index. Renders only for cities we cover; city-wide menus,
+            clearly labelled as not necessarily this clinic's own prices. */}
+        {cityPrices && (
+          <div className="mb-12 rounded-3xl border border-wellness-100 bg-wellness-50/60 p-6 md:p-8">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-wellness-700">Typical IV prices in {cityPrices.city}</span>
+              <div className="h-px flex-1 bg-wellness-100" />
+            </div>
+            <p className="text-sm text-slate-600 leading-relaxed mb-5">
+              Across {cityPrices.clinicCount} {cityPrices.city} clinics with published menus, a standard IV vitamin drip runs a median of <b className="text-slate-900">${cityPrices.headline.median}</b> (about ${cityPrices.headline.low} to ${cityPrices.headline.high}). These are city-wide published prices, not necessarily {provider.name}&apos;s own — confirm directly with the clinic.
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
+              {cityPrices.rows.slice(0, 6).map((r) => (
+                <div key={r.treatment} className="bg-white rounded-2xl border border-slate-100 px-4 py-3">
+                  <div className="text-[11px] font-bold text-slate-500 truncate">{r.treatment}</div>
+                  <div className="text-lg font-black text-[#0F6E56]">${r.median}</div>
+                </div>
+              ))}
+            </div>
+            <Link href={`/iv-prices/${cityPrices.citySlug}`} className="inline-flex items-center gap-1.5 text-sm font-black text-[#0F6E56] hover:gap-2.5 transition-[gap]">
+              See the full {cityPrices.city} IV price index →
+            </Link>
           </div>
         )}
 
