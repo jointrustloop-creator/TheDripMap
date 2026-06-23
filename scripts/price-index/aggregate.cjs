@@ -10,11 +10,32 @@ function median(arr) {
   return n % 2 ? b[(n - 1) / 2] : (b[n / 2 - 1] + b[n / 2]) / 2;
 }
 
+// Chain identity: same registrable domain in one city = one chain. Falls back
+// to a normalized brand name when a domain wasn't captured (older raw caches).
+function chainKey(p) {
+  if (p.domain) return 'd:' + p.domain;
+  const n = (p.name || '').toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\b(the|inc|ltd|clinic|wellness|health|centre|center|spa|medical|aesthetics|iv|therapy|and|of|co|mobile|downtown|uptown|north|south|east|west|central|location|\d+)\b/g, '')
+    .replace(/\s+/g, ' ').trim();
+  return 'n:' + (n || (p.name || '').toLowerCase());
+}
+
 function aggregate(byProvider) {
-  // collect every clinic's representative price per rawKey
-  const byKey = {};
+  // Collapse chains FIRST: multiple locations of one brand in the same city
+  // share a menu, so counting each location separately would let a single chain
+  // clear the n>=MIN gate on its own and narrow/skew the distribution. Group by
+  // chainKey and keep one representative (min) price per treatment per chain.
+  const chains = {};
   for (const p of Object.values(byProvider)) {
-    for (const x of p.prices || []) (byKey[x.treatment] ||= []).push(x.price);
+    const k = chainKey(p);
+    (chains[k] ||= { prices: {}, members: [] }).members.push(p.name || '');
+    const cp = chains[k].prices;
+    for (const x of p.prices || []) if (cp[x.treatment] == null || x.price < cp[x.treatment]) cp[x.treatment] = x.price;
+  }
+  // one representative price per CHAIN per treatment
+  const byKey = {};
+  for (const c of Object.values(chains)) {
+    for (const [treatment, price] of Object.entries(c.prices)) (byKey[treatment] ||= []).push(price);
   }
 
   const published = [];
@@ -50,11 +71,14 @@ function aggregate(byProvider) {
     return b.clinics - a.clinics || b.median - a.median;
   });
 
-  // honest clinic count: clinics contributing at least one PUBLISHED price
+  // honest clinic count: CHAINS (deduped) contributing at least one published price
   const publishedKeys = new Set(Object.entries(T.PUBLISH).map(([k]) => k));
-  const clinicCount = Object.values(byProvider).filter((p) =>
-    (p.prices || []).some((x) => publishedKeys.has(x.treatment) && byKey[x.treatment]?.length >= T.MIN_CLINICS)
+  const clinicCount = Object.values(chains).filter((c) =>
+    Object.keys(c.prices).some((tk) => publishedKeys.has(tk) && byKey[tk]?.length >= T.MIN_CLINICS)
   ).length;
+
+  // chains collapsed from >1 location (surfaced in the review doc for transparency)
+  const mergedChains = Object.values(chains).filter((c) => c.members.length > 1).map((c) => c.members);
 
   return {
     rows: published,
@@ -62,6 +86,8 @@ function aggregate(byProvider) {
     dropped,
     clinicCount,
     clinicsScraped: Object.keys(byProvider).length,
+    chainsAfterDedup: Object.keys(chains).length,
+    mergedChains,
     clinicsWithAnyPrice: Object.values(byProvider).filter((p) => (p.prices || []).length).length,
   };
 }

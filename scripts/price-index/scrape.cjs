@@ -115,11 +115,15 @@ async function scrapeCity({ supabase, citySlug, outPath, limit = Infinity, log =
 
     let site = String(p.website || '').trim();
     if (!/^https?:\/\//i.test(site)) site = 'https://' + site;
-    let origin;
+    let origin, domain = '';
     try {
-      origin = new URL(site).origin;
+      const u = new URL(site);
+      origin = u.origin;
+      // registrable host drives chain detection in aggregate() (same domain in
+      // the same city = one chain, counted once, so it can't skew the index).
+      domain = u.hostname.replace(/^www\./, '').toLowerCase();
     } catch {
-      done[p.id] = { name: p.name, city: p.city, claimed: !!(p.is_claimed || p.is_featured), prices: [] };
+      done[p.id] = { name: p.name, city: p.city, domain: '', claimed: !!(p.is_claimed || p.is_featured), prices: [] };
       continue;
     }
 
@@ -142,7 +146,7 @@ async function scrapeCity({ supabase, citySlug, outPath, limit = Infinity, log =
     for (const h of pairs) if (!byTreat[h.treatment] || h.price < byTreat[h.treatment]) byTreat[h.treatment] = h.price;
     const prices = Object.entries(byTreat).map(([treatment, price]) => ({ treatment, price }));
 
-    done[p.id] = { name: p.name, city: p.city, claimed: !!(p.is_claimed || p.is_featured), prices };
+    done[p.id] = { name: p.name, city: p.city, domain, claimed: !!(p.is_claimed || p.is_featured), prices };
     log(`${prices.length ? '+' : '-'} ${p.name} -> ${prices.map((x) => `${x.treatment} $${x.price}`).join(', ') || 'none'}`);
     fs.writeFileSync(outPath, JSON.stringify({ cityName, currency, byProvider: done }, null, 2));
   }

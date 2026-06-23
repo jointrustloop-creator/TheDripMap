@@ -31,6 +31,20 @@ export interface CityPriceIndex {
 }
 
 export const PRICE_INDEX: Record<string, CityPriceIndex> = {
+  calgary: {
+    city: 'Calgary',
+    citySlug: 'calgary',
+    asOf: 'June 2026',
+    currency: 'CAD',
+    clinicCount: 6,
+    headline: { treatment: 'Standard IV vitamin drip', clinics: 3, low: 75, median: 200, high: 260 },
+    rows: [
+      { treatment: 'Standard IV vitamin drip', clinics: 3, low: 75, median: 200, high: 260 },
+      { treatment: 'Hydration', clinics: 4, low: 85, median: 125, high: 200 },
+      { treatment: 'NAD+', clinics: 3, low: 60, median: 150, high: 167 },
+    ],
+    note: "Immune support, Glutathione, Athletic recovery and Myers' Cocktail drips had too few published prices in this round to report a reliable range. Some ranges span both add-on pushes and full drips.",
+  },
   toronto: {
     city: 'Toronto',
     citySlug: 'toronto',
