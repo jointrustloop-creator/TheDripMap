@@ -20,7 +20,7 @@ import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { ProviderCredentialBlock } from '../../../src/components/ProviderCredentialBlock';
-import { isNoindexedUSPage } from '../../../src/lib/market';
+import { isNoindexedUSPage, marketOf } from '../../../src/lib/market';
 import { ClinicImage } from '../../../src/components/ClinicImage';
 import { ResilientImage } from '../../../src/components/ResilientImage';
 import { ClaimListingTrigger } from '../../../src/components/ClaimListingTrigger';
@@ -320,7 +320,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   const safetyVerifiedCount = safetyResults.filter(c => c.passed).length;
   const safetyVerified = (provider as { safety_verified?: boolean }).safety_verified === true;
   const stateCode = provider.state || getStateFromProvider(provider);
-  const timezone = TIMEZONE_MAP[stateCode] || 'America/New_York';
+  const timezone = TIMEZONE_MAP[stateCode] || 'America/Toronto';
   const stateName = STATE_MAP[stateCode] || stateCode;
   const citySlug = slugify(provider.city);
   // City price context from the IV Price Index. Lights up only for cities we
@@ -412,9 +412,10 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
       "addressLocality": provider.city,
       "addressRegion": stateCode,
       "postalCode": provider.postal_code,
-      // Use the actual stored country so Canadian clinics aren't tagged "US".
-      // Falls back to "US" only when no country is on the row.
-      "addressCountry": /canada/i.test(String((provider as { country?: string }).country || '')) ? "CA" : "US"
+      // marketOf understands province fallback (ON/BC/AB...) and only returns
+      // "US" when confidently US, so a Canadian clinic with a blank/abbreviated
+      // country is tagged "CA", not mislabelled "US", in its schema.
+      "addressCountry": marketOf({ country: (provider as { country?: string }).country, state: provider.state }) === 'US' ? "US" : "CA"
     },
     "geo": {
       "@type": "GeoCoordinates",

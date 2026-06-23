@@ -107,6 +107,7 @@ export default function RootLayout({
     "alternateName": siteNameAlternate,
     "url": siteUrl,
     "logo": `${siteUrl}/logo.png`,
+    "areaServed": { "@type": "Country", "name": "Canada" },
     "sameAs": [
       "https://www.instagram.com/thedripmap"
     ]
@@ -126,7 +127,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable} ${fraunces.variable} ${hankenGrotesk.variable}`}>
+    <html lang="en-CA" className={`${inter.variable} ${outfit.variable} ${fraunces.variable} ${hankenGrotesk.variable}`}>
       <head>
         <script
           id="fix-fetch-getter"

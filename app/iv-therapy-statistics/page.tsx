@@ -9,6 +9,7 @@ import {
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { slugify, getSiteStats } from '../../src/lib/data';
+import { US_MARKET_ENABLED } from '../../src/lib/market';
 
 export const revalidate = 3600; // 1 hour
 
@@ -27,6 +28,9 @@ export async function generateMetadata(): Promise<Metadata> {
     title,
     description,
     alternates: { canonical: 'https://www.thedripmap.com/iv-therapy-statistics' },
+    // This page is US-framed (US clinic counts, states). Noindex it while the US
+    // market is off so it can't signal a US focus. Reversible via the flag.
+    robots: US_MARKET_ENABLED ? undefined : { index: false, follow: true },
     openGraph: {
       title,
       description,

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import React from 'react';
 import { getStateBySlug } from '../../../src/lib/states';
 import { getListingsByState } from '../../../src/lib/data';
+import { usMarketRobots } from '../../../src/lib/market';
 
 const SITE_URL = 'https://www.thedripmap.com';
 
@@ -35,6 +36,9 @@ export async function generateMetadata({ params }: { params: Promise<{ state: st
     title,
     description,
     alternates: { canonical: url },
+    // Canada-first: while the US market is off, US state pages (FL/NY/TX/CA/VA)
+    // render noindex,follow — only Ontario stays indexable. Reverses with the flag.
+    robots: usMarketRobots({ country: state.country }),
     openGraph: {
       title,
       description,

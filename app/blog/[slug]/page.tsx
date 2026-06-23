@@ -149,9 +149,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   // Province data is stored inconsistently (abbr on some rows, full name on
   // others), so match both fields against abbreviations AND full names.
   const CA_PROVINCES = new Set(['on', 'bc', 'ab', 'qc', 'mb', 'sk', 'ns', 'nb', 'nl', 'pe', 'nt', 'yt', 'nu', 'ontario', 'british columbia', 'alberta', 'quebec', 'québec', 'manitoba', 'saskatchewan', 'nova scotia', 'new brunswick', 'newfoundland and labrador', 'newfoundland', 'prince edward island', 'northwest territories', 'yukon', 'nunavut']);
+  // Only Canadian cities with an INDEXABLE hub (>=3 providers, same gate as the
+  // sitemap + city-page noindex) qualify. This stops a neighbourhood post like
+  // iv-therapy-yorkville-toronto from up-linking to a thin/noindex /cities/yorkville
+  // — it falls through to the parent metro hub (/cities/toronto) instead.
   const caCitySlugs = new Set(
     allCities
-      .filter((c) => CA_PROVINCES.has((c.stateAbbr || '').toLowerCase().trim()) || CA_PROVINCES.has((c.state || '').toLowerCase().trim()))
+      .filter((c) => (c.count ?? 0) >= 3 && (CA_PROVINCES.has((c.stateAbbr || '').toLowerCase().trim()) || CA_PROVINCES.has((c.state || '').toLowerCase().trim())))
       .map((c) => slugify(c.city))
   );
   const cityHub = (() => {

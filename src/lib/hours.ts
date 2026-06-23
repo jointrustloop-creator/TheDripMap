@@ -13,8 +13,9 @@ export function getStatus(hours: Record<string, string> | undefined, timezone?: 
     return { isOpen: false, known: false, text: 'Hours not listed', todayHours: '' };
   }
 
-  // Use provided timezone or fallback to America/New_York (Eastern Time)
-  const tz = timezone || 'America/New_York';
+  // Use provided timezone or fall back to Toronto. The platform is Canada-only,
+  // so an unknown timezone should default to Eastern Canada, not the US.
+  const tz = timezone || 'America/Toronto';
   
   // Get current time in correct timezone
   const now = new Date(new Date().toLocaleString('en-US', { timeZone: tz }));

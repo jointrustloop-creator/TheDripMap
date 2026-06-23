@@ -121,7 +121,7 @@ export const GoogleListingMap = ({ providers }: GoogleListingMapProps) => {
   // Center of map based on providers
   const center = useMemo(() => {
     const validProviders = providers.filter(p => p.latitude && p.longitude);
-    if (validProviders.length === 0) return { lat: 37.0902, lng: -95.7129 }; // USA center
+    if (validProviders.length === 0) return { lat: 56.1304, lng: -106.3468 }; // Canada (geographic centre)
 
     const sumLat = validProviders.reduce((acc, p) => acc + (p.latitude || 0), 0);
     const sumLng = validProviders.reduce((acc, p) => acc + (p.longitude || 0), 0);

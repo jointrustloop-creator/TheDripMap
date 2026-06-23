@@ -38,9 +38,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/tools/seo-audit`,              priority: 0.6, changeFrequency: 'monthly', lastModified: new Date() },
     { url: `${baseUrl}/contact`,                priority: 0.6, changeFrequency: 'monthly', lastModified: new Date() },
     { url: `${baseUrl}/symptoms`,               priority: 0.7, changeFrequency: 'monthly', lastModified: new Date() },
-    { url: `${baseUrl}/iv-therapy-statistics`,  priority: 0.6, changeFrequency: 'monthly', lastModified: new Date() },
     { url: `${baseUrl}/treatments`,             priority: 0.8, changeFrequency: 'monthly', lastModified: new Date() },
   ];
+
+  // /iv-therapy-statistics is a US-framed page ("IV Therapy in the United States").
+  // While the US market is off it is noindexed and kept out of the sitemap.
+  const statsRoutes: MetadataRoute.Sitemap = US_MARKET_ENABLED
+    ? [{ url: `${baseUrl}/iv-therapy-statistics`, priority: 0.6, changeFrequency: 'monthly', lastModified: new Date() }]
+    : [];
 
   const symptomRoutes = USE_CASES.map((useCase) => ({
     url: `${baseUrl}/symptoms/${useCase.slug}`,
@@ -86,12 +91,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     }));
 
-  const stateRoutes = STATES.map((s) => ({
-    url: `${baseUrl}/states/${s.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.85,
-  }));
+  const stateRoutes = STATES
+    // US market off: only Ontario (the sole Canadian "state") stays sitemapped;
+    // the 5 US states also emit robots:noindex on the page. Reversible via flag.
+    .filter((s) => US_MARKET_ENABLED || s.country === 'Canada')
+    .map((s) => ({
+      url: `${baseUrl}/states/${s.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.85,
+    }));
 
   const audienceRoutes = AUDIENCES.map((a) => ({
     url: `${baseUrl}/for/${a.slug}`,
@@ -171,7 +180,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .sort((a, b) => (b.count || 0) - (a.count || 0))
     .slice(0, 20)
     .map((c) => c.city);
-  const matrixCities = [...CANADA_MATRIX_CITIES, ...topUSMatrixCities];
+  // US market off: only Canadian matrix cities are sitemapped (US treatment x
+  // city combos also emit robots:noindex on the page). Reversible via the flag.
+  const matrixCities = US_MARKET_ENABLED ? [...CANADA_MATRIX_CITIES, ...topUSMatrixCities] : [...CANADA_MATRIX_CITIES];
 
   // Parse a PostgREST .or() filter (only the ilike.%x% and cs.{"x"} forms that
   // getServiceFilter emits) into an in-memory OR-predicate. enrichProvider does
@@ -228,5 +239,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  return [...staticRoutes, ...audienceRoutes, ...symptomRoutes, ...treatmentHubRoutes, ...stateRoutes, ...guideRoutes, ...cityRoutes, ...providerRoutes, ...blogRoutes, ...matrixRoutes, ...priceRoutes];
+  return [...staticRoutes, ...statsRoutes, ...audienceRoutes, ...symptomRoutes, ...treatmentHubRoutes, ...stateRoutes, ...guideRoutes, ...cityRoutes, ...providerRoutes, ...blogRoutes, ...matrixRoutes, ...priceRoutes];
 }

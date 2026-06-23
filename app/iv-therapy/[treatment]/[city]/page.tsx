@@ -13,6 +13,7 @@ import {
   slugify,
   STATE_MAP,
 } from '../../../../src/lib/data';
+import { isNoindexedUSPage } from '../../../../src/lib/market';
 import { getTreatmentContent } from '../../../../src/lib/treatment-content';
 import { findDefinition } from '../../../../src/lib/treatment-definitions';
 import { Provider } from '../../../../src/types';
@@ -195,7 +196,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     // sitting at 1-2 providers, those pages diluting overall site authority
     // signal. Pages remain reachable for users via direct URL and internal
     // links, just noindexed.
-    robots: count < 3 ? { index: false, follow: true } : undefined,
+    // Noindex when too few clinics OR when this is a US city and the US market
+    // is off (Canada-first) — mirrors the city/provider noindex + the sitemap.
+    robots: (count < 3 || isNoindexedUSPage({ state: resolved.stateAbbr || resolved.state })) ? { index: false, follow: true } : undefined,
     openGraph: {
       title: `${t.name} in ${cityLabel} (${YEAR}) | TheDripMap`,
       description: `Find ${t.name.toLowerCase()} clinics in ${cityLabel}.`,

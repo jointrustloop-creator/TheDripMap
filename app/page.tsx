@@ -59,7 +59,7 @@ export async function generateMetadata(): Promise<Metadata> {
       url: 'https://www.thedripmap.com',
       siteName: 'The Drip Map',
       images: [{ url: 'https://www.thedripmap.com/og-image.png', width: 1200, height: 630, alt: 'The Drip Map — Find Your IV Therapy Match' }],
-      locale: 'en_US',
+      locale: 'en_CA',
       type: 'website',
     },
     twitter: { card: 'summary_large_image', description, images: ['https://www.thedripmap.com/og-image.png'] },
