@@ -137,6 +137,33 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       : `/search?city=${encodeURIComponent(cityName)}`;
   };
 
+  // Blog -> city-hub up-link. City-specific posts (the city name appears as a
+  // token in the slug, e.g. mobile-iv-therapy-toronto-gta) compete with the
+  // commercial /cities/[slug] page for "iv therapy {city}". A prominent link up
+  // to that hub consolidates authority onto the city page (the page we want to
+  // rank) and signals the blog as the supporting/informational asset.
+  // Gated to CANADIAN city hubs only: the active indexed market we want to
+  // boost, and it cleanly excludes noindexed US city pages plus the
+  // province-vs-US-city collision (e.g. an "...-ontario" post must NOT link to
+  // Ontario, California, whose stateAbbr is "CA", not a CA province code).
+  // Province data is stored inconsistently (abbr on some rows, full name on
+  // others), so match both fields against abbreviations AND full names.
+  const CA_PROVINCES = new Set(['on', 'bc', 'ab', 'qc', 'mb', 'sk', 'ns', 'nb', 'nl', 'pe', 'nt', 'yt', 'nu', 'ontario', 'british columbia', 'alberta', 'quebec', 'québec', 'manitoba', 'saskatchewan', 'nova scotia', 'new brunswick', 'newfoundland and labrador', 'newfoundland', 'prince edward island', 'northwest territories', 'yukon', 'nunavut']);
+  const caCitySlugs = new Set(
+    allCities
+      .filter((c) => CA_PROVINCES.has((c.stateAbbr || '').toLowerCase().trim()) || CA_PROVINCES.has((c.state || '').toLowerCase().trim()))
+      .map((c) => slugify(c.city))
+  );
+  const cityHub = (() => {
+    const tokens = `-${slug}-`;
+    const match = [...caCitySlugs]
+      .filter((cs) => cs.length >= 4 && tokens.includes(`-${cs}-`))
+      .sort((a, b) => b.length - a.length)[0];
+    if (!match) return null;
+    const name = match.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    return { name, href: `/cities/${match}` };
+  })();
+
   // BreadcrumbList JSON-LD for blog detail.
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -379,6 +406,18 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   </p>
                 </div>
               </div>
+            )}
+            {cityHub && (
+              <Link
+                href={cityHub.href}
+                className="mb-10 group flex items-center justify-between gap-4 bg-wellness-50 hover:bg-wellness-100 border border-wellness-200 hover:border-wellness-300 rounded-2xl px-6 py-4 transition-all no-underline"
+              >
+                <span className="flex items-center gap-3 text-base font-bold text-slate-700">
+                  <MapPin size={18} className="text-wellness-600 shrink-0" />
+                  <span>Comparing clinics? <span className="text-wellness-700 font-black">See all IV therapy clinics in {cityHub.name}</span></span>
+                </span>
+                <ArrowRight size={18} className="text-wellness-500 group-hover:translate-x-1 transition-transform shrink-0" />
+              </Link>
             )}
             <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline markdown-body">
               {post.content ? (
