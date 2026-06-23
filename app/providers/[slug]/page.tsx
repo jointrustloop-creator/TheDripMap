@@ -48,6 +48,7 @@ import SmartSummary from '../../../src/components/SmartSummary';
 import { calculateValueMetrics } from '../../../src/lib/price-utils';
 import { getCityPriceIndex } from '../../../src/lib/price-index-data';
 import DefinitiveListingLayout from '../../../src/components/DefinitiveListingLayout';
+import { OpenStatus } from '../../../src/components/OpenStatus';
 import ListingAnalytics from '../../../src/components/ListingAnalytics';
 import TrackedLink from '../../../src/components/TrackedLink';
 
@@ -507,6 +508,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
           safetyResults={safetyResults.map(r => ({ key: r.key, label: r.label, detail: r.detail, passed: r.passed }))}
           safetyVerified={safetyVerified}
           status={status}
+          timezone={timezone}
           displayName={displayName}
           displayRating={displayRating}
           displayReviewCount={displayReviewCount}

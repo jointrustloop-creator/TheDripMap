@@ -12,6 +12,7 @@
  */
 import React from 'react';
 import Link from 'next/link';
+import { OpenStatus } from './OpenStatus';
 import {
   CheckCircle2,
   Star,
@@ -68,6 +69,7 @@ interface Props {
   safetyResults: SafetyResult[];
   safetyVerified: boolean;
   status: ProviderStatus;
+  timezone: string;
   displayName: string;
   displayRating: number;
   displayReviewCount: number;
@@ -273,7 +275,7 @@ export default function DefinitiveListingLayout({
   profile,
   safetyResults,
   safetyVerified,
-  status,
+  timezone,
   displayName,
   displayRating,
   displayReviewCount,
@@ -523,8 +525,7 @@ export default function DefinitiveListingLayout({
                   <MapPin size={15} /> {cityLabel}, {stateCode}
                 </span>
                 <span className="text-sm text-[#c4c9b8] font-medium px-4 flex items-center gap-[7px] border-l border-[rgba(243,239,226,0.18)]">
-                  <span className={`w-[7px] h-[7px] rounded-full inline-block ${status.isOpen ? 'bg-emerald-400' : 'bg-[#d8b878]'}`} />
-                  {status.text}
+                  <OpenStatus hours={provider.hours} timezone={timezone} className="flex items-center gap-[7px]" openDotClass="bg-emerald-400" closedDotClass="bg-[#d8b878]" />
                 </span>
                 {provider.price_range && (
                   <span className="text-sm text-[#c4c9b8] font-medium px-4 flex items-center gap-[7px] border-l border-[rgba(243,239,226,0.18)]">
@@ -987,8 +988,7 @@ export default function DefinitiveListingLayout({
                   </div>
                 </div>
                 <div className="flex items-center gap-2 mt-[18px] mb-[14px] text-[13.5px]">
-                  <span className={`w-[7px] h-[7px] rounded-full inline-block ${status.isOpen ? 'bg-emerald-500' : 'bg-[#d8b878]'}`} />
-                  <span className="font-semibold text-[#b08a3e]">{status.text}</span>
+                  <OpenStatus hours={provider.hours} timezone={timezone} className="flex items-center gap-2" openDotClass="bg-emerald-500" closedDotClass="bg-[#d8b878]" textClass="font-semibold text-[#b08a3e]" />
                 </div>
                 {provider.price_range && (
                   <div className="flex items-baseline justify-between gap-2 mb-[18px] py-[12px] px-[15px] rounded-[13px] bg-[#ebf1e5] border border-[rgba(47,84,54,0.12)]">
