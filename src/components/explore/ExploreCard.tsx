@@ -28,7 +28,15 @@ interface ExploreCardProps {
 export function ExploreCard({ provider: p, active, onHover, onSelect }: ExploreCardProps) {
   const verified = isVerifiedClinic(p);
   const sv = (p as { safety_verified?: boolean }).safety_verified === true;
-  const open = isOpenNow(p.working_hours);
+  // Live open/closed: compute in the browser after mount (and refresh each
+  // minute) so it reflects the real current time, not when the page was cached.
+  const [open, setOpen] = useState<boolean | null>(null);
+  useEffect(() => {
+    const tick = () => setOpen(isOpenNow(p.working_hours));
+    tick();
+    const id = setInterval(tick, 60_000);
+    return () => clearInterval(id);
+  }, [p.working_hours]);
   const hours = todayHours(p.working_hours);
   const services = topServices(p, 3);
   const price = priceIndicator(p);
@@ -144,7 +152,7 @@ export function ExploreCard({ provider: p, active, onHover, onSelect }: ExploreC
       {/* Open-now + price */}
       {(p.working_hours || price) && (
         <div className="flex items-center gap-3 mt-3 text-xs font-bold">
-          {p.working_hours && (
+          {p.working_hours && open !== null && (
             <span className={cn('inline-flex items-center gap-1', open ? 'text-emerald-600' : 'text-slate-400')}>
               <Clock size={12} /> {open ? 'Open now' : 'Closed'}
               {hours ? ` · ${hours}` : ''}

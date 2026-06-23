@@ -28,6 +28,9 @@ export function OpenStatus({
   openText = 'Open now',
   closedText = 'Closed',
   showDot = true,
+  openClass = '',
+  closedClass = '',
+  unknownClass = '',
   fallback = null,
 }: {
   hours: Record<string, string> | undefined;
@@ -41,6 +44,9 @@ export function OpenStatus({
   openText?: string;
   closedText?: string;
   showDot?: boolean;
+  openClass?: string;
+  closedClass?: string;
+  unknownClass?: string;
   fallback?: React.ReactNode;
 }) {
   const [status, setStatus] = useState<StatusResult | null>(null);
@@ -56,9 +62,10 @@ export function OpenStatus({
 
   const label = status.isOpen ? openText : status.known ? closedText : 'Hours not listed';
   const dot = status.isOpen ? openDotClass : status.known ? closedDotClass : unknownDotClass;
+  const stateClass = status.isOpen ? openClass : status.known ? closedClass : unknownClass;
 
   return (
-    <span className={className}>
+    <span className={`${className} ${stateClass}`.trim()}>
       {showDot && <span className={`${dotBaseClass} ${dot}`} />}
       <span className={textClass}>{label}</span>
     </span>

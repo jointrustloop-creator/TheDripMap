@@ -7,7 +7,7 @@ import { Provider } from '../types';
 import { slugify } from '../lib/data';
 import { cn } from '../lib/utils';
 import { ResilientImage } from './ResilientImage';
-import { getStatus } from '../lib/hours';
+import { OpenStatus } from './OpenStatus';
 import { motion } from 'motion/react';
 import { useClaimListing } from '../context/ClaimListingContext';
 import { CompareToggle } from './CompareToggle';
@@ -310,7 +310,6 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
   // ----------------------------------------------------------------------------
   // UNCLAIMED — muted treatment that nudges the owner to claim (unchanged)
   // ----------------------------------------------------------------------------
-  const status = getStatus(provider.hours);
   const hasOversight = (() => {
     const mt = (provider as { medical_team?: unknown[] }).medical_team;
     if (Array.isArray(mt) && mt.length > 0) return true;
@@ -356,12 +355,16 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
           {/* Status Row */}
           <div className="flex items-center gap-3 mb-4">
             {provider.hours && (
-              <div className={cn(
-                'text-[10px] font-black uppercase tracking-tight',
-                status.isOpen ? 'text-emerald-600' : 'text-amber-600'
-              )}>
-                {status.isOpen ? '● OPEN NOW' : '● CLOSED'}
-              </div>
+              <OpenStatus
+                hours={provider.hours}
+                showDot={false}
+                className="text-[10px] font-black uppercase tracking-tight"
+                openClass="text-emerald-600"
+                closedClass="text-amber-600"
+                unknownClass="text-slate-400"
+                openText="● OPEN NOW"
+                closedText="● CLOSED"
+              />
             )}
             {provider.hours && <div className="w-1 h-1 bg-slate-200 rounded-full" />}
             <div className="flex items-center gap-1 text-[11px] font-bold text-slate-500">
