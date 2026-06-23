@@ -16,6 +16,7 @@ import { SupabaseUnreachableError } from '@/src/lib/supabase-health';
 import { TemporarilyUnavailable } from '@/src/components/TemporarilyUnavailable';
 import { getCityIntro } from '@/src/lib/city-intros';
 import { getCityMeta, filterByUseCase } from '@/src/lib/city-meta';
+import { getCityPriceIndex } from '@/src/lib/price-index-data';
 import { normalizeCountry, isNoindexedUSPage } from '@/src/lib/market';
 import { MapTrigger } from '@/src/components/MapTrigger';
 import { FAQSection } from '@/src/components/FAQSection';
@@ -377,6 +378,13 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   // existing layout when no meta is present.
   const cityMeta = getCityMeta(slug);
 
+  // Citable IV Price Index for this city, if a published snapshot exists (n>=3
+  // gate, currently Toronto + Edmonton). Surfacing it answer-first near the top
+  // gives the city page a unique, data-driven block competitors can't copy and
+  // an internal link to our flagship /iv-prices/[city] asset.
+  const cityPriceIndex = getCityPriceIndex(slug);
+  const cur = (n: number) => (cityPriceIndex?.currency === 'USD' ? '$' : 'CA$') + n;
+
   // Precompute use-case pools so each section can short-circuit when empty.
   // Each filter is a cheap O(n) pass over the local listing pool.
   const useCaseSections = (cityMeta?.useCases || [])
@@ -593,6 +601,38 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
             </section>
           );
         })()}
+
+        {/* IV Price Index module — answer-first pricing pulled from the citable
+            /iv-prices/[city] snapshot. Renders only where a published index
+            exists. Unique, data-driven content + a strong internal link to the
+            flagship price asset. */}
+        {cityPriceIndex && (
+          <section className="mb-12 max-w-4xl">
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[11px] font-black uppercase tracking-[0.18em] text-wellness-600">IV Price Index</span>
+                <span className="text-[11px] font-bold text-slate-400">Updated {cityPriceIndex.asOf}</span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight mb-3">
+                What IV therapy costs in {cityData.name}
+              </h2>
+              <p className="text-lg text-slate-600 leading-relaxed">
+                A {cityPriceIndex.headline.treatment.toLowerCase()} in {cityData.name} runs a median of{' '}
+                <span className="font-black text-slate-900">{cur(cityPriceIndex.headline.median)}</span>{' '}
+                ({cur(cityPriceIndex.headline.low)} to {cur(cityPriceIndex.headline.high)}), based on published
+                prices from {cityPriceIndex.clinicCount} {cityData.name} clinics. These are published menu prices,
+                not medical advice.
+              </p>
+              <Link
+                href={`/iv-prices/${cityPriceIndex.citySlug}`}
+                className="inline-flex items-center gap-2 mt-4 text-sm font-black text-wellness-700 hover:text-wellness-800 group"
+              >
+                See the full {cityData.name} IV Price Index
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </section>
+        )}
 
         {/* Regulation / market note — only renders when the city has curated meta
             (Toronto today). Frames it as general information with a link to the
