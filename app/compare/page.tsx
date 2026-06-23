@@ -19,6 +19,7 @@ import { ResilientImage } from '../../src/components/ResilientImage';
 import { getListingsByIds } from '../../src/lib/data';
 import { Provider } from '../../src/types';
 import { getStatus } from '../../src/lib/hours';
+import { OpenStatus } from '../../src/components/OpenStatus';
 import { ClearCompareButton } from '../../src/components/ClearCompareButton';
 
 export const metadata: Metadata = {
@@ -142,16 +143,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Sear
             const status = getStatus(p.hours);
             return (
               <Cell key={p.id}>
-                <div className="flex items-center gap-2 mb-1">
-                  <span
-                    className={`w-2 h-2 rounded-full ${
-                      status.isOpen ? 'bg-emerald-500' : 'bg-amber-500'
-                    }`}
-                  />
-                  <span className="text-sm font-black text-slate-900">
-                    {status.isOpen ? 'Open' : 'Closed'}
-                  </span>
-                </div>
+                <OpenStatus hours={p.hours} className="flex items-center gap-2 mb-1" dotBaseClass="w-2 h-2 rounded-full inline-block" openDotClass="bg-emerald-500" closedDotClass="bg-amber-500" textClass="text-sm font-black text-slate-900" openText="Open" closedText="Closed" />
                 <div className="text-xs text-slate-500 font-medium">{status.todayHours}</div>
               </Cell>
             );
@@ -335,7 +327,6 @@ function ClinicHeader({ provider }: { provider: Provider }) {
 
 function MobileCompareCard({ provider }: { provider: Provider }) {
   const initials = getInitials(provider.name);
-  const status = getStatus(provider.hours);
   return (
     <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
       <div className="w-full h-40 bg-slate-100 relative">
@@ -382,16 +373,7 @@ function MobileCompareCard({ provider }: { provider: Provider }) {
             <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
               Status
             </div>
-            <div className="flex items-center gap-1.5 mt-1">
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  status.isOpen ? 'bg-emerald-500' : 'bg-amber-500'
-                }`}
-              />
-              <span className="text-sm font-black text-slate-900">
-                {status.isOpen ? 'Open' : 'Closed'}
-              </span>
-            </div>
+            <OpenStatus hours={provider.hours} className="flex items-center gap-1.5 mt-1" dotBaseClass="w-2 h-2 rounded-full inline-block" openDotClass="bg-emerald-500" closedDotClass="bg-amber-500" textClass="text-sm font-black text-slate-900" openText="Open" closedText="Closed" />
           </div>
         </div>
 
