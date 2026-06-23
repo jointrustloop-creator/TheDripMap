@@ -79,7 +79,11 @@ export default async function HomePage() {
   ).slice(0, US_MARKET_ENABLED ? 12 : 8);
   // Featured Verified Clinics — pull the 4 claimed listings live from Supabase
   // so the homepage always reflects current claimed-and-verified status.
-  const featuredClinics = (await getFeaturedListings(4)) || [];
+  // Canada-first: the homepage Featured shelf shows Canadian clinics only while
+  // US_MARKET_ENABLED is off (reversible). US claimed/featured clinics keep their
+  // live, verified listings — they simply do not take a slot on the Canadian
+  // homepage, which would not reach their US patients anyway.
+  const featuredClinics = (await getFeaturedListings(4, undefined, US_MARKET_ENABLED ? undefined : 'Canada')) || [];
   const latestPosts = blogPosts.slice(0, 3);
 
   // Per-clinic Safety Verified map for the featured shelf. As of 2026-06-08
