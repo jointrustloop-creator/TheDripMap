@@ -33,7 +33,13 @@ export function getStatus(hours: Record<string, string> | undefined, timezone?: 
     // "to"-separated range silently fell through to isOpen:true (the Tri-Health bug).
     const parts = todayHours.split(/\s+to\s+|\s*[‒–—-]\s*/i).filter(Boolean);
     if (parts.length < 2) {
-      return { isOpen: true, known: true, text: todayHours, todayHours };
+      // A single token that is a real time / "open" / "24 hours" means open all
+      // day. Free text like "By appointment" is NOT a status — show "Hours not
+      // listed" instead of a misleading "Open now" (the Diamond Aesthetics case).
+      const looksOpen = /\d\s*(:|\d|am|pm)|24\s*\/?\s*7|24\s*hours|open/i.test(todayHours);
+      return looksOpen
+        ? { isOpen: true, known: true, text: todayHours, todayHours }
+        : { isOpen: false, known: false, text: 'Hours not listed', todayHours: '' };
     }
     
     const [start, end] = parts.map(t => t.trim());
