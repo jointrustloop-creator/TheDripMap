@@ -28,7 +28,10 @@ export function getStatus(hours: Record<string, string> | undefined, timezone?: 
   }
   
   try {
-    const parts = todayHours.split('-');
+    // Hours come from several sources in different formats: "9AM-5PM",
+    // "9:00 AM to 8:00 PM", "10AM–7PM" (en-dash). Split on any of them, else a
+    // "to"-separated range silently fell through to isOpen:true (the Tri-Health bug).
+    const parts = todayHours.split(/\s+to\s+|\s*[‒–—-]\s*/i).filter(Boolean);
     if (parts.length < 2) {
       return { isOpen: true, known: true, text: todayHours, todayHours };
     }
