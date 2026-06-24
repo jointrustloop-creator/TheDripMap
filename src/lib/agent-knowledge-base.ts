@@ -1061,7 +1061,9 @@ export function getPeptideKnowledge(name: string): PeptideKnowledge | null {
 
 // Combined lookup — checks treatments first, then peptides.
 export function getKnowledge(name: string): TreatmentKnowledge | PeptideKnowledge | null {
-  return getTreatmentKnowledge(name) || getPeptideKnowledge(name);
+  // Peptide therapy removed from the platform: only treatment knowledge is
+  // surfaced now (getPeptideKnowledge / PEPTIDES are intentionally unused).
+  return getTreatmentKnowledge(name);
 }
 
 // Used inside getTreatmentInfo for the "summary" field when the legacy

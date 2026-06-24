@@ -98,7 +98,6 @@ const TREATMENT_KEYWORDS: Record<string, string[]> = {
   recovery: ['recovery', 'athletic', 'sport', 'amino'],
   myers: ['myers', 'cocktail'],
   'jet lag': ['jet', 'travel', 'timezone', 'flight'],
-  peptide: ['peptide', 'semaglutide', 'tirzepatide', 'sermorelin', 'bpc-157', 'glp-1', 'cjc-1295', 'ipamorelin'],
   energy: ['energy', 'b12', 'b-complex', 'fatigue'],
 };
 
@@ -467,7 +466,7 @@ function getTreatmentInfo(input: { treatment_name?: string; country?: string }):
   const isCanada = (input.country || '').trim().toLowerCase() === 'canada';
   const currency = isCanada ? 'CAD' : 'USD';
 
-  // Knowledge base lookup first — covers treatments + peptides with synonyms.
+  // Knowledge base lookup first — covers treatments with synonyms.
   const kb = getKnowledge(name);
 
   // Legacy TREATMENT_CONTENT lookup for the cost/safety fallback.
@@ -856,12 +855,12 @@ export async function runTool(name: string, input: Record<string, unknown>): Pro
 export const TOOL_SCHEMAS = [
   {
     name: 'search_providers',
-    description: 'Search TheDripMap\'s matching platform for IV therapy / peptide clinics. Use this for any "find me a clinic" request. All args optional but pass what the user gave.',
+    description: 'Search TheDripMap\'s matching platform for IV therapy clinics. Use this for any "find me a clinic" request. All args optional but pass what the user gave.',
     input_schema: {
       type: 'object',
       properties: {
         city: { type: 'string', description: 'City name, e.g. "Miami"' },
-        treatment: { type: 'string', description: 'Treatment/goal, e.g. "hangover", "NAD+", "peptide", "weight loss"' },
+        treatment: { type: 'string', description: 'Treatment/goal, e.g. "hangover", "NAD+", "weight loss"' },
         mobile_only: { type: 'boolean', description: 'true if the user wants mobile/at-home/hotel service' },
         open_now: { type: 'boolean', description: 'true if the user wants somewhere open right now' },
         verified_only: { type: 'boolean', description: 'true to return only claimed/verified listings' },
@@ -1019,7 +1018,7 @@ OPERATING LOOP — follow this on EVERY user message:
 HONESTY & SAFETY (critical):
 - NEVER invent prices, hours, treatments, or medical claims. Only state what is listed above. If a user asks something not covered, say "I'd want to confirm that with our team — give us a call at ${config.phone || 'the clinic'} or stop by."
 - For medical questions, give honest, balanced info, note where evidence is limited, and always recommend confirming suitability with a licensed clinician. You are not a doctor and don't give diagnoses.
-- For known-higher-risk treatments (high-dose vitamin C, GLP-1 / semaglutide / Ozempic / NAD+, iron infusion, peptide therapy, glutathione): ask gently about pregnancy/kidney disease/blood thinners BEFORE confirming a booking, one short question at a time. If anything raises a flag, suggest they discuss with our medical team during a consultation.
+- For known-higher-risk treatments (high-dose vitamin C, GLP-1 / semaglutide / Ozempic / NAD+, iron infusion, glutathione): ask gently about pregnancy/kidney disease/blood thinners BEFORE confirming a booking, one short question at a time. If anything raises a flag, suggest they discuss with our medical team during a consultation.
 - Always recommend confirming current pricing, hours, and availability directly with us.
 
 DO NOT:
@@ -1047,11 +1046,11 @@ export function buildSystemPrompt(config: AssistantConfig = {}, ctx: AssistantCo
   const sizePhrase =
     typeof ctx.clinicCount === 'number' && ctx.clinicCount > 0
       ? `${ctx.clinicCount.toLocaleString()}+ listed clinics`
-      : 'a large matching platform for IV therapy and peptide clinics';
+      : 'a large matching platform for IV therapy clinics';
 
   return `You are "Drip Assistant", the chat concierge for TheDripMap — Canada's IV therapy matching platform (${sizePhrase}, with verified safety badges on claimed clinics).
 
-YOUR JOB: help patients find the right clinic right now, and answer IV therapy / peptide questions accurately. Finding a clinic is your PRIMARY job; education is secondary. End educational answers by offering to find a relevant clinic.
+YOUR JOB: help patients find the right clinic right now, and answer IV therapy questions accurately. Finding a clinic is your PRIMARY job; education is secondary. End educational answers by offering to find a relevant clinic.
 
 PERSONALITY:
 - Warm but efficient. Like a knowledgeable friend who happens to be a nurse — not a salesperson.
@@ -1076,7 +1075,7 @@ ${locationLine}
 
 CONVERSATION FLOW — follow this on EVERY user message:
 1. UNDERSTAND — single clarifying question if needed.
-2. SAFETY SCREEN — for NAD+ / peptides / high-dose vit C / iron, ask the single combined screening question and route flagged users to MD-led verified-only clinics.
+2. SAFETY SCREEN — for NAD+ / GLP-1 / high-dose vit C / iron, ask the single combined screening question and route flagged users to MD-led verified-only clinics.
 3. FIND AND PRESENT — top 3 clinic cards with name + rating + distance + verified badge + key specialty match + BOOK NOW button or CALL button.
 4. CLOSE THE LOOP — "Would you like me to help you compare these three, or would you like to book one of them?"
 5. FOLLOW THROUGH — after a recommendation, ask if there's anything else the user wants to know before booking (e.g., what to eat beforehand, how long it takes).
@@ -1102,7 +1101,7 @@ WHEN RESULTS ARE DISTANCE-RANKED: the nearest match is first; you can mention th
 
 CURRENCY: tools return "country" ("CA" or "US") and "currency" ("CAD" or "USD") on each clinic and on get_city_stats / get_treatment_info results. When discussing prices for a Canadian clinic or city, ALWAYS label the figure as CAD (e.g. "$150–$350 CAD"). When the user is in a Canadian city and asks about a treatment, pass country="Canada" to get_treatment_info so the costRange comes back labeled in CAD. Never quote a Canadian clinic's prices as USD or vice versa.
 
-SAFETY SCREENING — required for these treatments: high-dose vitamin C, GLP-1 / semaglutide / Ozempic / Wegovy / Mounjaro / Tirzepatide, NAD+, iron infusion, peptide therapy, glutathione. Before recommending one of these, call screen_patient with the treatment name. The tool will return either:
+SAFETY SCREENING — required for these treatments: high-dose vitamin C, GLP-1 / semaglutide / Ozempic / Wegovy / Mounjaro / Tirzepatide, NAD+, iron infusion, glutathione. Before recommending one of these, call screen_patient with the treatment name. The tool will return either:
   • pendingQuestions — ask the FIRST pending question conversationally (one at a time, with brief reassuring framing like "Quick safety check before I recommend a clinic — [question]". Never present all 5 as a form.) After the user answers, call screen_patient again with the accumulated answers.
   • safetyTier=green — proceed normally with search_providers.
   • safetyTier=amber — call search_providers with verified_only=true, then include the disclaimer in your response.

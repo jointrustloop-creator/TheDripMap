@@ -180,7 +180,11 @@ export default function RootLayout({
             {children}
             <CompareBar />
             <EmailCapturePopup />
-            <DripAssistant />
+            {/* Drip Assistant is hidden until its LLM key is configured: a
+                widget that errors on every message is worse than no widget.
+                Gated on GROQ_API_KEY (server-only), so it self-restores the
+                moment the key is added to Vercel and the app redeploys. */}
+            {process.env.GROQ_API_KEY ? <DripAssistant /> : null}
           </ClaimListingProvider>
         </ErrorBoundary>
       </body>

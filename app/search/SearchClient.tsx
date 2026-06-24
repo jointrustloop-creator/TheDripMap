@@ -38,7 +38,6 @@ interface SearchClientProps {
 const GOAL_KEYWORDS: Record<string, string[]> = {
   'NAD': ['nad+', 'nad ', 'nicotinamide', 'longevity'],
   'WeightLoss': ['weight loss', 'semaglutide', 'tirzepatide', 'ozempic', 'wegovy', 'mounjaro', 'lipotropic', 'mic injection', 'fat burn'],
-  'Peptides': ['peptide'],
   'SkinGlow': ['glutathione', 'beauty drip', 'beauty + glow', 'beauty and glow', 'skin glow', 'brightening'],
 };
 
@@ -140,7 +139,6 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
     { id: 'Oversight', label: 'MD / NP on staff' },
     { id: 'NAD', label: 'NAD+' },
     { id: 'WeightLoss', label: 'Weight Loss' },
-    { id: 'Peptides', label: 'Peptides' },
     { id: 'SkinGlow', label: 'Beauty / Glutathione' },
     { id: 'TopRated', label: 'Top Rated' },
     { id: 'Open', label: 'Open Now' },
