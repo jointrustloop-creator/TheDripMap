@@ -21,7 +21,7 @@ import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { BlogCard } from '../../../src/components/BlogCard';
-import { getBlogPostBySlug, getBlogPosts, slugify, getListingsByIds, getAllCities, US_MARKET_BLOG_SLUGS } from '../../../src/lib/data';
+import { getBlogPostBySlug, getBlogPosts, slugify, getListingsByIds, getAllCities, US_MARKET_BLOG_SLUGS, BLOG_CANONICAL_OVERRIDES } from '../../../src/lib/data';
 import { US_MARKET_ENABLED } from '../../../src/lib/market';
 import { cn } from '../../../src/lib/utils';
 
@@ -58,7 +58,11 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     .split('-')
     .map(w => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
-  const canonical = `https://www.thedripmap.com/blog/${safeSlug}`;
+  // A commercial "best clinics" roundup canonicals to its city hub (the page we
+  // want to rank); everything else self-canonicals. See BLOG_CANONICAL_OVERRIDES.
+  const canonical = BLOG_CANONICAL_OVERRIDES[safeSlug]
+    ? `https://www.thedripmap.com${BLOG_CANONICAL_OVERRIDES[safeSlug]}`
+    : `https://www.thedripmap.com/blog/${safeSlug}`;
 
   const post = await getBlogPostBySlug(slug);
 

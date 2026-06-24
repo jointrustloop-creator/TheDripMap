@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { getAllListings, getBlogPosts, getAllCities, slugify, getServiceFilter } from '../src/lib/data';
+import { getAllListings, getBlogPosts, getAllCities, slugify, getServiceFilter, BLOG_CANONICAL_OVERRIDES } from '../src/lib/data';
 import { US_MARKET_ENABLED, marketOf } from '../src/lib/market';
 import { priceIndexCitySlugs } from '../src/lib/price-index-data';
 
@@ -139,12 +139,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
   const posts = await getBlogPosts();
-  const blogRoutes = posts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly' as const,
-    priority: 0.6,
-  }));
+  const blogRoutes = posts
+    // Posts that canonical to a city hub are not canonical URLs — keep them out
+    // of the sitemap (it should advertise only canonical URLs).
+    .filter((post) => !BLOG_CANONICAL_OVERRIDES[post.slug || ''])
+    .map((post) => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }));
 
   // IV Price Index — one citable page per covered city. Driven off the dataset
   // so adding a city to price-index-data.ts auto-adds it here.

@@ -1223,6 +1223,25 @@ export const US_MARKET_BLOG_SLUGS = new Set<string>([
   'myers-cocktail-nyc', 'iv-therapy-manhattan', 'iv-therapy-brooklyn', 'iv-therapy-upper-east-side',
 ]);
 
+// Cannibalization fix (2026-06-23): these commercial "Best IV therapy clinics in
+// {city}" roundup posts duplicate the intent of the /cities/{city} hub (a ranked
+// clinic list — the page we want to rank for "iv therapy {city}"). Canonical
+// them to the hub so Google consolidates the ranking signal onto it, and drop
+// them from the sitemap (a sitemap should list only canonical URLs). The pages
+// stay live + resolvable; the DEEP informational "complete guide" posts keep
+// their own canonical (they target a different, informational intent). Canonical
+// (not 301) so it is a reversible hint — remove an entry to restore self-canonical.
+export const BLOG_CANONICAL_OVERRIDES: Record<string, string> = {
+  'best-iv-therapy-toronto-2026': '/cities/toronto',
+  'iv-therapy-greater-toronto-area': '/cities/toronto',
+  'best-iv-therapy-ottawa-2026': '/cities/ottawa',
+  'best-iv-therapy-montreal-2026': '/cities/montreal',
+  'best-iv-therapy-mississauga-2026': '/cities/mississauga',
+  'best-iv-therapy-vancouver-2026': '/cities/vancouver',
+  'best-iv-therapy-calgary-2026': '/cities/calgary',
+  'iv-therapy-oakville': '/cities/oakville',
+};
+
 export async function getBlogPosts() {
   const configured = isSupabaseConfigured();
 
