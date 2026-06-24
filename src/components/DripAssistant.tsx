@@ -32,13 +32,13 @@ interface Msg {
   greeting?: boolean;
 }
 
-const GREETING = 'Hi! I can help you find the right IV therapy or peptide clinic near you — or answer quick questions about treatments. What are you looking for?';
+const GREETING = 'Hi! I can help you find the right IV therapy clinic near you, or answer quick questions about treatments. What are you looking for?';
 
 const SUGGESTIONS = [
   'Find a hangover IV near me',
   "What's a Myers Cocktail?",
   'Mobile IV to my hotel',
-  'Are peptides safe?',
+  'Is NAD+ safe?',
   'How much does NAD+ cost?',
 ];
 
