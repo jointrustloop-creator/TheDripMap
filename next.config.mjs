@@ -95,14 +95,9 @@ const nextConfig = {
         destination: '/providers/:slug*',
         permanent: true,
       },
-      // Bare /iv-prices -> the flagship city index. Exact source, so it never
-      // shadows the per-city /iv-prices/<slug> pages (which render directly).
-      // Temporary (307) because the flagship city may change as coverage grows.
-      {
-        source: '/iv-prices',
-        destination: '/iv-prices/toronto',
-        permanent: false,
-      },
+      // NOTE: the old /iv-prices -> /iv-prices/toronto redirect was removed
+      // 2026-06-23 when the real /iv-prices national hub (app/iv-prices/page.tsx)
+      // shipped. Re-adding it would shadow that hub.
       // -----------------------------------------------------------------
       // GSC 404 cleanup — 2026-05-30
       // -----------------------------------------------------------------
