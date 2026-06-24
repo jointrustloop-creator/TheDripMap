@@ -18,6 +18,7 @@ const TREATMENTS = [
 ];
 
 const GUIDES = [
+  { label: 'IV Price Index (Canada)', href: '/iv-prices', strong: true },
   { label: 'IV Therapy Insurance Coverage in Canada', href: '/blog/iv-therapy-insurance-coverage-canada' },
   { label: 'Who Can Legally Give IV Therapy by Province', href: '/blog/who-can-legally-give-iv-canada-rules-by-province-2026' },
   { label: 'Mobile IV Therapy Toronto & GTA', href: '/blog/mobile-iv-therapy-toronto-gta' },

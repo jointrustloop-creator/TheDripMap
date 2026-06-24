@@ -39,6 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/contact`,                priority: 0.6, changeFrequency: 'monthly', lastModified: new Date() },
     { url: `${baseUrl}/symptoms`,               priority: 0.7, changeFrequency: 'monthly', lastModified: new Date() },
     { url: `${baseUrl}/treatments`,             priority: 0.8, changeFrequency: 'monthly', lastModified: new Date() },
+    { url: `${baseUrl}/iv-prices`,              priority: 0.85, changeFrequency: 'weekly',  lastModified: new Date() },
   ];
 
   // /iv-therapy-statistics is a US-framed page ("IV Therapy in the United States").
