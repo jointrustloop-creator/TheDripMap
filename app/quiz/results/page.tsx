@@ -2,7 +2,7 @@
 import React, { useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Sparkles, ArrowRight, MapPin, ShieldAlert } from 'lucide-react';
+import { Sparkles, ArrowRight, MapPin, ShieldAlert, ChevronDown } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
@@ -12,6 +12,7 @@ import {
   getOperatorProfiles,
   getListingsByCity,
   getFeaturedListings,
+  slugify,
 } from '../../../src/lib/data';
 import {
   getSymptomById,
@@ -130,6 +131,7 @@ function ResultsContent() {
   const [operatorProfiles, setOperatorProfiles] = React.useState<OperatorProfile[]>([]);
   const [listings, setListings] = React.useState<Provider[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [showMore, setShowMore] = React.useState(false);
 
   React.useEffect(() => {
     async function loadData() {
@@ -226,7 +228,7 @@ function ResultsContent() {
   // claimed (is_featured) first, then by rating descending. Take top 3.
   // If no clinics match the specialty keyword, fall back to claimed-first
   // rating-sorted across the whole result set.
-  const matchedClinics = useMemo<(Provider & { offersRecommended?: boolean })[]>(() => {
+  const rankedClinics = useMemo<(Provider & { offersRecommended?: boolean })[]>(() => {
     if (!recommendation || listings.length === 0) return [];
     const keywords = treatmentMatchKeywords(recommendation.name);
 
@@ -275,8 +277,13 @@ function ResultsContent() {
       seenOperators.add(key);
       deduped.push(p);
     }
-    return deduped.slice(0, 3);
+    return deduped;
   }, [recommendation, listings, surveyData.locationPreference, safetyTriggered]);
+
+  // Top 3 are the hero "matches"; the rest expand on demand ("view more").
+  // This makes the top-3 slots scarce + sellable as Featured placement.
+  const matchedClinics = useMemo(() => rankedClinics.slice(0, 3), [rankedClinics]);
+  const moreClinics = useMemo(() => rankedClinics.slice(3), [rankedClinics]);
 
   // Location transparency: getListingsByCity silently broadens an empty city to
   // state level, so detect when nothing in the shown set is actually in the
@@ -485,6 +492,49 @@ function ResultsContent() {
                 Retake Quiz
               </button>
             </div>
+          </div>
+        )}
+
+        {/* View more clinics nearby — keeps patients on the results page and
+            makes the top-3 "featured" slots visibly scarce (sellable placement). */}
+        {moreClinics.length > 0 && (
+          <div className="mt-6">
+            {!showMore ? (
+              <button
+                onClick={() => setShowMore(true)}
+                className="w-full bg-white border-2 border-slate-200 hover:border-wellness-400 hover:bg-wellness-50/40 text-slate-900 px-6 py-4 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2"
+              >
+                View more clinics{surveyData.city ? ` in ${titleCase(surveyData.city)}` : ' nearby'}
+                <ChevronDown size={16} />
+              </button>
+            ) : (
+              <>
+                <div className="text-center mt-14 mb-6">
+                  <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">More clinics nearby</h3>
+                </div>
+                <div className="space-y-6">
+                  {moreClinics.slice(0, 9).map((provider) => (
+                    <ProviderCardFeatured
+                      key={provider.id}
+                      provider={provider}
+                      operatorProfile={operatorProfiles.find((op) => op.clinicId === provider.id)}
+                      isPrimary={false}
+                      recommendedTreatment={recommendation.name}
+                    />
+                  ))}
+                </div>
+                {moreClinics.length > 9 && surveyData.city && (
+                  <div className="text-center mt-8">
+                    <Link
+                      href={`/cities/${slugify(surveyData.city)}`}
+                      className="inline-flex items-center gap-1.5 text-sm font-black text-wellness-700 hover:gap-2.5 transition-[gap]"
+                    >
+                      See all {rankedClinics.length} clinics in {titleCase(surveyData.city)} <ArrowRight size={16} />
+                    </Link>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
 
