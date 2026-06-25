@@ -327,7 +327,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
       whileHover={{ y: -5 }}
       className={cn(
         'group relative rounded-[2rem] border overflow-hidden transition-all duration-500 flex flex-col h-full',
-        'border-slate-200 shadow-sm bg-slate-50 grayscale-[0.5] opacity-90 hover:grayscale-0 hover:opacity-100',
+        'border-slate-200 shadow-sm bg-slate-50',
         className
       )}
     >
@@ -351,11 +351,22 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
         <div className="px-5 pb-5 flex-1 flex flex-col">
           <div className="flex justify-between items-start gap-2 mb-3">
             <Link href={`/providers/${slug}`} className="flex-1">
-              <h3 className="text-xl font-black leading-tight line-clamp-2 transition-colors text-slate-600">
+              <h3 className="text-xl font-black leading-tight line-clamp-2 transition-colors text-slate-900">
                 {provider.name}
               </h3>
             </Link>
           </div>
+
+          {/* Google rating — shown on every rated clinic now (claimed or not),
+              so the most-browsed pages read as trustworthy, not greyed-out.
+              The "Claim Listing" nudge below keeps the soft claim incentive. */}
+          {Number(provider.rating) > 0 && (
+            <div className="flex items-center gap-1.5 mb-3">
+              <StarIcon size={14} className="text-amber-500" fill="currentColor" />
+              <span className="text-sm font-black text-slate-900">{provider.rating}</span>
+              <span className="text-xs font-bold text-slate-400">({provider.reviewCount || 0})</span>
+            </div>
+          )}
 
           {/* Status Row */}
           <div className="flex items-center gap-3 mb-4">
