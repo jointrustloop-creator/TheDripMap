@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { ResilientImage } from './ResilientImage';
 import TrackedLink from './TrackedLink';
+import { MessageClinicButton } from './MessageClinicButton';
 import {
   MapPin,
   ArrowRight,
@@ -208,7 +209,7 @@ export const ProviderCardFeatured = ({
               <MapPin size={13} className="text-slate-400 shrink-0" />
               <span className="truncate">{provider.city}{provider.state ? `, ${provider.state}` : ''}</span>
             </div>
-            {isClaimed && provider.rating > 0 && (
+            {provider.rating > 0 && (
               <div className="flex items-center gap-1.5 text-sm font-black text-slate-900 shrink-0">
                 <StarIcon size={14} className="text-amber-500" fill="currentColor" />
                 {provider.rating}
@@ -317,6 +318,14 @@ export const ProviderCardFeatured = ({
               </TrackedLink>
             )}
           </div>
+
+          {/* 1-click contact straight from the match: sends the lead to the
+              clinic (auto-forward) without a detour through the profile page. */}
+          <MessageClinicButton
+            provider={provider}
+            label="Message this clinic"
+            className="mt-2 w-full bg-wellness-50 hover:bg-wellness-100 text-wellness-700 border border-wellness-200 px-4 py-2.5 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2"
+          />
         </div>
       </div>
     </motion.div>
