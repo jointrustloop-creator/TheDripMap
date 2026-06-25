@@ -72,8 +72,19 @@ Email: info@thedripmap.com
   /admin/onboarding.
 - PENDING OPERATOR PASTE: scripts/create-onboarding-engine-tables.sql
   (onboarding_requests), scripts/create-seo-health-runs-findings.sql
-  (WS6, unlocks nightly SEO mechanic),
-  scripts/create-auto-forward-shadow-tables.sql (shadow lead-forward).
+  (WS6, unlocks nightly SEO mechanic).
+- LEAD AUTO-FORWARD LIVE 2026-06-25 (app/api/message-clinic/route.ts):
+  ENABLE_AUTO_FORWARD = true; migration create-auto-forward-shadow-tables.sql
+  APPLIED (no longer pending). A patient "Message Clinic" lead now emails the
+  claimed clinic owner directly (reply-to = patient) when eligible (claimed +
+  not orphan stub + forward_leads != false + valid, non-bounced, non-suppressed
+  email); everything else is saved + info@ notified for manual relay. info@ is
+  copied on EVERY lead. Route + /admin/leads tolerate the forward_* columns
+  being absent. Per-clinic opt-out = providers.forward_leads=false (or add the
+  clinic email to a suppression list). Weekly report now has a LEADS THIS WEEK
+  block (patient messages + forwarded count + top clinics by contact clicks).
+  Modal copy is status-tailored (claimed = "sent to clinic"; else = "we'll
+  relay"). Card/compare contact clicks are now tracked via TrackedLink.
 - Templates A (outreach) + B (onboarding) operator-APPROVED 2026-06-12;
   texts in scripts/_autopilot-templates-for-approval.md, flags in
   scripts/_autopilot-approvals.md.

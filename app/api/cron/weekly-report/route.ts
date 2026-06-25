@@ -4,9 +4,10 @@
  * Schedule (vercel.json): "0 22 * * 0" = 22:00 UTC every Sunday.
  *
  * 7-day rollup with trend vs prior 7 days, outreach-to-claim conversion
- * rate, top 10 listings by views/clicks from listing_events, and the
- * latest SEO health snapshot. Delivered via email + Telegram, same as
- * the daily report.
+ * rate, a leads-this-week block (patient messages + how many auto-forwarded,
+ * plus top clinics by contact clicks), top 10 listings by views/clicks from
+ * listing_events, and the latest SEO health snapshot. Delivered via email +
+ * Telegram, same as the daily report.
  *
  * Auth: Authorization: Bearer ${CRON_SECRET}.
  */
@@ -125,7 +126,13 @@ export async function GET(req: Request) {
     .select('provider_id, event_type')
     .gte('created_at', weekStart.toISOString());
 
+  // Direct-contact "lead" clicks — the patient-intent signal that powers the
+  // claimed-clinic value prop (and the auto-forward feature): book / call /
+  // website only. Views + directions are weaker signals, scored separately.
+  const LEAD_CLICK_TYPES = new Set(['book_click', 'call_click', 'website_click']);
   const eventTally = new Map<string, { views: number; clicks: number }>();
+  const leadTally = new Map<string, number>();
+  let totalLeadClicks = 0;
   for (const ev of eventsRaw || []) {
     const pid = (ev as { provider_id: string }).provider_id;
     const et = (ev as { event_type: string }).event_type;
@@ -134,18 +141,56 @@ export async function GET(req: Request) {
     const t = eventTally.get(pid)!;
     if (et === 'view') t.views += 1;
     else t.clicks += 1;
+    if (LEAD_CLICK_TYPES.has(et)) {
+      leadTally.set(pid, (leadTally.get(pid) || 0) + 1);
+      totalLeadClicks += 1;
+    }
   }
   const ranked = [...eventTally.entries()]
     .map(([pid, t]) => ({ pid, views: t.views, clicks: t.clicks, score: t.views + t.clicks * 3 }))
     .sort((a, b) => b.score - a.score)
     .slice(0, 10);
+  const rankedLeads = [...leadTally.entries()]
+    .map(([pid, n]) => ({ pid, n }))
+    .sort((a, b) => b.n - a.n)
+    .slice(0, 10);
+
+  // Patient messages (Message Clinic leads) this week + how many auto-forwarded
+  // straight to the clinic. Resilient to the forward_status column being absent.
+  let messagesThis = 0;
+  let forwardedThis = 0;
+  {
+    let rows: Array<{ message?: string | null; forward_status?: string | null }> | null = null;
+    const full = await supabase
+      .from('inquiries')
+      .select('message, forward_status')
+      .gte('created_at', weekStart.toISOString())
+      .limit(2000);
+    if (full.error) {
+      const lite = await supabase
+        .from('inquiries')
+        .select('message')
+        .gte('created_at', weekStart.toISOString())
+        .limit(2000);
+      rows = (lite.data || null) as typeof rows;
+    } else {
+      rows = (full.data || null) as typeof rows;
+    }
+    for (const r of rows || []) {
+      if (typeof r.message === 'string' && r.message.startsWith('[Lead for ')) {
+        messagesThis += 1;
+        if (r.forward_status === 'sent') forwardedThis += 1;
+      }
+    }
+  }
 
   const topProviderMap = new Map<string, ProviderLite>();
-  if (ranked.length) {
+  const nameIds = [...new Set([...ranked.map((r) => r.pid), ...rankedLeads.map((r) => r.pid)])];
+  if (nameIds.length) {
     const { data: provs } = await supabase
       .from('providers')
       .select('id, name, slug, city, state')
-      .in('id', ranked.map((r) => r.pid));
+      .in('id', nameIds);
     for (const p of (provs || []) as ProviderLite[]) topProviderMap.set(p.id, p);
   }
 
@@ -234,6 +279,19 @@ export async function GET(req: Request) {
   lines.push(`  Verified clinics: ${totalVerified || 0}`);
   lines.push(`  Total listings:   ${totalListings || 0}`);
   lines.push('');
+  lines.push('LEADS THIS WEEK (patient intent)');
+  lines.push(`  Patient messages:  ${messagesThis}${messagesThis > 0 ? ` (${forwardedThis} auto-forwarded to clinics)` : ''}`);
+  lines.push(`  Contact clicks:    ${totalLeadClicks} (book + call + website)`);
+  if (rankedLeads.length) {
+    lines.push('  Top clinics by contact clicks:');
+    for (const r of rankedLeads) {
+      const p = topProviderMap.get(r.pid);
+      const name = p?.name || r.pid.slice(0, 8);
+      const loc = [p?.city, p?.state].filter(Boolean).join(', ');
+      lines.push(`    - ${name}${loc ? ' (' + loc + ')' : ''} — ${r.n} contact clicks`);
+    }
+  }
+  lines.push('');
   lines.push('TOP 10 LISTINGS THIS WEEK (views + 3x clicks)');
   if (ranked.length === 0) {
     lines.push('  No tracked listing events yet.');
@@ -275,6 +333,9 @@ export async function GET(req: Request) {
       draftsPrior: draftsPrior || 0,
       totalVerified: totalVerified || 0,
       totalListings: totalListings || 0,
+      messagesThis,
+      forwardedThis,
+      totalLeadClicks,
       repliesThis: repliesThis.length,
       optOutsThis,
       bouncesThis,
