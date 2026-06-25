@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ResilientImage } from './ResilientImage';
+import TrackedLink from './TrackedLink';
 import {
   MapPin,
   ArrowRight,
@@ -276,38 +277,44 @@ export const ProviderCardFeatured = ({
               View clinic <ArrowRight size={17} />
             </Link>
             {bookingUrl && (
-              <a
+              <TrackedLink
+                providerId={provider.id}
+                eventType="book_click"
                 href={bookingUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 px-4 py-3 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2"
-                aria-label="Book online"
+                ariaLabel="Book online"
                 title="Book online"
               >
                 <Calendar size={16} />
-              </a>
+              </TrackedLink>
             )}
             {provider.phone && (
-              <a
+              <TrackedLink
+                providerId={provider.id}
+                eventType="call_click"
                 href={`tel:${provider.phone}`}
                 className="bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 px-4 py-3 rounded-2xl font-black text-sm transition-all flex items-center justify-center"
-                aria-label="Call"
+                ariaLabel="Call"
                 title="Call"
               >
                 <Phone size={16} />
-              </a>
+              </TrackedLink>
             )}
             {provider.website && (
-              <a
+              <TrackedLink
+                providerId={provider.id}
+                eventType="website_click"
                 href={provider.website}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 px-4 py-3 rounded-2xl font-black text-sm transition-all flex items-center justify-center"
-                aria-label="Website"
+                ariaLabel="Website"
                 title="Website"
               >
                 <Globe size={16} />
-              </a>
+              </TrackedLink>
             )}
           </div>
         </div>

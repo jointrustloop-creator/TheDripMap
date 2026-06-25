@@ -11,6 +11,7 @@ import { OpenStatus } from './OpenStatus';
 import { motion } from 'motion/react';
 import { useClaimListing } from '../context/ClaimListingContext';
 import { CompareToggle } from './CompareToggle';
+import TrackedLink from './TrackedLink';
 
 interface ProviderCardProps {
   provider: Provider;
@@ -280,26 +281,30 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
               View Profile <ArrowRight size={15} />
             </Link>
             {bookingUrl && (
-              <a
+              <TrackedLink
+                providerId={provider.id}
+                eventType="book_click"
                 href={bookingUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="h-11 w-11 inline-flex items-center justify-center rounded-2xl border border-slate-200 text-slate-500 hover:text-wellness-700 hover:border-wellness-300 transition-colors"
-                aria-label="Book online"
+                ariaLabel="Book online"
                 title="Book online"
               >
                 <Calendar size={17} />
-              </a>
+              </TrackedLink>
             )}
             {provider.phone && (
-              <a
+              <TrackedLink
+                providerId={provider.id}
+                eventType="call_click"
                 href={`tel:${provider.phone}`}
                 className="h-11 w-11 inline-flex items-center justify-center rounded-2xl border border-slate-200 text-slate-500 hover:text-wellness-700 hover:border-wellness-300 transition-colors"
-                aria-label="Call"
+                ariaLabel="Call"
                 title="Call"
               >
                 <Phone size={17} />
-              </a>
+              </TrackedLink>
             )}
           </div>
         </div>

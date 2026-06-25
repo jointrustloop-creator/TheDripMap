@@ -31,17 +31,30 @@ export default async function AdminLeadsPage() {
   // Pull all 3 lead-bearing tables in parallel — last 30 days, capped.
   const since = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
 
-  const [inqRes, claimRes, testRes] = await Promise.all([
-    supabase
+  // Resilient inquiries fetch: forward_status / forwarded_to_clinic_email /
+  // forwarded_to_clinic_at only exist once the auto-forward migration is
+  // applied. PostgREST errors the WHOLE select if any column is missing,
+  // which would silently drop EVERY lead from this page — so on error we
+  // retry with just the base columns. The page renders either way (the
+  // forward fields simply read as null until the migration lands).
+  const fetchInquiries = async () => {
+    const full = await supabase
       .from('inquiries')
-      // 2026-06-12: forward_status / forwarded_to_clinic_email /
-      // forwarded_to_clinic_at are recorded by /api/message-clinic in
-      // shadow mode so the admin can see what auto-forward WOULD have
-      // done. The select tolerates these columns being absent in dev.
       .select('id, name, email, phone, message, listing_id, created_at, forward_status, forwarded_to_clinic_email, forwarded_to_clinic_at')
       .gte('created_at', since)
       .order('created_at', { ascending: false })
-      .limit(500),
+      .limit(500);
+    if (!full.error) return full;
+    return supabase
+      .from('inquiries')
+      .select('id, name, email, phone, message, listing_id, created_at')
+      .gte('created_at', since)
+      .order('created_at', { ascending: false })
+      .limit(500);
+  };
+
+  const [inqRes, claimRes, testRes] = await Promise.all([
+    fetchInquiries(),
     supabase
       .from('claim_requests')
       .select(

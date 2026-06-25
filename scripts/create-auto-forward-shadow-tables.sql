@@ -1,10 +1,10 @@
--- Auto-forward shadow mode 2026-06-12.
+-- Auto-forward migration (shadow mode 2026-06-12, went LIVE 2026-06-25).
 --
 -- Adds the bookkeeping columns the /api/message-clinic route uses to
--- record, for every clinic-message lead, what auto-forward to the
--- claimed clinic owner WOULD have done if the feature flag were on.
--- No clinic emails fire while ENABLE_AUTO_FORWARD=false. Once we have
--- 1-2 weeks of forward_status data we can flip the flag.
+-- record, for every clinic-message lead, where the lead was forwarded,
+-- plus a per-clinic opt-out flag (forward_leads). Forwarding now fires
+-- for claimed clinics (ENABLE_AUTO_FORWARD=true); these columns make the
+-- result visible on /admin/leads and let a clinic opt out.
 --
 -- Run once in Supabase SQL Editor:
 --   https://supabase.com/dashboard/project/qaqzwfnjajyejehmdvuw/sql/new

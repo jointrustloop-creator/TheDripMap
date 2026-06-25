@@ -18,11 +18,16 @@ export const MessageClinicModal = ({ provider, isOpen, onClose }: MessageClinicM
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  // True only when the lead was auto-forwarded straight to the clinic
+  // (claimed clinics with a valid email). Drives the success copy so we
+  // never tell a patient "sent to the clinic" when it was actually queued
+  // for our team to relay.
+  const [forwarded, setForwarded] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const reset = () => {
     setName(''); setEmail(''); setPhone(''); setMessage('');
-    setIsSuccess(false); setError(null);
+    setIsSuccess(false); setForwarded(false); setError(null);
   };
 
   const handleClose = () => {
@@ -56,6 +61,8 @@ export const MessageClinicModal = ({ provider, isOpen, onClose }: MessageClinicM
       if (!res.ok || !result.success) {
         throw new Error(result.error || 'Could not send. Please try again.');
       }
+      // forwardStatus === 'sent' means the lead went straight to the clinic.
+      setForwarded(result.forwardStatus === 'sent');
       setIsSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
@@ -93,7 +100,11 @@ export const MessageClinicModal = ({ provider, isOpen, onClose }: MessageClinicM
                     Message sent
                   </h3>
                   <p className="text-slate-500 mb-8 leading-relaxed">
-                    We&apos;ve forwarded your message to {provider.name}. Expect a reply within 24 hours.
+                    {forwarded ? (
+                      <>We&apos;ve sent your message straight to {provider.name}. They&apos;ll reply directly to your email, usually within 1 to 2 business days.</>
+                    ) : (
+                      <>We&apos;ve received your message and our team will make sure {provider.name} gets it. You&apos;ll hear back by email soon.</>
+                    )}
                   </p>
                   <button
                     onClick={handleClose}
@@ -207,7 +218,7 @@ export const MessageClinicModal = ({ provider, isOpen, onClose }: MessageClinicM
                     </button>
 
                     <p className="text-[11px] text-slate-400 font-medium text-center leading-relaxed">
-                      Your message is forwarded directly to {provider.name}. No spam — your email is only used for the clinic&apos;s reply.
+                      We&apos;ll connect you with {provider.name} and they&apos;ll reply to your email. No spam. Your email is only used to put you in touch.
                     </p>
                   </form>
                 </>

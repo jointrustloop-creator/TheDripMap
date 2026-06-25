@@ -27,6 +27,7 @@ type Props = {
   target?: string;
   rel?: string;
   ariaLabel?: string;
+  title?: string;
   children: React.ReactNode;
 };
 
@@ -38,6 +39,7 @@ export default function TrackedLink({
   target,
   rel,
   ariaLabel,
+  title,
   children,
 }: Props) {
   return (
@@ -46,6 +48,7 @@ export default function TrackedLink({
       target={target}
       rel={rel}
       aria-label={ariaLabel}
+      title={title}
       className={className}
       onClick={() => {
         // Fire-and-forget. sendBeacon is queued by the browser even

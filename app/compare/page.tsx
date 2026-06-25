@@ -21,6 +21,7 @@ import { Provider } from '../../src/types';
 import { getStatus } from '../../src/lib/hours';
 import { OpenStatus } from '../../src/components/OpenStatus';
 import { ClearCompareButton } from '../../src/components/ClearCompareButton';
+import TrackedLink from '../../src/components/TrackedLink';
 
 export const metadata: Metadata = {
   title: 'Compare IV Therapy Clinics | TheDripMap',
@@ -239,14 +240,16 @@ export default async function ComparePage({ searchParams }: { searchParams: Sear
           {providers.map((p) => (
             <Cell key={p.id}>
               {p.website ? (
-                <a
+                <TrackedLink
+                  providerId={p.id}
+                  eventType="website_click"
                   href={p.website}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm font-black text-wellness-600 hover:text-wellness-700 inline-flex items-center gap-1.5"
                 >
                   <Globe size={14} /> Visit
-                </a>
+                </TrackedLink>
               ) : (
                 <span className="text-xs text-slate-400">—</span>
               )}

@@ -3,22 +3,23 @@ import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../src/lib/mailer';
 import { isJunkEmail } from '../../../src/lib/outreach-quality';
 
-// 2026-06-12 auto-forward shadow mode.
+// Auto-forward — LIVE 2026-06-25 (shadow mode 2026-06-12 → 2026-06-25).
 //
-// When ENABLE_AUTO_FORWARD=true, this route will additionally send the
-// lead body straight to the claimed clinic owner's email so they hear
-// from the patient with zero operator-in-the-middle delay.
+// When ENABLE_AUTO_FORWARD=true, this route additionally sends the lead
+// straight to the CLAIMED clinic owner's email so they hear from the
+// patient with zero operator-in-the-middle delay. reply-to is set to the
+// patient, so the clinic replies directly to them.
 //
-// Right now we are in SHADOW MODE. No clinic emails fire. The route
-// computes what the forward decision WOULD have been (eligible vs
-// suppressed vs unclaimed vs no_email etc) and records the answer in
-// inquiries.forward_status. The admin /admin/leads page surfaces the
-// shadow status so we can audit a week or two of real traffic before
-// flipping the flag.
+// Eligibility is decided by computeForwardDecision(): claimed + not an
+// orphan stub + forward_leads !== false + a valid, non-bounced,
+// non-suppressed email. Everything else (unclaimed, no_email, bounced,
+// suppressed, opted_out) is recorded but NOT forwarded — the operator
+// relays those manually. info@thedripmap.com is copied on EVERY lead
+// regardless, so the go-live is monitored end to end.
 //
-// Hard rule: do NOT flip ENABLE_AUTO_FORWARD to true without operator
-// approval in the same instruction.
-const ENABLE_AUTO_FORWARD = false;
+// Operator approval is required to change this flag (granted 2026-06-25
+// for the claimed-clinic go-live).
+const ENABLE_AUTO_FORWARD = true;
 
 type ForwardStatus =
   | 'sent'
@@ -56,11 +57,30 @@ async function computeForwardDecision(
   if (isJunkEmail(patientEmail)) {
     return { status: 'junk_patient', clinicEmail: null, provider: null };
   }
-  const { data: provider } = await supabase
-    .from('providers')
-    .select('id, name, email, email_bounced, is_claimed, decision_drivers, forward_leads')
-    .eq('id', clinicId)
-    .maybeSingle() as { data: ProviderRow | null };
+  // Resilient select: forward_leads only exists once the auto-forward
+  // migration has been applied. If the column is absent the full select
+  // errors, so we retry without it and treat forward_leads as its default
+  // (true / opted-in). This keeps forwarding working pre- and post-migration.
+  let provider: ProviderRow | null = null;
+  {
+    const full = await supabase
+      .from('providers')
+      .select('id, name, email, email_bounced, is_claimed, decision_drivers, forward_leads')
+      .eq('id', clinicId)
+      .maybeSingle();
+    if (full.error) {
+      const lite = await supabase
+        .from('providers')
+        .select('id, name, email, email_bounced, is_claimed, decision_drivers')
+        .eq('id', clinicId)
+        .maybeSingle();
+      provider = lite.data
+        ? ({ ...(lite.data as Record<string, unknown>), forward_leads: null } as ProviderRow)
+        : null;
+    } else {
+      provider = (full.data as ProviderRow | null) ?? null;
+    }
+  }
   if (!provider) {
     return { status: 'no_provider', clinicEmail: null, provider: null };
   }
@@ -218,7 +238,7 @@ Message:
 ${data.message}
 
 ---
-Auto-forward (shadow mode): ${decision.status}${
+Auto-forward (${ENABLE_AUTO_FORWARD ? 'LIVE' : 'shadow mode'}): ${decision.status}${
         decision.clinicEmail ? ` · clinic email on file: ${decision.clinicEmail}` : ''
       }${clinicForwardError ? ` · forward attempt FAILED: ${clinicForwardError}` : ''}
 This lead came through TheDripMap's "Message This Clinic" feature.
