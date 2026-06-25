@@ -49,18 +49,20 @@ export function buildOnboardingEmail(p: OnboardingProvider, ownerName: string | 
   const first = (ownerName || '').trim().split(/\s+/)[0] || 'there';
   const city = (p.city || '').trim() || 'your area';
   return {
-    subject: `You're verified on TheDripMap. Finish your listing in two minutes`,
+    subject: `You're confirmed as owner of ${p.name}. Earn your Safety Verified badge next`,
     text: `Hi ${first},
 
-${p.name} is now verified on TheDripMap, and your listing is live at ${SITE_URL}/providers/${p.slug}.
+Great news, you've confirmed ownership of ${p.name} and your listing is live at ${SITE_URL}/providers/${p.slug}.
 
-You're confirmed as the owner. To finish your listing (your photos, your drips and prices, and who patients will meet), tap through your own private page here:
+One short step makes it stand out: complete your safety questionnaire and we will review it and add your Safety Verified badge. That is the gold shield patients look for, and it visibly lifts your listing above unverified clinics when people in ${city} are choosing a clinic.
+
+It is all quick multiple choice plus a few photos, about two minutes, on your own private page:
 
 ${finishUrl}
 
-It is all quick multiple choice, it takes about two minutes, and the page is always yours. Bookmark it and update anything anytime. There is nothing to write up and nothing to reply to.
+The page is always yours. Bookmark it and update anything anytime.
 
-Thanks again for verifying. Patients in ${city} are already finding you.
+Thanks again, and welcome.
 
 TheDripMap
 ${OPERATOR_EMAIL}
@@ -74,14 +76,14 @@ export function buildOnboardingNudge(p: OnboardingProvider, ownerName: string | 
 } {
   const first = (ownerName || '').trim().split(/\s+/)[0] || 'there';
   return {
-    subject: `Finish your TheDripMap listing in two minutes`,
+    subject: `Two minutes to earn your Safety Verified badge on TheDripMap`,
     text: `Hi ${first},
 
-Quick nudge to finish your listing for ${p.name}. It is all quick multiple choice and a few photos, about two minutes, on your own private page:
+Quick nudge for ${p.name}: completing your safety questionnaire earns your Safety Verified badge, the gold shield patients look for when they pick a clinic. It is all quick multiple choice and a few photos, about two minutes, on your own private page:
 
 ${finishUrl}
 
-If now is a bad time, no problem, your verified listing stays live either way. The page is always there when you're ready.
+No rush, your listing stays live either way. The page is always there when you're ready.
 
 TheDripMap
 ${OPERATOR_EMAIL}
