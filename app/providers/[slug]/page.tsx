@@ -373,10 +373,12 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   // Reviews & ratings are shown ONLY for claimed/verified listings. Unclaimed
   // listings never display ratings, review counts, or testimonials anywhere.
   const isVerified = provider.is_featured === true;
-  // Blend Google rating with patient testimonials so a clinic with 0 Google reviews
-  // but verified TheDripMap testimonials still shows a meaningful rating.
-  const googleRating = isVerified ? Number(provider.rating) || 0 : 0;
-  const googleCount = isVerified ? Number(provider.reviewCount) || 0 : 0;
+  // Show the clinic's real Google rating on EVERY listing. The 2026-06 ratings
+  // backfill populated rating + review count for ~96% of Canadian clinics, so a
+  // bare page now shows a credible star rating (CTR + trust). Blended with any
+  // first-party TheDripMap testimonials for the visible display.
+  const googleRating = Number(provider.rating) || 0;
+  const googleCount = Number(provider.reviewCount) || 0;
   const testimonialCount = patientTestimonials.length;
   const testimonialRatingSum = patientTestimonials.reduce(
     (sum, t) => sum + (Number(t.rating) || 0),
@@ -393,6 +395,21 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
       : testimonialCount > 0
       ? 'testimonials'
       : 'google';
+  // Structured-data rating is intentionally NARROWER than the visible rating.
+  // We only assert AggregateRating from a first-party basis — TheDripMap patient
+  // testimonials, plus Google ratings ONLY for featured/claimed clinics (the
+  // prior behaviour). We deliberately do NOT mark up scraped third-party (Google)
+  // ratings across every unclaimed listing: Google's guidelines disallow marking
+  // up ratings aggregated from other sources, and a site-wide review-snippet
+  // manual action would undo the SEO we're building. The real Google rating still
+  // shows visibly on the page — it just isn't claimed as our structured data.
+  const schemaGoogleCount = isVerified ? googleCount : 0;
+  const schemaGoogleRating = isVerified ? googleRating : 0;
+  const schemaCount = schemaGoogleCount + testimonialCount;
+  const schemaRating = schemaCount > 0
+    ? Number(((schemaGoogleRating * schemaGoogleCount + testimonialRatingSum) / schemaCount).toFixed(1))
+    : 0;
+
   const isCityMatch = similarClinics.every(c => c.city === provider.city);
   const similarTitle = isCityMatch && similarClinics.length >= 3 
     ? `Other IV therapy clinics in ${provider.city}` 
@@ -422,10 +439,10 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
       "latitude": provider.latitude,
       "longitude": provider.longitude
     },
-    "aggregateRating": displayReviewCount > 0 ? {
+    "aggregateRating": schemaCount > 0 ? {
       "@type": "AggregateRating",
-      "ratingValue": displayRating,
-      "reviewCount": displayReviewCount
+      "ratingValue": schemaRating,
+      "reviewCount": schemaCount
     } : undefined
   };
 
@@ -635,7 +652,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               {displayRating > 0 && displayReviewCount > 0 && (
                 <div className="bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 shadow-md">
                   <Star size={13} fill="currentColor" className="text-amber-500" />
-                  {displayRating} · {displayReviewCount} {ratingSource === 'testimonials' ? 'patient testimonials' : 'reviews'}
+                  {displayRating} · {displayReviewCount} {ratingSource === 'testimonials' ? 'patient testimonials' : ratingSource === 'google' ? 'Google reviews' : 'reviews'}
                 </div>
               )}
               <div className="bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 shadow-md">
@@ -1726,7 +1743,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   )}
 
                   {/* RATING — quick credibility anchor */}
-                  {provider.is_featured && displayRating > 0 && displayReviewCount > 0 && (
+                  {displayRating > 0 && displayReviewCount > 0 && (
                     <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <Star size={14} fill="currentColor" className="text-amber-500" />
