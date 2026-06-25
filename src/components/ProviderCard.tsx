@@ -91,6 +91,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
   // Safety Verified is a separate, stronger signal than Claimed. The shield is
   // reserved for it; Claimed gets only a subtle check.
   const isSafetyVerified = provider.safety_verified === true;
+  const isFeatured = provider.is_featured === true;
 
   const initials = getInitials(provider.name);
 
@@ -121,8 +122,14 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
       <motion.div
         whileHover={{ y: -6 }}
         className={cn(
-          'group relative flex flex-col h-full rounded-3xl bg-white border border-slate-200/70 overflow-hidden',
-          'shadow-[0_18px_40px_-22px_rgba(15,23,42,0.28)] hover:shadow-[0_30px_60px_-25px_rgba(15,23,42,0.4)] transition-shadow duration-300',
+          'group relative flex flex-col h-full rounded-3xl bg-white border overflow-hidden transition-shadow duration-300',
+          // Verification ladder (matches ProviderCardFeatured): Featured = emerald
+          // ring, Safety Verified = amber "sparkle" ring, Claimed = neutral lift.
+          isFeatured
+            ? 'border-wellness-400 ring-2 ring-wellness-400/50 shadow-[0_22px_48px_-24px_rgba(20,184,166,0.45)] hover:shadow-[0_30px_60px_-24px_rgba(20,184,166,0.55)]'
+            : isSafetyVerified
+            ? 'border-amber-300 ring-2 ring-amber-300/60 shadow-[0_20px_44px_-24px_rgba(245,158,11,0.42)] hover:shadow-[0_28px_56px_-24px_rgba(245,158,11,0.5)]'
+            : 'border-slate-200/70 shadow-[0_18px_40px_-22px_rgba(15,23,42,0.28)] hover:shadow-[0_30px_60px_-25px_rgba(15,23,42,0.4)]',
           className
         )}
       >
