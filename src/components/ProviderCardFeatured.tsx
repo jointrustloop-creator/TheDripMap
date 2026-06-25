@@ -102,6 +102,7 @@ export const ProviderCardFeatured = ({
   const bookingUrl = (provider as { online_booking_url?: string }).online_booking_url;
   const isClaimed = provider.is_claimed === true || provider.is_featured === true;
   const isSafety = provider.safety_verified === true;
+  const isFeatured = provider.is_featured === true;
   const oneLiner = operatorProfile?.profile_data?.oneLiner;
 
   // Status badge — EVERY card carries exactly one, by priority. Safety Verified
@@ -147,7 +148,14 @@ export const ProviderCardFeatured = ({
       whileHover={{ y: -4 }}
       className={cn(
         'group relative bg-white rounded-3xl overflow-hidden border transition-all duration-300',
-        isClaimed
+        // Status ladder, most prominent first: Featured (paid, emerald ring) >
+        // Safety Verified (amber "sparkle" ring) > Claimed (soft green lift) >
+        // unclaimed (plain). The visible gap motivates clinics to complete.
+        isFeatured
+          ? 'border-wellness-400 ring-2 ring-wellness-400/50 shadow-[0_24px_52px_-24px_rgba(20,184,166,0.45),0_6px_16px_-10px_rgba(15,23,42,0.12)] hover:shadow-[0_32px_64px_-24px_rgba(20,184,166,0.55)]'
+          : isSafety
+          ? 'border-amber-300 ring-2 ring-amber-300/60 shadow-[0_22px_48px_-26px_rgba(245,158,11,0.40),0_6px_16px_-10px_rgba(15,23,42,0.1)] hover:shadow-[0_30px_60px_-26px_rgba(245,158,11,0.50)]'
+          : isClaimed
           ? 'border-wellness-500/30 shadow-[0_22px_48px_-26px_rgba(20,184,166,0.28),0_6px_16px_-10px_rgba(15,23,42,0.1)] hover:shadow-[0_30px_60px_-26px_rgba(20,184,166,0.38)]'
           : 'border-slate-200 shadow-sm hover:shadow-md'
       )}
