@@ -84,7 +84,7 @@ export default function GuidesIndexPage() {
           </h1>
           <p className="text-xl text-slate-500 leading-relaxed">
             Plain-language guides written for people deciding whether IV therapy is
-            right for them — what to ask, what it costs, what credentials matter,
+            right for them: what to ask, what it costs, what credentials matter,
             and what to expect when you walk in.
           </p>
         </section>

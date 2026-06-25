@@ -190,7 +190,7 @@ export default async function BlogPage() {
                 Take the 60-sec quiz
               </h3>
               <p className="text-sm text-slate-300 leading-relaxed mb-4">
-                Pick your symptom — we&apos;ll recommend the right protocol and show clinics that offer it.
+                Pick your symptom. We&apos;ll recommend the right protocol and show clinics that offer it.
               </p>
               <span className="text-xs font-black text-wellness-300 uppercase tracking-widest">
                 Start quiz →

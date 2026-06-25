@@ -274,7 +274,7 @@ export default function TreatmentsIndexPage() {
                 Take the 60-sec quiz
               </h3>
               <p className="text-sm text-slate-300 leading-relaxed mb-4">
-                Pick your symptom — we&apos;ll recommend the right protocol and
+                Pick your symptom. We&apos;ll recommend the right protocol and
                 show clinics that offer it.
               </p>
               <span className="text-xs font-black text-wellness-300 uppercase tracking-widest">
@@ -292,7 +292,7 @@ export default function TreatmentsIndexPage() {
                 Browse by symptom
               </h3>
               <p className="text-sm text-slate-600 leading-relaxed mb-4">
-                Fatigue, migraine, hangover, jet lag, morning sickness — match
+                Fatigue, migraine, hangover, jet lag, morning sickness. Match
                 how you feel to the right drip.
               </p>
               <span className="text-xs font-black text-wellness-600 uppercase tracking-widest group-hover:underline">

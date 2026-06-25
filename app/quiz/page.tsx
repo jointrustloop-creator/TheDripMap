@@ -43,13 +43,13 @@ const STEPS = [
   {
     id: 'city',
     question: 'Where are you located?',
-    description: 'We\'ll find clinics nearest to you. Confirm or edit below — we try to auto-detect.',
+    description: 'We\'ll find clinics nearest to you. Confirm or edit below. We try to auto-detect.',
     type: 'location',
   },
   {
     id: 'symptoms',
     question: 'Which best describes how you\'re feeling?',
-    description: 'Pick the one that fits best — we\'ll recommend a treatment, then match clinics that offer it.',
+    description: 'Pick the one that fits best. We\'ll recommend a treatment, then match clinics that offer it.',
     options: [
       { id: 'wiped-out', label: "I'm wiped out", icon: <Battery size={24} />, desc: 'Low energy, foggy, dragging' },
       { id: 'fighting-cold', label: "Fighting a cold", icon: <ShieldCheck size={24} />, desc: 'Run-down, post-illness' },
@@ -60,13 +60,13 @@ const STEPS = [
       { id: 'mental-sharp', label: 'Want to feel sharper', icon: <Brain size={24} />, desc: 'Focus, clarity, performance' },
       { id: 'skin-goals', label: 'Skin & glow goals', icon: <Sparkles size={24} />, desc: 'Long-term skin clarity' },
       { id: 'iron', label: 'Iron / anemia diagnosed', icon: <Droplet size={24} />, desc: 'Confirmed low iron or ferritin' },
-      { id: 'just-curious', label: "Not sure — show options", icon: <HelpCircle size={24} />, desc: 'Browsing, help me understand' },
+      { id: 'just-curious', label: "Not sure, show options", icon: <HelpCircle size={24} />, desc: 'Browsing, help me understand' },
     ],
   },
   {
     id: 'medicalHistory',
-    question: 'Before we match you — anything we should know?',
-    description: 'This helps us prioritize clinics with proper medical oversight for your case. Pick one — your data stays private.',
+    question: 'Before we match you, anything we should know?',
+    description: 'This helps us prioritize clinics with proper medical oversight for your case. Pick one. Your data stays private.',
     options: [
       { id: 'none', label: 'None of these apply', icon: <CheckCircle2 size={24} />, desc: 'Healthy, no medications' },
       { id: 'pregnant', label: 'Pregnant or breastfeeding', icon: <ShieldAlert size={24} />, desc: 'Show clinics with MD on-site' },
