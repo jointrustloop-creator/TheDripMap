@@ -344,6 +344,18 @@ export const ProviderCardFeatured = ({
             label="Message this clinic"
             className="mt-2 w-full bg-wellness-50 hover:bg-wellness-100 text-wellness-700 border border-wellness-200 px-4 py-2.5 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2"
           />
+
+          {/* Owner nudge: claimed but not yet Safety Verified. A self-serve path
+              to the finish link so we stop chasing them by email, and so they
+              can earn the badge that visibly lifts their card above. */}
+          {isClaimed && !isSafety && (
+            <Link
+              href={`/get-verified?id=${encodeURIComponent(provider.id)}&name=${encodeURIComponent(provider.name)}`}
+              className="mt-2 inline-flex items-center justify-center gap-1 text-[12px] font-bold text-slate-400 hover:text-wellness-700 transition-colors"
+            >
+              <ShieldCheck size={13} /> Clinic owner? Get the Safety Verified badge
+            </Link>
+          )}
         </div>
       </div>
     </motion.div>

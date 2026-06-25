@@ -314,6 +314,17 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
               </TrackedLink>
             )}
           </div>
+
+          {/* Owner nudge: claimed but not yet Safety Verified. Self-serve path
+              to the finish link so we stop chasing them by email. */}
+          {isClaimed && !isSafetyVerified && (
+            <Link
+              href={`/get-verified?id=${encodeURIComponent(provider.id)}&name=${encodeURIComponent(provider.name)}`}
+              className="mt-3 inline-flex items-center justify-center gap-1 text-[11px] font-bold text-slate-400 hover:text-wellness-700 transition-colors"
+            >
+              <ShieldCheck size={12} /> Clinic owner? Get the Safety Verified badge
+            </Link>
+          )}
         </div>
       </motion.div>
     );
