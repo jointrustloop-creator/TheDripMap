@@ -81,7 +81,7 @@ export const HowItWorks = ({ totalListings = 1042 }: { totalListings?: number })
             Wellness
           </h2>
           <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            We&apos;ve simplified the process of finding medical-grade IV therapy. No more endless searching—just results.
+            We&apos;ve simplified the process of finding medical-grade IV therapy. No more endless searching. Just results.
           </p>
         </motion.div>
 

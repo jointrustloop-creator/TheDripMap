@@ -56,7 +56,7 @@ export const CompactCityGrid = ({ cities }: CompactCityGridProps) => {
           <p className="text-slate-500 font-medium">
             Don&apos;t see your city?{" "}
             <Link href="/quiz" className="text-wellness-600 hover:underline font-bold">
-              We&apos;re expanding — take the quiz and we&apos;ll find the nearest option.
+              We&apos;re expanding. Take the quiz and we&apos;ll find the nearest option.
             </Link>
           </p>
         </div>

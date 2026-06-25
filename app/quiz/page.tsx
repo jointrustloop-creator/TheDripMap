@@ -313,7 +313,7 @@ export default function QuizPage() {
     return (
       <div className="h-[100dvh] flex flex-col items-center justify-center p-6 text-center bg-[#FDFDFB]">
         <div className="w-12 h-12 border-4 border-wellness-600 border-t-transparent rounded-full animate-spin mb-6"></div>
-        <h2 className="text-xl font-black text-slate-900 mb-2 tracking-tight">Finding Your Location</h2>
+        <h1 className="text-xl font-black text-slate-900 mb-2 tracking-tight">Finding Your Location</h1>
         <p className="text-sm text-slate-500 font-medium">We&apos;re locating nearby clinics for you...</p>
       </div>
     );
@@ -475,9 +475,9 @@ export default function QuizPage() {
               className="space-y-6 md:space-y-8"
             >
               <div className="max-w-2xl mx-auto text-center">
-                <h2 className="text-2xl md:text-4xl font-black text-slate-900 mb-2 md:mb-3 tracking-tight leading-tight">
+                <h1 className="text-2xl md:text-4xl font-black text-slate-900 mb-2 md:mb-3 tracking-tight leading-tight">
                   {currentStep.question}
-                </h2>
+                </h1>
                 <p className="text-sm md:text-base text-slate-500 leading-relaxed max-w-lg mx-auto">
                   {currentStep.description}
                 </p>

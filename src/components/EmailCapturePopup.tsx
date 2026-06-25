@@ -160,7 +160,7 @@ export const EmailCapturePopup = () => {
                     Get alerted when new IV clinics open near you.
                   </h3>
                   <p className="text-white/85 text-sm font-medium leading-relaxed">
-                    One short email a month. No spam, no upsells — just new clinics, pricing changes, and treatment guides for your city.
+                    One short email a month. No spam, no upsells. Just new clinics, pricing changes, and treatment guides for your city.
                   </p>
                 </div>
               </div>
