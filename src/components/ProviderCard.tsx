@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowRight, Star as StarIcon, Navigation, ShieldCheck, CheckCircle2, MapPin, Stethoscope, Phone, Calendar } from 'lucide-react';
 import { Provider } from '../types';
 import { slugify } from '../lib/data';
+import { bookingUrlOf } from '../lib/card-signals';
 import { cn } from '../lib/utils';
 import { ResilientImage } from './ResilientImage';
 import { OpenStatus } from './OpenStatus';
@@ -110,7 +111,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
     const specs = (provider.specialties || []).filter(Boolean);
     const namedServices = (provider.services || []).map((s) => s?.name).filter(Boolean) as string[];
     const tags = specs.length ? specs : namedServices;
-    const bookingUrl = (provider as { online_booking_url?: string }).online_booking_url;
+    const bookingUrl = bookingUrlOf(provider);
 
     const mode: 'credential' | 'services' | 'reputation' | 'basic' =
       credential || lead ? 'credential'
@@ -203,6 +204,33 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
             <span className="w-1 h-1 rounded-full bg-slate-300 shrink-0" />
             <span className="shrink-0">{isMobile ? 'Mobile' : 'Clinic'}</span>
           </div>
+
+          {/* Immediacy row — open-now + books-online. Previously shown only on
+              the featured card; surfaced here too since /search and /cities
+              claimed cards are the highest-traffic browse surface. Each cue is
+              honest: open-now is derived from real hours, "Books online" renders
+              only when a validated booking URL exists. */}
+          {(provider.hours || bookingUrl) && (
+            <div className="mt-1.5 flex items-center gap-2.5 flex-wrap">
+              {provider.hours && (
+                <OpenStatus
+                  hours={provider.hours}
+                  showDot={false}
+                  className="text-[10px] font-black uppercase tracking-tight"
+                  openClass="text-emerald-600"
+                  closedClass="text-amber-600"
+                  unknownClass="text-slate-400"
+                  openText="● OPEN NOW"
+                  closedText="● CLOSED"
+                />
+              )}
+              {bookingUrl && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-tight text-wellness-700">
+                  <Calendar size={11} /> Books online
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Trust signal, visible in EVERY card mode. Safety Verified leads as
               a prominent gold badge; Claimed shows subtly only on its own. */}

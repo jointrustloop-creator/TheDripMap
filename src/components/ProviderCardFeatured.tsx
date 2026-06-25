@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { Provider, OperatorProfile } from '../types';
 import { slugify } from '../lib/data';
+import { bookingUrlOf } from '../lib/card-signals';
 import { practitionerType } from '../lib/practitioner';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
@@ -99,7 +100,7 @@ export const ProviderCardFeatured = ({
   const firstTimeOffer = provider.special_offers?.find(
     (o) => o && o.title && o.active !== false && (!o.expires || o.expires >= new Date().toISOString().slice(0, 10))
   );
-  const bookingUrl = (provider as { online_booking_url?: string }).online_booking_url;
+  const bookingUrl = bookingUrlOf(provider);
   const isClaimed = provider.is_claimed === true || provider.is_featured === true;
   const isSafety = provider.safety_verified === true;
   const isFeatured = provider.is_featured === true;
@@ -236,8 +237,10 @@ export const ProviderCardFeatured = ({
             )}
           </div>
 
-          {/* Scannable signal row: practitioner type + offers-treatment + open */}
-          {(pracChip || provider.offersRecommended || openStatus) && (
+          {/* Scannable signal row: practitioner type + offers-treatment + open
+              + books-online. "Books online" shows only when a real booking URL
+              exists (validated), so it is never a fabricated cue. */}
+          {(pracChip || provider.offersRecommended || openStatus || bookingUrl) && (
             <div className="flex flex-wrap items-center gap-2 mb-4">
               {pracChip}
               {provider.offersRecommended && recommendedTreatment && (
@@ -248,6 +251,11 @@ export const ProviderCardFeatured = ({
               {openStatus && (
                 <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-emerald-600">
                   <Clock size={12} /> {openStatus}
+                </span>
+              )}
+              {bookingUrl && (
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-wellness-700">
+                  <Calendar size={12} /> Books online
                 </span>
               )}
             </div>
