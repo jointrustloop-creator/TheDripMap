@@ -262,6 +262,10 @@ function ResultsContent() {
         const diff = practitionerType(b).rank - practitionerType(a).rank;
         if (diff !== 0) return diff;
       }
+      // Featured (paid) clinics take the top slots — the sellable "Featured =
+      // top-3 match placement." Safety oversight still ranks above this for
+      // patients who flagged a contraindication (trust before revenue).
+      if (!!b.is_featured !== !!a.is_featured) return b.is_featured ? 1 : -1;
       if (!!b.offersRecommended !== !!a.offersRecommended) return b.offersRecommended ? 1 : -1;
       if (!!b.is_claimed !== !!a.is_claimed) return b.is_claimed ? 1 : -1;
       return (b.rating || 0) - (a.rating || 0);

@@ -17,6 +17,7 @@ import {
   Leaf,
   Gift,
   Calendar,
+  Sparkles,
   Star as StarIcon,
 } from 'lucide-react';
 import { Provider, OperatorProfile } from '../types';
@@ -193,6 +194,15 @@ export const ProviderCardFeatured = ({
 
         {/* Content */}
         <div className={cn('flex-1 flex flex-col min-w-0', isPrimary ? 'p-6 md:p-8' : 'p-5 md:p-6')}>
+          {/* Featured = paid top-placement. Labelled for transparency so the
+              ranking boost reads as sponsored, not favoritism. */}
+          {provider.is_featured === true && (
+            <div className="mb-2">
+              <span className="inline-flex items-center gap-1 bg-wellness-600 text-white px-2.5 py-1 rounded-full text-[10px] font-black tracking-[0.12em] uppercase shadow-sm">
+                <Sparkles size={11} /> Featured
+              </span>
+            </div>
+          )}
           {/* Name + status badge */}
           <div className="flex items-start justify-between gap-3 mb-1.5">
             <Link href={`/providers/${slug}`} className="min-w-0">
