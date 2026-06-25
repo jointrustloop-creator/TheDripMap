@@ -247,18 +247,38 @@ export async function POST(req: NextRequest) {
   // safety_verified so the badge renders. This is independent of Claimed
   // (ownership / is_claimed). The revalidatePath below makes it appear at once.
   if (isSafetyComplete(answers)) {
+    // The badge IS the critical outcome, so set it FIRST and on its own, so a
+    // failure deriving the (secondary) attestation flags can never block it.
+    // Bug fixed 2026-06-25: the operator_profiles INSERT below previously omitted
+    // the table's not-null owner_name/email, threw, and the shared catch silently
+    // skipped the flip — a clinic that completed the safety section got no badge
+    // (Knead Therapy was hit by exactly this).
+    if ((provider as { safety_verified?: boolean }).safety_verified !== true) {
+      try {
+        await supabase.from('providers').update({ safety_verified: true }).eq('id', providerId);
+      } catch (e) {
+        console.error('finish-listing safety_verified set failed', e instanceof Error ? e.message : e);
+      }
+    }
+    // Derive the attestation flags into the operator profile (enrichment only).
+    // Supply owner_name + email so the INSERT path satisfies the not-null columns.
     try {
       const derived = deriveSafetyFlags(answers);
       const { data: prof } = await supabase
         .from('operator_profiles').select('id, profile_data').eq('clinic_id', providerId).maybeSingle();
-      const mergedPd = { ...((prof?.profile_data as Record<string, unknown>) || {}), ...derived };
-      if (prof) await supabase.from('operator_profiles').update({ profile_data: mergedPd }).eq('id', prof.id);
-      else await supabase.from('operator_profiles').insert({ clinic_id: providerId, profile_data: mergedPd });
-      if ((provider as { safety_verified?: boolean }).safety_verified !== true) {
-        await supabase.from('providers').update({ safety_verified: true }).eq('id', providerId);
+      if (prof) {
+        const mergedPd = { ...((prof.profile_data as Record<string, unknown>) || {}), ...derived };
+        await supabase.from('operator_profiles').update({ profile_data: mergedPd }).eq('id', prof.id);
+      } else {
+        await supabase.from('operator_profiles').insert({
+          clinic_id: providerId,
+          owner_name: scrub(answers.team?.leadName, 80) || provider.name,
+          email: provider.email || OPERATOR_EMAIL,
+          profile_data: derived,
+        });
       }
     } catch (e) {
-      console.error('finish-listing safety badge set failed', e instanceof Error ? e.message : e);
+      console.error('finish-listing profile flags failed (non-fatal)', e instanceof Error ? e.message : e);
     }
   }
 
