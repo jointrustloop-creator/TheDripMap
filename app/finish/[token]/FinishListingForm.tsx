@@ -103,9 +103,9 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
   );
 }
 
-function SectionCard({ step, title, hint, children }: { step: number; title: string; hint?: string; children: React.ReactNode }) {
+function SectionCard({ step, title, hint, children, id }: { step: number; title: string; hint?: string; children: React.ReactNode; id?: string }) {
   return (
-    <section className="bg-white rounded-[1.75rem] border border-slate-200 shadow-[0_12px_34px_-22px_rgba(25,40,28,0.4)] p-6 md:p-8">
+    <section id={id} className="scroll-mt-24 bg-white rounded-[1.75rem] border border-slate-200 shadow-[0_12px_34px_-22px_rgba(25,40,28,0.4)] p-6 md:p-8">
       <div className="flex items-start gap-3.5 mb-5">
         <span className="flex-none w-8 h-8 rounded-full bg-[#ebf1e5] text-[#0F6E56] flex items-center justify-center font-black text-sm">{step}</span>
         <div>
@@ -176,6 +176,12 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
     (logo || photos.length || about.trim() || hasLogo || photoCount > 0 ? 1 : 0);
   const pctDone = Math.round((sectionsDone / 5) * 100);
 
+  // Safety Verified badge is earned by the safety section specifically — who
+  // starts the IV AND medical oversight (mirrors isSafetyComplete on the API).
+  // Tracked separately from the generic % so a 100%-complete profile that
+  // skipped these can never silently miss the badge.
+  const badgeEarned = whoPlaces.length > 0 && oversight.trim() !== '';
+
   const dealSuggestions = suggestedDeals(slowWindows);
 
   async function save() {
@@ -221,21 +227,43 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
       <div className="min-h-screen bg-[#f8f5ee] flex items-center justify-center px-6 py-16">
         <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl p-12 text-center max-w-lg">
           <div className="flex justify-center mb-6"><Logo imgClassName="h-10" /></div>
-          <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 text-emerald-600">
-            <CheckCircle2 size={32} />
-          </div>
-          <h1 className="text-3xl font-black text-slate-900 mb-3 tracking-tight">Saved. Your listing is updated.</h1>
-          <p className="text-slate-500 leading-relaxed mb-8">
-            Your changes are live now. This page is always yours, so bookmark it and come back to update anything anytime.
-          </p>
-          <div className="flex flex-col gap-3">
-            <a href={listingUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 bg-[#0F6E56] text-white px-7 py-4 rounded-xl font-black hover:bg-[#0A5742] transition-all">
-              View your live listing <ArrowRight size={18} />
-            </a>
-            <button onClick={() => setDone(false)} className="text-sm font-bold text-slate-500 hover:text-slate-900">
-              Keep editing
-            </button>
-          </div>
+          {badgeEarned ? (
+            <>
+              <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-600">
+                <ShieldCheck size={32} />
+              </div>
+              <h1 className="text-3xl font-black text-slate-900 mb-3 tracking-tight">Saved, and your Safety Verified badge is live.</h1>
+              <p className="text-slate-500 leading-relaxed mb-8">
+                Your changes are live now and your listing carries the Safety Verified badge, the gold shield that lifts you above unverified clinics in your city. This page is always yours, so come back to update anything anytime.
+              </p>
+              <div className="flex flex-col gap-3">
+                <a href={listingUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 bg-[#0F6E56] text-white px-7 py-4 rounded-xl font-black hover:bg-[#0A5742] transition-all">
+                  See your verified listing <ArrowRight size={18} />
+                </a>
+                <button onClick={() => setDone(false)} className="text-sm font-bold text-slate-500 hover:text-slate-900">
+                  Keep editing
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 text-emerald-600">
+                <CheckCircle2 size={32} />
+              </div>
+              <h1 className="text-3xl font-black text-slate-900 mb-3 tracking-tight">Saved. You are one step from your badge.</h1>
+              <p className="text-slate-500 leading-relaxed mb-8">
+                Your listing is updated and live. To earn the Safety Verified badge, the gold shield patients look for, just answer two quick safety questions: who starts the IV and your medical oversight. It takes about twenty seconds.
+              </p>
+              <div className="flex flex-col gap-3">
+                <button onClick={() => { setDone(false); if (typeof window !== 'undefined') setTimeout(() => { document.getElementById('safety-section')?.scrollIntoView({ behavior: 'smooth' }); }, 50); }} className="inline-flex items-center justify-center gap-2 bg-amber-500 text-white px-7 py-4 rounded-xl font-black hover:bg-amber-600 transition-all">
+                  Earn my Safety Verified badge <ShieldCheck size={18} />
+                </button>
+                <a href={listingUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-slate-500 hover:text-slate-900">
+                  View your live listing
+                </a>
+              </div>
+            </>
+          )}
         </div>
       </div>
     );
@@ -272,13 +300,26 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
             <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
               <div className="h-full bg-[#0F6E56] rounded-full transition-all duration-500" style={{ width: `${pctDone}%` }} />
             </div>
+            {/* Badge status — separate from the % so 100% complete can never
+                hide a missing badge. Reads off the safety section live. */}
+            <div className="mt-3">
+              {badgeEarned ? (
+                <span className="inline-flex items-center gap-1.5 text-[12px] font-black py-1.5 px-3 rounded-full bg-amber-50 text-amber-800 border border-amber-300">
+                  <ShieldCheck size={14} /> Safety Verified badge: earned — it goes live when you save
+                </span>
+              ) : (
+                <a href="#safety-section" className="inline-flex items-center gap-1.5 text-[12px] font-bold py-1.5 px-3 rounded-full bg-slate-50 text-slate-500 border border-slate-200 hover:border-amber-300 hover:text-amber-800 transition-colors">
+                  <ShieldCheck size={14} /> One step from your Safety Verified badge — answer who starts the IV + oversight
+                </a>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="space-y-5">
           {/* 1 - SAFETY FIRST. The #1 thing patients (and Google's medical
               ranking) check, and what earns the Safety Verified badge. */}
-          <SectionCard step={1} title="Who keeps patients safe?" hint="The first thing patients check, and what earns your Safety Verified badge.">
+          <SectionCard id="safety-section" step={1} title="Who keeps patients safe?" hint="The first thing patients check, and what earns your Safety Verified badge.">
             <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Who starts the IV?</div>
             <div className="flex flex-wrap gap-2 mb-5">
               {WHO_PLACES.map((o) => <Chip key={o} active={whoPlaces.includes(o)} onClick={() => toggle(whoPlaces, setWhoPlaces, o)}>{o}</Chip>)}

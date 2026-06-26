@@ -250,6 +250,34 @@ export async function GET(req: Request) {
   const safetyBadge = funnelRows.filter((p) => p.safety_verified === true).length;
   const pctOf = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 100) : 0);
 
+  // Funnel drop-off (actionable): owners who raised a hand but stalled.
+  //  - Pending claims aging >3 days: started a claim, never clicked verify.
+  //  - Claimed but profile not finished: verified, never touched /finish.
+  //  - Finished form but NO badge: filled the profile but skipped the safety
+  //    section, so earned no Safety Verified badge (the silent-failure case
+  //    the finish-form badge feedback now also surfaces to the owner).
+  const threeDaysAgo = nDaysAgo(now, 3);
+  const { data: pendingClaimsRaw } = await supabase
+    .from('claim_requests')
+    .select('listing_id, email, created_at')
+    .eq('status', 'pending')
+    .lte('created_at', threeDaysAgo.toISOString())
+    .order('created_at', { ascending: true });
+  const pendingAging = (pendingClaimsRaw || []) as Array<{ listing_id: string; email: string; created_at: string }>;
+  const pendingNameMap = new Map<string, string>();
+  if (pendingAging.length) {
+    const { data: pn } = await supabase
+      .from('providers')
+      .select('id, name')
+      .in('id', pendingAging.map((p) => p.listing_id));
+    for (const p of (pn || []) as Array<{ id: string; name: string }>) pendingNameMap.set(p.id, p.name);
+  }
+  const claimedNotFinished = Math.max(0, verifiedCount - completedQuestionnaire);
+  const finishedNoBadge = funnelRows.filter((p) => {
+    const dd = (p.decision_drivers && typeof p.decision_drivers === 'object') ? (p.decision_drivers as Record<string, unknown>) : {};
+    return !!(dd.manage && typeof dd.manage === 'object') && p.safety_verified !== true;
+  }).length;
+
   const lines: string[] = [];
   lines.push(`TheDripMap weekly summary — week of ${fmtDate(weekStart)}`);
   lines.push('');
@@ -274,6 +302,15 @@ export async function GET(req: Request) {
   lines.push(`  Verified clinics:        ${verifiedCount}`);
   lines.push(`  Completed questionnaire: ${completedQuestionnaire} (${pctOf(completedQuestionnaire, verifiedCount)}% of verified)`);
   lines.push(`  Safety Verified badge:   ${safetyBadge} (${pctOf(safetyBadge, verifiedCount)}% of verified)`);
+  lines.push('');
+  lines.push('FUNNEL HEALTH — needs attention');
+  lines.push(`  Pending claims aging >3 days: ${pendingAging.length}${pendingAging.length ? ' (started a claim, never verified)' : ''}`);
+  for (const pc of pendingAging.slice(0, 10)) {
+    const nm = pendingNameMap.get(pc.listing_id) || pc.listing_id.slice(0, 8);
+    lines.push(`    - ${nm} (${pc.email}) — since ${fmtDate(new Date(pc.created_at))}`);
+  }
+  lines.push(`  Claimed but profile not finished: ${claimedNotFinished}`);
+  lines.push(`  Finished form but NO safety badge (skipped safety Qs): ${finishedNoBadge}`);
   lines.push('');
   lines.push('TOTALS');
   lines.push(`  Verified clinics: ${totalVerified || 0}`);
@@ -341,6 +378,9 @@ export async function GET(req: Request) {
       bouncesThis,
       completedQuestionnaire,
       safetyBadge,
+      pendingClaimsAging: pendingAging.length,
+      claimedNotFinished,
+      finishedNoBadge,
     },
     mail: mailResult,
     telegram: tgResult,
