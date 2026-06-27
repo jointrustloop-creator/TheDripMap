@@ -20,7 +20,7 @@ import { ExploreResults } from '../../src/components/explore/ExploreResults';
 import { BreadcrumbNav } from '../../src/components/BreadcrumbNav';
 import { isVerifiedClinic } from '../../src/lib/clinic-display';
 import { cn } from '../../src/lib/utils';
-import { searchListings, getCitiesWithListings, slugify } from '../../src/lib/data';
+import { searchListings, getCitiesWithListings } from '../../src/lib/data';
 import { getUserLocation, UserLocation } from '../../src/lib/geo';
 import { calculateValueMetrics } from '../../src/lib/price-utils';
 
@@ -686,28 +686,35 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl font-black text-slate-900 mb-10 tracking-tight">Browse by City</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-            {(cities && cities.length > 0 ? cities.slice(0, 14) : [
-              'New York',
-              'Clearwater',
-              'Washington',
-              'Houston',
-              'San Diego',
-              'Tampa',
-              'Miami'
-            ]).map((city: string | { city?: string; name?: string }) => {
-              const cityName = typeof city === 'string' ? city : city.city || city.name || '';
-              const citySlug = slugify(cityName);
-              return (
-                <button
-                  key={citySlug}
-                  onClick={() => router.push(`/cities/${citySlug}`)}
-                  className="p-6 bg-white border border-slate-100 rounded-2xl text-center hover:border-wellness-200 hover:shadow-md transition-all group"
-                >
-                  <div className="text-sm font-bold text-slate-900 group-hover:text-wellness-600 transition-colors uppercase tracking-tight">{cityName}</div>
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">View City Info</div>
-                </button>
-              );
-            })}
+            {/* Canada-first top markets (matches the footer + homepage). Curated
+                and count-ranked rather than an alphabetical slice of every
+                provider city, which previously surfaced random US cities here on
+                a Canada-first platform. Every slug has a live /cities page. */}
+            {[
+              { name: 'Toronto', slug: 'toronto' },
+              { name: 'Vancouver', slug: 'vancouver' },
+              { name: 'Calgary', slug: 'calgary' },
+              { name: 'Ottawa', slug: 'ottawa' },
+              { name: 'Montreal', slug: 'montreal' },
+              { name: 'Edmonton', slug: 'edmonton' },
+              { name: 'Mississauga', slug: 'mississauga' },
+              { name: 'Hamilton', slug: 'hamilton' },
+              { name: 'Brampton', slug: 'brampton' },
+              { name: 'Winnipeg', slug: 'winnipeg' },
+              { name: 'Vaughan', slug: 'vaughan' },
+              { name: 'Markham', slug: 'markham' },
+              { name: 'Richmond Hill', slug: 'richmond-hill' },
+              { name: 'Halifax', slug: 'halifax' },
+            ].map((city) => (
+              <button
+                key={city.slug}
+                onClick={() => router.push(`/cities/${city.slug}`)}
+                className="p-6 bg-white border border-slate-100 rounded-2xl text-center hover:border-wellness-200 hover:shadow-md transition-all group"
+              >
+                <div className="text-sm font-bold text-slate-900 group-hover:text-wellness-600 transition-colors uppercase tracking-tight">{city.name}</div>
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">View City Info</div>
+              </button>
+            ))}
           </div>
         </div>
       </section>

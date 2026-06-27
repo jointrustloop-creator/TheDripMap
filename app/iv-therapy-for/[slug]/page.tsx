@@ -241,9 +241,9 @@ export default async function UseCasePage({ params }: PageProps) {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { city: 'New York', state: 'ny' },
-              { city: 'Miami', state: 'fl' },
-              { city: 'Los Angeles', state: 'ca' }
+              { city: 'Toronto', state: 'on' },
+              { city: 'Vancouver', state: 'bc' },
+              { city: 'Calgary', state: 'ab' }
             ].map((loc) => (
               <Link 
                 key={`${loc.city}-${loc.state}`}
