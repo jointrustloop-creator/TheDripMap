@@ -5,8 +5,8 @@ import { Footer } from './Footer';
 import { AlertCircle, ArrowRight } from 'lucide-react';
 
 interface Props {
-  /** "city" or "clinic" — used to vary the message wording. */
-  kind: 'city' | 'clinic';
+  /** "city", "clinic", or "blog" — used to vary the message wording. */
+  kind: 'city' | 'clinic' | 'blog';
   /** Best-effort human-readable label derived from the slug, e.g. "Toronto". */
   label?: string;
 }
@@ -19,7 +19,7 @@ interface Props {
  * placeholder with the real page as soon as Supabase is reachable again.
  */
 export function TemporarilyUnavailable({ kind, label }: Props) {
-  const noun = kind === 'city' ? 'city page' : 'clinic page';
+  const noun = kind === 'city' ? 'city page' : kind === 'blog' ? 'article' : 'clinic page';
   const subject = label ? ` for ${label}` : '';
   return (
     <div className="min-h-screen bg-[#FDFDFB]">

@@ -23,9 +23,15 @@ import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { BlogCard } from '../../../src/components/BlogCard';
 import { getBlogPostBySlug, getBlogPosts, slugify, getListingsByIds, getAllCities, US_MARKET_BLOG_SLUGS, BLOG_CANONICAL_OVERRIDES } from '../../../src/lib/data';
 import { US_MARKET_ENABLED } from '../../../src/lib/market';
+import { SupabaseUnreachableError } from '../../../src/lib/supabase-health';
+import { TemporarilyUnavailable } from '../../../src/components/TemporarilyUnavailable';
 import { cn } from '../../../src/lib/utils';
 
-export const revalidate = 3600;
+// 300s (was 3600): a shorter window so any transient bad-cache state clears
+// fast. Paired with the SupabaseUnreachableError handling below so a DB outage
+// renders the maintenance page (HTTP 200) and ISR keeps the last-good copy,
+// instead of caching a 404 on a real article.
+export const revalidate = 300;
 
 // Archived posts: still renderable for anyone with the link, but noindex and
 // stamped with an "archived" banner. Reversible by removing the slug here.
@@ -64,7 +70,22 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     ? `https://www.thedripmap.com${BLOG_CANONICAL_OVERRIDES[safeSlug]}`
     : `https://www.thedripmap.com/blog/${safeSlug}`;
 
-  const post = await getBlogPostBySlug(slug);
+  let post;
+  try {
+    post = await getBlogPostBySlug(slug);
+  } catch (err) {
+    // DB unreachable: emit minimal valid tags (never tagless), no noindex, so a
+    // brief outage doesn't poison the post's SEO. The page body renders
+    // TemporarilyUnavailable.
+    if (err instanceof SupabaseUnreachableError) {
+      return {
+        title: `${fallbackTitle} | TheDripMap Blog`,
+        description: `Read our latest IV therapy guides and city insights on TheDripMap.`,
+        alternates: { canonical },
+      };
+    }
+    throw err;
+  }
 
   // Even on a missing post we emit canonical + title + description so the page
   // is never tagless. Tagged noindex so Google doesn't index the 404 body.
@@ -112,9 +133,22 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
-  const post = await getBlogPostBySlug(slug);
-  const allPosts = await getBlogPosts();
-  
+
+  let post;
+  let allPosts;
+  try {
+    post = await getBlogPostBySlug(slug);
+    allPosts = await getBlogPosts();
+  } catch (err) {
+    // DB unreachable: render the maintenance page (HTTP 200) instead of a 404,
+    // matching the city + provider pages. ISR keeps serving the last-good copy.
+    if (err instanceof SupabaseUnreachableError) {
+      const label = slug.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      return <TemporarilyUnavailable kind="blog" label={label} />;
+    }
+    throw err;
+  }
+
   if (!post) notFound();
 
   const relatedPosts = allPosts

@@ -1323,6 +1323,16 @@ export async function getBlogPostBySlug(slug: string) {
         .eq('slug', slug)
         .single();
 
+        // A connection-level failure (Supabase down / Cloudflare 522) must NOT
+        // be mistaken for "post not found" — otherwise the page notFound()s and
+        // caches a 404 for a real article (SEO damage). Throw so the page can
+        // render TemporarilyUnavailable and ISR keeps serving the last-good
+        // copy. A genuine no-rows result (PGRST116) is not a connection error,
+        // so it falls through to the null return -> a correct 404.
+        if (error && isSupabaseConnectionError(error)) {
+          throw new SupabaseUnreachableError(error.message);
+        }
+
         if (!error && data) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const post = data as any;
@@ -1355,6 +1365,10 @@ export async function getBlogPostBySlug(slug: string) {
           } as BlogPost;
         }
     } catch (_err) {
+      // Re-throw connection failures (so the page shows TemporarilyUnavailable,
+      // not a 404). Everything else falls through to mock/null as before.
+      if (_err instanceof SupabaseUnreachableError) throw _err;
+      if (isSupabaseConnectionError(_err)) throw new SupabaseUnreachableError((_err as Error).message);
       console.error('Supabase error fetching blog post by slug:', _err);
     }
   }
