@@ -199,7 +199,7 @@ export function enrichProvider(p: any): Provider {
   // /search payload (hurting Core Web Vitals). Strip them from the client shape.
   // No public component reads them; server flows (finish, message-clinic) do
   // their own service-role reads and are unaffected.
-  const rec = enriched as Record<string, unknown>;
+  const rec = enriched as unknown as Record<string, unknown>;
   for (const k of Object.keys(rec)) {
     if (k === 'manage_token' || k === 'email' || k.startsWith('outreach_')) delete rec[k];
   }
