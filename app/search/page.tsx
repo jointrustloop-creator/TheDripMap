@@ -51,7 +51,13 @@ export default async function SearchPage() {
     .from('providers')
     .select('*', { count: 'exact', head: true });
 
-  const initialProviders = deduplicateListings(data || []).map(enrichProvider);
+  // CWV: SSR only the top-ranked slice (already ordered claimed -> featured ->
+  // rating), not all ~1,550 providers. This cut the /search HTML from ~3MB.
+  // The default view renders verified clinics (all included in this slice,
+  // ordered first); "browse all" and filtered searches hydrate the full pool
+  // client-side (SearchClient fetches it once on mount / per filter).
+  const SSR_CAP = 150;
+  const initialProviders = deduplicateListings(data || []).map(enrichProvider).slice(0, SSR_CAP);
   const cities = await getCitiesWithListings();
   const initialStats = await getListingStats();
 

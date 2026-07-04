@@ -122,6 +122,20 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
   const [verifiedSortAsc, setVerifiedSortAsc] = useState(false); // false = newest claim first
   const [showAllClinics, setShowAllClinics] = useState(false);
   const [filteredProviders, setFilteredProviders] = useState<Provider[]>(initialProviders);
+  // Full provider pool for "browse all" + country-scoped fallback. SSR sends
+  // only a top-ranked slice (CWV); hydrate the rest client-side once on mount.
+  // Until it loads, fullPool === the SSR slice (which already holds every
+  // claimed clinic, so the default verified view is complete immediately).
+  const [fullPool, setFullPool] = useState<Provider[]>(initialProviders);
+  useEffect(() => {
+    let cancelled = false;
+    searchListings('', 'All')
+      .then((all) => {
+        if (!cancelled && Array.isArray(all) && all.length > initialProviders.length) setFullPool(all);
+      })
+      .catch(() => { /* keep the SSR slice on failure */ });
+    return () => { cancelled = true; };
+  }, [initialProviders]);
   // True when the user's combination of filters produced zero results and we
   // auto-broadened to nationwide top-rated. Drives the amber "broadened" banner.
   const [isBroadened, setIsBroadened] = useState(false);
@@ -275,7 +289,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
     const fetchListings = async () => {
       // --- Default view: verified-only, sorted by claim date ---
       if (isDefaultView && !showAllClinics) {
-        const verifiedOnly = initialProviders
+        const verifiedOnly = fullPool
           .filter((p) => p.is_claimed)
           .slice()
           .sort((a, b) =>
@@ -288,7 +302,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
 
       // --- Default view + "Browse all" escape: full pool, claimed pinned top ---
       if (isDefaultView && showAllClinics) {
-        const all = initialProviders.slice().sort((a, b) => {
+        const all = fullPool.slice().sort((a, b) => {
           if (a.is_claimed !== b.is_claimed) return a.is_claimed ? -1 : 1;
           if (a.is_claimed && b.is_claimed) return claimDateMs(b) - claimDateMs(a);
           return (b.rating ?? 0) - (a.rating ?? 0);
@@ -387,7 +401,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
       // cross-border clinics as if they were nearby (no Chicago for Toronto).
       if (sorted.length === 0 && selectedCity !== 'All' && selectedCity !== '') {
         const broadened = await searchListings(searchQuery, 'All');
-        const cityProv = initialProviders.find(
+        const cityProv = fullPool.find(
           (p) => (p.city || '').toLowerCase() === String(selectedCity).toLowerCase(),
         );
         const cityCountry = (cityProv as { country?: string } | undefined)?.country;
@@ -413,7 +427,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
     };
 
     fetchListings();
-  }, [selectedCity, searchQuery, activeChips, sortBy, userLocation, initialProviders, isDefaultView, showAllClinics, verifiedSortAsc, claimDateMs]);
+  }, [selectedCity, searchQuery, activeChips, sortBy, userLocation, fullPool, isDefaultView, showAllClinics, verifiedSortAsc, claimDateMs]);
 
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
