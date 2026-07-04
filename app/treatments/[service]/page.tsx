@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { permanentRedirect } from "next/navigation";
 import ServicePageClient from "./ServicePageClient";
 
 // Source of truth for service display names + canonical slug + aliases.
@@ -70,5 +71,18 @@ export async function generateMetadata({ params }: { params: Promise<{ service: 
 
 export default async function ServicePage({ params }: { params: Promise<{ service: string }> }) {
   const { service } = await params;
+
+  // Alias slugs (e.g. /treatments/nad-plus-therapy, /treatments/b12) used to
+  // render as full 200 duplicates of the canonical page, relying on the
+  // canonical tag alone. Google indexed them as "Alternate page with proper
+  // canonical tag" (323 pages in the 2026-07-04 GSC coverage export) and
+  // showed them in SERPs at diluted positions. A permanent redirect (308)
+  // consolidates every alias onto the one canonical URL.
+  const slug = service.toLowerCase();
+  const match = SERVICES.find((s) => s.slug === slug || (s.aliases && s.aliases.includes(slug)));
+  if (match && slug !== match.slug) {
+    permanentRedirect(`/treatments/${match.slug}`);
+  }
+
   return <ServicePageClient serviceSlug={service} />;
 }

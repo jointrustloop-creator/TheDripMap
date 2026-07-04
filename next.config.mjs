@@ -192,6 +192,51 @@ const nextConfig = {
         permanent: true,
       },
       // -----------------------------------------------------------------
+      // 2026-07-04 GSC crawl-debt sweep: 616 404s reported in Coverage.
+      // Verified-dead legacy patterns Google still crawls; soft-land them
+      // on the closest live hub instead of 404ing.
+      // -----------------------------------------------------------------
+      {
+        source: '/peptides',
+        destination: '/treatments',
+        permanent: true,
+      },
+      {
+        source: '/peptides/:path*',
+        destination: '/treatments',
+        permanent: true,
+      },
+      {
+        source: '/listing/:slug*',
+        destination: '/providers/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/listings/:slug*',
+        destination: '/providers/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/clinic/:slug*',
+        destination: '/providers/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/clinics/:slug*',
+        destination: '/providers/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/city/:slug*',
+        destination: '/cities/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/treatment/:slug*',
+        destination: '/treatments/:slug*',
+        permanent: true,
+      },
+      // -----------------------------------------------------------------
       // 2026-06-09: Polo Health + Longevity Centre dedup. The slug
       // `polo-health-longevity-centre-new-westminster` was a duplicate of
       // `polo-health-and-longevity-centre-new-westminster`. The duplicate
