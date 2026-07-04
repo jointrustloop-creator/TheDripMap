@@ -32,7 +32,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const cities = coveredCities();
   const natMedian = median(cities.map((c) => c.headline.median));
   const names = cities.map((c) => c.city).join(', ');
-  const title = `IV Therapy Prices in Canada (2026): What Clinics Charge by City | TheDripMap`;
+  // Title targets the real query cluster from GSC (2026-07-04): "iv therapy
+  // cost", "how much is iv therapy", "iv drip price" — cost AND prices both
+  // appear verbatim.
+  const title = `IV Therapy Cost in Canada (2026): Real Prices by City | TheDripMap`;
   const description = `A standard IV vitamin drip in Canada runs a median of CA$${natMedian}, based on published menus from ${cities.reduce((s, c) => s + c.clinicCount, 0)} clinics across ${names}. Compare real IV therapy prices by city.`;
   return {
     title,

@@ -22,7 +22,9 @@ export async function generateMetadata({ params }: { params: Promise<{ city: str
   const idx = getCityPriceIndex(city);
   if (!idx) return { title: 'IV Therapy Prices | TheDripMap', robots: { index: false, follow: true } };
   const h = idx.headline;
-  const title = `IV Therapy Prices in ${idx.city} (2026): What Clinics Charge | TheDripMap`;
+  // "Cost" + "prices" both verbatim: the GSC query cluster is "iv therapy
+  // {city} cost" / "how much" (pos 45-88 as of 2026-07-04), not "prices".
+  const title = `IV Therapy Cost in ${idx.city} (2026): Real Prices From ${idx.clinicCount} Clinics | TheDripMap`;
   const description = `A standard IV vitamin drip in ${idx.city} runs a median of $${h.median} (about $${h.low} to $${h.high}), based on ${idx.clinicCount} published clinic menus. Compare ${idx.rows.length} drips by real price.`;
   const url = `${SITE}/iv-prices/${idx.citySlug}`;
   return {
@@ -102,7 +104,7 @@ export default async function CityPriceIndexPage({ params }: { params: Promise<{
           <MapPin size={13} /> {i.city} price index &middot; {i.asOf}
         </div>
         <h1 className="text-[clamp(2rem,5vw,3.25rem)] font-black text-slate-900 tracking-tight leading-[1.05]">
-          IV therapy prices in {i.city}
+          IV therapy cost in {i.city}: real prices
         </h1>
         <p className="mt-4 text-lg text-slate-600 leading-relaxed">
           Across <b className="text-slate-900">{i.clinicCount} {i.city} IV therapy clinics</b> with published menus, a standard IV vitamin drip costs a <b className="text-slate-900">median of {dollars(h.median)}</b>, typically {dollars(h.low)} to {dollars(h.high)} ({curLong}, as of {i.asOf}). Specialty drips like NAD+ and beauty blends run higher. Here is the real range by drip.
