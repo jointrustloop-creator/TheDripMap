@@ -190,6 +190,26 @@ export function enrichProvider(p: any): Provider {
     enriched.mobile_service = false;
   }
 
+  // SECURITY + PAYLOAD (2026-07-04): enrichProvider output is serialized into
+  // PUBLIC HTML on /search, /cities/*, /providers/*. `manage_token` grants edit
+  // access to a listing via /finish/[token]; `email` is clinic PII and the
+  // lead-forward target; `decision_drivers.manage_token`/`.manage` embed the
+  // same secret plus bulky form answers; `outreach_*` are internal CRM columns.
+  // These were leaking (harvestable edit tokens) and made up most of the 3.2MB
+  // /search payload (hurting Core Web Vitals). Strip them from the client shape.
+  // No public component reads them; server flows (finish, message-clinic) do
+  // their own service-role reads and are unaffected.
+  const rec = enriched as Record<string, unknown>;
+  for (const k of Object.keys(rec)) {
+    if (k === 'manage_token' || k === 'email' || k.startsWith('outreach_')) delete rec[k];
+  }
+  if (rec.decision_drivers && typeof rec.decision_drivers === 'object') {
+    const dd = { ...(rec.decision_drivers as Record<string, unknown>) };
+    delete dd.manage;
+    delete dd.manage_token;
+    rec.decision_drivers = dd;
+  }
+
   return enriched;
 }
 
