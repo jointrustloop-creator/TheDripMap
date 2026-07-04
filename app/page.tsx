@@ -184,7 +184,7 @@ export default async function HomePage() {
   ];
 
   const guides = [
-    { num: '01', label: 'Pricing',         title: 'What IV therapy actually costs',         href: '/guide/iv-therapy-cost-guide',                desc: 'Hangover, NAD+, Myers, recovery — real 2026 ranges across US and Canadian metros.',                image: 'iv-therapy-vitamin-drip-citrus.jpg' },
+    { num: '01', label: 'Prices',          title: 'What IV therapy actually costs',         href: '/iv-prices',                                  desc: 'Real published prices by Canadian city: low, median, and high per drip, from live clinic menus. Updated as clinics add prices.', image: 'iv-therapy-vitamin-drip-citrus.jpg' },
     { num: '02', label: 'Quality Signals', title: 'How to choose a clinic',                 href: '/guide/how-to-choose-iv-therapy-clinic',      desc: 'The 7 things every reputable IV therapy clinic should have. Walk away if any are missing.', image: 'iv-therapy-modern-clinic-recliners.jpg' },
     { num: '03', label: 'Walk-through',    title: 'Your first session, step by step',       href: '/guide/first-time-iv-therapy-what-to-expect', desc: 'Intake to needle to discharge. What to expect, what to ask, how to know it went well.',     image: 'iv-therapy-nad-iv-bag-closeup.jpg' },
   ];
