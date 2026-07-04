@@ -423,6 +423,74 @@ export const GUIDES: Guide[] = [
       { name: 'Miami', slug: 'miami' },
     ],
   },
+  {
+    slug: 'do-you-need-a-prescription-for-iv-therapy-canada',
+    title: 'Do You Need a Prescription or Referral for IV Therapy in Canada?',
+    metaTitle: 'Prescription or Referral for IV Therapy in Canada? | TheDripMap',
+    metaDescription: 'Do you need a doctor’s note, referral, or prescription for an IV drip in Canada? How intake works, when a prescriber is required, and what to ask before you book.',
+    intro: `Short answer: for most standard wellness drips at a private IV clinic in Canada, you do not need a referral from your family doctor the way you would for a specialist. But that does not mean anyone can walk in and get anything. IV therapy is a medical act, and the clinic itself is responsible for making sure a qualified professional assesses you and authorizes your drip. This guide explains how that works, when a prescriber is genuinely required, and the questions that tell you a clinic is doing it properly. TheDripMap is a matching platform, not a medical provider, so always confirm the details with the clinic.`,
+    sections: [
+      {
+        heading: 'Referral vs prescription: they are not the same',
+        paragraphs: [
+          `These terms get used interchangeably, but they mean different things. A referral is one clinician sending you to another, usually a specialist. Private IV clinics are direct-access, so you almost never need a referral from your GP to book.`,
+          `A prescription or medical order is a qualified prescriber authorizing a specific treatment for you. For IV therapy this is often handled inside the clinic: a nurse practitioner, physician, or, within their provincial scope, a naturopathic doctor reviews your intake and authorizes the drip. You may never hold a paper prescription, but that authorization still has to happen.`,
+        ],
+      },
+      {
+        heading: 'How intake usually works at a Canadian IV clinic',
+        bullets: [
+          'You book. Many clinics take walk-ins; some require an appointment.',
+          'You complete a health intake: medications, conditions, allergies, pregnancy, kidney and liver history, and your goal for the visit.',
+          'A qualified professional reviews it: a nurse under medical oversight, a nurse practitioner, a physician, or a naturopathic doctor, depending on the clinic and your history.',
+          'They confirm the drip is appropriate, adjust it, or decline it. A good clinic will say no when something is not safe for you.',
+          'A regulated professional places the IV and monitors you during the infusion.',
+        ],
+      },
+      {
+        heading: 'When a prescriber is genuinely required',
+        paragraphs: [
+          `Some treatments are not simple wellness drips and do require a prescriber’s order, often with bloodwork first.`,
+        ],
+        bullets: [
+          'Iron infusions usually require recent bloodwork (ferritin, iron studies) and a prescriber’s order, because dosing depends on your labs.',
+          'Prescription medications added to a drip (certain anti-nausea meds or higher doses) require a prescriber.',
+          'Anything for a diagnosed medical condition, as opposed to general wellness, belongs under a prescriber’s care.',
+        ],
+      },
+      {
+        heading: 'Who can authorize and place your IV (varies by province)',
+        paragraphs: [
+          `Rules are set provincially and scope of practice differs. In general, IVs are started by a regulated health professional such as a registered nurse, nurse practitioner, or physician, and in some provinces a naturopathic doctor within their scope, under medical oversight. If a clinic offers an iron infusion or a prescription add-on with no intake, no bloodwork, and no prescriber involved, treat that as a red flag.`,
+        ],
+      },
+      {
+        heading: 'What to ask before you book',
+        bullets: [
+          'Who reviews my intake, and who places the IV? Look for a regulated title.',
+          'Is there medical oversight, and who provides it?',
+          'For an iron infusion: do you require bloodwork and a prescriber’s order first?',
+          'Where do your IV ingredients come from? A licensed compounding pharmacy or prepared on site is what you want to hear.',
+        ],
+      },
+    ],
+    faqs: [
+      { question: 'Do I need my family doctor’s referral for an IV drip in Canada?', answer: 'Usually no. Private IV clinics are direct-access. You book directly, complete an intake, and a qualified professional at the clinic authorizes the drip.' },
+      { question: 'Do I need a prescription for a vitamin drip?', answer: 'For a standard wellness vitamin drip, the authorization is typically handled inside the clinic after your intake. For iron infusions or prescription add-ons, a prescriber’s order, and often bloodwork, is required.' },
+      { question: 'Can I just walk in?', answer: 'Many clinics accept walk-ins for standard drips, but you still complete a health intake and can be declined if a drip is not appropriate for you.' },
+      { question: 'Is a naturopath allowed to give IV therapy in Canada?', answer: 'In several provinces, naturopathic doctors administer IV therapy within their regulated scope. It varies by province, so confirm with the clinic.' },
+    ],
+    relatedTreatments: [
+      { name: 'Iron Infusion', slug: 'iron-infusion' },
+      { name: 'Myers Cocktail', slug: 'myers-cocktail' },
+      { name: 'NAD+ Plus', slug: 'nad-plus' },
+    ],
+    relatedCities: [
+      { name: 'Toronto', slug: 'toronto' },
+      { name: 'Calgary', slug: 'calgary' },
+      { name: 'Vancouver', slug: 'vancouver' },
+    ],
+  },
 ];
 
 export function getGuideBySlug(slug: string): Guide | undefined {
