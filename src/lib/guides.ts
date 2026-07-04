@@ -426,7 +426,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'do-you-need-a-prescription-for-iv-therapy-canada',
     title: 'Do You Need a Prescription or Referral for IV Therapy in Canada?',
-    metaTitle: 'Prescription or Referral for IV Therapy in Canada? | TheDripMap',
+    metaTitle: 'Do You Need a Prescription or Referral for IV Therapy in Canada?',
     metaDescription: 'Do you need a doctor’s note, referral, or prescription for an IV drip in Canada? How intake works, when a prescriber is required, and what to ask before you book.',
     intro: `Short answer: for most standard wellness drips at a private IV clinic in Canada, you do not need a referral from your family doctor the way you would for a specialist. But that does not mean anyone can walk in and get anything. IV therapy is a medical act, and the clinic itself is responsible for making sure a qualified professional assesses you and authorizes your drip. This guide explains how that works, when a prescriber is genuinely required, and the questions that tell you a clinic is doing it properly. TheDripMap is a matching platform, not a medical provider, so always confirm the details with the clinic.`,
     sections: [
