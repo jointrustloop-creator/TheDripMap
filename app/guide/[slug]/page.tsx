@@ -133,6 +133,26 @@ export default async function GuidePage({ params }: GuidePageProps) {
               )}
             </section>
           )}
+
+          {/* Related guides — cross-link the sibling guides so the guide cluster
+              links to itself (topical authority + crawl paths). */}
+          {GUIDES.filter((g) => g.slug !== guide.slug).length > 0 && (
+            <section className="mt-12 pt-12 border-t border-slate-100">
+              <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-4">Keep reading</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {GUIDES.filter((g) => g.slug !== guide.slug).slice(0, 4).map((g) => (
+                  <Link
+                    key={g.slug}
+                    href={`/guide/${g.slug}`}
+                    className="flex items-center justify-between gap-3 px-5 py-4 rounded-2xl bg-white border border-slate-100 text-slate-800 font-bold text-sm hover:border-wellness-200 hover:text-wellness-700 transition-colors"
+                  >
+                    <span>{g.title}</span>
+                    <ArrowRight size={16} className="text-wellness-500 shrink-0" />
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
         </article>
 
         <div className="mt-20">
