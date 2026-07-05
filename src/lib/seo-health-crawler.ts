@@ -116,6 +116,21 @@ function extractLocs(xml: string): string[] {
 // ---------- per-URL probe ----------
 
 async function probeUrl(url: string): Promise<CrawlResult> {
+  const first = await probeOnce(url);
+  // Retry once when the fetch itself failed (abort/timeout/network) or when the
+  // page returned 2xx but the body read aborted before <head> was parsed. Cold
+  // ISR caches routinely exceed the first-attempt window and then respond fine —
+  // without this retry they get misreported as broken/missing-tag pages
+  // (2026-07-05: 78 of 80 findings in the daily email were this false positive).
+  const fetchFailed = first.status === 0;
+  const bodyUnread = first.status >= 200 && first.status < 300 && !!first.error && !first.title;
+  if (fetchFailed || bodyUnread) {
+    return probeOnce(url);
+  }
+  return first;
+}
+
+async function probeOnce(url: string): Promise<CrawlResult> {
   const base: CrawlResult = {
     url,
     status: 0,
@@ -270,6 +285,7 @@ export async function crawlUrls(
 
 export type IssueType =
   | 'non_200'
+  | 'crawl_timeout'
   | 'redirect_chain'
   | 'missing_canonical'
   | 'unexpected_noindex'
@@ -285,10 +301,13 @@ export interface Issue {
 export function detectIssues(summary: CrawlSummary): Issue[] {
   const issues: Issue[] = [];
   for (const r of summary.results) {
-    // Non-200 (treat network errors as non-200 too).
+    // status 0 = the crawler never got an HTTP response (abort/timeout/network,
+    // even after the retry). That is a crawl failure, NOT evidence the page is
+    // broken — report it as its own informational type so it never lands in
+    // "broken pages" (the 2026-07-05 email misfiled 18 healthy pages that way).
     if (r.status === 0) {
       issues.push({
-        type: 'non_200',
+        type: 'crawl_timeout',
         url: r.url,
         detail: r.error || 'network error',
       });
@@ -309,6 +328,18 @@ export function detectIssues(summary: CrawlSummary): Issue[] {
           detail: `HTTP ${r.status}`,
         });
       }
+      continue;
+    }
+
+    // 2xx but the body read failed (error set, head never parsed): we have zero
+    // evidence about the head tags, so claiming "missing title/canonical/meta"
+    // would be fabricated. Report the read failure honestly instead.
+    if (r.error && !r.title && !r.canonical && !r.metaDescription) {
+      issues.push({
+        type: 'crawl_timeout',
+        url: r.url,
+        detail: `HTTP ${r.status} but body read failed: ${r.error}`,
+      });
       continue;
     }
 

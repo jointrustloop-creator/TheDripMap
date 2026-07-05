@@ -12,6 +12,7 @@ import { GscReport } from './seo-health-gsc';
 
 const ISSUE_LABELS: Record<IssueType, string> = {
   non_200: 'Non-200 responses (broken pages)',
+  crawl_timeout: 'Crawler timeouts (page not read — usually cold cache, verify before acting)',
   redirect_chain: 'Redirect chains longer than 1 hop',
   missing_canonical: 'Missing canonical tag',
   unexpected_noindex: 'Unexpected noindex',
@@ -26,6 +27,7 @@ const ISSUE_ORDER: IssueType[] = [
   'missing_canonical',
   'missing_title',
   'missing_meta',
+  'crawl_timeout',
 ];
 
 const MAX_PER_GROUP = 10;
