@@ -149,12 +149,38 @@ async function sendTodayBatch(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  // HARD GUARD: never send to an address on the suppression list (unsubscribe OR
+  // hard_bounce). email_bounced on the provider row can miss opt-outs recorded
+  // against a different listing that shares the email, so we consult
+  // email_suppressions (the source of truth) directly and drop any match.
+  // If we cannot load it, we abort rather than risk emailing a suppressed address.
+  const suppressed = new Set<string>();
+  for (const tbl of ['email_suppressions', 'outreach_suppressions'] as const) {
+    let sf = 0;
+    for (;;) {
+      const { data: sup, error: supErr } = await supabase
+        .from(tbl)
+        .select('email')
+        .range(sf, sf + 999);
+      if (supErr) {
+        return NextResponse.json(
+          { error: `Refusing to send: could not load ${tbl} — ` + supErr.message },
+          { status: 500 }
+        );
+      }
+      for (const r of (sup as { email: string }[]) || []) suppressed.add(String(r.email).toLowerCase().trim());
+      if (!sup || sup.length < 1000) break;
+      sf += 1000;
+    }
+  }
+
   // Group by lowercased email so we send ONE email per draft (matching how the
   // daily-outreach cron created drafts grouped by shared inbox).
   const byEmail = new Map<string, TplProviderRow[]>();
   for (const row of (data as unknown as TplProviderRow[]) || []) {
     const k = (row.email || '').trim().toLowerCase();
     if (!k) continue;
+    if (suppressed.has(k)) continue; // unsubscribed or hard-bounced — skip entirely
     if (!byEmail.has(k)) byEmail.set(k, []);
     byEmail.get(k)!.push(row);
   }
