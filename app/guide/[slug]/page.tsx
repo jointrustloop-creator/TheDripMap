@@ -7,6 +7,7 @@ import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { FAQSection } from '../../../src/components/FAQSection';
 import { QuizCTA } from '../../../src/components/QuizCTA';
+import { GuideByline, MethodologyNote } from '../../../src/components/GuideByline';
 import { GUIDES, getGuideBySlug } from '../../../src/lib/guides';
 
 export const revalidate = 86400;
@@ -33,7 +34,9 @@ export default async function GuidePage({ params }: GuidePageProps) {
     headline: guide.title,
     description: guide.metaDescription,
     url: `${SITE_URL}/guide/${guide.slug}`,
-    author: { '@type': 'Organization', name: 'TheDripMap' },
+    author: { '@type': 'Organization', name: guide.author || 'TheDripMap Editorial Team' },
+    ...(guide.lastUpdated ? { dateModified: guide.lastUpdated } : {}),
+    ...(guide.reviewedBy ? { reviewedBy: { '@type': 'Person', name: guide.reviewedBy } } : {}),
     publisher: {
       '@type': 'Organization',
       name: 'TheDripMap',
@@ -62,9 +65,14 @@ export default async function GuidePage({ params }: GuidePageProps) {
               <BookOpen size={16} />
               <span>Guide</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-8">
+            <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">
               {guide.title}
             </h1>
+            <GuideByline
+              author={guide.author}
+              lastUpdated={guide.lastUpdated}
+              reviewedBy={guide.reviewedBy}
+            />
             <p className="text-xl text-slate-600 leading-relaxed">{guide.intro}</p>
           </header>
 
@@ -165,6 +173,8 @@ export default async function GuidePage({ params }: GuidePageProps) {
         <div className="mt-20">
           <FAQSection faqs={guide.faqs} title="Frequently Asked Questions" />
         </div>
+
+        <MethodologyNote />
       </main>
 
       <Footer />

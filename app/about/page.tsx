@@ -113,6 +113,40 @@ export default async function AboutPage() {
           </div>
         </div>
 
+        {/* Verification methodology. Linked from every guide byline and footer
+            (#how-we-verify) as the site-wide trust/methodology reference. */}
+        <section id="how-we-verify" className="mb-32 scroll-mt-24">
+          <h2 className="text-4xl font-black text-slate-900 mb-8 tracking-tight">How We Verify Clinics</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-6 text-lg text-slate-500 leading-relaxed">
+              <p>
+                TheDripMap is an independent matching platform. We do not sell treatments, we do not
+                take commissions on bookings, and no clinic can pay to change how it ranks. That
+                independence is the foundation of every recommendation on this site.
+              </p>
+              <p>
+                The Safety Verified badge is earned, not bought. A clinic gets it only after its
+                owner claims the listing and attests to the specifics that matter: who the medical
+                director is, which licensed professionals administer IVs, and where ingredients are
+                sourced. Where a provincial registry lists the practitioner, we check it.
+              </p>
+            </div>
+            <div className="space-y-6 text-lg text-slate-500 leading-relaxed">
+              <p>
+                Listing data starts from public sources (clinic websites, Google business profiles)
+                and is upgraded to clinic-verified detail when an owner completes their profile.
+                Ratings shown are real Google review scores; we never edit or filter them.
+              </p>
+              <p>
+                Aggregated numbers, like the city cost ranges in our guides and the IV Price Index,
+                are computed from clinics&apos; own published menus. When we rank or shortlist
+                clinics, the criteria are stated on the page: verified status first, then rating and
+                review volume. Nothing on TheDripMap is medical advice.
+              </p>
+            </div>
+          </div>
+        </section>
+
         <div className="bg-slate-900 text-white rounded-[4rem] p-12 md:p-20 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-1/2 h-full bg-slate-800/50 skew-x-12 translate-x-1/4" />
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">

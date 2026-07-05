@@ -15,11 +15,19 @@ export interface Guide {
   faqs: { question: string; answer: string }[];
   relatedTreatments?: { name: string; slug: string }[];
   relatedCities?: { name: string; slug: string }[];
+  /** E-E-A-T: visible byline. Defaults to the editorial team when absent. */
+  author?: string;
+  /** E-E-A-T: ISO date (YYYY-MM-DD) the guide content was last updated. */
+  lastUpdated?: string;
+  /** E-E-A-T: medical reviewer display name, e.g. "Jane Doe, RN". Renders only when set. */
+  reviewedBy?: string;
 }
 
 export const GUIDES: Guide[] = [
   {
     slug: 'how-to-choose-iv-therapy-clinic',
+    author: 'TheDripMap Editorial Team',
+    lastUpdated: '2026-05-24',
     title: 'How to Choose an IV Therapy Clinic — A Practical Guide',
     metaTitle: 'How to Choose an IV Therapy Clinic — Guide for Patients',
     metaDescription: 'Step-by-step guide to choosing a safe, effective IV therapy clinic. What credentials to look for, questions to ask, red flags to avoid.',
@@ -103,6 +111,8 @@ export const GUIDES: Guide[] = [
 
   {
     slug: 'iv-therapy-cost-guide',
+    author: 'TheDripMap Editorial Team',
+    lastUpdated: '2026-05-24',
     title: 'IV Therapy Cost Guide — What You\'ll Actually Pay',
     metaTitle: 'IV Therapy Cost Guide — Pricing by Treatment & Location',
     metaDescription: 'How much does IV therapy cost? Detailed pricing breakdown by treatment, location, and delivery method. Hangover drips to NAD+ infusions.',
@@ -184,6 +194,8 @@ export const GUIDES: Guide[] = [
 
   {
     slug: 'iv-therapy-vs-oral-supplements',
+    author: 'TheDripMap Editorial Team',
+    lastUpdated: '2026-05-24',
     title: 'IV Therapy vs Oral Supplements — Which Actually Works?',
     metaTitle: 'IV Therapy vs Oral Supplements — Bioavailability & Cost Compared',
     metaDescription: 'Direct comparison of IV therapy and oral supplements. Bioavailability, speed of effect, cost per dose, and when each is the better choice.',
@@ -267,6 +279,8 @@ export const GUIDES: Guide[] = [
 
   {
     slug: 'first-time-iv-therapy-what-to-expect',
+    author: 'TheDripMap Editorial Team',
+    lastUpdated: '2026-05-24',
     title: 'First-Time IV Therapy — What to Expect, Step by Step',
     metaTitle: 'First-Time IV Therapy — What to Expect on Your First Visit',
     metaDescription: 'Nervous about your first IV therapy session? A complete walkthrough of intake, the actual drip, how long it takes, and how you\'ll feel after.',
@@ -345,6 +359,8 @@ export const GUIDES: Guide[] = [
 
   {
     slug: 'mobile-iv-therapy-vs-clinic',
+    author: 'TheDripMap Editorial Team',
+    lastUpdated: '2026-05-24',
     title: 'Mobile IV Therapy vs Clinic — Which Should You Choose?',
     metaTitle: 'Mobile IV Therapy vs Clinic — Pros, Cons, Pricing Comparison',
     metaDescription: 'Should you go to an IV clinic or have a nurse come to you? Detailed comparison of mobile vs in-clinic IV therapy: cost, convenience, safety.',
@@ -425,6 +441,8 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'do-you-need-a-prescription-for-iv-therapy-canada',
+    author: 'TheDripMap Editorial Team',
+    lastUpdated: '2026-07-04',
     title: 'Do You Need a Prescription or Referral for IV Therapy in Canada?',
     metaTitle: 'Do You Need a Prescription or Referral for IV Therapy in Canada?',
     metaDescription: 'Do you need a doctor’s note, referral, or prescription for an IV drip in Canada? How intake works, when a prescriber is required, and what to ask before you book.',
@@ -493,6 +511,8 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'iv-therapy-memberships-packages-canada',
+    author: 'TheDripMap Editorial Team',
+    lastUpdated: '2026-07-04',
     title: 'IV Therapy Memberships and Packages in Canada: Do They Save You Money?',
     metaTitle: 'IV Therapy Memberships and Packages in Canada: Worth It?',
     metaDescription: 'How IV therapy memberships and multi-session packages work in Canada, the break-even math against pay-per-visit prices, when they save money, and what to ask.',

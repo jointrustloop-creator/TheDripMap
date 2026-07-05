@@ -12,6 +12,8 @@ import { QuizCTA } from '@/src/components/QuizCTA';
 import { ListingController } from '@/src/components/ListingController';
 import { ProviderCard } from '@/src/components/ProviderCard';
 import { getCityBySlug, getListingsByCity, getAllCities, getListingsByState, getFeaturedListings, getBlogPostBySlug, slugify, getTorontoGtaTieredListings } from '@/src/lib/data';
+import { marketOf } from '@/src/lib/market';
+import { RelatedGuides } from '@/src/components/RelatedGuides';
 import { SupabaseUnreachableError } from '@/src/lib/supabase-health';
 import { TemporarilyUnavailable } from '@/src/components/TemporarilyUnavailable';
 import { getCityIntro } from '@/src/lib/city-intros';
@@ -454,17 +456,24 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
     })),
   };
 
-  // BreadcrumbList JSON-LD — mirrors the visible <BreadcrumbNav> so search
-  // engines and AI assistants can place the city page in the site hierarchy.
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.thedripmap.com/' },
-      { '@type': 'ListItem', position: 2, name: 'Cities', item: 'https://www.thedripmap.com/cities' },
-      { '@type': 'ListItem', position: 3, name: cityData.name, item: `https://www.thedripmap.com/cities/${cityData.slug || slug}` },
-    ],
-  };
+  // Breadcrumb trail: Canadian cities get the geo hierarchy Home / Canada /
+  // Province / City (linking /canada and the province page) so Canadian
+  // authority flows through the hub-and-spoke. Non-CA cities keep the generic
+  // Cities trail (those pages are noindexed under the Canada-first posture).
+  // The BreadcrumbList JSON-LD is emitted by <BreadcrumbNav> itself — do not
+  // hand-emit a second copy here (it produced duplicate breadcrumb schema).
+  const cityIsCanadian = marketOf({ state: cityData.state }) !== 'US';
+  const breadcrumbItems = cityIsCanadian
+    ? [
+        { label: 'Canada', href: '/canada' },
+        ...(cityData.state ? [{ label: cityData.state, href: `/states/${slugify(cityData.state)}` }] : []),
+        { label: cityData.name },
+      ]
+    : [
+        { label: 'Cities', href: '/cities' },
+        ...(cityData.state ? [{ label: cityData.state }] : []),
+        { label: cityData.name },
+      ];
 
   // ItemList JSON-LD wrapping the visible clinic cards (top 12), each as a
   // LocalBusiness entry with name, address, phone, url, and aggregateRating
@@ -515,17 +524,10 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <Navbar />
       <main className="max-w-7xl mx-auto px-6 py-12">
-        <BreadcrumbNav
-          items={[
-            { label: 'Cities', href: '/cities' },
-            ...(cityData.state ? [{ label: cityData.state }] : []),
-            { label: cityData.name }
-          ]}
-        />
+        <BreadcrumbNav items={breadcrumbItems} />
 
         {/* Clinic-owner CTA banner — top-of-page so clinic owners spot it before the patient flow */}
         <Link
@@ -887,7 +889,15 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
           <FAQSection faqs={faqs} title={`${cityData.name} IV Therapy FAQ`} />
         </div>
 
-        {/* 8. Helpful Resources and related cities */}
+        {/* 8. Editorial guides for this city — internal-link module so authority
+            flows between the guide cluster and the geo cluster (Canadian pages only). */}
+        {cityIsCanadian && (
+          <div className="mb-24">
+            <RelatedGuides citySlug={cityData.slug || slug} cityName={cityData.name} />
+          </div>
+        )}
+
+        {/* 9. Helpful Resources and related cities */}
         {nearbyCities.length > 0 && (
           <div className="-mx-6 mb-24">
             <NearbyCities cities={nearbyCities} currentState={cityData.state || ''} />

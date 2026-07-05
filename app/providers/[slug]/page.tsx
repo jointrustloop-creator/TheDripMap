@@ -487,18 +487,25 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
     ]
   } : null;
 
-  // BreadcrumbList JSON-LD for every provider page (claimed or not). Mirrors
-  // the visible <BreadcrumbNav> shown in both render branches.
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.thedripmap.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Cities", "item": "https://www.thedripmap.com/cities" },
-      { "@type": "ListItem", "position": 3, "name": cityLabel, "item": `https://www.thedripmap.com/cities/${citySlug}` },
-      { "@type": "ListItem", "position": 4, "name": displayName, "item": `https://www.thedripmap.com/providers/${provider.slug || slugify(provider.name)}` },
-    ]
-  };
+  // Breadcrumb trail for both render branches. Canadian clinics get the geo
+  // hierarchy Home / Canada / Province / City / Clinic; non-CA clinics keep the
+  // generic search trail (those pages are noindexed under Canada-first).
+  // The BreadcrumbList JSON-LD is emitted by <BreadcrumbNav> itself — the old
+  // hand-emitted copy here produced a second, INCONSISTENT breadcrumb schema
+  // on every provider page, so it was removed (2026-07-05 structural PR).
+  const providerIsCanadian = marketOf({ country: (provider as { country?: string }).country, state: provider.state }) !== 'US';
+  const breadcrumbItems = providerIsCanadian
+    ? [
+        { label: 'Canada', href: '/canada' },
+        ...(stateName ? [{ label: stateName, href: `/states/${slugify(stateName)}` }] : []),
+        { label: cityLabel, href: `/cities/${citySlug}` },
+        { label: provider.name },
+      ]
+    : [
+        { label: 'IV Therapy', href: '/search' },
+        { label: cityLabel, href: `/cities/${citySlug}` },
+        { label: provider.name },
+      ];
 
   // ─────────────────────────────────────────────────────────────
   // CLAIMED LISTINGS: render the new editorial template (DefinitiveListingLayout).
@@ -515,10 +522,6 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(medicalBusinessJsonLd) }}
         />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-        />
         {faqJsonLd && (
           <script
             type="application/ld+json"
@@ -528,6 +531,11 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
         {/* Fires a single 'view' analytics event per session. See
             ListingAnalytics for the 30-min sessionStorage dedupe. */}
         <ListingAnalytics providerId={provider.id} />
+        {/* Visible geo breadcrumb + its BreadcrumbList JSON-LD (emitted by the
+            component). The claimed layout has no breadcrumb of its own. */}
+        <div className="max-w-7xl mx-auto px-6 pt-6">
+          <BreadcrumbNav items={breadcrumbItems} className="!mb-0" />
+        </div>
         <DefinitiveListingLayout
           provider={provider}
           profile={profile}
@@ -567,10 +575,6 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(medicalBusinessJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       {faqJsonLd && (
         <script
@@ -613,11 +617,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
           <div className="relative h-full max-w-7xl mx-auto px-6 flex flex-col justify-end pb-12 md:pb-16">
             <div className="mb-6">
               <BreadcrumbNav
-                items={[
-                  { label: 'IV Therapy', href: '/search' },
-                  { label: cityLabel, href: `/cities/${citySlug}` },
-                  { label: provider.name }
-                ]}
+                items={breadcrumbItems}
                 className="!text-white/70 !mb-0"
                 activeClassName="text-white"
               />
@@ -687,13 +687,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
         {/* BREADCRUMB — only show for unclaimed listings (claimed listings get the breadcrumb inside the hero) */}
         {!provider.is_claimed && (
           <div className="mb-12">
-            <BreadcrumbNav
-              items={[
-                { label: 'IV Therapy', href: '/search' },
-                { label: cityLabel, href: `/cities/${citySlug}` },
-                { label: provider.name }
-              ]}
-            />
+            <BreadcrumbNav items={breadcrumbItems} />
           </div>
         )}
 
