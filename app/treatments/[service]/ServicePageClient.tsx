@@ -532,6 +532,13 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug }: { ser
                 <h3 className="text-2xl font-black tracking-tight text-slate-900 mb-4">Cost</h3>
                 <div className="text-4xl font-black text-wellness-600 mb-4">{content.costRange}</div>
                 <p className="text-base text-slate-600 leading-relaxed">{content.costContext}</p>
+                {/* Internal link to the Price Index: distributes authority to the
+                    cost pages (the query cluster) and answers "what does it really
+                    cost" with real published Canadian data. */}
+                <Link href="/iv-prices" className="mt-5 inline-flex items-center gap-2 text-sm font-black text-wellness-700 hover:text-wellness-800 hover:underline">
+                  See real IV therapy prices by Canadian city
+                  <ArrowRight size={15} />
+                </Link>
               </div>
             </section>
 
