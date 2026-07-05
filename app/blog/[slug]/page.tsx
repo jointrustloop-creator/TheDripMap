@@ -221,7 +221,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     "@context": "https://schema.org",
     "@type": "Article",
     "headline": post.title,
-    "image": post.imageUrl,
+    // omit image when the post has none — an explicit null is invalid schema
+    ...(post.imageUrl ? { "image": post.imageUrl } : {}),
     "datePublished": post.date,
     "dateModified": post.lastUpdated || post.date,
     "author": {
