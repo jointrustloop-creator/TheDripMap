@@ -491,6 +491,74 @@ export const GUIDES: Guide[] = [
       { name: 'Vancouver', slug: 'vancouver' },
     ],
   },
+  {
+    slug: 'iv-therapy-memberships-packages-canada',
+    title: 'IV Therapy Memberships and Packages in Canada: Do They Save You Money?',
+    metaTitle: 'IV Therapy Memberships and Packages in Canada: Worth It?',
+    metaDescription: 'How IV therapy memberships and multi-session packages work in Canada, the break-even math against pay-per-visit prices, when they save money, and what to ask.',
+    intro: `Many IV therapy clinics push memberships and multi-session packages, and they can genuinely save you money, if you would actually use them. They can also lock you into paying for drips you never book. This guide breaks down how each option works, the simple math that tells you whether a plan is worth it against pay-per-visit pricing, and the questions to ask before you commit. TheDripMap is a matching platform, not a medical provider; confirm current pricing and terms with the clinic.`,
+    sections: [
+      {
+        heading: 'The three ways clinics price IV therapy',
+        bullets: [
+          'Pay per visit: a single drip at the menu price. Most flexible, highest per-drip cost.',
+          'Package: you prepay for a set number of drips (say 5 or 10) at a per-drip discount, usually with an expiry date.',
+          'Membership: a recurring monthly fee that includes one or more drips per month, sometimes plus discounts on add-ons and extra drips.',
+        ],
+      },
+      {
+        heading: 'The break-even math (use real numbers)',
+        paragraphs: [
+          `The only question that matters is: will you use enough drips to beat pay-per-visit? Start from the real price. A standard IV vitamin drip in Canada runs a median of about $175 (published clinic menus; see our price index). Say a clinic charges $175 per visit and offers a membership at $130 per month for one drip plus 10% off extras.`,
+          `If you would get a drip every month anyway, the membership saves you $45 a month, or $540 a year, and the add-on discount is a bonus. If you would realistically only go every two or three months, you are prepaying for drips you will not use, and pay-per-visit is cheaper. Packages work the same way: a 5-drip package at $150 each ($750) only beats $175 per visit if you finish all five before they expire.`,
+        ],
+      },
+      {
+        heading: 'When a plan is worth it',
+        bullets: [
+          'You already get IV therapy on a regular cadence (monthly or more).',
+          'The per-drip price after the discount is clearly below the clinic\'s pay-per-visit price.',
+          'The package expiry gives you enough time to actually use every session.',
+          'The plan includes drips or add-ons you would buy anyway, not upsells you do not want.',
+        ],
+      },
+      {
+        heading: 'Questions to ask before you commit',
+        bullets: [
+          'What is the exact per-drip cost on the plan versus pay-per-visit?',
+          'Do package sessions expire, and can unused sessions be refunded or transferred?',
+          'Is the membership month-to-month, or is there a minimum term and an auto-renewal?',
+          'Can I pause or cancel, and how much notice do you need?',
+          'Does the plan cover the specific drip I want, or only a base drip?',
+        ],
+      },
+      {
+        heading: 'Red flags',
+        bullets: [
+          'Auto-renewing memberships with a long minimum term and a hard cancellation policy.',
+          'Packages with a short expiry that pressure you to book drips you do not need.',
+          'A "discount" where the per-drip price is not actually lower than pay-per-visit.',
+          'Pressure to sign up on your first visit before you know if you even like the clinic.',
+        ],
+      },
+    ],
+    faqs: [
+      { question: 'Are IV therapy memberships worth it in Canada?', answer: 'Only if you would use the included drips anyway. If a membership brings your per-drip cost below the clinic\'s pay-per-visit price ($175 median in Canada) and you go at least monthly, it saves money. If you go less often, pay-per-visit is usually cheaper.' },
+      { question: 'How much do IV therapy packages cost?', answer: 'Packages prepay for several drips at a per-drip discount. Whether they save money depends on the discounted per-drip price versus the clinic\'s single-visit price, and whether you finish the sessions before they expire. Compare against the median single-drip price of about $175.' },
+      { question: 'Can I get a refund on unused package sessions?', answer: 'It depends entirely on the clinic\'s policy. Ask before you buy whether unused sessions expire, and whether they can be refunded or transferred.' },
+      { question: 'Should I sign up for a membership on my first visit?', answer: 'It is usually better to try the clinic once first. A reputable clinic will let you decide later; pressure to commit on visit one is a red flag.' },
+    ],
+    relatedTreatments: [
+      { name: 'Myers Cocktail', slug: 'myers-cocktail' },
+      { name: 'NAD+ Plus', slug: 'nad-plus' },
+      { name: 'Hydration', slug: 'hydration' },
+    ],
+    relatedCities: [
+      { name: 'Toronto', slug: 'toronto' },
+      { name: 'Calgary', slug: 'calgary' },
+      { name: 'Edmonton', slug: 'edmonton' },
+    ],
+  },
 ];
 
 export function getGuideBySlug(slug: string): Guide | undefined {
