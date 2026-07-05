@@ -415,30 +415,38 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
     ? `Other IV therapy clinics in ${provider.city}` 
     : `Other IV therapy clinics in ${stateName}`;
 
+  // Only emit optional schema props when we actually have a value — Google
+  // prefers omitted keys over null/empty ones, and an empty GeoCoordinates or a
+  // misspelled property is silently dropped (or flags the item as invalid).
+  // NOTE: the property is "telephone" (was "telePhone" — a typo Google ignored,
+  // so no provider's phone was ever valid in structured data until this fix).
+  const hasGeo = provider.latitude != null && provider.longitude != null;
   const medicalBusinessJsonLd = {
     "@context": "https://schema.org",
     "@type": ["LocalBusiness", "MedicalBusiness"],
     "name": provider.name,
-    "description": provider.description,
-    "image": provider.imageUrl,
-    "telePhone": provider.phone,
+    ...(provider.description ? { "description": provider.description } : {}),
+    ...(provider.imageUrl ? { "image": provider.imageUrl } : {}),
+    ...(provider.phone ? { "telephone": provider.phone } : {}),
     "url": `https://www.thedripmap.com/providers/${slug}`,
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": provider.address,
+      ...(provider.address ? { "streetAddress": provider.address } : {}),
       "addressLocality": provider.city,
       "addressRegion": stateCode,
-      "postalCode": provider.postal_code,
+      ...(provider.postal_code ? { "postalCode": provider.postal_code } : {}),
       // marketOf understands province fallback (ON/BC/AB...) and only returns
       // "US" when confidently US, so a Canadian clinic with a blank/abbreviated
       // country is tagged "CA", not mislabelled "US", in its schema.
       "addressCountry": marketOf({ country: (provider as { country?: string }).country, state: provider.state }) === 'US' ? "US" : "CA"
     },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": provider.latitude,
-      "longitude": provider.longitude
-    },
+    ...(hasGeo ? {
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": provider.latitude,
+        "longitude": provider.longitude
+      }
+    } : {}),
     "aggregateRating": schemaCount > 0 ? {
       "@type": "AggregateRating",
       "ratingValue": schemaRating,
