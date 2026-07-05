@@ -112,71 +112,105 @@ export const GUIDES: Guide[] = [
   {
     slug: 'iv-therapy-cost-guide',
     author: 'TheDripMap Editorial Team',
-    lastUpdated: '2026-05-24',
-    title: 'IV Therapy Cost Guide — What You\'ll Actually Pay',
-    metaTitle: 'IV Therapy Cost Guide — Pricing by Treatment & Location',
-    metaDescription: 'How much does IV therapy cost? Detailed pricing breakdown by treatment, location, and delivery method. Hangover drips to NAD+ infusions.',
-    intro: `IV therapy pricing is one of the most opaque parts of the industry. Some clinics charge $99 for a basic drip, others charge $400 for what looks like the same thing on the menu. This guide breaks down what you should actually expect to pay for the most popular IV therapy treatments, what drives the price differences, and where the value typically sits.`,
+    lastUpdated: '2026-07-05',
+    title: 'How Much Does IV Therapy Cost in Canada? Real 2026 Prices',
+    metaTitle: 'IV Therapy Cost in Canada (2026): Real Prices by City',
+    metaDescription: 'A standard IV drip runs a median of CA$175 in Toronto, CA$200 in Calgary and CA$150 in Edmonton. Real 2026 prices from clinic menus, by treatment and city.',
+    intro: `A standard IV vitamin drip in Canada costs a median of about CA$175, but the spread is wide: the same drip is priced anywhere from CA$75 to CA$399 depending on the clinic. Those numbers come from TheDripMap's IV Price Index, built from Canadian clinics' own published menus, not estimates. This guide breaks down what you should actually expect to pay by city and treatment, what drives the differences, and how insurance works in Canada.`,
     sections: [
       {
-        heading: 'Typical price ranges by treatment',
+        heading: 'What Canadians pay right now, by city',
         paragraphs: [
-          `Most clinics structure their menu around 5 to 10 named drips. Pricing typically tracks with the cost of the active ingredients and the duration of the infusion. Here's the rough range you should expect across the major treatment categories.`,
+          `These figures are aggregated from clinics' own published menus in our IV Price Index (updated 2026). Each range covers only treatments where at least 3 clinics in that city post a price, so no single clinic's pricing skews the number.`,
         ],
         bullets: [
-          'Basic hydration (saline only): $100–$200',
-          'Myers Cocktail (B-complex, B12, C, calcium, magnesium): $150–$300',
-          'Hangover recovery (fluids + B vitamins + anti-nausea): $150–$350',
-          'Immune support (high-dose C + zinc + glutathione): $150–$300',
-          'Energy / B12 boost: $125–$250',
-          'Beauty / glow (glutathione + biotin + C): $200–$450',
-          'Recovery / athletic (BCAAs + magnesium + antioxidants): $175–$400',
-          'Weight loss / MIC (lipotropics + L-carnitine): $150–$300',
-          'NAD+ low dose (250mg): $400–$600',
-          'NAD+ high dose (500mg+): $700–$1,200+',
+          'Toronto, standard IV vitamin drip: CA$119 to CA$399, median CA$175 (9 clinics)',
+          'Calgary, standard IV vitamin drip: CA$75 to CA$260, median CA$200 (3 clinics)',
+          'Edmonton, standard IV vitamin drip: CA$75 to CA$295, median CA$150 (7 clinics)',
+          'Toronto, NAD+: CA$79 to CA$799, median CA$250 (5 clinics)',
+          "Toronto, Myers' Cocktail: CA$106 to CA$300, median CA$250 (4 clinics)",
+          'Toronto, glutathione: CA$60 to CA$389, median CA$189 (10 clinics)',
+          'Toronto, beauty / glow drips: CA$349 to CA$470, median CA$464 (3 clinics)',
+          'Edmonton, hydration: CA$125 to CA$175, median CA$160 (4 clinics)',
+        ],
+        subsections: [
+          {
+            heading: 'Why the spread matters',
+            paragraphs: [
+              `Almost no Canadian clinic posts prices prominently, so most patients book blind. The same standard drip can cost three times more a few blocks away. Checking the city price range before you book is the single easiest way to avoid overpaying. The full breakdown by city and treatment lives at thedripmap.com/iv-prices.`,
+            ],
+          },
+        ],
+      },
+      {
+        heading: 'Typical price ranges by treatment across Canada',
+        paragraphs: [
+          `Most clinics structure their menu around 5 to 10 named drips. Pricing tracks the cost of the active ingredients and the duration of the infusion. Here is the rough range you should expect across the major treatment categories, in Canadian dollars.`,
+        ],
+        bullets: [
+          'Basic hydration (saline only): CA$85 to CA$250',
+          "Myers' Cocktail (B-complex, B12, C, calcium, magnesium): CA$106 to CA$300",
+          'Hangover recovery (fluids + B vitamins + anti-nausea): CA$150 to CA$350',
+          'Immune support (high-dose C + zinc + glutathione): CA$65 to CA$250',
+          'Energy / B12 boost: CA$125 to CA$319',
+          'Beauty / glow (glutathione + biotin + C): CA$200 to CA$470',
+          'Recovery / athletic (BCAAs + magnesium + antioxidants): CA$125 to CA$400',
+          'NAD+ (dose-dependent, often priced per session): CA$79 to CA$799+',
         ],
       },
       {
         heading: 'What drives the price differences',
         paragraphs: [
-          `Three things explain most of the variation between clinics: the cost of the ingredients (NAD+ alone is dramatically more expensive than B vitamins), the time the infusion takes (slow drips occupy a chair for hours and tie up staff), and the operating cost of the clinic itself (Manhattan rent vs suburban Texas drives wildly different overhead).`,
-          `A drip menu that lists $99 hangover IVs is either a loss-leader to get you in the door or skimping on ingredients. A drip menu that charges $400 for the same isn't necessarily a rip-off — it may include better sourcing, more medical oversight, or premium add-ons baked in. Read the ingredient list, not just the price.`,
+          `Three things explain most of the variation between clinics: the cost of the ingredients (NAD+ alone is dramatically more expensive than B vitamins), the time the infusion takes (slow drips occupy a chair for hours and tie up nursing staff), and the operating cost of the clinic itself (downtown Toronto rent versus a suburban Alberta strip mall drives very different overhead).`,
+          `A menu that lists CA$99 hangover IVs is either a loss-leader to get you in the door or skimping on ingredients. A menu that charges CA$400 for the same is not necessarily a rip-off; it may include better sourcing, more medical oversight, or premium add-ons baked in. Read the ingredient list, not just the price.`,
         ],
       },
       {
         heading: 'In-clinic vs mobile pricing',
         paragraphs: [
-          `Mobile IV therapy (in-home or hotel-room) typically adds a $50 to $100 service premium over the equivalent in-clinic drip. You're paying for the nurse's travel time, the convenience of not leaving home, and the privacy. For occasional clients this premium is well worth it; for regular users it adds up fast.`,
-          `Some mobile services also charge a flat minimum (e.g., "$250 minimum for any mobile service") which can make smaller drips disproportionately expensive. Always check the total when you call.`,
+          `Mobile IV therapy (in-home or hotel-room) typically adds a CA$50 to CA$100 service premium over the equivalent in-clinic drip. You are paying for the nurse's travel time, the convenience of not leaving home, and the privacy. For occasional use the premium is often worth it; for regular users it adds up fast.`,
+          `Some mobile services also charge a flat minimum, for example CA$250 for any mobile visit, which can make smaller drips disproportionately expensive. Always confirm the total before booking.`,
         ],
       },
       {
         heading: 'Add-ons and packages',
         paragraphs: [
-          `Most clinics offer optional add-ons that can quickly inflate the total: extra glutathione, vitamin C boosts, B12 pushes, anti-nausea or pain medication, and so on. Each typically runs $25 to $75. They're often worth the upgrade for specific situations (Toradol for a stubborn hangover headache) but can also be soft-sold during your visit.`,
-          `If you're a regular user, ask about packages. Most clinics offer 4-to-10-session bundles at a 10 to 20% discount over single sessions. Monthly memberships are increasingly common too.`,
+          `Most clinics offer optional add-ons that can quickly inflate the total: extra glutathione, vitamin C boosts, B12 pushes, anti-nausea medication, and so on. Each typically runs CA$25 to CA$75. They can be worth it for specific situations but are also commonly soft-sold during your visit.`,
+          `If you are a regular user, ask about packages. Most clinics offer multi-session bundles at a 10 to 20 percent discount over single sessions, and monthly memberships are increasingly common. Our memberships guide covers when those actually save money.`,
         ],
       },
       {
-        heading: 'Is IV therapy covered by insurance?',
+        heading: 'Is IV therapy covered in Canada?',
         paragraphs: [
-          `In most cases, no. Standard wellness IVs (hydration, vitamins, beauty drips) are considered elective and not medically necessary by insurers. Specific therapeutic uses — like IV iron for diagnosed iron-deficiency anemia, or IV fluids for severe dehydration during an ER visit — may be covered, but you typically need a physician's order and a clinical diagnosis.`,
-          `HSA and FSA accounts can sometimes be used for IV therapy if it's deemed medically necessary by your doctor. Check with your plan administrator before assuming reimbursement.`,
+          `Provincial health plans (OHIP, AHCIP, MSP and the rest) do not cover elective wellness IV therapy. Drips for hydration, energy, beauty or general wellness are considered elective, so you pay out of pocket. Medically necessary IV treatment ordered by a physician in a hospital or clinic setting, such as IV iron for diagnosed deficiency, is a different category and is typically covered through the provincial system.`,
+          `Some workplace extended-health plans and Health Spending Accounts (HSAs) can reimburse IV therapy when it is administered by an eligible practitioner, most commonly a naturopathic doctor, up to your plan's paramedical limits. Whether a treatment qualifies depends on your specific plan wording, so check with your insurer before assuming reimbursement.`,
         ],
       },
     ],
     faqs: [
       {
-        question: 'Why does the same drip cost different amounts at different clinics?',
-        answer: 'Ingredient quality, dosing, medical oversight level, location overhead, and what add-ons are included can all account for $100+ price differences on similar-sounding drips. Compare ingredient lists, not just menu names.',
+        question: 'How much does IV therapy cost in Toronto?',
+        answer: "A standard IV vitamin drip in Toronto runs CA$119 to CA$399 with a median around CA$175, based on 9 clinics' published menus in TheDripMap's IV Price Index. Specialty drips run higher: NAD+ reaches CA$799 and beauty drips around CA$470.",
       },
       {
-        question: 'Can I use HSA or FSA funds for IV therapy?',
-        answer: 'Sometimes. If your doctor documents medical necessity, HSA/FSA reimbursement is possible. Pure wellness drips without a clinical diagnosis usually do not qualify.',
+        question: 'Why does the same drip cost different amounts at different clinics?',
+        answer: 'Ingredient quality, dosing, medical oversight level, location overhead, and what add-ons are included can account for CA$100+ price differences on similar-sounding drips. Compare ingredient lists, not just menu names.',
+      },
+      {
+        question: 'Does OHIP or my provincial health plan cover IV therapy?',
+        answer: 'No provincial plan covers elective wellness IV therapy; hydration, energy and beauty drips are out of pocket. Medically necessary IV treatment ordered by a physician is a separate category handled through the regular health system.',
+      },
+      {
+        question: 'Can I claim IV therapy through extended health benefits in Canada?',
+        answer: 'Sometimes. If the IV is administered by a practitioner your plan recognizes, most commonly a naturopathic doctor, extended-health or Health Spending Account coverage may apply up to your paramedical limits. Check your specific plan wording first.',
       },
       {
         question: 'Are package deals worth it?',
-        answer: 'If you plan to do IV therapy regularly (monthly or more often), yes — packages typically save 10 to 20%. For occasional users, single sessions are more flexible.',
+        answer: 'If you plan to do IV therapy regularly, monthly or more often, packages typically save 10 to 20 percent. For occasional users, single sessions are more flexible.',
+      },
+      {
+        question: 'What is the cheapest way to try IV therapy?',
+        answer: 'Check the price range for your city first, then compare a basic hydration or standard vitamin drip across 2 or 3 nearby clinics. In our data the low end for a standard drip is CA$75 to CA$119 in major Canadian cities, and first-visit promotions are common.',
       },
     ],
     relatedTreatments: [
@@ -186,9 +220,11 @@ export const GUIDES: Guide[] = [
       { name: 'Beauty Glow', slug: 'beauty-glow' },
     ],
     relatedCities: [
-      { name: 'Las Vegas', slug: 'las-vegas' },
-      { name: 'New York', slug: 'new-york' },
-      { name: 'Los Angeles', slug: 'los-angeles' },
+      { name: 'Toronto', slug: 'toronto' },
+      { name: 'Calgary', slug: 'calgary' },
+      { name: 'Edmonton', slug: 'edmonton' },
+      { name: 'Vancouver', slug: 'vancouver' },
+      { name: 'Ottawa', slug: 'ottawa' },
     ],
   },
 
