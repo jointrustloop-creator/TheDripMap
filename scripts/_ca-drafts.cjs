@@ -73,7 +73,13 @@ function bodyA(p) {
   const url = `https://www.thedripmap.com/providers/${p.slug}`;
   const claim = `${url}?claim=1`;
   const city = p.city || 'your area';
-  return `Hi ${p.name} team,\n\n${openerA(p)}\n\nI run TheDripMap, the IV therapy matching platform for Canada and the US. ${p.name} is already listed, and people searching IV therapy in ${city} are landing on this page right now:\n\n${url}\n\nThe listing is a bare placeholder. No photos, no prices, no team. Most people who land on a thin profile click away to the next clinic.\n\nClaiming it is free and takes about two minutes:\n\n${claim}\n\nOnce you verify, we fill in the page properly: your logo, photos, your most popular drips with your real prices, who is on your team, and the answers patients actually search for. Clinics with complete pages get noticeably more clicks than bare ones, we see it in our own data.\n\nIf you would rather we simply correct something on the listing, reply and tell me what to change. And if you want the listing removed, one reply does that too.\n\nWarmly,\nTheDripMap\ninfo@thedripmap.com\n${CASL_FOOTER}`;
+  // V2 (2026-07-06): booking-led pitch. TheDripMap now takes structured
+  // booking requests on clinic pages (treatment + availability + patient
+  // contact). Claimed clinics receive them directly with reply-to patient;
+  // unclaimed clinics' requests reach the operator for relay. That is the
+  // pitch now: claim to receive your own booking requests. Honest by
+  // construction (mirrors the message-clinic pipeline exactly).
+  return `Hi ${p.name} team,\n\n${openerA(p)}\n\nI run TheDripMap, the IV therapy matching platform for Canada. ${p.name} is already listed, and people searching IV therapy in ${city} are landing on this page right now:\n\n${url}\n\nNew on TheDripMap: patients can now send a booking request from your page. They pick a treatment and the times that work for them, and the request goes to the clinic. Because your listing is unclaimed, those requests currently come to our team instead of straight to you.\n\nClaiming your listing is free and takes about two minutes:\n\n${claim}\n\nOnce you verify, booking requests and patient messages land in your inbox and you just reply to confirm a time. We also fill in the page properly: your drips with your real prices, your team, your photos. Complete pages get noticeably more clicks than bare ones, we see it in our own data.\n\nIf you would rather we simply correct something on the listing, reply and tell me what to change. And if you want the listing removed, one reply does that too.\n\nWarmly,\nTheDripMap\ninfo@thedripmap.com\n${CASL_FOOTER}`;
 }
 const subjA = (p) => `Your ${p.city} clinic is already on TheDripMap`;
 
@@ -92,7 +98,8 @@ function openerB(p) {
 function bodyB(p) {
   const url = `https://www.thedripmap.com/providers/${p.slug}`;
   const claim = `${url}?claim=1`;
-  return `Hi ${p.name} team,\n\n${openerB(p)} The catch: your page on TheDripMap, the IV therapy matching platform for Canada, is blank right now, so most of those people click straight to the next clinic.\n\nClaiming it is free and takes about two minutes:\n\n${claim}\n\nThen we build it out properly with you: your services, your real prices, and your team, plus the questions patients actually ask. Complete pages get noticeably more clicks than blank ones, we see it in our own data.\n\nNot interested, or something to fix? Just reply, and one line removes the listing too.\n\nAdrianne Trenton\nTheDripMap\ninfo@thedripmap.com\n${CASL_FOOTER}`;
+  // V2 (2026-07-06): booking-led, tighter variant. Same honest mechanics as A.
+  return `Hi ${p.name} team,\n\n${openerB(p)} Here is the part worth ten seconds of your day: patients can now send a booking request from your TheDripMap page, they pick a treatment and the times that work. Because your listing is unclaimed, those requests reach our team instead of you.\n\nClaim it free in about two minutes and they land in your inbox instead, you just reply to confirm a time:\n\n${claim}\n\nWe also build out your page with your services, real prices, and team, so people stop clicking away to the next clinic.\n\nNot interested, or something to fix? Just reply, and one line removes the listing too.\n\nAdrianne Trenton\nTheDripMap\ninfo@thedripmap.com\n${CASL_FOOTER}`;
 }
 const subjB = (p) => `Quick one about ${p.name}'s listing on TheDripMap`;
 
