@@ -24,6 +24,7 @@ const ALLOWED: ReadonlySet<string> = new Set([
   'website_click',
   'directions_click',
   'message_click',
+  'booking_click',
 ]);
 
 // Strip path + query off document.referrer so we never log PII.

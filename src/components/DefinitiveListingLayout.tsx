@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { ResilientImage } from './ResilientImage';
 import { MessageClinicButton } from './MessageClinicButton';
+import { BookingRequestButton } from './BookingRequest';
 import { SubmitTestimonialButton } from './SubmitTestimonialButton';
 import { TreatmentDefinitionDisclosure } from './TreatmentDefinitionDisclosure';
 import { findDefinition } from '../lib/treatment-definitions';
@@ -1007,16 +1008,26 @@ export default function DefinitiveListingLayout({
                   >
                     <Calendar size={15} className="inline-block -mt-1 mr-2" /> Book appointment
                   </TrackedLink>
-                ) : phoneHref ? (
+                ) : (
+                  // No online booking of their own: our in-product booking
+                  // request becomes the primary action (v1 booking engine —
+                  // rides the message-clinic pipeline with structured fields).
+                  <BookingRequestButton
+                    provider={provider}
+                    treatments={ivDrips.map((d) => d.name)}
+                    className="block w-full text-center py-[15px] rounded-[13px] font-semibold text-[15px] mb-[10px] bg-[#1f3a27] text-[#f3efe2] hover:bg-[#142619] transition cursor-pointer flex items-center justify-center gap-2"
+                  />
+                )}
+                {!bookingHref && phoneHref && (
                   <TrackedLink
                     providerId={provider.id}
                     eventType="call_click"
                     href={phoneHref}
-                    className="block w-full text-center py-[15px] rounded-[13px] font-semibold text-[15px] mb-[10px] bg-[#1f3a27] text-[#f3efe2] hover:bg-[#142619] transition"
+                    className="block w-full text-center py-[15px] rounded-[13px] font-semibold text-[15px] mb-[10px] border border-[rgba(25,36,28,0.15)] hover:bg-[#ebf1e5] transition"
                   >
-                    <Phone size={15} className="inline-block -mt-1 mr-2" /> Call to book
+                    <Phone size={15} className="inline-block -mt-1 mr-2 text-[#2f5436]" /> Call clinic
                   </TrackedLink>
-                ) : null}
+                )}
                 {phoneHref && bookingHref && (
                   <TrackedLink
                     providerId={provider.id}

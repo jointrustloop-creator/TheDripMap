@@ -26,6 +26,7 @@ import { ResilientImage } from '../../../src/components/ResilientImage';
 import { ClaimListingTrigger } from '../../../src/components/ClaimListingTrigger';
 import { StickyClaimRail } from '../../../src/components/StickyClaimRail';
 import { MessageClinicButton } from '../../../src/components/MessageClinicButton';
+import { BookingRequestButton } from '../../../src/components/BookingRequest';
 import { PatientTestimonials } from '../../../src/components/PatientTestimonials';
 import { ClaimAutoOpener } from '../../../src/components/ClaimAutoOpener';
 import { TreatmentDefinitionDisclosure } from '../../../src/components/TreatmentDefinitionDisclosure';
@@ -1719,6 +1720,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                         <Phone size={18} /> Call Clinic
                       </TrackedLink>
                     )}
+                    <BookingRequestButton provider={provider} />
                     <MessageClinicButton provider={provider} variant="secondary" />
                   </div>
 

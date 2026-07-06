@@ -135,11 +135,22 @@ export async function POST(req: Request) {
     // Shadow-mode decision: figure out what auto-forward WOULD have done.
     const decision = await computeForwardDecision(supabase, data.clinicId, data.email);
 
+    // V1 booking requests ride this same pipeline with a structured payload.
+    // The [BOOKING] marker in the saved message lets /admin/leads and the
+    // weekly report distinguish bookings without a schema migration.
+    const booking =
+      data.booking && typeof data.booking === 'object' && typeof data.booking.treatment === 'string' && data.booking.treatment
+        ? {
+            treatment: String(data.booking.treatment).slice(0, 120),
+            times: Array.isArray(data.booking.times) ? data.booking.times.map(String).slice(0, 6) : [],
+          }
+        : null;
+
     const baseRow = {
       name: data.name,
       email: data.email,
       phone: data.phone || null,
-      message: `[Lead for ${data.clinicName} · clinicId=${data.clinicId}] ${data.message}`,
+      message: `[${booking ? 'BOOKING · ' : ''}Lead for ${data.clinicName} · clinicId=${data.clinicId}] ${data.message}`,
       listing_id: data.clinicId,
       created_at: new Date().toISOString(),
     };
@@ -195,8 +206,31 @@ export async function POST(req: Request) {
           from: 'TheDripMap <info@thedripmap.com>',
           to: decision.clinicEmail,
           replyTo: data.email,
-          subject: `New patient lead from TheDripMap, ${data.clinicName}`,
-          text: `Hi ${data.clinicName} team,
+          subject: booking
+            ? `Booking request from TheDripMap: ${booking.treatment}, ${data.clinicName}`
+            : `New patient lead from TheDripMap, ${data.clinicName}`,
+          text: booking
+            ? `Hi ${data.clinicName} team,
+
+A patient on TheDripMap wants to book with you. Reply to this email to confirm a time and your reply will go directly to ${data.name}.
+
+Booking request:
+Treatment: ${booking.treatment}
+Patient availability: ${booking.times.length ? booking.times.join(', ') : 'Not specified'}
+
+Patient details:
+Name: ${data.name}
+Email: ${data.email}
+Phone: ${data.phone || 'Not provided'}
+
+Full request:
+${data.message}
+
+Listing on TheDripMap: ${clinicUrl}
+
+If you no longer want auto-forwarded leads, reply with the word UNSUBSCRIBE in the body.
+`
+            : `Hi ${data.clinicName} team,
 
 A patient on TheDripMap sent you a new lead. Reply to this email and your reply will go directly to ${data.name}.
 
@@ -225,7 +259,7 @@ If you no longer want auto-forwarded leads, reply with the word UNSUBSCRIBE in t
       from: 'TheDripMap <info@thedripmap.com>',
       to: 'info@thedripmap.com',
       replyTo: data.email,
-      subject: `New patient lead: ${data.clinicName}`,
+      subject: booking ? `New BOOKING request: ${data.clinicName}` : `New patient lead: ${data.clinicName}`,
       text: `New patient inquiry for clinic: ${data.clinicName}
 Listing: ${clinicUrl}
 
