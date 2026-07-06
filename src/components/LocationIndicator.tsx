@@ -192,10 +192,10 @@ export const LocationIndicator = () => {
     <div className="relative group/loc">
       <div className="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-100 rounded-full px-3 py-1.5 transition-all focus-within:ring-2 focus-within:ring-wellness-600/20 focus-within:border-wellness-600 focus-within:bg-white">
         <MapPin size={14} className={cn("text-slate-400", location?.isPrecise && "text-wellness-600")} />
-        <input 
+        <input
           type="text"
-          placeholder="Enter city, state..."
-          className="bg-transparent border-none outline-none text-xs font-bold text-slate-900 w-24 md:w-32 focus:w-40 md:focus:w-48 transition-all placeholder:text-slate-400"
+          placeholder="Enter city or province"
+          className="bg-transparent border-none outline-none text-xs font-bold text-slate-900 w-20 md:w-32 focus:w-28 md:focus:w-48 transition-all placeholder:text-slate-400"
           value={isEditing ? searchTerm : (location ? `${location.city}, ${location.state}` : '')}
           onChange={(e) => {
             setSearchTerm(e.target.value);

@@ -42,8 +42,11 @@ export const Navbar = () => {
           than the page content's max-w-7xl center column, so it hugs the
           viewport edge on wider screens. pr-4/6 keeps the CTA from clipping. */}
       <div className="mx-auto flex items-center justify-between pl-4 md:pl-6 pr-4 md:pr-6 py-3 max-w-[1400px]">
+        {/* h-10 on mobile (desktop unchanged at h-16): at the default h-14 the
+            ~212px-wide logo + location pill + hamburger exceed 375px and force
+            sideways scroll on every page (2026-07-05 UX audit). */}
         <Link href="/" className="shrink-0">
-          <Logo />
+          <Logo imgClassName="h-10 md:h-16" />
         </Link>
 
         <div className="flex items-center gap-2 md:gap-3">

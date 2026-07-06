@@ -252,7 +252,7 @@ export default async function HomePage() {
             <span className="hidden md:inline text-slate-300">·</span>
             <span><span className="text-slate-900">{stats.cities}</span> &nbsp;Cities</span>
             <span className="hidden md:inline text-slate-300">·</span>
-            <span><span className="text-slate-900">{stats.states}</span> &nbsp;States &amp; Provinces</span>
+            <span><span className="text-slate-900">{stats.states}</span> &nbsp;Provinces &amp; States</span>
           </div>
         </div>
       </section>

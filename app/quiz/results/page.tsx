@@ -267,6 +267,12 @@ function ResultsContent() {
       // patients who flagged a contraindication (trust before revenue).
       if (!!b.is_featured !== !!a.is_featured) return b.is_featured ? 1 : -1;
       if (!!b.offersRecommended !== !!a.offersRecommended) return b.offersRecommended ? 1 : -1;
+      // Safety Verified outranks merely-claimed: the badge is the platform's
+      // stated methodology ("verified status first, then rating") and the
+      // owner's payoff for completing verification.
+      const aV = !!(a as { safety_verified?: boolean }).safety_verified;
+      const bV = !!(b as { safety_verified?: boolean }).safety_verified;
+      if (bV !== aV) return bV ? 1 : -1;
       if (!!b.is_claimed !== !!a.is_claimed) return b.is_claimed ? 1 : -1;
       return (b.rating || 0) - (a.rating || 0);
     };
@@ -401,7 +407,7 @@ function ResultsContent() {
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-black text-amber-900 mb-2 tracking-tight">
-                Important — you flagged: {safetyLabel}
+                Important: you flagged {safetyLabel}
               </h3>
               <p className="text-sm text-amber-900 leading-relaxed mb-3">
                 Talk to your primary doctor before any IV therapy session. When you reach out
