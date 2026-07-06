@@ -1027,13 +1027,15 @@ export default function DefinitiveListingLayout({
                     <Phone size={15} className="inline-block -mt-1 mr-2 text-[#2f5436]" /> Call clinic
                   </TrackedLink>
                 )}
-                {clinicEmail && (
-                  <MessageClinicButton
-                    provider={provider}
-                    className="block w-full text-center py-[15px] rounded-[13px] font-semibold text-[15px] mb-[10px] border border-[rgba(25,36,28,0.15)] hover:bg-[#ebf1e5] transition cursor-pointer flex items-center justify-center gap-2"
-                    label="Message clinic"
-                  />
-                )}
+                {/* Always rendered: the message-clinic API resolves the clinic
+                    email server-side. Gating on clinicEmail hid this button on
+                    every claimed page once enrichProvider began stripping email
+                    from public provider objects (2026-07-05 security fix). */}
+                <MessageClinicButton
+                  provider={provider}
+                  className="block w-full text-center py-[15px] rounded-[13px] font-semibold text-[15px] mb-[10px] border border-[rgba(25,36,28,0.15)] hover:bg-[#ebf1e5] transition cursor-pointer flex items-center justify-center gap-2"
+                  label="Message clinic"
+                />
                 <div className="mt-[18px] pt-[18px] border-t border-[rgba(25,36,28,0.09)] text-[13px] text-[#5c685e] leading-[1.55]">
                   {provider.address && (
                     <div>
