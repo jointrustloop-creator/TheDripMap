@@ -7,7 +7,9 @@ import ServicePageClient from "./ServicePageClient";
 // title/description/canonical before the page is shipped to the client.
 // Mirrored in ServicePageClient.tsx for client-side rendering / icon mapping.
 const SERVICES = [
-  { name: 'NAD+ Plus',           slug: 'nad-plus',             aliases: ['nad', 'nad-plus-therapy'] },
+  // titleName overrides the menu name in <title>/description only: "NAD+ Plus
+  // IV Therapy" reads as "NAD plus plus" in a SERP, and searchers query "NAD+".
+  { name: 'NAD+ Plus',           titleName: 'NAD+', slug: 'nad-plus',             aliases: ['nad', 'nad-plus-therapy'] },
   { name: 'Hangover',            slug: 'hangover',             aliases: ['hangover-recovery'] },
   { name: 'Immune Support',      slug: 'immune-support',       aliases: [] },
   { name: 'Beauty Glow',         slug: 'beauty-glow',          aliases: [] },
@@ -32,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ service: 
   const resolvedParams = await params;
   const serviceSlug = resolvedParams.service.toLowerCase();
   const service = SERVICES.find(s => s.slug === serviceSlug || (s.aliases && s.aliases.includes(serviceSlug)));
-  const serviceName = service ? service.name : serviceSlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  const serviceName = service ? ((service as { titleName?: string }).titleName || service.name) : serviceSlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
   const title = `${serviceName} IV Therapy Clinics Near Me | TheDripMap`;
   const description = `Find ${serviceName} IV therapy clinics near you. Compare top-rated providers, see pricing, and book your ${serviceName} drip session in-clinic or mobile.`;

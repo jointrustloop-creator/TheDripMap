@@ -47,7 +47,7 @@ const MATRIX_TREATMENTS: MatrixTreatment[] = [
   { slug: 'vitamin-c', name: 'Vitamin C IV', filter: 'Vitamin C', content: 'High-Dose Vitamin C' },
   { slug: 'glutathione', name: 'Glutathione IV', filter: 'Glutathione', content: 'Glutathione' },
   { slug: 'glp-1-weight-loss', name: 'GLP-1 IV (Semaglutide/Tirzepatide)', filter: 'Peptide', content: null },
-  { slug: 'iron-infusion', name: 'Iron Infusion', filter: 'Iron', content: null },
+  { slug: 'iron-infusion', name: 'Iron Infusion', filter: 'Iron', content: 'Iron Infusion' },
 ];
 
 // Canada is our uncontested lane (both competitors are US-only) — these get
