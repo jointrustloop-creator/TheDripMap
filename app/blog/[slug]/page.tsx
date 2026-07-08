@@ -21,6 +21,7 @@ import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { BlogCard } from '../../../src/components/BlogCard';
+import { BlogBookingCTA } from '../../../src/components/BlogBookingCTA';
 import { getBlogPostBySlug, getBlogPosts, slugify, getListingsByIds, getAllCities, US_MARKET_BLOG_SLUGS, BLOG_CANONICAL_OVERRIDES } from '../../../src/lib/data';
 import { US_MARKET_ENABLED } from '../../../src/lib/market';
 import { SupabaseUnreachableError } from '../../../src/lib/supabase-health';
@@ -477,6 +478,16 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 </div>
               )}
             </div>
+
+            {/* End-of-article booking CTA: city-specific posts route to their
+                city hub (verified clinics + booking buttons); the rest route to
+                the quiz. Canada-first, so only surface a city hub for Canadian
+                cities (cityHub is already gated to those); otherwise use /quiz. */}
+            {post.content && (
+              <BlogBookingCTA
+                {...(cityHub ? { cityName: cityHub.name, href: cityHub.href } : { href: '/quiz' })}
+              />
+            )}
 
             {/* Related Cities Tags */}
             {post.relatedCities && post.relatedCities.length > 0 && (
