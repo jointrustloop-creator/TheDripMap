@@ -80,8 +80,25 @@ export async function ensureManageToken(sb: SupabaseClient, providerId: string):
   // Prefer the dedicated column: a JSONB enrichment write can never clobber it.
   // Fall back to decision_drivers if the column does not exist yet, so links
   // keep working before the migration is applied.
-  const colRes = await sb.from('providers').update({ manage_token: secret }).eq('id', providerId);
-  if (!colRes.error) return secret;
+  // The column write is CONDITIONAL (only when still null): two callers race
+  // here on a fresh claim (verify handler + auto-enrich), and an unconditional
+  // write let each mint its own secret, so the confirmation email could carry
+  // the loser's token (Allies Integrated Health, 2026-07-07). With the guard,
+  // the loser re-reads and returns the winner's token instead.
+  const colRes = await sb.from('providers').update({ manage_token: secret }).eq('id', providerId).is('manage_token', null).select('id');
+  if (!colRes.error) {
+    if ((colRes.data || []).length === 1) return secret;
+    // Lost the race: another caller filled the column between our read and
+    // write. Re-read and return the winning token so every caller converges.
+    const { data: again } = await sb.from('providers').select('manage_token').eq('id', providerId).maybeSingle();
+    const winner = again && typeof (again as Record<string, unknown>).manage_token === 'string'
+      ? ((again as Record<string, unknown>).manage_token as string)
+      : '';
+    if (winner) return winner;
+    // Column exists but empty-string (not null): claim it unconditionally once.
+    const retry = await sb.from('providers').update({ manage_token: secret }).eq('id', providerId);
+    if (!retry.error) return secret;
+  }
   const { error: ddErr } = await sb.from('providers').update({ decision_drivers: { ...dd, manage_token: secret } }).eq('id', providerId);
   if (ddErr) return null;
   return secret;
