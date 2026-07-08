@@ -5,13 +5,24 @@ URL: https://www.thedripmap.com
 Stack: Next.js, Supabase, Vercel, Tailwind CSS
 Email: info@thedripmap.com
 
-## Database (as of 2026-06-11)
-- 1,478 providers total (993 United States, 480 Canada, 0 null country, 5 hidden)
-- 13 claimed as of 2026-06-12 (is_claimed = true), 6 featured (is_featured = true), 5 hidden (is_hidden = true)
+## Database (as of 2026-07-08, verified live in the CEO audit)
+- 1,583 providers total (997 United States, 586 Canada, 0 null country, 14 hidden)
+  -> active (not is_hidden) = 1,569
+- 21 claimed (is_claimed = true), 6 featured (is_featured = true), 8 safety_verified
+  -> of 21 claimed: 16 via the claim flow (verified claim_request), 5 grandfathered/manual
+- 636 providers outreach_sent = true; 3 reply_category = not_interested
+- 1,158 providers with email; 38 email_bounced; 77 Canada-active still have NULL email
+- Only 17 providers have a real (non-stock) logo; the rest show the stock/monogram fallback
 - Active provider geographic top-5:
-  - CA-Ontario 222, US-California 181, US-Texas 164, US-Florida 116, CA-BC 115
+  - CA-Ontario 304, US-California 181, US-Texas 164, CA-BC 121, US-Florida 116
 - Active provider top-5 cities:
-  - Toronto 61, New York 51, Dallas 36, Tampa/Atlanta/Houston 35 each, Calgary 32
+  - Toronto 77, New York 51, Dallas 36, Tampa 35, Atlanta 35
+- NOTE: the pre-2026-07-08 snapshot said 1,478 providers / 13 claimed (dated 2026-06-11);
+  those figures are superseded by the live numbers above. Roster below is the 2026-06 view;
+  the live claimed roster is 21 (see scripts/_autopilot-seo-log.md audit note).
+- 2 pending claim_requests (2026-07-08): BeYouty Medical Spa (beyoutymedspa@gmail.com,
+  genuinely open, is_claimed=false) and a STALE DUPLICATE for allies-integrated-health-victoria
+  (superseded by the verified row that claimed it; safe to delete).
 - Claimed roster ordered by claimed_at desc (newest first):
   0a. vida-flow-penticton (2026-06-12, via claim flow)
   0b. vp-health-lethbridge (2026-06-11, via claim flow)
