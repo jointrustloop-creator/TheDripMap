@@ -45,7 +45,7 @@ export default function TermsPage() {
           <h2>1. About the Service — Informational Matching Platform Only</h2>
           <p>
             TheDripMap is an online matching platform that helps people discover IV therapy and wellness clinics across
-            the United States and Canada. The Services are provided for general informational purposes only.
+            Canada and the United States. The Services are provided for general informational purposes only.
             We are a matching platform — we do not provide medical, health, or treatment services,
             and we are not a clinic, pharmacy, or healthcare provider.
           </p>
@@ -117,7 +117,7 @@ export default function TermsPage() {
 
           <h2>9. Governing Law</h2>
           <p>
-            TheDripMap operates in both the United States and Canada. These Terms, and any dispute arising from
+            TheDripMap operates in both Canada and the United States. These Terms, and any dispute arising from
             them or from your use of the Services, are governed by the applicable laws of the jurisdiction in which
             TheDripMap operates, without regard to conflict-of-law principles. Where local consumer-protection laws
             in your country, province, or state grant you rights that cannot be waived, nothing in these Terms is

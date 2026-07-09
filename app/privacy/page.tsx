@@ -37,8 +37,8 @@ export default function PrivacyPage() {
           <p><strong>Last updated: May 2026</strong></p>
           <p>
             At TheDripMap (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;), we take your privacy seriously.
-            TheDripMap operates an online matching platform for IV therapy and wellness clinics across the United States
-            and Canada. This policy explains, in plain English, what information we collect, how we use it, who
+            TheDripMap operates an online matching platform for IV therapy and wellness clinics across Canada
+            and the United States. This policy explains, in plain English, what information we collect, how we use it, who
             we share it with, and the rights you have over your data. If you have any questions, email us anytime
             at <a href="mailto:info@thedripmap.com">info@thedripmap.com</a>.
           </p>
@@ -96,7 +96,7 @@ export default function PrivacyPage() {
 
           <h2>5. Email Communications &amp; Anti-Spam Compliance</h2>
           <p>
-            TheDripMap sends commercial electronic messages to IV therapy clinics in the United States and Canada
+            TheDripMap sends commercial electronic messages to IV therapy clinics in Canada and the United States
             about their platform listings. We are committed to following the anti-spam laws of both countries.
           </p>
 
