@@ -65,6 +65,28 @@ interface CityPageProps {
   }>;
 }
 
+// Cross-border same-name guard. When no state constrains the query, a city
+// name that exists in more than one region returns a mixed set (Bedford NS +
+// Bedford TX + Bedford MA rendered as one "Bedford, Nova Scotia | 5 Clinics"
+// page in the 2026-07-08 audit). Keep only the modal state's listings so the
+// count, title, and cards all describe ONE real-world city. No-op when a
+// state was already applied to the query or all listings share one state.
+function constrainToModalState<T extends { state?: string }>(listings: T[], appliedState: string): T[] {
+  if (appliedState || listings.length === 0) return listings;
+  const tally = new Map<string, number>();
+  for (const l of listings) {
+    const st = (l.state || '').trim();
+    tally.set(st, (tally.get(st) || 0) + 1);
+  }
+  if (tally.size <= 1) return listings;
+  let best = '';
+  let bestN = 0;
+  for (const [k, n] of tally) {
+    if (n > bestN) { best = k; bestN = n; }
+  }
+  return listings.filter((l) => ((l.state || '').trim()) === best);
+}
+
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const { slug } = await params;
   const safeSlug = slug || 'unknown';
@@ -113,6 +135,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
       listings = await getListingsByCity(name, state);
     }
   }
+  listings = constrainToModalState(listings, state);
   const count = listings.length;
   // Real in-city count: getListingsByCity broadens to state level when a city
   // has zero exact matches, so filter back to this city for honest metadata
@@ -255,6 +278,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
         listings = await getListingsByCity(name, resolvedState);
       }
     }
+    listings = constrainToModalState(listings, resolvedState);
 
     if (listings.length > 0) {
       cityData = {
@@ -307,10 +331,11 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
     torontoNearby = tiered.nearby;
   }
 
-  // Fetch actual listings for display
+  // Fetch actual listings for display. Toronto's tiered view is multi-city by
+  // design, so the same-name guard only applies to the standard path.
   let listings = isToronto
     ? [...torontoCore, ...torontoNearby]
-    : await getListingsByCity(cityData.name, cityData.state || '');
+    : constrainToModalState(await getListingsByCity(cityData.name, cityData.state || ''), cityData.state || '');
   const exactCityCount = isToronto ? torontoCore.length : listings.length;
 
   // Tiered fallback so a small/empty city never shows 0 cards:
