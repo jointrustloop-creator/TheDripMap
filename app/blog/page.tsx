@@ -57,7 +57,7 @@ export default async function BlogPage() {
             Wellness <span className="text-wellness-600">Insights</span>
           </h1>
           <p className="text-xl text-slate-500 leading-relaxed font-medium">
-            Expert guides on IV therapy, clinical wellness, and local health trends across the US and Canada.
+            Expert guides on IV therapy, clinical wellness, and local health trends across Canada.
           </p>
         </div>
 
@@ -156,7 +156,7 @@ export default async function BlogPage() {
                 Browse by city
               </h3>
               <p className="text-sm text-slate-600 leading-relaxed mb-4">
-                300+ cities across the US and Canada with active IV therapy clinics. Find what&apos;s near you.
+                Cities across Canada with active IV therapy clinics. Find what&apos;s near you.
               </p>
               <span className="text-xs font-black text-wellness-600 uppercase tracking-widest group-hover:underline">
                 All cities →

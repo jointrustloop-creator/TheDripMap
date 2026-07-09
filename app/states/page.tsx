@@ -75,7 +75,7 @@ export default async function StatesIndexPage() {
 
         <section className="mb-16 max-w-3xl">
           <p className="text-lg text-slate-600 leading-relaxed">
-            Browse IV therapy clinics by state. Find top-rated providers across the United States and Canada.
+            Browse IV therapy clinics by province and state. Find top-rated providers across Canada.
           </p>
         </section>
 

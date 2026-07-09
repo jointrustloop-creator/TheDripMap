@@ -8,7 +8,7 @@ import { IVAnimation } from '../../src/components/IVAnimation';
 import { getSiteStats } from '../../src/lib/data';
 
 const aboutTitle = "Our Mission & Clinical Standards | TheDripMap";
-const aboutDescription = "Learn about the mission behind TheDripMap. We're building the most trusted resource for IV therapy and clinical wellness in the United States.";
+const aboutDescription = "Learn about the mission behind TheDripMap. We're building the most trusted resource for IV therapy and clinical wellness in Canada.";
 const aboutOgImage = 'https://www.thedripmap.com/og-image.png';
 
 export const metadata: Metadata = {
@@ -44,7 +44,7 @@ export default async function AboutPage() {
             Our <span className="text-wellness-600">Mission</span>
           </h1>
           <p className="text-xl text-slate-500 leading-relaxed">
-            We&apos;re building the most trusted resource for IV therapy and clinical wellness in the United States. Our goal is to help you find the perfect provider based on your specific health goals and lifestyle needs across {stats.total} clinics and {stats.cities} cities.
+            We&apos;re building the most trusted resource for IV therapy and clinical wellness in Canada. Our goal is to help you find the perfect provider based on your specific health goals and lifestyle needs across {stats.total} clinics and {stats.cities} cities.
           </p>
         </div>
 
@@ -58,7 +58,7 @@ export default async function AboutPage() {
               Finding a reputable IV therapy provider can be difficult. With so many options available, it&apos;s hard to know which clinics prioritize medical supervision, follow strict safety protocols, and offer the best value for your money.
             </p>
             <p className="text-lg text-slate-500 leading-relaxed">
-              TheDripMap was created to bring transparency and trust to the IV therapy industry. We&apos;ve analyzed hundreds of clinics across the country to provide you with the most accurate and up-to-date information.
+              TheDripMap was created to bring transparency and trust to the IV therapy industry. We&apos;ve analyzed hundreds of clinics across Canada to provide you with the most accurate and up-to-date information.
             </p>
           </div>
         </div>
@@ -173,7 +173,7 @@ export default async function AboutPage() {
               </div>
               <div>
                 <div className="text-4xl font-black text-wellness-400 mb-2">{stats.states}</div>
-                <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">States</div>
+                <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">Provinces &amp; States</div>
               </div>
               <div>
                 <div className="text-4xl font-black text-wellness-400 mb-2">{stats.avgRating}★</div>

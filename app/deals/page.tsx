@@ -14,11 +14,11 @@ const SITE_URL = 'https://www.thedripmap.com';
 
 export const metadata: Metadata = {
   title: 'IV Therapy Deals & Offers Near You | The Drip Map',
-  description: 'Live IV therapy deals and limited-time offers from verified clinics across the US and Canada. New offers added by clinics directly. Find a drip deal near you.',
+  description: 'Live IV therapy deals and limited-time offers from verified clinics across Canada. New offers added by clinics directly. Find a drip deal near you.',
   alternates: { canonical: `${SITE_URL}/deals` },
   openGraph: {
     title: 'IV Therapy Deals & Offers Near You | The Drip Map',
-    description: 'Live IV therapy deals from verified clinics across the US and Canada.',
+    description: 'Live IV therapy deals from verified clinics across Canada.',
     url: `${SITE_URL}/deals`,
     type: 'website',
   },
@@ -89,7 +89,7 @@ export default async function DealsPage() {
             IV therapy deals<br /><span className="font-serif italic font-normal text-[#0F6E56]">near you, right now.</span>
           </h1>
           <p className="text-lg text-slate-500 leading-relaxed">
-            Limited-time offers posted directly by verified clinics across the US and Canada. Clinics turn these on when they have openings, so they change often. Check back before you book.
+            Limited-time offers posted directly by verified clinics across Canada. Clinics turn these on when they have openings, so they change often. Check back before you book.
           </p>
         </div>
 
