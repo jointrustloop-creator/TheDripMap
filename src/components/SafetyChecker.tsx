@@ -54,9 +54,6 @@ function ClinicCard({ m, alt = false }: { m: SafetyMatch; alt?: boolean }) {
             Unclaimed
           </span>
         )}
-        {m.claimed && !m.safetyVerified && (
-          <span className="text-[10px] font-bold text-slate-400">{m.verifiedCount}/5 safety checks</span>
-        )}
       </div>
       {!alt && (
         <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-[#0F6E56]">
@@ -155,9 +152,9 @@ export const SafetyChecker = () => {
                 {result.matches.map((m) => <ClinicCard key={m.slug || m.name} m={m} />)}
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">
-                A <span className="font-bold text-emerald-700">Safety Verified</span> badge means the clinic confirmed all 5 of our safety checks
-                (medical director, licensed clinician, compounding pharmacy, liability insurance, state-board compliance). &quot;Claimed&quot; means the
-                owner manages the listing. Unclaimed listings haven&apos;t been confirmed by the clinic yet.
+                A <span className="font-bold text-emerald-700">Safety Verified</span> badge reflects the clinic&apos;s written answers to our safety
+                questionnaire (who administers IVs, who provides medical oversight, and where ingredients are sourced), not an independent medical
+                audit. &quot;Claimed&quot; means the owner manages the listing. Unclaimed listings haven&apos;t been confirmed by the clinic yet.
               </p>
             </>
           ) : (

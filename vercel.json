@@ -18,14 +18,6 @@
       "schedule": "0 */2 * * *"
     },
     {
-      "path": "/api/cron/backlink-research",
-      "schedule": "0 12 * * *"
-    },
-    {
-      "path": "/api/cron/backlink-drafts",
-      "schedule": "30 13 * * *"
-    },
-    {
       "path": "/api/cron/daily-outreach",
       "schedule": "0 13 * * *"
     },
@@ -44,10 +36,6 @@
     {
       "path": "/api/cron/weekly-report",
       "schedule": "0 22 * * 0"
-    },
-    {
-      "path": "/api/cron/gbp-snapshot",
-      "schedule": "0 5 1 * *"
     },
     {
       "path": "/api/cron/onboarding-nudge",

@@ -54,11 +54,24 @@ function extractPlaceId(driver: unknown): string | null {
   return null;
 }
 
+// DISABLED 2026-07-09 (stop the quota bleed): the gbp_snapshots table this
+// route inserts into does not exist in prod (migration
+// scripts/sql/add-gbp-snapshots.sql was never applied), so every scheduled
+// run was calling Google Places for up to 200 clinics, burning real quota,
+// then failing every insert. Removed from vercel.json's cron schedule; this
+// guard is defense in depth in case anything still calls it manually. To
+// reactivate: apply the migration, verify gbp_snapshots exists, then remove
+// this block and re-add the cron entry to vercel.json.
+const DISABLED = true;
+
 export async function GET(req: Request) {
   const expected = process.env.CRON_SECRET;
   if (!expected) return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
   if ((req.headers.get('authorization') || '') !== `Bearer ${expected}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (DISABLED) {
+    return NextResponse.json({ ok: false, disabled: true, reason: 'gbp_snapshots table does not exist in prod; migration never applied. See DISABLED comment in this file.' });
   }
   if (!process.env.GOOGLE_PLACES_API_KEY) {
     return NextResponse.json({ error: 'GOOGLE_PLACES_API_KEY not configured' }, { status: 500 });

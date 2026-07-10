@@ -140,15 +140,7 @@ That is the full ask for Claimed. Reply with whatever you have and I will integr
 
 OPTIONAL, SEPARATE TRACK: Safety Verified
 
-Safety Verified is a different, optional step that earns a distinct badge on your public listing. It is NOT granted by claiming. To start that attestation, reply Yes to whichever of these you can confirm:
-
-  a. Licensed medical director or lead clinician on staff (name and credentials).
-  b. IVs and injections administered by RNs, NPs, or physicians (not unlicensed staff).
-  c. Ingredients sourced from a licensed compounding pharmacy.
-  d. Active medical liability insurance covering IV therapy.
-  e. Operating in good standing with ${regulator}.
-
-All five are required to earn the Safety Verified badge. You can defer this entirely if you are not ready, your Claimed status is unaffected either way.
+Safety Verified is a different, optional step that earns a distinct badge on your public listing. It is NOT granted by claiming. To earn it, complete the short safety section on your private listing page, the same link we sent when you claimed: who administers your IVs, who provides medical oversight, and where ingredients are sourced. The badge reflects your written answers, not an independent audit, and you can defer this entirely if you are not ready, your Claimed status is unaffected either way.
 
 Warmly,
 TheDripMap Team

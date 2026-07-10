@@ -103,7 +103,7 @@ interface CityStats {
   avgRating: number;
   topRated: Provider | null;
   claimedCount: number;
-  verifiedCount: number;
+  safetyVerifiedCount: number;
   priced: Provider | null;
 }
 
@@ -127,7 +127,10 @@ function computeCityStats(clinics: Provider[]): CityStats {
     avgRating: avg,
     topRated: top,
     claimedCount: clinics.filter((c) => c.is_claimed === true).length,
-    verifiedCount: clinics.filter((c) => c.is_featured === true).length,
+    // Safety Verified is its own field (providers.safety_verified), never
+    // derived from is_claimed/is_featured. See src/lib/safety.ts: "Two
+    // INDEPENDENT badges, never conflated."
+    safetyVerifiedCount: clinics.filter((c) => (c as { safety_verified?: boolean }).safety_verified === true).length,
     priced,
   };
 }
@@ -236,7 +239,8 @@ export default async function TreatmentCityPage({ params }: PageProps) {
     if (mobileFirst.length) clinics = mobileFirst;
   }
   const count = clinics.length;
-  const verifiedCount = clinics.filter((c) => c.is_featured).length;
+  const claimedCount = clinics.filter((c) => c.is_claimed === true).length;
+  const safetyVerifiedCount = clinics.filter((c) => (c as { safety_verified?: boolean }).safety_verified === true).length;
   const content = t.content ? getTreatmentContent(t.content) : undefined;
 
   // Real per-(treatment x city) stats. Powers the "by the numbers" snapshot and
@@ -253,7 +257,11 @@ export default async function TreatmentCityPage({ params }: PageProps) {
   else if (cs.mobileCount > 0) snapshotParts.push(`${cs.mobileCount === cs.count ? 'All' : cs.mobileCount} of them offer mobile or in-home visits.`);
   else snapshotParts.push(`All of them work from a physical clinic.`);
   if (cs.ratedCount > 0) snapshotParts.push(`${cs.ratedCount} ${cs.ratedCount === 1 ? 'has' : 'have'} public reviews, averaging ${cs.avgRating.toFixed(1)} stars.`);
-  if (cs.claimedCount > 0) snapshotParts.push(`${cs.claimedCount} ${cs.claimedCount === 1 ? 'is' : 'are'} claimed and Safety Verified.`);
+  // Claimed and Safety Verified are two independent facts and must never be
+  // merged into one claim: a clinic can be claimed without the badge, and the
+  // badge always implies claimed but is not synonymous with it.
+  if (cs.claimedCount > 0) snapshotParts.push(`${cs.claimedCount} ${cs.claimedCount === 1 ? 'is' : 'are'} claimed by the clinic.`);
+  if (cs.safetyVerifiedCount > 0) snapshotParts.push(`${cs.safetyVerifiedCount} ${cs.safetyVerifiedCount === 1 ? 'holds' : 'hold'} a Safety Verified badge.`);
   const citySnapshot = noDash(snapshotParts.join(' '));
 
   // Trim the shared treatment definition to a 2-sentence lede on the matrix page;
@@ -267,8 +275,13 @@ export default async function TreatmentCityPage({ params }: PageProps) {
   // and treatment specifics so each combination reads uniquely.
   const topNames = clinics.slice(0, 3).map((c) => c.name).filter(Boolean);
   const summarySentence = content?.description?.split('. ')[0];
+  // Claimed and Safety Verified are reported as two separate real counts,
+  // never merged into one claim (a claimed clinic is not automatically
+  // Safety Verified, see src/lib/safety.ts).
+  const claimedNote = claimedCount > 0 ? `, ${claimedCount} claimed` : '';
+  const verifiedNote = safetyVerifiedCount > 0 ? `${claimedCount > 0 ? ' and' : ','} ${safetyVerifiedCount} Safety Verified` : '';
   const intro = count > 0
-    ? `There ${count === 1 ? 'is' : 'are'} ${count} ${t.name.toLowerCase()} ${count === 1 ? 'provider' : 'providers'} in ${cityLabel} on TheDripMap${verifiedCount > 0 ? `, ${verifiedCount} of them claimed (Safety Verified)` : ''}.${topNames.length ? ` Options include ${topNames.join(', ')}.` : ''} ${summarySentence ? summarySentence + '.' : ''} Compare what each clinic offers below, then book directly.`
+    ? `There ${count === 1 ? 'is' : 'are'} ${count} ${t.name.toLowerCase()} ${count === 1 ? 'provider' : 'providers'} in ${cityLabel} on TheDripMap${claimedNote}${verifiedNote}.${topNames.length ? ` Options include ${topNames.join(', ')}.` : ''} ${summarySentence ? summarySentence + '.' : ''} Compare what each clinic offers below, then book directly.`
     : `We're still adding ${t.name.toLowerCase()} providers in ${cityLabel}. ${summarySentence ? summarySentence + '.' : ''} In the meantime, browse nearby clinics or explore the treatment guide below.`;
 
   // Data-driven FAQs. Each answer leads with a fact computed from the live clinic
@@ -402,9 +415,9 @@ export default async function TreatmentCityPage({ params }: PageProps) {
               <span className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-700 bg-white border border-slate-200 px-4 py-2 rounded-full">
                 <Star size={14} className="text-amber-500" fill="currentColor" /> {count} {count === 1 ? 'clinic' : 'clinics'}
               </span>
-              {verifiedCount > 0 && (
+              {safetyVerifiedCount > 0 && (
                 <span className="inline-flex items-center gap-1.5 text-sm font-bold text-wellness-700 bg-wellness-50 border border-wellness-100 px-4 py-2 rounded-full">
-                  <ShieldCheck size={14} /> {verifiedCount} Safety Verified
+                  <ShieldCheck size={14} /> {safetyVerifiedCount} Safety Verified
                 </span>
               )}
             </div>
