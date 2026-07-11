@@ -375,16 +375,25 @@ export async function GET(req: Request) {
   // 5d. Onboarding questionnaire completion audit (READ-ONLY, additive).
   // "Completed" = providers.decision_drivers.manage exists (written only by
   // /api/finish-listing when the owner submits). A claimed clinic with no
-  // decision_drivers.manage_token has a BROKEN /finish link — the owner cannot
-  // open the questionnaire at all; that is surfaced loudly in DATA CHECK. This
-  // block ONLY reads; it never sends, modifies, or writes anything.
+  // manage_token (durable column, or the decision_drivers fallback for rows
+  // from before that column existed) has a BROKEN /finish link; that is
+  // surfaced loudly in DATA CHECK. This block ONLY reads; it never sends,
+  // modifies, or writes anything.
+  //
+  // FIXED 2026-07-11: this check only ever looked at decision_drivers.manage_token,
+  // a path ensureManageToken() (src/lib/manage-token.ts) stopped writing to once
+  // the durable providers.manage_token column shipped (2026-06-13). Every claimed
+  // clinic checked (including one verified same-day) had a working column token
+  // and a real, actively-submitted /finish payload; the report was 100% false
+  // alarms for as long as this ran. Now checks the same two locations
+  // ensureManageToken() itself treats as authoritative (colToken || ddToken).
   const questionnaireAwaiting: QuestionnaireRow[] = [];
   {
     const { data: claimedQ } = await supabase
       .from('providers')
-      .select('id, name, city, state, claimed_at, decision_drivers')
+      .select('id, name, city, state, claimed_at, decision_drivers, manage_token')
       .eq('is_claimed', true);
-    const claimedRows = (claimedQ || []) as Array<{ id: string; name: string | null; city: string | null; state: string | null; claimed_at: string | null; decision_drivers: Record<string, unknown> | null }>;
+    const claimedRows = (claimedQ || []) as Array<{ id: string; name: string | null; city: string | null; state: string | null; claimed_at: string | null; decision_drivers: Record<string, unknown> | null; manage_token: string | null }>;
     const obStatusByProvider = new Map<string, string>();
     {
       const { data: obAll } = await supabase.from('onboarding_requests').select('provider_id, status');
@@ -394,7 +403,9 @@ export async function GET(req: Request) {
     }
     for (const p of claimedRows) {
       const dd = (p.decision_drivers && typeof p.decision_drivers === 'object') ? (p.decision_drivers as Record<string, unknown>) : {};
-      const linkOk = typeof dd.manage_token === 'string' && (dd.manage_token as string).length > 0;
+      const colToken = typeof p.manage_token === 'string' && p.manage_token.length > 0;
+      const ddToken = typeof dd.manage_token === 'string' && (dd.manage_token as string).length > 0;
+      const linkOk = colToken || ddToken;
       const completed = !!(dd.manage && typeof dd.manage === 'object');
       const status = obStatusByProvider.get(p.id) || '(no onboarding row)';
       // Alarm: a claimed clinic whose /finish link cannot work. This is the

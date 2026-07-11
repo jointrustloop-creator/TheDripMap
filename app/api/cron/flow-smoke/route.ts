@@ -107,7 +107,12 @@ export async function GET(req: Request) {
     const { status, text } = await fetchText(`${SITE}/sitemap.xml`, 20000);
     if (status !== 200) throw new Error(`sitemap HTTP ${status}`);
     const locs = (text.match(/<loc>/g) || []).length;
-    if (locs < 1000) throw new Error(`sitemap only has ${locs} URLs (expected 1000+)`);
+    // Floor is 700, not 1000: US_MARKET_ENABLED=false (Canada-first, since
+    // 2026-06-23) drops all US city/provider/state/matrix routes from the
+    // sitemap, so the real count today is ~913, not 1000+. 700 still catches
+    // an actual generation break (e.g. the provider/city query returning
+    // empty) without false-alarming on normal day-to-day count drift.
+    if (locs < 700) throw new Error(`sitemap only has ${locs} URLs (expected 700+, Canada-only since the US noindex pivot)`);
     return `${locs} URLs`;
   }));
 
