@@ -123,7 +123,15 @@ async function probeUrl(url: string): Promise<CrawlResult> {
   // without this retry they get misreported as broken/missing-tag pages
   // (2026-07-05: 78 of 80 findings in the daily email were this false positive).
   const fetchFailed = first.status === 0;
-  const bodyUnread = first.status >= 200 && first.status < 300 && !!first.error && !first.title;
+  // Retry any 2xx page that parsed NO <title>. A genuinely rendered page always
+  // has a title, so getting none back means a cold/partial ISR render (which
+  // usually succeeds on the second hit), not a page truly missing its title.
+  // The old check also required first.error to be set, but the common partial-
+  // render case throws NO error: the GET returns 200 and text() succeeds on a
+  // truncated body that lacks the head tags. Those slipped past the retry and
+  // then got misreported as missing-tag pages (the 38 missing_title / 38
+  // missing_meta / 38 missing_canonical false-positive cluster).
+  const bodyUnread = first.status >= 200 && first.status < 300 && !first.title;
   if (fetchFailed || bodyUnread) {
     return probeOnce(url);
   }
@@ -331,14 +339,22 @@ export function detectIssues(summary: CrawlSummary): Issue[] {
       continue;
     }
 
-    // 2xx but the body read failed (error set, head never parsed): we have zero
-    // evidence about the head tags, so claiming "missing title/canonical/meta"
-    // would be fabricated. Report the read failure honestly instead.
-    if (r.error && !r.title && !r.canonical && !r.metaDescription) {
+    // 2xx but we parsed NONE of title/canonical/meta. A real rendered page
+    // always has at least a <title>, so zero head tags means the body we got
+    // was a partial/cold-render shell, not a page genuinely missing all three.
+    // Report it as a single crawl failure instead of three fabricated missing-
+    // tag findings (the 38 missing_title + 38 missing_meta + 38 missing_canonical
+    // false-positive cluster). r.error is NOT required: the partial-render case
+    // throws no error (200 + a truncated body). A page missing only ONE tag
+    // (e.g. has a title but no canonical) still has a title, so it does not hit
+    // this guard and is flagged correctly below.
+    if (!r.title && !r.canonical && !r.metaDescription) {
       issues.push({
         type: 'crawl_timeout',
         url: r.url,
-        detail: `HTTP ${r.status} but body read failed: ${r.error}`,
+        detail: r.error
+          ? `HTTP ${r.status} but body read failed: ${r.error}`
+          : `HTTP ${r.status} but no head tags parsed (cold/partial render)`,
       });
       continue;
     }
