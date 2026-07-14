@@ -20,7 +20,7 @@ import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { ProviderCredentialBlock } from '../../../src/components/ProviderCredentialBlock';
-import { isNoindexedUSPage, marketOf } from '../../../src/lib/market';
+import { isNoindexedUSProviderPage, marketOf } from '../../../src/lib/market';
 import { FEATURED_UPGRADE_ENABLED } from '../../../src/lib/featured-config';
 import { ClinicImage } from '../../../src/components/ClinicImage';
 import { ResilientImage } from '../../../src/components/ResilientImage';
@@ -232,9 +232,15 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   const dd = (provider as { decision_drivers?: { source?: string } | null }).decision_drivers;
   const isOrphanStub = dd?.source === 'orphan_claim_stub' && provider.is_claimed !== true;
 
-  // US market off: noindex US provider pages. Reversible via US_MARKET_ENABLED;
+  // US market off: noindex US provider pages, EXCEPT claimed ones (owner-
+  // maintained rich content deserves a visible page; see the claimed-US
+  // exception note in src/lib/market.ts). Reversible via US_MARKET_ENABLED;
   // Canadian providers are never affected (country=Canada => not US).
-  const usNoindex = isNoindexedUSPage({ country: provider.country, state: provider.state });
+  const usNoindex = isNoindexedUSProviderPage({
+    country: provider.country,
+    state: provider.state,
+    isClaimed: provider.is_claimed,
+  });
 
   return {
     title,
