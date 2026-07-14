@@ -129,8 +129,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return dd?.source === 'orphan_claim_stub' && p.is_claimed !== true;
   };
   const providerRoutes = providers
-    // US market off: keep US provider pages out of the sitemap. Reversible via the flag.
-    .filter((p) => p.name && !isOrphanStub(p as { is_claimed?: boolean; decision_drivers?: unknown }) && (US_MARKET_ENABLED || marketOf({ country: (p as { country?: string }).country, state: p.state }) !== 'US'))
+    // US market off: keep US provider pages out of the sitemap, EXCEPT claimed
+    // ones (owner-maintained rich content; mirrors the claimed-US exception in
+    // src/lib/market.ts and the provider page's robots logic). Reversible via
+    // the flag.
+    .filter((p) => p.name && !isOrphanStub(p as { is_claimed?: boolean; decision_drivers?: unknown }) && (US_MARKET_ENABLED || (p as { is_claimed?: boolean }).is_claimed === true || marketOf({ country: (p as { country?: string }).country, state: p.state }) !== 'US'))
     .map((p) => ({
       url: `${baseUrl}/providers/${p.slug || slugify(p.name)}`,
       lastModified: new Date(),

@@ -46,6 +46,21 @@ export const marketOf = (args: { country?: string | null; state?: string | null 
 export const isNoindexedUSPage = (args: { country?: string | null; state?: string | null }): boolean =>
   !US_MARKET_ENABLED && marketOf(args) === 'US';
 
+// CLAIMED-US EXCEPTION (2026-07-14, operator approved). Provider pages ONLY:
+// a US provider page whose owner has claimed it (is_claimed=true) is indexable
+// even while the US market is off, and belongs in the sitemap. Rationale: a
+// claimed page is rich, owner-maintained content (menu, prices, photos), and
+// hiding it from Google guts the claim value-prop for US owners (e.g. the
+// 2026-07-10 Miami Lakes claim). This is a handful of pages that grows only
+// with claims, so it adds none of the thin-stub dilution that keeps the rest
+// of the US market noindexed. US city/state/matrix/statistics pages are NOT
+// excepted; they keep using isNoindexedUSPage.
+export const isNoindexedUSProviderPage = (args: {
+  country?: string | null;
+  state?: string | null;
+  isClaimed?: boolean | null;
+}): boolean => isNoindexedUSPage(args) && args.isClaimed !== true;
+
 // robots override for App Router generateMetadata. undefined = no override.
 export const usMarketRobots = (args: { country?: string | null; state?: string | null }) =>
   isNoindexedUSPage(args) ? ({ index: false as const, follow: true as const }) : undefined;
