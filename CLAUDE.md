@@ -79,8 +79,14 @@ Email: info@thedripmap.com
   enqueue onboarding_requests rows; nothing auto-sends until the gate
   flips (separate PR, operator go). Operator sends via /admin/onboarding
   "Send now". Day-7 nudge cron /api/cron/onboarding-nudge (gated, in
-  vercel.json). safety_verified flips ONLY via the operator's click on
-  /admin/onboarding.
+  vercel.json). safety_verified AUTO-GRANTS (2026-06-19 rule, corrected
+  2026-07-09) the moment a claimed owner completes the safety section of
+  the /finish questionnaire (who administers IVs + medical oversight,
+  isSafetyComplete() in src/lib/safety.ts) - no operator review happens
+  at that point. The operator's click on /admin/onboarding is a SEPARATE,
+  secondary path (manual grant/backfill), not the primary one. A monthly
+  spot check (3 random Safety Verified clinics + their submitted answers)
+  ships in the weekly report so the badge still gets human eyes.
 - PENDING OPERATOR PASTE: scripts/create-onboarding-engine-tables.sql
   (onboarding_requests), scripts/create-seo-health-runs-findings.sql
   (WS6, unlocks nightly SEO mechanic).

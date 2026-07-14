@@ -14,8 +14,14 @@
  *   mark_replied          - record that a reply came in (stamps reply_received_at).
  *   mark_published        - record that the listing was updated from the answers.
  *   flip_safety_verified  - set providers.safety_verified = true for ONE provider.
- *                           This route is the operator's click; automation never
- *                           calls it. Scoped UPDATE with a SELECT-first check.
+ *                           This route itself is only ever called by an operator
+ *                           click, but it is a SECONDARY grant path: since
+ *                           2026-06-19 the primary path is automatic, the badge
+ *                           sets itself when a claimed owner completes the
+ *                           safety section of /finish (src/lib/safety.ts).
+ *                           This action exists for manual grants/backfills, not
+ *                           as the normal flow. Scoped UPDATE with a SELECT-first
+ *                           check.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';

@@ -250,6 +250,45 @@ export async function GET(req: Request) {
   const safetyBadge = funnelRows.filter((p) => p.safety_verified === true).length;
   const pctOf = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 100) : 0);
 
+  // SAFETY VERIFIED SPOT CHECK (2026-07-09): the badge auto-grants when a
+  // claimed owner completes the safety section of /finish, with no human
+  // review at grant time (src/lib/safety.ts). This gives it real teeth
+  // without a bottleneck: once a month (the report that lands in the first
+  // 7 days of the month), pull 3 random currently Safety Verified clinics
+  // and print their submitted answers for a quick operator eyeball. No
+  // "recently badged" claim is made, providers has no badge-grant
+  // timestamp to sort by, so this is an honest random sample of the
+  // currently verified set, not the newest ones specifically.
+  const isMonthlySpotCheck = now.getUTCDate() <= 7;
+  const spotCheckLines: string[] = [];
+  if (isMonthlySpotCheck) {
+    const { data: verifiedRows } = await supabase
+      .from('providers')
+      .select('id, name, city, state, decision_drivers')
+      .eq('safety_verified', true);
+    const pool = ((verifiedRows || []) as Array<{
+      id: string; name: string; city: string | null; state: string | null;
+      decision_drivers: Record<string, unknown> | null;
+    }>).slice();
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    for (const p of pool.slice(0, 3)) {
+      const dd = (p.decision_drivers && typeof p.decision_drivers === 'object') ? (p.decision_drivers as Record<string, unknown>) : {};
+      const manage = (dd.manage && typeof dd.manage === 'object') ? (dd.manage as Record<string, unknown>) : {};
+      const team = (manage.team && typeof manage.team === 'object') ? (manage.team as Record<string, unknown>) : {};
+      const who = Array.isArray(team.whoPlaces) && (team.whoPlaces as string[]).length ? (team.whoPlaces as string[]).join(', ') : '(not on file)';
+      const oversight = typeof team.oversight === 'string' && team.oversight.trim() ? team.oversight.trim() : '(not on file)';
+      const sourcing = Array.isArray(manage.sourcing) && (manage.sourcing as string[]).length ? (manage.sourcing as string[]).join(', ') : '(not on file)';
+      const loc = [p.city, p.state].filter(Boolean).join(', ');
+      spotCheckLines.push(`  - ${p.name}${loc ? ' (' + loc + ')' : ''}`);
+      spotCheckLines.push(`      Who administers: ${who}`);
+      spotCheckLines.push(`      Medical oversight: ${oversight}`);
+      spotCheckLines.push(`      Ingredient sourcing: ${sourcing}`);
+    }
+  }
+
   // Funnel drop-off (actionable): owners who raised a hand but stalled.
   //  - Pending claims aging >3 days: started a claim, never clicked verify.
   //  - Claimed but profile not finished: verified, never touched /finish.
@@ -303,6 +342,15 @@ export async function GET(req: Request) {
   lines.push(`  Completed questionnaire: ${completedQuestionnaire} (${pctOf(completedQuestionnaire, verifiedCount)}% of verified)`);
   lines.push(`  Safety Verified badge:   ${safetyBadge} (${pctOf(safetyBadge, verifiedCount)}% of verified)`);
   lines.push('');
+  if (isMonthlySpotCheck) {
+    lines.push('SAFETY VERIFIED SPOT CHECK (monthly, random sample, badge auto-grants with no review at grant time)');
+    if (spotCheckLines.length === 0) {
+      lines.push('  No Safety Verified clinics yet.');
+    } else {
+      lines.push(...spotCheckLines);
+    }
+    lines.push('');
+  }
   lines.push('FUNNEL HEALTH — needs attention');
   lines.push(`  Pending claims aging >3 days: ${pendingAging.length}${pendingAging.length ? ' (started a claim, never verified)' : ''}`);
   for (const pc of pendingAging.slice(0, 10)) {

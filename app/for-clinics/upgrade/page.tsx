@@ -1,10 +1,12 @@
 import React from 'react';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { UpgradeRequestForm } from '../../../src/components/UpgradeRequestForm';
+import { FEATURED_UPGRADE_ENABLED } from '../../../src/lib/featured-config';
 import { Check, X, Sparkles, TrendingUp, Eye, Star, Calendar, MessageSquare, Image as ImageIcon, MapPin } from 'lucide-react';
 
 const SITE_URL = 'https://www.thedripmap.com';
@@ -13,25 +15,29 @@ const PRICE = 99; // monthly USD
 const title = 'Upgrade to a Featured Listing — TheDripMap';
 const description = `Featured listings get top placement on city + treatment pages, image-rich profiles, instant-book CTAs, and patient testimonials. $${PRICE}/month, cancel anytime.`;
 
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: `${SITE_URL}/for-clinics/upgrade` },
-  openGraph: {
-    title,
-    description,
-    url: `${SITE_URL}/for-clinics/upgrade`,
-    type: 'website',
-    siteName: 'TheDripMap',
-    images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: title }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title,
-    description,
-    images: [`${SITE_URL}/og-image.png`],
-  },
-};
+// Featured is dark (FEATURED_UPGRADE_ENABLED = false): unpublished, noindexed,
+// and returns 404. No pricing metadata while dark.
+export const metadata: Metadata = FEATURED_UPGRADE_ENABLED
+  ? {
+      title,
+      description,
+      alternates: { canonical: `${SITE_URL}/for-clinics/upgrade` },
+      openGraph: {
+        title,
+        description,
+        url: `${SITE_URL}/for-clinics/upgrade`,
+        type: 'website',
+        siteName: 'TheDripMap',
+        images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: title }],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: [`${SITE_URL}/og-image.png`],
+      },
+    }
+  : { robots: { index: false, follow: false } };
 
 const BENEFITS = [
   {
@@ -87,6 +93,8 @@ const COMPARISON: Row[] = [
 ];
 
 export default function UpgradePage() {
+  if (!FEATURED_UPGRADE_ENABLED) notFound();
+
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />

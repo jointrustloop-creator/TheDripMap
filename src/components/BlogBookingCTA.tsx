@@ -28,7 +28,11 @@ export function BlogBookingCTA({ cityName, href }: { cityName?: string; href: st
           </h2>
           <p className="text-wellness-100 text-sm md:text-[15px] leading-relaxed">
             {inCity
-              ? `Browse Safety Verified clinics in ${cityName}, pick your treatment and the times that work for you, and send a booking request. The clinic confirms your time by email. No payment is taken on TheDripMap.`
+              // Do not assert "Safety Verified clinics" here: the component
+              // has no per-city badge count, and not every city has a
+              // badge holder. Never label a city's clinics Safety Verified
+              // without knowing it is true.
+              ? `Browse clinics in ${cityName}, pick your treatment and the times that work for you, and send a booking request. The clinic confirms your time by email. No payment is taken on TheDripMap.`
               : `Answer a few quick questions, get matched with clinics near you, and send a booking request in a couple of clicks. The clinic confirms your time by email. No payment is taken on TheDripMap.`}
           </p>
         </div>
