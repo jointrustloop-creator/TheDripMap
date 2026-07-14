@@ -106,6 +106,16 @@ Return ONLY a minified JSON object with this shape (no markdown, no prose):
 // Hubert reviews + sends manually from his Gmail inbox.
 //
 // Auth: same Bearer ${CRON_SECRET} pattern.
+// DISABLED 2026-07-09: paired with backlink-research, which is dormant (see
+// that route's DISABLED comment). Only 3 of 19 backlink_targets were ever
+// drafted, newest drafted_at 2026-05-31, so this side of the pipeline is not
+// consuming what little research exists either. Removed from vercel.json's
+// cron schedule. This guard is defense in depth in case anything still calls
+// it manually. To reactivate: fix backlink-research first, confirm targets
+// are flowing, then remove this block and re-add the cron entry to
+// vercel.json.
+const DISABLED = true;
+
 export async function GET(req: Request) {
   const expected = process.env.CRON_SECRET;
   if (!expected) {
@@ -114,6 +124,9 @@ export async function GET(req: Request) {
   const auth = req.headers.get('authorization') || '';
   if (auth !== `Bearer ${expected}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (DISABLED) {
+    return NextResponse.json({ ok: false, disabled: true, reason: 'Paired cron (backlink-research) is dormant. See DISABLED comment in this file.' });
   }
 
   if (!process.env.ANTHROPIC_API_KEY) {

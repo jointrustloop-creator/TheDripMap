@@ -21,6 +21,7 @@ import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { ProviderCredentialBlock } from '../../../src/components/ProviderCredentialBlock';
 import { isNoindexedUSProviderPage, marketOf } from '../../../src/lib/market';
+import { FEATURED_UPGRADE_ENABLED } from '../../../src/lib/featured-config';
 import { ClinicImage } from '../../../src/components/ClinicImage';
 import { ResilientImage } from '../../../src/components/ResilientImage';
 import { ClaimListingTrigger } from '../../../src/components/ClaimListingTrigger';
@@ -1612,8 +1613,10 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
 
             {/* UPGRADE CTA — FREE-tier (claimed but not Featured) only. Activated
                 2026-06-01 as part of the tier-split: claim now flips is_claimed
-                only, so this branch is real production code, not dead. */}
-            {provider.is_claimed && !provider.is_featured && (
+                only, so this branch is real production code, not dead.
+                Hidden while FEATURED_UPGRADE_ENABLED is false (Featured dark,
+                2026-07-09): no pricing surfaces anywhere while it is off. */}
+            {FEATURED_UPGRADE_ENABLED && provider.is_claimed && !provider.is_featured && (
               <section className="bg-slate-900 rounded-[3rem] p-12 text-center text-white relative overflow-hidden shadow-2xl mt-16">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-wellness-600/20 rounded-full -mr-48 -mt-48 blur-3xl opacity-50" />
                 <div className="relative z-10">

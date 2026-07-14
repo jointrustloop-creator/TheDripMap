@@ -156,6 +156,17 @@ function rootDomain(url: string): string | null {
 // status='researched'. The drafts cron handles emails the next morning.
 //
 // Auth: same Bearer ${CRON_SECRET} pattern as other crons.
+// DISABLED 2026-07-09: dormant for a month (19 backlink_targets total,
+// newest researched_at 2026-06-06 despite a daily schedule) with no visible
+// kill switch, most likely because ANTHROPIC_API_KEY is unset in Vercel and
+// every run 500s before writing anything, or dedup silently skips every
+// candidate. Removed from vercel.json's cron schedule pending investigation,
+// so it stops paying for a call that produces nothing either way. This guard
+// is defense in depth in case anything still calls it manually. To
+// reactivate: confirm ANTHROPIC_API_KEY is set and producing new rows, then
+// remove this block and re-add the cron entry to vercel.json.
+const DISABLED = true;
+
 export async function GET(req: Request) {
   const expected = process.env.CRON_SECRET;
   if (!expected) {
@@ -164,6 +175,9 @@ export async function GET(req: Request) {
   const auth = req.headers.get('authorization') || '';
   if (auth !== `Bearer ${expected}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (DISABLED) {
+    return NextResponse.json({ ok: false, disabled: true, reason: 'Dormant ~1 month, likely missing ANTHROPIC_API_KEY in Vercel. See DISABLED comment in this file.' });
   }
 
   if (!process.env.ANTHROPIC_API_KEY) {

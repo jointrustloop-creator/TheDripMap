@@ -315,9 +315,12 @@ function ResultsContent() {
 
   // Honest header wording: only call the set "verified" when every shown clinic
   // carries a real badge, and only claim the treatment when one actually offers it.
+  // The condition below now matches the comment: is_claimed/is_featured alone
+  // used to qualify, which meant a page of merely-claimed clinics could be
+  // headlined "Verified clinics", a claim only the safety_verified badge earns.
   const anyConfirmed = matchedClinics.some((c) => c.offersRecommended);
-  const allVerified = matchedClinics.length > 0 && matchedClinics.every((c) => c.is_claimed || c.is_featured || c.safety_verified);
-  const clinicNoun = allVerified ? 'Verified clinics' : 'Clinics';
+  const allVerified = matchedClinics.length > 0 && matchedClinics.every((c) => c.safety_verified === true);
+  const clinicNoun = allVerified ? 'Safety Verified clinics' : 'Clinics';
 
   if (isLoading) {
     return (

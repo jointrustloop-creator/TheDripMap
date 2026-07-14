@@ -32,12 +32,15 @@ interface Row {
   state: string | null;
   rating: number | string | null;
   reviews: number | string | null;
+  is_claimed: boolean | null;
   is_featured: boolean | null;
   safety_verified: boolean | null;
 }
 
 function toMatch(r: Row, verifiedCount: number): SafetyMatch {
-  const claimed = !!r.is_featured;
+  // "Claimed" means is_claimed, not is_featured (Featured is a separate,
+  // unrelated placement concept and must never stand in for ownership).
+  const claimed = !!r.is_claimed;
   return {
     name: r.name,
     slug: r.slug,
@@ -67,14 +70,14 @@ export async function POST(req: Request) {
   }
 
   const sb = getServiceSupabase();
-  const cols = 'id, name, slug, city, state, rating, reviews, is_featured, safety_verified';
+  const cols = 'id, name, slug, city, state, rating, reviews, is_claimed, is_featured, safety_verified';
 
   // 1. Find matching clinics by name (optionally narrowed to the city).
   let q = sb
     .from('providers')
     .select(cols)
     .ilike('name', `%${name}%`)
-    .order('is_featured', { ascending: false })
+    .order('is_claimed', { ascending: false })
     .order('rating', { ascending: false, nullsFirst: false })
     .limit(5);
   if (city) q = q.ilike('city', `%${city}%`);
@@ -86,7 +89,7 @@ export async function POST(req: Request) {
   // 2. Pull verification flags for any matched claimed clinics in one query.
   const rows = (matchRows as Row[]) || [];
   const verifiedByClinic = new Map<string, number>();
-  const claimedIds = rows.filter((r) => r.is_featured).map((r) => r.id);
+  const claimedIds = rows.filter((r) => r.is_claimed).map((r) => r.id);
   if (claimedIds.length) {
     const { data: profs } = await sb
       .from('operator_profiles')
@@ -101,14 +104,16 @@ export async function POST(req: Request) {
   const matches = rows.map((r) => toMatch(r, verifiedByClinic.get(r.id) || 0));
   const notFound = matches.length === 0;
 
-  // 3. If not found, surface 3 verified alternatives — same city first, else anywhere.
+  // 3. If not found, surface 3 Safety Verified alternatives (the actual
+  // badge field), same city first, else anywhere. Was querying is_featured,
+  // which labels paid placement as "verified"; that is not the same claim.
   let alternatives: SafetyMatch[] = [];
   if (notFound) {
     const buildAlt = async (withCity: boolean) => {
       let aq = sb
         .from('providers')
         .select(cols)
-        .eq('is_featured', true)
+        .eq('safety_verified', true)
         .order('rating', { ascending: false, nullsFirst: false })
         .limit(3);
       if (withCity && city) aq = aq.ilike('city', `%${city}%`);

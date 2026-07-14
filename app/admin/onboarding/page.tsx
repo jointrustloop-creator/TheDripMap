@@ -3,8 +3,13 @@
  *
  * One line per clinic in the onboarding pipeline: status, preview link,
  * assembled safety evidence, and the operator's click-actions (send now,
- * park, mark replied/published, flip safety_verified). The operator's whole
- * job here is read and click; automation never flips safety_verified.
+ * park, mark replied/published, flip safety_verified). This page's
+ * flip_safety_verified action is a manual/backfill path only, NOT the
+ * primary one: since 2026-06-19 the badge auto-grants when a claimed owner
+ * completes the safety section of the /finish questionnaire (see
+ * src/lib/safety.ts, app/api/finish-listing/route.ts). Human eyes on
+ * badged clinics come from the monthly spot check in the weekly report,
+ * not from a per-claim review gate here.
  */
 import React from 'react';
 import { redirect } from 'next/navigation';

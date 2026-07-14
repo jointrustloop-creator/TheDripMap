@@ -54,7 +54,7 @@ export function buildOnboardingEmail(p: OnboardingProvider, ownerName: string | 
 
 Great news, you've confirmed ownership of ${p.name} and your listing is live at ${SITE_URL}/providers/${p.slug}.
 
-One short step makes it stand out: complete your safety questionnaire and we will review it and add your Safety Verified badge. That is the gold shield patients look for, and it visibly lifts your listing above unverified clinics when people in ${city} are choosing a clinic.
+One short step makes it stand out: complete your safety questionnaire to earn your Safety Verified badge. That is the gold shield patients look for, and it visibly lifts your listing above unverified clinics when people in ${city} are choosing a clinic. Safety Verified reflects your written answers to our questionnaire, not an independent medical audit.
 
 It is all quick multiple choice plus a few photos, about two minutes, on your own private page:
 

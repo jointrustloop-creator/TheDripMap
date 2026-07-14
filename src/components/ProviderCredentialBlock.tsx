@@ -68,8 +68,12 @@ export function ProviderCredentialBlock({
   const statement = pd.founderStatement?.trim();
 
   const checks = CHECKLIST.map((c) => ({ ...c, done: pd[c.key] === true }));
-  const verifiedCount = checks.filter((c) => c.done).length;
-  const allVerified = verifiedCount === CHECKLIST.length;
+  // The badge itself must read the canonical providers.safety_verified
+  // column, not the legacy 5-flag checklist below (which predates the
+  // 2026-06-19 questionnaire flow and is often unpopulated for clinics that
+  // earned the badge the current way). The checklist stays as supplementary
+  // detail; it no longer gates the header label.
+  const allVerified = (provider as { safety_verified?: boolean }).safety_verified === true;
 
   // ── UNCLAIMED / UNVERIFIED state ──────────────────────────────────
   if (!isClaimed) {
