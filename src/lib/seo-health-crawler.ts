@@ -42,6 +42,10 @@ export interface CrawlResult {
   noindex: boolean;
   title: string | null;
   metaDescription: string | null;
+  // True when a <title> exists in the full HTML but NOT inside <head> (metadata
+  // rendered outside <head>, e.g. Next.js streaming metadata). Distinguishes a
+  // real placement defect from a cold/partial render that returned nothing.
+  titleOutsideHead: boolean;
   error: string | null;
 }
 
@@ -148,6 +152,7 @@ async function probeOnce(url: string): Promise<CrawlResult> {
     noindex: false,
     title: null,
     metaDescription: null,
+    titleOutsideHead: false,
     error: null,
   };
 
@@ -209,6 +214,14 @@ async function probeOnce(url: string): Promise<CrawlResult> {
     if (!getRes.ok) return base;
     const html = await getRes.text();
     parseHead(html, base);
+    // A <title> present in the full HTML but absent from our <head> region means
+    // the page rendered its metadata OUTSIDE <head> (e.g. Next.js streaming
+    // metadata that React hoists client-side). Google may still process it, but
+    // a canonical outside <head> is not reliably honored, so mark it as its own
+    // real placement issue rather than letting it look like a cold render.
+    if (!base.title && /<title[^>]*>[\s\S]*?<\/title>/i.test(html)) {
+      base.titleOutsideHead = true;
+    }
   } catch (err) {
     base.error = err instanceof Error ? err.message : String(err);
   }
@@ -298,7 +311,8 @@ export type IssueType =
   | 'missing_canonical'
   | 'unexpected_noindex'
   | 'missing_title'
-  | 'missing_meta';
+  | 'missing_meta'
+  | 'meta_outside_head';
 
 export interface Issue {
   type: IssueType;
@@ -339,23 +353,34 @@ export function detectIssues(summary: CrawlSummary): Issue[] {
       continue;
     }
 
-    // 2xx but we parsed NONE of title/canonical/meta. A real rendered page
-    // always has at least a <title>, so zero head tags means the body we got
-    // was a partial/cold-render shell, not a page genuinely missing all three.
-    // Report it as a single crawl failure instead of three fabricated missing-
-    // tag findings (the 38 missing_title + 38 missing_meta + 38 missing_canonical
-    // false-positive cluster). r.error is NOT required: the partial-render case
-    // throws no error (200 + a truncated body). A page missing only ONE tag
-    // (e.g. has a title but no canonical) still has a title, so it does not hit
-    // this guard and is flagged correctly below.
+    // 2xx but we parsed NONE of title/canonical/meta from <head>. A real
+    // rendered page always has at least a <title>, so this is never a page
+    // genuinely missing all three. Two distinct causes, reported as ONE finding
+    // each instead of three fabricated missing_title/meta/canonical (the false-
+    // positive cluster):
+    //   (a) titleOutsideHead: the tags exist in the HTML but outside <head>
+    //       (Next.js streaming metadata). A real, specific placement issue,
+    //       because a canonical outside <head> is not reliably honored.
+    //   (b) otherwise: we got a partial/cold-render shell with no tags at all
+    //       (r.error not required, the partial-render case throws no error).
+    // A page missing only ONE tag (has a title, no canonical) still has a title,
+    // so it skips this guard and is flagged correctly below.
     if (!r.title && !r.canonical && !r.metaDescription) {
-      issues.push({
-        type: 'crawl_timeout',
-        url: r.url,
-        detail: r.error
-          ? `HTTP ${r.status} but body read failed: ${r.error}`
-          : `HTTP ${r.status} but no head tags parsed (cold/partial render)`,
-      });
+      if (r.titleOutsideHead) {
+        issues.push({
+          type: 'meta_outside_head',
+          url: r.url,
+          detail: 'title/canonical/meta render outside <head> (canonical may be ignored by Google)',
+        });
+      } else {
+        issues.push({
+          type: 'crawl_timeout',
+          url: r.url,
+          detail: r.error
+            ? `HTTP ${r.status} but body read failed: ${r.error}`
+            : `HTTP ${r.status} but no head tags parsed (cold/partial render)`,
+        });
+      }
       continue;
     }
 

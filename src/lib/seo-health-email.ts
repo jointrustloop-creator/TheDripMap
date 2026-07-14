@@ -18,6 +18,7 @@ const ISSUE_LABELS: Record<IssueType, string> = {
   unexpected_noindex: 'Unexpected noindex',
   missing_title: 'Missing <title>',
   missing_meta: 'Missing meta description',
+  meta_outside_head: 'Metadata rendered outside <head> (title/canonical/meta present but misplaced)',
 };
 
 const ISSUE_ORDER: IssueType[] = [
@@ -27,6 +28,7 @@ const ISSUE_ORDER: IssueType[] = [
   'missing_canonical',
   'missing_title',
   'missing_meta',
+  'meta_outside_head',
   'crawl_timeout',
 ];
 
