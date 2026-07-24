@@ -648,8 +648,12 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap gap-1.5 mb-3">
+                  {/* Claimed, not "Verified": this pill shows on every claimed
+                      listing regardless of safety_verified, so "Verified Clinic"
+                      overclaimed. The separate Safety Verified pill below is the
+                      only badge that implies the safety attestation. */}
                   <div className="inline-flex items-center gap-1.5 bg-emerald-500/95 text-white text-[10px] font-black uppercase tracking-[0.15em] px-2.5 py-1 rounded-full shadow-lg">
-                    <CheckCircle2 size={11} /> Verified Clinic
+                    <CheckCircle2 size={11} /> Claimed Clinic
                   </div>
                   {safetyVerified && (
                     <a href="#safety-verified" className="inline-flex items-center gap-1.5 bg-sky-500/95 hover:bg-sky-400 text-white text-[10px] font-black uppercase tracking-[0.15em] px-2.5 py-1 rounded-full shadow-lg transition-colors" title="Operator confirmed all 5 safety criteria — tap to see the breakdown.">

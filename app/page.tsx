@@ -38,15 +38,16 @@ export const revalidate = 60;
  *  Section rhythm: dark → light → dark → light → bone → light → bone →
  *  emerald. Alternating creates calm contrast without color noise.
  *
- *  Previous version preserved at scripts/page-backup-2026-05-27.tsx.
+ *  Previous version is in git history (removed the fabricated LiveStatsBar).
  * ─────────────────────────────────────────────────────────────────────
  */
 
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getSiteStats();
   // Title kept under ~60 visible chars so it never truncates in SERPs.
-  // "Verified" is the differentiator word; the live count is the proof.
-  const title = `IV Therapy Near Me: Compare ${stats.total}+ Verified Clinics | The Drip Map`;
+  // Clinics are LISTED, not verified: only Safety Verified clinics have attested
+  // to their safety criteria. "Verified" was removed from the count claim (2026-07).
+  const title = `IV Therapy Near Me: Compare ${stats.total}+ Clinics | The Drip Map`;
   const description = `Find the right IV therapy clinic near you. Compare ${stats.total}+ IV therapy clinics across Canada and the US, see real drip menus and safety credentials, and match in 60 seconds.`;
 
   return {
@@ -77,13 +78,19 @@ export default async function HomePage() {
   const metroCities = (
     US_MARKET_ENABLED ? popularCities : popularCities.filter((c) => c.country === 'Canada')
   ).slice(0, US_MARKET_ENABLED ? 12 : 8);
-  // Featured Verified Clinics — pull the 4 claimed listings live from Supabase
-  // so the homepage always reflects current claimed-and-verified status.
-  // Canada-first: the homepage Featured shelf shows Canadian clinics only while
-  // US_MARKET_ENABLED is off (reversible). US claimed/featured clinics keep their
-  // live, verified listings — they simply do not take a slot on the Canadian
-  // homepage, which would not reach their US patients anyway.
-  const featuredClinics = (await getFeaturedListings(4, undefined, US_MARKET_ENABLED ? undefined : 'Canada')) || [];
+  // Featured row integrity (2026-07): the homepage "Who we trust" shelf must only
+  // show clinics that LEGITIMATELY hold the Safety Verified badge AND are claimed.
+  // We gate on the real safety_verified flag + is_claimed and render fewer than 4
+  // cards if the eligible pool is smaller (never pad with unverified clinics).
+  // Bay Wellness is display-excluded here per operator instruction (its badge is
+  // pending reconciliation); the safety_verified flag itself is NOT modified — that
+  // is the operator's gate. Canada-first: Canadian clinics only while US is off.
+  const FEATURED_ROW_EXCLUDE = new Set(['bay-wellness-centre-vancouver']);
+  const featuredClinics = ((await getFeaturedListings(24, undefined, US_MARKET_ENABLED ? undefined : 'Canada')) || [])
+    .filter((c) => (c as { safety_verified?: boolean }).safety_verified === true
+      && c.is_claimed === true
+      && !FEATURED_ROW_EXCLUDE.has(String(c.slug)))
+    .slice(0, 4);
   const latestPosts = blogPosts.slice(0, 3);
 
   // Per-clinic Safety Verified map for the featured shelf. As of 2026-06-08

@@ -8,7 +8,7 @@ import { IVAnimation } from '../../src/components/IVAnimation';
 import { getSiteStats } from '../../src/lib/data';
 
 const aboutTitle = "Our Mission & Clinical Standards | TheDripMap";
-const aboutDescription = "Learn about the mission behind TheDripMap. We're building the most trusted resource for IV therapy and clinical wellness in Canada.";
+const aboutDescription = "Learn about TheDripMap, Canada's IV therapy matching platform. We help patients compare clinics and match with the right IV therapy provider.";
 const aboutOgImage = 'https://www.thedripmap.com/og-image.png';
 
 export const metadata: Metadata = {
@@ -44,7 +44,7 @@ export default async function AboutPage() {
             Our <span className="text-wellness-600">Mission</span>
           </h1>
           <p className="text-xl text-slate-500 leading-relaxed">
-            We&apos;re building the most trusted resource for IV therapy and clinical wellness in Canada. Our goal is to help you find the perfect provider based on your specific health goals and lifestyle needs across {stats.total} clinics and {stats.cities} cities.
+            TheDripMap is Canada&apos;s IV therapy matching platform. Our goal is to help you find the right provider for your goals and lifestyle, across {stats.total} clinics and {stats.cities} cities.
           </p>
         </div>
 
@@ -69,15 +69,15 @@ export default async function AboutPage() {
               <div className="w-12 h-12 bg-wellness-600 rounded-2xl flex items-center justify-center text-white">
                 <ShieldCheck size={24} />
               </div>
-              <h3 className="text-2xl font-black text-slate-900 tracking-tight">Our Standards</h3>
+              <h3 className="text-2xl font-black text-slate-900 tracking-tight">What Safety Verified means</h3>
             </div>
             <ul className="space-y-6">
               {[
-                'Verified Medical Director Required',
-                'Licensed RN Administration Only',
-                'Transparent Pricing Protocols',
-                'High Clinical Safety Standards',
-                'Verified Patient Reviews'
+                'The owner has claimed and verified the listing',
+                'They name their medical director',
+                'They confirm who administers the IVs',
+                'They disclose where ingredients are sourced',
+                'Attested in writing, checked against public registries where available'
               ].map((item, idx) => (
                 <li key={idx} className="flex items-center gap-4 text-slate-700 font-bold">
                   <div className="w-6 h-6 bg-wellness-100 rounded-full flex items-center justify-center text-wellness-600">
@@ -100,7 +100,7 @@ export default async function AboutPage() {
               {[
                 { icon: <Clock size={16} />, title: 'Real-time Booking', desc: 'Instant access to clinic schedules' },
                 { icon: <MapPin size={16} />, title: 'Mobile Options', desc: 'IV therapy delivered to your door' },
-                { icon: <Star size={16} />, title: 'Expert Guidance', desc: 'Clinically-backed matching quiz' },
+                { icon: <Star size={16} />, title: 'Guided Matching', desc: 'Personalized matching quiz' },
                 { icon: <CheckCircle2 size={16} />, title: '100% Free', desc: 'No hidden fees for patients' }
               ].map((benefit, idx) => (
                 <div key={idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
@@ -153,7 +153,7 @@ export default async function AboutPage() {
             <div>
               <h2 className="text-4xl md:text-5xl font-black mb-8 tracking-tight">Ready to find your match?</h2>
               <p className="text-lg text-slate-300 mb-10 leading-relaxed">
-                Take our clinical diagnostic quiz and get matched with the best IV therapy providers in your city.
+                Take our match quiz and get matched with IV therapy providers in your city.
               </p>
               <Link 
                 href="/quiz"
@@ -165,7 +165,7 @@ export default async function AboutPage() {
             <div className="grid grid-cols-2 gap-8">
               <div>
                 <div className="text-4xl font-black text-wellness-400 mb-2">{stats.total}+</div>
-                <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">Verified Clinics</div>
+                <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">Clinics Listed</div>
               </div>
               <div>
                 <div className="text-4xl font-black text-wellness-400 mb-2">{stats.cities}+</div>
