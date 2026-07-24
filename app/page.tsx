@@ -48,7 +48,7 @@ export async function generateMetadata(): Promise<Metadata> {
   // Clinics are LISTED, not verified: only Safety Verified clinics have attested
   // to their safety criteria. "Verified" was removed from the count claim (2026-07).
   const title = `IV Therapy Near Me: Compare ${stats.total}+ Clinics | The Drip Map`;
-  const description = `Find the right IV therapy clinic near you. Compare ${stats.total}+ IV therapy clinics across Canada and the US, see real drip menus and safety credentials, and match in 60 seconds.`;
+  const description = `Find the right IV therapy clinic near you. Compare ${stats.total}+ IV therapy clinics across Canada, see real drip menus and safety credentials, and match in 60 seconds.`;
 
   return {
     title,
@@ -259,7 +259,7 @@ export default async function HomePage() {
             <span className="hidden md:inline text-slate-300">·</span>
             <span><span className="text-slate-900">{stats.cities}</span> &nbsp;Cities</span>
             <span className="hidden md:inline text-slate-300">·</span>
-            <span><span className="text-slate-900">{stats.states}</span> &nbsp;Provinces &amp; States</span>
+            <span><span className="text-slate-900">{stats.states}</span> &nbsp;Provinces</span>
           </div>
         </div>
       </section>
@@ -1003,7 +1003,7 @@ export default async function HomePage() {
           <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-white/50 mb-8 block">Your match is waiting</span>
           <h2 className="font-black tracking-[-0.025em] leading-[1] text-[clamp(2.5rem,6vw,5rem)] mb-10">
             Stop guessing.<br />
-            <span className="font-serif italic font-normal text-white/85">Start healing.</span>
+            <span className="font-serif italic font-normal text-white/85">Get matched.</span>
           </h2>
           <p className="text-lg md:text-xl text-white/70 max-w-xl mx-auto mb-14 leading-relaxed font-light">
             Five questions. One match. The right drip, the right clinic, the first time.

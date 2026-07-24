@@ -241,7 +241,7 @@ export const GUIDES: Guide[] = [
         heading: 'Bioavailability — the core difference',
         paragraphs: [
           `When you take an oral supplement, your body absorbs somewhere between 10% and 50% of the active ingredient, depending on the nutrient, the formulation, what you ate with it, and your individual gut. Vitamin C, for example, has saturable intestinal transport — you can only absorb about 200mg per dose orally, regardless of how much you swallow.`,
-          `IV administration bypasses your digestive system entirely. The nutrient enters your bloodstream directly, achieving close to 100% bioavailability. This is why a single IV vitamin C drip can deliver more of the active nutrient than weeks of oral supplementation.`,
+          `IV administration bypasses your digestive system entirely. The nutrient enters your bloodstream directly, bypassing digestion. This bypasses the digestive step that limits how much of an oral supplement is absorbed.`,
         ],
       },
       {

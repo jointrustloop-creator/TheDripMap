@@ -173,7 +173,7 @@ export default async function AboutPage() {
               </div>
               <div>
                 <div className="text-4xl font-black text-wellness-400 mb-2">{stats.states}</div>
-                <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">Provinces &amp; States</div>
+                <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">Provinces</div>
               </div>
               <div>
                 <div className="text-4xl font-black text-wellness-400 mb-2">{stats.avgRating}★</div>

@@ -24,7 +24,7 @@ export const TREATMENT_CONTENT: Record<string, TreatmentContent> = {
 Most hangover IV formulations include a litre of Lactated Ringer's or normal saline for rehydration, a high-dose B-complex (especially B1, B6, and B12), vitamin C for immune and adrenal support, and magnesium to ease headaches and muscle tension. Many providers offer optional add-ons such as ondansetron (Zofran) for nausea or ketorolac (Toradol) for headache and body aches. The result is what many describe as a "reset button" — relief that would otherwise take 12 to 24 hours of rest and oral hydration to achieve.
 
 Hangover IV therapy is most effective when administered within 4 to 8 hours of waking. It is not a license to drink more, nor a substitute for moderation, but it is widely used by professionals, athletes, and frequent travellers who need to be functional after a long night.`,
-    howItWorks: `A medical professional inserts a small IV catheter into a vein in your arm or hand. Over 30 to 60 minutes, the fluids and nutrients drip directly into your bloodstream, achieving close to 100% bioavailability compared to roughly 20 to 50% for the same nutrients taken orally. Your body begins rehydrating from the first few minutes, with most clients reporting noticeable relief within 15 to 20 minutes of the infusion starting.`,
+    howItWorks: `A medical professional inserts a small IV catheter into a vein in your arm or hand. Over 30 to 60 minutes, the fluids and nutrients drip directly into your bloodstream, bypassing digestion. Your body begins rehydrating from the first few minutes, with most clients reporting noticeable relief within 15 to 20 minutes of the infusion starting.`,
     benefits: [
       'Rapid rehydration — restores fluid balance in minutes, not hours',
       'Replaces B vitamins and magnesium depleted by alcohol metabolism',
@@ -53,7 +53,7 @@ Hangover IV therapy is most effective when administered within 4 to 8 hours of w
   'NAD+ Plus': {
     description: `NAD+ (nicotinamide adenine dinucleotide) is a coenzyme found in every living cell, essential for converting nutrients into cellular energy, repairing DNA, and regulating circadian rhythms. NAD+ levels decline naturally with age — research suggests by middle age we may have only about half the NAD+ we had in our twenties — and that decline has been linked to fatigue, cognitive slowdown, and impaired cellular recovery. NAD+ IV therapy bypasses oral supplements (which have very poor bioavailability for NAD+) and delivers the molecule directly into the bloodstream, restoring cellular levels in a single session.
 
-NAD+ IV therapy is used for a wide range of goals: sustained energy, mental clarity, focus, exercise recovery, and increasingly as a supportive therapy in addiction recovery programs. Some longevity-focused clients use NAD+ as part of a broader healthspan protocol. Sessions are notably longer than other IV therapies — NAD+ must be infused slowly to avoid side effects like chest pressure, anxiety, or stomach discomfort, so a standard 250mg dose can take 2 to 4 hours, and high-dose protocols (500mg+) can stretch to 6 to 8 hours.
+NAD+ IV therapy is used for a range of wellness goals: sustained energy, mental clarity, focus, and exercise recovery. Some longevity-focused clients use NAD+ as part of a broader healthspan protocol. Sessions are notably longer than other IV therapies — NAD+ must be infused slowly to avoid side effects like chest pressure, anxiety, or stomach discomfort, so a standard 250mg dose can take 2 to 4 hours, and high-dose protocols (500mg+) can stretch to 6 to 8 hours.
 
 NAD+ is one of the more researched IV interventions, but it remains an emerging area. Clinical evidence for some claimed benefits is still maturing, and results vary by individual. Most clinics recommend a series of sessions for noticeable effect rather than a single drip.`,
     howItWorks: `NAD+ is infused at a controlled, slow rate to allow your cells to absorb and convert it into the active forms (NADH, NADP+) that power mitochondrial function. As cellular NAD+ rises, mitochondria produce more ATP — the energy currency your cells run on — and DNA-repair enzymes called sirtuins become more active. Most clients feel the effects build over the days following each session, with cumulative benefit across a series.`,
@@ -61,7 +61,6 @@ NAD+ is one of the more researched IV interventions, but it remains an emerging 
       'Sustained energy and mental clarity',
       'Improved focus and cognitive performance',
       'Supports cellular repair and mitochondrial function',
-      'Used adjunctively in addiction recovery programs',
       'Part of longevity and healthspan protocols',
     ],
     whatToExpect: `Plan for a long session — typically 2 to 4 hours, sometimes longer for high-dose protocols. The clinic should provide a reclining chair, blanket, snacks, and entertainment. The infusion can cause mild side effects (warm flushing, chest pressure, abdominal discomfort, or anxiety) if it runs too fast, which is why slow titration matters. A good provider will start slow and adjust the rate to your tolerance.`,

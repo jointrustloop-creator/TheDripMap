@@ -1122,17 +1122,31 @@ export async function getSiteStats() {
   }
 
   try {
-    const { count: total } = await supabase
-      .from('providers')
-      .select('*', { 
-        count: 'exact', 
-        head: true 
-      });
+    // SINGLE SOURCE OF TRUTH for platform-wide counts. Excludes hidden listings
+    // always, and US clinics while US_MARKET_ENABLED is off (Canada-first). Every
+    // count shown on the site flows from getSiteStats, so the same filter lives
+    // here. Previously there was NO country/hidden filter, and the aggregate
+    // select hit Supabase's 1000-row default cap while `total` used an exact
+    // count, so total / cities / states disagreed (the 1,626 vs 1,567 mismatch).
+    const { count: total } = await (() => {
+      let q = supabase.from('providers').select('*', { count: 'exact', head: true }).neq('is_hidden', true);
+      if (!US_MARKET_ENABLED) q = q.neq('country', 'United States');
+      return q;
+    })();
 
-    const { data: allData } = await supabase
-      .from('providers')
-      .select('city, state, reviews, rating')
-    
+    // Paginate ALL matching rows so city / province / rating aggregates cover the
+    // full set instead of the first 1000, and always match `total`.
+    let allData: { city?: string | null; state?: string | null; reviews?: unknown; rating?: unknown }[] = [];
+    let pageFrom = 0;
+    while (true) {
+      let q = supabase.from('providers').select('city, state, reviews, rating').neq('is_hidden', true);
+      if (!US_MARKET_ENABLED) q = q.neq('country', 'United States');
+      const { data } = await q.range(pageFrom, pageFrom + 999);
+      allData = allData.concat(data || []);
+      if (!data || data.length < 1000) break;
+      pageFrom += 1000;
+    }
+
     if (!allData || allData.length === 0) return getMockStats();
 
     // Calculate unique cities and states
