@@ -7,6 +7,7 @@ import { Logo } from './Logo';
 import { Provider } from '../types';
 import { supabase } from '../lib/supabase';
 import { cn } from '../lib/utils';
+import { marketOf, US_MARKET_ENABLED } from '../lib/market';
 
 interface ClaimListingModalProps {
   provider: Provider;
@@ -39,9 +40,19 @@ export const ClaimListingModal = ({
   const [ownerName, setOwnerName] = useState('');
   const [ownerPhone, setOwnerPhone] = useState('');
 
+  // US claim gate: while the US market is paused (US_MARKET_ENABLED=false) we do
+  // not accept new claims on US listings. Canadian listings are never affected.
+  const isUSGated =
+    !US_MARKET_ENABLED &&
+    marketOf({ country: (provider as { country?: string | null }).country, state: provider.state }) === 'US';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!ownerName.trim() || !ownerPhone.trim() || !email || !confirmed) return;
+    if (isUSGated) {
+      setError('TheDripMap is focused on Canada right now, so we are not accepting new US clinic claims yet. Email info@thedripmap.com and we will let you know the moment US claims reopen.');
+      return;
+    }
 
     setIsSubmitting(true);
     setError(null);
@@ -193,6 +204,21 @@ export const ClaimListingModal = ({
                     <h3 className="font-black text-amber-900 text-lg mb-2">This listing is already claimed</h3>
                     <p className="text-amber-700 text-sm leading-relaxed">
                       Someone has already verified ownership of <span className="font-bold">{provider.name}</span>. If you believe this is a mistake, contact <a href="mailto:info@thedripmap.com" className="underline">info@thedripmap.com</a>.
+                    </p>
+                  </div>
+                  <button
+                    onClick={onClose}
+                    className="mt-6 w-full bg-slate-900 text-white p-4 rounded-2xl font-bold hover:bg-slate-800 transition-all"
+                  >
+                    Close
+                  </button>
+                </div>
+              ) : isUSGated ? (
+                <div className="p-8 pt-4">
+                  <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6 text-center">
+                    <h3 className="font-black text-amber-900 text-lg mb-2">US claims are paused</h3>
+                    <p className="text-amber-700 text-sm leading-relaxed">
+                      TheDripMap is focused on Canada right now, so we are not accepting new US clinic claims yet. We will reopen US listings for claims soon. Questions? Email <a href="mailto:info@thedripmap.com" className="underline">info@thedripmap.com</a>.
                     </p>
                   </div>
                   <button

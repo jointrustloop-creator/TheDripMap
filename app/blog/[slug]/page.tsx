@@ -22,6 +22,7 @@ import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { BlogCard } from '../../../src/components/BlogCard';
 import { BlogBookingCTA } from '../../../src/components/BlogBookingCTA';
+import { ClinicB2BCta } from '../../../src/components/ClinicB2BCta';
 import { getBlogPostBySlug, getBlogPosts, slugify, getListingsByIds, getAllCities, US_MARKET_BLOG_SLUGS, BLOG_CANONICAL_OVERRIDES } from '../../../src/lib/data';
 import { US_MARKET_ENABLED } from '../../../src/lib/market';
 import { SupabaseUnreachableError } from '../../../src/lib/supabase-health';
@@ -42,6 +43,17 @@ const ARCHIVED_POSTS: Record<string, { reason: string }> = {
       'TheDripMap no longer covers peptide therapy as a category. This guide is kept online for archive reference only.',
   },
 };
+
+// Operator-intent posts (clinic owners, not patients) get a B2B "get listed free"
+// CTA at the end of the article. Canada-first: the US "laws by state" post is
+// intentionally excluded (its readers cannot claim during the US pause).
+// Reversible by editing this set.
+const OPERATOR_INTENT_POSTS = new Set([
+  'how-to-find-medical-director-iv-therapy-clinic',
+  'how-to-start-iv-therapy-business-2026',
+  'how-to-get-patients-iv-therapy-clinic-without-ads',
+  'iv-therapy-laws-canada-province-by-province-2026',
+]);
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -478,6 +490,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 </div>
               )}
             </div>
+
+            {/* Operator-intent posts get a B2B "get listed free" CTA. */}
+            {post.content && OPERATOR_INTENT_POSTS.has(String(post.slug)) && <ClinicB2BCta />}
 
             {/* End-of-article booking CTA: city-specific posts route to their
                 city hub (verified clinics + booking buttons); the rest route to
