@@ -8,8 +8,11 @@
  * "TheDripMap's safety questionnaire" is Step 1 of the /finish form ("Who keeps
  * patients safe?"): who administers IVs, medical oversight, ingredient sourcing.
  * Those answers are stored on providers.decision_drivers.manage. Completing it
- * derives the attestation flags into operator_profiles.profile_data AND sets
- * providers.safety_verified = true. The badge renders off safety_verified.
+ * derives the attestation flags into operator_profiles.profile_data AND queues
+ * the clinic for review (providers.safety_review_status='pending'). Since
+ * 2026-07-25 the badge is HUMAN-REVIEWED: an operator approves it in
+ * /admin/badge-reviews, which sets providers.safety_verified = true. The badge
+ * renders off safety_verified.
  *
  * The form covers 3 of the 5 attestation checks (who administers, oversight,
  * sourcing). Liability insurance and regulator standing are NOT asked there, so

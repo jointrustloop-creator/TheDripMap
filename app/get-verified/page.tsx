@@ -71,7 +71,7 @@ function GetVerifiedInner() {
               </h1>
               <p className="text-sm text-slate-600 leading-relaxed mb-5">
                 Enter the email you used to claim this clinic and we will send your private link to finish your
-                profile. Completing it earns the Safety Verified badge, which makes your listing stand out to
+                profile. Completing it submits you for the Safety Verified badge. Once our team reviews and approves your answers, it makes your listing stand out to
                 patients searching your city.
               </p>
 

@@ -27,6 +27,7 @@ import {
   Star,
   Link2,
   ExternalLink,
+  ShieldCheck,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -54,6 +55,9 @@ async function loadStats() {
       (s, p) => s + p.counts.book_click + p.counts.call_click + p.counts.website_click + p.counts.directions_click + p.counts.message_click,
       0,
     );
+    // Best-effort: the review column may not exist before the migration is pasted,
+    // in which case the query returns count:null (no throw) and this stays 0.
+    const badge = await supabase.from('providers').select('id', { count: 'exact', head: true }).eq('safety_review_status', 'pending');
     return {
       providers: provTotal.count ?? 0,
       claimed: claimed.count ?? 0,
@@ -61,6 +65,7 @@ async function loadStats() {
       views30,
       clicks30,
       active30: per.length,
+      badgePending: badge.count ?? 0,
     };
   } catch {
     return null;
@@ -101,6 +106,7 @@ const GROUPS: Group[] = [
   {
     title: 'Clinics and Data',
     tiles: [
+      { href: '/admin/badge-reviews', Icon: ShieldCheck, label: 'Badge Reviews', description: 'Safety Verified review queue. Clinics that completed the safety questionnaire await your Approve / Decline. The badge only turns on here.' },
       { href: '/admin/insights', Icon: LineChart, label: 'Per-clinic engagement insights', description: 'Views + book / call / website / directions / message clicks per clinic. Filter by last 30 days / month / all-time and claimed vs unclaimed.' },
       { href: '/admin/testimonials', Icon: Star, label: 'Testimonials moderation', description: 'Approve, edit, or reject patient testimonials submitted on claimed listings.' },
     ],
@@ -140,6 +146,17 @@ export default async function AdminDashboardPage() {
                 <div className="text-2xl font-black text-slate-900 mt-1 tabular-nums">{n.toLocaleString()}</div>
               </div>
             ))}
+          </div>
+        </Link>
+      )}
+
+      {stats && stats.badgePending > 0 && (
+        <Link href="/admin/badge-reviews" className="block mb-10 bg-amber-50 border border-amber-200 rounded-2xl p-4 hover:border-amber-300 transition-colors">
+          <div className="flex items-center gap-3">
+            <ShieldCheck size={20} className="text-amber-600 shrink-0" />
+            <span className="text-sm font-bold text-amber-900">
+              {stats.badgePending} clinic{stats.badgePending === 1 ? '' : 's'} awaiting Safety Verified review &rarr;
+            </span>
           </div>
         </Link>
       )}

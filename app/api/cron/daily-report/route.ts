@@ -504,6 +504,19 @@ export async function GET(req: Request) {
   }
   lines.push('');
 
+  // Badge reviews pending (2026-07-25): Safety Verified now requires operator
+  // approval in /admin/badge-reviews. Surface the queue depth here until Telegram
+  // is wired. Best-effort: reads 0 if the review column is not present yet.
+  const { count: badgePending } = await supabase
+    .from('providers').select('id', { count: 'exact', head: true }).eq('safety_review_status', 'pending');
+  lines.push(`SAFETY VERIFIED REVIEWS PENDING (${badgePending ?? 0})`);
+  if ((badgePending ?? 0) === 0) {
+    lines.push('  None. Queue clear.');
+  } else {
+    lines.push(`  ${badgePending} clinic(s) await Approve / Decline at /admin/badge-reviews.`);
+  }
+  lines.push('');
+
   // Onboarding email audit (read-only): confirm the finish-listing email went
   // out within 5 min of each verification in the last 24h. Missing sends are
   // flagged loudly so a silently-dropped confirmation never goes unnoticed.
