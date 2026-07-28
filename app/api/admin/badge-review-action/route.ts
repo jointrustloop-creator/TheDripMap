@@ -9,14 +9,22 @@
  * only flips to true HERE, on an explicit operator approval.
  *
  * Actions:
- *   approve  - safety_verified = true, safety_review_status = 'approved',
- *              stamps reviewed_at / reviewed_by.
- *   decline  - safety_review_status = 'declined' with a reason. safety_verified
- *              stays false, so the badge does not render.
+ *   approve             - safety_verified = true, safety_review_status = 'approved',
+ *                         stamps reviewed_at / reviewed_by.
+ *   decline             - safety_review_status = 'declined' with a reason.
+ *                         safety_verified stays false, so the badge does not render.
+ *   request_completion  - safety_review_status = 'incomplete' + requested_at. The
+ *                         clinic's answers are blank or thin, so instead of a
+ *                         decline we ask them to finish. Emails the DRAFT to
+ *                         info@thedripmap.com (never to the clinic): the operator
+ *                         sends. Resubmitting via /finish returns them to 'pending'.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { isAdminRequest } from '../../../../src/lib/admin-auth';
+import { sendMail } from '../../../../src/lib/mailer';
+import { manageUrlForProvider } from '../../../../src/lib/manage-token';
+import { buildCompletionRequestEmail, missingSafetyParts } from '../../../../src/lib/badge-review';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -39,7 +47,7 @@ export async function POST(req: NextRequest) {
   // SELECT first: operate on exactly one known provider.
   const { data: provider, error: rowErr } = await sb
     .from('providers')
-    .select('id, name, is_claimed, safety_verified, safety_review_status')
+    .select('id, name, slug, email, is_claimed, safety_verified, safety_review_status, decision_drivers')
     .eq('id', providerId)
     .maybeSingle();
   if (rowErr) return NextResponse.json({ error: rowErr.message }, { status: 500 });
@@ -88,6 +96,46 @@ export async function POST(req: NextRequest) {
       })
       .eq('id', provider.id);
     if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 });
+    return back;
+  }
+
+  if (action === 'request_completion') {
+    // Not a rejection: the clinic's safety answers are blank or thin, so we ask
+    // them to finish. Badge stays off until they resubmit (which sets 'pending').
+    const { error: updErr } = await sb
+      .from('providers')
+      .update({
+        safety_verified: false,
+        safety_review_status: 'incomplete',
+        safety_review_requested_at: nowIso,
+        safety_reviewed_by: reviewedBy,
+      })
+      .eq('id', provider.id);
+    if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 });
+
+    // Build the draft and send it to the OPERATOR only. The operator sends the
+    // real note to the clinic (drafts-only gate).
+    const dd = (provider as { decision_drivers?: { manage?: unknown } }).decision_drivers;
+    const finishUrl =
+      (await manageUrlForProvider(sb, provider.id)) ||
+      `https://www.thedripmap.com/providers/${(provider as { slug?: string }).slug || ''}`;
+    const draft = buildCompletionRequestEmail({
+      clinicName: provider.name as string,
+      finishUrl,
+      missing: missingSafetyParts(dd?.manage),
+    });
+    const clinicEmail = (provider as { email?: string }).email || '(no email on file)';
+    try {
+      await sendMail({
+        from: 'TheDripMap <info@thedripmap.com>',
+        to: 'info@thedripmap.com',
+        replyTo: 'info@thedripmap.com',
+        subject: `[DRAFT, not sent] ${draft.subject}`,
+        text: `This is a DRAFT for you to send. Intended recipient: ${clinicEmail}\n\nSubject: ${draft.subject}\n\n${draft.text}`,
+      });
+    } catch (e) {
+      console.error('completion-request draft email failed', e instanceof Error ? e.message : e);
+    }
     return back;
   }
 

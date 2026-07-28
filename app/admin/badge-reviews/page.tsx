@@ -27,6 +27,7 @@ interface Row {
   safety_review_status: string | null;
   safety_reviewed_at: string | null;
   safety_review_reason: string | null;
+  safety_review_requested_at: string | null;
   decision_drivers: Record<string, unknown> | null;
 }
 
@@ -48,8 +49,9 @@ export default async function BadgeReviewsPage() {
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
   const { data, error } = await sb
     .from('providers')
-    .select('id,name,slug,city,state,country,is_claimed,safety_verified,safety_review_status,safety_reviewed_at,safety_review_reason,decision_drivers')
-    .eq('safety_review_status', 'pending')
+    .select('id,name,slug,city,state,country,is_claimed,safety_verified,safety_review_status,safety_reviewed_at,safety_review_reason,safety_review_requested_at,decision_drivers')
+    .in('safety_review_status', ['pending', 'incomplete'])
+    .order('safety_review_status', { ascending: true })
     .order('name', { ascending: true });
 
   const tableMissing = !!error && /safety_review_status/.test(error.message || '');
@@ -81,7 +83,18 @@ export default async function BadgeReviewsPage() {
           return (
             <div key={r.id} className="bg-white border border-slate-200 rounded-2xl p-5">
               <div className="flex flex-wrap items-center gap-3 mb-3">
-                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">pending</span>
+                <span
+                  className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                    r.safety_review_status === 'incomplete' ? 'bg-sky-100 text-sky-800' : 'bg-amber-100 text-amber-800'
+                  }`}
+                >
+                  {r.safety_review_status === 'incomplete' ? 'completion requested' : 'pending'}
+                </span>
+                {r.safety_review_requested_at && (
+                  <span className="text-[11px] font-bold text-slate-400">
+                    asked {new Date(r.safety_review_requested_at).toISOString().slice(0, 10)}
+                  </span>
+                )}
                 <span className="font-black text-slate-900">{r.name}</span>
                 <span className="text-slate-400 text-sm">
                   {[r.city, r.state].filter(Boolean).join(', ')}
@@ -118,6 +131,16 @@ export default async function BadgeReviewsPage() {
                     title={r.is_claimed !== true ? 'Only claimed clinics can be approved' : 'Grant the Safety Verified badge'}
                   >
                     Approve badge
+                  </button>
+                </form>
+                <form action="/api/admin/badge-review-action" method="post">
+                  <input type="hidden" name="action" value="request_completion" />
+                  <input type="hidden" name="provider_id" value={r.id} />
+                  <button
+                    className="px-4 py-2 rounded-lg bg-sky-600 text-white text-xs font-black hover:bg-sky-700"
+                    title="Ask the clinic to finish its safety answers. Emails you a draft; nothing goes to the clinic automatically."
+                  >
+                    Request completion
                   </button>
                 </form>
                 <form action="/api/admin/badge-review-action" method="post" className="flex gap-2 items-center">

@@ -5,10 +5,11 @@
 -- scripts/_reconcile-badges.cjs to move every machine-granted badge to pending.
 
 ALTER TABLE providers
-  ADD COLUMN IF NOT EXISTS safety_review_status  text,        -- null | 'pending' | 'approved' | 'declined'
-  ADD COLUMN IF NOT EXISTS safety_reviewed_at    timestamptz, -- when a human decided
-  ADD COLUMN IF NOT EXISTS safety_reviewed_by    text,        -- who decided (operator id / name)
-  ADD COLUMN IF NOT EXISTS safety_review_reason  text;        -- decline reason
+  ADD COLUMN IF NOT EXISTS safety_review_status       text,        -- null | 'pending' | 'incomplete' | 'approved' | 'declined'
+  ADD COLUMN IF NOT EXISTS safety_reviewed_at         timestamptz, -- when a human decided
+  ADD COLUMN IF NOT EXISTS safety_reviewed_by         text,        -- who decided (operator id / name)
+  ADD COLUMN IF NOT EXISTS safety_review_reason       text,        -- decline reason
+  ADD COLUMN IF NOT EXISTS safety_review_requested_at timestamptz; -- completion request sent to the clinic
 
 -- Fast lookup of the review queue.
 CREATE INDEX IF NOT EXISTS idx_providers_safety_review_status

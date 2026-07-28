@@ -248,8 +248,10 @@ export async function POST(req: NextRequest) {
   // /admin/badge-reviews. We still derive the attestation answers into the
   // operator profile below so the reviewer sees them.
   if (isSafetyComplete(answers)) {
-    // Queue for review on a first completion only: never re-queue, and never
-    // demote a clinic the operator has already approved (safety_verified=true).
+    // Queue for review: a first completion (status null) OR a clinic we asked to
+    // finish its answers ('incomplete') returns to 'pending'. Never demote a
+    // clinic the operator already approved, and never re-queue one already
+    // pending or declined.
     if ((provider as { safety_verified?: boolean }).safety_verified !== true) {
       try {
         await supabase
@@ -257,7 +259,7 @@ export async function POST(req: NextRequest) {
           .update({ safety_review_status: 'pending' })
           .eq('id', providerId)
           .neq('safety_verified', true)
-          .is('safety_review_status', null);
+          .or('safety_review_status.is.null,safety_review_status.eq.incomplete');
       } catch (e) {
         console.error('finish-listing safety_review queue failed', e instanceof Error ? e.message : e);
       }
