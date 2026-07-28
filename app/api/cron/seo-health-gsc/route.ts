@@ -25,6 +25,7 @@ import { loadBaseline } from '../../../../src/lib/seo-health-baseline';
 import { buildGscReport } from '../../../../src/lib/seo-health-gsc';
 import { buildSundayDigestEmail } from '../../../../src/lib/seo-health-email';
 import { sendMail } from '../../../../src/lib/mailer';
+import { REPORT_TO } from '../../../../src/lib/report-recipient';
 
 export const maxDuration = 300;
 export const dynamic = 'force-dynamic';
@@ -128,7 +129,7 @@ export async function GET(req: Request) {
   try {
     const res = await sendMail({
       from: 'TheDripMap SEO <info@thedripmap.com>',
-      to: 'info@thedripmap.com',
+      to: REPORT_TO,
       subject: body.subject,
       text: body.text,
       html: body.html,

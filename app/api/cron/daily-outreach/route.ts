@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../../src/lib/mailer';
+import { REPORT_TO } from '../../../../src/lib/report-recipient';
 import { saveDrafts, type DraftPayload } from '../../../../src/lib/draft-saver';
 import { isJunkEmail, isDomainMismatch } from '../../../../src/lib/outreach-quality';
 import {
@@ -114,7 +115,7 @@ export async function GET(req: Request) {
     try {
       await sendMail({
         from: 'TheDripMap <info@thedripmap.com>',
-        to: 'info@thedripmap.com',
+        to: REPORT_TO,
         subject: `[TheDripMap] 0 outreach drafts ready for review, pool exhausted`,
         text: `Daily outreach drafts, ${today}\n\nThe eligible outreach pool is exhausted. No new drafts prepared today.\n\nNext steps: source more emails for unclaimed listings, or expand inventory.`,
       });
@@ -290,7 +291,7 @@ export async function GET(req: Request) {
   try {
     await sendMail({
       from: 'TheDripMap <info@thedripmap.com>',
-      to: 'info@thedripmap.com',
+      to: REPORT_TO,
       subject: `[TheDripMap] ${savedDrafts} outreach drafts ready for review`,
       text: reportLines.join('\n'),
     });

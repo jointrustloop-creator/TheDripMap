@@ -28,6 +28,7 @@ import {
 } from '../../../../src/lib/seo-health-baseline';
 import { buildLayerAEmail, buildLayerASubject } from '../../../../src/lib/seo-health-email';
 import { sendMail } from '../../../../src/lib/mailer';
+import { REPORT_TO } from '../../../../src/lib/report-recipient';
 import {
   startRun,
   finishRun,
@@ -126,7 +127,7 @@ export async function GET(req: Request) {
     try {
       const res = await sendMail({
         from: 'TheDripMap SEO <info@thedripmap.com>',
-        to: 'info@thedripmap.com',
+        to: REPORT_TO,
         subject: subjectInfo.subject,
         text: body.text,
         html: body.html,
