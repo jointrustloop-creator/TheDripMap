@@ -2,7 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { MapPin, ArrowRight } from 'lucide-react';
+import { MapPin, ArrowRight, Gift } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 // GFM is REQUIRED here: bespoke city copy contains pipe tables (the 2026 price
 // bands on /cities/toronto). Without this plugin ReactMarkdown does not parse
@@ -468,6 +468,25 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   const isTemplatedBody = typeof cityData.content === 'string' && cityData.content.includes('short for intravenous therapy');
   const snapInCity = (listings as SnapClinic[]).filter((l) => (l.city || '').toLowerCase() === cityData.name.toLowerCase());
   const snapPool: SnapClinic[] = snapInCity.length ? snapInCity : (listings as SnapClinic[]);
+
+  // Live offers for clinics on this page. Deals are a strong, time-sensitive
+  // conversion hook, so we surface them ON the city page (where ranked traffic
+  // lands) rather than only on /deals. Data-gated: the block renders only when a
+  // clinic here actually has an active offer, so it never adds thin content. The
+  // offer's canonical Offer schema lives on the provider page (linked), so we do
+  // not duplicate it here.
+  const cityTodayIso = new Date().toISOString().slice(0, 10);
+  type CityOffer = { title?: string; code?: string; expires?: string; active?: boolean };
+  const cityOffers = (listings as Array<{ name: string; slug?: string; is_hidden?: boolean; special_offers?: CityOffer[] }>)
+    .map((l) => {
+      if (l.is_hidden || !l.slug) return null;
+      const o = Array.isArray(l.special_offers)
+        ? l.special_offers.find((x) => x && x.title && x.active !== false && (!x.expires || x.expires >= cityTodayIso))
+        : null;
+      return o ? { name: l.name, slug: l.slug, offer: o } : null;
+    })
+    .filter((x): x is { name: string; slug: string; offer: CityOffer } => x !== null)
+    .slice(0, 6);
   const snapMobile = snapPool.filter((c) => {
     if (c.mobile_service) return true;
     const ty = (c.type || '').toLowerCase();
@@ -636,6 +655,39 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
         <div className="flex justify-end mb-8">
           <MapTrigger />
         </div>
+
+        {/* Live offers in this city — surfaced where ranked traffic lands. Only
+            renders when a clinic here has an active offer (data-gated). */}
+        {cityOffers.length > 0 && (
+          <section className="mb-12">
+            <div className="flex items-center justify-between gap-4 mb-5">
+              <h2 className="text-sm font-black uppercase tracking-[0.16em] text-[#0F6E56] flex items-center gap-2">
+                <Gift size={15} /> Live offers in {cityData.name}
+                <span className="text-slate-300 font-bold">·</span>
+                <span className="text-slate-400">{cityOffers.length} offer{cityOffers.length > 1 ? 's' : ''}</span>
+              </h2>
+              <Link href="/deals" className="text-[13px] font-bold text-wellness-700 hover:underline shrink-0">All deals</Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {cityOffers.map((d) => (
+                <Link key={d.slug} href={`/providers/${d.slug}`} className="group bg-white rounded-[1.5rem] border border-slate-200 p-6 hover:border-wellness-300 hover:shadow-xl transition-all flex flex-col">
+                  <div className="flex items-center gap-2 text-[10.5px] font-black uppercase tracking-[0.14em] text-[#a9772a] mb-3">
+                    <Gift size={13} /> Limited-time offer
+                  </div>
+                  <div className="text-[17px] font-black text-slate-900 leading-snug mb-3 flex-1">{String(d.offer.title || '').replace(/[‒-―−]/g, '-')}</div>
+                  <div className="text-[13px] text-slate-500 flex flex-wrap gap-x-3 mb-4">
+                    {d.offer.code && <span>Code <b className="text-slate-700">{d.offer.code}</b></span>}
+                    {d.offer.expires && <span>Ends {d.offer.expires}</span>}
+                  </div>
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-[14px] font-bold text-slate-900 truncate">{d.name}</span>
+                    <span className="text-[#0F6E56] inline-flex items-center gap-1 text-[13px] font-bold shrink-0">View <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" /></span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* 3. Intro paragraph */}
         {(() => {
