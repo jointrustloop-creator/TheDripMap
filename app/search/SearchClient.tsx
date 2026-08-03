@@ -553,7 +553,7 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
 
 
           <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 text-left">
-            Showing {filteredProviders.length} {activeChips.includes('Mobile') ? 'mobile IV ' : ''}clinics {selectedCity === 'All' ? 'across Canada and the US' : `in ${selectedCity}`}
+            Showing {filteredProviders.length} {activeChips.includes('Mobile') ? 'mobile IV ' : ''}clinics {selectedCity === 'All' ? 'across Canada' : `in ${selectedCity}`}
           </div>
 
           <AnimatePresence>

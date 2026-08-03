@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { permanentRedirect } from "next/navigation";
 import ServicePageClient from "./ServicePageClient";
 
@@ -29,6 +30,17 @@ const SERVICES = [
   { name: 'Migraine Relief',     slug: 'migraine-relief',      aliases: ['migraine', 'headache', 'migraine-cocktail'] },
   { name: 'Hormone Therapy',     slug: 'hormone-therapy',      aliases: ['trt', 'hrt', 'testosterone', 'hormone', 'bhrt'] },
 ];
+
+// Prerender the canonical service pages as static HTML. Without this the route
+// is rendered on-demand (dynamic), and Next 15.5 streams generateMetadata output
+// (title/canonical) into the <body> instead of <head>. Static generation, paired
+// with the Suspense boundary around the useSearchParams client child, inlines the
+// metadata in <head> (matching the already-static /iv-therapy and /cities pages).
+// Aliases + unknown slugs still render on-demand (dynamicParams stays true) and
+// 308-redirect to their canonical, which is static.
+export function generateStaticParams() {
+  return SERVICES.map((s) => ({ service: s.slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ service: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
@@ -86,5 +98,15 @@ export default async function ServicePage({ params }: { params: Promise<{ servic
     permanentRedirect(`/treatments/${match.slug}`);
   }
 
-  return <ServicePageClient serviceSlug={service} />;
+  // ServicePageClient calls useSearchParams() (reads ?city=). Without a Suspense
+  // boundary that opts the WHOLE route into dynamic rendering, which streams the
+  // generateMetadata output (title/canonical/description) into the <body> instead
+  // of <head> (Google may then ignore the canonical). Wrapping the dynamic child
+  // in Suspense lets the shell + <head> render statically so metadata lands in
+  // <head>. See SEO crawler finding "metadata rendered outside <head>" (2026-07).
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#FDFDFB]" />}>
+      <ServicePageClient serviceSlug={service} />
+    </Suspense>
+  );
 }

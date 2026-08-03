@@ -305,9 +305,16 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug }: { ser
               )}
             </h1>
             <p className="text-xl text-slate-500 leading-relaxed mb-10">
-              {currentCity && currentCity !== 'All'
-                ? `Compare ${listings.length} top-rated ${service.name} IV therapy clinics and mobile services in ${currentCity}. Real ratings, real pricing, book in under a minute.`
-                : `Compare ${listings.length} top-rated clinics and mobile services specializing in ${service.name} IV therapy. Find the perfect treatment for your wellness goals today.`}
+              {(() => {
+                // Never render "Compare 0 clinics": listings load client-side, so
+                // the count is 0 at static generation / first paint (this is what
+                // Google cached on /treatments/hydration). Omit the number until we
+                // actually have clinics; the count fills in after hydration.
+                const n = listings.length > 0 ? `${listings.length} ` : '';
+                return currentCity && currentCity !== 'All'
+                  ? `Compare ${n}top-rated ${service.name} IV therapy clinics and mobile services in ${currentCity}. Real ratings, real pricing, book in under a minute.`
+                  : `Compare ${n}top-rated clinics and mobile services specializing in ${service.name} IV therapy. Find the right treatment for your wellness goals today.`;
+              })()}
             </p>
 
             <div className="flex flex-wrap gap-4">
