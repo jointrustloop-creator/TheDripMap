@@ -1254,6 +1254,11 @@ export const US_MARKET_BLOG_SLUGS = new Set<string>([
 export const BLOG_CANONICAL_OVERRIDES: Record<string, string> = {
   'best-iv-therapy-toronto-2026': '/cities/toronto',
   'iv-therapy-greater-toronto-area': '/cities/toronto',
+  // Toronto rescue (2026-08): the complete guide is the most head-on competitor
+  // for "iv therapy toronto" and was the one Toronto roundup still
+  // self-canonicalizing, splitting authority three ways while the city page sat
+  // at position ~76. Consolidate onto the hub like its two siblings above.
+  'iv-therapy-toronto-complete-guide': '/cities/toronto',
   'best-iv-therapy-ottawa-2026': '/cities/ottawa',
   'best-iv-therapy-montreal-2026': '/cities/montreal',
   'best-iv-therapy-mississauga-2026': '/cities/mississauga',

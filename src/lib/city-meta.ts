@@ -376,8 +376,11 @@ const metas: Record<string, CityMeta> = {
       },
       {
         question: 'How much does IV therapy cost in Toronto?',
+        // Real figures from the Toronto IV Price Index (published clinic menus,
+        // June 2026 snapshot). Keep in sync with src/lib/price-index-data.ts
+        // when the snapshot is refreshed.
         answer:
-          'Each Toronto clinic sets its own pricing, so check the individual clinic listing for current rates. As a general market guide, wellness drips like hydration and Myers cocktail tend to sit in the low to mid hundreds, with NAD+ protocols typically running higher because of the longer session and the dose. Always confirm with the clinic before booking.',
+          'Based on published menu prices from 17 Toronto clinics (June 2026), a standard IV vitamin drip runs CA$119 to CA$399, with a median of CA$175. NAD+ varies most, roughly CA$79 to CA$799 depending on dose, with a median around CA$250. Each clinic sets its own pricing, so always confirm the current rate before booking.',
       },
       {
         question: 'Do Toronto clinics offer mobile or in-home IV therapy?',

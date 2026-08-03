@@ -4,7 +4,11 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { MapPin, ArrowRight } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-// import remarkGfm from 'remark-gfm';
+// GFM is REQUIRED here: bespoke city copy contains pipe tables (the 2026 price
+// bands on /cities/toronto). Without this plugin ReactMarkdown does not parse
+// GFM tables and the markdown rendered as literal "| Treatment | Price |" text
+// on the highest-value section of the page. Found in the 2026-08 SERP teardown.
+import remarkGfm from 'remark-gfm';
 import { Navbar } from '@/src/components/Navbar';
 import { Footer } from '@/src/components/Footer';
 import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
@@ -437,7 +441,11 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
     },
     {
       question: `What is the average cost of IV therapy in ${cityData.name}?`,
-      answer: `While prices vary by provider and specific protocol, most standard hydration and wellness drips in ${cityData.name} range from $150 to $300. Specialized treatments like NAD+ therapy typically start at $500.`
+      // Data-driven where a published Price Index snapshot exists; the generic
+      // range only appears for cities without collected menu data yet.
+      answer: cityPriceIndex
+        ? `Based on published menu prices from ${cityPriceIndex.clinicCount} ${cityData.name} clinics (${cityPriceIndex.asOf}), a ${cityPriceIndex.headline.treatment.toLowerCase()} runs ${cur(cityPriceIndex.headline.low)} to ${cur(cityPriceIndex.headline.high)}, with a median of ${cur(cityPriceIndex.headline.median)}. See the full ${cityData.name} IV Price Index on TheDripMap for per-treatment ranges.`
+        : `While prices vary by provider and specific protocol, most standard hydration and wellness drips in ${cityData.name} range from $150 to $300. Specialized treatments like NAD+ therapy typically start at $500.`
     }
   ];
   const faqs = [...curatedFaqs, ...genericFaqs].slice(0, 6);
@@ -446,7 +454,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   // therapy" template body; this replaces that shared block (on any city without
   // bespoke copy) with real figures computed from the city's own listings, so no
   // two city pages carry a duplicate body. Bespoke city copy is left untouched.
-  type SnapClinic = { city?: string; name?: string; rating?: number | string; reviewCount?: number | string; mobile_service?: boolean; type?: string; category?: string; specialties?: string[]; subtypes?: string[]; description?: string; is_claimed?: boolean };
+  type SnapClinic = { city?: string; name?: string; rating?: number | string; reviewCount?: number | string; mobile_service?: boolean; type?: string; category?: string; specialties?: string[]; subtypes?: string[]; description?: string; is_claimed?: boolean; safety_verified?: boolean };
   const isTemplatedBody = typeof cityData.content === 'string' && cityData.content.includes('short for intravenous therapy');
   const snapInCity = (listings as SnapClinic[]).filter((l) => (l.city || '').toLowerCase() === cityData.name.toLowerCase());
   const snapPool: SnapClinic[] = snapInCity.length ? snapInCity : (listings as SnapClinic[]);
@@ -468,18 +476,16 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   else if (snapMobile > 0) snapParts.push(`${snapMobile === snapCount ? 'All' : snapMobile} of them offer mobile or in-home visits.`);
   else snapParts.push(`All of them work from a physical clinic.`);
   if (snapRated.length > 0) snapParts.push(`${snapRated.length} ${snapRated.length === 1 ? 'has' : 'have'} public reviews, averaging ${snapAvg.toFixed(1)} stars${snapTop && snapTop.name ? `, led by ${snapTop.name} at ${Number(snapTop.rating).toFixed(1)}` : ''}.`);
-  if (snapClaimed > 0) snapParts.push(`${snapClaimed} ${snapClaimed === 1 ? 'is' : 'are'} claimed and Safety Verified.`);
+  // Claimed and Safety Verified are two INDEPENDENT badges (see src/lib/safety.ts)
+  // and must never be merged into one sentence: a clinic can be claimed without
+  // the badge, and the badge is granted only by operator review.
+  const snapSafety = snapPool.filter((c) => c.safety_verified === true).length;
+  if (snapClaimed > 0) snapParts.push(`${snapClaimed} ${snapClaimed === 1 ? 'is' : 'are'} claimed by the clinic.`);
+  if (snapSafety > 0) snapParts.push(`${snapSafety} ${snapSafety === 1 ? 'holds' : 'hold'} a Safety Verified badge.`);
   const citySnapshot = snapParts.join(' ').replace(/[‒-―−]/g, '-');
 
-  const faqJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqs.map((f) => ({
-      '@type': 'Question',
-      name: f.question,
-      acceptedAnswer: { '@type': 'Answer', text: f.answer },
-    })),
-  };
+  // No FAQPage JSON-LD is built here on purpose: <FAQSection> emits it from the
+  // same `faqs` array, colocated with the visible Q&A. See the render below.
 
   // Breadcrumb trail: Canadian cities get the geo hierarchy Home / Canada /
   // Province / City (linking /canada and the province page) so Canadian
@@ -548,7 +554,9 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
 
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      {/* FAQPage JSON-LD is emitted by <FAQSection> itself, colocated with the
+          visible Q&A. Emitting it here too produced TWO identical FAQPage blocks
+          on every city page (invalid duplicate schema). Removed 2026-08. */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <Navbar />
       <main className="max-w-7xl mx-auto px-6 py-12">
@@ -592,6 +600,26 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           )}
+
+          {/* Answer-first block: the direct answer to "IV therapy in {city}" in
+              one snippet-ready paragraph, composed entirely from live data
+              (counts, price index, ratings), so search engines and AI assistants
+              can lift it verbatim. Every figure is computed above; nothing is
+              hardcoded. */}
+          <div className="mt-6 max-w-3xl rounded-2xl border border-wellness-100 bg-wellness-50/50 px-5 py-4">
+            <p className="text-base md:text-lg text-slate-700 leading-relaxed">
+              {isToronto
+                ? `There are ${torontoCore.length} IV therapy clinics in Toronto on TheDripMap, plus ${torontoNearby.length} more across the GTA.`
+                : `There ${snapCount === 1 ? 'is' : 'are'} ${snapCount} IV therapy ${snapCount === 1 ? 'clinic' : 'clinics'} in ${cityData.name} on TheDripMap.`}{' '}
+              {cityPriceIndex
+                ? `A ${cityPriceIndex.headline.treatment.toLowerCase()} runs ${cur(cityPriceIndex.headline.low)} to ${cur(cityPriceIndex.headline.high)}, median ${cur(cityPriceIndex.headline.median)}, per published menus from ${cityPriceIndex.clinicCount} clinics.`
+                : ''}{' '}
+              {snapRated.length > 0
+                ? `${snapRated.length} ${snapRated.length === 1 ? 'has' : 'have'} public reviews, averaging ${snapAvg.toFixed(1)} stars.`
+                : ''}{' '}
+              {snapMobile > 0 ? `${snapMobile} offer mobile or in-home visits.` : ''}
+            </p>
+          </div>
         </section>
 
         {/* 2. Quick map view trigger */}
@@ -650,6 +678,65 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
                 prices from {cityPriceIndex.clinicCount} {cityData.name} clinics. These are published menu prices,
                 not medical advice.
               </p>
+
+              {/* Full per-treatment table (Toronto rescue, 2026-08): the whole
+                  citable dataset on the money page itself, not just the headline.
+                  Real published-menu figures; the one thing a single clinic's
+                  site can never publish. */}
+              <div className="mt-5 overflow-x-auto">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="text-left text-[11px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-200">
+                      <th className="py-2 pr-4">Treatment</th>
+                      <th className="py-2 pr-4 text-right">Low</th>
+                      <th className="py-2 pr-4 text-right">Median</th>
+                      <th className="py-2 pr-4 text-right">High</th>
+                      <th className="py-2 text-right">Clinics</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cityPriceIndex.rows.map((r) => (
+                      <tr key={r.treatment} className="border-b border-slate-100 last:border-0">
+                        <td className="py-2.5 pr-4 font-bold text-slate-800">{r.treatment}</td>
+                        <td className="py-2.5 pr-4 text-right text-slate-600 tabular-nums">{cur(r.low)}</td>
+                        <td className="py-2.5 pr-4 text-right font-black text-slate-900 tabular-nums">{cur(r.median)}</td>
+                        <td className="py-2.5 pr-4 text-right text-slate-600 tabular-nums">{cur(r.high)}</td>
+                        <td className="py-2.5 text-right text-slate-500 tabular-nums">{r.clinics}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-3 text-xs text-slate-400 leading-relaxed">
+                Method: one representative (lowest listed) published price per clinic per treatment; low, median and
+                high across clinics; only treatments priced by at least 3 clinics are shown. Snapshot: {cityPriceIndex.asOf}.
+                {cityPriceIndex.note ? ` ${cityPriceIndex.note}` : ''}
+              </p>
+
+              {/* Dataset JSON-LD so the price table is a citable dataset for
+                  search and AI engines (AEO), scoped to this module. */}
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                  __html: JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'Dataset',
+                    name: `IV Therapy Price Index, ${cityData.name} (${cityPriceIndex.asOf})`,
+                    description: `Published IV therapy menu prices in ${cityData.name}, Canada: low, median and high per treatment across ${cityPriceIndex.clinicCount} clinics. Collected from public clinic menus by TheDripMap, the IV therapy matching platform for Canada.`,
+                    url: `https://www.thedripmap.com/iv-prices/${cityPriceIndex.citySlug}`,
+                    creator: { '@type': 'Organization', name: 'TheDripMap', url: 'https://www.thedripmap.com' },
+                    temporalCoverage: cityPriceIndex.asOf,
+                    spatialCoverage: { '@type': 'Place', name: `${cityData.name}, Canada` },
+                    variableMeasured: cityPriceIndex.rows.map((r) => ({
+                      '@type': 'PropertyValue',
+                      name: `${r.treatment} (median)`,
+                      value: r.median,
+                      unitText: cityPriceIndex.currency,
+                    })),
+                  }),
+                }}
+              />
+
               <Link
                 href={`/iv-prices/${cityPriceIndex.citySlug}`}
                 className="inline-flex items-center gap-2 mt-4 text-sm font-black text-wellness-700 hover:text-wellness-800 group"
@@ -660,6 +747,42 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
             </div>
           </section>
         )}
+
+        {/* GTA neighborhood coverage (Toronto rescue, 2026-08): Toronto searches
+            are often really "near me in my part of the GTA" searches. Real,
+            live per-city counts + internal links push authority through the
+            hub-and-spoke and give the page local depth no single clinic has.
+            Toronto-only: other cities keep the standard NearbyCities module. */}
+        {isToronto && (() => {
+          const GTA_NEIGHBOURS = ['Mississauga', 'Vaughan', 'Richmond Hill', 'Markham', 'Brampton', 'Oakville', 'Etobicoke', 'North York', 'Scarborough'];
+          const gta = GTA_NEIGHBOURS
+            .map((n) => allCities.find((c) => c.city.toLowerCase() === n.toLowerCase()))
+            .filter((c): c is NonNullable<typeof c> => !!c && c.count > 0);
+          if (gta.length < 3) return null;
+          return (
+            <section className="mb-12 max-w-4xl">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight mb-2">
+                IV therapy across the GTA
+              </h2>
+              <p className="text-slate-600 leading-relaxed mb-5">
+                Not downtown? TheDripMap lists clinics across the Greater Toronto Area, so you can compare options
+                close to home instead of commuting for a drip.
+              </p>
+              <div className="flex flex-wrap gap-2.5">
+                {gta.map((c) => (
+                  <Link
+                    key={c.city}
+                    href={`/cities/${slugify(c.city)}`}
+                    className="inline-flex items-center gap-2 bg-white border border-slate-200 hover:border-wellness-600 px-4 py-2.5 rounded-2xl text-sm font-bold text-slate-700 hover:text-wellness-700 transition-all"
+                  >
+                    {c.city}
+                    <span className="text-[11px] font-black text-slate-400">{c.count}</span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          );
+        })()}
 
         {/* Regulation / market note — only renders when the city has curated meta
             (Toronto today). Frames it as general information with a link to the
@@ -818,7 +941,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
         {cityData.content && !isTemplatedBody ? (
           <section className="mb-24">
             <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline bg-white p-12 rounded-[3.5rem] border border-slate-100 shadow-sm">
-              <ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {String(cityData.content)
                   .replace(/\\n/g, '\n')
                   .replace(/\{count\}/g, String(count))
