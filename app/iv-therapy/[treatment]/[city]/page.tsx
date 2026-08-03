@@ -94,6 +94,24 @@ function clinicIsMobile(c: Provider): boolean {
 // case a clinic name or price_range carries one.
 const noDash = (str: string): string => str.replace(/[‒-―−]/g, '-');
 
+// Provincial regulatory note (2026-08). Every wellness IV is a regulated act,
+// and who may start it differs by province. This surfaces a one-line, sourced
+// note on each treatment x city page and links to the dedicated province guide
+// (or the national overview). Only Canadian provinces get a note; US pages are
+// noindexed under the Canada-first posture, so they return null. Facts trace to
+// the provincial colleges cited in the linked guides.
+function getProvincialIVNote(state: string | null | undefined): { text: string; href: string } | null {
+  const s = (state || '').toLowerCase();
+  const NATIONAL = '/blog/who-can-legally-give-iv-canada-rules-by-province-2026';
+  if (/ontario|^on$/.test(s)) return { text: 'In Ontario, an IV must be started by a physician, a nurse registered with the College of Nurses of Ontario, or a naturopathic doctor who holds the College of Naturopaths of Ontario IVIT authorization.', href: '/blog/who-can-legally-give-iv-ontario-2026' };
+  if (/british columbia|^bc$/.test(s)) return { text: 'In British Columbia, an IV must be started by a physician, a nurse (BCCNM), or a naturopathic doctor who holds the CNPBC advanced IV certification.', href: '/blog/who-can-legally-give-iv-british-columbia-2026' };
+  if (/alberta|^ab$/.test(s)) return { text: 'In Alberta, starting an IV is a restricted activity performed by a physician, a nurse (CRNA or CLPNA), or a naturopathic doctor with CNDA IV authorization.', href: '/blog/who-can-legally-give-iv-alberta-2026' };
+  if (/quebec|québec|^qc$/.test(s)) return { text: 'In Quebec, an IV must be started by a physician (CMQ) or a nurse (OIIQ). Naturopathy is not a regulated profession in Quebec, so naturopaths cannot legally start an IV.', href: '/blog/who-can-legally-give-iv-quebec-2026' };
+  const CA = /manitoba|saskatchewan|nova scotia|new brunswick|newfoundland|prince edward|^mb$|^sk$|^ns$|^nb$|^nl$|^pe$/;
+  if (CA.test(s)) return { text: 'Across Canada, an IV must be started by an authorized professional: a physician, a nurse, or in some provinces a naturopathic doctor with the right IV authorization. Confirm the credential of whoever starts your drip.', href: NATIONAL };
+  return null;
+}
+
 interface CityStats {
   count: number;
   mobileCount: number;
@@ -242,6 +260,9 @@ export default async function TreatmentCityPage({ params }: PageProps) {
   const claimedCount = clinics.filter((c) => c.is_claimed === true).length;
   const safetyVerifiedCount = clinics.filter((c) => (c as { safety_verified?: boolean }).safety_verified === true).length;
   const content = t.content ? getTreatmentContent(t.content) : undefined;
+
+  // Sourced, one-line provincial regulatory note + link to the province guide.
+  const provincialNote = getProvincialIVNote(resolved.state || resolved.stateAbbr);
 
   // Real per-(treatment x city) stats. Powers the "by the numbers" snapshot and
   // the data-driven FAQs below so each page carries facts unique to this city.
@@ -474,6 +495,23 @@ export default async function TreatmentCityPage({ params }: PageProps) {
             <Link href={`/treatments/${treatmentPageSlug}`} className="inline-flex items-center gap-2 mt-6 text-wellness-600 font-black text-sm hover:underline">
               Full {t.name.replace(/ IV$/, '')} guide <ArrowRight size={15} />
             </Link>
+          </section>
+        )}
+
+        {/* Provincial regulatory note — sourced one-liner + link to the province
+            guide. Renders only for Canadian provinces (US pages are noindexed). */}
+        {provincialNote && (
+          <section className="mb-12 bg-white border border-slate-200 rounded-3xl p-6 md:p-8">
+            <div className="flex items-start gap-3">
+              <ShieldCheck size={22} className="text-wellness-600 shrink-0 mt-0.5" />
+              <div>
+                <h2 className="text-lg md:text-xl font-black text-slate-900 mb-2 tracking-tight">Who can legally give you this IV</h2>
+                <p className="text-slate-700 leading-relaxed">{provincialNote.text}</p>
+                <Link href={provincialNote.href} className="inline-flex items-center gap-2 mt-3 text-wellness-700 font-black text-sm hover:underline">
+                  Read the full rules <ArrowRight size={15} />
+                </Link>
+              </div>
+            </div>
           </section>
         )}
 

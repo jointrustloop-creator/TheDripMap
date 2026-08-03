@@ -187,10 +187,20 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     resolvedState = best;
   }
   const cityStateLabel = resolvedState ? `${name}, ${resolvedState}` : name;
-  const title =
-    localCount > 0
-      ? `IV Therapy in ${cityStateLabel} (${titleYear}) | ${localCount} ${localCount === 1 ? 'Clinic' : 'Clinics'}`
-      : `IV Therapy in ${cityStateLabel} (${titleYear}) | Nearby Clinics`;
+  // CTR surgery (2026-08): the old title "IV Therapy in Toronto, Ontario (2026)
+  // | 77 Clinics" ran at 0.6% CTR on 1,666 Toronto impressions. Lead with the
+  // city, add the compare + price benefit and the year, and keep it under ~60
+  // chars so it is not truncated in the SERP. Province is dropped from the title
+  // (still in the H1 + description) for brevity; the number + "Prices" carry the
+  // click. Length-guarded so long city names fall back to a tighter form.
+  let title: string;
+  if (localCount > 0) {
+    title = `IV Therapy ${name}: Compare ${localCount} Clinics & Prices (${titleYear})`;
+    if (title.length > 60) title = `IV Therapy ${name}: ${localCount} Clinics & Prices (${titleYear})`;
+    if (title.length > 60) title = `IV Therapy in ${cityStateLabel} (${titleYear}) | ${localCount} Clinics`;
+  } else {
+    title = `IV Therapy in ${name} (${titleYear}): Clinics Near You`;
+  }
   const description =
     intro?.metaDescription ||
     cityData?.meta_description?.replace('{count}', String(localCount || count)) ||
