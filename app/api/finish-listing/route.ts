@@ -241,23 +241,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'could not save, please try again' }, { status: 500 });
   }
 
-  // Badge rule (2026-06-19): completing the safety section of the questionnaire
-  // (who administers IVs + medical oversight) earns the Safety Verified badge.
-  // Derive the attestation flags into the operator profile and flip
-  // safety_verified so the badge renders. This is independent of Claimed
-  // (ownership / is_claimed). The revalidatePath below makes it appear at once.
+  // Badge rule (2026-07-25): Safety Verified is HUMAN-REVIEWED. Completing the
+  // safety section (who administers IVs + medical oversight) no longer grants the
+  // badge; it QUEUES the clinic for operator review by setting
+  // safety_review_status='pending'. safety_verified only turns true from
+  // /admin/badge-reviews. We still derive the attestation answers into the
+  // operator profile below so the reviewer sees them.
   if (isSafetyComplete(answers)) {
-    // The badge IS the critical outcome, so set it FIRST and on its own, so a
-    // failure deriving the (secondary) attestation flags can never block it.
-    // Bug fixed 2026-06-25: the operator_profiles INSERT below previously omitted
-    // the table's not-null owner_name/email, threw, and the shared catch silently
-    // skipped the flip — a clinic that completed the safety section got no badge
-    // (Knead Therapy was hit by exactly this).
+    // Queue for review: a first completion (status null) OR a clinic we asked to
+    // finish its answers ('incomplete') returns to 'pending'. Never demote a
+    // clinic the operator already approved, and never re-queue one already
+    // pending or declined.
     if ((provider as { safety_verified?: boolean }).safety_verified !== true) {
       try {
-        await supabase.from('providers').update({ safety_verified: true }).eq('id', providerId);
+        await supabase
+          .from('providers')
+          .update({ safety_review_status: 'pending' })
+          .eq('id', providerId)
+          .neq('safety_verified', true)
+          .or('safety_review_status.is.null,safety_review_status.eq.incomplete');
       } catch (e) {
-        console.error('finish-listing safety_verified set failed', e instanceof Error ? e.message : e);
+        console.error('finish-listing safety_review queue failed', e instanceof Error ? e.message : e);
       }
     }
     // Derive the attestation flags into the operator profile (enrichment only).
@@ -317,7 +321,7 @@ Ingredient sourcing: ${sourcing}
 Logo uploaded: ${newLogoUrl ? 'yes' : 'no'} | Photos uploaded: ${newPhotoUrls.length}
 Slow-time offer: ${offerTitle ? offerTitle + (answers.offer?.expires ? ` (ends ${answers.offer.expires})` : '') : 'none'}
 
-Safety evidence is above (team + sourcing). The Safety Verified badge auto-sets when the safety section (who administers + oversight) is completed; this submission ${isSafetyComplete(answers) ? 'COMPLETED it, so the badge is now live' : 'did not complete it, so no safety badge'}.
+Safety evidence is above (team + sourcing). Safety Verified is granted by operator review, not automatically; this submission ${isSafetyComplete(answers) ? 'COMPLETED the safety section, so the clinic is now queued for review at /admin/badge-reviews' : 'did not complete the safety section, so it is not queued for review'}.
 
 Live listing: ${SITE_URL}/providers/${provider.slug}
 `,

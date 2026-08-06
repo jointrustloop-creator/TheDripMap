@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../../src/lib/mailer';
+import { REPORT_TO } from '../../../../src/lib/report-recipient';
 import { saveDrafts, type DraftPayload } from '../../../../src/lib/draft-saver';
 import { isJunkEmail, isDomainMismatch, CASL_FOOTER } from '../../../../src/lib/outreach-quality';
 import { applyOutreachCountryFilter } from '../../../../src/lib/outreach-config';
@@ -203,7 +204,7 @@ export async function GET(req: Request) {
     try {
       await sendMail({
         from: 'TheDripMap <info@thedripmap.com>',
-        to: 'info@thedripmap.com',
+        to: REPORT_TO,
         subject: `[TheDripMap] 0 followup drafts ready for review, pool exhausted`,
         text: `Daily followup drafts, ${today}\n\nNo clinics eligible for a 7-day follow-up today.`,
       });
@@ -365,7 +366,7 @@ export async function GET(req: Request) {
   try {
     await sendMail({
       from: 'TheDripMap <info@thedripmap.com>',
-      to: 'info@thedripmap.com',
+      to: REPORT_TO,
       subject: `[TheDripMap] ${savedDrafts} followup drafts ready for review`,
       text: reportLines.join('\n'),
     });

@@ -656,7 +656,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                     <CheckCircle2 size={11} /> Claimed Clinic
                   </div>
                   {safetyVerified && (
-                    <a href="#safety-verified" className="inline-flex items-center gap-1.5 bg-sky-500/95 hover:bg-sky-400 text-white text-[10px] font-black uppercase tracking-[0.15em] px-2.5 py-1 rounded-full shadow-lg transition-colors" title="Operator confirmed all 5 safety criteria — tap to see the breakdown.">
+                    <a href="#safety-verified" className="inline-flex items-center gap-1.5 bg-sky-500/95 hover:bg-sky-400 text-white text-[10px] font-black uppercase tracking-[0.15em] px-2.5 py-1 rounded-full shadow-lg transition-colors" title="Completed TheDripMap's safety questionnaire, reviewed by our team. Tap to see the breakdown.">
                       <CheckCircle2 size={11} /> Safety Verified · 5/5
                     </a>
                   )}

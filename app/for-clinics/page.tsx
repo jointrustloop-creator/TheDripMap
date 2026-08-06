@@ -336,7 +336,7 @@ export default async function ForClinicsPage() {
             {[
               { icon: <Users size={28} />, title: 'Patients, not impressions', desc: 'High-intent patients comparing IV clinics in your city land on your listing at the exact moment they decide where to book.' },
               { icon: <BarChart size={28} />, title: 'Your page, complete', desc: 'Your drip menu with your real prices, your team and their credentials, photos, hours, and a direct booking link, plus limited-time deals you can post anytime. You set it all in a two-minute questionnaire that publishes the moment you save.' },
-              { icon: <Globe size={28} />, title: 'The Safety Verified badge', desc: 'Answer our safety questionnaire — who starts your IVs, your oversight, your sourcing — and earn the badge patients look for. It is never sold, only earned, and it stays free.' }
+              { icon: <Globe size={28} />, title: 'The Safety Verified badge', desc: 'Answer our safety questionnaire (who starts your IVs, your oversight, your sourcing). Our team reviews it, and once approved you earn the badge patients look for. It is never sold, only earned by review, and it stays free.' }
             ].map((item, idx) => (
               <div key={idx} className="bg-white p-8 md:p-9 rounded-[2.5rem] border border-slate-100 shadow-xl">
                 <div className="w-14 h-14 bg-wellness-50 rounded-2xl flex items-center justify-center text-wellness-600 mb-7">

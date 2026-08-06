@@ -20,6 +20,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../../src/lib/mailer';
+import { REPORT_TO } from '../../../../src/lib/report-recipient';
 import { sendTelegram } from '../../../../src/lib/telegram';
 
 export const maxDuration = 60;
@@ -163,7 +164,7 @@ export async function GET(req: Request) {
     ].join('\n');
     await sendMail({
       from: 'TheDripMap <info@thedripmap.com>',
-      to: 'info@thedripmap.com',
+      to: REPORT_TO,
       subject: `[TheDripMap] FLOW SMOKE CHECK FAILED (${failures.length})`,
       text: body,
     });

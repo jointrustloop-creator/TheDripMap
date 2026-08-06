@@ -232,9 +232,9 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
               <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-600">
                 <ShieldCheck size={32} />
               </div>
-              <h1 className="text-3xl font-black text-slate-900 mb-3 tracking-tight">Saved, and your Safety Verified badge is live.</h1>
+              <h1 className="text-3xl font-black text-slate-900 mb-3 tracking-tight">Saved, and your safety answers are in for review.</h1>
               <p className="text-slate-500 leading-relaxed mb-8">
-                Your changes are live now and your listing carries the Safety Verified badge, the gold shield that lifts you above unverified clinics in your city. This page is always yours, so come back to update anything anytime.
+                Your changes are live now. Your safety answers go to our team for review, and once approved your listing carries the Safety Verified badge, the gold shield that lifts you above unverified clinics in your city. This page is always yours, so come back to update anything anytime.
               </p>
               <div className="flex flex-col gap-3">
                 <a href={listingUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 bg-[#0F6E56] text-white px-7 py-4 rounded-xl font-black hover:bg-[#0A5742] transition-all">
@@ -252,7 +252,7 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
               </div>
               <h1 className="text-3xl font-black text-slate-900 mb-3 tracking-tight">Saved. You are one step from your badge.</h1>
               <p className="text-slate-500 leading-relaxed mb-8">
-                Your listing is updated and live. To earn the Safety Verified badge, the gold shield patients look for, just answer two quick safety questions: who starts the IV and your medical oversight. It takes about twenty seconds.
+                Your listing is updated and live. To be reviewed for the Safety Verified badge, the gold shield patients look for, just answer two quick safety questions: who starts the IV and your medical oversight. Our team reviews your answers before the badge goes live. It takes about twenty seconds.
               </p>
               <div className="flex flex-col gap-3">
                 <button onClick={() => { setDone(false); if (typeof window !== 'undefined') setTimeout(() => { document.getElementById('safety-section')?.scrollIntoView({ behavior: 'smooth' }); }, 50); }} className="inline-flex items-center justify-center gap-2 bg-amber-500 text-white px-7 py-4 rounded-xl font-black hover:bg-amber-600 transition-all">
@@ -305,7 +305,7 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
             <div className="mt-3">
               {badgeEarned ? (
                 <span className="inline-flex items-center gap-1.5 text-[12px] font-black py-1.5 px-3 rounded-full bg-amber-50 text-amber-800 border border-amber-300">
-                  <ShieldCheck size={14} /> Safety Verified badge: earned — it goes live when you save
+                  <ShieldCheck size={14} /> Safety Verified: submitted for our team's review when you save
                 </span>
               ) : (
                 <a href="#safety-section" className="inline-flex items-center gap-1.5 text-[12px] font-bold py-1.5 px-3 rounded-full bg-slate-50 text-slate-500 border border-slate-200 hover:border-amber-300 hover:text-amber-800 transition-colors">
@@ -319,7 +319,7 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
         <div className="space-y-5">
           {/* 1 - SAFETY FIRST. The #1 thing patients (and Google's medical
               ranking) check, and what earns the Safety Verified badge. */}
-          <SectionCard id="safety-section" step={1} title="Who keeps patients safe?" hint="The first thing patients check, and what earns your Safety Verified badge.">
+          <SectionCard id="safety-section" step={1} title="Who keeps patients safe?" hint="The first thing patients check, and what qualifies you for Safety Verified review.">
             <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Who starts the IV?</div>
             <div className="flex flex-wrap gap-2 mb-5">
               {WHO_PLACES.map((o) => <Chip key={o} active={whoPlaces.includes(o)} onClick={() => toggle(whoPlaces, setWhoPlaces, o)}>{o}</Chip>)}
