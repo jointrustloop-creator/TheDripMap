@@ -1,0 +1,64 @@
+{
+ "ts": "2026-08-07T11:43:25.225Z",
+ "claims": [
+  {
+   "id": "f06dfbad-483c-4f71-b179-6623e98ad100",
+   "oldToken": "26f5e67e-8bc6-4955-b6e9-0b9c33ab02b3",
+   "oldExpiry": "2026-08-02T23:19:07.678+00:00"
+  },
+  {
+   "id": "b8d739bf-dd85-4fd7-8f95-97acbebfd1a8",
+   "oldToken": "08fdaa59-db77-42e2-a407-ebbcb9eeb1ee",
+   "oldExpiry": "2026-07-03T10:57:18.29+00:00"
+  },
+  {
+   "id": "9571c256-7e6e-461c-a48b-56ea72c908b3",
+   "oldToken": "dfe4bed1-111d-466c-a176-e710db17254c",
+   "oldExpiry": "2026-07-22T10:10:17.192+00:00"
+  }
+ ],
+ "badges": [
+  {
+   "id": "bc62d832-6a77-4202-8c90-1f5e6734ad62",
+   "name": "Knead Therapy Clinic",
+   "safety_verified": true,
+   "safety_review_status": null
+  },
+  {
+   "id": "7917e8cd-b61f-40b3-bae4-3e425107b4b2",
+   "name": "Aafiyat Aesthetics",
+   "safety_verified": true,
+   "safety_review_status": null
+  },
+  {
+   "id": "c1a88d85-df0b-4946-a5d9-dbfd68740d2f",
+   "name": "Tri-Health Wellness Centre",
+   "safety_verified": true,
+   "safety_review_status": null
+  },
+  {
+   "id": "4e8d0681-0866-4c6e-9235-4ae9e3f9e2d1",
+   "name": "DRS Mobile Therapy",
+   "safety_verified": true,
+   "safety_review_status": null
+  },
+  {
+   "id": "255815ef-bf6f-4c2f-9d1a-c098bbe1e315",
+   "name": "Erin Mills Optimum Health",
+   "safety_verified": true,
+   "safety_review_status": null
+  },
+  {
+   "id": "2a5079b2-f960-4ec6-ad46-11789565c7c6",
+   "name": "Glow Wellness Clinic",
+   "safety_verified": true,
+   "safety_review_status": null
+  },
+  {
+   "id": "d8a1f9c0-1d50-443f-9a7d-9b7da600f2bb",
+   "name": "Allies Integrated Health",
+   "safety_verified": true,
+   "safety_review_status": null
+  }
+ ]
+}
