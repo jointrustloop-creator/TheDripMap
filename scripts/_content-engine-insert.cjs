@@ -64,6 +64,26 @@ const POSTS = [
     related_cities: ['Toronto', 'Calgary', 'Vancouver', 'Mississauga', 'Ottawa'],
     query_family: 'NAD+ IV Canada / NAD+ IV cost / NAD+ dosing / does NAD+ work',
   },
+  {
+    file: 'how-to-claim-iv-therapy-insurance-canada-2026.md',
+    slug: 'how-to-claim-iv-therapy-insurance-canada-2026',
+    title: 'How to Claim IV Therapy on Your Benefits in Canada (2026)',
+    meta_title: 'How to Claim IV Therapy on Benefits in Canada (2026)',
+    meta_description: 'How to claim IV therapy on extended health benefits in Canada: the naturopath receipt that works, what your plan must include, HSAs, and why claims fail.',
+    excerpt: 'Provincial plans do not cover wellness IVs, but the right naturopath receipt plus the right benefits plan can get you reimbursed. Here is exactly how claiming works.',
+    related_cities: ['Toronto', 'Vancouver', 'Calgary', 'Mississauga', 'Ottawa'],
+    query_family: 'claim IV therapy insurance / IV therapy benefits receipt / naturopath receipt IV',
+  },
+  {
+    file: 'can-you-eat-before-iv-drip.md',
+    slug: 'can-you-eat-before-iv-drip',
+    title: 'Can You Eat Before an IV Drip? Prep Do’s and Don’ts (2026)',
+    meta_title: 'Can You Eat Before an IV Drip? Prep Guide (2026)',
+    meta_description: 'Yes, eat before an IV drip. What to do before and after: food, water, coffee, alcohol, exercise, the NAD+ exception, and when to call the clinic.',
+    excerpt: 'Yes, you should eat before an IV drip. The full before-and-after checklist: food, water, coffee, alcohol, exercise, and the one drip that needs real preparation.',
+    related_cities: ['Toronto', 'Montreal', 'Calgary'],
+    query_family: 'can you eat before an IV / do you fast before IV therapy / IV drip prep',
+  },
 ];
 
 const CATEGORY = 'Educational';
