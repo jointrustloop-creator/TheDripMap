@@ -27,7 +27,9 @@ export async function generateMetadata({ params }: { params: Promise<{ state: st
     .slice(0, 3)
     .map(([city]) => city);
 
-  const title = `IV Therapy in ${state.name} — ${total} Top-Rated Clinics in ${cityCount} Cities | TheDripMap`;
+  // House style: no em/en dashes in copy (2026-08-08). Also mirrors the city
+  // title pattern: lead with the place, then the number + benefit.
+  const title = `IV Therapy in ${state.name}: ${total} Clinics in ${cityCount} Cities`;
   const description = `Find IV therapy clinics across ${state.name}. Compare ${total} top-rated providers in ${topCities.join(', ')}, and more. Book hangover recovery, NAD+, immune support, and hydration drips.`;
   const url = `${SITE_URL}/states/${state.slug}`;
   const ogImage = `${SITE_URL}/og-image.png`;

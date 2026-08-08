@@ -109,7 +109,7 @@ export default async function StatePage({ params }: StatePageProps) {
 
         <section className="mt-12 mb-8">
           <h1 className="text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-            IV Therapy in {state.name} — {total} {total === 1 ? 'Clinic' : 'Clinics'}
+            IV Therapy in {state.name}: {total} {total === 1 ? 'Clinic' : 'Clinics'}
           </h1>
         </section>
 

@@ -29,7 +29,15 @@ export const STATE_MAP: Record<string, string> = {
   'oklahoma': 'OK', 'oregon': 'OR', 'pennsylvania': 'PA', 'rhode-island': 'RI', 'south-carolina': 'SC',
   'south-dakota': 'SD', 'tennessee': 'TN', 'texas': 'TX', 'utah': 'UT', 'vermont': 'VT',
   'virginia': 'VA', 'washington': 'WA', 'west-virginia': 'WV', 'wisconsin': 'WI', 'wyoming': 'WY',
-  'district-of-columbia': 'DC', 'ontario': 'ON'
+  'district-of-columbia': 'DC',
+  // Canadian provinces (Ontario was the only one until 2026-08-08; the rest
+  // were missing, so getListingsByState could not resolve their slug to an
+  // abbreviation and /states/<province> 404'd). Keep in sync with
+  // src/lib/states.ts.
+  'ontario': 'ON', 'british-columbia': 'BC', 'alberta': 'AB', 'quebec': 'QC',
+  'manitoba': 'MB', 'saskatchewan': 'SK', 'nova-scotia': 'NS',
+  'new-brunswick': 'NB', 'newfoundland-and-labrador': 'NL',
+  'prince-edward-island': 'PE', 'yukon': 'YT', 'northwest-territories': 'NT', 'nunavut': 'NU'
 };
 
 export const GTA_CITIES = ['Toronto', 'Ajax', 'Brampton', 'Mississauga', 'Oakville', 'Richmond Hill', 'Vaughan'];
@@ -484,7 +492,12 @@ export async function getListingsByState(state: string) {
     if (!stateAbbr && state.trim().length === 2) stateAbbr = state.trim().toUpperCase();
     if (!stateAbbr) stateAbbr = state;
     const stateFull = REVERSE_STATE_MAP[stateAbbr.toUpperCase()] || state;
-    const isUSState = Object.values(STATE_MAP).includes(stateAbbr.toUpperCase()) && stateAbbr.toUpperCase() !== 'ON';
+    // Country detection must be driven by an explicit province list, NOT by
+    // "is it in STATE_MAP" (STATE_MAP now holds Canadian provinces too, so that
+    // test would classify Alberta as a US state and return zero clinics).
+    const CA_ABBRS = new Set(['ON', 'BC', 'AB', 'QC', 'MB', 'SK', 'NS', 'NB', 'NL', 'PE', 'YT', 'NT', 'NU']);
+    const isCAProvince = CA_ABBRS.has(stateAbbr.toUpperCase());
+    const isUSState = !isCAProvince && Object.values(STATE_MAP).includes(stateAbbr.toUpperCase());
 
     let query = supabase
       .from('providers')
@@ -494,7 +507,7 @@ export async function getListingsByState(state: string) {
 
     if (isUSState) {
       query = query.ilike('country', '%United%');
-    } else if (stateAbbr.toUpperCase() === 'ON' || state.toLowerCase() === 'ontario') {
+    } else if (isCAProvince) {
       query = query.eq('country', 'Canada');
     }
 
