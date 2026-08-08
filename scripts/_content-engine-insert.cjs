@@ -89,6 +89,25 @@ const POSTS = [
 const CATEGORY = 'Educational';
 const AUTHOR = 'TheDripMap Editorial';
 
+// Cannibalization guard (2026-08-07, after the 3rd-insurance-post miss): before
+// any insert, compare the new post's title+slug tokens against every EXISTING
+// post. High overlap = same query family = flag BEFORE publishing, not after.
+async function cannibalizationCheck(p) {
+  let all = [], f = 0;
+  while (true) { const { data } = await s.from('blog_posts').select('slug,title').range(f, f + 499); if (!data || !data.length) break; all = all.concat(data); if (data.length < 500) break; f += 500; }
+  const STOP = new Set(['the','a','an','in','on','of','for','and','or','to','you','your','can','how','what','is','iv','therapy','canada','canadian','2026','guide','complete']);
+  const toks = (s2) => new Set(String(s2 || '').toLowerCase().replace(/[^a-z0-9\s-]/g, ' ').split(/[\s-]+/).filter((w) => w.length > 2 && !STOP.has(w)));
+  const mine = toks(p.title + ' ' + p.slug);
+  const overlaps = [];
+  for (const ex of all) {
+    if (ex.slug === p.slug) continue;
+    const theirs = toks((ex.title || '') + ' ' + (ex.slug || ''));
+    const shared = [...mine].filter((t) => theirs.has(t));
+    if (mine.size && shared.length / mine.size >= 0.5) overlaps.push(`${ex.slug} (shares: ${shared.join(',')})`);
+  }
+  return overlaps;
+}
+
 function validate(p, content) {
   const problems = [];
   if (p.meta_title.length > 60) problems.push(`meta_title ${p.meta_title.length}>60`);
@@ -112,6 +131,10 @@ function validate(p, content) {
     const content = fs.readFileSync(path.join(DIR, p.file), 'utf8');
     const { problems, qCount } = validate(p, content);
     const { data: existing } = await s.from('blog_posts').select('slug').eq('slug', p.slug).maybeSingle();
+    if (!existing) {
+      const overlaps = await cannibalizationCheck(p);
+      if (overlaps.length) problems.push('CANNIBALIZATION RISK vs: ' + overlaps.join(' | ') + ' — differentiate intent or consolidate BEFORE publishing');
+    }
     const status = existing ? 'EXISTS-SKIP' : problems.length ? 'BLOCKED' : 'OK';
     console.log(`\n[${status}] ${p.slug}`);
     console.log(`   title(${p.title.length}) meta_title(${p.meta_title.length}) meta_desc(${p.meta_description.length}) faqs(${qCount}) words(${content.split(/\s+/).length})`);
