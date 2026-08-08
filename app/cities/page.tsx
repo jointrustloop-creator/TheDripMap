@@ -7,6 +7,7 @@ import { Navbar } from '@/src/components/Navbar';
 import { Footer } from '@/src/components/Footer';
 import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
 import { getAllCities, slugify } from '@/src/lib/data';
+import { US_MARKET_ENABLED, marketOf } from '@/src/lib/market';
 import { getCityPhoto, getCityGradient, getCityInitial } from '@/src/lib/city-images';
 
 const citiesTitle = 'Cities Archive — Browse IV Therapy Locations | TheDripMap';
@@ -40,6 +41,10 @@ export default async function CitiesHubPage() {
   const providerCities = await getAllCities();
 
   const cities = providerCities
+    // Canada-first (2026-08-07): while the US market is off, this indexed hub
+    // page stops listing US cities (their pages are noindexed anyway, so the
+    // links only leaked crawl budget and confused Canadian visitors).
+    .filter((pc) => US_MARKET_ENABLED || marketOf({ state: pc.state }) !== 'US')
     .map((pc) => ({
       name: pc.city,
       slug: slugify(pc.city),

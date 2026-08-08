@@ -285,8 +285,8 @@ export async function getListingsByCity(city: string, state?: string) {
         .select('*')
         .neq('availability', false)
         .ilike('address', `%${searchCity.substring(0, 5)}%`)
-        .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
-        .order('rating', { ascending: false, nullsFirst: false })
+        .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
+        .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
         .limit(100);
       
       if (!zipError && zipData && zipData.length > 0) {
@@ -343,8 +343,8 @@ export async function getListingsByCity(city: string, state?: string) {
       }
       
       return query
-        .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
-        .order('rating', { ascending: false, nullsFirst: false })
+        .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
+        .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
         .limit(200);
     };
 
@@ -435,8 +435,8 @@ export async function getTorontoGtaTieredListings(): Promise<{
         .neq('availability', false)
         .in('city', TORONTO_CORE_CITIES)
         .or('state.ilike.Ontario,state.ilike.ON')
-        .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
-        .order('rating', { ascending: false, nullsFirst: false })
+        .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
+        .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
         .limit(200),
       supabase
         .from('providers')
@@ -444,8 +444,8 @@ export async function getTorontoGtaTieredListings(): Promise<{
         .neq('availability', false)
         .in('city', TORONTO_GTA_NEARBY_CITIES)
         .or('state.ilike.Ontario,state.ilike.ON')
-        .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
-        .order('rating', { ascending: false, nullsFirst: false })
+        .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
+        .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
         .limit(200),
     ]);
 
@@ -499,8 +499,8 @@ export async function getListingsByState(state: string) {
     }
 
     const { data, error } = await query
-      .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
-      .order('rating', { ascending: false, nullsFirst: false })
+      .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
+      .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
       .limit(300);
 
     if (error) throw error;
@@ -569,8 +569,8 @@ export async function getListingBySlug(slug: string) {
     const { data: widerCandidates, error: widerError } = await supabase
       .from('providers')
       .select('*')
-      .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
-      .order('rating', { ascending: false, nullsFirst: false })
+      .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
+      .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
       .limit(1000);
 
     if (!widerError && widerCandidates) {
@@ -677,6 +677,9 @@ export async function getAllCities(): Promise<{ city: string, state: string, sta
   }
 }
 
+// Canadian provinces/territories, used for Canada-first display filtering.
+const CA_PROVINCES = new Set(['Ontario', 'British Columbia', 'Alberta', 'Quebec', 'Manitoba', 'Saskatchewan', 'Nova Scotia', 'New Brunswick', 'Newfoundland and Labrador', 'Prince Edward Island', 'Yukon', 'Northwest Territories', 'Nunavut']);
+
 export async function getTopHubs(limit: number = 8) {
   const getMockHubs = () => {
     const cityCounts: Record<string, { city: string, state: string, count: number }> = {};
@@ -730,6 +733,10 @@ export async function getTopHubs(limit: number = 8) {
         count: counts[hub.name] || 0
       }))
       .filter(hub => hub.count > 0)
+      // Canada-first (2026-08-07): hub chips on shared surfaces (treatment
+      // pages' city finder) point only at Canadian cities. Raw counts would
+      // otherwise surface New York/Dallas/Tampa, whose pages are noindexed.
+      .filter(hub => CA_PROVINCES.has(hub.state))
       .sort((a, b) => b.count - a.count)
       .slice(0, limit);
 
@@ -881,7 +888,13 @@ export function getServiceFilter(service: string): string {
     return "name.ilike.%beauty%,name.ilike.%glow%,description.ilike.%beauty%,subtypes.cs.{\"Beauty\"},subtypes.cs.{\"Skin\"}";
   }
   if (s.includes('hydration')) {
-    return "name.ilike.%hydration%,name.ilike.%hydrate%,description.ilike.%hydration%";
+    // Hydration is the BASE service of an IV clinic: fluids are in every drip.
+    // The old narrow filter (name/description must literally say "hydration")
+    // surfaced 26 of Toronto's 77 clinics on hydration pages (2026-08-07 audit).
+    // Broadened to the same signals the old wellness fallback used, now as a
+    // first-class filter. ilike/cs forms only: app/sitemap.ts parses this
+    // string to mirror page indexability, and only understands those forms.
+    return "name.ilike.%hydration%,name.ilike.%hydrate%,description.ilike.%hydration%,description.ilike.%rehydrat%,description.ilike.%fluids%,description.ilike.%saline%,subtypes.cs.{\"Hydration\"},subtypes.cs.{\"Wellness\"},name.ilike.%drip%,name.ilike.%wellness%,description.ilike.%iv therapy%,description.ilike.%iv drip%,description.ilike.%iv hydration%";
   }
   if (s.includes('recovery')) {
     return "name.ilike.%recovery%,description.ilike.%recovery%,subtypes.cs.{\"Athletic\"},subtypes.cs.{\"Sport\"},subtypes.cs.{\"Performance\"},subtypes.cs.{\"Muscle\"}";
@@ -912,8 +925,8 @@ export async function getListingsByService(service: string, limit: number = 4) {
       .select('*')
       .neq('availability', false)
       .or(filter)
-      .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
-      .order('rating', { ascending: false, nullsFirst: false })
+      .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
+      .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
       .limit(2000);
 
     if (error) throw error;
@@ -972,8 +985,8 @@ export async function searchListings(query: string, city?: string) {
     }
 
     const { data, error } = await q
-      .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
-      .order('rating', { ascending: false, nullsFirst: false })
+      .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
+      .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
       .limit(2000);
     if (error) throw error;
     
@@ -1044,8 +1057,8 @@ export async function getFeaturedListings(limit: number = 6, city?: string, coun
     }
 
     const { data, error } = await q
-      .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
-      .order('rating', { ascending: false, nullsFirst: false })
+      .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
+      .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
       .limit(limit);
 
     if (error) throw error;
@@ -1498,8 +1511,8 @@ export async function getAllListings() {
         .from('providers')
         .select('*')
         .neq('availability', false)
-        .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
-        .order('rating', { ascending: false, nullsFirst: false })
+        .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
+        .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
     );
 
     const results = data && data.length > 0 ? data : MOCK_LISTINGS;
@@ -1517,8 +1530,8 @@ export async function getListingsByIds(ids: string[]) {
       .select('*')
       .neq('availability', false)
       .in('id', ids)
-      .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
-      .order('rating', { ascending: false, nullsFirst: false });
+      .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
+      .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false });
 
     if (error) throw error;
     return (data || []).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
@@ -1542,8 +1555,8 @@ export async function getListingsByServiceAndCity(service: string, city: string,
       .neq('availability', false)
       .ilike('city', cityPattern)
       .or(filter)
-      .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
-      .order('rating', { ascending: false, nullsFirst: false })
+      .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
+      .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
       .limit(2000);
 
     const error = response.error;
@@ -1551,25 +1564,13 @@ export async function getListingsByServiceAndCity(service: string, city: string,
 
     if (error) throw error;
 
-    // Fallback: If no specific results in this city, try a broader wellness filter for the same city
-    if (!data || data.length === 0) {
-      console.log(`No specific results for ${service} in ${city}, trying fallback broad search...`);
-      const broadFilter = "name.ilike.%hydration%,description.ilike.%hydration%,name.ilike.%wellness%,description.ilike.%wellness%,name.ilike.%drip%,description.ilike.%iv%";
-      const { data: fallbackData, error: fallbackError } = await supabase
-        .from('providers')
-        .select('*')
-        .neq('availability', false)
-        .ilike('city', cityPattern)
-        .or(broadFilter)
-        .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
-        .order('rating', { ascending: false, nullsFirst: false })
-        .limit(2000);
-      
-      if (!fallbackError && fallbackData && fallbackData.length > 0) {
-        data = fallbackData;
-      }
-    }
-    
+    // NO broad fallback (removed 2026-08-07). The old wellness fallback quietly
+    // replaced zero real matches with generic clinics, which inflated treatment
+    // x city pages with false counts ("GLP-1 IV in Ottawa | 15 Clinics" listing
+    // clinics that never matched GLP-1) and leaked into the sitemap's
+    // indexability mirror. Zero matches now honestly returns zero; the pages
+    // render their zero-state UI with nearby links instead.
+
     // Deduplicate while allowing multiple locations
     const dbResults = deduplicateListings(data || []).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
 
@@ -1664,8 +1665,8 @@ export async function getSimilarClinics(currentSlug: string, city: string, state
       .neq('availability', false)
       .eq('city', city)
       .neq('slug', currentSlug)
-      .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
-      .order('rating', { ascending: false, nullsFirst: false })
+      .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
+      .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
       .limit(limit);
 
     if (cityError) throw cityError;
@@ -1682,8 +1683,8 @@ export async function getSimilarClinics(currentSlug: string, city: string, state
         .eq('state', state)
         .neq('city', city) // Don't pick up city clinics again
         .neq('slug', currentSlug)
-        .order('is_claimed', { ascending: false }).order('is_featured', { ascending: false })
-        .order('rating', { ascending: false, nullsFirst: false })
+        .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
+        .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
         .limit(remaining);
 
       if (stateError) throw stateError;

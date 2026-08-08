@@ -48,15 +48,17 @@ const SERVICES = [
   { name: 'Hormone Therapy', slug: 'hormone-therapy', icon: <Activity size={24} />,   aliases: ['trt', 'hrt', 'testosterone', 'hormone', 'bhrt'] },
 ];
 
-export default function ServicePageClient({ serviceSlug: rawServiceSlug }: { serviceSlug: string }) {
+export default function ServicePageClient({ serviceSlug: rawServiceSlug, initialListings = [], initialHubs = [] }: { serviceSlug: string; initialListings?: Provider[]; initialHubs?: { city: string; state: string; count: number }[] }) {
   const serviceSlug = rawServiceSlug.toLowerCase();
   const searchParams = useSearchParams();
   const cityParam = searchParams.get('city');
 
   const [service] = useState(SERVICES.find(s => s.slug === serviceSlug || (s.aliases && s.aliases.includes(serviceSlug))));
-  const [listings, setListings] = useState<Provider[]>([]);
-  const [topCities, setTopCities] = useState<{ city: string; state: string; count: number }[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Seeded from the server render (Canada-first national list) so the HTML
+  // Google sees carries real clinics and users get no empty flash.
+  const [listings, setListings] = useState<Provider[]>(initialListings);
+  const [topCities, setTopCities] = useState<{ city: string; state: string; count: number }[]>(initialHubs);
+  const [isLoading, setIsLoading] = useState(initialListings.length === 0);
   const [currentCity, setCurrentCity] = useState<string | null>(cityParam);
   // True when the visitor picked a city but it had 0 matches for this treatment,
   // so we broadened to nationwide top-rated. Drives the "Showing nearby options" banner.
@@ -66,8 +68,6 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug }: { ser
     if (!service) return;
 
     const loadData = async () => {
-      setIsLoading(true);
-      
       // Read the visitor's location from session storage: city (for the query)
       // plus country + coordinates (to keep nearby clinics ranked first).
       let cityToUse = currentCity;
@@ -86,6 +86,15 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug }: { ser
       } catch (e) {
         console.error('Failed to parse cached location', e);
       }
+
+      // The server already rendered a Canada-first national list. Without any
+      // city or location context there is nothing to personalize, so keep the
+      // server content instead of refetching the same national query.
+      if (!cityToUse && !userCoords && !userCountry && initialListings.length > 0) {
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(listings.length === 0);
 
       const [serviceListings, hubs] = await Promise.all([
         cityToUse && cityToUse !== 'All'
@@ -108,7 +117,7 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug }: { ser
           const cityListings = await getListingsByCity(cityToUse!);
           fallbackListings = [...fallbackListings, ...cityListings];
         }
-
+        const beforePad = finalResults.length;
         const existingIds = new Set(finalResults.map(p => p.id));
         const existingBrands = new Set(finalResults.map(p => p.name.toLowerCase().split(' - ')[0].split(' (')[0].trim()));
         fallbackListings.forEach(p => {
@@ -119,6 +128,10 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug }: { ser
             existingBrands.add(brand);
           }
         });
+        // Honesty fix (2026-08-07): padding with same-city generic clinics is
+        // still a broadened result set, so the banner shows for this tier too,
+        // not only for the nationwide tier below.
+        if (finalResults.length > beforePad) broadened = true;
       }
 
       // Hard floor: if city + nearby still under 3, broaden to nationwide top-rated

@@ -181,8 +181,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'vitamin-c': 'Vitamin C', 'glutathione': 'Glutathione', 'glp-1-weight-loss': 'Peptide',
     'iron-infusion': 'Iron',
   };
-  // Mirrors the zero-result fallback inside getListingsByServiceAndCity.
-  const BROAD_FALLBACK_FILTER = 'name.ilike.%hydration%,description.ilike.%hydration%,name.ilike.%wellness%,description.ilike.%wellness%,name.ilike.%drip%,description.ilike.%iv%';
+  // The broad zero-result fallback was REMOVED from getListingsByServiceAndCity
+  // on 2026-08-07 (it inflated zero-match combos with generic clinics), so the
+  // sitemap mirror no longer applies one either: specific matches only.
   const CANADA_MATRIX_CITIES = ['Toronto', 'Vancouver', 'Calgary', 'Ottawa', 'Mississauga', 'Richmond Hill', 'North York', 'Oakville', 'Edmonton', 'Montreal', 'Quebec City', 'Winnipeg', 'Halifax', 'Victoria', 'Kelowna', 'Red Deer'];
   const topUSMatrixCities = cities
     .filter((c) => c.count > 0 && c.city && !CANADA_MATRIX_CITIES.includes(c.city))
@@ -226,7 +227,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         return false;
       });
   };
-  const broadPred = buildOrPredicate(BROAD_FALLBACK_FILTER);
   const cityContains = (pCity: unknown, city: string): boolean => normTxt(pCity).includes(normTxt(city));
 
   // Same gate the page applies: list the URL only when 3+ clinics match.
@@ -236,8 +236,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const specificPred = buildOrPredicate(getServiceFilter(filter));
     for (const city of matrixCities) {
       const inCity = (providers as MatrixProvider[]).filter((p) => cityContains(p.city, city));
-      let matches = inCity.filter(specificPred).length;
-      if (matches === 0) matches = inCity.filter(broadPred).length;
+      const matches = inCity.filter(specificPred).length;
       if (matches < MIN_PROVIDERS_FOR_SITEMAP) continue;
       matrixRoutes.push({
         url: `${baseUrl}/iv-therapy/${slug}/${slugify(city)}`,
