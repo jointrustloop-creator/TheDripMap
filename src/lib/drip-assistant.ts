@@ -8,7 +8,7 @@
 
 import { getServiceSupabase } from './supabase';
 import { TREATMENT_CONTENT } from './treatment-content';
-import { getStatus } from './hours';
+import { getStatus, normalizeHours } from './hours';
 import { getKnowledge } from './agent-knowledge-base';
 
 export interface AssistantClinic {
@@ -202,7 +202,10 @@ async function searchProviders(input: {
     // as open — the user asked for confirmed-open results.
     rows = rows.filter((p) => {
       try {
-        const s = getStatus(p.working_hours as never);
+        // Raw DB working_hours has capitalized keys / array values; getStatus
+        // only understands lowercase-day strings. Passing raw data made every
+        // such clinic read "Closed" here (2026-08-09 hours audit).
+        const s = getStatus(normalizeHours(p.working_hours));
         return s?.isOpen === true;
       } catch {
         return false;
@@ -713,7 +716,7 @@ async function getAvailabilityHint(input: { slug?: string }): Promise<ToolOutcom
 
   // First, today's status using the existing helper.
   let todayStatus: { isOpen: boolean; text: string; todayHours: string } | null = null;
-  try { todayStatus = getStatus(hours as Record<string, string>); } catch { todayStatus = null; }
+  try { todayStatus = getStatus(normalizeHours(hours)); } catch { todayStatus = null; }
 
   // Parse "9AM-5PM" style strings into start/end labels we can return.
   const parseRange = (s: string): { start: string; end: string } | null => {

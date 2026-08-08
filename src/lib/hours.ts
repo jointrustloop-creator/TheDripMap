@@ -6,6 +6,28 @@ export interface StatusResult {
   todayHours: string;
 }
 
+/**
+ * Normalize a raw working_hours object into what getStatus expects: lowercase
+ * day keys, string values (arrays unwrapped to their first entry). Mirrors
+ * enrichProvider's mapping in src/lib/data.ts. Use this whenever passing RAW
+ * DB working_hours (capitalized keys, array values) to getStatus — passing raw
+ * data made every such clinic read "Closed" (2026-08-09 audit: 398 providers).
+ */
+export function normalizeHours(raw: unknown): Record<string, string> {
+  const out: Record<string, string> = {};
+  if (raw && typeof raw === 'object') {
+    for (const [day, val] of Object.entries(raw as Record<string, unknown>)) {
+      const k = day.toLowerCase();
+      if (Array.isArray(val)) {
+        if (typeof val[0] === 'string' && val[0].trim() !== '') out[k] = val[0];
+      } else if (typeof val === 'string' && val.trim() !== '') {
+        out[k] = val;
+      }
+    }
+  }
+  return out;
+}
+
 export function getStatus(hours: Record<string, string> | undefined, timezone?: string): StatusResult {
   // No hours on file is NOT the same as closed. Showing "Closed" on a listing
   // whose owner simply hasn't entered hours is misleading (and a support ticket).
@@ -23,8 +45,21 @@ export function getStatus(hours: Record<string, string> | undefined, timezone?: 
   const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const today = days[now.getDay()];
   const todayHours = hours[today];
-  
-  if (!todayHours || typeof todayHours !== 'string' || todayHours.toLowerCase() === 'closed') {
+
+  // 2026-08-09 hours audit: an hours object can be non-empty yet carry ZERO
+  // real day keys (auto-enrich writes {hint: "Mon-Fri 10am"}). That used to
+  // fall through to "Closed" for every day of the week on a clinic that is,
+  // in fact, open (Ottawa NP Services). No day data = unknown, never Closed.
+  const hasDayData = days.some((d) => typeof hours[d] === 'string' && hours[d].trim() !== '');
+  if (!hasDayData) {
+    return { isOpen: false, known: false, text: 'Hours not listed', todayHours: '' };
+  }
+  // A MISSING day among otherwise-present days is also unknown, not "Closed".
+  // Only an explicit "Closed" value earns the Closed label.
+  if (!todayHours || typeof todayHours !== 'string' || todayHours.trim() === '') {
+    return { isOpen: false, known: false, text: 'Hours not listed', todayHours: '' };
+  }
+  if (todayHours.toLowerCase() === 'closed') {
     return { isOpen: false, known: true, text: 'Closed', todayHours: 'Closed' };
   }
   

@@ -331,13 +331,17 @@ export default function DefinitiveListingLayout({
   // is derived separately, from this same data, by getStatus on the page, not
   // by removing the current day.
   const hoursMap = (provider.hours || {}) as Record<string, string>;
-  const hasAnyHours = Object.values(hoursMap).some(
-    (v) => typeof v === 'string' && v.trim() !== ''
+  // 2026-08-09 hours audit: gate on REAL day keys, not "any non-empty value".
+  // {hint: "Mon-Fri 10am"} passed the old check and rendered a full week of
+  // "Closed" rows for clinics that are open. And a MISSING day now reads
+  // "Hours not listed" instead of "Closed": only an explicit Closed is Closed.
+  const hasAnyHours = FACT_HOURS_ORDER.some(
+    (d) => typeof hoursMap[d] === 'string' && hoursMap[d].trim() !== ''
   );
   const hoursToRender = hasAnyHours
     ? FACT_HOURS_ORDER.map((d) => {
         const raw = hoursMap[d];
-        const value = typeof raw === 'string' && raw.trim() !== '' ? raw.trim() : 'Closed';
+        const value = typeof raw === 'string' && raw.trim() !== '' ? raw.trim() : 'Hours not listed';
         return { key: d, label: DAY_LABEL[d], value };
       })
     : [];
