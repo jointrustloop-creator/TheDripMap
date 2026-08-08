@@ -99,7 +99,7 @@ const POSTS = [
     slug: 'therapie-iv-montreal-guide-2026',
     title: 'Thérapie IV à Montréal : prix, cliniques et règles (2026)',
     meta_title: 'Thérapie IV à Montréal : prix et cliniques (2026)',
-    meta_description: 'Le guide de la thérapie IV à Montréal en 2026 : ce que coûtent les perfusions, qui peut légalement les administrer, en clinique ou à domicile, et comment choisir.',
+    meta_description: 'Le guide de la thérapie IV à Montréal : ce que coûtent les perfusions, qui peut légalement les administrer, en clinique ou à domicile, et comment choisir.',
     excerpt: 'Bars à soluté, services mobiles, perfusions de vitamines : le guide honnête de la thérapie IV à Montréal, des prix aux règles québécoises.',
     related_cities: ['Montreal'],
     query_family: 'FR: therapie IV Montreal / clinique IV Montreal / prix perfusion vitamines Montreal',
