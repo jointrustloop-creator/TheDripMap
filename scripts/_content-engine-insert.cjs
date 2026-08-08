@@ -84,6 +84,26 @@ const POSTS = [
     related_cities: ['Toronto', 'Montreal', 'Calgary'],
     query_family: 'can you eat before an IV / do you fast before IV therapy / IV drip prep',
   },
+  {
+    file: 'qui-peut-administrer-therapie-iv-quebec-2026.md',
+    slug: 'qui-peut-administrer-therapie-iv-quebec-2026',
+    title: 'Qui peut vous administrer une thérapie IV au Québec? (2026)',
+    meta_title: 'Thérapie IV au Québec : qui peut l\'administrer (2026)',
+    meta_description: 'Qui peut légalement vous installer une perfusion au Québec en 2026? Le rôle de l\'OIIQ et du CMQ, pourquoi les naturopathes ne peuvent pas, et quoi vérifier.',
+    excerpt: 'Au Québec, seuls les infirmières, infirmiers et médecins peuvent légalement installer une perfusion. Voici les règles en langage clair, et quoi vérifier avant de réserver.',
+    related_cities: ['Montreal', 'Quebec City'],
+    query_family: 'FR: qui peut administrer IV Quebec / therapie IV Quebec regles / infirmiere perfusion',
+  },
+  {
+    file: 'therapie-iv-montreal-guide-2026.md',
+    slug: 'therapie-iv-montreal-guide-2026',
+    title: 'Thérapie IV à Montréal : prix, cliniques et règles (2026)',
+    meta_title: 'Thérapie IV à Montréal : prix et cliniques (2026)',
+    meta_description: 'Le guide de la thérapie IV à Montréal en 2026 : ce que coûtent les perfusions, qui peut légalement les administrer, en clinique ou à domicile, et comment choisir.',
+    excerpt: 'Bars à soluté, services mobiles, perfusions de vitamines : le guide honnête de la thérapie IV à Montréal, des prix aux règles québécoises.',
+    related_cities: ['Montreal'],
+    query_family: 'FR: therapie IV Montreal / clinique IV Montreal / prix perfusion vitamines Montreal',
+  },
 ];
 
 const CATEGORY = 'Educational';
@@ -112,7 +132,7 @@ function validate(p, content) {
   const problems = [];
   if (p.meta_title.length > 60) problems.push(`meta_title ${p.meta_title.length}>60`);
   if (p.meta_description.length > 160) problems.push(`meta_description ${p.meta_description.length}>160`);
-  if (!/##\s+Frequently asked questions/i.test(content)) problems.push('no FAQ heading (FAQPage schema will not generate)');
+  if (!/##\s+(Frequently asked questions|Foire aux questions)/i.test(content)) problems.push('no FAQ heading (FAQPage schema will not generate)');
   const qCount = (content.match(/\n###\s+/g) || []).length;
   if (qCount < 3) problems.push(`only ${qCount} FAQ questions`);
   // Guard: no em/en dashes in body (house style).

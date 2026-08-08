@@ -304,7 +304,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   // don't pollute the output).
   const faqJsonLd = (() => {
     const content = String(post.content || '');
-    const faqStartMatch = content.match(/##\s+Frequently asked questions[\s\S]*$/i);
+    // "Foire aux questions" = the French FAQ heading (first FR posts 2026-08).
+    const faqStartMatch = content.match(/##\s+(Frequently asked questions|Foire aux questions)[\s\S]*$/i);
     if (!faqStartMatch) return null;
     const faqBlock = faqStartMatch[0];
     const qaPattern = /###\s+([^\n]+)\n+([\s\S]+?)(?=\n###\s+|\n##\s+|<!--|$)/g;
