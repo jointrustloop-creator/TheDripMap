@@ -14,8 +14,37 @@ const MAILING = 'TheDripMap, Caledon, Ontario, Canada';
 const PRIORITY = ['Toronto', 'Mississauga', 'Vaughan', 'Richmond Hill', 'Markham', 'Brampton', 'Montreal', 'Vancouver', 'Calgary', 'Ottawa'];
 const CITY_20PLUS = { Montreal: 83, Toronto: 34, Mississauga: 24 }; // >=20 views/30d
 
-function footer(name) {
-  return `\n\nYou are receiving this because ${name} is listed on TheDripMap, the Canadian IV therapy matching platform. ${MAILING}. Reply with the word REMOVE and we will not contact you again.`;
+const SENDER = 'Deborah';
+const SITE = 'https://www.thedripmap.com';
+const claimUrlFor = (slug) => `${SITE}/providers/${slug}?claim=1`;
+function caslSentence(name) {
+  return `You are receiving this because ${name} is listed on TheDripMap, the Canadian IV therapy matching platform. ${MAILING}. Reply with the word REMOVE and we will not contact you again.`;
+}
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+// Compose the plaintext fallback + the HTML body (real <a> anchors, so Gmail
+// keeps the hrefs clean instead of wrapping plaintext links in google.com/url).
+function render(name, paras, claimUrl) {
+  const body = [
+    `Hi ${name} team,`,
+    ...paras,
+    `Claim your listing: ${claimUrl}`,
+    'Warm regards,',
+    `${SENDER}\nFounder, TheDripMap\nthedripmap.com`,
+    caslSentence(name),
+  ].join('\n\n');
+
+  const pHtml = paras.map((t) => `<p style="margin:0 0 16px;">${escapeHtml(t)}</p>`).join('');
+  const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#1f2937;">`
+    + `<p style="margin:0 0 16px;">Hi ${escapeHtml(name)} team,</p>`
+    + pHtml
+    + `<p style="margin:24px 0;"><a href="${claimUrl}" style="background:#0F6E56;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:700;display:inline-block;">Claim your listing</a></p>`
+    + `<p style="margin:0;">Warm regards,</p>`
+    + `<p style="margin:4px 0 0;">${SENDER}<br>Founder, TheDripMap<br><a href="${SITE}" style="color:#0F6E56;">thedripmap.com</a></p>`
+    + `<p style="font-size:12px;color:#9ca3af;line-height:1.5;margin-top:24px;">${escapeHtml(caslSentence(name))}</p>`
+    + `</div>`;
+  return { body, html };
 }
 
 // Human phrasing: never render internal check labels in email copy.
@@ -81,19 +110,24 @@ function joinNatural(arr) {
     const viewLine = views >= 5 ? ` Your listing was viewed ${views} times in the same period.` : '';
     const cityLine = cityViews >= 20 ? `Patients in ${p.city} compared IV therapy clinics on TheDripMap ${cityViews} times in the last month.` : '';
 
-    let subject, body;
+    const claimUrl = claimUrlFor(p.slug);
+    let subject;
+    const paras = [];
     if (band === '0-2') {
       subject = `Patients are comparing ${p.city} IV clinics on TheDripMap`;
-      const lead = cityLine ? cityLine + viewLine : `Patients are comparing IV therapy clinics in ${p.city} on TheDripMap.` + viewLine;
-      body = `Hi ${p.name} team,\n\n${lead}\n\nRight now your listing shows ${score} of the 7 transparency details patients look for before they book. The ${numWord(unmet.length)} not yet shown are ${joinNatural(unmetPhrases)}. Claiming your listing is free and takes a few minutes, and filling these in updates what patients see right away.${footer(p.name)}`;
+      paras.push(cityLine ? (cityLine + viewLine) : (`Patients are comparing IV therapy clinics in ${p.city} on TheDripMap.` + viewLine));
+      paras.push(`Right now your listing shows ${score} of the 7 transparency details patients look for before they book. The ${numWord(unmet.length)} not yet shown are ${joinNatural(unmetPhrases)}. Claiming your listing is free and takes a few minutes, and filling these in updates what patients see right away.`);
     } else {
       subject = `${p.name} shows ${score} of 7 transparency details on TheDripMap`;
-      const cityBit = cityLine ? '\n\n' + cityLine : '';
-      body = `Hi ${p.name} team,\n\nYour listing on TheDripMap already shows ${score} of 7 transparency details, which puts you ahead of most clinics in ${p.city}. You are ${numWord(unmet.length)} details away from a full 7 of 7: ${joinNatural(unmetPhrases)}.${cityBit}${viewLine ? '\n\n' + viewLine.trim() : ''}\n\nClaiming your listing is free and takes a few minutes, and adding those details completes your profile the moment you save.${footer(p.name)}`;
+      paras.push(`Your listing on TheDripMap already shows ${score} of 7 transparency details, which puts you ahead of most clinics in ${p.city}. You are ${numWord(unmet.length)} details away from a full 7 of 7: ${joinNatural(unmetPhrases)}.`);
+      if (cityLine) paras.push(cityLine);
+      if (viewLine) paras.push(viewLine.trim());
+      paras.push('Claiming your listing is free and takes a few minutes, and adding those details completes your profile the moment you save.');
     }
+    const { body, html } = render(p.name, paras, claimUrl);
 
     const prioIdx = PRIORITY.indexOf(p.city);
-    drafts.push({ id: p.id, to: p.email, name: p.name, city: p.city, score, band, touch: isFollowup ? 'followup-replacement' : 'first', views, subject, body, _prio: prioIdx === -1 ? 999 : prioIdx, _views: views });
+    drafts.push({ id: p.id, to: p.email, name: p.name, city: p.city, score, band, touch: isFollowup ? 'followup-replacement' : 'first', views, subject, body, html, claimUrl, _prio: prioIdx === -1 ? 999 : prioIdx, _views: views });
     counts.staged++;
     if (isFollowup) counts.followup_replacement++; else counts.first_touch++;
   }
