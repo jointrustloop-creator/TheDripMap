@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Star as StarIcon, Navigation, ShieldCheck, CheckCircle2, MapPin, Stethoscope, Phone, Calendar } from 'lucide-react';
+import { TransparencyChip } from './TransparencyChip';
 import { Provider } from '../types';
 import { slugify } from '../lib/data';
 import { bookingUrlOf } from '../lib/card-signals';
@@ -413,6 +414,10 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
               <span className="text-xs font-bold text-slate-400">({provider.reviewCount || 0})</span>
             </div>
           )}
+
+          <div className="mb-3">
+            <TransparencyChip score={(provider as { transparency_score?: number | null }).transparency_score} />
+          </div>
 
           {/* Status Row */}
           <div className="flex items-center gap-3 mb-4">

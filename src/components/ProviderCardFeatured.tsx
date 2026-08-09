@@ -20,6 +20,7 @@ import {
   Sparkles,
   Star as StarIcon,
 } from 'lucide-react';
+import { TransparencyChip } from './TransparencyChip';
 import { Provider, OperatorProfile } from '../types';
 import { slugify } from '../lib/data';
 import { bookingUrlOf } from '../lib/card-signals';
@@ -235,6 +236,9 @@ export const ProviderCardFeatured = ({
                 <span className="text-slate-500 font-bold">({provider.reviewCount || 0})</span>
               </div>
             )}
+          </div>
+          <div className="mb-3">
+            <TransparencyChip score={(provider as { transparency_score?: number | null }).transparency_score} />
           </div>
 
           {/* Scannable signal row: practitioner type + offers-treatment + open

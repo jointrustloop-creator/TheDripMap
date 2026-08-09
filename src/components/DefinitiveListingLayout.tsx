@@ -64,6 +64,9 @@ interface SimilarClinic {
   specialties?: string[];
 }
 
+import { TransparencyPanel } from './TransparencyPanel';
+import type { TransparencyCheck } from '../lib/transparency-score';
+
 interface Props {
   provider: Provider;
   profile: OperatorProfile | undefined;
@@ -79,6 +82,8 @@ interface Props {
   initials: string;
   similarClinics: SimilarClinic[];
   citySlug: string;
+  transparencyScore?: number | null;
+  transparencyChecks?: TransparencyCheck[] | null;
 }
 
 // Region → regulator line. Localizes the State board criterion in the Safety
@@ -285,6 +290,8 @@ export default function DefinitiveListingLayout({
   initials,
   similarClinics,
   citySlug,
+  transparencyScore,
+  transparencyChecks,
 }: Props) {
   const photos = Array.isArray(provider.photos)
     ? (provider.photos as unknown[]).filter((p): p is string =>
@@ -959,7 +966,8 @@ export default function DefinitiveListingLayout({
               doesn't stretch to the row height and so sticky has actual scroll
               runway inside the surrounding grid row). The inner card stays a
               plain block. */}
-          <aside className="lg:sticky lg:top-6 lg:self-start">
+          <aside className="lg:sticky lg:top-6 lg:self-start space-y-4">
+            <TransparencyPanel score={transparencyScore} checks={transparencyChecks} isClaimed clinicName={displayName} />
             <div className="bg-[#fffefa] border border-[rgba(25,36,28,0.15)] rounded-[22px] overflow-hidden shadow-sm">
               <div className="h-[4px]" style={{ background: 'linear-gradient(90deg, #b08a3e, #d8b878)' }} />
               <div className="p-6">
