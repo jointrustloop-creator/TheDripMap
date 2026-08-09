@@ -22,6 +22,7 @@ import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../src/lib/mailer';
 import { parseManageToken, secretsMatch } from '../../../src/lib/manage-token';
 import { isSafetyComplete, deriveSafetyFlags } from '../../../src/lib/safety';
+import { computeTransparencyScore } from '../../../src/lib/transparency-score';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -235,7 +236,23 @@ export async function POST(req: NextRequest) {
     update.special_offers = [];
   }
 
-  const { error: updErr } = await supabase.from('providers').update(update).eq('id', providerId);
+  // Transparency Score: recompute from the merged row so the owner's edits raise
+  // their score the moment they save (also recomputed nightly for everyone).
+  try {
+    const t = computeTransparencyScore({ ...provider, ...update });
+    update.transparency_score = t.score;
+    update.transparency_checks = t.checks;
+    update.transparency_scored_at = new Date().toISOString();
+  } catch { /* non-fatal: the nightly recompute will still catch it */ }
+
+  let { error: updErr } = await supabase.from('providers').update(update).eq('id', providerId);
+  // Resilient to the transparency_* migration not being applied yet: if those
+  // columns are missing, drop them and retry so a save NEVER fails on them.
+  if (updErr && /transparency_|column|schema cache|could not find/i.test(updErr.message || '')) {
+    const { transparency_score, transparency_checks, transparency_scored_at, ...safe } = update;
+    void transparency_score; void transparency_checks; void transparency_scored_at;
+    ({ error: updErr } = await supabase.from('providers').update(safe).eq('id', providerId));
+  }
   if (updErr) {
     console.error('finish-listing update error', updErr.message);
     return NextResponse.json({ error: 'could not save, please try again' }, { status: 500 });

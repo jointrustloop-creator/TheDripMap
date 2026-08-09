@@ -50,6 +50,8 @@ import SmartSummary from '../../../src/components/SmartSummary';
 import { calculateValueMetrics } from '../../../src/lib/price-utils';
 import { getCityPriceIndex } from '../../../src/lib/price-index-data';
 import DefinitiveListingLayout from '../../../src/components/DefinitiveListingLayout';
+import { TransparencyPanel } from '../../../src/components/TransparencyPanel';
+import type { TransparencyCheck } from '../../../src/lib/transparency-score';
 import { OpenStatus } from '../../../src/components/OpenStatus';
 import ListingAnalytics from '../../../src/components/ListingAnalytics';
 import TrackedLink from '../../../src/components/TrackedLink';
@@ -327,6 +329,10 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   });
   const safetyVerifiedCount = safetyResults.filter(c => c.passed).length;
   const safetyVerified = (provider as { safety_verified?: boolean }).safety_verified === true;
+  // Transparency Score is computed server-side and stored on the row (manage is
+  // stripped from this shape, so we read the stored value, never recompute here).
+  const transparencyScore = (provider as { transparency_score?: number | null }).transparency_score ?? null;
+  const transparencyChecks = ((provider as { transparency_checks?: TransparencyCheck[] | null }).transparency_checks ?? null);
   const stateCode = provider.state || getStateFromProvider(provider);
   const timezone = TIMEZONE_MAP[stateCode] || 'America/Toronto';
   const stateName = STATE_MAP[stateCode] || stateCode;
@@ -565,6 +571,8 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
             specialties: c.specialties || [],
           }))}
           citySlug={citySlug}
+          transparencyScore={transparencyScore}
+          transparencyChecks={transparencyChecks}
         />
         <Footer />
       </div>
@@ -840,6 +848,15 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   Verified WHO + credential checklist + safety badge for claimed
                   clinics; "not verified" warning + claim CTA for unclaimed. */}
               <ProviderCredentialBlock provider={provider} profile={profile} />
+
+              {/* Transparency Score panel (unclaimed branch). Claimed listings
+                  get it in the DefinitiveListingLayout sidebar. */}
+              <TransparencyPanel
+                score={transparencyScore}
+                checks={transparencyChecks}
+                isClaimed={provider.is_claimed === true}
+                clinicName={displayName}
+              />
 
               {/* {CLINIC} AT A GLANCE — survey-driven facts as compact icon cards.
                   Only the cards with actual data render; nothing is faked. */}
