@@ -3,7 +3,7 @@ import { supabase, isSupabaseConfigured, fetchAllRows } from './supabase';
 import { SupabaseUnreachableError, isSupabaseConnectionError } from './supabase-health';
 import { MOCK_BLOG_POSTS, MOCK_LISTINGS, MOCK_CITIES } from './mock-data';
 import { htmlToMarkdown, containsHtml } from './blog-utils';
-import { US_MARKET_ENABLED } from './market';
+import { US_MARKET_ENABLED, marketOf } from './market';
 
 // Helper to slugify strings
 export const slugify = (text: string | null | undefined) => {
@@ -634,7 +634,7 @@ export async function getAllCities(): Promise<{ city: string, state: string, sta
     for (let offset = 0; ; offset += 1000) {
       const response = await supabase
         .from('providers')
-        .select('id, city, state')
+        .select('id, city, state, country')
         .order('id')
         .range(offset, offset + 999);
       if (response.error) {
@@ -642,17 +642,21 @@ export async function getAllCities(): Promise<{ city: string, state: string, sta
         break;
       }
       if (!response.data || response.data.length === 0) break;
-      data = data.concat(response.data);
+      data = data.concat(response.data as { id: string; city: string | null; state: string | null; country?: string | null }[]);
       if (response.data.length < 1000) break;
     }
     if (data.length === 0) return getMockCities();
     const seenIds = new Set<string>();
     const cityCounts = new Map<string, { city: string, stateAbbr: string, count: number }>();
-    
-    data?.forEach(item => {
+
+    data?.forEach((item: { id: string; city: string | null; state: string | null; country?: string | null }) => {
       const cityVal = item.city;
       const stateVal = item.state; // Use 'state' since 'state_abbr' doesn't exist
       if (!cityVal || !stateVal || !item.id) return;
+      // Canada-first gate (2026-08 US leakage sweep): while the US market is off,
+      // never surface US cities anywhere this list feeds (location picker,
+      // autocomplete, etc.). One gate here fixes every consumer at once.
+      if (!US_MARKET_ENABLED && marketOf({ country: item.country, state: stateVal }) === 'US') return;
       
       if (seenIds.has(item.id)) return;
       seenIds.add(item.id);
@@ -833,7 +837,10 @@ export async function getPopularCities() {
     })
   );
 
-  return results;
+  // Canada-first gate (2026-08 US leakage sweep): callers no longer have to
+  // remember to filter. While the US market is off, this returns Canadian
+  // metros only. Flipping US_MARKET_ENABLED re-enables US metros consistently.
+  return US_MARKET_ENABLED ? results : results.filter((r) => r.country === 'Canada');
 }
 
 export async function getCitiesWithListings() {

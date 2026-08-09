@@ -19,6 +19,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 import { GTA_CITIES } from '../lib/data';
+import { US_MARKET_ENABLED } from '../lib/market';
 
 const GOALS = [
   { id: 'hangover', label: 'Hangover Recovery', icon: <Heart size={18} /> },
@@ -35,14 +36,22 @@ const GOALS = [
 // Popular metros with the strongest directory inventory — shown in the
 // location picker so users can choose from a visible list rather than
 // having to know exactly what to type. Free typing still works.
-const POPULAR_LOCATIONS = [
+// Canada-first (2026-08 US leakage sweep): while US_MARKET_ENABLED is false the
+// picker only offers Canadian metros, so no US city is ever suggested here.
+// Flipping the flag restores the US list for Phase 2.
+const CA_LOCATIONS = [
+  'Toronto, ON', 'Vancouver, BC', 'Calgary, AB', 'Montreal, QC',
+  'Ottawa, ON', 'Edmonton, AB', 'Winnipeg, MB', 'Hamilton, ON',
+  'Mississauga, ON', 'Halifax, NS',
+];
+const US_LOCATIONS = [
   'New York, NY', 'Los Angeles, CA', 'Chicago, IL', 'Houston, TX',
   'Miami, FL', 'San Diego, CA', 'Atlanta, GA', 'Dallas, TX',
   'Phoenix, AZ', 'Boston, MA', 'Philadelphia, PA', 'Las Vegas, NV',
   'San Francisco, CA', 'Washington, DC', 'Seattle, WA', 'Denver, CO',
-  'Tampa, FL', 'Toronto, ON', 'Vancouver, BC', 'Calgary, AB',
-  'Montreal, QC', 'Ottawa, ON', 'Edmonton, AB',
+  'Tampa, FL',
 ];
+const POPULAR_LOCATIONS = US_MARKET_ENABLED ? [...US_LOCATIONS, ...CA_LOCATIONS] : CA_LOCATIONS;
 
 export function QuickMatch() {
   const router = useRouter();
