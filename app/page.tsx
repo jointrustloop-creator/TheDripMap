@@ -24,6 +24,7 @@ import { ClinicianSection } from '../src/components/ClinicianSection';
 import { TrustSignals } from '../src/components/TrustSignals';
 import { getBlogPosts, getSiteStats, getPopularCities, getFeaturedListings, getOperatorProfiles } from '../src/lib/data';
 import { US_MARKET_ENABLED } from '../src/lib/market';
+import { isSafetyVerified } from '../src/lib/safety';
 import { Metadata } from 'next';
 
 export const revalidate = 60;
@@ -87,7 +88,7 @@ export default async function HomePage() {
   // is the operator's gate. Canada-first: Canadian clinics only while US is off.
   const FEATURED_ROW_EXCLUDE = new Set(['bay-wellness-centre-vancouver']);
   const featuredClinics = ((await getFeaturedListings(24, undefined, US_MARKET_ENABLED ? undefined : 'Canada')) || [])
-    .filter((c) => (c as { safety_verified?: boolean }).safety_verified === true
+    .filter((c) => isSafetyVerified(c as { safety_verified?: boolean; safety_review_status?: string | null })
       && c.is_claimed === true
       && !FEATURED_ROW_EXCLUDE.has(String(c.slug)))
     .slice(0, 4);
@@ -98,7 +99,7 @@ export default async function HomePage() {
   // Claimed and Safety Verified are explicitly separate signals.
   const safetyVerifiedById = new Map<string, boolean>();
   for (const c of featuredClinics) {
-    safetyVerifiedById.set(String(c.id), (c as { safety_verified?: boolean }).safety_verified === true);
+    safetyVerifiedById.set(String(c.id), isSafetyVerified(c as { safety_verified?: boolean; safety_review_status?: string | null }));
   }
 
   // Initials helper for the small circular logo chip when a clinic has no

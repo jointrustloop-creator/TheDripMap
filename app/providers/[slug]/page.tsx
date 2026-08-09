@@ -52,6 +52,7 @@ import { getCityPriceIndex } from '../../../src/lib/price-index-data';
 import DefinitiveListingLayout from '../../../src/components/DefinitiveListingLayout';
 import { TransparencyPanel } from '../../../src/components/TransparencyPanel';
 import type { TransparencyCheck } from '../../../src/lib/transparency-score';
+import { isSafetyVerified as isSafetyVerifiedFn } from '../../../src/lib/safety';
 import { OpenStatus } from '../../../src/components/OpenStatus';
 import ListingAnalytics from '../../../src/components/ListingAnalytics';
 import TrackedLink from '../../../src/components/TrackedLink';
@@ -328,7 +329,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
     return { ...c, detail, passed: profileData[c.key] === true };
   });
   const safetyVerifiedCount = safetyResults.filter(c => c.passed).length;
-  const safetyVerified = (provider as { safety_verified?: boolean }).safety_verified === true;
+  const safetyVerified = isSafetyVerifiedFn(provider as { safety_verified?: boolean; safety_review_status?: string | null });
   // Transparency Score is computed server-side and stored on the row (manage is
   // stripped from this shape, so we read the stored value, never recompute here).
   const transparencyScore = (provider as { transparency_score?: number | null }).transparency_score ?? null;

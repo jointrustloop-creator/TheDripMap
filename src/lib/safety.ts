@@ -30,6 +30,23 @@ export interface SafetyAnswers {
  * oversight. That is the core of "who keeps patients safe" and the bar for the
  * Safety Verified badge. A barely-touched form does not qualify.
  */
+/**
+ * THE single source of truth for rendering the Safety Verified badge, anywhere.
+ *
+ * The badge requires BOTH the operator-set safety_verified flag AND an approved
+ * human review (safety_review_status === 'approved'). This closes the integrity
+ * gap where grandfathered clinics carried safety_verified=true with blank
+ * attestations and no review (status null): those must never show the badge.
+ * Data is left intact and reversible: completing the questionnaire and getting
+ * approved (status='approved') makes the badge return automatically. Every
+ * render site (homepage featured row, provider pages, cards) MUST use this.
+ */
+export function isSafetyVerified(
+  p: { safety_verified?: boolean | null; safety_review_status?: string | null } | null | undefined
+): boolean {
+  return p?.safety_verified === true && p?.safety_review_status === 'approved';
+}
+
 export function isSafetyComplete(manage: unknown): boolean {
   const m = manage && typeof manage === 'object' ? (manage as SafetyAnswers) : {};
   const who = Array.isArray(m.team?.whoPlaces) ? (m.team!.whoPlaces as string[]) : [];
