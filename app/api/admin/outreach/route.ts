@@ -21,8 +21,15 @@ function db() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 }
 
-function mailerConfigured(): boolean {
-  return (!!process.env.SMTP_USER && !!process.env.SMTP_PASS) || !!process.env.RESEND_API_KEY;
+// Bulk outreach goes through Resend ONLY (never Workspace SMTP), so info@'s
+// Workspace account is not exposed to bulk-send rate limits / suspension.
+// The from address must be on the Resend-authenticated domain (resend._domainkey
+// + send.thedripmap.com return-path). Reply-to stays info@ so replies are seen.
+const OUTREACH_FROM = process.env.OUTREACH_FROM || 'TheDripMap <hello@thedripmap.com>';
+const OUTREACH_REPLY_TO = 'info@thedripmap.com';
+
+function resendConfigured(): boolean {
+  return !!process.env.RESEND_API_KEY;
 }
 
 export async function GET() {
@@ -34,7 +41,8 @@ export async function GET() {
   }));
   return NextResponse.json({
     ok: true,
-    mailerConfigured: mailerConfigured(),
+    resendConfigured: resendConfigured(),
+    from: OUTREACH_FROM,
     counts,
     batchSize: batch.length,
     remaining: Math.max(0, drafts.length - batch.length),
@@ -44,8 +52,8 @@ export async function GET() {
 
 export async function POST(req: Request) {
   if (!(await isAdminRequest())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (!mailerConfigured()) {
-    return NextResponse.json({ error: 'No mail provider configured (SMTP_USER+SMTP_PASS or RESEND_API_KEY).' }, { status: 500 });
+  if (!resendConfigured()) {
+    return NextResponse.json({ error: 'RESEND_API_KEY is not set. Part B outreach sends via Resend only.' }, { status: 500 });
   }
   let body: { action?: string; testEmail?: string; limit?: number };
   try { body = await req.json(); } catch { return NextResponse.json({ error: 'invalid json' }, { status: 400 }); }
@@ -55,8 +63,8 @@ export async function POST(req: Request) {
     const to = (body.testEmail || '').trim();
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)) return NextResponse.json({ error: 'valid testEmail required' }, { status: 400 });
     const s = sampleTestEmail('your clinic');
-    const r = await sendMail({ from: 'TheDripMap <info@thedripmap.com>', to, replyTo: 'info@thedripmap.com', subject: s.subject, text: s.text, html: s.html });
-    return NextResponse.json({ ok: r.ok, action: 'test', to, provider: r.provider, id: r.id, error: r.error });
+    const r = await sendMail({ from: OUTREACH_FROM, to, replyTo: OUTREACH_REPLY_TO, subject: s.subject, text: s.text, html: s.html, channel: 'resend' });
+    return NextResponse.json({ ok: r.ok, action: 'test', to, from: OUTREACH_FROM, provider: r.provider, id: r.id, error: r.error });
   }
 
   // SEND: the pending batch. Records the two-touch state on each success.
@@ -68,7 +76,7 @@ export async function POST(req: Request) {
     const results: Array<{ to: string; sent: boolean; error?: string }> = [];
     for (const d of batch) {
       try {
-        const r = await sendMail({ from: 'TheDripMap <info@thedripmap.com>', to: d.to, replyTo: 'info@thedripmap.com', subject: d.subject, text: d.text, html: d.html });
+        const r = await sendMail({ from: OUTREACH_FROM, to: d.to, replyTo: OUTREACH_REPLY_TO, subject: d.subject, text: d.text, html: d.html, channel: 'resend' });
         if (r.ok) {
           await recordSentTouch(supabase, d.id, d.touch);
           results.push({ to: d.to, sent: true });

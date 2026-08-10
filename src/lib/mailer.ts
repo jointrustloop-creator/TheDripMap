@@ -19,6 +19,11 @@ export interface MailPayload {
   subject: string;
   text: string;
   html?: string; // Optional HTML body (text is still required as fallback).
+  // Force a specific channel. 'auto' (default) keeps the SMTP-first, Resend-
+  // fallback behavior for transactional mail. 'resend' forces Resend and never
+  // touches Workspace SMTP — REQUIRED for bulk outreach, which must not run
+  // through info@'s Workspace account (rate limits + suspension risk).
+  channel?: 'auto' | 'resend' | 'smtp';
 }
 
 export interface MailResult {
@@ -46,8 +51,32 @@ function getSmtpTransporter(): nodemailer.Transporter | null {
 }
 
 export async function sendMail(payload: MailPayload): Promise<MailResult> {
-  // 1. Try SMTP (Workspace Gmail) first if configured.
-  const transporter = getSmtpTransporter();
+  const channel = payload.channel || 'auto';
+
+  // Forced Resend (bulk outreach): never fall back to SMTP.
+  if (channel === 'resend') {
+    if (!process.env.RESEND_API_KEY) {
+      return { ok: false, provider: 'none', error: 'channel=resend but RESEND_API_KEY is not set' };
+    }
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const result = await resend.emails.send({
+        from: payload.from,
+        to: payload.to,
+        ...(payload.replyTo ? { replyTo: payload.replyTo } : {}),
+        subject: payload.subject,
+        text: payload.text,
+        ...(payload.html ? { html: payload.html } : {}),
+      });
+      if (result?.error) return { ok: false, provider: 'resend', error: result.error.message };
+      return { ok: true, provider: 'resend', id: result?.data?.id };
+    } catch (err) {
+      return { ok: false, provider: 'resend', error: err instanceof Error ? err.message : String(err) };
+    }
+  }
+
+  // 1. Try SMTP (Workspace Gmail) first if configured (skipped when channel='resend').
+  const transporter = channel === 'smtp' || channel === 'auto' ? getSmtpTransporter() : null;
   if (transporter) {
     try {
       const info = await transporter.sendMail({

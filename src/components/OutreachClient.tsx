@@ -6,7 +6,7 @@ interface BatchRow {
   id: string; to: string; name: string; city: string; band: string; score: number; touch: string; views: number; subject: string; html: string;
 }
 interface Payload {
-  ok: boolean; mailerConfigured: boolean; counts: Record<string, number>; batchSize: number; remaining: number; batch: BatchRow[];
+  ok: boolean; resendConfigured: boolean; from: string; counts: Record<string, number>; batchSize: number; remaining: number; batch: BatchRow[];
 }
 
 export function OutreachClient() {
@@ -56,11 +56,11 @@ export function OutreachClient() {
   return (
     <div>
       <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-1">Score outreach</h1>
-      <p className="text-sm text-slate-500 mb-6">Sent by TheDripMap&apos;s own mailer. Nothing sends until you click. {data.remaining} more clinics queued after this batch.</p>
+      <p className="text-sm text-slate-500 mb-6">Sent via Resend as <b className="text-slate-700">{data.from}</b> (reply-to info@). Never through the Workspace account. Nothing sends until you click. {data.remaining} more clinics queued after this batch.</p>
 
-      {!data.mailerConfigured && (
+      {!data.resendConfigured && (
         <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-900 text-sm font-bold">
-          No mail provider is configured in this environment, so sends will fail here. It works on the deployed site where SMTP or Resend is set.
+          RESEND_API_KEY is not set in this environment, so sends will fail here. It works on the deployed site where Resend is configured.
         </div>
       )}
 
