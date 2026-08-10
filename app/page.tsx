@@ -767,7 +767,7 @@ export default async function HomePage() {
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-2xl font-black text-[#0F6E56] tracking-tight">{city.count}</span>
                     <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400">
-                      {city.name.toLowerCase().includes('toronto') ? 'providers' : 'clinics'}
+                      clinics
                     </span>
                   </div>
                 ) : (
