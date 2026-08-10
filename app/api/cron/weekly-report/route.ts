@@ -326,6 +326,12 @@ export async function GET(req: Request) {
   lines.push(`  New verifications: ${verifsThis.length}`);
   lines.push(`  Outreach drafts:   ${draftsThis || 0}`);
   lines.push('');
+  // WATCH ITEMS: manual reminders that must not silently expire. Clear the
+  // relevant line here once resolved. Workspace billing added 2026-08-09 after
+  // the Google Workspace payment on file failed.
+  lines.push('WATCH ITEMS (clear each line when resolved)');
+  lines.push('  Workspace billing status: UNRESOLVED. The Google Workspace payment on file failed; update the card in Google Admin so info@thedripmap.com never expires.');
+  lines.push('');
   lines.push('TREND vs LAST WEEK');
   lines.push(`  Claims:        ${trend(claimsThis.length, claimsPrior.length)}`);
   lines.push(`  Verifications: ${trend(verifsThis.length, verifsPrior.length)}`);

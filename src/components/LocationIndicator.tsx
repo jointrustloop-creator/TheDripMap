@@ -6,6 +6,19 @@ import { LocationInfo } from '../types';
 import { cn } from '../lib/utils';
 import { usePathname, useRouter } from 'next/navigation';
 import { getAllCities, slugify, GTA_CITIES } from '../lib/data';
+import { US_MARKET_ENABLED } from '../lib/market';
+
+// Canada-first default (2026-08 US leakage sweep): while the US market is off,
+// the location widget must never show a US city. If geolocation detects a
+// non-Canadian location, or detection fails, we fall back to Toronto.
+function makeToronto() {
+  return { city: 'Toronto', state: 'ON', country: 'Canada', latitude: 43.6532, longitude: -79.3832, isPrecise: false, detectedAt: Date.now() };
+}
+function normalizeMarket<T extends { country?: string }>(loc: T): T | ReturnType<typeof makeToronto> {
+  if (US_MARKET_ENABLED) return loc;
+  const isCanada = !!loc.country && String(loc.country).toLowerCase().includes('canada');
+  return isCanada ? loc : makeToronto();
+}
 
 export const LocationIndicator = () => {
   const pathname = usePathname();
@@ -49,7 +62,7 @@ export const LocationIndicator = () => {
           const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
           const data = await res.json();
           
-          const detected = {
+          const detectedRaw = {
             city: data.city || data.locality || 'Unknown City',
             state: data.principalSubdivisionCode?.split('-')[1] || data.principalSubdivision || '',
             country: data.countryName,
@@ -58,7 +71,8 @@ export const LocationIndicator = () => {
             isPrecise: true,
             detectedAt: Date.now()
           };
-          
+          const detected = normalizeMarket(detectedRaw);
+
           setLocation(detected);
           sessionStorage.setItem('tdm_location', JSON.stringify(detected));
           window.dispatchEvent(new CustomEvent('tdm_location_change', { detail: detected }));
@@ -107,7 +121,7 @@ export const LocationIndicator = () => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
         if (data.city || data.locality) {
-          const detected = {
+          const detectedRaw = {
             city: data.city || data.locality,
             state: data.principalSubdivisionCode?.split('-')[1] || data.principalSubdivision || '',
             country: data.countryName,
@@ -116,6 +130,7 @@ export const LocationIndicator = () => {
             isPrecise: false,
             detectedAt: Date.now()
           };
+          const detected = normalizeMarket(detectedRaw);
           setLocation(detected);
           sessionStorage.setItem('tdm_location', JSON.stringify(detected));
           window.dispatchEvent(new CustomEvent('tdm_location_change', { detail: detected }));

@@ -21,6 +21,7 @@ import {
   Star as StarIcon,
 } from 'lucide-react';
 import { TransparencyChip } from './TransparencyChip';
+import { isSafetyVerified as isSafetyVerifiedFn } from '../lib/safety';
 import { Provider, OperatorProfile } from '../types';
 import { slugify } from '../lib/data';
 import { bookingUrlOf } from '../lib/card-signals';
@@ -103,7 +104,7 @@ export const ProviderCardFeatured = ({
   );
   const bookingUrl = bookingUrlOf(provider);
   const isClaimed = provider.is_claimed === true || provider.is_featured === true;
-  const isSafety = provider.safety_verified === true;
+  const isSafety = isSafetyVerifiedFn(provider as { safety_verified?: boolean; safety_review_status?: string | null });
   const isFeatured = provider.is_featured === true;
   const oneLiner = operatorProfile?.profile_data?.oneLiner;
 

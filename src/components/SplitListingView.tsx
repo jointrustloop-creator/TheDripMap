@@ -58,7 +58,7 @@ export const SplitListingView = ({ providers, cityName }: SplitListingViewProps)
         {featuredCount > 0 && (
           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-700 px-3">
             <Star size={12} fill="currentColor" className="text-emerald-500" />
-            <span>{featuredCount} verified · always shown first</span>
+            <span>{featuredCount} featured · always shown first</span>
           </div>
         )}
         {providers.map((provider) => {

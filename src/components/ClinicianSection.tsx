@@ -47,7 +47,7 @@ export const ClinicianSection = ({ stats }: ClinicianSectionProps) => {
               <span className="inline-block italic bg-gradient-to-br from-wellness-300 via-wellness-400 to-sky-300 bg-clip-text text-transparent pb-3 pr-3">Grow with TheDripMap.</span>
             </h2>
             <p className="text-slate-300 text-base md:text-lg font-medium leading-relaxed max-w-md">
-              Join {stats.totalListings}+ elite providers across {stats.totalCities} cities and start receiving high-intent patient referrals today.
+              Join {stats.totalListings}+ clinics across {stats.totalCities} cities and start receiving high-intent patient referrals today.
             </p>
           </div>
 
@@ -56,7 +56,7 @@ export const ClinicianSection = ({ stats }: ClinicianSectionProps) => {
             <div className="flex items-center gap-6 md:gap-10">
               <div className="text-center lg:text-right">
                 <div className="text-3xl md:text-4xl font-black text-white tracking-tight">{stats.totalListings}+</div>
-                <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mt-1">Clinics Verified</div>
+                <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mt-1">Clinics Listed</div>
               </div>
               <div className="h-12 w-px bg-white/10" />
               <div className="text-center lg:text-right">

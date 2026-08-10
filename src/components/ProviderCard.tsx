@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Star as StarIcon, Navigation, ShieldCheck, CheckCircle2, MapPin, Stethoscope, Phone, Calendar } from 'lucide-react';
 import { TransparencyChip } from './TransparencyChip';
+import { isSafetyVerified as isSafetyVerifiedFn } from '../lib/safety';
 import { Provider } from '../types';
 import { slugify } from '../lib/data';
 import { bookingUrlOf } from '../lib/card-signals';
@@ -92,7 +93,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
   const isClaimed = provider.is_claimed === true || provider.is_featured === true;
   // Safety Verified is a separate, stronger signal than Claimed. The shield is
   // reserved for it; Claimed gets only a subtle check.
-  const isSafetyVerified = provider.safety_verified === true;
+  const isSafetyVerified = isSafetyVerifiedFn(provider as { safety_verified?: boolean; safety_review_status?: string | null });
   const isFeatured = provider.is_featured === true;
 
   const initials = getInitials(provider.name);

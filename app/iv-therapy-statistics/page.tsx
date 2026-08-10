@@ -20,8 +20,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const states = stats.states;
 
   const year = new Date().getFullYear();
+  const regionAdj = US_MARKET_ENABLED ? 'US' : 'Canadian';
+  const subdiv = US_MARKET_ENABLED ? 'states' : 'provinces';
   const title = `IV Therapy Statistics & Market Data ${year} | TheDripMap`;
-  const description = `Comprehensive IV therapy market statistics from TheDripMap's matching platform for ${total} verified US clinics. Data on top cities, states, and trends across ${cities} cities and ${states} states.`;
+  const description = `Comprehensive IV therapy market statistics from TheDripMap's matching platform for ${total} listed ${regionAdj} clinics. Data on top cities, ${subdiv}, and trends across ${cities} cities and ${states} ${subdiv}.`;
   const ogImage = 'https://www.thedripmap.com/og-image.png';
 
   return {
@@ -56,6 +58,17 @@ export default async function StatisticsPage() {
   const topStates = stats.topStates;
   const topCities = stats.topCities;
 
+  // Region framing (2026-08 US leakage sweep): while the US market is off, the
+  // numbers getSiteStats returns are Canada-only, so every "US / United States /
+  // states / nationwide" phrase must read Canadian. Flip US_MARKET_ENABLED and
+  // the page reverts to US framing. "verified" is never used for the whole set —
+  // clinics are LISTED; only Safety Verified clinics are attested.
+  const region = US_MARKET_ENABLED ? 'the United States' : 'Canada';
+  const regionAdj = US_MARKET_ENABLED ? 'US' : 'Canadian';
+  const subdiv = US_MARKET_ENABLED ? 'states' : 'provinces';
+  const SubdivCap = US_MARKET_ENABLED ? 'States' : 'Provinces';
+  const nationwide = US_MARKET_ENABLED ? 'nationwide' : 'across Canada';
+
   const reviewVolume = [
     { range: '100+ reviews', pct: 0.383 },
     { range: '50–99 reviews', pct: 0.193 },
@@ -70,32 +83,32 @@ export default async function StatisticsPage() {
 
   const faqs = [
     {
-      question: "How many IV therapy clinics are there in the US?",
-      answer: `Based on TheDripMap's matching platform for ${stats.total.toLocaleString()} verified clinics across ${stats.cities} cities and ${stats.states} states, IV therapy is widely available across the United States. The actual total number of IV therapy providers nationwide is likely significantly higher as TheDripMap continues to expand its coverage.`
+      question: `How many IV therapy clinics are there in ${region}?`,
+      answer: `Based on TheDripMap's matching platform for ${stats.total.toLocaleString()} listed clinics across ${stats.cities} cities and ${stats.states} ${subdiv}, IV therapy is widely available across ${region}. The actual total number of IV therapy providers ${nationwide} is likely significantly higher as TheDripMap continues to expand its coverage.`
     },
     {
-      question: "Which US state has the most IV therapy clinics?",
-      answer: `${topStates[0]?.name} leads all US states with ${topStates[0]?.count} listed IV therapy clinics, followed by ${topStates[1]?.name} (${topStates[1]?.count}) and ${topStates[2]?.name} (${topStates[2]?.count}). Together these three states account for a significant portion of all IV therapy providers in TheDripMap's national matching platform.`
+      question: `Which ${regionAdj} ${US_MARKET_ENABLED ? 'state' : 'province'} has the most IV therapy clinics?`,
+      answer: `${topStates[0]?.name} leads all ${regionAdj} ${subdiv} with ${topStates[0]?.count} listed IV therapy clinics, followed by ${topStates[1]?.name} (${topStates[1]?.count}) and ${topStates[2]?.name} (${topStates[2]?.count}). Together these three ${subdiv} account for a significant portion of all IV therapy providers in TheDripMap's matching platform.`
     },
     {
-      question: "Which US city has the most IV therapy clinics?",
-      answer: `${topCities[0]?.city} has the highest concentration of IV therapy clinics in the United States with ${topCities[0]?.count} providers listed on TheDripMap. ${topCities[1]?.city}, ${topCities[1]?.state} ranks second with ${topCities[1]?.count} clinics, followed by ${topCities[2]?.city} with ${topCities[2]?.count}.`
+      question: `Which ${regionAdj} city has the most IV therapy clinics?`,
+      answer: `${topCities[0]?.city} has the highest concentration of IV therapy clinics in ${region} with ${topCities[0]?.count} providers listed on TheDripMap. ${topCities[1]?.city}, ${topCities[1]?.state} ranks second with ${topCities[1]?.count} clinics, followed by ${topCities[2]?.city} with ${topCities[2]?.count}.`
     },
     {
       question: "Are IV therapy clinics available in my city?",
-      answer: `IV therapy clinics are available in ${stats.cities} cities across ${stats.states} US states. Use the TheDripMap search or take the free matching quiz to find providers near your specific location.`
+      answer: `IV therapy clinics are available in ${stats.cities} cities across ${stats.states} ${regionAdj} ${subdiv}. Use the TheDripMap search or take the free matching quiz to find providers near your specific location.`
     },
     {
       question: "How do I find the best IV therapy clinic near me?",
-      answer: `TheDripMap's free matching quiz asks 5 questions about your goal, delivery preference, timing, budget, and location then matches you to the highest-scoring clinic for your specific needs from over ${stats.total.toLocaleString()} verified providers nationwide.`
+      answer: `TheDripMap's free matching quiz asks 5 questions about your goal, delivery preference, timing, budget, and location then matches you to the highest-scoring clinic for your specific needs from over ${stats.total.toLocaleString()} listed providers ${nationwide}.`
     }
   ];
 
   const datasetSchema = {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    "name": "US IV Therapy Clinic Matching Platform Statistics",
-    "description": "Statistics on IV therapy clinics across the United States compiled from TheDripMap's verified matching platform",
+    "name": `${regionAdj} IV Therapy Clinic Matching Platform Statistics`,
+    "description": `Statistics on IV therapy clinics across ${region} compiled from TheDripMap's matching platform`,
     "url": "https://www.thedripmap.com/iv-therapy-statistics",
     "creator": {
       "@type": "Organization",
@@ -165,25 +178,25 @@ export default async function StatisticsPage() {
         {/* Hero Section */}
         <section className="mb-20">
           <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
-            IV Therapy in the United States — <br className="hidden md:block" />
+            IV Therapy in {region} — <br className="hidden md:block" />
             <span className="text-wellness-600">Market Statistics & Data</span>
           </h1>
           <p className="text-xl text-slate-500 max-w-3xl leading-relaxed">
-            The following statistics are compiled from TheDripMap&apos;s verified matching platform for IV therapy clinics across the United States. Data is updated regularly as new clinics are added to the matching platform. Last updated: {lastUpdated}.
+            The following statistics are compiled from TheDripMap&apos;s matching platform for IV therapy clinics across {region}. Data is updated regularly as new clinics are added to the matching platform. Last updated: {lastUpdated}.
           </p>
         </section>
 
         {/* Section 1: Key Stats Row */}
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
-            <StatCard 
-              number={stats.total.toLocaleString()} 
-              label="IV therapy clinics listed" 
-              sub="Across the United States" 
+            <StatCard
+              number={stats.total.toLocaleString()}
+              label="IV therapy clinics listed"
+              sub={`Across ${region}`}
             />
-            <StatCard 
-              number={stats.cities.toLocaleString()} 
-              label="Cities with IV therapy clinics" 
-              sub={`In ${stats.states} US states`} 
+            <StatCard
+              number={stats.cities.toLocaleString()}
+              label="Cities with IV therapy clinics"
+              sub={`In ${stats.states} ${regionAdj} ${subdiv}`}
             />
             <StatCard 
               number={Math.round(stats.totalReviews / stats.total).toLocaleString()} 
@@ -194,16 +207,16 @@ export default async function StatisticsPage() {
 
         {/* Section 2: States With Most Clinics */}
         <section className="mb-24">
-          <h2 className="text-3xl font-black text-slate-900 mb-6 tracking-tight">States With the Most IV Therapy Clinics</h2>
+          <h2 className="text-3xl font-black text-slate-900 mb-6 tracking-tight">{SubdivCap} With the Most IV Therapy Clinics</h2>
           <p className="text-lg text-slate-600 mb-8 max-w-4xl leading-relaxed">
-            {topStates[0]?.name} leads all US states in IV therapy clinic density, followed by {topStates[1]?.name} and {topStates[2]?.name}. These three states alone account for a significant share of all listed IV therapy providers nationwide.
+            {topStates[0]?.name} leads all {regionAdj} {subdiv} in IV therapy clinic density, followed by {topStates[1]?.name} and {topStates[2]?.name}. These three {subdiv} alone account for a significant share of all listed IV therapy providers {nationwide}.
           </p>
           
           <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden overflow-x-auto">
             <table className="w-full min-w-[600px] border-collapse">
               <thead>
                 <tr className="bg-slate-50 text-left">
-                  <th className="px-8 py-4 text-xs font-black uppercase tracking-widest text-slate-400 border-b border-slate-100">State</th>
+                  <th className="px-8 py-4 text-xs font-black uppercase tracking-widest text-slate-400 border-b border-slate-100">{US_MARKET_ENABLED ? 'State' : 'Province'}</th>
                   <th className="px-8 py-4 text-xs font-black uppercase tracking-widest text-slate-400 border-b border-slate-100">Clinics</th>
                   <th className="px-8 py-4 text-xs font-black uppercase tracking-widest text-slate-400 border-b border-slate-100">Share of Total</th>
                 </tr>
@@ -228,7 +241,7 @@ export default async function StatisticsPage() {
         <section className="mb-24">
           <h2 className="text-3xl font-black text-slate-900 mb-6 tracking-tight">Cities With the Most IV Therapy Clinics</h2>
           <p className="text-lg text-slate-600 mb-10 max-w-4xl leading-relaxed">
-            {topCities[0]?.city} is the undisputed leader for IV therapy clinic density in the United States with {topCities[0]?.count} listed providers. {topCities[1]?.city}, {topCities[1]?.state} ranks second — a reflection of the city&apos;s strong wellness market.
+            {topCities[0]?.city} is the undisputed leader for IV therapy clinic density in {region} with {topCities[0]?.count} listed providers. {topCities[1]?.city}, {topCities[1]?.state} ranks second — a reflection of the city&apos;s strong wellness market.
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
@@ -297,7 +310,7 @@ export default async function StatisticsPage() {
           <div className="relative z-10 max-w-3xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-black text-white mb-6 tracking-tight">Find an IV Therapy Clinic Near You</h2>
             <p className="text-xl text-wellness-50 mb-12 font-medium leading-relaxed">
-              Browse {stats.total.toLocaleString()} verified clinics or take our free 60-second quiz to get matched to the right provider for your specific goals.
+              Browse {stats.total.toLocaleString()} listed clinics or take our free 60-second quiz to get matched to the right provider for your specific goals.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link 
@@ -318,7 +331,7 @@ export default async function StatisticsPage() {
 
         {/* Section 7: FAQ */}
         <section className="mb-24">
-          <h2 className="text-3xl font-black text-slate-900 mb-10 tracking-tight text-center">Frequently Asked Questions About IV Therapy in the US</h2>
+          <h2 className="text-3xl font-black text-slate-900 mb-10 tracking-tight text-center">Frequently Asked Questions About IV Therapy in {region}</h2>
           <div className="max-w-4xl mx-auto space-y-6">
             {faqs.map((faq, idx) => (
               <div key={idx} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
@@ -332,7 +345,7 @@ export default async function StatisticsPage() {
         {/* Footer Note */}
         <section className="pt-12 border-t border-slate-100 text-center max-w-4xl mx-auto">
           <p className="text-sm text-slate-400 font-medium leading-relaxed">
-            &quot;Data source: TheDripMap matching platform for verified US IV therapy clinics. Statistics reflect current matching platform coverage and are updated as new clinics are added. TheDripMap is an independent matching service and does not endorse any individual clinic. Always verify credentials directly with the provider before booking any IV therapy treatment.&quot;
+            &quot;Data source: TheDripMap matching platform for listed {regionAdj} IV therapy clinics. Statistics reflect current matching platform coverage and are updated as new clinics are added. TheDripMap is an independent matching service and does not endorse any individual clinic. Always verify credentials directly with the provider before booking any IV therapy treatment.&quot;
           </p>
         </section>
       </main>
