@@ -28,12 +28,13 @@ export function OutreachClient() {
   };
   useEffect(() => { load(); }, []);
 
-  const sendTest = async () => {
+  const sendTest = async (realFromQueue = false) => {
     setBusy('test'); setFlash(null);
     try {
-      const r = await fetch('/api/admin/outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'test', testEmail }) });
+      const r = await fetch('/api/admin/outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'test', testEmail, realFromQueue }) });
       const j = await r.json();
-      setFlash(j.ok ? `Test sent to ${j.to} via ${j.provider}. Check that inbox.` : `Test failed: ${j.error}`);
+      const who = j.clinic ? ` (real clinic: ${j.clinic.name}, band ${j.clinic.band})` : '';
+      setFlash(j.ok ? `Test sent to ${j.to} via ${j.provider}${who}. Subject: "${j.subject}". Check that inbox.` : `Test failed: ${j.error}`);
     } catch (e) { setFlash('Test failed: ' + (e instanceof Error ? e.message : String(e))); }
     finally { setBusy(null); }
   };
@@ -76,7 +77,8 @@ export function OutreachClient() {
           <label className="text-xs font-black uppercase tracking-widest text-slate-400 block mb-1">Send one test email to</label>
           <input value={testEmail} onChange={(e) => setTestEmail(e.target.value)} placeholder="you@example.com" className="w-full px-3 py-2 border-2 border-slate-200 rounded-xl font-medium text-slate-900 focus:outline-none focus:border-wellness-500" />
         </div>
-        <button onClick={sendTest} disabled={busy !== null || !testEmail} className="bg-slate-900 text-white px-5 py-2.5 rounded-xl font-black text-sm hover:bg-slate-800 disabled:opacity-50">{busy === 'test' ? 'Sending…' : 'Send test'}</button>
+        <button onClick={() => sendTest(false)} disabled={busy !== null || !testEmail} className="bg-slate-200 text-slate-800 px-5 py-2.5 rounded-xl font-black text-sm hover:bg-slate-300 disabled:opacity-50">{busy === 'test' ? 'Sending…' : 'Sample test'}</button>
+        <button onClick={() => sendTest(true)} disabled={busy !== null || !testEmail} className="bg-slate-900 text-white px-5 py-2.5 rounded-xl font-black text-sm hover:bg-slate-800 disabled:opacity-50">{busy === 'test' ? 'Sending…' : 'Real first-clinic test'}</button>
       </div>
 
       {flash && <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-sm font-bold">{flash}</div>}
