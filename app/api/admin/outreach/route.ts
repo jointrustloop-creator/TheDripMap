@@ -55,16 +55,31 @@ export async function POST(req: Request) {
   if (!resendConfigured()) {
     return NextResponse.json({ error: 'RESEND_API_KEY is not set. Part B outreach sends via Resend only.' }, { status: 500 });
   }
-  let body: { action?: string; testEmail?: string; limit?: number };
+  let body: { action?: string; testEmail?: string; limit?: number; realFromQueue?: boolean; index?: number };
   try { body = await req.json(); } catch { return NextResponse.json({ error: 'invalid json' }, { status: 400 }); }
 
-  // TEST: one sample email to a chosen address. Sends nothing to clinics.
+  // TEST: one email to a chosen address. Sends nothing to real clinics.
+  //   default        -> a fixed sample ("Hi your clinic team,").
+  //   realFromQueue  -> the ACTUAL rendered email of a real pending-batch clinic
+  //                     (default the first), so name-fill in greeting + subject
+  //                     is proven before the batch. Still goes to testEmail only.
   if (body.action === 'test') {
     const to = (body.testEmail || '').trim();
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)) return NextResponse.json({ error: 'valid testEmail required' }, { status: 400 });
-    const s = sampleTestEmail('your clinic');
+    let s: { subject: string; text: string; html: string };
+    let clinic: { name: string; city: string; band: string } | null = null;
+    if (body.realFromQueue) {
+      const { drafts } = await computeOutreachQueue(db());
+      const idx = Math.min(Math.max(0, Number(body.index) || 0), Math.max(0, drafts.length - 1));
+      const d = drafts[idx];
+      if (!d) return NextResponse.json({ error: 'no pending clinics to sample' }, { status: 400 });
+      s = { subject: d.subject, text: d.text, html: d.html };
+      clinic = { name: d.name, city: d.city, band: d.band };
+    } else {
+      s = sampleTestEmail('your clinic');
+    }
     const r = await sendMail({ from: OUTREACH_FROM, to, replyTo: OUTREACH_REPLY_TO, subject: s.subject, text: s.text, html: s.html, channel: 'resend' });
-    return NextResponse.json({ ok: r.ok, action: 'test', to, from: OUTREACH_FROM, provider: r.provider, id: r.id, error: r.error });
+    return NextResponse.json({ ok: r.ok, action: 'test', realFromQueue: !!body.realFromQueue, clinic, subject: s.subject, to, from: OUTREACH_FROM, provider: r.provider, id: r.id, error: r.error });
   }
 
   // SEND: the pending batch. Records the two-touch state on each success.
