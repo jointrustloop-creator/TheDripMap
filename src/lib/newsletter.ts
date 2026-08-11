@@ -165,12 +165,16 @@ export function renderNewsletter(input: RenderInput): { subject: string; text: s
     '----',
     `You are receiving this because you subscribed to updates at thedripmap.com.`,
     MAILING,
-    `Unsubscribe: ${SITE}/api/newsletter/unsubscribe?e=${encodeURIComponent(email)}`,
+    `Unsubscribe: ${SITE}/api/newsletter/unsubscribe/${encodeURIComponent(email)}`,
   );
   const text = textLines.join('\n');
 
   // ── Branded HTML (lightweight, text-first, images-optional) ──
-  const unsubUrl = `${SITE}/api/newsletter/unsubscribe?e=${encodeURIComponent(email)}`;
+  // Unsubscribe uses a PATH segment, not a ?e= query param. A "?e=ab..." query
+  // gets corrupted by quoted-printable MIME encoding, which reads the "=" plus
+  // the next two hex-like chars as an escape (=AB -> byte 0xAB), mangling the
+  // address. A path has no "=" so it survives every mail client intact.
+  const unsubUrl = `${SITE}/api/newsletter/unsubscribe/${encodeURIComponent(email)}`;
   const btn = (href: string, label: string) =>
     `<a href="${href}" style="display:inline-block;background:${GREEN};color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;padding:12px 22px;border-radius:10px;">${label}</a>`;
   const link = (href: string, label: string) =>
@@ -266,6 +270,35 @@ export async function computeNewsletterQueue(supabase: SupabaseClient): Promise<
     }
   }
 
+  // 1b. Suppression list. This is what the unsubscribe link writes to, so it is
+  //     what makes unsubscribe actually stick across editions: anyone here is
+  //     dropped. Fail-closed on the primary table (email_suppressions) so a load
+  //     error never risks mailing someone who opted out; outreach_suppressions
+  //     is read too for parity but tolerated if absent.
+  const suppressed = new Set<string>();
+  {
+    let f = 0;
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const { data, error } = await supabase.from('email_suppressions').select('email').range(f, f + 999);
+      if (error) throw new Error(`Refusing to build newsletter queue: could not load email_suppressions: ${error.message}`);
+      for (const r of (data as { email: string }[]) || []) if (r.email) suppressed.add(r.email.toLowerCase().trim());
+      if (!data || data.length < 1000) break;
+      f += 1000;
+    }
+    try {
+      let g = 0;
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const { data, error } = await supabase.from('outreach_suppressions').select('email').range(g, g + 999);
+        if (error) break; // secondary list; tolerate absence
+        for (const r of (data as { email: string }[]) || []) if (r.email) suppressed.add(r.email.toLowerCase().trim());
+        if (!data || data.length < 1000) break;
+        g += 1000;
+      }
+    } catch { /* secondary list; ignore */ }
+  }
+
   // 2. Subscribers from inquiries [SUBSCRIBE], plus which have already been sent
   //    this edition (marker rows written after a successful send).
   const subs: NewsletterSubscriber[] = [];
@@ -318,6 +351,10 @@ export async function computeNewsletterQueue(supabase: SupabaseClient): Promise<
     if (seen.has(s.email)) continue;
     seen.add(s.email);
 
+    if (suppressed.has(s.email)) {
+      excluded.push({ email: s.email, city: s.city, reason: 'unsubscribed / suppressed' });
+      continue;
+    }
     if (INTERNAL_RE.test(s.email) || INTERNAL_EXACT.has(s.email)) {
       excluded.push({ email: s.email, city: s.city, reason: 'internal address' });
       continue;
