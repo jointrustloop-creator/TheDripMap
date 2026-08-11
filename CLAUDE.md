@@ -33,10 +33,10 @@ Email: info@thedripmap.com
   5. insight-naturopathic-clinic-toronto (2026-06-03, via claim flow)
   6. bay-wellness-centre-vancouver (2026-06-01, via claim flow) [FEATURED]
   7. diamond-aesthetics-brampton (2026-06-01, via claim flow) [FEATURED]
-  8. refresh-med-spa-la-los-angeles (2026-05-26, Kia, grandfathered) [FEATURED]
+  8. refresh-med-spa-la-los-angeles (2026-05-26, Kia, grandfathered) [FEATURED] [US: Los Angeles, California]
   9. signature-beauty-lounge-downtown-toronto (2026-04-27, Eva, grandfathered) [FEATURED]
   10. signature-beauty-lounge-richmond-hill (2026-04-27, Eva, grandfathered) [FEATURED]
-  11. blue-cypress-iv-and-wellness-georgetown (2026-04-19, Mechelle, grandfathered) [FEATURED]
+  11. blue-cypress-iv-and-wellness-georgetown (2026-04-19, Mechelle, grandfathered) [FEATURED] [US: Georgetown, KENTUCKY — not Georgetown ON; email bluecypressky.com]
 - Claim distribution: 8 of 11 (73%) are Canadian. 5 free, 6 featured.
 - 3 pending claim_requests as of 2026-06-11: BeYouty Medical Spa (Corinna Chin,
   created 2026-06-01, token regenerated 2026-06-11 in WS1), Tri-Health Wellness
@@ -79,14 +79,15 @@ Email: info@thedripmap.com
   enqueue onboarding_requests rows; nothing auto-sends until the gate
   flips (separate PR, operator go). Operator sends via /admin/onboarding
   "Send now". Day-7 nudge cron /api/cron/onboarding-nudge (gated, in
-  vercel.json). safety_verified AUTO-GRANTS (2026-06-19 rule, corrected
-  2026-07-09) the moment a claimed owner completes the safety section of
-  the /finish questionnaire (who administers IVs + medical oversight,
-  isSafetyComplete() in src/lib/safety.ts) - no operator review happens
-  at that point. The operator's click on /admin/onboarding is a SEPARATE,
-  secondary path (manual grant/backfill), not the primary one. A monthly
-  spot check (3 random Safety Verified clinics + their submitted answers)
-  ships in the weekly report so the badge still gets human eyes.
+  vercel.json). BADGE IS HUMAN-REVIEWED since 2026-07-25 (this line corrected
+  2026-08-11; it previously and wrongly said the badge AUTO-GRANTS on
+  completion). Completing the safety section of /finish sets
+  safety_review_status='pending' and queues the clinic in /admin/badge-reviews.
+  The badge (safety_verified=true) only turns on when an operator APPROVES it
+  there; approval is blocked unless the questionnaire is complete
+  (isSafetyComplete() in src/lib/safety.ts). isSafetyVerified() (the single
+  render gate) requires safety_verified=true AND safety_review_status='approved'.
+  See the badge standard SSOT: docs/badge-standard.md.
 - PENDING OPERATOR PASTE: scripts/create-onboarding-engine-tables.sql
   (onboarding_requests), scripts/create-seo-health-runs-findings.sql
   (WS6, unlocks nightly SEO mechanic).
