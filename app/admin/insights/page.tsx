@@ -45,6 +45,7 @@ interface InsightRow extends EventCountsByType {
   slug: string;
   is_claimed: boolean;
   total_clicks: number;
+  leads: number; // real submitted message-clinic leads (from inquiries)
 }
 
 type WindowKey = 'month' | '30d' | 'all';
@@ -79,6 +80,34 @@ async function fetchRollup(sb: SupabaseClient, monthEq?: string): Promise<{ map:
   return { map, error: false };
 }
 
+// Real submitted message-clinic LEADS per provider, from the inquiries table.
+// A lead is an inquiry whose body carries the "Lead for ... clinicId=" marker
+// the message-clinic route writes (covers plain leads and [BOOKING ...] ones).
+// This is the true "a patient actually contacted this clinic" count, and is
+// deliberately separate from the message_click intent event (which fires the
+// moment the Message button is tapped, before anything is submitted).
+async function fetchLeadCounts(sb: SupabaseClient, sinceIso?: string): Promise<Map<string, number>> {
+  const map = new Map<string, number>();
+  let from = 0;
+  for (let i = 0; i < 50; i++) {
+    let q = sb
+      .from('inquiries')
+      .select('listing_id, created_at, message')
+      .ilike('message', '%Lead for %')
+      .not('listing_id', 'is', null)
+      .range(from, from + 999);
+    if (sinceIso) q = q.gte('created_at', sinceIso);
+    const { data, error } = await q;
+    if (error || !data) break;
+    for (const r of data as Array<{ listing_id: string | null }>) {
+      if (r.listing_id) map.set(r.listing_id, (map.get(r.listing_id) || 0) + 1);
+    }
+    if (data.length < 1000) break;
+    from += 1000;
+  }
+  return map;
+}
+
 export default async function AdminInsightsPage({ searchParams }: { searchParams: Promise<{ window?: string; seg?: string }> }) {
   if (!(await isAdminRequest())) {
     redirect('/admin/login?next=/admin/insights');
@@ -105,6 +134,15 @@ export default async function AdminInsightsPage({ searchParams }: { searchParams
     counts = map;
     rolloutPending = error;
   }
+
+  // Real submitted leads for the same window (separate signal from message_click).
+  const leadSinceIso = window === '30d'
+    ? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+    : window === 'month' ? monthStart + 'T00:00:00Z' : undefined;
+  const leadsByProvider = await fetchLeadCounts(supabase, leadSinceIso);
+  // A clinic can have a submitted lead without a tracked event in this window;
+  // make sure it still surfaces (zero-filled) so a real lead is never dropped.
+  for (const id of leadsByProvider.keys()) if (!counts.has(id)) counts.set(id, zero());
 
   // Determine which providers to render.
   const activeIds = Array.from(counts.keys());
@@ -143,6 +181,7 @@ export default async function AdminInsightsPage({ searchParams }: { searchParams
       slug: info?.slug || '',
       is_claimed: claimed,
       total_clicks,
+      leads: leadsByProvider.get(provider_id) || 0,
       ...c,
     });
   }
@@ -154,6 +193,7 @@ export default async function AdminInsightsPage({ searchParams }: { searchParams
     return acc;
   }, zero());
   const totalClicks = totals.book_click + totals.call_click + totals.website_click + totals.directions_click + totals.message_click;
+  const totalLeads = rows.reduce((acc, r) => acc + r.leads, 0);
 
   const windowLabel = window === 'month'
     ? new Date(monthStart + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })
@@ -217,23 +257,26 @@ export default async function AdminInsightsPage({ searchParams }: { searchParams
           </div>
         )}
 
-        {/* Totals strip */}
-        <div className="grid grid-cols-2 md:grid-cols-7 gap-3 mb-8">
+        {/* Totals strip. "Leads" (real submitted messages) is highlighted and
+            kept distinct from "Msg clicks" (button taps, intent only). */}
+        <div className="grid grid-cols-2 md:grid-cols-8 gap-3 mb-3">
           {([
-            ['Views', totals.view],
-            ['All clicks', totalClicks],
-            ['Book', totals.book_click],
-            ['Call', totals.call_click],
-            ['Website', totals.website_click],
-            ['Directions', totals.directions_click],
-            ['Message', totals.message_click],
-          ] as [string, number][]).map(([label, n]) => (
-            <div key={label} className="bg-white border border-slate-200 rounded-2xl p-4">
-              <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</div>
-              <div className="text-2xl font-black text-slate-900 mt-1">{n}</div>
+            ['Leads', totalLeads, true],
+            ['Views', totals.view, false],
+            ['All clicks', totalClicks, false],
+            ['Book', totals.book_click, false],
+            ['Call', totals.call_click, false],
+            ['Website', totals.website_click, false],
+            ['Directions', totals.directions_click, false],
+            ['Msg clicks', totals.message_click, false],
+          ] as [string, number, boolean][]).map(([label, n, highlight]) => (
+            <div key={label} className={'rounded-2xl p-4 border ' + (highlight ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-slate-200')}>
+              <div className={'text-[10px] font-black uppercase tracking-widest ' + (highlight ? 'text-emerald-700' : 'text-slate-400')}>{label}</div>
+              <div className={'text-2xl font-black mt-1 ' + (highlight ? 'text-emerald-700' : 'text-slate-900')}>{n}</div>
             </div>
           ))}
         </div>
+        <p className="text-xs text-slate-400 mb-8"><b className="text-slate-500">Leads</b> = patients who actually submitted the Message Clinic form (saved in full, shown in <Link href="/admin/leads" className="text-wellness-700 font-bold hover:underline">/admin/leads</Link>). <b className="text-slate-500">Msg clicks</b> = taps on the Message button (intent only, no message sent). They will differ whenever someone opens the form and does not send.</p>
 
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
@@ -243,19 +286,20 @@ export default async function AdminInsightsPage({ searchParams }: { searchParams
                   <th className="text-left px-4 py-3 font-black text-slate-700">Clinic</th>
                   <th className="text-left px-4 py-3 font-black text-slate-700">City</th>
                   <th className="text-center px-3 py-3 font-black text-slate-700">Status</th>
+                  <th className="text-right px-3 py-3 font-black text-emerald-700">Leads</th>
                   <th className="text-right px-3 py-3 font-black text-slate-700">Views</th>
                   <th className="text-right px-3 py-3 font-black text-slate-700">Clicks</th>
                   <th className="text-right px-3 py-3 font-black text-slate-700">Book</th>
                   <th className="text-right px-3 py-3 font-black text-slate-700">Call</th>
                   <th className="text-right px-3 py-3 font-black text-slate-700">Website</th>
                   <th className="text-right px-3 py-3 font-black text-slate-700">Direction</th>
-                  <th className="text-right px-3 py-3 font-black text-slate-700">Message</th>
+                  <th className="text-right px-3 py-3 font-black text-slate-700">Msg clicks</th>
                 </tr>
               </thead>
               <tbody>
                 {rows.length === 0 && (
                   <tr>
-                    <td colSpan={10} className="px-4 py-12 text-center text-sm text-slate-400 font-medium">
+                    <td colSpan={11} className="px-4 py-12 text-center text-sm text-slate-400 font-medium">
                       No listing activity captured yet for this window/segment.
                     </td>
                   </tr>
@@ -279,6 +323,7 @@ export default async function AdminInsightsPage({ searchParams }: { searchParams
                         <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-100 text-slate-500">unclaimed</span>
                       )}
                     </td>
+                    <td className={'px-3 py-3 text-right tabular-nums font-black ' + (r.leads > 0 ? 'text-emerald-700' : 'text-slate-300')}>{r.leads}</td>
                     <td className="px-3 py-3 text-right tabular-nums font-bold text-slate-900">{r.view}</td>
                     <td className="px-3 py-3 text-right tabular-nums font-bold text-slate-900">{r.total_clicks}</td>
                     <td className="px-3 py-3 text-right tabular-nums text-slate-700">{r.book_click}</td>
