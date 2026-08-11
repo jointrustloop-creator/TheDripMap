@@ -13,16 +13,26 @@ document changes first, then the three consumers are updated to match.
 
 ## 1. What the badge asserts (and does not)
 
-**Safety Verified asserts:** this clinic told us, in writing, **who administers its
-IVs** and **who the qualified prescriber is that authorizes and oversees its
-protocols**, an operator reviewed those answers, and they meet the standard below.
+**Safety Verified asserts, and only this:** we asked the clinic **who administers
+its IVs** and **who the prescriber is that oversees its protocols**; the clinic
+named that prescriber and their credential; and we **confirmed that prescriber's
+registration number on the relevant public college register** (CPSO, CNO, or
+CONO). That is the entire claim: two questions answered, one registration checked.
 
-**It does NOT assert:**
-- That every substance on the clinic's menu is within that prescriber's legal
-  scope (see §5 — open item for ND-prescribed clinics).
-- Liability insurance or regulator standing (not asked in the questionnaire; only
-  ever set from an operator-recorded attestation).
+**It does NOT assert** (we did not do any of these):
+- That the clinic is **safe**. The badge is a credential check, not a safety
+  judgment. We did not inspect the premises, observe care, or audit records.
+- That we verified anything **beyond the prescriber's registration** — not the
+  clinic's own licensing, not its equipment, not its practices.
+- That every substance on the menu is within that prescriber's legal scope
+  (see §5 — open item for ND-prescribed clinics).
+- Liability insurance or regulator standing (not asked; only ever set from an
+  operator-recorded attestation).
 - Anything about price, quality of outcomes, or endorsement.
+
+> Name-vs-claim note: the label "Safety Verified" is broader than the narrow claim
+> above. If that gap concerns us, the fix is a tooltip/definition on the badge that
+> states exactly this, not a broadening of what we check. Operator decision.
 
 Safety Verified and **Claimed** are independent. Claimed = ownership verified.
 Safety Verified = the safety standard below is met. Neither implies the other.
@@ -65,7 +75,19 @@ For the prescriber/overseer named in §3:
 5. The answers on file (questionnaire submission, or an owner email confirmation
    recorded as evidence in `decision_drivers.safety_evidence`).
 
-An operator reviews this in `/admin/badge-reviews` before the badge turns on.
+An operator reviews this in `/admin/badge-reviews` before the badge turns on, and
+**as part of approval must look up the registration number on the public college
+register** and confirm it matches the named prescriber. That lookup is what makes
+the §1 "confirmed on the public register" assertion true — without it, do not
+approve.
+
+**Grandfathering (2026-08-11 ruling).** The registration number is required for
+**new** verifications, up front. The clinics already verified to this standard
+(9 on the roster as of 2026-08-11) are **not** broken or revoked for lacking a
+registration number on file: it is collected at their **next** review. A rule
+change never retroactively punishes a clinic that did nothing wrong. Concretely:
+`isSafetyVerified()` trusts an existing `safety_review_status='approved'`; the
+stricter completeness rule below gates only new completions and new approvals.
 
 ## 5. Scope caveat for ND-prescribed clinics (OPEN ITEM)
 
