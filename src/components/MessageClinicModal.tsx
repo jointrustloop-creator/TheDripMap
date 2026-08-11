@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Send, Loader2, CheckCircle2, MessageSquare } from 'lucide-react';
 import { Provider } from '../types';
+import { trackEvent } from '../lib/analytics-client';
 
 interface MessageClinicModalProps {
   provider: Provider;
@@ -61,6 +62,9 @@ export const MessageClinicModal = ({ provider, isOpen, onClose }: MessageClinicM
       if (!res.ok || !result.success) {
         throw new Error(result.error || 'Could not send. Please try again.');
       }
+      // Real conversion event, fired ONLY on a successful submit (distinct from
+      // message_click, which fires when the modal opens).
+      if (provider?.id) trackEvent(provider.id, 'message_submitted');
       // forwardStatus === 'sent' means the lead went straight to the clinic.
       setForwarded(result.forwardStatus === 'sent');
       setIsSuccess(true);

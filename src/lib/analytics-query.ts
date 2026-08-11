@@ -24,6 +24,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 export const EVENT_TYPES = [
   'view',
   'book_click',
+  'booking_click',
   'call_click',
   'website_click',
   'directions_click',
@@ -63,6 +64,7 @@ function zeroCounts(): EventCountsByType {
   return {
     view: 0,
     book_click: 0,
+    booking_click: 0,
     call_click: 0,
     website_click: 0,
     directions_click: 0,

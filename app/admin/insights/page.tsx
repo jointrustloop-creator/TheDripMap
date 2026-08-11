@@ -52,7 +52,7 @@ type WindowKey = 'month' | '30d' | 'all';
 type SegKey = 'all' | 'claimed' | 'unclaimed';
 
 function zero(): EventCountsByType {
-  return { view: 0, book_click: 0, call_click: 0, website_click: 0, directions_click: 0, message_click: 0 };
+  return { view: 0, book_click: 0, booking_click: 0, call_click: 0, website_click: 0, directions_click: 0, message_click: 0 };
 }
 
 // Paginate the pre-aggregated monthly rollup. monthEq filters to one calendar
@@ -172,7 +172,9 @@ export default async function AdminInsightsPage({ searchParams }: { searchParams
     const claimed = !!info?.is_claimed;
     if (seg === 'claimed' && !claimed) continue;
     if (seg === 'unclaimed' && claimed) continue;
-    const total_clicks = c.book_click + c.call_click + c.website_click + c.directions_click + c.message_click;
+    // Actions set (= monetization "actions"): booking_click (in-app booking form
+    // opens) counts alongside book_click (outbound booking-link clicks).
+    const total_clicks = c.book_click + c.booking_click + c.call_click + c.website_click + c.directions_click + c.message_click;
     rows.push({
       provider_id,
       name: info?.name || '(unknown)',
@@ -192,7 +194,7 @@ export default async function AdminInsightsPage({ searchParams }: { searchParams
     for (const t of EVENT_TYPES) acc[t] += r[t];
     return acc;
   }, zero());
-  const totalClicks = totals.book_click + totals.call_click + totals.website_click + totals.directions_click + totals.message_click;
+  const totalClicks = totals.book_click + totals.booking_click + totals.call_click + totals.website_click + totals.directions_click + totals.message_click;
   const totalLeads = rows.reduce((acc, r) => acc + r.leads, 0);
 
   const windowLabel = window === 'month'
@@ -259,12 +261,13 @@ export default async function AdminInsightsPage({ searchParams }: { searchParams
 
         {/* Totals strip. "Leads" (real submitted messages) is highlighted and
             kept distinct from "Msg clicks" (button taps, intent only). */}
-        <div className="grid grid-cols-2 md:grid-cols-8 gap-3 mb-3">
+        <div className="grid grid-cols-2 md:grid-cols-9 gap-3 mb-3">
           {([
             ['Leads', totalLeads, true],
             ['Views', totals.view, false],
             ['All clicks', totalClicks, false],
             ['Book', totals.book_click, false],
+            ['Book form', totals.booking_click, false],
             ['Call', totals.call_click, false],
             ['Website', totals.website_click, false],
             ['Directions', totals.directions_click, false],
@@ -290,6 +293,7 @@ export default async function AdminInsightsPage({ searchParams }: { searchParams
                   <th className="text-right px-3 py-3 font-black text-slate-700">Views</th>
                   <th className="text-right px-3 py-3 font-black text-slate-700">Clicks</th>
                   <th className="text-right px-3 py-3 font-black text-slate-700">Book</th>
+                  <th className="text-right px-3 py-3 font-black text-slate-700">Book form</th>
                   <th className="text-right px-3 py-3 font-black text-slate-700">Call</th>
                   <th className="text-right px-3 py-3 font-black text-slate-700">Website</th>
                   <th className="text-right px-3 py-3 font-black text-slate-700">Direction</th>
@@ -299,7 +303,7 @@ export default async function AdminInsightsPage({ searchParams }: { searchParams
               <tbody>
                 {rows.length === 0 && (
                   <tr>
-                    <td colSpan={11} className="px-4 py-12 text-center text-sm text-slate-400 font-medium">
+                    <td colSpan={12} className="px-4 py-12 text-center text-sm text-slate-400 font-medium">
                       No listing activity captured yet for this window/segment.
                     </td>
                   </tr>
@@ -327,6 +331,7 @@ export default async function AdminInsightsPage({ searchParams }: { searchParams
                     <td className="px-3 py-3 text-right tabular-nums font-bold text-slate-900">{r.view}</td>
                     <td className="px-3 py-3 text-right tabular-nums font-bold text-slate-900">{r.total_clicks}</td>
                     <td className="px-3 py-3 text-right tabular-nums text-slate-700">{r.book_click}</td>
+                    <td className="px-3 py-3 text-right tabular-nums text-slate-700">{r.booking_click}</td>
                     <td className="px-3 py-3 text-right tabular-nums text-slate-700">{r.call_click}</td>
                     <td className="px-3 py-3 text-right tabular-nums text-slate-700">{r.website_click}</td>
                     <td className="px-3 py-3 text-right tabular-nums text-slate-700">{r.directions_click}</td>

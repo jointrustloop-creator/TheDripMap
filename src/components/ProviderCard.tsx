@@ -19,6 +19,8 @@ import TrackedLink from './TrackedLink';
 interface ProviderCardProps {
   provider: Provider;
   className?: string;
+  /** utm_campaign for outbound clinic links from this card (default 'card'). */
+  utmCampaign?: string;
 }
 
 // Per-clinic accent palette. Each entry is a COMPLETE literal class string so
@@ -80,7 +82,7 @@ const getInitials = (name: string) => {
   return (first + second).toUpperCase().slice(0, 2) || 'IV';
 };
 
-export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
+export const ProviderCard = ({ provider, className, utmCampaign }: ProviderCardProps) => {
   const { openClaimModal } = useClaimListing();
   const slug = provider.slug || slugify(provider.name);
 
@@ -322,6 +324,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
                 providerId={provider.id}
                 eventType="book_click"
                 href={bookingUrl}
+                utmCampaign={utmCampaign || 'card'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="h-11 w-11 inline-flex items-center justify-center rounded-2xl border border-slate-200 text-slate-500 hover:text-wellness-700 hover:border-wellness-300 transition-colors"

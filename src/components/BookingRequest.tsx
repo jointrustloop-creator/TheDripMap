@@ -122,6 +122,9 @@ export const BookingRequestModal = ({ provider, treatments, isOpen, onClose }: B
       });
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || 'Something went wrong.');
+      // Real conversion event, fired ONLY on a successful submit (distinct from
+      // booking_click, which fires when the form opens).
+      if (provider?.id) trackEvent(provider.id, 'booking_submitted');
       setForwarded(json.forwardStatus === 'sent');
       setIsSuccess(true);
     } catch (err) {

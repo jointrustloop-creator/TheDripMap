@@ -90,7 +90,11 @@ export default async function AdminLeadsPage() {
   }>) {
     const msg = r.message || '';
     let source: LeadRow['source'] = 'contact';
-    if (msg.startsWith('[Lead for ')) source = 'message-clinic';
+    // Booking requests ride the message-clinic pipeline but their body starts
+    // with "[BOOKING · Lead for …" (not "[Lead for …"), so without this branch
+    // they fell through to the default 'contact' bucket. File them with the rest
+    // of the message-clinic leads.
+    if (msg.startsWith('[Lead for ') || msg.startsWith('[BOOKING')) source = 'message-clinic';
     else if (msg.startsWith('[SUBSCRIBE]')) source = 'subscribe';
     else if (msg.startsWith('[UPGRADE REQUEST]')) source = 'upgrade';
     else if (msg.startsWith('[SEO AUDIT]')) source = 'seo-audit';

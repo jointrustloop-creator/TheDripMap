@@ -1727,18 +1727,21 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                     </div>
                   </div>
 
-                  {/* PRIMARY ACTIONS — Book is the conversion CTA */}
+                  {/* PRIMARY ACTIONS — this is an unclaimed listing, so the
+                      primary button opens the clinic's general website. It must
+                      NOT say "Book" (it does not book) and must NOT fire
+                      book_click (it is a website visit, not a booking intent). */}
                   <div className="space-y-3">
                     {provider.website && (
                       <TrackedLink
                         providerId={provider.id}
-                        eventType="book_click"
+                        eventType="website_click"
                         href={provider.website}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-full bg-wellness-600 text-white px-6 py-4 rounded-2xl font-black text-base hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-200/50 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
                       >
-                        Book Appointment <ExternalLink size={18} />
+                        Visit Website <ExternalLink size={18} />
                       </TrackedLink>
                     )}
                     {provider.phone && (

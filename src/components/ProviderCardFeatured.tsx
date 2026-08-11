@@ -37,6 +37,8 @@ interface ProviderCardFeaturedProps {
   // Treatment the quiz recommended, shown as an "Offers …" chip ONLY when this
   // clinic actually matched it (offersRecommended). Never claimed otherwise.
   recommendedTreatment?: string;
+  /** utm_campaign for outbound clinic links (default 'quiz' — this is the quiz card). */
+  utmCampaign?: string;
 }
 
 const isStock = (url?: string | null): boolean =>
@@ -91,6 +93,7 @@ export const ProviderCardFeatured = ({
   operatorProfile,
   isPrimary = false,
   recommendedTreatment,
+  utmCampaign = 'quiz',
 }: ProviderCardFeaturedProps) => {
   const slug = provider.slug || slugify(provider.name);
   const photo = firstRealPhoto(provider);
@@ -313,6 +316,7 @@ export const ProviderCardFeatured = ({
                 providerId={provider.id}
                 eventType="book_click"
                 href={bookingUrl}
+                utmCampaign={utmCampaign}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 px-4 py-3 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2"
@@ -339,6 +343,7 @@ export const ProviderCardFeatured = ({
                 providerId={provider.id}
                 eventType="website_click"
                 href={provider.website}
+                utmCampaign={utmCampaign}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 px-4 py-3 rounded-2xl font-black text-sm transition-all flex items-center justify-center"

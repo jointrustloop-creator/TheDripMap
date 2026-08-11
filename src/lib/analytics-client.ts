@@ -25,6 +25,9 @@ const ALLOWED: ReadonlySet<string> = new Set([
   'directions_click',
   'message_click',
   'booking_click',
+  // Real conversions — fired only on a successful form submit.
+  'booking_submitted',
+  'message_submitted',
 ]);
 
 // Strip path + query off document.referrer so we never log PII.

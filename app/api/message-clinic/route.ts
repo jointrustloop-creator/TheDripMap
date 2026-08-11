@@ -253,9 +253,12 @@ If you no longer want auto-forwarded leads, reply with the word UNSUBSCRIBE in t
       }
     }
 
-    // Operator notification (unchanged from prior behaviour, plus a
-    // single new line summarizing the shadow-mode decision).
-    await sendMail({
+    // Operator notification. info@ is the delivery safety net for EVERY lead
+    // (and the ONLY delivery for unclaimed / non-forwarded ones), so a silent
+    // failure here would strand a submission the way a discarded verification
+    // send stranded the IV Alchemy claim. Capture the result and log failures
+    // loudly instead of fire-and-forget.
+    const opNotify = await sendMail({
       from: 'TheDripMap <info@thedripmap.com>',
       to: 'info@thedripmap.com',
       replyTo: data.email,
@@ -284,10 +287,26 @@ ${
 `,
     });
 
+    if (!opNotify.ok) {
+      // The lead is still saved in `inquiries` (insert already succeeded above),
+      // so nothing is lost — but the human-facing copy at info@ did not arrive.
+      // Log loudly so it can be caught and relayed, especially for unclaimed /
+      // non-forwarded leads where info@ is the only delivery path.
+      console.error('message-clinic: info@ operator notification FAILED to send', {
+        provider: opNotify.provider,
+        error: opNotify.error,
+        clinicId: data.clinicId,
+        clinicName: data.clinicName,
+        inquiryId: insertedInquiryId,
+        forwardStatus: decision.status,
+      });
+    }
+
     return NextResponse.json({
       success: true,
       inquiryId: insertedInquiryId,
       forwardStatus: decision.status,
+      operatorNotified: opNotify.ok,
     });
   } catch (error) {
     console.error('Message clinic error:', error);
