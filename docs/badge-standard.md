@@ -24,8 +24,10 @@ CONO). That is the entire claim: two questions answered, one registration checke
   judgment. We did not inspect the premises, observe care, or audit records.
 - That we verified anything **beyond the prescriber's registration** — not the
   clinic's own licensing, not its equipment, not its practices.
-- That every substance on the menu is within that prescriber's legal scope
-  (see §5 — open item for ND-prescribed clinics).
+- That every substance on the menu is within that prescriber's legal scope by our
+  independent check. For ND-prescribed clinics we take the prescriber's own
+  attestation that the menu is within their prescribing authority, plus a premises
+  check — we do not adjudicate substance-by-substance (see §5).
 - Liability insurance or regulator standing (not asked; only ever set from an
   operator-recorded attestation).
 - Anything about price, quality of outcomes, or endorsement.
@@ -72,7 +74,15 @@ For the prescriber/overseer named in §3:
    so the claim can be checked against a public college register.
 4. **For an ND: explicit confirmation of CONO IVIT authorization** (not merely
    "ND"; not every Ontario ND may prescribe IV).
-5. The answers on file (questionnaire submission, or an owner email confirmation
+5. **For an ND-prescriber clinic: premises verification.** The clinic must appear
+   as an **Authorised IVIT Premise** on CONO's public IVIT Premises Register, and
+   the operator confirms this at approval (see the register-lookup note below).
+6. **Menu-scope attestation (all clinics, prescriber-signed).** The prescriber
+   attests that **every IV on the clinic's menu is within their own prescribing
+   authority.** This puts substance-level scope on the accountable licensed person
+   rather than on us enumerating a list. For an ND that authority is defined and
+   limited by Table 2 of the General Regulation (see §5).
+7. The answers on file (questionnaire submission, or an owner email confirmation
    recorded as evidence in `decision_drivers.safety_evidence`).
 
 An operator reviews this in `/admin/badge-reviews` before the badge turns on, and
@@ -80,6 +90,18 @@ An operator reviews this in `/admin/badge-reviews` before the badge turns on, an
 register** and confirm it matches the named prescriber. That lookup is what makes
 the §1 "confirmed on the public register" assertion true — without it, do not
 approve.
+
+**Register lookups (operator, at approval):**
+- **Prescriber registration** — CPSO (physicians): `doctors.cpso.on.ca`; CNO
+  (NPs): `cno.org` "Find a Nurse"; CONO (NDs): the College of Naturopaths public
+  ND register on the Alinity portal (`cono.alinityapp.com/client/publicdirectory`).
+- **ND-prescriber clinics only — IVIT premises** — confirm the clinic is listed as
+  an **Authorised IVIT Premise** on CONO's public IVIT Premises Register
+  (`cono.alinityapp.com/client/findcorporationdirectory`, searchable by clinic name
+  + city; also linked from the CONO site as "IVIT Premises Search"). This register
+  is **manual web lookup only — there is no public API**, so it is an operator step
+  at approval, not an automated gate. Record the outcome in
+  `decision_drivers.safety_evidence`.
 
 **Grandfathering (2026-08-11 ruling).** The registration number is required for
 **new** verifications, up front. The clinics already verified to this standard
@@ -89,28 +111,41 @@ change never retroactively punishes a clinic that did nothing wrong. Concretely:
 `isSafetyVerified()` trusts an existing `safety_review_status='approved'`; the
 stricter completeness rule below gates only new completions and new approvals.
 
-## 5. Scope caveat for ND-prescribed clinics (OPEN ITEM)
+## 5. Scope for ND-prescribed clinics (2026-08-11 ruling)
 
-Our content states a CONO IVIT ND is authorized "**only for a defined list of
-substances** on inspected premises." Our content references that this list exists
-and is limited but **does not enumerate it**. Consequence: an ND-prescriber clinic
-could satisfy the badge while offering a substance outside CONO IVIT scope.
+An Ontario ND's IV authority is **defined and limited by Table 2 of the General
+Regulation (O. Reg. 168/15)**, surfaced on CONO's Practice Tables page
+(`collegeofnaturopaths.on.ca/members/standards-guidelines/nd-practice-tables/`). If a
+substance is not in Table 2, an ND may not administer it by injection. Table 2 was
+amended in May 2023 and can change again.
 
-Two follow-ups (operator decision):
-- **Content gap:** add what CONO's IVIT list does and does not cover (directionally,
-  with a "confirm with CONO" caveat).
-- **Badge gap:** decide whether an ND-prescriber clinic must additionally attest
-  that its offered menu is within IVIT scope, or whether the badge's assertion in
-  §1 (a lawful prescriber oversees the protocols) is scoped narrowly enough. Until
-  resolved, the badge does not claim substance-level scope compliance.
+**We do not republish an enumerated substance list.** Republishing the list would
+mean owning its currency, and a stale list is worse than none. Our public content
+**links to CONO's Practice Tables page** and explains that ND IV authority is
+defined and limited by that table, carrying (a) the date we last checked the link
+and (b) a line telling readers to confirm current scope with CONO. It does **not**
+enumerate substances.
+
+**Substance-scope is handled by attestation, not by us adjudicating the menu**
+(§4.6): the prescriber attests every IV on the menu is within their own prescribing
+authority. For an ND that authority is Table 2. This puts scope on the accountable
+licensed person and unblocks the badge now, without us maintaining a list.
+
+**Premises** (§4.5): an ND-prescriber clinic must additionally appear as an
+Authorised IVIT Premise on CONO's public IVIT Premises Register, confirmed by the
+operator at approval (manual lookup; no API).
+
+With these three in place — link-out content, prescriber-signed menu-scope
+attestation, and premises verification — the badge no longer leaves substance scope
+as an open gap for ND-prescriber clinics.
 
 ## 6. How the standard is enforced in code (must reference this doc)
 
 | Layer | File / mechanism | Rule |
 |---|---|---|
-| Questionnaire | `/finish` safety section → `decision_drivers.manage` | Two questions: who administers (§2) and who prescribes + registration # (§3/§4). |
+| Questionnaire | `/finish` safety section → `decision_drivers.manage` | Who administers (§2); who prescribes + registration # (§3/§4); prescriber's menu-scope attestation (§4.6). |
 | Completeness | `isSafetyComplete()` in `src/lib/safety.ts` | Requires who-administers AND a §3-qualified prescriber named. |
-| Approval | `/api/admin/badge-review-action` (`approve`) | Refuses approval unless the questionnaire is complete; operator makes the call. |
+| Approval | `/api/admin/badge-review-action` (`approve`) | Refuses approval unless the questionnaire is complete; operator looks up the registration (§4) and, for ND-prescriber clinics, the IVIT premises (§4.5) before approving. |
 | Render gate | `isSafetyVerified()` in `src/lib/safety.ts` | Requires `safety_verified=true` AND `safety_review_status='approved'`. **Every** surface (cards, listing layouts, city pages, explore, schema) must use this — never the raw flag. |
 | Public content | `who-can-legally-give-iv-*` posts | Must state §2/§3 exactly; kept in sync with this doc. |
 
