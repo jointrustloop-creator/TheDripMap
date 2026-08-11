@@ -21,6 +21,8 @@ import {
 } from '../../../src/lib/symptom-treatments';
 import { practitionerType } from '../../../src/lib/practitioner';
 import { isSafetyVerified } from '../../../src/lib/safety';
+// Shared ranking primitives — ONE implementation across quiz + city/search.
+import { profileCompleteness } from '../../../src/lib/ranking';
 
 // Great-circle distance in miles for the organic distance tiebreak.
 function haversineMi(aLat: number, aLng: number, bLat: number, bLng: number): number {
@@ -31,26 +33,6 @@ function haversineMi(aLat: number, aLng: number, bLat: number, bLng: number): nu
     Math.sin(dLat / 2) ** 2 +
     Math.cos((aLat * Math.PI) / 180) * Math.cos((bLat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(s));
-}
-
-// TEMPORARY profile-completeness proxy (0-100), equal-weighted per the
-// monetization brief. There is no providers.completeness_score column yet (it
-// ships in the tier migration), so this derives a score from raw fields.
-// It is used ONLY for the organic sort tiebreak — NOT as the featured-band gate
-// (the 70% gate is deliberately deferred; see the TODO in rankedClinics).
-// REPLACE with providers.completeness_score once that column exists.
-function profileCompleteness(p: Provider): number {
-  const online = (p as { online_booking_url?: string | null }).online_booking_url;
-  const checks = [
-    Array.isArray(p.photos) && p.photos.length >= 3,
-    !!p.price_range,
-    !!p.working_hours && Object.keys(p.working_hours).length > 0,
-    !!online,
-    !!p.phone,
-    typeof p.description === 'string' && p.description.length >= 200,
-    p.safety_verified === true,
-  ];
-  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
 }
 
 export default function ResultsPage() {

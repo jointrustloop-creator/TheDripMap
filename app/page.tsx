@@ -79,14 +79,16 @@ export default async function HomePage() {
   const metroCities = (
     US_MARKET_ENABLED ? popularCities : popularCities.filter((c) => c.country === 'Canada')
   ).slice(0, US_MARKET_ENABLED ? 12 : 8);
-  // Featured row integrity (2026-07): the homepage "Who we trust" shelf must only
-  // show clinics that LEGITIMATELY hold the Safety Verified badge AND are claimed.
-  // We gate on the real safety_verified flag + is_claimed and render fewer than 4
-  // cards if the eligible pool is smaller (never pad with unverified clinics).
-  // Bay Wellness is display-excluded here per operator instruction (its badge is
-  // pending reconciliation); the safety_verified flag itself is NOT modified — that
-  // is the operator's gate. Canada-first: Canadian clinics only while US is off.
-  const FEATURED_ROW_EXCLUDE = new Set(['bay-wellness-centre-vancouver']);
+  // Featured row integrity: the homepage "Who we trust" shelf must only show
+  // clinics that LEGITIMATELY hold the Safety Verified badge AND are claimed. We
+  // gate on isSafetyVerified() (strict: approved review + complete questionnaire)
+  // + is_claimed, and render fewer than 4 cards if the eligible pool is smaller
+  // (never pad with unverified clinics). Canada-first while US is off.
+  // 2026-08 reconciliation: the Bay Wellness display-exclusion was LIFTED — its
+  // badge is legitimate (safety_verified + approved review + complete
+  // questionnaire, confirmed against live data), so it no longer needs a manual
+  // carve-out. The strict helper now gates everyone uniformly.
+  const FEATURED_ROW_EXCLUDE = new Set<string>([]);
   const featuredClinics = ((await getFeaturedListings(24, undefined, US_MARKET_ENABLED ? undefined : 'Canada')) || [])
     .filter((c) => isSafetyVerified(c as { safety_verified?: boolean; safety_review_status?: string | null })
       && c.is_claimed === true

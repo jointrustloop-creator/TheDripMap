@@ -42,9 +42,23 @@ export interface SafetyAnswers {
  * render site (homepage featured row, provider pages, cards) MUST use this.
  */
 export function isSafetyVerified(
-  p: { safety_verified?: boolean | null; safety_review_status?: string | null } | null | undefined
+  p: {
+    safety_verified?: boolean | null;
+    safety_review_status?: string | null;
+    decision_drivers?: { manage?: unknown } | null;
+  } | null | undefined
 ): boolean {
-  return p?.safety_verified === true && p?.safety_review_status === 'approved';
+  if (p?.safety_verified !== true || p?.safety_review_status !== 'approved') return false;
+  // Belt-and-suspenders: when the raw questionnaire answers are present (server
+  // objects that still carry decision_drivers.manage), require them to be
+  // complete too. On public/enriched objects `manage` is stripped for privacy;
+  // there we rely on the approval-time gate in /api/admin/badge-review-action,
+  // which makes 'approved' impossible without a complete questionnaire. So a
+  // flag pair alone is never sufficient anywhere: either the answers are here
+  // and checked, or they were checked at approval.
+  const manage = p?.decision_drivers?.manage;
+  if (manage !== undefined && manage !== null && !isSafetyComplete(manage)) return false;
+  return true;
 }
 
 export function isSafetyComplete(manage: unknown): boolean {

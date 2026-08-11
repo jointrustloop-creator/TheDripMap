@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { ShieldCheck, ShieldAlert, Check, Stethoscope } from 'lucide-react';
 import { Provider, OperatorProfile } from '../types';
 import { cn } from '../lib/utils';
+import { isSafetyVerified } from '../lib/safety';
 
 /*
  * Trust & Credentials block — the #1 trust signal patients want
@@ -68,12 +69,12 @@ export function ProviderCredentialBlock({
   const statement = pd.founderStatement?.trim();
 
   const checks = CHECKLIST.map((c) => ({ ...c, done: pd[c.key] === true }));
-  // The badge itself must read the canonical providers.safety_verified
-  // column, not the legacy 5-flag checklist below (which predates the
-  // 2026-06-19 questionnaire flow and is often unpopulated for clinics that
-  // earned the badge the current way). The checklist stays as supplementary
-  // detail; it no longer gates the header label.
-  const allVerified = (provider as { safety_verified?: boolean }).safety_verified === true;
+  // The header badge reads the SINGLE source of truth isSafetyVerified() (2026-08
+  // integrity fix): safety_verified alone is never enough — it must be an
+  // approved review (and, where present, a complete questionnaire). Reading the
+  // raw flag here previously showed the badge for clinics with no completed
+  // review. The 5-flag checklist below stays as supplementary detail only.
+  const allVerified = isSafetyVerified(provider as { safety_verified?: boolean; safety_review_status?: string | null });
 
   // ── UNCLAIMED / UNVERIFIED state ──────────────────────────────────
   if (!isClaimed) {

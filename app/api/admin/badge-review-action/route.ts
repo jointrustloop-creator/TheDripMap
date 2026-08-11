@@ -25,6 +25,7 @@ import { isAdminRequest } from '../../../../src/lib/admin-auth';
 import { sendMail } from '../../../../src/lib/mailer';
 import { manageUrlForProvider } from '../../../../src/lib/manage-token';
 import { buildCompletionRequestEmail, missingSafetyParts } from '../../../../src/lib/badge-review';
+import { isSafetyComplete } from '../../../../src/lib/safety';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -62,6 +63,18 @@ export async function POST(req: NextRequest) {
     // claimed clinic. Single-row scoped update.
     if (provider.is_claimed !== true) {
       return NextResponse.json({ error: 'provider is not claimed; refusing to approve' }, { status: 400 });
+    }
+    // INTEGRITY GATE (2026-08): approval is IMPOSSIBLE without a complete safety
+    // questionnaire. This makes safety_review_status='approved' a reliable proxy
+    // for "questionnaire complete", which every public surface relies on (the
+    // raw answers are stripped from client-facing objects, so the badge helper
+    // cannot re-check them there — the guarantee has to be enforced here).
+    const manage = (provider as { decision_drivers?: { manage?: unknown } }).decision_drivers?.manage;
+    if (!isSafetyComplete(manage)) {
+      return NextResponse.json(
+        { error: 'safety questionnaire is incomplete (need who administers IVs + medical oversight); cannot approve the Safety Verified badge' },
+        { status: 400 },
+      );
     }
     const { error: updErr, count } = await sb
       .from('providers')
