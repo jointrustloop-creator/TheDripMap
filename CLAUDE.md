@@ -33,10 +33,10 @@ Email: info@thedripmap.com
   5. insight-naturopathic-clinic-toronto (2026-06-03, via claim flow)
   6. bay-wellness-centre-vancouver (2026-06-01, via claim flow) [FEATURED]
   7. diamond-aesthetics-brampton (2026-06-01, via claim flow) [FEATURED]
-  8. refresh-med-spa-la-los-angeles (2026-05-26, Kia, grandfathered) [FEATURED]
+  8. refresh-med-spa-la-los-angeles (2026-05-26, Kia, grandfathered) [FEATURED] [US: Los Angeles, California]
   9. signature-beauty-lounge-downtown-toronto (2026-04-27, Eva, grandfathered) [FEATURED]
   10. signature-beauty-lounge-richmond-hill (2026-04-27, Eva, grandfathered) [FEATURED]
-  11. blue-cypress-iv-and-wellness-georgetown (2026-04-19, Mechelle, grandfathered) [FEATURED]
+  11. blue-cypress-iv-and-wellness-georgetown (2026-04-19, Mechelle, grandfathered) [FEATURED] [US: Georgetown, KENTUCKY — not Georgetown ON; email bluecypressky.com]
 - Claim distribution: 8 of 11 (73%) are Canadian. 5 free, 6 featured.
 - 3 pending claim_requests as of 2026-06-11: BeYouty Medical Spa (Corinna Chin,
   created 2026-06-01, token regenerated 2026-06-11 in WS1), Tri-Health Wellness
