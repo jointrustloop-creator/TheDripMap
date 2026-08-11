@@ -139,6 +139,24 @@ With these three in place — link-out content, prescriber-signed menu-scope
 attestation, and premises verification — the badge no longer leaves substance scope
 as an open gap for ND-prescriber clinics.
 
+**A flag is RELATIVE to the named prescriber, never absolute.** A substance that
+falls outside CONO Table 2 is only a scope question when the clinic's **named
+prescriber is an ND**. Under an MD or NP prescriber the same substance may be fully
+within authority — Table 2 governs naturopaths only. So the future menu-scope check
+(once we capture ingredient data, see the drip data model) must key off the
+prescriber's credential on that clinic, and must never present a Table 2 miss as an
+absolute compliance failure.
+
+**OPEN ITEM — menu-scope review flag: what happens next (undefined).** We have
+decided *when* a flag is raised (an ND-prescriber clinic lists a substance outside
+its prescriber's authority) but **not** the downstream process. Before we wire any
+flag, define: (1) **who reviews** it (operator? the same badge-review queue?);
+(2) **what we ask the clinic** — a neutral, non-accusatory question that puts it on
+the prescriber, consistent with §4.6's attestation, never a public accusation;
+(3) **what it means for the badge** — does an unresolved flag block/suspend Safety
+Verified, or is it review-only? Until this is defined, no flag is surfaced anywhere,
+public or internal-actionable.
+
 ## 6. How the standard is enforced in code (must reference this doc)
 
 | Layer | File / mechanism | Rule |
