@@ -53,17 +53,18 @@ export async function handleUnsubscribe(rawEmail: string | null | undefined): Pr
     return unsubscribePage('You are unsubscribed', `${email} is already removed from our mailing list. You will not receive further newsletters.`);
   }
 
+  // email_suppressions columns: email, reason (NOT NULL, CHECK in
+  // {'hard_bounce','unsubscribe'}), source, notes, suppressed_at. Use the
+  // allowed 'unsubscribe' reason and the real suppressed_at column (there is no
+  // created_at). The `source` marks where the opt-out came from.
   const { error } = await supabase.from('email_suppressions').insert({
     email,
-    reason: 'newsletter-unsubscribe',
-    created_at: new Date().toISOString(),
+    reason: 'unsubscribe',
+    source: 'newsletter',
+    suppressed_at: new Date().toISOString(),
   });
   if (error) {
-    // Retry without optional columns in case the schema is leaner than expected.
-    const retry = await supabase.from('email_suppressions').insert({ email });
-    if (retry.error) {
-      return unsubscribePage('Something went wrong', 'We could not process that automatically. Please reply to any email from us and we will remove you by hand.');
-    }
+    return unsubscribePage('Something went wrong', 'We could not process that automatically. Please reply to any email from us and we will remove you by hand.');
   }
 
   return unsubscribePage('You are unsubscribed', `Done. ${email} will no longer receive the TheDripMap newsletter. If this was a mistake, just subscribe again from any page on the site.`);

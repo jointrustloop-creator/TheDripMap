@@ -270,6 +270,35 @@ export async function computeNewsletterQueue(supabase: SupabaseClient): Promise<
     }
   }
 
+  // 1b. Suppression list. This is what the unsubscribe link writes to, so it is
+  //     what makes unsubscribe actually stick across editions: anyone here is
+  //     dropped. Fail-closed on the primary table (email_suppressions) so a load
+  //     error never risks mailing someone who opted out; outreach_suppressions
+  //     is read too for parity but tolerated if absent.
+  const suppressed = new Set<string>();
+  {
+    let f = 0;
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const { data, error } = await supabase.from('email_suppressions').select('email').range(f, f + 999);
+      if (error) throw new Error(`Refusing to build newsletter queue: could not load email_suppressions: ${error.message}`);
+      for (const r of (data as { email: string }[]) || []) if (r.email) suppressed.add(r.email.toLowerCase().trim());
+      if (!data || data.length < 1000) break;
+      f += 1000;
+    }
+    try {
+      let g = 0;
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const { data, error } = await supabase.from('outreach_suppressions').select('email').range(g, g + 999);
+        if (error) break; // secondary list; tolerate absence
+        for (const r of (data as { email: string }[]) || []) if (r.email) suppressed.add(r.email.toLowerCase().trim());
+        if (!data || data.length < 1000) break;
+        g += 1000;
+      }
+    } catch { /* secondary list; ignore */ }
+  }
+
   // 2. Subscribers from inquiries [SUBSCRIBE], plus which have already been sent
   //    this edition (marker rows written after a successful send).
   const subs: NewsletterSubscriber[] = [];
@@ -322,6 +351,10 @@ export async function computeNewsletterQueue(supabase: SupabaseClient): Promise<
     if (seen.has(s.email)) continue;
     seen.add(s.email);
 
+    if (suppressed.has(s.email)) {
+      excluded.push({ email: s.email, city: s.city, reason: 'unsubscribed / suppressed' });
+      continue;
+    }
     if (INTERNAL_RE.test(s.email) || INTERNAL_EXACT.has(s.email)) {
       excluded.push({ email: s.email, city: s.city, reason: 'internal address' });
       continue;
