@@ -25,6 +25,7 @@ import { isAdminRequest } from '../../../../src/lib/admin-auth';
 import { sendMail } from '../../../../src/lib/mailer';
 import { manageUrlForProvider } from '../../../../src/lib/manage-token';
 import { buildCompletionRequestEmail, missingSafetyParts } from '../../../../src/lib/badge-review';
+import { isSafetyComplete } from '../../../../src/lib/safety';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -63,6 +64,23 @@ export async function POST(req: NextRequest) {
     if (provider.is_claimed !== true) {
       return NextResponse.json({ error: 'provider is not claimed; refusing to approve' }, { status: 400 });
     }
+    // INTEGRITY GATE (2026-08): approval is IMPOSSIBLE without a complete safety
+    // questionnaire. This makes safety_review_status='approved' a reliable proxy
+    // for "questionnaire complete", which every public surface relies on (the
+    // raw answers are stripped from client-facing objects, so the badge helper
+    // cannot re-check them there — the guarantee has to be enforced here).
+    const existingDD = (provider as { decision_drivers?: Record<string, unknown> }).decision_drivers || {};
+    const manage = (existingDD as { manage?: unknown }).manage;
+    if (!isSafetyComplete(manage)) {
+      return NextResponse.json(
+        { error: 'safety questionnaire is incomplete: need who administers IVs AND a qualified prescriber (MD/NP, or IVIT-authorized ND) named with a college registration number. An RN alone does not qualify. Cannot approve the badge.' },
+        { status: 400 },
+      );
+    }
+    // Approvals EXPIRE (2026-08 ruling): stamp a review-by date one year out so
+    // the badge is re-checked rather than trusted forever. isSafetyVerified()
+    // lapses the badge once this passes, returning the clinic to review.
+    const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
     const { error: updErr, count } = await sb
       .from('providers')
       .update(
@@ -72,6 +90,7 @@ export async function POST(req: NextRequest) {
           safety_reviewed_at: nowIso,
           safety_reviewed_by: reviewedBy,
           safety_review_reason: null,
+          decision_drivers: { ...existingDD, safety_review_expires_at: expires },
         },
         { count: 'exact' },
       )

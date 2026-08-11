@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ShieldCheck, Star, Clock, Navigation, Bookmark, Share2, ArrowRight } from 'lucide-react';
 import { Provider } from '../../types';
 import { cn } from '../../lib/utils';
+import { isSafetyVerified } from '../../lib/safety';
 import {
   isVerifiedClinic,
   isOpenNow,
@@ -27,7 +28,9 @@ interface ExploreCardProps {
 
 export function ExploreCard({ provider: p, active, onHover, onSelect }: ExploreCardProps) {
   const verified = isVerifiedClinic(p);
-  const sv = (p as { safety_verified?: boolean }).safety_verified === true;
+  // Strict: never render the Safety Verified badge from the raw flag (must be
+  // approved + questionnaire complete). Matches every other card surface.
+  const sv = isSafetyVerified(p);
   // Live open/closed: compute in the browser after mount (and refresh each
   // minute) so it reflects the real current time, not when the page was cached.
   const [open, setOpen] = useState<boolean | null>(null);

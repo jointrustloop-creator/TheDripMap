@@ -17,6 +17,7 @@ import { ListingController } from '@/src/components/ListingController';
 import { ProviderCard } from '@/src/components/ProviderCard';
 import { getCityBySlug, getListingsByCity, getAllCities, getListingsByState, getFeaturedListings, getBlogPostBySlug, slugify, getTorontoGtaTieredListings } from '@/src/lib/data';
 import { marketOf } from '@/src/lib/market';
+import { isSafetyVerified } from '@/src/lib/safety';
 import { RelatedGuides } from '@/src/components/RelatedGuides';
 import { SupabaseUnreachableError } from '@/src/lib/supabase-health';
 import { TemporarilyUnavailable } from '@/src/components/TemporarilyUnavailable';
@@ -508,7 +509,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   // Claimed and Safety Verified are two INDEPENDENT badges (see src/lib/safety.ts)
   // and must never be merged into one sentence: a clinic can be claimed without
   // the badge, and the badge is granted only by operator review.
-  const snapSafety = snapPool.filter((c) => c.safety_verified === true).length;
+  const snapSafety = snapPool.filter((c) => isSafetyVerified(c as { safety_verified?: boolean; safety_review_status?: string | null })).length;
   if (snapClaimed > 0) snapParts.push(`${snapClaimed} ${snapClaimed === 1 ? 'is' : 'are'} claimed by the clinic.`);
   if (snapSafety > 0) snapParts.push(`${snapSafety} ${snapSafety === 1 ? 'holds' : 'hold'} a Safety Verified badge.`);
   const citySnapshot = snapParts.join(' ').replace(/[‒-―−]/g, '-');

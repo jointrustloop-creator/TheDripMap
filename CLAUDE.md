@@ -32,6 +32,9 @@ Email: info@thedripmap.com
   4. natures-touch-naturopathic-clinic-brampton (2026-06-09, via claim flow)
   5. insight-naturopathic-clinic-toronto (2026-06-03, via claim flow)
   6. bay-wellness-centre-vancouver (2026-06-01, via claim flow) [FEATURED]
+     (badge reconciled 2026-08-11: legitimate — safety_verified + approved review
+     + complete questionnaire, confirmed vs live data; the homepage featured-row
+     display-exclusion in app/page.tsx was LIFTED.)
   7. diamond-aesthetics-brampton (2026-06-01, via claim flow) [FEATURED]
   8. refresh-med-spa-la-los-angeles (2026-05-26, Kia, grandfathered) [FEATURED] [US: Los Angeles, California]
   9. signature-beauty-lounge-downtown-toronto (2026-04-27, Eva, grandfathered) [FEATURED]

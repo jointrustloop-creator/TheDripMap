@@ -2,6 +2,7 @@ import { Provider, BlogPost, OperatorProfile, ListingStats } from '../types';
 import { supabase, isSupabaseConfigured, fetchAllRows } from './supabase';
 import { SupabaseUnreachableError, isSupabaseConnectionError } from './supabase-health';
 import { MOCK_BLOG_POSTS, MOCK_LISTINGS, MOCK_CITIES } from './mock-data';
+import { rankCityListings } from './ranking';
 import { htmlToMarkdown, containsHtml } from './blog-utils';
 import { US_MARKET_ENABLED, marketOf } from './market';
 
@@ -298,7 +299,7 @@ export async function getListingsByCity(city: string, state?: string) {
         .limit(100);
       
       if (!zipError && zipData && zipData.length > 0) {
-        return zipData.filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
+        return rankCityListings(zipData.filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider), searchCity);
       }
     }
 
@@ -366,7 +367,7 @@ export async function getListingsByCity(city: string, state?: string) {
       const { getListingsByState } = await import('./data'); // Self-referential fix if needed, but we are in data.ts
       const stateListings = await getListingsByState(searchState);
       if (stateListings.length > 0) {
-        return stateListings.filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
+        return rankCityListings(stateListings.filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider), searchCity);
       }
     }
 
@@ -391,7 +392,9 @@ export async function getListingsByCity(city: string, state?: string) {
       }).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
 
     const merged = deduplicateListings([...dbResults, ...mockResults]);
-    return merged;
+    // Featured band capped + gated on strict Safety Verification, then organic
+    // (see src/lib/ranking.ts). Non-verified featured no longer top city pages.
+    return rankCityListings(merged, searchCity);
   } catch (err) {
     console.error('Error fetching listings by city:', err);
     return [];

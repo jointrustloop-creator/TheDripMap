@@ -6,7 +6,10 @@ import { Logo } from '../../../src/components/Logo';
 
 interface PrefillDrip { name?: string; price?: string | null }
 interface Prefill {
-  team?: { whoPlaces?: string[]; oversight?: string; leadName?: string };
+  team?: {
+    whoPlaces?: string[]; oversight?: string; leadName?: string;
+    prescriberName?: string; prescriberCredential?: string; prescriberRegNum?: string; prescriberNdIvit?: boolean;
+  };
   sourcing?: string[];
   drips?: PrefillDrip[];
   boosters?: string[];
@@ -31,7 +34,10 @@ interface Props {
 // Who can legally start the line. ND kept (most of our claimed roster is
 // Canada, where NDs run IV clinics); MD/DO + PA cover the US.
 const WHO_PLACES = ['RN', 'NP', 'ND', 'MD / DO', 'PA', 'Paramedic'];
-const OVERSIGHT = ['Medical director', 'On-site physician', 'NP-led', 'ND-led'];
+// 2026-08 two-part model (docs/badge-standard.md): the prescriber/overseer must
+// be one of these. An RN administers but is NOT a prescriber, so RN is not here.
+const PRESCRIBER_CREDS = ['Physician (MD/DO)', 'Nurse Practitioner (NP)', 'CONO-authorized ND (IVIT)'];
+const isNdCred = (c: string) => /\bnd\b|naturopath/i.test(c);
 // "Licensed compounding pharmacy" covers a US 503A or a provincial pharmacy;
 // "503B outsourcing facility" is the US sterile-batch signal. Either reads as
 // in-the-know to the owner.
@@ -121,8 +127,12 @@ function SectionCard({ step, title, hint, children, id }: { step: number; title:
 export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo, photoCount, prefill }: Props) {
   const pf = (prefill || {}) as Prefill;
   const [whoPlaces, setWhoPlaces] = useState<string[]>(pf.team?.whoPlaces || []);
-  const [oversight, setOversight] = useState<string>(pf.team?.oversight || '');
-  const [leadName, setLeadName] = useState<string>(pf.team?.leadName || '');
+  const [oversight] = useState<string>(pf.team?.oversight || '');
+  // 2026-08 two-part prescriber fields.
+  const [prescriberName, setPrescriberName] = useState<string>(pf.team?.prescriberName || pf.team?.leadName || '');
+  const [prescriberCredential, setPrescriberCredential] = useState<string>(pf.team?.prescriberCredential || '');
+  const [prescriberRegNum, setPrescriberRegNum] = useState<string>(pf.team?.prescriberRegNum || '');
+  const [prescriberNdIvit, setPrescriberNdIvit] = useState<boolean>(pf.team?.prescriberNdIvit === true);
   const [sourcing, setSourcing] = useState<string[]>(pf.sourcing || []);
   const [selectedDrips, setSelectedDrips] = useState<string[]>((pf.drips || []).map((d) => d.name || '').filter(Boolean));
   const [prices, setPrices] = useState<Record<string, string>>(() => {
@@ -169,7 +179,7 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
   // Live completion across the 5 substantive sections (boosters + offer are
   // bonus, not counted), to nudge owners to finish.
   const sectionsDone =
-    (whoPlaces.length || oversight || sourcing.length || leadName.trim() ? 1 : 0) +
+    (whoPlaces.length || sourcing.length || prescriberName.trim() ? 1 : 0) +
     (selectedDrips.length ? 1 : 0) +
     (delivery.length || consult || length || booking ? 1 : 0) +
     (payment.length ? 1 : 0) +
@@ -180,7 +190,12 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
   // starts the IV AND medical oversight (mirrors isSafetyComplete on the API).
   // Tracked separately from the generic % so a 100%-complete profile that
   // skipped these can never silently miss the badge.
-  const badgeEarned = whoPlaces.length > 0 && oversight.trim() !== '';
+  const badgeEarned =
+    whoPlaces.length > 0 &&
+    prescriberName.trim() !== '' &&
+    prescriberRegNum.trim() !== '' &&
+    prescriberCredential !== '' &&
+    (!isNdCred(prescriberCredential) || prescriberNdIvit);
 
   const dealSuggestions = suggestedDeals(slowWindows);
 
@@ -190,7 +205,15 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
     try {
       const answers = {
         token,
-        team: { whoPlaces, oversight, leadName: leadName.trim() },
+        team: {
+          whoPlaces,
+          oversight, // legacy field kept for back-compat display
+          leadName: prescriberName.trim(),
+          prescriberName: prescriberName.trim(),
+          prescriberCredential,
+          prescriberRegNum: prescriberRegNum.trim(),
+          prescriberNdIvit,
+        },
         sourcing,
         drips: selectedDrips.map((n) => ({ name: n, price: prices[n] ? prices[n].trim() : null })),
         boosters,
@@ -324,23 +347,41 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
             <div className="flex flex-wrap gap-2 mb-5">
               {WHO_PLACES.map((o) => <Chip key={o} active={whoPlaces.includes(o)} onClick={() => toggle(whoPlaces, setWhoPlaces, o)}>{o}</Chip>)}
             </div>
-            <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Medical oversight</div>
-            <div className="flex flex-wrap gap-2 mb-5">
-              {OVERSIGHT.map((o) => <Chip key={o} active={oversight === o} onClick={() => setOversight(oversight === o ? '' : o)}>{o}</Chip>)}
+            <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Who prescribes and oversees your protocols?</div>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {PRESCRIBER_CREDS.map((o) => <Chip key={o} active={prescriberCredential === o} onClick={() => setPrescriberCredential(prescriberCredential === o ? '' : o)}>{o}</Chip>)}
             </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
+              <input
+                value={prescriberName}
+                onChange={(e) => setPrescriberName(e.target.value)}
+                placeholder="Prescriber name, e.g. Dr. Megan Maycher"
+                maxLength={80}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#0F6E56] focus:ring-2 focus:ring-[#0F6E56]/20 outline-none text-sm"
+              />
+              <input
+                value={prescriberRegNum}
+                onChange={(e) => setPrescriberRegNum(e.target.value)}
+                placeholder="College registration # (CPSO / CNO / CONO)"
+                maxLength={40}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#0F6E56] focus:ring-2 focus:ring-[#0F6E56]/20 outline-none text-sm"
+              />
+            </div>
+            {isNdCred(prescriberCredential) && (
+              <label className="flex items-start gap-2 mb-3 text-[13px] text-slate-700 cursor-pointer">
+                <input type="checkbox" checked={prescriberNdIvit} onChange={(e) => setPrescriberNdIvit(e.target.checked)} className="mt-0.5" />
+                <span>I confirm this ND holds the College of Naturopaths of Ontario (CONO) <b>IVIT authorization</b> to prescribe/administer IV therapy.</span>
+              </label>
+            )}
+            <p className="text-[11.5px] text-slate-400 mb-5">
+              An RN is a great answer for who <i>starts</i> the IV, but the substances need a prescriber. We ask for the
+              registration number so we can confirm it against the public college register. An RN alone does not qualify for the badge.
+            </p>
             <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Where do your IVs come from?</div>
             <div className="flex flex-wrap gap-2 mb-1.5">
               {SOURCING.map((o) => <Chip key={o} active={sourcing.includes(o)} onClick={() => toggle(sourcing, setSourcing, o)}>{o}</Chip>)}
             </div>
-            <p className="text-[11.5px] text-slate-400 mb-5">A 503A pharmacy, a 503B outsourcing facility, or mixed on site, however your bags are made.</p>
-            <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Lead practitioner (optional)</div>
-            <input
-              value={leadName}
-              onChange={(e) => setLeadName(e.target.value)}
-              placeholder="e.g. Dr. Megan Maycher, ND"
-              maxLength={80}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#0F6E56] focus:ring-2 focus:ring-[#0F6E56]/20 outline-none text-sm"
-            />
+            <p className="text-[11.5px] text-slate-400 mb-1.5">A 503A pharmacy, a 503B outsourcing facility, or mixed on site, however your bags are made.</p>
           </SectionCard>
 
           {/* 2 - THE REAL MENU, pre-loaded with true formulas. */}
