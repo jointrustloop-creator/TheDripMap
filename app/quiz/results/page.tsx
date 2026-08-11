@@ -20,6 +20,38 @@ import {
   SAFETY_FLAGS,
 } from '../../../src/lib/symptom-treatments';
 import { practitionerType } from '../../../src/lib/practitioner';
+import { isSafetyVerified } from '../../../src/lib/safety';
+
+// Great-circle distance in miles for the organic distance tiebreak.
+function haversineMi(aLat: number, aLng: number, bLat: number, bLng: number): number {
+  const R = 3958.8;
+  const dLat = ((bLat - aLat) * Math.PI) / 180;
+  const dLng = ((bLng - aLng) * Math.PI) / 180;
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((aLat * Math.PI) / 180) * Math.cos((bLat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+
+// TEMPORARY profile-completeness proxy (0-100), equal-weighted per the
+// monetization brief. There is no providers.completeness_score column yet (it
+// ships in the tier migration), so this derives a score from raw fields.
+// It is used ONLY for the organic sort tiebreak — NOT as the featured-band gate
+// (the 70% gate is deliberately deferred; see the TODO in rankedClinics).
+// REPLACE with providers.completeness_score once that column exists.
+function profileCompleteness(p: Provider): number {
+  const online = (p as { online_booking_url?: string | null }).online_booking_url;
+  const checks = [
+    Array.isArray(p.photos) && p.photos.length >= 3,
+    !!p.price_range,
+    !!p.working_hours && Object.keys(p.working_hours).length > 0,
+    !!online,
+    !!p.phone,
+    typeof p.description === 'string' && p.description.length >= 200,
+    p.safety_verified === true,
+  ];
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+}
 
 export default function ResultsPage() {
   return (
@@ -130,6 +162,10 @@ function ResultsContent() {
   const router = useRouter();
   const [operatorProfiles, setOperatorProfiles] = React.useState<OperatorProfile[]>([]);
   const [listings, setListings] = React.useState<Provider[]>([]);
+  // Cross-region verified clinics for the honest empty state ONLY. Kept OUT of
+  // the ranked set: these do not serve the selected city and are never presented
+  // as treatment matches (see the empty-state block).
+  const [nearbyFallback, setNearbyFallback] = React.useState<Provider[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [showMore, setShowMore] = React.useState(false);
 
@@ -142,9 +178,14 @@ function ResultsContent() {
         // Country hint keeps the featured fallback in the visitor's own country.
         const country = searchParams.get('country') || deriveCountry(state);
 
-        const [profilesRes, locationListingsRes] = await Promise.allSettled([
+        // Load the city set AND the same-country featured set separately. The
+        // city set feeds the hard-filtered ranked results; the featured set is
+        // held aside for the honest empty state only (never merged into ranked,
+        // so a cross-region clinic can never appear as a treatment "match").
+        const [profilesRes, locationListingsRes, fallbackRes] = await Promise.allSettled([
           getOperatorProfiles(),
           city ? getListingsByCity(city, state || undefined) : getFeaturedListings(12, undefined, country || undefined),
+          getFeaturedListings(12, undefined, country || undefined),
         ]);
 
         let initialListings: Provider[] = [];
@@ -152,21 +193,13 @@ function ResultsContent() {
           initialListings = locationListingsRes.value as Provider[];
         }
 
-        // If a city search returned nothing, fall back to featured (claimed)
-        // clinics IN THE SAME COUNTRY so the visitor always sees verified
-        // results — never cross-border (no US clinics for a Canadian, etc.).
-        if (city && initialListings.length === 0) {
-          try {
-            initialListings = (await getFeaturedListings(12, undefined, country || undefined)) as Provider[];
-          } catch {
-            /* empty */
-          }
-        }
-
         if (profilesRes.status === 'fulfilled') {
           setOperatorProfiles(profilesRes.value as OperatorProfile[]);
         }
         setListings(initialListings);
+        if (fallbackRes.status === 'fulfilled') {
+          setNearbyFallback(fallbackRes.value as Provider[]);
+        }
       } catch (err) {
         console.error('Error loading results data:', err);
       } finally {
@@ -223,77 +256,142 @@ function ResultsContent() {
     return SAFETY_FLAGS.find((f) => f.id === id)?.label || null;
   }, [surveyData.medicalHistory]);
 
-  // Top 3 clinics that offer the recommended treatment.
-  // Strategy: filter by specialty keyword for the treatment, then sort
-  // claimed (is_featured) first, then by rating descending. Take top 3.
-  // If no clinics match the specialty keyword, fall back to claimed-first
-  // rating-sorted across the whole result set.
+  // Ranked quiz matches. Rebuilt 2026-08 to fix the core-promise bug where a
+  // featured clinic could top a result for a treatment it does not offer.
+  //
+  //  1. HARD FILTER (a clinic failing any of these never appears, featured or
+  //     not): active, serves the selected city/region, AND offers the selected
+  //     treatment. Only city and treatment are hard; modality (Mobile/In-Clinic)
+  //     is a SOFT preference that sorts within the qualified set.
+  //  2. FEATURED BAND, max 2, at the top — but ONLY featured clinics that are
+  //     Safety Verified (strict). Paying does not exempt a clinic from the
+  //     safety bar. NOTE: the brief also gates the featured band on profile
+  //     completeness >= 70%; that gate is deliberately DEFERRED until the real
+  //     providers.completeness_score column ships (there are no paying clinics
+  //     today, and demoting on an approximate proxy would be worse than not
+  //     gating). See the TODO below.
+  //  3. ORGANIC: safety verified -> completeness (proxy) -> rating -> distance,
+  //     with the modality preference as a soft nudge.
+  //
+  // Contraindication override (trust before revenue): when the visitor flags a
+  // safety contraindication, MD/NP/DO-led clinics rank above EVERYTHING,
+  // including the featured band — the featured band is suspended in that case.
   const rankedClinics = useMemo<(Provider & { offersRecommended?: boolean })[]>(() => {
     if (!recommendation || listings.length === 0) return [];
     const keywords = treatmentMatchKeywords(recommendation.name);
 
-    // Honor the visitor's delivery choice — the quiz asks Mobile vs In-Clinic.
-    // If a filter would empty the set, ignore it rather than dead-end the visitor.
     const isMobile = (p: Provider) =>
       p.type === 'Mobile' || p.type === 'Both' ||
       (p as { mobile_service?: boolean }).mobile_service === true ||
       /\bmobile\b|concierge|in[\s-]home|come to you/i.test(`${p.name || ''} ${p.description || ''}`);
-    const pref = surveyData.locationPreference;
-    let pool = listings;
-    if (pref === 'Mobile') { const m = listings.filter(isMobile); if (m.length) pool = m; }
-    else if (pref === 'In-Clinic') { const c = listings.filter((p) => p.type !== 'Mobile'); if (c.length) pool = c; }
-
     const hasTreatmentMatch = (p: Provider) => {
       const haystacks = [...(p.specialties || []), ...(p.subtypes || []), p.name || '', p.description || '']
         .map((s) => (s || '').toLowerCase());
       return keywords.some((kw) => haystacks.some((h) => h.includes(kw)));
     };
 
-    // Annotate each clinic with whether it actually offers the recommended
-    // treatment — the card shows an honest "Offers …" chip only when true, and
-    // the header only claims the treatment when at least one clinic confirms it.
-    const annotated = pool.map((p) => ({ ...p, offersRecommended: hasTreatmentMatch(p) }));
+    // HARD FILTER: serves the selected region (city, or state as region), active,
+    // offers the treatment. If no city was provided, the region test is a no-op.
+    const reqCity = (surveyData.city || '').toLowerCase().trim();
+    const reqState = (surveyData.state || '').toLowerCase().trim();
+    const servesRegion = (p: Provider) =>
+      !reqCity ||
+      (p.city || '').toLowerCase().trim() === reqCity ||
+      (!!reqState && (p.state || '').toLowerCase().trim() === reqState);
 
-    // Safety-aware ranking: when the visitor flagged a contraindication, MD / NP
-    // / DO-led clinics rise to the TOP (sort, never hard-filter, so thin markets
-    // still return results). Then confirmed-treatment, then claimed, then rating.
-    const sortFn = (a: typeof annotated[number], b: typeof annotated[number]) => {
+    const qualified = listings
+      .filter((p) => (p as { is_hidden?: boolean }).is_hidden !== true)
+      .filter(servesRegion)
+      .filter(hasTreatmentMatch)
+      .map((p) => ({ ...p, offersRecommended: true })); // every qualified clinic offers it
+
+    // Dedupe by operator BEFORE banding (one card per operator).
+    const seenOperators = new Set<string>();
+    const deduped = qualified.filter((p) => {
+      const key = operatorKey(p);
+      if (seenOperators.has(key)) return false;
+      seenOperators.add(key);
+      return true;
+    });
+
+    // Soft modality preference: matching the visitor's Mobile/In-Clinic choice
+    // sorts higher, but never excludes.
+    const pref = surveyData.locationPreference;
+    const modalityRank = (p: Provider) => {
+      if (pref === 'Mobile') return isMobile(p) ? 0 : 1;
+      if (pref === 'In-Clinic') return p.type !== 'Mobile' ? 0 : 1;
+      return 0;
+    };
+    const distMi = (p: Provider) =>
+      surveyData.lat != null && surveyData.lng != null && p.latitude != null && p.longitude != null
+        ? haversineMi(surveyData.lat, surveyData.lng, p.latitude, p.longitude)
+        : Number.POSITIVE_INFINITY;
+
+    // Organic order: (contraindication -> MD/NP/DO first), then Safety Verified
+    // (strict), then completeness (proxy), then rating, then modality pref, then
+    // distance.
+    const organicSort = (a: Provider, b: Provider) => {
       if (safetyTriggered) {
-        const diff = practitionerType(b).rank - practitionerType(a).rank;
-        if (diff !== 0) return diff;
+        const d = practitionerType(b).rank - practitionerType(a).rank;
+        if (d !== 0) return d;
       }
-      // Featured (paid) clinics take the top slots — the sellable "Featured =
-      // top-3 match placement." Safety oversight still ranks above this for
-      // patients who flagged a contraindication (trust before revenue).
-      if (!!b.is_featured !== !!a.is_featured) return b.is_featured ? 1 : -1;
-      if (!!b.offersRecommended !== !!a.offersRecommended) return b.offersRecommended ? 1 : -1;
-      // Safety Verified outranks merely-claimed: the badge is the platform's
-      // stated methodology ("verified status first, then rating") and the
-      // owner's payoff for completing verification.
-      const aV = !!(a as { safety_verified?: boolean }).safety_verified;
-      const bV = !!(b as { safety_verified?: boolean }).safety_verified;
-      if (bV !== aV) return bV ? 1 : -1;
-      if (!!b.is_claimed !== !!a.is_claimed) return b.is_claimed ? 1 : -1;
-      return (b.rating || 0) - (a.rating || 0);
+      const aV = isSafetyVerified(a), bV = isSafetyVerified(b);
+      if (aV !== bV) return bV ? 1 : -1;
+      const ac = profileCompleteness(a), bc = profileCompleteness(b);
+      if (ac !== bc) return bc - ac;
+      if ((b.rating || 0) !== (a.rating || 0)) return (b.rating || 0) - (a.rating || 0);
+      const am = modalityRank(a), bm = modalityRank(b);
+      if (am !== bm) return am - bm;
+      return distMi(a) - distMi(b);
     };
 
-    // One card per operator (no data operator key exists; see operatorKey()).
-    const sorted = annotated.sort(sortFn);
-    const seenOperators = new Set<string>();
-    const deduped: typeof annotated = [];
-    for (const p of sorted) {
-      const key = operatorKey(p);
-      if (seenOperators.has(key)) continue;
-      seenOperators.add(key);
-      deduped.push(p);
+    // Contraindication flagged: trust before revenue — suspend the featured band
+    // entirely and let MD/NP/DO-led clinics lead the whole qualified set.
+    if (safetyTriggered) {
+      return deduped.slice().sort(organicSort);
     }
-    return deduped;
-  }, [recommendation, listings, surveyData.locationPreference, safetyTriggered]);
+
+    // FEATURED BAND (max 2): featured AND Safety Verified (strict). A featured
+    // clinic failing the safety bar drops to the organic band.
+    // TODO(completeness-gate): when providers.completeness_score ships, also
+    // require profileCompleteness(p) >= 70 here. Deferred intentionally.
+    const featuredEligible = (p: Provider) => p.is_featured === true && isSafetyVerified(p);
+    const featured = deduped.filter(featuredEligible).sort(organicSort).slice(0, 2);
+    const featuredIds = new Set(featured.map((p) => p.id));
+    const organic = deduped.filter((p) => !featuredIds.has(p.id)).sort(organicSort);
+    return [...featured, ...organic];
+  }, [recommendation, listings, surveyData.city, surveyData.state, surveyData.lat, surveyData.lng, surveyData.locationPreference, safetyTriggered]);
 
   // Top 3 are the hero "matches"; the rest expand on demand ("view more").
   // This makes the top-3 slots scarce + sellable as Featured placement.
   const matchedClinics = useMemo(() => rankedClinics.slice(0, 3), [rankedClinics]);
   const moreClinics = useMemo(() => rankedClinics.slice(3), [rankedClinics]);
+
+  // COVERAGE-GAP LOG (deliverable): every time a real city+treatment search
+  // returns zero qualified clinics, log it so we can see which markets patients
+  // are searching for and where we have no coverage. Fire once per unique
+  // city+treatment per mount. Best-effort; never blocks or errors the page.
+  const loggedGapRef = React.useRef<string>('');
+  React.useEffect(() => {
+    if (isLoading || !recommendation) return;
+    if (rankedClinics.length > 0) return; // only log true empties
+    if (!surveyData.city) return; // no city = nothing actionable to log
+    const key = `${surveyData.city}|${recommendation.name}`.toLowerCase();
+    if (loggedGapRef.current === key) return;
+    loggedGapRef.current = key;
+    try {
+      fetch('/api/log-search-gap', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          city: surveyData.city,
+          state: surveyData.state || null,
+          treatment: recommendation.name,
+        }),
+        keepalive: true,
+      }).catch(() => {});
+    } catch { /* never block the page on logging */ }
+  }, [isLoading, recommendation, rankedClinics.length, surveyData.city, surveyData.state]);
 
   // Location transparency: getListingsByCity silently broadens an empty city to
   // state level, so detect when nothing in the shown set is actually in the
@@ -319,8 +417,20 @@ function ResultsContent() {
   // used to qualify, which meant a page of merely-claimed clinics could be
   // headlined "Verified clinics", a claim only the safety_verified badge earns.
   const anyConfirmed = matchedClinics.some((c) => c.offersRecommended);
-  const allVerified = matchedClinics.length > 0 && matchedClinics.every((c) => c.safety_verified === true);
+  // "Verified" means the same strict thing here as everywhere else (safety_verified
+  // AND an approved review), via isSafetyVerified.
+  const allVerified = matchedClinics.length > 0 && matchedClinics.every((c) => isSafetyVerified(c));
   const clinicNoun = allVerified ? 'Safety Verified clinics' : 'Clinics';
+  // Clinics to show in the honest empty state: same-country featured clinics that
+  // do NOT serve the selected city (kept out of the ranked set). Deduped by
+  // operator, capped at 3, labelled as NOT treatment matches.
+  const emptyStateNearby = useMemo(() => {
+    const seen = new Set<string>();
+    return nearbyFallback
+      .filter((p) => (p as { is_hidden?: boolean }).is_hidden !== true)
+      .filter((p) => { const k = operatorKey(p); if (seen.has(k)) return false; seen.add(k); return true; })
+      .slice(0, 3);
+  }, [nearbyFallback]);
 
   if (isLoading) {
     return (
@@ -481,30 +591,61 @@ function ResultsContent() {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-3xl border border-slate-100 p-10 text-center">
-            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-400">
-              <MapPin size={28} />
+          <div className="space-y-6">
+            {/* Honest empty state: no clinic in the selected city LISTS the
+                selected treatment. We say exactly that — we do not pad the
+                result with clinics that do not match. */}
+            <div className="bg-white rounded-3xl border border-slate-100 p-10 text-center">
+              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-400">
+                <MapPin size={28} />
+              </div>
+              <h3 className="text-xl font-black text-slate-900 mb-2">
+                No clinics in {surveyData.city ? titleCase(surveyData.city) : 'your area'} list {recommendation.name} yet.
+              </h3>
+              <p className="text-slate-500 mb-8 max-w-md mx-auto">
+                We only show clinics that actually offer what you searched for. None in {surveyData.city ? titleCase(surveyData.city) : 'your area'} list {recommendation.name} on their menu right now.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Link
+                  href="/search"
+                  className="bg-wellness-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-wellness-700 transition-all shadow-sm"
+                >
+                  Browse all clinics
+                </Link>
+                <button
+                  onClick={() => router.push('/quiz')}
+                  className="bg-white text-slate-900 border-2 border-slate-200 px-6 py-3 rounded-2xl font-bold hover:border-slate-900 transition-all"
+                >
+                  Retake Quiz
+                </button>
+              </div>
             </div>
-            <h3 className="text-xl font-black text-slate-900 mb-2">
-              No verified clinics found in {surveyData.city ? titleCase(surveyData.city) : 'your area'} yet.
-            </h3>
-            <p className="text-slate-500 mb-8 max-w-md mx-auto">
-              Browse all clinics nationwide or retake the quiz with a different location.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href="/search"
-                className="bg-wellness-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-wellness-700 transition-all shadow-sm"
-              >
-                Browse Clinics
-              </Link>
-              <button
-                onClick={() => router.push('/quiz')}
-                className="bg-white text-slate-900 border-2 border-slate-200 px-6 py-3 rounded-2xl font-bold hover:border-slate-900 transition-all"
-              >
-                Retake Quiz
-              </button>
-            </div>
+
+            {/* Nearby verified clinics — EXPLICITLY labelled as NOT matches for
+                the searched treatment, and NOT in the selected city. Never
+                presented as quiz matches. */}
+            {emptyStateNearby.length > 0 && (
+              <div>
+                <div className="text-center mb-4 mt-10">
+                  <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">
+                    Verified clinics elsewhere
+                  </h3>
+                  <p className="text-sm text-slate-500 font-semibold mt-2 max-w-xl mx-auto">
+                    These are Safety Verified clinics in other areas. They are <span className="text-slate-700 font-bold">not matches</span> for {recommendation.name}{surveyData.city ? ` in ${titleCase(surveyData.city)}` : ''} — confirm treatment and location before you reach out.
+                  </p>
+                </div>
+                <div className="space-y-6">
+                  {emptyStateNearby.map((provider) => (
+                    <ProviderCardFeatured
+                      key={provider.id}
+                      provider={provider}
+                      operatorProfile={operatorProfiles.find((op) => op.clinicId === provider.id)}
+                      isPrimary={false}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
