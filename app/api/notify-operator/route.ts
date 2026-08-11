@@ -205,10 +205,18 @@ export async function POST(req: Request) {
       }
     }
 
-    // Verification email to the owner (em-dash + en-dash free).
+    // Verification email to the owner (em-dash + en-dash free). Capture the send
+    // result: sendMail returns { ok:false } on failure rather than throwing, so
+    // a failed verification email used to be swallowed here and the claim would
+    // sit "pending" with the owner never having received anything (caught
+    // 2026-08 with a 16-day-stuck legit claim). We now record the outcome and
+    // surface it in the operator notification + Telegram so a silent failure is
+    // visible at claim time, not weeks later.
+    let verifyStatus = 'not attempted (no verification token)';
+    let verifyFailed = false;
     if (token) {
       const verifyUrl = `${SITE_URL}/verify-claim?token=${encodeURIComponent(token)}`;
-      await sendMail({
+      const verifyResult = await sendMail({
         from: 'TheDripMap <info@thedripmap.com>',
         to: email,
         replyTo: 'info@thedripmap.com',
@@ -226,6 +234,19 @@ If you did not submit this claim, you can safely ignore this email.
 TheDripMap Team
 `,
       });
+      if (verifyResult.ok) {
+        verifyStatus = `SENT via ${verifyResult.provider}`;
+      } else {
+        verifyFailed = true;
+        verifyStatus = `FAILED via ${verifyResult.provider}: ${verifyResult.error || 'unknown error'}`;
+        console.error('Claim verification email FAILED to send', {
+          to: email,
+          listingId,
+          clinicName,
+          provider: verifyResult.provider,
+          error: verifyResult.error,
+        });
+      }
     }
 
     const publicUrl = providerSlug ? `${SITE_URL}/providers/${providerSlug}` : '(no slug)';
@@ -247,8 +268,9 @@ Listing ID: ${listingId || '(unknown)'}
 Public listing: ${publicUrl}
 Manage in Supabase: ${supabaseUrlAdmin}
 ${stubInfo ? '\nNOTE: this was an orphan claim. A minimal providers row was auto-created with source=orphan_claim_stub. Review and enrich it in Supabase.\n' : ''}
+Verification email to ${email}: ${verifyStatus}
 Status: pending verification (owner must click the link in their verification email)
-`,
+${verifyFailed ? '\nACTION NEEDED: the verification email FAILED to send, so the owner has nothing to click. Re-send it from /admin/claims (Resend verification) before this claim goes stale.\n' : ''}`,
     });
 
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
@@ -258,7 +280,7 @@ Status: pending verification (owner must click the link in their verification em
       return NextResponse.json({ success: true, warning: 'Telegram skipped (config missing)', listingId, providerSlug, orphan });
     }
 
-    const message = `\u{1F3E5} New Clinic Signup!\n\nClinic: ${clinicName || 'Unknown'}\nOwner: ${ownerName || 'Not provided'}\nEmail: ${email}\nPhone: ${ownerPhone || 'Not provided'}\nSpecialty: ${specialty || 'N/A'}${orphan ? '\n(orphan stub auto-created)' : ''}\n\nReview at: https://supabase.com/dashboard`;
+    const message = `\u{1F3E5} New Clinic Signup!\n\nClinic: ${clinicName || 'Unknown'}\nOwner: ${ownerName || 'Not provided'}\nEmail: ${email}\nPhone: ${ownerPhone || 'Not provided'}\nSpecialty: ${specialty || 'N/A'}${orphan ? '\n(orphan stub auto-created)' : ''}\nVerification email: ${verifyStatus}${verifyFailed ? '\n\u{26A0}\u{FE0F} VERIFICATION EMAIL FAILED - resend from /admin/claims' : ''}\n\nReview at: https://supabase.com/dashboard`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
     try {
