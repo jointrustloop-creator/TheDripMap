@@ -8,8 +8,11 @@ interface Draft {
 }
 interface Example { to: string; city: string | null; priceCity: string; localLine: string | null; subject: string; html: string; }
 interface Excluded { email: string; city: string | null; reason: string }
+interface LastSend {
+  created_at: string; action: string; actor: string | null; recipient_count: number; recipients: string[] | null; subject: string | null;
+}
 interface Payload {
-  ok: boolean; resendConfigured: boolean; from: string; replyTo: string;
+  ok: boolean; resendConfigured: boolean; from: string; replyTo: string; sendPaused?: boolean; lastSend?: LastSend | null;
   counts: { total: number; clean: number; excluded: number; alreadySent: number };
   examples: Example[]; drafts: Draft[]; excluded: Excluded[];
 }
@@ -43,14 +46,23 @@ export function NewsletterClient() {
     finally { setBusy(null); }
   };
 
+  const fmtLast = (l?: LastSend | null) =>
+    l ? `${l.recipient_count} sent ${new Date(l.created_at).toLocaleString()} by ${l.actor || 'operator'}` : 'none on record';
+
   const sendBatch = async () => {
-    const n = data?.counts.clean || 0;
-    if (!confirm(`Send the first-edition newsletter to all ${n} clean subscribers now? This cannot be undone.`)) return;
+    if (!data) return;
+    const n = data.counts.clean - data.counts.alreadySent;
+    const last = data.lastSend;
+    const lastLine = last
+      ? `LAST SEND: ${last.recipient_count} on ${new Date(last.created_at).toLocaleString()} by ${last.actor || 'operator'}.`
+      : 'LAST SEND: none on record.';
+    if (!confirm(`${lastLine}\n\nTHIS SEND: ${n} subscribers who have NOT already received this edition.\n\nSend now? This cannot be undone.`)) return;
     setBusy('send'); setFlash(null);
     try {
       const r = await fetch('/api/admin/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'send' }) });
       const j = await r.json();
-      setFlash(j.ok ? `Sent ${j.sent}, failed ${j.failed}, skipped ${j.skippedAlreadySent} already-sent.` : `Send failed: ${j.error}`);
+      if (j.paused) setFlash(`Paused — nothing sent. ${j.message || ''}`);
+      else setFlash(j.ok ? `Sent ${j.sent}, failed ${j.failed}, skipped ${j.skippedAlreadySent} already-sent.` : `Send failed: ${j.error}`);
       await load();
     } catch (e) { setFlash('Send failed: ' + (e instanceof Error ? e.message : String(e))); }
     finally { setBusy(null); }
@@ -73,6 +85,21 @@ export function NewsletterClient() {
           RESEND_API_KEY is not set in this environment, so sends will fail here. It works on the deployed site where Resend is configured.
         </div>
       )}
+
+      {/* Send-gate visibility: what already went out + the default-paused state. */}
+      <div className="mb-6 grid gap-3 sm:grid-cols-2">
+        <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+          <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Last send</div>
+          <div className="text-sm font-bold text-slate-900">{fmtLast(data.lastSend)}</div>
+        </div>
+        <div className={`p-4 rounded-2xl border ${data.sendPaused ? 'bg-rose-50 border-rose-200' : 'bg-emerald-50 border-emerald-200'}`}>
+          <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Send status</div>
+          <div className={`text-sm font-black ${data.sendPaused ? 'text-rose-700' : 'text-emerald-700'}`}>
+            {data.sendPaused ? 'PAUSED (default safe state)' : 'Sending enabled'}
+          </div>
+          {data.sendPaused && <div className="text-xs text-rose-600/80 mt-0.5">Set NEWSLETTER_SEND_ENABLED=&apos;true&apos; in Vercel to release the batch.</div>}
+        </div>
+      </div>
 
       <div className="flex flex-wrap gap-2 mb-6 text-[11px] font-bold text-slate-500">
         <span className="bg-white border border-slate-200 rounded-full px-3 py-1">clean list: <b className="text-emerald-700">{data.counts.clean}</b></span>
@@ -112,8 +139,8 @@ export function NewsletterClient() {
       {/* Approve + send */}
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-lg font-black text-slate-900">Clean subscriber list · {data.counts.clean}</h2>
-        <button onClick={sendBatch} disabled={busy !== null || data.counts.clean === 0} className="bg-wellness-600 text-white px-6 py-3 rounded-xl font-black text-sm hover:bg-wellness-700 disabled:opacity-50">
-          {busy === 'send' ? 'Sending…' : `Approve and send (${data.counts.clean - data.counts.alreadySent})`}
+        <button onClick={sendBatch} disabled={busy !== null || data.counts.clean === 0 || data.sendPaused} title={data.sendPaused ? 'Sending is paused (NEWSLETTER_SEND_ENABLED not set)' : undefined} className="bg-wellness-600 text-white px-6 py-3 rounded-xl font-black text-sm hover:bg-wellness-700 disabled:opacity-50">
+          {busy === 'send' ? 'Sending…' : data.sendPaused ? 'Sending paused' : `Approve and send (${data.counts.clean - data.counts.alreadySent})`}
         </button>
       </div>
 

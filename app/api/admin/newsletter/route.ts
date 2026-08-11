@@ -14,6 +14,8 @@ import { createClient } from '@supabase/supabase-js';
 import { isAdminRequest } from '../../../../src/lib/admin-auth';
 import { sendMail } from '../../../../src/lib/mailer';
 import { computeNewsletterQueue, recordNewsletterSent } from '../../../../src/lib/newsletter';
+import { NEWSLETTER_SEND_PAUSED, sendPausedMessage } from '../../../../src/lib/send-config';
+import { logSend, getLastSend } from '../../../../src/lib/send-log';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -44,11 +46,14 @@ export async function GET() {
     .map((c) => draftForCity(drafts, c))
     .filter(Boolean)
     .map((d) => ({ to: d!.to, city: d!.city, priceCity: d!.priceCity, localLine: d!.localLine, subject: d!.subject, html: d!.html }));
+  const lastSend = await getLastSend(db(), 'newsletter');
   return NextResponse.json({
     ok: true,
     resendConfigured: resendConfigured(),
     from: NEWSLETTER_FROM,
     replyTo: NEWSLETTER_REPLY_TO,
+    sendPaused: NEWSLETTER_SEND_PAUSED,
+    lastSend,
     counts,
     examples,
     drafts: drafts.map((d) => ({
@@ -77,12 +82,16 @@ export async function POST(req: Request) {
     const pick = (body.city ? draftForCity(drafts, body.city) : null) || draftForCity(drafts, 'Montreal') || drafts[0];
     if (!pick) return NextResponse.json({ error: 'no subscribers to sample' }, { status: 400 });
     const r = await sendMail({ from: NEWSLETTER_FROM, to, replyTo: NEWSLETTER_REPLY_TO, subject: pick.subject, text: pick.text, html: pick.html, channel: 'resend' });
+    if (r.ok) await logSend(db(), { channel: 'newsletter', action: 'test', recipients: [to], subject: pick.subject, note: 'test send' });
     return NextResponse.json({ ok: r.ok, action: 'test', sampleCity: pick.city, subject: pick.subject, to, from: NEWSLETTER_FROM, provider: r.provider, id: r.id, error: r.error });
   }
 
   // SEND: the clean batch. Skips anyone already sent this edition, and records a
   // marker on each success so a second click will not re-mail them.
   if (body.action === 'send') {
+    if (NEWSLETTER_SEND_PAUSED) {
+      return NextResponse.json({ ok: true, paused: true, sent: 0, message: sendPausedMessage('newsletter') });
+    }
     const supabase = db();
     const batch = drafts.filter((d) => !d.alreadySent);
     const results: Array<{ to: string; sent: boolean; error?: string }> = [];
@@ -99,6 +108,8 @@ export async function POST(req: Request) {
         results.push({ to: d.to, sent: false, error: err instanceof Error ? err.message : String(err) });
       }
     }
+    const sentTo = results.filter((r) => r.sent).map((r) => r.to);
+    await logSend(supabase, { channel: 'newsletter', action: 'send', recipients: sentTo, subject: `Newsletter batch (${sentTo.length})`, note: `attempted ${results.length}` });
     return NextResponse.json({
       ok: true,
       action: 'send',
