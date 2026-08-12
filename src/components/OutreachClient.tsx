@@ -5,8 +5,11 @@ import React, { useEffect, useState } from 'react';
 interface BatchRow {
   id: string; to: string; name: string; city: string; band: string; score: number; touch: string; views: number; subject: string; html: string;
 }
+interface LastSend {
+  created_at: string; action: string; actor: string | null; recipient_count: number; recipients: string[] | null; subject: string | null;
+}
 interface Payload {
-  ok: boolean; resendConfigured: boolean; from: string; counts: Record<string, number>; batchSize: number; remaining: number; batch: BatchRow[];
+  ok: boolean; resendConfigured: boolean; from: string; sendPaused?: boolean; confirmCode?: string; lastSend?: LastSend | null; counts: Record<string, number>; batchSize: number; remaining: number; batch: BatchRow[];
 }
 
 export function OutreachClient() {
@@ -40,16 +43,34 @@ export function OutreachClient() {
   };
 
   const sendBatch = async () => {
-    if (!confirm(`Send this batch of ${data?.batchSize} real emails to clinics now? This cannot be undone.`)) return;
+    if (!data) return;
+    // Confirm dialog that SHOWS what already went out and the exact new batch —
+    // the visibility that was missing on 2026-08-11 (batch sent twice).
+    const last = data.lastSend;
+    const lastLine = last
+      ? `LAST BATCH: ${last.recipient_count} sent ${new Date(last.created_at).toLocaleString()} by ${last.actor || 'operator'}.`
+      : 'LAST BATCH: none on record.';
+    const names = data.batch.slice(0, 5).map((b) => b.name).join(', ');
+    const code = data.confirmCode || '';
+    // Typed per-batch code: shows last-batch state + the exact new batch, and
+    // requires transcribing the code. The server re-verifies it, so a bare
+    // action:'send' (an automated session) is refused.
+    const typed = window.prompt(`${lastLine}\n\nTHIS BATCH: ${data.batchSize} clinics — ${names}${data.batchSize > 5 ? ', …' : ''}.\n\nTo send these ${data.batchSize} real emails, type this confirmation code: ${code}`);
+    if (typed == null) return; // cancelled
     setBusy('send'); setFlash(null);
     try {
-      const r = await fetch('/api/admin/outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'send' }) });
+      const r = await fetch('/api/admin/outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'send', confirmCode: typed.trim() }) });
       const j = await r.json();
-      setFlash(j.ok ? `Sent ${j.sent}, failed ${j.failed}.` : `Send failed: ${j.error}`);
+      if (j.needCode) setFlash(`Not sent — ${j.error}`);
+      else if (j.paused) setFlash(`Paused — nothing sent. ${j.message || ''}`);
+      else setFlash(j.ok ? `Sent ${j.sent}, failed ${j.failed}.` : `Send failed: ${j.error}`);
       await load();
     } catch (e) { setFlash('Send failed: ' + (e instanceof Error ? e.message : String(e))); }
     finally { setBusy(null); }
   };
+
+  const fmtLast = (l?: LastSend | null) =>
+    l ? `${l.recipient_count} sent ${new Date(l.created_at).toLocaleString()} by ${l.actor || 'operator'}` : 'none on record';
 
   if (err) return <div className="p-6 bg-rose-50 border border-rose-200 rounded-2xl text-rose-700 font-bold">{err}</div>;
   if (!data) return <div className="text-slate-400 font-bold">Loading pending batch…</div>;
@@ -64,6 +85,22 @@ export function OutreachClient() {
           RESEND_API_KEY is not set in this environment, so sends will fail here. It works on the deployed site where Resend is configured.
         </div>
       )}
+
+      {/* Send-gate visibility: what already went out + the default-paused state. */}
+      <div className="mb-6 grid gap-3 sm:grid-cols-2">
+        <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+          <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Last batch sent</div>
+          <div className="text-sm font-bold text-slate-900">{fmtLast(data.lastSend)}</div>
+          {data.lastSend?.subject && <div className="text-xs text-slate-400 mt-0.5">{data.lastSend.subject}</div>}
+        </div>
+        <div className={`p-4 rounded-2xl border ${data.sendPaused ? 'bg-rose-50 border-rose-200' : 'bg-emerald-50 border-emerald-200'}`}>
+          <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Send status</div>
+          <div className={`text-sm font-black ${data.sendPaused ? 'text-rose-700' : 'text-emerald-700'}`}>
+            {data.sendPaused ? 'PAUSED (default safe state)' : 'Sending enabled'}
+          </div>
+          {data.sendPaused && <div className="text-xs text-rose-600/80 mt-0.5">Set OUTREACH_SEND_ENABLED=&apos;true&apos; in Vercel to release a batch.</div>}
+        </div>
+      </div>
 
       <div className="flex flex-wrap gap-2 mb-6 text-[11px] font-bold text-slate-500">
         {Object.entries(data.counts).map(([k, v]) => (
@@ -86,8 +123,8 @@ export function OutreachClient() {
       {/* Pending batch */}
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-lg font-black text-slate-900">Pending batch · {data.batchSize} clinics</h2>
-        <button onClick={sendBatch} disabled={busy !== null || data.batchSize === 0} className="bg-wellness-600 text-white px-6 py-3 rounded-xl font-black text-sm hover:bg-wellness-700 disabled:opacity-50">
-          {busy === 'send' ? 'Sending…' : `Approve and send this batch (${data.batchSize})`}
+        <button onClick={sendBatch} disabled={busy !== null || data.batchSize === 0 || data.sendPaused} title={data.sendPaused ? 'Sending is paused (OUTREACH_SEND_ENABLED not set)' : undefined} className="bg-wellness-600 text-white px-6 py-3 rounded-xl font-black text-sm hover:bg-wellness-700 disabled:opacity-50">
+          {busy === 'send' ? 'Sending…' : data.sendPaused ? 'Sending paused' : `Approve and send this batch (${data.batchSize})`}
         </button>
       </div>
 

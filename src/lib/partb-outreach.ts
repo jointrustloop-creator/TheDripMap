@@ -41,26 +41,34 @@ const claimUrlFor = (slug: string) => `${SITE}/providers/${slug}?claim=1`;
 function escapeHtml(s: string): string {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
-function caslSentence(name: string): string {
-  return `You are receiving this because ${name} is listed on TheDripMap, the Canadian IV therapy matching platform. ${MAILING}. Reply with the word REMOVE and we will not contact you again.`;
+// One-click unsubscribe (path form, QP-safe — a ?e= query gets mangled by
+// quoted-printable MIME). Points at the shared newsletter unsubscribe endpoint,
+// which writes to email_suppressions — the list every send path (including this
+// one) reads. Replaces the old "Reply REMOVE" instruction (operator ruling
+// 2026-08-11): a real one-click link is the CASL-preferred mechanism.
+const unsubUrl = (email: string) => `${SITE}/api/newsletter/unsubscribe/${encodeURIComponent(email)}`;
+function caslText(name: string, email: string): string {
+  return `You are receiving this because ${name} is listed on TheDripMap, the Canadian IV therapy matching platform. ${MAILING}. To stop receiving these emails, unsubscribe here: ${unsubUrl(email)}`;
 }
-function render(name: string, paras: string[], claimUrl: string): { text: string; html: string } {
+function render(name: string, paras: string[], claimUrl: string, email: string): { text: string; html: string } {
   const text = [
     `Hi ${name} team,`,
     ...paras,
     `Claim your listing: ${claimUrl}`,
     'Warm regards,',
     `${SENDER}\nFounder, TheDripMap\nthedripmap.com`,
-    caslSentence(name),
+    caslText(name, email),
   ].join('\n\n');
   const pHtml = paras.map((t) => `<p style="margin:0 0 16px;">${escapeHtml(t)}</p>`).join('');
+  const caslHtml = `You are receiving this because ${escapeHtml(name)} is listed on TheDripMap, the Canadian IV therapy matching platform. ${escapeHtml(MAILING)}. `
+    + `<a href="${unsubUrl(email)}" style="color:#9ca3af;text-decoration:underline;">Unsubscribe</a>.`;
   const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#1f2937;">`
     + `<p style="margin:0 0 16px;">Hi ${escapeHtml(name)} team,</p>`
     + pHtml
     + `<p style="margin:24px 0;"><a href="${claimUrl}" style="background:#0F6E56;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:700;display:inline-block;">Claim your listing</a></p>`
     + `<p style="margin:0;">Warm regards,</p>`
     + `<p style="margin:4px 0 0;">${SENDER}<br>Founder, TheDripMap<br><a href="${SITE}" style="color:#0F6E56;">thedripmap.com</a></p>`
-    + `<p style="font-size:12px;color:#9ca3af;line-height:1.5;margin-top:24px;">${escapeHtml(caslSentence(name))}</p>`
+    + `<p style="font-size:12px;color:#9ca3af;line-height:1.5;margin-top:24px;">${caslHtml}</p>`
     + `</div>`;
   return { text, html };
 }
@@ -171,7 +179,7 @@ export async function computeOutreachQueue(supabase: any): Promise<{ drafts: Out
       if (viewLine) paras.push(viewLine.trim());
       paras.push('Claiming your listing is free and takes a few minutes, and adding those details completes your profile the moment you save.');
     }
-    const { text, html } = render(p.name, paras, claimUrl);
+    const { text, html } = render(p.name, paras, claimUrl, p.email);
     drafts.push({ id: p.id, to: p.email, name: p.name, city: p.city, band, score, touch: touches === 1 ? 'followup-replacement' : 'first', views, subject, text, html, _prio: PRIORITY.indexOf(p.city) === -1 ? 999 : PRIORITY.indexOf(p.city), _views: views } as any);
   }
 
@@ -197,7 +205,7 @@ export function sampleTestEmail(toName = 'your clinic'): { subject: string; text
     'Patients in Toronto compared IV therapy clinics on TheDripMap 34 times in the last month.',
     'Right now your listing shows 1 of the 7 transparency details patients look for before they book. The six not yet shown are who provides medical oversight, who administers your IVs, whether there is a health screening before treatment, your pricing, your current business details, and how patients can book. Claiming your listing is free and takes a few minutes, and filling these in updates what patients see right away.',
   ];
-  const { text, html } = render(toName, paras, claimUrlFor('urban-iv-toronto'));
+  const { text, html } = render(toName, paras, claimUrlFor('urban-iv-toronto'), 'sample@example.com');
   return { subject: 'TEST: Patients are comparing Toronto IV clinics on TheDripMap', text, html };
 }
 

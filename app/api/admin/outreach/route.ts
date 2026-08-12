@@ -13,6 +13,8 @@ import { createClient } from '@supabase/supabase-js';
 import { isAdminRequest } from '../../../../src/lib/admin-auth';
 import { sendMail } from '../../../../src/lib/mailer';
 import { computeOutreachQueue, recordSentTouch, sampleTestEmail } from '../../../../src/lib/partb-outreach';
+import { OUTREACH_SEND_PAUSED, sendPausedMessage, sendConfirmCode, verifySendCode } from '../../../../src/lib/send-config';
+import { logSend, getLastSend } from '../../../../src/lib/send-log';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -39,10 +41,14 @@ export async function GET() {
   const batch = drafts.slice(0, limit).map((d) => ({
     id: d.id, to: d.to, name: d.name, city: d.city, band: d.band, score: d.score, touch: d.touch, views: d.views, subject: d.subject, html: d.html,
   }));
+  const lastSend = await getLastSend(db(), 'partb');
   return NextResponse.json({
     ok: true,
     resendConfigured: resendConfigured(),
     from: OUTREACH_FROM,
+    sendPaused: OUTREACH_SEND_PAUSED,
+    confirmCode: sendConfirmCode('partb'),
+    lastSend,
     counts,
     batchSize: batch.length,
     remaining: Math.max(0, drafts.length - batch.length),
@@ -55,7 +61,7 @@ export async function POST(req: Request) {
   if (!resendConfigured()) {
     return NextResponse.json({ error: 'RESEND_API_KEY is not set. Part B outreach sends via Resend only.' }, { status: 500 });
   }
-  let body: { action?: string; testEmail?: string; limit?: number; realFromQueue?: boolean; index?: number };
+  let body: { action?: string; testEmail?: string; limit?: number; realFromQueue?: boolean; index?: number; confirmCode?: string };
   try { body = await req.json(); } catch { return NextResponse.json({ error: 'invalid json' }, { status: 400 }); }
 
   // TEST: one email to a chosen address. Sends nothing to real clinics.
@@ -79,11 +85,23 @@ export async function POST(req: Request) {
       s = sampleTestEmail('your clinic');
     }
     const r = await sendMail({ from: OUTREACH_FROM, to, replyTo: OUTREACH_REPLY_TO, subject: s.subject, text: s.text, html: s.html, channel: 'resend' });
+    // Log tests too, so the "what already went out" panel shows the info@ test
+    // copies that caused confusion on 2026-08-11.
+    if (r.ok) await logSend(db(), { channel: 'partb', action: 'test', recipients: [to], subject: s.subject, note: 'test send' });
     return NextResponse.json({ ok: r.ok, action: 'test', realFromQueue: !!body.realFromQueue, clinic, subject: s.subject, to, from: OUTREACH_FROM, provider: r.provider, id: r.id, error: r.error });
   }
 
   // SEND: the pending batch. Records the two-touch state on each success.
   if (body.action === 'send') {
+    // HARD GATE: default-paused kill-switch. Prevents an accidental or
+    // unattended release (the 2026-08-11 double-send failure mode).
+    if (OUTREACH_SEND_PAUSED) {
+      return NextResponse.json({ ok: true, paused: true, sent: 0, message: sendPausedMessage('outreach') });
+    }
+    // Typed per-batch confirmation code (independent of the pause switch).
+    if (!verifySendCode('partb', body.confirmCode)) {
+      return NextResponse.json({ error: 'Confirmation code missing, wrong, or expired. Reopen the send dialog and type the current code.', needCode: true }, { status: 400 });
+    }
     const supabase = db();
     const limit = Math.min(Math.max(1, Number(body.limit) || 25), 25);
     const { drafts } = await computeOutreachQueue(supabase);
@@ -102,6 +120,9 @@ export async function POST(req: Request) {
         results.push({ to: d.to, sent: false, error: err instanceof Error ? err.message : String(err) });
       }
     }
+    // Audit row: the source of truth the admin screen reads to show "last batch".
+    const sentTo = results.filter((r) => r.sent).map((r) => r.to);
+    await logSend(supabase, { channel: 'partb', action: 'send', recipients: sentTo, subject: `Part B batch (${sentTo.length})`, note: `attempted ${results.length}` });
     return NextResponse.json({
       ok: true,
       action: 'send',
