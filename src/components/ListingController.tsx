@@ -1,13 +1,25 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Columns, LayoutGrid, Map as MapIcon, Navigation } from 'lucide-react';
+import { Columns, LayoutGrid, Map as MapIcon, Navigation, ShieldCheck, CheckCircle2, HelpCircle } from 'lucide-react';
 import { Provider } from '../types';
 import { ProviderCard } from './ProviderCard';
 import dynamic from 'next/dynamic';
 import { calculateDistance, getUserLocation } from '../lib/geo';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
+import {
+  CHIPS,
+  isMobile as isMobileFilter,
+  isPrescriberVerified,
+  groupBySoft,
+  countHard,
+  countFacet,
+  isSoftId,
+  SOFT_GROUP_LABELS,
+  type SoftFilterId,
+} from '../lib/filters';
+import { trackFilter } from '../lib/track-filter';
 
 // Dynamically import map/split-view to avoid SSR issues
 const MapboxListingMap = dynamic(() => import('./MapboxListingMap'), {
@@ -52,6 +64,16 @@ export function ListingController({ initialProviders, cityName, hideHeading = fa
   const [view, setView] = useState<ViewMode>('grid');
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   const [providers, setProviders] = useState<Provider[]>(initialProviders);
+  // Same filter set as /search (shared src/lib/filters.ts). Hard + facet narrow;
+  // soft chips regroup into visible labelled groups and never hide.
+  const [activeChips, setActiveChips] = useState<string[]>([]);
+  const toggleChip = (id: string) => {
+    setActiveChips((prev) => {
+      const on = !prev.includes(id);
+      trackFilter(id, on ? 'on' : 'off', 'city', cityName);
+      return on ? [...prev, id] : prev.filter((c) => c !== id);
+    });
+  };
 
   // Upgrade to split view on lg+ viewports after hydration, unless user already toggled.
   useEffect(() => {
@@ -142,6 +164,16 @@ export function ListingController({ initialProviders, cityName, hideHeading = fa
     { id: 'map', label: 'Map', icon: <MapIcon size={18} /> },
   ];
 
+  // Apply hard + facet narrowing, then soft grouping. `narrowed` feeds split/map
+  // (grouping is a grid-only concept); `grouped` drives the grid sections.
+  const activeSoft = activeChips.filter(isSoftId) as SoftFilterId[];
+  let narrowed = providers;
+  if (activeChips.includes('Mobile')) narrowed = narrowed.filter(isMobileFilter);
+  if (activeChips.includes('PrescriberVerified')) narrowed = narrowed.filter(isPrescriberVerified);
+  const grouped = groupBySoft(narrowed, activeSoft);
+  const chipCount = (id: string): number | null =>
+    id === 'Mobile' ? countHard(providers, 'Mobile') : id === 'PrescriberVerified' ? countFacet(providers, 'PrescriberVerified') : null;
+
   return (
     <section className="mb-24">
       {/* Header with View Toggle */}
@@ -176,6 +208,32 @@ export function ListingController({ initialProviders, cityName, hideHeading = fa
         </div>
       </div>
 
+      {/* Filter chips — the same set as /search (shared filters lib). */}
+      <div className="flex flex-wrap gap-2 mb-8">
+        {CHIPS.map((chip) => {
+          const active = activeChips.includes(chip.id);
+          const count = chipCount(chip.id);
+          return (
+            <button
+              key={chip.id}
+              onClick={() => toggleChip(chip.id)}
+              className={cn(
+                'px-4 py-1.5 rounded-full text-xs font-bold border transition-all inline-flex items-center gap-1.5',
+                active ? 'bg-wellness-600 border-wellness-600 text-white' : 'bg-white border-slate-200 text-slate-600 hover:border-wellness-300',
+                chip.kind === 'facet' && !active && 'border-wellness-300 text-wellness-700'
+              )}
+            >
+              {chip.kind === 'facet' && <ShieldCheck size={12} />}
+              {chip.label}
+              {count != null && <span className={cn('font-black', active ? 'text-white/80' : 'text-slate-400')}>{count}</span>}
+            </button>
+          );
+        })}
+        {activeChips.length > 0 && (
+          <button onClick={() => setActiveChips([])} className="text-[11px] font-bold text-slate-400 hover:text-slate-600 self-center ml-1">Clear</button>
+        )}
+      </div>
+
       {/* Location Access Bar (if not granted) */}
       {!userLocation && (
         <motion.div
@@ -202,33 +260,42 @@ export function ListingController({ initialProviders, cityName, hideHeading = fa
       )}
 
       {/* Main Content Area with AnimatePresence */}
+      {narrowed.length === 0 ? (
+        <div className="text-center py-20 bg-white rounded-[2.5rem] border border-slate-100">
+          <h3 className="text-xl font-black text-slate-900 mb-2">No clinics match these filters in {cityName}</h3>
+          <p className="text-slate-500 mb-6 text-sm">Try clearing a filter to see more.</p>
+          <button onClick={() => setActiveChips([])} className="text-wellness-600 font-bold hover:text-wellness-700">Clear filters</button>
+        </div>
+      ) : (
       <AnimatePresence mode="wait">
         {view === 'split' ? (
-          <motion.div
-            key="split"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <SplitListingView providers={providers} cityName={cityName} />
+          <motion.div key="split" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <SplitListingView providers={narrowed} cityName={cityName} />
           </motion.div>
         ) : view === 'grid' ? (
-          <motion.div
-            key="grid"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            {providers.map((provider) => (
-              // 2026-06-14: every listing (claimed + unclaimed) renders through
-              // ProviderCard. The claimed branch carries the premium, per-clinic
-              // distinct treatment; the unclaimed branch stays muted. One card
-              // component = a consistent grid and no two claimed cards alike.
-              <div key={provider.id}>
-                <ProviderCard provider={provider} />
+          <motion.div key="grid" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            {grouped.grouped ? (
+              <div className="space-y-12">
+                <ClinicGroupSection label={SOFT_GROUP_LABELS.lists} tone="lists" providers={grouped.lists} />
+                <ClinicGroupSection label={SOFT_GROUP_LABELS.notListed} tone="notListed" providers={grouped.notListed} />
+                <ClinicGroupSection
+                  label={SOFT_GROUP_LABELS.unknown}
+                  tone="unknown"
+                  providers={grouped.unknown}
+                  note="These clinics haven't listed their full menu yet. If you own one, claiming your listing fills this in."
+                />
               </div>
-            ))}
+            ) : (
+              // 2026-06-14: every listing (claimed + unclaimed) renders through
+              // ProviderCard. One card component = a consistent grid.
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {narrowed.map((provider) => (
+                  <div key={provider.id}>
+                    <ProviderCard provider={provider} />
+                  </div>
+                ))}
+              </div>
+            )}
           </motion.div>
         ) : (
           <motion.div
@@ -238,10 +305,49 @@ export function ListingController({ initialProviders, cityName, hideHeading = fa
             exit={{ opacity: 0 }}
             className="relative h-[600px] w-full rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-2xl"
           >
-            <MapboxListingMap providers={providers} />
+            <MapboxListingMap providers={narrowed} />
           </motion.div>
         )}
       </AnimatePresence>
+      )}
     </section>
+  );
+}
+
+// Labelled, always-visible result group for the city grid's soft-boost view.
+// The unknown group is shown too (never buried) and doubles as a claim incentive.
+function ClinicGroupSection({
+  label,
+  tone,
+  providers,
+  note,
+}: {
+  label: string;
+  tone: 'lists' | 'notListed' | 'unknown';
+  providers: Provider[];
+  note?: string;
+}) {
+  if (providers.length === 0) return null;
+  const toneStyle =
+    tone === 'lists' ? 'bg-wellness-600 text-white' : tone === 'unknown' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500';
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-5">
+        <span className={cn('inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest px-3 py-1 rounded-full', toneStyle)}>
+          {tone === 'lists' && <CheckCircle2 size={12} />}
+          {tone === 'unknown' && <HelpCircle size={12} />}
+          {label}
+        </span>
+        <span className="text-xs font-bold text-slate-400">{providers.length}</span>
+      </div>
+      {note && <p className="text-xs text-slate-500 font-medium mb-4 -mt-2 max-w-2xl">{note}</p>}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {providers.map((provider) => (
+          <div key={provider.id}>
+            <ProviderCard provider={provider} />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
