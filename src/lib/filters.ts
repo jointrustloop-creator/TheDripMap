@@ -40,6 +40,11 @@ export const CHIPS: ChipDef[] = [
   { id: 'TopRated', label: 'Top Rated', kind: 'soft' },
 ];
 
+export const SOFT_FILTER_IDS: SoftFilterId[] = ['NAD', 'SkinGlow', 'TopRated'];
+export function isSoftId(id: string): id is SoftFilterId {
+  return (SOFT_FILTER_IDS as string[]).includes(id);
+}
+
 const SOFT_KEYWORDS: Record<'NAD' | 'SkinGlow', string[]> = {
   NAD: ['nad+', 'nad ', 'nicotinamide', 'longevity'],
   SkinGlow: ['glutathione', 'beauty drip', 'beauty + glow', 'beauty and glow', 'skin glow', 'brightening'],
