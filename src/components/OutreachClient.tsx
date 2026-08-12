@@ -9,7 +9,7 @@ interface LastSend {
   created_at: string; action: string; actor: string | null; recipient_count: number; recipients: string[] | null; subject: string | null;
 }
 interface Payload {
-  ok: boolean; resendConfigured: boolean; from: string; sendPaused?: boolean; lastSend?: LastSend | null; counts: Record<string, number>; batchSize: number; remaining: number; batch: BatchRow[];
+  ok: boolean; resendConfigured: boolean; from: string; sendPaused?: boolean; confirmCode?: string; lastSend?: LastSend | null; counts: Record<string, number>; batchSize: number; remaining: number; batch: BatchRow[];
 }
 
 export function OutreachClient() {
@@ -51,13 +51,18 @@ export function OutreachClient() {
       ? `LAST BATCH: ${last.recipient_count} sent ${new Date(last.created_at).toLocaleString()} by ${last.actor || 'operator'}.`
       : 'LAST BATCH: none on record.';
     const names = data.batch.slice(0, 5).map((b) => b.name).join(', ');
-    const msg = `${lastLine}\n\nTHIS BATCH: ${data.batchSize} clinics — ${names}${data.batchSize > 5 ? ', …' : ''}.\n\nSend these ${data.batchSize} real emails now? This cannot be undone.`;
-    if (!confirm(msg)) return;
+    const code = data.confirmCode || '';
+    // Typed per-batch code: shows last-batch state + the exact new batch, and
+    // requires transcribing the code. The server re-verifies it, so a bare
+    // action:'send' (an automated session) is refused.
+    const typed = window.prompt(`${lastLine}\n\nTHIS BATCH: ${data.batchSize} clinics — ${names}${data.batchSize > 5 ? ', …' : ''}.\n\nTo send these ${data.batchSize} real emails, type this confirmation code: ${code}`);
+    if (typed == null) return; // cancelled
     setBusy('send'); setFlash(null);
     try {
-      const r = await fetch('/api/admin/outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'send' }) });
+      const r = await fetch('/api/admin/outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'send', confirmCode: typed.trim() }) });
       const j = await r.json();
-      if (j.paused) setFlash(`Paused — nothing sent. ${j.message || ''}`);
+      if (j.needCode) setFlash(`Not sent — ${j.error}`);
+      else if (j.paused) setFlash(`Paused — nothing sent. ${j.message || ''}`);
       else setFlash(j.ok ? `Sent ${j.sent}, failed ${j.failed}.` : `Send failed: ${j.error}`);
       await load();
     } catch (e) { setFlash('Send failed: ' + (e instanceof Error ? e.message : String(e))); }

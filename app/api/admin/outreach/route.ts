@@ -13,7 +13,7 @@ import { createClient } from '@supabase/supabase-js';
 import { isAdminRequest } from '../../../../src/lib/admin-auth';
 import { sendMail } from '../../../../src/lib/mailer';
 import { computeOutreachQueue, recordSentTouch, sampleTestEmail } from '../../../../src/lib/partb-outreach';
-import { OUTREACH_SEND_PAUSED, sendPausedMessage } from '../../../../src/lib/send-config';
+import { OUTREACH_SEND_PAUSED, sendPausedMessage, sendConfirmCode, verifySendCode } from '../../../../src/lib/send-config';
 import { logSend, getLastSend } from '../../../../src/lib/send-log';
 
 export const runtime = 'nodejs';
@@ -47,6 +47,7 @@ export async function GET() {
     resendConfigured: resendConfigured(),
     from: OUTREACH_FROM,
     sendPaused: OUTREACH_SEND_PAUSED,
+    confirmCode: sendConfirmCode('partb'),
     lastSend,
     counts,
     batchSize: batch.length,
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
   if (!resendConfigured()) {
     return NextResponse.json({ error: 'RESEND_API_KEY is not set. Part B outreach sends via Resend only.' }, { status: 500 });
   }
-  let body: { action?: string; testEmail?: string; limit?: number; realFromQueue?: boolean; index?: number };
+  let body: { action?: string; testEmail?: string; limit?: number; realFromQueue?: boolean; index?: number; confirmCode?: string };
   try { body = await req.json(); } catch { return NextResponse.json({ error: 'invalid json' }, { status: 400 }); }
 
   // TEST: one email to a chosen address. Sends nothing to real clinics.
@@ -96,6 +97,10 @@ export async function POST(req: Request) {
     // unattended release (the 2026-08-11 double-send failure mode).
     if (OUTREACH_SEND_PAUSED) {
       return NextResponse.json({ ok: true, paused: true, sent: 0, message: sendPausedMessage('outreach') });
+    }
+    // Typed per-batch confirmation code (independent of the pause switch).
+    if (!verifySendCode('partb', body.confirmCode)) {
+      return NextResponse.json({ error: 'Confirmation code missing, wrong, or expired. Reopen the send dialog and type the current code.', needCode: true }, { status: 400 });
     }
     const supabase = db();
     const limit = Math.min(Math.max(1, Number(body.limit) || 25), 25);

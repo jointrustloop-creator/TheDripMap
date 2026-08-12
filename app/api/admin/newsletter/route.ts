@@ -14,7 +14,7 @@ import { createClient } from '@supabase/supabase-js';
 import { isAdminRequest } from '../../../../src/lib/admin-auth';
 import { sendMail } from '../../../../src/lib/mailer';
 import { computeNewsletterQueue, recordNewsletterSent } from '../../../../src/lib/newsletter';
-import { NEWSLETTER_SEND_PAUSED, sendPausedMessage } from '../../../../src/lib/send-config';
+import { NEWSLETTER_SEND_PAUSED, sendPausedMessage, sendConfirmCode, verifySendCode } from '../../../../src/lib/send-config';
 import { logSend, getLastSend } from '../../../../src/lib/send-log';
 
 export const runtime = 'nodejs';
@@ -53,6 +53,7 @@ export async function GET() {
     from: NEWSLETTER_FROM,
     replyTo: NEWSLETTER_REPLY_TO,
     sendPaused: NEWSLETTER_SEND_PAUSED,
+    confirmCode: sendConfirmCode('newsletter'),
     lastSend,
     counts,
     examples,
@@ -69,7 +70,7 @@ export async function POST(req: Request) {
   if (!resendConfigured()) {
     return NextResponse.json({ error: 'RESEND_API_KEY is not set. The newsletter sends via Resend only.' }, { status: 500 });
   }
-  let body: { action?: string; testEmail?: string; city?: string };
+  let body: { action?: string; testEmail?: string; city?: string; confirmCode?: string };
   try { body = await req.json(); } catch { return NextResponse.json({ error: 'invalid json' }, { status: 400 }); }
 
   const { drafts } = await computeNewsletterQueue(db());
@@ -91,6 +92,9 @@ export async function POST(req: Request) {
   if (body.action === 'send') {
     if (NEWSLETTER_SEND_PAUSED) {
       return NextResponse.json({ ok: true, paused: true, sent: 0, message: sendPausedMessage('newsletter') });
+    }
+    if (!verifySendCode('newsletter', body.confirmCode)) {
+      return NextResponse.json({ error: 'Confirmation code missing, wrong, or expired. Reopen the send dialog and type the current code.', needCode: true }, { status: 400 });
     }
     const supabase = db();
     const batch = drafts.filter((d) => !d.alreadySent);

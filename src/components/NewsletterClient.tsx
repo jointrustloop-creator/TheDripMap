@@ -12,7 +12,7 @@ interface LastSend {
   created_at: string; action: string; actor: string | null; recipient_count: number; recipients: string[] | null; subject: string | null;
 }
 interface Payload {
-  ok: boolean; resendConfigured: boolean; from: string; replyTo: string; sendPaused?: boolean; lastSend?: LastSend | null;
+  ok: boolean; resendConfigured: boolean; from: string; replyTo: string; sendPaused?: boolean; confirmCode?: string; lastSend?: LastSend | null;
   counts: { total: number; clean: number; excluded: number; alreadySent: number };
   examples: Example[]; drafts: Draft[]; excluded: Excluded[];
 }
@@ -56,12 +56,15 @@ export function NewsletterClient() {
     const lastLine = last
       ? `LAST SEND: ${last.recipient_count} on ${new Date(last.created_at).toLocaleString()} by ${last.actor || 'operator'}.`
       : 'LAST SEND: none on record.';
-    if (!confirm(`${lastLine}\n\nTHIS SEND: ${n} subscribers who have NOT already received this edition.\n\nSend now? This cannot be undone.`)) return;
+    const code = data.confirmCode || '';
+    const typed = window.prompt(`${lastLine}\n\nTHIS SEND: ${n} subscribers who have NOT already received this edition.\n\nTo send, type this confirmation code: ${code}`);
+    if (typed == null) return; // cancelled
     setBusy('send'); setFlash(null);
     try {
-      const r = await fetch('/api/admin/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'send' }) });
+      const r = await fetch('/api/admin/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'send', confirmCode: typed.trim() }) });
       const j = await r.json();
-      if (j.paused) setFlash(`Paused — nothing sent. ${j.message || ''}`);
+      if (j.needCode) setFlash(`Not sent — ${j.error}`);
+      else if (j.paused) setFlash(`Paused — nothing sent. ${j.message || ''}`);
       else setFlash(j.ok ? `Sent ${j.sent}, failed ${j.failed}, skipped ${j.skippedAlreadySent} already-sent.` : `Send failed: ${j.error}`);
       await load();
     } catch (e) { setFlash('Send failed: ' + (e instanceof Error ? e.message : String(e))); }
