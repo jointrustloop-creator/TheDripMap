@@ -38,6 +38,7 @@ import { BookingRequestButton } from './BookingRequest';
 import { SubmitTestimonialButton } from './SubmitTestimonialButton';
 import { TreatmentDefinitionDisclosure } from './TreatmentDefinitionDisclosure';
 import { findDefinition } from '../lib/treatment-definitions';
+import { premisesVerification } from '../lib/safety';
 import TrackedLink from './TrackedLink';
 import type { Provider, OperatorProfile } from '../types';
 
@@ -766,6 +767,50 @@ export default function DefinitiveListingLayout({
                 </div>
               </section>
             )}
+
+            {/* ── Regulator-Inspected premises (verification ladder L5) ──
+                We do not run this inspection. Where a college publishes an
+                outcome for the premises, we mirror it and link to their
+                register. Only a positive, current authorization is surfaced;
+                a negative outcome is an operator review signal, never a public
+                mark. See docs/badge-standard.md §7. */}
+            {(() => {
+              const pv = premisesVerification(provider as Parameters<typeof premisesVerification>[0]);
+              if (!pv) return null;
+              return (
+                <section id="regulator-inspected" className="mb-[46px] scroll-mt-24">
+                  <div className="rounded-[22px] border border-[#d8cfae] bg-[#faf7ef] p-[26px_28px]">
+                    <div className="flex items-start gap-[13px]">
+                      <div className="w-[38px] h-[38px] rounded-full bg-white text-[#8a6d1f] flex items-center justify-center border border-[#e2d7b4] flex-none">
+                        <ShieldCheck size={19} />
+                      </div>
+                      <div className="min-w-0">
+                        <h2 className="font-[var(--font-fraunces)] text-[20px] font-normal leading-tight text-[#1f3a27]">
+                          Regulator-inspected premises
+                          {pv.outcome ? `: ${pv.outcome}` : ''}
+                        </h2>
+                        <p className="text-[13px] text-[#5c685e] leading-[1.55] mt-[6px]">
+                          This location appears on {pv.register}
+                          {pv.checkedAt ? `, which we checked on ${pv.checkedAt}` : ''}. The
+                          inspection was carried out and published by the college, not by
+                          TheDripMap.{' '}
+                          {pv.url && (
+                            <a
+                              href={pv.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-semibold text-[#8a6d1f] underline underline-offset-2"
+                            >
+                              Check the register yourself
+                            </a>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              );
+            })()}
 
             {/* ── Drip menu ── */}
             {(ivDrips.length > 0 || otherServices.length > 0) && (

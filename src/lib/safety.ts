@@ -106,6 +106,48 @@ export function isSafetyComplete(manage: unknown): boolean {
 }
 
 /**
+ * L5 "Regulator-Inspected" (docs/badge-standard.md §7). We do NOT run this
+ * inspection: we mirror an outcome the regulator already published, and link to
+ * their register. In Ontario every premises where an ND performs IVIT must be
+ * registered and inspected by CONO, which publishes the result.
+ *
+ * Stored on the existing decision_drivers JSONB (no migration), shape:
+ *   decision_drivers.premises = {
+ *     register: 'CONO IVIT Premises Register',
+ *     status: 'authorized' | 'not_listed' | 'unknown',
+ *     outcome: 'Pass' | 'Pass with conditions' | ...,
+ *     url: '<register URL>',
+ *     checked_at: '2026-08-13'
+ *   }
+ *
+ * Display rule: we surface ONLY a positive, current authorization. A negative
+ * outcome is an operator review signal, never a public mark against a clinic —
+ * the process for handling one is still an open item in the SSOT (§5), and
+ * publishing a scarlet letter before that process exists would be unfair.
+ */
+export interface PremisesVerification {
+  register: string;
+  outcome: string | null;
+  url: string | null;
+  checkedAt: string | null;
+}
+
+export function premisesVerification(
+  p: { decision_drivers?: { premises?: unknown } | null } | null | undefined
+): PremisesVerification | null {
+  const raw = p?.decision_drivers?.premises;
+  if (!raw || typeof raw !== 'object') return null;
+  const r = raw as Record<string, unknown>;
+  if (String(r.status || '').trim().toLowerCase() !== 'authorized') return null;
+  return {
+    register: String(r.register || 'the regulator’s register'),
+    outcome: r.outcome ? String(r.outcome) : null,
+    url: r.url ? String(r.url) : null,
+    checkedAt: r.checked_at ? String(r.checked_at) : null,
+  };
+}
+
+/**
  * Map the completed safety answers to the badge's attestation flags. Only the
  * checks the form actually covers are set true; the others are left untouched.
  */
