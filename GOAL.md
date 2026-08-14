@@ -1,5 +1,57 @@
 # TheDripMap — $10,000/month by November 20, 2026
 
+## ⭐ THE TRUSTED SOURCE PLAN (2026-08-13) — CURRENT OPERATING PLAN
+Operator-approved execution of the patient-pain deep research
+(docs/research/patient-pain-research-2026-08.md — every claim sourced; visual:
+the Research Findings artifact). This is now the primary lens for all work:
+**answer the questions patients actually have, and verify clinics against
+public registers instead of trusting their word.**
+
+Thesis: patients' #1 question is "which clinics are reputable / which to avoid";
+Ontario's regulator itself tells consumers to "check the register." TheDripMap
+checks the registers FOR them and says exactly what was checked.
+
+### Phase 1 — Trust foundation (NOW)
+- [ ] Content 01: "Who should NOT get IV therapy" (condition × mechanism table,
+      sourced; the page no clinic can write)
+- [ ] Content 02: "Verify your IV provider, province by province" (register
+      links + walkthrough + complaint forms; extends our #1-ranking page)
+- [ ] "How verification works" public page (states per ladder level what is and
+      is not checked — the core trust/SEO asset every credible platform has)
+- [x] Verification Ladder L1–L5 adopted into docs/badge-standard.md (2026-08-13)
+
+### Phase 2 — Demand capture
+- [ ] Content 03: Iron infusions in Canada (OHIP/MSP decision tree + private
+      prices, Price-Index style) — Canada's sharpest legitimate pain
+- [ ] Content 04: IV vs oral, the honest absorption story
+- [ ] Content 05: CRA tax deductibility (cite the 2012 T.I.)
+- [ ] Content 06: Per-drip honest-triage verdicts (hangover, Myers', immune,
+      NAD+ cautionary, glutathione incl. skin-brightening safety)
+
+### Phase 3 — Round out the question space
+- [ ] Content 07: Pregnancy & breastfeeding ingredient table (SOGC-aligned)
+- [ ] Content 08: Mobile IV in Canada (legality + premium + emergency questions)
+- [ ] Content 09: 10-point printable pre-appointment checklist
+
+### Product track (parallel)
+- [ ] L5 register-surfacing: show CONO IVIT premises inspection outcomes on
+      Ontario ND-clinic listings, linked to the regulator's register
+- [ ] Questionnaire additions: G6PD-before-high-dose-C (yes/no), injectables
+      supplier (cross-check vs Health Canada recalls), ops-trust disclosures
+      (refund policy, cancellation path, no-membership-trap)
+- [ ] Drip capture (approved data model): flag finish_template rows, fix
+      dropped duration, vocabulary reference table (internal cono_table2_status)
+- [ ] Iron-infusion facet (after drip capture)
+
+### Standing rules for this plan
+- Every trust claim carries a NAMED authority + checked-as-of date; the word
+  "verified" is reserved for register-checked (L2) and above; checks fail closed.
+- Content posture = honest triage ("makes sense for X, skip it for Y") — never
+  clinic-marketing voice; every claim sourced; no health claims we can't cite.
+- Rejuuv/CBC item: PARKED per operator 2026-08-13 (note on file, no action).
+- This plan serves priority #3 (GET GOOGLE TO TRUST US) and is the moat for
+  #1 and #2: verified data no competitor can copy.
+
 ## The math
 - 100 paying clinics × $100/month average = $10,000/month
 - Current paying clinics: 0

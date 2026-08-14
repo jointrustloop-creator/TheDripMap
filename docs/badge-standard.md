@@ -170,7 +170,28 @@ public or internal-actionable.
 The badge is **human-reviewed** (since 2026-07-25). Completing the questionnaire
 sets `safety_review_status='pending'`; it never auto-grants.
 
-## 7. Change process
+## 7. The Verification Ladder (adopted 2026-08-13, operator-approved)
+
+Five levels, modeled on Psychology Today / Zocdoc / RealSelf / Google Guaranteed
+(benchmark research: docs/research/patient-pain-research-2026-08.md §4). Rules
+that bind every level: each badge names its authority + checked-as-of date; the
+word **"verified" is reserved for L2 and above**; every check **fails closed**
+(expiry removes the badge without operator action); a public "How verification
+works" page states per level exactly what is and is not checked.
+
+| Level | Name | What it means | Cadence / degradation |
+|---|---|---|---|
+| L1 | Owner-provided | Questionnaire answers, labeled "Owner-provided — not independently verified by TheDripMap." Never uses the v-word. | Re-attestation prompt at 12 months |
+| L2 | Credentials Verified | Named prescriber's registration checked on the public college register (CPSO/CNO/CONO); Ontario ND clinics also premises-checked on the CONO IVIT register. "We verify licensure and premises authorization against public regulator registers; we do not assess quality of care." **= today's Safety Verified badge, formalized (§§1–6).** | Re-check quarterly; auto-expire at 12 months; register shows lapsed/restricted/Fail → badge pulled + dropped from featured placement |
+| L3 | Documents Verified | Insurance certificate (minimum coverage) + pharmacy/compounder sourcing evidence + medical-director attestation, reviewed by operator. "We reviewed documents provided by the clinic; we do not audit clinical operations." | Badge expiry = document expiry; 30-day nudge; fail closed |
+| L4 | Site-Assessed | Checklist visit (premises matches register, consent process, who inserts, emergency equipment). "Not a regulatory inspection; does not evaluate medical care." | Valid 24 months; revoked on substantiated safety complaint |
+| L5 | Regulator-Inspected (surfaced) | Display the regulator's own published inspection outcome (CONO IVIT premises Pass/Pass-with-conditions; CPSO OHP where applicable), linked to the source register. "Inspection conducted and published by [College], not by TheDripMap." | Mirror the source register quarterly; only the most recent outcome shown |
+
+Implementation status: L1–L2 live (this document's §§1–6 are the L2 spec). L5 is
+the next build (near-zero cost, unique in Canada). L3–L4 are operator-gated
+future work.
+
+## 8. Change process
 
 1. Edit THIS document first and get operator approval.
 2. Update the three consumers (content, questionnaire + `isSafetyComplete`, badge
