@@ -11,13 +11,12 @@ Thesis: patients' #1 question is "which clinics are reputable / which to avoid";
 Ontario's regulator itself tells consumers to "check the register." TheDripMap
 checks the registers FOR them and says exactly what was checked.
 
-### Phase 1 — Trust foundation (NOW)
-- [ ] Content 01: "Who should NOT get IV therapy" (condition × mechanism table,
-      sourced; the page no clinic can write)
-- [ ] Content 02: "Verify your IV provider, province by province" (register
-      links + walkthrough + complaint forms; extends our #1-ranking page)
-- [ ] "How verification works" public page (states per ladder level what is and
-      is not checked — the core trust/SEO asset every credible platform has)
+### Phase 1 — Trust foundation (COMPLETE 2026-08-13)
+- [x] Content 01: "Who should NOT get IV therapy" — published
+      (who-should-not-get-iv-therapy-canada-2026)
+- [x] Content 02: "Verify your IV provider, province by province" — published
+      (how-to-verify-iv-provider-license-canada-2026)
+- [x] "How verification works" public page — live at /verification
 - [x] Verification Ladder L1–L5 adopted into docs/badge-standard.md (2026-08-13)
 
 ### Phase 2 — Demand capture
