@@ -231,9 +231,19 @@ appears), Drug Product Database (does the injectable have a DIN at all).
    came from contaminated compounded products. Ask clinics where injectables
    come from; cross-check suppliers against Health Canada recalls. Differentiating
    AND checkable.
-4. **G6PD screening before high-dose vitamin C is a concrete, literature-backed
-   yes/no** for the safety questionnaire — separates rigorous clinics from
-   menu-driven ones.
+4. **G6PD + high-dose vitamin C is the best-documented harm** — but see the
+   correction below before using it as a standard.
+
+   ⚠️ **CORRECTION (2026-08-13, verified against the source):** the original
+   research summary said pre-screening for G6PD is a documented safety standard.
+   It is not. The Cureus review (PMC8857720) gathered **14 hemolysis cases; 10 of
+   14 had G6PD deficiency, and only 2 had any prior hemolytic episode** (i.e.
+   most did not know). Complications appeared within 3 days in 78.6%. The authors
+   called for **physician awareness at high doses**, and explicitly did NOT
+   establish routine pre-screening as standard of care. Consequence: we may ask
+   clinics *what they do about G6PD* as a differentiating question, but we must
+   NOT imply a clinic is non-compliant for not testing. All published wording
+   follows this corrected framing.
 5. **Marketing claims are where regulators actually act** (FTC iV Bars, CBC
    BPC-157). Scan listed clinics' sites for disease-treatment claims and
    unauthorized substances (BPC-157; EDTA-by-ND in Ontario); gate badges on
