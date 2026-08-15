@@ -20,10 +20,13 @@ checks the registers FOR them and says exactly what was checked.
 - [x] Verification Ladder L1–L5 adopted into docs/badge-standard.md (2026-08-13)
 
 ### Phase 2 — Demand capture
-- [ ] Content 03: Iron infusions in Canada (OHIP/MSP decision tree + private
-      prices, Price-Index style) — Canada's sharpest legitimate pain
-- [ ] Content 04: IV vs oral, the honest absorption story
-- [ ] Content 05: CRA tax deductibility (cite the 2012 T.I.)
+- [x] Content 03: Iron infusions in Canada — published
+      (iron-infusion-canada-cost-coverage-2026)
+- [x] Content 04: IV vs oral, the honest absorption story — published
+      (iv-vs-oral-vitamins-absorption-canada-2026; NIH/PNAS figures verified)
+- [x] Content 05: CRA tax deductibility — published
+      (iv-therapy-tax-deductible-canada-2026; corrected vs the actual 2012 T.I.:
+      practitioner FEE eligible under 118.2(2)(a), substances generally NOT)
 - [ ] Content 06: Per-drip honest-triage verdicts (hangover, Myers', immune,
       NAD+ cautionary, glutathione incl. skin-brightening safety)
 
