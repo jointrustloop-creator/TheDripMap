@@ -48,7 +48,7 @@ const SERVICES = [
   { name: 'Hormone Therapy', slug: 'hormone-therapy', icon: <Activity size={24} />,   aliases: ['trt', 'hrt', 'testosterone', 'hormone', 'bhrt'] },
 ];
 
-export default function ServicePageClient({ serviceSlug: rawServiceSlug, initialListings = [], initialHubs = [] }: { serviceSlug: string; initialListings?: Provider[]; initialHubs?: { city: string; state: string; count: number }[] }) {
+export default function ServicePageClient({ serviceSlug: rawServiceSlug, initialListings = [], initialHubs = [], hub, priceStats }: { serviceSlug: string; initialListings?: Provider[]; initialHubs?: { city: string; state: string; count: number }[]; hub?: import('../../../src/lib/treatment-hub-content').TreatmentHub; priceStats?: { n: number; min: number; max: number } | null }) {
   const serviceSlug = rawServiceSlug.toLowerCase();
   const searchParams = useSearchParams();
   const cityParam = searchParams.get('city');
@@ -264,7 +264,13 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug, initial
   // Prefer the treatment's own researched FAQs; fall back to a sensible generic
   // set (kept accurate — uses the real session duration + cost range) only if a
   // treatment has none defined.
-  const faqs = content?.faqs && content.faqs.length > 0
+  // Hub FAQs (honest-triage voice, Move 1 of the 2026-08-15 audit) override
+  // both the legacy content faqs and the generic marketing fallback below,
+  // whose "higher absorption than oral supplements" framing contradicts our
+  // published IV-vs-oral guide.
+  const faqs = hub?.faqs?.length
+    ? hub.faqs.map((f) => ({ question: f.q, answer: f.a }))
+    : content?.faqs && content.faqs.length > 0
     ? content.faqs
     : [
         {
@@ -331,6 +337,23 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug, initial
             </p>
 
             <div className="flex flex-wrap gap-4">
+              {hub ? (
+                <>
+                  <div className="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm">
+                    <CheckCircle2 size={18} className="text-wellness-600" />
+                    <span className="text-sm font-bold text-slate-700">Evidence-graded, sourced</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm">
+                    <CheckCircle2 size={18} className="text-wellness-600" />
+                    <span className="text-sm font-bold text-slate-700">Real menu prices we captured</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm">
+                    <CheckCircle2 size={18} className="text-wellness-600" />
+                    <span className="text-sm font-bold text-slate-700">Providers checkable on public registers</span>
+                  </div>
+                </>
+              ) : (
+                <>
               <div className="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm">
                 <CheckCircle2 size={18} className="text-wellness-600" />
                 <span className="text-sm font-bold text-slate-700">Clinical Strength</span>
@@ -343,9 +366,40 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug, initial
                 <CheckCircle2 size={18} className="text-wellness-600" />
                 <span className="text-sm font-bold text-slate-700">Rapid Results</span>
               </div>
+                </>
+              )}
             </div>
           </div>
         </section>
+
+        {/* The honest verdict (treatment-hub content, Move 1 of the 2026-08-15
+            audit): evidence-first editorial + live captured price data + the
+            trust-cluster links. This is what separates these hubs from every
+            clinic page targeting the same terms. */}
+        {hub && (
+          <section className="mb-14 max-w-3xl">
+            <div className="bg-white border border-slate-200 rounded-3xl p-7 md:p-8">
+              <div className="text-[11px] font-black uppercase tracking-[0.16em] text-wellness-700 mb-3">The honest verdict</div>
+              {hub.verdict.map((p, i) => (
+                <p key={i} className="text-[15px] text-slate-700 leading-relaxed mb-3 last:mb-0">{p}</p>
+              ))}
+              {priceStats && priceStats.n > 0 && (
+                <p className="text-[13.5px] text-slate-500 mt-4 pt-4 border-t border-slate-100">
+                  Real prices from Canadian clinic menus we captured: {priceStats.n === 1
+                    ? `$${priceStats.min}`
+                    : `$${priceStats.min} to $${priceStats.max}`} across {priceStats.n} published menu {priceStats.n === 1 ? 'item' : 'items'}, each traceable to its source. City-level detail on our <a href="/iv-prices" className="font-bold text-wellness-700 hover:underline">price index</a>.
+                </p>
+              )}
+              <div className="flex flex-wrap gap-x-5 gap-y-2 mt-5 pt-4 border-t border-slate-100">
+                {hub.links.map((l) => (
+                  <a key={l.href} href={l.href} className="text-[13px] font-bold text-wellness-700 hover:underline">
+                    {l.label} →
+                  </a>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* City Chip Row — quick local filter */}
         {topCities.length > 0 && (

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { permanentRedirect } from "next/navigation";
+import { createClient } from "@supabase/supabase-js";
 import ServicePageClient from "./ServicePageClient";
 import { getListingsByService, getTopHubs } from "../../../src/lib/data";
+import { TREATMENT_HUBS } from "../../../src/lib/treatment-hub-content";
 
 // Regenerate the static pages hourly so the server-rendered clinic list stays
 // fresh without a redeploy (pairs with the server fetch in ServicePage below).
@@ -54,7 +56,13 @@ export async function generateMetadata({ params }: { params: Promise<{ service: 
   const serviceName = service ? ((service as { titleName?: string }).titleName || service.name) : serviceSlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
   const title = `${serviceName} IV Therapy Clinics Near Me | TheDripMap`;
-  const description = `Find ${serviceName} IV therapy clinics near you. Compare top-rated providers, see pricing, and book your ${serviceName} drip session in-clinic or mobile.`;
+  // Hub pages carry the honest-triage voice (2026-08-15 Move 1): the
+  // description promises comparison + real data + verification, not a booking
+  // pitch. Non-hub slugs keep the legacy line.
+  const hasHub = !!(service && TREATMENT_HUBS[service.slug]);
+  const description = hasHub
+    ? `${serviceName} IV therapy in Canada: the honest verdict, real prices from clinic menus we captured, and how to check who prescribes before you book.`
+    : `Find ${serviceName} IV therapy clinics near you. Compare top-rated providers, see pricing, and book your ${serviceName} drip session in-clinic or mobile.`;
   const siteUrl = 'https://www.thedripmap.com';
   const canonicalUrl = `${siteUrl}/treatments/${service ? service.slug : serviceSlug}`;
 
@@ -122,6 +130,40 @@ export default async function ServicePage({ params }: { params: Promise<{ servic
     // Never fail the page over the initial fetch; the client path still loads.
   }
 
+  // Hub editorial (Move 1 of the 2026-08-15 audit) + live captured price stats
+  // from clinic_drips for this treatment's formula. Tolerant: stats are null if
+  // the table is absent or empty, and the page renders without them.
+  const hubContent = match ? TREATMENT_HUBS[match.slug] : undefined;
+  let priceStats: { n: number; min: number; max: number } | null = null;
+  if (hubContent?.formulaId && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    try {
+      const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+      const { data } = await sb
+        .from('clinic_drips')
+        .select('price_cad')
+        .eq('formula_id', hubContent.formulaId)
+        .eq('is_active', true)
+        .not('price_cad', 'is', null);
+      const prices = (data || []).map((r) => Number(r.price_cad)).filter((n) => n > 0);
+      if (prices.length) priceStats = { n: prices.length, min: Math.min(...prices), max: Math.max(...prices) };
+    } catch { /* stats are optional */ }
+  }
+
+  // FAQPage JSON-LD: rendered as a sibling of the Suspense boundary so it
+  // exists in the server HTML AND survives hydration (fallback-only content
+  // disappears from the rendered DOM once the client component mounts).
+  const faqJsonLd = hubContent
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: hubContent.faqs.map((f) => ({
+          '@type': 'Question',
+          name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+      }
+    : null;
+
   // ServicePageClient calls useSearchParams() (reads ?city=). Without a Suspense
   // boundary that opts the WHOLE route into dynamic rendering, which streams the
   // generateMetadata output (title/canonical/description) into the <body> instead
@@ -140,6 +182,31 @@ export default async function ServicePage({ params }: { params: Promise<{ servic
         <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-4">
           {svcName} IV therapy clinics in Canada
         </h1>
+        {hubContent && (
+          <section className="max-w-3xl mb-10">
+            <h2 className="text-sm font-black uppercase tracking-widest text-wellness-700 mb-2">The honest verdict</h2>
+            {hubContent.verdict.map((p, i) => (
+              <p key={i} className="text-slate-700 leading-relaxed mb-3">{p}</p>
+            ))}
+            {priceStats && priceStats.n > 0 && (
+              <p className="text-sm text-slate-500 mb-3">
+                Real prices from Canadian clinic menus we captured: {priceStats.n === 1 ? `$${priceStats.min}` : `$${priceStats.min} to $${priceStats.max}`} across {priceStats.n} published menu {priceStats.n === 1 ? 'item' : 'items'}. See the <a href="/iv-prices" className="text-wellness-700 font-bold">price index</a> for city detail.
+              </p>
+            )}
+            <ul className="mb-6">
+              {hubContent.links.map((l) => (
+                <li key={l.href}><a href={l.href} className="text-wellness-700 font-bold text-sm">{l.label}</a></li>
+              ))}
+            </ul>
+            <h2 className="text-sm font-black uppercase tracking-widest text-slate-500 mb-2">Frequently asked questions</h2>
+            {hubContent.faqs.map((f) => (
+              <div key={f.q} className="mb-4">
+                <h3 className="font-bold text-slate-900">{f.q}</h3>
+                <p className="text-slate-600 text-sm leading-relaxed">{f.a}</p>
+              </div>
+            ))}
+          </section>
+        )}
         {initialListings.length > 0 ? (
           <>
             <p className="text-lg text-slate-600 mb-8">
@@ -181,8 +248,19 @@ export default async function ServicePage({ params }: { params: Promise<{ servic
   );
 
   return (
-    <Suspense fallback={fallback}>
-      <ServicePageClient serviceSlug={service} initialListings={initialListings} initialHubs={initialHubs} />
-    </Suspense>
+    <>
+      {faqJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      )}
+      <Suspense fallback={fallback}>
+        <ServicePageClient
+          serviceSlug={service}
+          initialListings={initialListings}
+          initialHubs={initialHubs}
+          hub={hubContent}
+          priceStats={priceStats}
+        />
+      </Suspense>
+    </>
   );
 }
