@@ -27,8 +27,14 @@ checks the registers FOR them and says exactly what was checked.
 - [x] Content 05: CRA tax deductibility — published
       (iv-therapy-tax-deductible-canada-2026; corrected vs the actual 2012 T.I.:
       practitioner FEE eligible under 118.2(2)(a), substances generally NOT)
-- [ ] Content 06: Per-drip honest-triage verdicts (hangover, Myers', immune,
-      NAD+ cautionary, glutathione incl. skin-brightening safety)
+- [x] Content 06: Drip-by-drip verdicts hub — published
+      (iv-drip-verdicts-evidence-2026). Built as ONE hub: per-drip pages
+      already exist; new ones would cannibalize. NOTE FOR OPERATOR: several
+      LEGACY per-drip posts carry marketing voice that contradicts the trust
+      posture (e.g. "Why IV Therapy is the Gold Standard" for hangovers,
+      "Science-Backed Protocol for Getting Sick Less", glutathione
+      "Benefits for Skin, Detox, Anti-Aging"). Editing them needs explicit
+      operator OK per Hard Rule #4 — ruling pending.
 
 ### Phase 3 — Round out the question space
 - [ ] Content 07: Pregnancy & breastfeeding ingredient table (SOGC-aligned)
