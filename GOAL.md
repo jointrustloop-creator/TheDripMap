@@ -36,10 +36,19 @@ checks the registers FOR them and says exactly what was checked.
       "Benefits for Skin, Detox, Anti-Aging"). Editing them needs explicit
       operator OK per Hard Rule #4 — ruling pending.
 
-### Phase 3 — Round out the question space
-- [ ] Content 07: Pregnancy & breastfeeding ingredient table (SOGC-aligned)
-- [ ] Content 08: Mobile IV in Canada (legality + premium + emergency questions)
-- [ ] Content 09: 10-point printable pre-appointment checklist
+### Phase 3 — Round out the question space (COMPLETE 2026-08-15)
+- [x] Content 07: Pregnancy & breastfeeding — published
+      (iv-therapy-pregnancy-breastfeeding-canada-2026; RCOG-sourced;
+      deliberately NO safe-ingredient table — prescriber's call, same
+      principle as the Table 2 link-out)
+- [x] Content 08: Mobile IV in Canada — ALREADY EXISTED
+      (mobile-iv-therapy-canada-laws-province-by-province)
+- [x] Content 09: 10-point checklist — published
+      (iv-therapy-checklist-before-you-book-2026)
+- [x] BONUS (operator-approved): 4 legacy marketing-voice posts rewritten to
+      honest-triage voice, slugs kept, originals backed up
+      (_legacy-post-backups-2026-08-15.json). Trust cluster now
+      contradiction-free.
 
 ### Product track (parallel)
 - [ ] L5 register-surfacing: show CONO IVIT premises inspection outcomes on
