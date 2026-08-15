@@ -11,6 +11,19 @@ Thesis: patients' #1 question is "which clinics are reputable / which to avoid";
 Ontario's regulator itself tells consumers to "check the register." TheDripMap
 checks the registers FOR them and says exactly what was checked.
 
+### CEO AUDIT FIVE MOVES (2026-08-15) — ALL FIVE SHIPPED
+1. DONE Treatment hubs rebuilt (19 slugs, verdicts + live prices + FAQ schema).
+2. DONE City pages "Verified local data" module (captured drip prices,
+   premises + badge counts). Verified live on /cities/brampton.
+3. DONE Symptom pages honesty pass (use-cases.ts: morning-sickness OB-first,
+   "100%" claims removed, glow/glutathione honest framing).
+4. DONE Payload slimming (commit ffc5202): /cities/toronto provider props
+   whitelisted via slimProviderForList(), /blog index ships card metadata only
+   (was 2.38MB / 2.14MB). Verify sizes on prod after deploy.
+5. DONE Press kit: docs/press/press-kit-regulator-inspected-2026-08.md
+   (pitch drafts, target list, hedged exclusivity wording; Hubert sends,
+   log every pitch in the file's Pitch log).
+
 ### Phase 1 — Trust foundation (COMPLETE 2026-08-13)
 - [x] Content 01: "Who should NOT get IV therapy" — published
       (who-should-not-get-iv-therapy-canada-2026)
