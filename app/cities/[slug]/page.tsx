@@ -427,6 +427,38 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   const cityPriceIndex = getCityPriceIndex(slug);
   const cur = (n: number) => (cityPriceIndex?.currency === 'USD' ? '$' : 'CA$') + n;
 
+  // ── Proprietary local data (Move 2, 2026-08-15 audit) ─────────────────────
+  // The data no competitor can paraphrase: captured drip menu items for THIS
+  // city's listed clinics (clinic_drips, every row source-attributed), plus the
+  // verification counts. Tolerant: all of it is optional and the page renders
+  // without it.
+  type CityDrip = { published_name: string; price_cad: number | null; source_type: string; captured_at: string; provider_id: string };
+  let cityDrips: CityDrip[] = [];
+  const listingIds = listings.map((l) => (l as { id?: string }).id).filter(Boolean) as string[];
+  const listingById = new Map(listings.map((l) => [(l as { id?: string }).id as string, l]));
+  if (listingIds.length && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+      const { data } = await sb
+        .from('clinic_drips')
+        .select('published_name,price_cad,source_type,captured_at,provider_id')
+        .in('provider_id', listingIds)
+        .eq('is_active', true)
+        .not('price_cad', 'is', null)
+        .order('price_cad', { ascending: true })
+        .limit(10);
+      cityDrips = (data || []) as CityDrip[];
+    } catch { /* optional module */ }
+  }
+  const premisesInspectedCount = listings.filter((l) => {
+    const dd = (l as { decision_drivers?: { premises?: { status?: string } } }).decision_drivers;
+    return dd?.premises && String(dd.premises.status || '').toLowerCase() === 'authorized';
+  }).length;
+  const safetyVerifiedCount = listings.filter((l) =>
+    isSafetyVerified(l as { safety_verified?: boolean | null; safety_review_status?: string | null })
+  ).length;
+
   // Precompute use-case pools so each section can short-circuit when empty.
   // Each filter is a cheap O(n) pass over the local listing pool.
   const useCaseSections = (cityMeta?.useCases || [])
@@ -807,6 +839,75 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
                 See the full {cityData.name} IV Price Index
                 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </Link>
+            </div>
+          </section>
+        )}
+
+        {/* ── Verified local data (Move 2, 2026-08-15) ──────────────────────
+            Captured drip menu items + verification counts for THIS city's
+            clinics. Every drip row is source-attributed (clinic website or
+            owner-selected) with a capture date; verification counts come from
+            the register-checked badge system. Renders on any city with data,
+            which is exactly what lifts the thin-tail city pages. */}
+        {(cityDrips.length > 0 || premisesInspectedCount > 0 || safetyVerifiedCount > 0) && (
+          <section className="mb-12 max-w-4xl">
+            <div className="rounded-3xl border border-wellness-100 bg-white p-6 md:p-8 shadow-sm">
+              <div className="text-[11px] font-black uppercase tracking-[0.18em] text-wellness-600 mb-2">
+                Verified local data
+              </div>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-3">
+                What we have verified in {cityData.name}
+              </h2>
+              {(safetyVerifiedCount > 0 || premisesInspectedCount > 0) && (
+                <p className="text-slate-600 leading-relaxed mb-4">
+                  {safetyVerifiedCount > 0 && (
+                    <>
+                      <span className="font-black text-slate-900">{safetyVerifiedCount}</span>{' '}
+                      {safetyVerifiedCount === 1 ? 'clinic here holds' : 'clinics here hold'} a Safety Verified
+                      badge, meaning we checked the named prescriber against a public college register.{' '}
+                    </>
+                  )}
+                  {premisesInspectedCount > 0 && (
+                    <>
+                      <span className="font-black text-slate-900">{premisesInspectedCount}</span>{' '}
+                      {premisesInspectedCount === 1 ? 'premises appears' : 'premises appear'} as authorized on the
+                      regulator&apos;s own IVIT inspection register.{' '}
+                    </>
+                  )}
+                  <Link href="/verification" className="font-bold text-wellness-700 hover:underline">
+                    How our verification works
+                  </Link>
+                  .
+                </p>
+              )}
+              {cityDrips.length > 0 && (
+                <>
+                  <p className="text-sm text-slate-500 mb-3">
+                    Real drips with real prices from menus we track at {cityData.name} clinics, each traceable to
+                    its source:
+                  </p>
+                  <ul className="divide-y divide-slate-100 border border-slate-100 rounded-2xl overflow-hidden">
+                    {cityDrips.slice(0, 8).map((d, i) => {
+                      const clinic = listingById.get(d.provider_id) as { name?: string; slug?: string } | undefined;
+                      return (
+                        <li key={i} className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-4 py-2.5 text-sm">
+                          <span className="font-bold text-slate-800">{d.published_name}</span>
+                          <span className="font-black text-slate-900 tabular-nums">CA${d.price_cad}</span>
+                          {clinic?.slug && (
+                            <Link href={`/providers/${clinic.slug}`} className="text-wellness-700 font-bold hover:underline">
+                              {clinic.name}
+                            </Link>
+                          )}
+                          <span className="ml-auto text-[11px] text-slate-400">
+                            {d.source_type === 'clinic_website' ? "clinic's published menu" : 'owner-selected'} ·{' '}
+                            {d.captured_at}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </>
+              )}
             </div>
           </section>
         )}
