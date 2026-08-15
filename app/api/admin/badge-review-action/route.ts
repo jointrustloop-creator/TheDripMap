@@ -102,6 +102,53 @@ export async function POST(req: NextRequest) {
     return back;
   }
 
+  if (action === 'record_premises') {
+    // L5 register mirror (docs/badge-standard.md §4.5/§7): the operator looked
+    // up the clinic on the CONO IVIT Premises Register (manual; no API) and
+    // records what the register shows. Only status='authorized' ever renders
+    // publicly (premisesVerification in src/lib/safety.ts); 'not_listed' and
+    // 'unknown' are internal review signals.
+    const status = String(form.get('premises_status') || '').trim().toLowerCase();
+    if (!['authorized', 'not_listed', 'unknown'].includes(status)) {
+      return NextResponse.json({ error: 'premises_status must be authorized | not_listed | unknown' }, { status: 400 });
+    }
+    const outcome = String(form.get('premises_outcome') || '').trim() || null;
+    const note = String(form.get('premises_note') || '').trim();
+    const today = nowIso.slice(0, 10);
+    const existingDD = (provider.decision_drivers && typeof provider.decision_drivers === 'object')
+      ? (provider.decision_drivers as Record<string, unknown>)
+      : {};
+    const prevEvidence = Array.isArray(existingDD.safety_evidence)
+      ? (existingDD.safety_evidence as unknown[])
+      : existingDD.safety_evidence ? [existingDD.safety_evidence] : [];
+    const evidence = `CONO IVIT Premises Register lookup ${today} by operator: status=${status}` +
+      (outcome ? `, outcome=${outcome}` : '') + (note ? `. ${note}` : '');
+    const { error: updErr, count } = await sb
+      .from('providers')
+      .update(
+        {
+          decision_drivers: {
+            ...existingDD,
+            premises: {
+              register: 'the CONO IVIT Premises Register',
+              status,
+              outcome,
+              url: 'https://cono.alinityapp.com/client/findcorporationdirectory',
+              checked_at: today,
+            },
+            safety_evidence: [...prevEvidence, evidence],
+          },
+        },
+        { count: 'exact' },
+      )
+      .eq('id', provider.id);
+    if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 });
+    if (count !== null && count !== 1) {
+      return NextResponse.json({ error: `unexpected update scope: ${count} rows` }, { status: 500 });
+    }
+    return back;
+  }
+
   if (action === 'decline') {
     const reason = String(form.get('reason') || '').trim() || 'declined by operator';
     const { error: updErr } = await sb

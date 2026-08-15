@@ -33,12 +33,36 @@ interface Row {
 
 function answers(dd: Record<string, unknown> | null) {
   const manage = (dd && typeof dd === 'object' ? (dd as { manage?: unknown }).manage : null) as
-    | { team?: { whoPlaces?: string[]; oversight?: string }; sourcing?: string[] }
+    | {
+        team?: {
+          whoPlaces?: string[];
+          oversight?: string;
+          prescriberName?: string;
+          prescriberCredential?: string;
+          prescriberRegNum?: string;
+          prescriberNdIvit?: boolean;
+        };
+        sourcing?: string[];
+      }
     | null;
   const who = Array.isArray(manage?.team?.whoPlaces) ? manage!.team!.whoPlaces!.join(', ') : '';
   const oversight = typeof manage?.team?.oversight === 'string' ? manage!.team!.oversight! : '';
   const sourcing = Array.isArray(manage?.sourcing) ? manage!.sourcing!.join(', ') : '';
-  return { who, oversight, sourcing };
+  const t = manage?.team;
+  const prescriber = t?.prescriberName
+    ? `${t.prescriberName}${t.prescriberCredential ? ` (${t.prescriberCredential})` : ''}${t.prescriberRegNum ? ` · reg# ${t.prescriberRegNum}` : ' · NO REG#'}${t.prescriberNdIvit ? ' · IVIT confirmed' : ''}`
+    : '';
+  return { who, oversight, sourcing, prescriber };
+}
+
+// The premises record, if an operator has looked the clinic up on the CONO
+// IVIT Premises Register (L5 mirror; docs/badge-standard.md §4.5).
+function premises(dd: Record<string, unknown> | null) {
+  const p = (dd && typeof dd === 'object' ? (dd as { premises?: unknown }).premises : null) as
+    | { status?: string; outcome?: string | null; checked_at?: string | null }
+    | null;
+  if (!p || !p.status) return null;
+  return { status: String(p.status), outcome: p.outcome || null, checkedAt: p.checked_at || null };
 }
 
 export default async function BadgeReviewsPage() {
@@ -117,9 +141,51 @@ export default async function BadgeReviewsPage() {
               <div className="bg-slate-50 rounded-xl p-4 mb-4 text-sm space-y-1.5">
                 <div className="font-bold text-slate-700 mb-1 text-xs uppercase tracking-wide">Questionnaire answers</div>
                 <div className="text-slate-700"><span className="font-semibold">Who administers IVs:</span> {a.who || <em className="text-slate-400">not answered</em>}</div>
-                <div className="text-slate-700"><span className="font-semibold">Medical oversight:</span> {a.oversight || <em className="text-slate-400">not answered</em>}</div>
+                <div className="text-slate-700"><span className="font-semibold">Prescriber:</span> {a.prescriber || a.oversight || <em className="text-slate-400">not answered</em>}</div>
                 <div className="text-slate-700"><span className="font-semibold">Ingredient sourcing:</span> {a.sourcing || <em className="text-slate-400">not answered</em>}</div>
+                <div className="text-[11px] text-slate-500 pt-1.5 border-t border-slate-200 mt-2">
+                  Check the registration before approving:{' '}
+                  <a href="https://register.cpso.on.ca/" target="_blank" className="underline font-semibold">CPSO</a>{' · '}
+                  <a href="https://registry.cno.org/" target="_blank" className="underline font-semibold">CNO</a>{' · '}
+                  <a href="https://cono.alinityapp.com/client/publicdirectory" target="_blank" className="underline font-semibold">CONO ND</a>{' · '}
+                  <a href="https://cono.alinityapp.com/client/findcorporationdirectory" target="_blank" className="underline font-semibold">CONO IVIT premises</a>
+                </div>
               </div>
+
+              {/* Premises record (L5). Shows what has been recorded; the form
+                  below records a fresh lookup. Only 'authorized' ever renders
+                  on the public listing. */}
+              {(() => {
+                const pv = premises(r.decision_drivers);
+                return (
+                  <div className="bg-amber-50/60 border border-amber-100 rounded-xl p-4 mb-4 text-sm">
+                    <div className="font-bold text-slate-700 mb-1 text-xs uppercase tracking-wide">
+                      CONO IVIT premises (ND-prescriber clinics)
+                    </div>
+                    <div className="text-slate-700 mb-2">
+                      {pv ? (
+                        <>Recorded: <b>{pv.status}</b>{pv.outcome ? ` (${pv.outcome})` : ''}{pv.checkedAt ? `, checked ${pv.checkedAt}` : ''}</>
+                      ) : (
+                        <em className="text-slate-400">no lookup recorded yet</em>
+                      )}
+                    </div>
+                    <form action="/api/admin/badge-review-action" method="post" className="flex flex-wrap gap-2 items-center">
+                      <input type="hidden" name="action" value="record_premises" />
+                      <input type="hidden" name="provider_id" value={r.id} />
+                      <select name="premises_status" className="border border-slate-200 rounded-lg px-2 py-1.5 text-xs bg-white" defaultValue="authorized">
+                        <option value="authorized">authorized (Active on register)</option>
+                        <option value="not_listed">not listed (review item)</option>
+                        <option value="unknown">unknown / not applicable</option>
+                      </select>
+                      <input name="premises_outcome" placeholder="outcome, e.g. Pass" className="border border-slate-200 rounded-lg px-2 py-1.5 text-xs w-32" />
+                      <input name="premises_note" placeholder="note (premise #, registrant seen...)" className="border border-slate-200 rounded-lg px-2 py-1.5 text-xs w-64" />
+                      <button className="px-3 py-2 rounded-lg bg-amber-600 text-white text-xs font-black hover:bg-amber-700">
+                        Record lookup
+                      </button>
+                    </form>
+                  </div>
+                );
+              })()}
 
               <div className="flex flex-wrap gap-2 items-center">
                 <form action="/api/admin/badge-review-action" method="post">
