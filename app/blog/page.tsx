@@ -44,8 +44,22 @@ export const metadata: Metadata = {
 
 export default async function BlogPage() {
   const posts = await getBlogPosts();
+  // The index only renders card metadata; full post content (1,000+ words each,
+  // ~150 posts) must never ship in the page payload. Slim before serializing.
+  const slimPosts = posts.map(p => ({
+    slug: p.slug,
+    title: p.title,
+    metaTitle: p.metaTitle,
+    metaDescription: p.metaDescription,
+    excerpt: p.excerpt,
+    category: p.category,
+    date: p.date,
+    author: p.author,
+    imageUrl: p.imageUrl,
+    content: '',
+  }));
   // Pin the newest post as the featured hero. Rest goes into the chip-filtered grid.
-  const [featured, ...restPosts] = posts;
+  const [featured, ...restPosts] = slimPosts;
 
   return (
     <div className="min-h-screen bg-[#FDFDFB]">

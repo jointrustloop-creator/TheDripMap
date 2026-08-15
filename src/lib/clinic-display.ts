@@ -7,6 +7,30 @@ export const isVerifiedClinic = (p: Provider): boolean =>
   p.is_featured === true ||
   (p as { safety_verified?: boolean }).safety_verified === true;
 
+// Payload slimmer for list/map surfaces. City pages were shipping the full
+// enriched provider row (decision_drivers, outreach fields, long text) into
+// the client flight payload — /cities/toronto hit 2.4MB. Only the fields the
+// card, filter, and map layers actually read may cross the server boundary.
+const LIST_FIELDS = [
+  'id', 'slug', 'name', 'address', 'city', 'state', 'phone', 'type',
+  'latitude', 'longitude', 'distance', 'rating', 'reviewCount',
+  'is_claimed', 'is_featured', 'safety_verified', 'safety_review_status',
+  'price_range', 'specialties', 'subtypes', 'services', 'medical_team',
+  'mobile_service', 'hours', 'imageUrl', 'image_url',
+] as const;
+
+export function slimProviderForList(p: Provider): Provider {
+  const rec = p as unknown as Record<string, unknown>;
+  const slim: Record<string, unknown> = {};
+  for (const f of LIST_FIELDS) {
+    if (rec[f] !== undefined) slim[f] = rec[f];
+  }
+  // Cards line-clamp the description; anything past ~300 chars never renders.
+  const desc = typeof rec.description === 'string' ? rec.description : '';
+  if (desc) slim.description = desc.length > 300 ? `${desc.slice(0, 300).trimEnd()}…` : desc;
+  return slim as unknown as Provider;
+}
+
 // Valid lat/lng or null. Guards against 0,0 and non-numeric values.
 export const coordsOf = (p: Provider): [number, number] | null => {
   const lat = Number(p.latitude);

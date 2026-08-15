@@ -14,6 +14,7 @@ import { Footer } from '@/src/components/Footer';
 import { BreadcrumbNav } from '@/src/components/BreadcrumbNav';
 import { QuizCTA } from '@/src/components/QuizCTA';
 import { ListingController } from '@/src/components/ListingController';
+import { slimProviderForList } from '@/src/lib/clinic-display';
 import { ProviderCard } from '@/src/components/ProviderCard';
 import { getCityBySlug, getListingsByCity, getAllCities, getListingsByState, getFeaturedListings, getBlogPostBySlug, slugify, getTorontoGtaTieredListings } from '@/src/lib/data';
 import { marketOf } from '@/src/lib/market';
@@ -999,7 +1000,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
                   </div>
                 </div>
                 <ListingController
-                  initialProviders={torontoCore}
+                  initialProviders={torontoCore.map(slimProviderForList)}
                   cityName={cityData.name}
                   hideHeading
                 />
@@ -1019,7 +1020,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
                   </div>
                 </div>
                 <ListingController
-                  initialProviders={torontoNearby}
+                  initialProviders={torontoNearby.map(slimProviderForList)}
                   cityName={cityData.name}
                   hideHeading
                 />
@@ -1047,7 +1048,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
                 </div>
               )}
               <ListingController
-                initialProviders={listings}
+                initialProviders={listings.map(slimProviderForList)}
                 cityName={cityData.name}
               />
             </>
