@@ -177,7 +177,18 @@ export async function POST(req: NextRequest) {
 
   // ---- Map constrained answers -> real listing fields ----
   const drips = (answers.drips || []).filter((d) => d && typeof d.name === 'string' && d.name.trim());
-  const services = drips.map((d) => ({ name: d.name.trim(), price: normalizePrice(d.price) }));
+  // Duration was collected by the form but silently dropped until 2026-08-15
+  // (drip-capture fix): owners were giving us the data and we threw it away.
+  // source 'finish_template' marks that these names are OUR standard menu
+  // labels the owner selected, not the clinic's verbatim published menu — the
+  // display layer must attribute them that way (badge-standard/drip-capture
+  // attribution rule: never present template labels as the clinic's own menu).
+  const services = drips.map((d) => ({
+    name: d.name.trim(),
+    price: normalizePrice(d.price),
+    ...(typeof d.duration === 'string' && d.duration.trim() ? { duration: d.duration.trim().slice(0, 30) } : {}),
+    source: 'finish_template',
+  }));
   const boosterNames = (answers.boosters || []).filter((b): b is string => typeof b === 'string' && b.trim().length > 0).map((b) => b.trim());
   // Boosters round out the offered-treatments list (deduped against drips) but
   // are not priced services.

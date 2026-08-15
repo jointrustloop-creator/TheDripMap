@@ -305,6 +305,12 @@ export default function DefinitiveListingLayout({
 
   const drips = buildDripMenu(provider);
   const dripDefs = new Map(drips.map((d) => [d.name, findDefinition(d.name)]));
+  // Attribution (drip-capture rule 2026-08-15): services chosen in /finish carry
+  // source 'finish_template' — OUR standard labels the owner selected, not the
+  // clinic's verbatim published menu. Say so under the menu heading rather than
+  // presenting them as the clinic's own menu copy.
+  const menuIsTemplateSourced = ((provider as { services?: Array<{ source?: string }> }).services || [])
+    .some((s2) => s2 && s2.source === 'finish_template');
   const ivDrips = drips.filter((d) => isIvService(d.name, !!dripDefs.get(d.name)));
   const otherServices = drips.filter((d) => !isIvService(d.name, !!dripDefs.get(d.name)));
 
@@ -817,6 +823,12 @@ export default function DefinitiveListingLayout({
               <section className="mb-[46px]">
                 <div className="text-[11.5px] tracking-[0.18em] uppercase text-[#b08a3e] font-semibold inline-flex items-center gap-[10px] mb-[14px] before:content-[''] before:w-[22px] before:h-[1px] before:bg-[#b08a3e]">Drip menu</div>
                 <h2 className="font-[var(--font-fraunces)] text-[28px] font-normal tracking-tight mb-4 leading-[1.15]">{ivDrips.length > 0 ? 'IV therapy at this clinic' : 'Services offered'}</h2>
+                {menuIsTemplateSourced && (
+                  <p className="text-[12px] text-[#8a938c] -mt-2 mb-4">
+                    Selected by the clinic owner from TheDripMap&apos;s standard drip list. Names and
+                    formulations on the clinic&apos;s own menu may differ; confirm details with the clinic.
+                  </p>
+                )}
                 {ivDrips.length > 0 && (
                   <div className="grid gap-[10px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(185px, 1fr))' }}>
                     {ivDrips.map((d) => (
