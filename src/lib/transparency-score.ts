@@ -53,6 +53,32 @@ function arr(v: unknown): unknown[] {
 }
 
 /**
+ * Operator-verified prescriber record (2026-08-16 rule change). Stored at
+ * decision_drivers.prescriber_verification by the /admin/badge-reviews
+ * "record prescriber" action, and ONLY there — same human-only pattern as
+ * safety_verified. Self-declared /finish answers never set it.
+ *
+ * Shape: { name, credential, reg_num, verified: true, verified_at, verified_by }
+ */
+export interface PrescriberVerification {
+  name: string;
+  credential: string;
+  regNum: string;
+  verifiedAt: string | null;
+}
+
+export function verifiedPrescriber(providerRaw: Raw | null | undefined): PrescriberVerification | null {
+  const p = providerRaw || {};
+  const dd = (p.decision_drivers && typeof p.decision_drivers === 'object' ? p.decision_drivers : {}) as Raw;
+  const pv = (dd.prescriber_verification && typeof dd.prescriber_verification === 'object'
+    ? dd.prescriber_verification : {}) as Raw;
+  const name = str(pv.name);
+  const regNum = str(pv.reg_num);
+  if (pv.verified !== true || !name || !regNum) return null;
+  return { name, credential: str(pv.credential), regNum, verifiedAt: str(pv.verified_at) || null };
+}
+
+/**
  * Compute the Transparency Score from a RAW provider row (must include
  * decision_drivers.manage; do NOT pass an enrichProvider() result here).
  */
@@ -67,16 +93,13 @@ export function computeTransparencyScore(providerRaw: Raw | null | undefined): T
   const specialties = arr(p.specialties).map((x) => str(x));
   const drips = arr(manage.drips);
   const description = str(p.description);
-  const medicalTeam = arr(p.medical_team);
 
-  // 1. Medical oversight disclosed: a supervising clinician or oversight model
-  //    is named (team.oversight / team.leadName / medical_team column).
-  const oversight = str(team.oversight);
-  const leadName = str(team.leadName);
-  const check1 =
-    (oversight !== '' && !/^none$/i.test(oversight)) ||
-    leadName !== '' ||
-    medicalTeam.length > 0;
+  // 1. Prescriber verified (RULE CHANGE 2026-08-16): this point ONLY counts
+  //    when a named prescriber with a registration number has been human
+  //    verified by the operator (decision_drivers.prescriber_verification,
+  //    written solely by /admin/badge-reviews). Self-declared oversight
+  //    answers no longer earn it, so the max self-declared score is 6/7.
+  const check1 = verifiedPrescriber(p) !== null;
 
   // 2. Administering professional identified: at least one role stated.
   const whoPlaces = arr(team.whoPlaces).map((x) => str(x)).filter(Boolean);
@@ -115,7 +138,7 @@ export function computeTransparencyScore(providerRaw: Raw | null | undefined): T
     str(p.online_booking_url) !== '' || str(p.phone) !== '' || str(firstVisit.booking) !== '';
 
   const checks: TransparencyCheck[] = [
-    { key: 'oversight', label: 'Medical oversight disclosed', passed: check1 },
+    { key: 'oversight', label: 'Prescriber verified with their regulator', passed: check1 },
     { key: 'administrator', label: 'Administering professional identified', passed: check2 },
     { key: 'screening', label: 'Health screening disclosed', passed: check3 },
     { key: 'ingredients', label: 'Drip ingredients disclosed', passed: check4 },
@@ -133,7 +156,7 @@ export function computeTransparencyScore(providerRaw: Raw | null | undefined): T
 // Map each check to the /finish field an owner completes to earn it. Used by
 // the owner facing "raise your score" hints and by outreach copy.
 export const CHECK_TO_FINISH_FIELD: Record<string, string> = {
-  oversight: 'Team and oversight',
+  oversight: 'Your prescriber\'s name and registration number (we verify it with the register)',
   administrator: 'Who administers your IVs',
   screening: 'First visit and screening',
   ingredients: 'Your drip menu',

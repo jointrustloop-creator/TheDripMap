@@ -26,6 +26,7 @@ import { sendMail } from '../../../../src/lib/mailer';
 import { manageUrlForProvider } from '../../../../src/lib/manage-token';
 import { buildCompletionRequestEmail, missingSafetyParts } from '../../../../src/lib/badge-review';
 import { isSafetyComplete } from '../../../../src/lib/safety';
+import { computeTransparencyScore } from '../../../../src/lib/transparency-score';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -138,6 +139,78 @@ export async function POST(req: NextRequest) {
             },
             safety_evidence: [...prevEvidence, evidence],
           },
+        },
+        { count: 'exact' },
+      )
+      .eq('id', provider.id);
+    if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 });
+    if (count !== null && count !== 1) {
+      return NextResponse.json({ error: `unexpected update scope: ${count} rows` }, { status: 500 });
+    }
+    return back;
+  }
+
+  if (action === 'record_prescriber') {
+    // Transparency Score rule change (2026-08-16): the "prescriber verified"
+    // point only counts when the operator records a named prescriber with a
+    // registration number AND flips the verified toggle, having checked the
+    // public register. This is the ONLY writer of prescriber_verification —
+    // the same human-only pattern as safety_verified. Unchecking the toggle
+    // (or clearing name/reg#) removes the point again.
+    const name = String(form.get('prescriber_name') || '').trim();
+    const credential = String(form.get('prescriber_credential') || '').trim();
+    const regNum = String(form.get('prescriber_reg_num') || '').trim();
+    const verified = String(form.get('prescriber_verified') || '') === 'on';
+    if (verified && (!name || !regNum)) {
+      return NextResponse.json(
+        { error: 'cannot mark verified without both a prescriber name and a registration number' },
+        { status: 400 },
+      );
+    }
+    const today = nowIso.slice(0, 10);
+    const existingDD = (provider.decision_drivers && typeof provider.decision_drivers === 'object')
+      ? (provider.decision_drivers as Record<string, unknown>)
+      : {};
+    const prevEvidence = Array.isArray(existingDD.safety_evidence)
+      ? (existingDD.safety_evidence as unknown[])
+      : existingDD.safety_evidence ? [existingDD.safety_evidence] : [];
+    const evidence = `Prescriber record ${today} by operator: ${name || '(none)'}` +
+      (credential ? ` (${credential})` : '') + (regNum ? `, reg# ${regNum}` : '') +
+      `, verified=${verified}`;
+    const nextDD = {
+      ...existingDD,
+      prescriber_verification: {
+        name,
+        credential,
+        reg_num: regNum,
+        verified,
+        verified_at: verified ? nowIso : null,
+        verified_by: verified ? reviewedBy : null,
+      },
+      safety_evidence: [...prevEvidence, evidence],
+    };
+    // Recompute the stored Transparency Score in the same write path so the
+    // point appears (or disappears) immediately — render surfaces read the
+    // stored columns, never recompute. The top-of-route SELECT is narrow, so
+    // fetch the FULL row here: computing from the narrow row would falsely
+    // fail checks 4-7 (menu, pricing, business, booking) and clobber the score.
+    const { data: fullRow, error: fullErr } = await sb
+      .from('providers')
+      .select('*')
+      .eq('id', provider.id)
+      .maybeSingle();
+    if (fullErr || !fullRow) {
+      return NextResponse.json({ error: fullErr?.message || 'provider row fetch failed' }, { status: 500 });
+    }
+    const t = computeTransparencyScore({ ...(fullRow as Record<string, unknown>), decision_drivers: nextDD });
+    const { error: updErr, count } = await sb
+      .from('providers')
+      .update(
+        {
+          decision_drivers: nextDD,
+          transparency_score: t.score,
+          transparency_checks: t.checks,
+          transparency_scored_at: nowIso,
         },
         { count: 'exact' },
       )

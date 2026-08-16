@@ -165,10 +165,34 @@ public or internal-actionable.
 | Completeness | `isSafetyComplete()` in `src/lib/safety.ts` | Requires who-administers AND a §3-qualified prescriber named. |
 | Approval | `/api/admin/badge-review-action` (`approve`) | Refuses approval unless the questionnaire is complete; operator looks up the registration (§4) and, for ND-prescriber clinics, the IVIT premises (§4.5) before approving. |
 | Render gate | `isSafetyVerified()` in `src/lib/safety.ts` | Requires `safety_verified=true` AND `safety_review_status='approved'`. **Every** surface (cards, listing layouts, city pages, explore, schema) must use this — never the raw flag. |
+| Transparency Score | `computeTransparencyScore()` in `src/lib/transparency-score.ts` | Point 1 ("Prescriber verified with their regulator") counts ONLY when `verifiedPrescriber()` returns a record (§6.1). Self-declared answers cap a listing at 6/7. |
 | Public content | `who-can-legally-give-iv-*` posts | Must state §2/§3 exactly; kept in sync with this doc. |
 
 The badge is **human-reviewed** (since 2026-07-25). Completing the questionnaire
 sets `safety_review_status='pending'`; it never auto-grants.
+
+### 6.1 Transparency Score prescriber gate (2026-08-16 operator ruling)
+
+A listing must never display a full **7/7 Transparency Score** on self-declared
+answers alone. The oversight point requires a prescriber **name + registration
+number that a human (operator) has checked against the public register**.
+
+- Stored at `decision_drivers.prescriber_verification`
+  `{ name, credential, reg_num, verified, verified_at, verified_by }`.
+- Written by exactly ONE surface: `/api/admin/badge-review-action`
+  (`record_prescriber`), reached from the Prescriber verification panel on
+  `/admin/badge-reviews`. The `/finish` owner form can never set it — same
+  human-only pattern as `safety_verified`.
+- `verified: true` is rejected unless both a name and a registration number are
+  present, so the flag can never stand alone.
+- Consequence: **max self-declared score is 6/7.** Losing the point shows the
+  honest lower number. No "pending" chip and no shaming label: the score reports
+  what is disclosed and verified, never a judgment about the clinic.
+- Because render surfaces read the STORED `transparency_score` column (the raw
+  `manage` answers are stripped from public objects), any rule change must be
+  followed by `npx tsx scripts/_transparency-recompute.ts`. Assert the result
+  with `--verify`, which exits non-zero if any listing still shows 7/7 without a
+  verified prescriber.
 
 ## 7. The Verification Ladder (adopted 2026-08-13, operator-approved)
 

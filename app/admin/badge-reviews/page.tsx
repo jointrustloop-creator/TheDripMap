@@ -55,6 +55,23 @@ function answers(dd: Record<string, unknown> | null) {
   return { who, oversight, sourcing, prescriber };
 }
 
+// Operator-verified prescriber record (Transparency Score rule 2026-08-16).
+// Written only by the record_prescriber action; the score's oversight point
+// counts ONLY when verified=true with a name and reg#.
+function prescriberRecord(dd: Record<string, unknown> | null) {
+  const p = (dd && typeof dd === 'object' ? (dd as { prescriber_verification?: unknown }).prescriber_verification : null) as
+    | { name?: string; credential?: string; reg_num?: string; verified?: boolean; verified_at?: string | null }
+    | null;
+  if (!p || (!p.name && !p.reg_num)) return null;
+  return {
+    name: p.name || '',
+    credential: p.credential || '',
+    regNum: p.reg_num || '',
+    verified: p.verified === true,
+    verifiedAt: p.verified_at ? String(p.verified_at).slice(0, 10) : null,
+  };
+}
+
 // The premises record, if an operator has looked the clinic up on the CONO
 // IVIT Premises Register (L5 mirror; docs/badge-standard.md §4.5).
 function premises(dd: Record<string, unknown> | null) {
@@ -80,6 +97,17 @@ export default async function BadgeReviewsPage() {
 
   const tableMissing = !!error && /safety_review_status/.test(error.message || '');
   const rows = (data || []) as Row[];
+
+  // All claimed clinics, for the prescriber-verification panel below. Renewal
+  // replies come from already-approved clinics that are NOT in the review
+  // queue, so this list is the entry point for recording their credentials.
+  const { data: claimedData } = await sb
+    .from('providers')
+    .select('id,name,slug,city,state,country,is_claimed,safety_verified,safety_review_status,safety_reviewed_at,safety_review_reason,safety_review_requested_at,decision_drivers,transparency_score')
+    .eq('is_claimed', true)
+    .eq('is_hidden', false)
+    .order('name', { ascending: true });
+  const claimedRows = (claimedData || []) as (Row & { transparency_score: number | null })[];
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10">
@@ -221,6 +249,90 @@ export default async function BadgeReviewsPage() {
             </div>
           );
         })}
+      </div>
+
+      {/* PRESCRIBER VERIFICATION (Transparency Score rule, 2026-08-16).
+          Separate from the review queue on purpose: badge-renewal replies come
+          from clinics that are already approved, so they never appear above.
+          Recording a name + reg# and ticking "verified" restores the clinic's
+          7th transparency point; unticking removes it again. */}
+      <div className="mt-14">
+        <h2 className="text-2xl font-black text-slate-900 mb-2">Prescriber verification</h2>
+        <p className="text-sm text-slate-500 mb-6 max-w-2xl">
+          The 7th transparency point (&quot;Prescriber verified with their regulator&quot;) counts only when you
+          record a prescriber name and registration number here and tick verified, having checked the public
+          register yourself. Self-declared answers never earn it, so a clinic tops out at 6 of 7 until you do.
+          Enter renewal replies here as they arrive.
+        </p>
+        <div className="text-[11px] text-slate-500 mb-5">
+          Registers:{' '}
+          <a href="https://register.cpso.on.ca/" target="_blank" className="underline font-semibold">CPSO</a>{' · '}
+          <a href="https://registry.cno.org/" target="_blank" className="underline font-semibold">CNO</a>{' · '}
+          <a href="https://cono.alinityapp.com/client/publicdirectory" target="_blank" className="underline font-semibold">CONO ND</a>{' · '}
+          <a href="https://cchpbc.ca/find-a-registrant/" target="_blank" className="underline font-semibold">CCHPBC (BC)</a>
+        </div>
+
+        <div className="space-y-3">
+          {claimedRows.map((c) => {
+            const rec = prescriberRecord(c.decision_drivers);
+            const a = answers(c.decision_drivers);
+            return (
+              <div key={c.id} className="bg-white border border-slate-200 rounded-2xl p-4">
+                <div className="flex flex-wrap items-center gap-3 mb-2">
+                  <span className="font-black text-slate-900">{c.name}</span>
+                  <span className="text-slate-400 text-sm">{[c.city, c.state].filter(Boolean).join(', ')}</span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                      rec?.verified ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    {rec?.verified ? `verified${rec.verifiedAt ? ` ${rec.verifiedAt}` : ''}` : 'not verified'}
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-bold">
+                    score {typeof c.transparency_score === 'number' ? `${c.transparency_score} of 7` : 'not scored'}
+                  </span>
+                  <a href={`/providers/${c.slug}`} target="_blank" className="text-wellness-700 text-xs font-bold underline underline-offset-2">
+                    listing
+                  </a>
+                </div>
+                {a.prescriber && (
+                  <div className="text-[11px] text-slate-500 mb-2">
+                    Owner stated: {a.prescriber}
+                  </div>
+                )}
+                <form action="/api/admin/badge-review-action" method="post" className="flex flex-wrap gap-2 items-center">
+                  <input type="hidden" name="action" value="record_prescriber" />
+                  <input type="hidden" name="provider_id" value={c.id} />
+                  <input
+                    name="prescriber_name"
+                    placeholder="prescriber full name"
+                    defaultValue={rec?.name || ''}
+                    className="border border-slate-200 rounded-lg px-2 py-1.5 text-xs w-56"
+                  />
+                  <input
+                    name="prescriber_credential"
+                    placeholder="MD / NP / ND"
+                    defaultValue={rec?.credential || ''}
+                    className="border border-slate-200 rounded-lg px-2 py-1.5 text-xs w-28"
+                  />
+                  <input
+                    name="prescriber_reg_num"
+                    placeholder="registration number"
+                    defaultValue={rec?.regNum || ''}
+                    className="border border-slate-200 rounded-lg px-2 py-1.5 text-xs w-44"
+                  />
+                  <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700">
+                    <input type="checkbox" name="prescriber_verified" defaultChecked={rec?.verified === true} />
+                    I checked the register
+                  </label>
+                  <button className="px-3 py-2 rounded-lg bg-slate-900 text-white text-xs font-black hover:bg-slate-800">
+                    Save
+                  </button>
+                </form>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
