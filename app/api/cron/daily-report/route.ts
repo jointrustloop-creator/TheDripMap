@@ -21,6 +21,7 @@ import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../../src/lib/mailer';
 import { REPORT_TO } from '../../../../src/lib/report-recipient';
 import { sendTelegram } from '../../../../src/lib/telegram';
+import { detectBadgeReply, BADGE_CAMPAIGNS } from '../../../../src/lib/badge-reply';
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
@@ -517,6 +518,64 @@ export async function GET(req: Request) {
     lines.push(`  ${badgePending} clinic(s) await Approve / Decline at /admin/badge-reviews.`);
   }
   lines.push('');
+
+  // BADGE REPLIES (2026-08-16): clinics emailed in a badge-renewal campaign were
+  // asked for their prescriber's name, credential and registration number. A
+  // reply carrying those details unblocks a verification, so it is surfaced here
+  // rather than left to be spotted in the inbox. Detection is signal-reporting
+  // only; recording the prescriber stays a human action.
+  try {
+    const { data: campaignRows } = await supabase
+      .from('outbound_message_log')
+      .select('to_email, campaign, template_id')
+      .order('sent_at', { ascending: false })
+      .limit(1000);
+    // Tolerate the pre-migration shape, where campaign lived in template_id as
+    // 'gmail_manual:<campaign>' (see scripts/sql/add-contact-log-campaign-fields.sql).
+    const campaignEmails = new Set(
+      (campaignRows || [])
+        .filter((r: { campaign?: string | null; template_id?: string | null }) => {
+          const c = r.campaign || (r.template_id || '').split(':')[1] || '';
+          return BADGE_CAMPAIGNS.includes(c);
+        })
+        .map((r: { to_email?: string | null }) => (r.to_email || '').toLowerCase())
+        .filter(Boolean),
+    );
+
+    if (campaignEmails.size > 0) {
+      const { data: replies } = await supabase
+        .from('email_replies')
+        .select('from_email, subject, snippet, received_at, gmail_thread_url')
+        .gte('received_at', new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString())
+        .order('received_at', { ascending: false })
+        .limit(200);
+      const badgeReplies = (replies || [])
+        .filter((r: { from_email?: string | null }) => campaignEmails.has((r.from_email || '').toLowerCase()))
+        .map((r: { from_email?: string | null; subject?: string | null; snippet?: string | null; received_at?: string | null; gmail_thread_url?: string | null }) => ({
+          ...r,
+          detected: detectBadgeReply(`${r.subject || ''}\n${r.snippet || ''}`),
+        }))
+        .filter((r) => r.detected.isBadgeReply);
+
+      lines.push(`BADGE REPLIES, ACTION NEEDED (${badgeReplies.length})`);
+      if (badgeReplies.length === 0) {
+        lines.push('  None in the last 14 days.');
+      } else {
+        for (const r of badgeReplies) {
+          lines.push(`  - BADGE REPLY, action needed: ${r.from_email}`);
+          lines.push(`      found: ${r.detected.signals.join(' | ')}`);
+          lines.push(`      received ${(r.received_at || '').slice(0, 10)}`);
+          if (r.gmail_thread_url) lines.push(`      thread: ${r.gmail_thread_url}`);
+        }
+        lines.push('  Record each at /admin/badge-reviews (Prescriber verification), then tick verified.');
+      }
+      lines.push('');
+    }
+  } catch (e) {
+    lines.push('BADGE REPLIES, ACTION NEEDED');
+    lines.push(`  check failed: ${e instanceof Error ? e.message : String(e)}`);
+    lines.push('');
+  }
 
   // Onboarding email audit (read-only): confirm the finish-listing email went
   // out within 5 min of each verification in the last 24h. Missing sends are
