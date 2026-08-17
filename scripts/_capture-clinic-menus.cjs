@@ -51,25 +51,42 @@ const INGREDIENTS = [
   ['edta', [' edta', 'chelation']], ['ozone', ['ozone']], ['curcumin', ['curcumin']],
 ];
 
+// Crash visibility: the process died silently (exit 0) at the same clinic on
+// two runs. Log ANY escape hatch so the killer is identifiable, and never let
+// one bad host end the run.
+process.on('uncaughtException', (e) => { console.log('UNCAUGHT:', e && e.message); });
+process.on('unhandledRejection', (e) => { console.log('UNHANDLED:', e && (e.message || e)); });
+
 function fetchUrl(url) {
   return new Promise((resolve) => {
     let redirects = 0;
+    let settled = false;
+    const done = (v) => { if (!settled) { settled = true; resolve(v); } };
     const go = (u) => {
-      const mod = u.startsWith('https') ? https : http;
-      const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), TIMEOUT);
-      const req = mod.get(u, { signal: ctrl.signal, headers: { 'User-Agent': 'Mozilla/5.0 (compatible; TheDripMapBot/1.0; +https://www.thedripmap.com)' } }, (r) => {
-        if (r.statusCode >= 300 && r.statusCode < 400 && r.headers.location && redirects < 3) {
-          redirects++; clearTimeout(t); r.resume();
-          const next = r.headers.location.startsWith('http') ? r.headers.location : new URL(r.headers.location, u).href;
-          return go(next);
-        }
-        if (r.statusCode !== 200) { clearTimeout(t); r.resume(); return resolve({ ok: false, status: r.statusCode }); }
-        let d = '';
-        r.on('data', (c) => { d += c; if (d.length > 900000) { req.destroy(); } });
-        r.on('end', () => { clearTimeout(t); resolve({ ok: true, html: d, finalUrl: u }); });
-      });
-      req.on('error', () => { clearTimeout(t); resolve({ ok: false, status: 'ERR' }); });
+      try {
+        const mod = u.startsWith('https') ? https : http;
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), TIMEOUT);
+        const req = mod.get(u, { signal: ctrl.signal, headers: { 'User-Agent': 'Mozilla/5.0 (compatible; TheDripMapBot/1.0; +https://www.thedripmap.com)' } }, (r) => {
+          r.on('error', () => { clearTimeout(t); done({ ok: false, status: 'RESP_ERR' }); });
+          if (r.statusCode >= 300 && r.statusCode < 400 && r.headers.location && redirects < 3) {
+            redirects++; clearTimeout(t); r.resume();
+            let next;
+            try { next = r.headers.location.startsWith('http') ? r.headers.location : new URL(r.headers.location, u).href; }
+            catch { return done({ ok: false, status: 'BAD_REDIRECT' }); }
+            return go(next);
+          }
+          if (r.statusCode !== 200) { clearTimeout(t); r.resume(); return done({ ok: false, status: r.statusCode }); }
+          let d = '';
+          r.on('data', (c) => { d += c; if (d.length > 900000) { clearTimeout(t); done({ ok: true, html: d, finalUrl: u }); req.destroy(); } });
+          r.on('end', () => { clearTimeout(t); done({ ok: true, html: d, finalUrl: u }); });
+          r.on('aborted', () => { clearTimeout(t); done({ ok: false, status: 'ABORTED' }); });
+        });
+        req.on('error', () => { clearTimeout(t); done({ ok: false, status: 'ERR' }); });
+      } catch (e) {
+        console.log('FETCH_THROW:', u, e && e.message);
+        done({ ok: false, status: 'THROW' });
+      }
     };
     go(url);
   });
@@ -122,12 +139,31 @@ function extract(lines, sourceUrl, capturedAt) {
   return out;
 }
 
+// --gta mode (keyword sprint, 2026-08-16): capture Toronto + GTA clinic menus
+// regardless of claim status, to unblock the Toronto and NAD price targets
+// (both below the n>=3 publish rule). Same verbatim-attribution pipeline; the
+// loader still takes only reviewed high-confidence rows.
+const GTA_MODE = process.argv.includes('--gta');
+const GTA_CITIES = ['Toronto', 'North York', 'Scarborough', 'Etobicoke', 'York', 'East York',
+  'Mississauga', 'Brampton', 'Vaughan', 'Markham', 'Richmond Hill', 'Oakville', 'Burlington'];
+
 (async () => {
-  const { data: claimed, error } = await s.from('providers')
-    .select('id,slug,name,city,website').eq('is_claimed', true)
-    .not('website', 'is', null);
+  const query = GTA_MODE
+    ? s.from('providers')
+        .select('id,slug,name,city,website').in('city', GTA_CITIES)
+        .eq('is_hidden', false).eq('country', 'Canada')
+        .not('website', 'is', null)
+    : s.from('providers')
+        .select('id,slug,name,city,website').eq('is_claimed', true)
+        .not('website', 'is', null);
+  const { data: claimed, error } = await query;
   if (error) { console.log('ERR', error.message); return; }
   let targets = (claimed || []).filter((p) => /^https?:\/\//i.test(p.website || ''));
+  if (GTA_MODE) {
+    // Toronto proper first (the blocked target), then the rest of the GTA.
+    const core = new Set(['Toronto', 'North York', 'Scarborough', 'Etobicoke', 'York', 'East York']);
+    targets.sort((a, b) => (core.has(b.city) ? 1 : 0) - (core.has(a.city) ? 1 : 0));
+  }
   // RESUMABLE (hard lesson: Windows+Node dies silently mid-scrape, exit 0):
   // partial JSON is written after EVERY clinic, and a restart skips clinics
   // already captured.

@@ -51,7 +51,12 @@ export async function generateMetadata(): Promise<Metadata> {
 // per clinic. Tolerant: any failure returns null and the FAQ is simply omitted,
 // this page must never break on a data hiccup. Numbers are computed live so the
 // published answer can never drift from the dataset (the n>=3 moat rule).
-async function getMyersStats(): Promise<{ clinics: number; low: number; high: number; median: number; cities: string[] } | null> {
+interface DripStats { clinics: number; low: number; high: number; median: number; cities: string[] }
+
+async function getDripStats(
+  formulaId: string,
+  cityFilter?: string[],
+): Promise<DripStats | null> {
   try {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -61,17 +66,21 @@ async function getMyersStats(): Promise<{ clinics: number; low: number; high: nu
     const { data: drips, error } = await sb
       .from('clinic_drips')
       .select('provider_id, price_cad')
-      .eq('formula_id', 'myers')
+      .eq('formula_id', formulaId)
       .eq('is_active', true)
       .not('price_cad', 'is', null);
     if (error || !drips || drips.length === 0) return null;
     const ids = Array.from(new Set(drips.map((d) => d.provider_id)));
     const { data: provs } = await sb.from('providers').select('id, city, country').in('id', ids);
-    const caIds = new Map((provs || []).filter((p) => p.country === 'Canada').map((p) => [p.id, p.city as string]));
+    const eligible = new Map(
+      (provs || [])
+        .filter((p) => p.country === 'Canada' && (!cityFilter || cityFilter.includes(p.city as string)))
+        .map((p) => [p.id, p.city as string]),
+    );
     // One representative price per clinic (lowest listed), matching the index method.
     const perClinic = new Map<string, number>();
     for (const d of drips) {
-      if (!caIds.has(d.provider_id)) continue;
+      if (!eligible.has(d.provider_id)) continue;
       const price = Number(d.price_cad);
       const prev = perClinic.get(d.provider_id);
       if (prev === undefined || price < prev) perClinic.set(d.provider_id, price);
@@ -83,7 +92,54 @@ async function getMyersStats(): Promise<{ clinics: number; low: number; high: nu
       low: Math.min(...prices),
       high: Math.max(...prices),
       median: median(prices),
-      cities: Array.from(new Set(Array.from(perClinic.keys()).map((id) => caIds.get(id)).filter(Boolean))) as string[],
+      cities: Array.from(new Set(Array.from(perClinic.keys()).map((id) => eligible.get(id)).filter(Boolean))) as string[],
+    };
+  } catch {
+    return null;
+  }
+}
+
+// Toronto question covers the city proper; "standard drip" = the everyday
+// formula family, mirroring the city index's headline metric.
+const TORONTO_CORE = ['Toronto', 'North York', 'Scarborough', 'Etobicoke', 'York', 'East York'];
+const STANDARD_FORMULAS = ['myers', 'hydration', 'energy', 'immune', 'hangover'];
+
+async function getTorontoStats(): Promise<DripStats | null> {
+  try {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) return null;
+    const { createClient } = await import('@supabase/supabase-js');
+    const sb = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+    const { data: drips, error } = await sb
+      .from('clinic_drips')
+      .select('provider_id, price_cad, formula_id')
+      .in('formula_id', STANDARD_FORMULAS)
+      .eq('is_active', true)
+      .not('price_cad', 'is', null);
+    if (error || !drips || drips.length === 0) return null;
+    const ids = Array.from(new Set(drips.map((d) => d.provider_id)));
+    const { data: provs } = await sb.from('providers').select('id, city, country').in('id', ids);
+    const eligible = new Map(
+      (provs || [])
+        .filter((p) => p.country === 'Canada' && TORONTO_CORE.includes(p.city as string))
+        .map((p) => [p.id, p.city as string]),
+    );
+    const perClinic = new Map<string, number>();
+    for (const d of drips) {
+      if (!eligible.has(d.provider_id)) continue;
+      const price = Number(d.price_cad);
+      const prev = perClinic.get(d.provider_id);
+      if (prev === undefined || price < prev) perClinic.set(d.provider_id, price);
+    }
+    const prices = Array.from(perClinic.values());
+    if (prices.length < 3) return null; // n>=3 rule
+    return {
+      clinics: prices.length,
+      low: Math.min(...prices),
+      high: Math.max(...prices),
+      median: median(prices),
+      cities: Array.from(new Set(Array.from(perClinic.keys()).map((id) => eligible.get(id)).filter(Boolean))) as string[],
     };
   } catch {
     return null;
@@ -92,7 +148,11 @@ async function getMyersStats(): Promise<{ clinics: number; low: number; high: nu
 
 export default async function PriceIndexHubPage() {
   const cities = coveredCities();
-  const myers = await getMyersStats();
+  const [myers, nad, toronto] = await Promise.all([
+    getDripStats('myers'),
+    getDripStats('nad_infusion'),
+    getTorontoStats(),
+  ]);
   const natMedian = median(cities.map((c) => c.headline.median));
   const natLow = Math.min(...cities.map((c) => c.headline.low));
   const natHigh = Math.max(...cities.map((c) => c.headline.high));
@@ -112,6 +172,18 @@ export default async function PriceIndexHubPage() {
       ? [{
           q: `How much does a Myers cocktail cost in Canada?`,
           a: `Across ${myers.clinics} Canadian clinic menus we track (${myers.cities.join(', ')}), a Myers cocktail runs ${ca(myers.low)} to ${ca(myers.high)} CAD, with a median of ${ca(myers.median)}. Every price comes from the clinic's own published menu, with the source URL and capture date recorded. Added ingredients like glutathione, bag volume, and bundled naturopath consults move the number. See our full ingredient breakdown at /blog/what-is-in-a-myers-cocktail.`,
+        }]
+      : []),
+    ...(nad
+      ? [{
+          q: `How much does NAD+ IV therapy cost in Canada?`,
+          a: `Across ${nad.clinics} Canadian clinic menus we track that publish a NAD+ infusion price, NAD+ runs ${ca(nad.low)} to ${ca(nad.high)} CAD, with a median of ${ca(nad.median)}. NAD+ is dose based: clinics price by milligrams in the bag, so the same clinic often lists several tiers and the range is wider than for standard drips. Every price comes from the clinic's own published menu with the source URL and capture date recorded.`,
+        }]
+      : []),
+    ...(toronto
+      ? [{
+          q: `How much does IV therapy cost in Toronto?`,
+          a: `Across ${toronto.clinics} Toronto clinic menus we track, a standard IV vitamin drip runs ${ca(toronto.low)} to ${ca(toronto.high)} CAD, with a median of ${ca(toronto.median)}. These are published menu prices for everyday drips (Myers, hydration, energy, immune); NAD+ and specialty infusions cost more. Compare clinics at /cities/toronto, where verified listings show captured prices with sources.`,
         }]
       : []),
     {
