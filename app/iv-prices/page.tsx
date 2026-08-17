@@ -46,8 +46,53 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function PriceIndexHubPage() {
+// Live Myers cocktail stats from the drip-capture dataset (clinic_drips holds
+// verbatim menu prices with source URL + capture date). Canada only, one price
+// per clinic. Tolerant: any failure returns null and the FAQ is simply omitted,
+// this page must never break on a data hiccup. Numbers are computed live so the
+// published answer can never drift from the dataset (the n>=3 moat rule).
+async function getMyersStats(): Promise<{ clinics: number; low: number; high: number; median: number; cities: string[] } | null> {
+  try {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) return null;
+    const { createClient } = await import('@supabase/supabase-js');
+    const sb = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+    const { data: drips, error } = await sb
+      .from('clinic_drips')
+      .select('provider_id, price_cad')
+      .eq('formula_id', 'myers')
+      .eq('is_active', true)
+      .not('price_cad', 'is', null);
+    if (error || !drips || drips.length === 0) return null;
+    const ids = Array.from(new Set(drips.map((d) => d.provider_id)));
+    const { data: provs } = await sb.from('providers').select('id, city, country').in('id', ids);
+    const caIds = new Map((provs || []).filter((p) => p.country === 'Canada').map((p) => [p.id, p.city as string]));
+    // One representative price per clinic (lowest listed), matching the index method.
+    const perClinic = new Map<string, number>();
+    for (const d of drips) {
+      if (!caIds.has(d.provider_id)) continue;
+      const price = Number(d.price_cad);
+      const prev = perClinic.get(d.provider_id);
+      if (prev === undefined || price < prev) perClinic.set(d.provider_id, price);
+    }
+    const prices = Array.from(perClinic.values());
+    if (prices.length < 3) return null; // n>=3 rule: never publish a thin number
+    return {
+      clinics: prices.length,
+      low: Math.min(...prices),
+      high: Math.max(...prices),
+      median: median(prices),
+      cities: Array.from(new Set(Array.from(perClinic.keys()).map((id) => caIds.get(id)).filter(Boolean))) as string[],
+    };
+  } catch {
+    return null;
+  }
+}
+
+export default async function PriceIndexHubPage() {
   const cities = coveredCities();
+  const myers = await getMyersStats();
   const natMedian = median(cities.map((c) => c.headline.median));
   const natLow = Math.min(...cities.map((c) => c.headline.low));
   const natHigh = Math.max(...cities.map((c) => c.headline.high));
@@ -63,6 +108,12 @@ export default function PriceIndexHubPage() {
       q: `Which Canadian cities does the IV Price Index cover?`,
       a: `Right now: ${cities.map((c) => `${c.city} (${c.clinicCount} clinics)`).join(', ')}. We publish a city only once at least three clinics there have a public price for a drip, so the numbers are reliable. We add cities as coverage grows and as clinics add verified prices when they claim their listing.`,
     },
+    ...(myers
+      ? [{
+          q: `How much does a Myers cocktail cost in Canada?`,
+          a: `Across ${myers.clinics} Canadian clinic menus we track (${myers.cities.join(', ')}), a Myers cocktail runs ${ca(myers.low)} to ${ca(myers.high)} CAD, with a median of ${ca(myers.median)}. Every price comes from the clinic's own published menu, with the source URL and capture date recorded. Added ingredients like glutathione, bag volume, and bundled naturopath consults move the number. See our full ingredient breakdown at /blog/what-is-in-a-myers-cocktail.`,
+        }]
+      : []),
     {
       q: `Where do these IV therapy prices come from?`,
       a: `We collect publicly published prices from each city's IV therapy clinics, take one representative price per clinic per drip, and report the low, median, and high across clinics. They are published menu prices, not medical advice. Prices change often, so confirm the current price with the clinic before booking.`,

@@ -557,6 +557,12 @@ export function buildLayerBEmail(report: GscReport, todayIso: string): LayerBEma
         ${searchAnalytics.topPages.map((p) => `<li><a href="${esc(p.page)}" style="color:#0F6E56;">${esc(p.page)}</a> — ${p.clicks} clicks, ${p.impressions} imp</li>`).join('')}
       </ol>
 
+      ${(searchAnalytics.trackedQueries || []).length ? `
+      <h3 style="margin:18px 0 6px;">Keyword sprint watchlist</h3>
+      <ul style="font-size:13px;line-height:1.5;padding-left:20px;">
+        ${(searchAnalytics.trackedQueries || []).map((q) => `<li>${esc(q.query)} — ${q.position != null ? `pos ${q.position.toFixed(1)}, ${q.impressions} imp, ${q.clicks} clicks` : 'no impressions this window yet'}</li>`).join('')}
+      </ul>` : ''}
+
       <h3 style="margin:18px 0 6px;">Sitemaps</h3>
       <ul style="font-size:13px;line-height:1.5;padding-left:20px;">
         ${sitemaps.map((s) => `<li>${esc(s.path)} — submitted ${s.submitted}, indexed ${s.indexed}${s.warnings ? `, warnings ${s.warnings}` : ''}${s.errors ? `, errors ${s.errors}` : ''}</li>`).join('')}
@@ -594,6 +600,14 @@ export function buildLayerBEmail(report: GscReport, todayIso: string): LayerBEma
   text += `TOP 10 QUERIES\n`;
   for (const q of searchAnalytics.topQueries) {
     text += `  - ${q.query}  —  ${q.clicks} clicks, ${q.impressions} imp, pos ${q.position.toFixed(1)}\n`;
+  }
+  if ((searchAnalytics.trackedQueries || []).length) {
+    text += `\nKEYWORD SPRINT WATCHLIST\n`;
+    for (const q of searchAnalytics.trackedQueries) {
+      text += q.position != null
+        ? `  - ${q.query}  —  pos ${q.position.toFixed(1)}, ${q.impressions} imp, ${q.clicks} clicks\n`
+        : `  - ${q.query}  —  no impressions this window yet\n`;
+    }
   }
   text += `\nTOP 10 PAGES\n`;
   for (const p of searchAnalytics.topPages) {

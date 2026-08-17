@@ -55,7 +55,29 @@ export interface SearchAnalyticsSummary {
   wow: { clicks: number; impressions: number };
   topQueries: Array<{ query: string; clicks: number; impressions: number; ctr: number; position: number }>;
   topPages: Array<{ page: string; clicks: number; impressions: number; ctr: number; position: number }>;
+  /** Sprint watchlist rows; null position = no impressions recorded in the window. */
+  trackedQueries: Array<{ query: string; clicks: number; impressions: number; position: number | null }>;
 }
+
+/**
+ * Keyword-sprint watchlist (Aug 2026): the queries the sprint content targets.
+ * The weekly report shows each one's position so the climb is visible. Add to
+ * this list when a new sprint ships; remove only when a query is abandoned.
+ */
+export const TRACKED_QUERIES: string[] = [
+  'is iv therapy covered by ohip',
+  'does insurance cover iv therapy canada',
+  'do you need a prescription for iv therapy in canada',
+  'can a nurse start an iv clinic in ontario',
+  'myers cocktail cost canada',
+  'what is in a myers cocktail',
+  'is iv vitamin therapy worth it',
+  'iv drip vs drinking water',
+  'iron infusion oakville',
+  // Deferred sprint targets (content ships after menu capture widens):
+  'nad+ iv therapy cost canada',
+  'how much does iv therapy cost in toronto',
+];
 
 export interface SitemapEntry {
   path: string;
@@ -161,12 +183,24 @@ async function fetchSearchAnalytics(token: string, property: string): Promise<Se
   const recent = dateRange(28, 0);
   const previous = dateRange(28, 28);
 
-  const [totalsRecent, totalsPrev, queriesRes, pagesRes] = await Promise.all([
+  const [totalsRecent, totalsPrev, queriesRes, pagesRes, allQueriesRes] = await Promise.all([
     searchAnalyticsQuery(token, property, { ...recent, dimensions: [] }),
     searchAnalyticsQuery(token, property, { ...previous, dimensions: [] }),
     searchAnalyticsQuery(token, property, { ...recent, dimensions: ['query'], rowLimit: 10 }),
     searchAnalyticsQuery(token, property, { ...recent, dimensions: ['page'], rowLimit: 10 }),
+    // Wide pull to resolve the sprint watchlist without one API call per query.
+    searchAnalyticsQuery(token, property, { ...recent, dimensions: ['query'], rowLimit: 1000 }),
   ]);
+
+  const byQuery = new Map(
+    (allQueriesRes.rows ?? []).map((r) => [String(r.keys?.[0] || '').toLowerCase(), r]),
+  );
+  const trackedQueries = TRACKED_QUERIES.map((q) => {
+    const row = byQuery.get(q.toLowerCase());
+    return row
+      ? { query: q, clicks: Math.round(row.clicks), impressions: Math.round(row.impressions), position: row.position }
+      : { query: q, clicks: 0, impressions: 0, position: null };
+  });
 
   const tR = totalsRecent.rows?.[0] ?? { clicks: 0, impressions: 0, ctr: 0, position: 0 };
   const tP = totalsPrev.rows?.[0] ?? { clicks: 0, impressions: 0, ctr: 0, position: 0 };
@@ -196,6 +230,7 @@ async function fetchSearchAnalytics(token: string, property: string): Promise<Se
       ctr: r.ctr,
       position: r.position,
     })),
+    trackedQueries,
   };
 }
 
