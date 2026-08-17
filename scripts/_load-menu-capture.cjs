@@ -15,10 +15,33 @@ const ONLY = (process.argv.find((a) => a.startsWith('--slug=')) || '').split('='
   if (probe.error) { console.log('clinic_drips not created yet (paste scripts/sql/create-drip-capture.sql). Nothing done.'); return; }
 
   const staging = JSON.parse(fs.readFileSync('.audit-tmp/_menu-capture.json', 'utf8'));
+  // Canada-first: only load Canadian clinics (QA found a US clinic's referral
+  // promo scored high-confidence — country filter removes that class entirely).
+  const { data: caRows } = await s.from('providers').select('id').eq('country', 'Canada');
+  const CA = new Set((caRows || []).map((r) => r.id));
+  // Manual review exclusions (GTA sprint QA pass, 2026-08-16):
+  // - upper-room-*: standing operator rule, never act on their published menu
+  // - timeless-health-*: their "high" rows are ORAL supplements (LipoMicel,
+  //   "Oral Liquid"), a retail store page, not an IV menu
+  // - serene-cosmetic: $799 "long-lasting hydration" is a skin treatment
+  const EXCLUDE_SLUGS = new Set([
+    'upper-room-clinic-toronto', 'upper-room-clinic-oakville',
+    'timeless-health-clinic-toronto', 'timeless-health-clinic-mississauga',
+    'serene-cosmetic-clinic-markham',
+  ]);
+  // Row-level: promo lines and indication-list fragments that scored high but
+  // are not a named drip with its price.
+  const EXCLUDE_ROW = (slug, name) =>
+    /receive \d+% off/i.test(name) ||
+    (slug === 'clara-clinic-toronto' && /^key ingredients/i.test(name)) ||
+    (slug === 'drip-club-toronto' && /^(cold & flu|hangovers, headaches)/i.test(name));
+
   let drips = 0, ings = 0, clinics = 0, skipped = 0;
   for (const c of staging) {
     if (ONLY && c.slug !== ONLY) continue;
-    const high = (c.drips || []).filter((d) => d.confidence === 'high');
+    if (EXCLUDE_SLUGS.has(c.slug)) { skipped++; continue; }
+    if (!CA.has(c.provider_id)) { skipped++; continue; }
+    const high = (c.drips || []).filter((d) => d.confidence === 'high' && !EXCLUDE_ROW(c.slug, d.published_name || ''));
     if (!high.length) { skipped++; continue; }
     const { data: existing, error: exErr } = await s.from('clinic_drips').select('id').eq('provider_id', c.provider_id).eq('source_type', 'clinic_website').limit(1);
     if (exErr) { console.log(`ERR probe ${c.slug}: ${exErr.message}`); continue; }
