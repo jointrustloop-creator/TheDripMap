@@ -16,10 +16,15 @@
 import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env.local', override: true });
 import { createClient } from '@supabase/supabase-js';
-import { computeTransparencyScore } from '../src/lib/transparency-score';
+import { computeTransparencyScore, verifiedPrescriber } from '../src/lib/transparency-score';
 
 const dry = process.argv.includes('--dry');
 const caOnly = process.argv.includes('--ca');
+// --verify: the E2E assertion for the 2026-08-16 prescriber gate. Reads what is
+// actually STORED (what every render surface displays) and fails loudly if any
+// listing shows 7/7 without an operator-verified prescriber. Exit code 1 on a
+// violation so it can gate a deploy.
+const verify = process.argv.includes('--verify');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -48,6 +53,32 @@ async function fetchAll() {
 async function main() {
   const all = await fetchAll();
   const active = all.filter((p) => !p.is_hidden);
+
+  if (verify) {
+    // Assert against the STORED value, not a fresh computation: surfaces render
+    // the stored column, so a stale-high stored score is exactly the failure
+    // this check exists to catch.
+    const storedSevens = active.filter((p) => Number(p.transparency_score) === 7);
+    const illegal = storedSevens.filter((p) => verifiedPrescriber(p) === null);
+    const legal = storedSevens.filter((p) => verifiedPrescriber(p) !== null);
+    console.log(`Active listings: ${active.length}`);
+    console.log(`Stored 7/7: ${storedSevens.length} (verified prescriber: ${legal.length}, WITHOUT: ${illegal.length})`);
+    for (const p of legal) console.log(`  OK   ${p.slug} — ${verifiedPrescriber(p)!.name}, reg# ${verifiedPrescriber(p)!.regNum}`);
+    for (const p of illegal) console.log(`  FAIL ${p.slug} — displays 7/7 with no verified prescriber`);
+    // Drift check: stored vs computed, which would mean a recompute is overdue.
+    const drift = active.filter((p) => typeof p.transparency_score === 'number'
+      && p.transparency_score !== computeTransparencyScore(p).score);
+    console.log(`Stored-vs-computed drift: ${drift.length}${drift.length ? ' (run without --verify to rewrite)' : ''}`);
+    for (const p of drift.slice(0, 20)) {
+      console.log(`  drift ${p.slug}: stored=${p.transparency_score} computed=${computeTransparencyScore(p).score}`);
+    }
+    if (illegal.length > 0) {
+      console.log('\nVERIFY FAILED: listings render 7/7 without an operator-verified prescriber.');
+      process.exit(1);
+    }
+    console.log('\nVERIFY PASSED: no listing renders 7/7 without an operator-verified prescriber.');
+    return;
+  }
   const ca = active.filter((p) => p.country === 'Canada');
   const scope = caOnly ? ca : active;
 
