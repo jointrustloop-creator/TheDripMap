@@ -114,7 +114,9 @@ export const GUIDES: Guide[] = [
     author: 'TheDripMap Editorial Team',
     lastUpdated: '2026-07-05',
     title: 'How Much Does IV Therapy Cost in Canada? Real 2026 Prices',
-    metaTitle: 'IV Therapy Cost in Canada (2026): Real Prices by City',
+    // CTR rewrite 2026-08-20: was 66 chars with the site suffix, so Google
+    // truncated it. Now leads with the real price range from our own index.
+    metaTitle: 'IV Therapy Cost Canada 2026: CA$150 to CA$350',
     metaDescription: 'A standard IV drip runs a median of CA$175 in Toronto, CA$200 in Calgary and CA$150 in Edmonton. Real 2026 prices from clinic menus, by treatment and city.',
     intro: `A standard IV vitamin drip in Canada costs a median of about CA$175, but the spread is wide: the same drip is priced anywhere from CA$75 to CA$399 depending on the clinic. Those numbers come from TheDripMap's IV Price Index, built from Canadian clinics' own published menus, not estimates. This guide breaks down what you should actually expect to pay by city and treatment, what drives the differences, and how insurance works in Canada.`,
     sections: [

@@ -828,6 +828,10 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
                     creator: { '@type': 'Organization', name: 'TheDripMap', url: 'https://www.thedripmap.com' },
                     temporalCoverage: cityPriceIndex.asOf,
                     spatialCoverage: { '@type': 'Place', name: `${cityData.name}, Canada` },
+                    // Recommended by Google's Dataset rich result (GSC warning
+                    // 2026-08-05); points at the published methodology.
+                    license: 'https://www.thedripmap.com/iv-prices#methodology',
+                    isAccessibleForFree: true,
                     variableMeasured: cityPriceIndex.rows.map((r) => ({
                       '@type': 'PropertyValue',
                       name: `${r.treatment} (median)`,
