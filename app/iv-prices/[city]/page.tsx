@@ -77,6 +77,13 @@ export default async function CityPriceIndexPage({ params }: { params: Promise<{
     description: `Published prices for ${i.rows.length} IV therapy drips across ${i.clinicCount} clinics in ${i.city}, with low, median, and high in ${curLong}.`,
     url: `${SITE}/iv-prices/${i.citySlug}`,
     creator: { '@type': 'Organization', name: 'TheDripMap', url: SITE },
+    // Dataset rich-result recommended properties (GSC "Datasets" warning,
+    // 2026-08-05). license, temporalCoverage and spatialCoverage are the three
+    // Google flags as recommended-but-missing; the other Dataset blocks on the
+    // site already carry them, so these two were the outliers.
+    license: `${SITE}/iv-prices#methodology`,
+    temporalCoverage: i.asOf,
+    spatialCoverage: { '@type': 'Place', name: `${i.city}, Canada` },
     isAccessibleForFree: true,
     variableMeasured: i.rows.map((r) => ({
       '@type': 'PropertyValue',
