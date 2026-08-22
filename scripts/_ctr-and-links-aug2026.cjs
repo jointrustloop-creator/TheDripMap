@@ -113,7 +113,17 @@ async function main() {
     if (DRY) continue;
     if (backups[m.slug] === undefined) backups[m.slug] = { meta_title: p.meta_title, meta_description: p.meta_description };
     else Object.assign(backups[m.slug], { meta_title: p.meta_title, meta_description: p.meta_description });
-    const { error: e } = await s.from('blog_posts').update({ meta_title: m.meta_title, meta_description: m.meta_description }).eq('slug', m.slug);
+    // GOTCHA (found live 2026-08-20): blog_posts still carries the legacy
+    // camelCase metaTitle/metaDescription columns, and the data-layer mapper
+    // reads `post.metaTitle || post.meta_title`, so the OLD camelCase value
+    // wins and a snake_case-only update renders nothing. Write both until
+    // scripts/drop-camelcase-blog-columns.sql is applied.
+    const { error: e } = await s.from('blog_posts').update({
+      meta_title: m.meta_title,
+      meta_description: m.meta_description,
+      metaTitle: m.meta_title,
+      metaDescription: m.meta_description,
+    }).eq('slug', m.slug);
     if (e) { console.error('  UPDATE FAIL', e.message); process.exitCode = 1; }
   }
 
