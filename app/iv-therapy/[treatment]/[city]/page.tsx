@@ -197,7 +197,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const resolved = await resolveCity(city);
-  const clinics = await getListingsByServiceAndCity(t.filter, resolved.name, 60);
+  // STRICT: the robots decision below is gated on this count. These are the
+  // exact pages the crawler caught flapping noindex (Montreal, four dates):
+  // a failed query returned [] and the page declared itself thin. Now a failed
+  // query fails the render, so ISR keeps serving the last good page instead.
+  const clinics = await getListingsByServiceAndCity(t.filter, resolved.name, 60, { strict: true });
   const count = clinics.length;
   const cityLabel = resolved.stateAbbr ? `${resolved.name}, ${resolved.stateAbbr}` : resolved.name;
   // Canonicalize the city to its resolved slug so variant URLs dedupe to one URL.
@@ -249,7 +253,7 @@ export default async function TreatmentCityPage({ params }: PageProps) {
   const citySlug = city.toLowerCase();
   const canonical = `${SITE_URL}/iv-therapy/${t.slug}/${citySlug}`;
 
-  let clinics = (await getListingsByServiceAndCity(t.filter, resolved.name, 60)) as Provider[];
+  let clinics = (await getListingsByServiceAndCity(t.filter, resolved.name, 60, { strict: true })) as Provider[];
   if (t.mobile) {
     const mobileFirst = clinics.filter(
       (p) => p.mobile_service || p.type === 'Mobile' || (p.specialties || []).some((s) => (s || '').toLowerCase().includes('mobile'))

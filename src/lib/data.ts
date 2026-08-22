@@ -1,6 +1,6 @@
 import { Provider, BlogPost, OperatorProfile, ListingStats } from '../types';
 import { supabase, isSupabaseConfigured, fetchAllRows } from './supabase';
-import { SupabaseUnreachableError, isSupabaseConnectionError } from './supabase-health';
+import { SupabaseUnreachableError, isSupabaseConnectionError, failIfStrict } from './supabase-health';
 import { MOCK_BLOG_POSTS, MOCK_LISTINGS, MOCK_CITIES } from './mock-data';
 import { rankCityListings } from './ranking';
 import { htmlToMarkdown, containsHtml } from './blog-utils';
@@ -245,7 +245,7 @@ export function deduplicateListings(data: any[]): any[] {
   return result;
 }
 
-export async function getListingsByCity(city: string, state?: string) {
+export async function getListingsByCity(city: string, state?: string, opts?: { strict?: boolean }) {
   const isCityMatch = (pCity: string, search: string) => {
     if (!search || search === 'All') return true;
     
@@ -397,6 +397,12 @@ export async function getListingsByCity(city: string, state?: string) {
     return rankCityListings(merged, searchCity);
   } catch (err) {
     console.error('Error fetching listings by city:', err);
+    // STRICT (2026-08-20): a caller that gates robots/meta on the count must
+    // never receive an empty array for a FAILED query. Returning [] here is
+    // indistinguishable from "this city has no clinics", which made healthy
+    // city pages emit robots:noindex and then cached it via ISR. In strict
+    // mode we fail the render instead, so the last good page keeps serving.
+    failIfStrict(opts?.strict, 'getListingsByCity', err);
     return [];
   }
 }
@@ -480,7 +486,7 @@ export async function getTorontoGtaTieredListings(): Promise<{
   }
 }
 
-export async function getListingsByState(state: string) {
+export async function getListingsByState(state: string, opts?: { strict?: boolean }) {
   if (!isSupabaseConfigured()) {
     return MOCK_LISTINGS.filter(p => 
       p.state?.toLowerCase() === state.toLowerCase()
@@ -523,6 +529,7 @@ export async function getListingsByState(state: string) {
     return (data || []).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
   } catch (err) {
     console.error('Error fetching listings by state:', err);
+    failIfStrict(opts?.strict, 'getListingsByState', err);
     return [];
   }
 }
@@ -1564,7 +1571,7 @@ export async function getListingsByIds(ids: string[]) {
   }
 }
 
-export async function getListingsByServiceAndCity(service: string, city: string, limit: number = 4) {
+export async function getListingsByServiceAndCity(service: string, city: string, limit: number = 4, opts?: { strict?: boolean }) {
   if (!isSupabaseConfigured()) return [];
 
   try {
@@ -1618,6 +1625,7 @@ export async function getListingsByServiceAndCity(service: string, city: string,
     return merged.slice(0, limit);
   } catch (err) {
     console.error('Supabase error in getListingsByServiceAndCity:', err);
+    failIfStrict(opts?.strict, 'getListingsByServiceAndCity', err);
     return [];
   }
 }
