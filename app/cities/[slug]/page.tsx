@@ -127,8 +127,11 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     name = fallbackName;
   }
 
-  // Fetch actual count for accurate metadata
-  let listings = await getListingsByCity(name, state);
+  // Fetch actual count for accurate metadata.
+  // STRICT: the robots decision below is gated on this count, so a FAILED query
+  // must throw rather than return []. A silent [] made healthy pages emit
+  // noindex, which ISR then cached (see DataUnavailableError in supabase-health).
+  let listings = await getListingsByCity(name, state, { strict: true });
   // Slug-aware fallback: catches DB city strings the naive reconstruction
   // can't produce (e.g. "Whitchurch-Stouffville" preserves dash, "St. Petersburg"
   // preserves period). slugify("Whitchurch-Stouffville") === "whitchurch-stouffville".
@@ -138,7 +141,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     if (match) {
       name = match.city;
       state = match.state || match.stateAbbr || '';
-      listings = await getListingsByCity(name, state);
+      listings = await getListingsByCity(name, state, { strict: true });
     }
   }
   listings = constrainToModalState(listings, state);
@@ -279,7 +282,9 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
     // 1. Try naive slug→name reconstruction (handles san-diego → San Diego).
     let name = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     let resolvedState = '';
-    let listings = await getListingsByCity(name);
+    // STRICT: an empty result here routes to notFound(), so a failed query
+    // would 404 a healthy city page and ISR would cache that 404.
+    let listings = await getListingsByCity(name, undefined, { strict: true });
 
     // 2. Slug-aware fallback: match against actual provider cities so we catch
     //    DB strings the naive reconstruction can't produce — e.g.
@@ -291,7 +296,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
       if (match) {
         name = match.city;
         resolvedState = match.state || match.stateAbbr || '';
-        listings = await getListingsByCity(name, resolvedState);
+        listings = await getListingsByCity(name, resolvedState, { strict: true });
       }
     }
     listings = constrainToModalState(listings, resolvedState);
@@ -351,7 +356,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   // design, so the same-name guard only applies to the standard path.
   let listings = isToronto
     ? [...torontoCore, ...torontoNearby]
-    : constrainToModalState(await getListingsByCity(cityData.name, cityData.state || ''), cityData.state || '');
+    : constrainToModalState(await getListingsByCity(cityData.name, cityData.state || '', { strict: true }), cityData.state || '');
   const exactCityCount = isToronto ? torontoCore.length : listings.length;
 
   // Tiered fallback so a small/empty city never shows 0 cards:

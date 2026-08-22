@@ -32,3 +32,37 @@ export function isSupabaseConnectionError(err: unknown): boolean {
   if (/UND_ERR_SOCKET|ECONNRESET|ECONNREFUSED|ETIMEDOUT|EAI_AGAIN|fetch failed|network error|terminated/i.test(msg)) return true;
   return false;
 }
+
+/**
+ * Thrown when a data fetch that gates robots/meta could not be COMPLETED.
+ *
+ * WHY THIS EXISTS (2026-08-20 incident class): several fetchers swallowed
+ * query errors and returned an empty array, which is indistinguishable from
+ * "this page genuinely has no listings". Pages that gate `robots: noindex` on
+ * a count then emitted noindex for a HEALTHY page, and because those pages are
+ * ISR-cached, the poisoned render was served until the next successful
+ * revalidate. The crawler caught it on the Montreal treatment-city pages on
+ * four separate days.
+ *
+ * The rule: noindex may only be emitted when a SUCCESSFUL query confirms the
+ * page is genuinely thin. When the query fails we must fail the render instead,
+ * so Next keeps serving the last good cached page rather than caching a
+ * noindex. Metadata and page paths pass { strict: true } to opt into throwing.
+ */
+export class DataUnavailableError extends Error {
+  constructor(context: string, origMessage?: string) {
+    super(`Data unavailable (${context}): ${(origMessage || 'unknown error').slice(0, 200)}`);
+    this.name = 'DataUnavailableError';
+  }
+}
+
+/**
+ * Call from a catch block in any fetcher that feeds a robots/meta decision.
+ * In strict mode it rethrows as DataUnavailableError (fail the render); in the
+ * default soft mode it returns, letting the caller degrade gracefully for UI.
+ */
+export function failIfStrict(strict: boolean | undefined, context: string, err: unknown): void {
+  if (!strict) return;
+  const msg = err instanceof Error ? err.message : String(err);
+  throw new DataUnavailableError(context, msg);
+}
