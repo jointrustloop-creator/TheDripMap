@@ -7,7 +7,7 @@ import { Logo } from './Logo';
 import { Provider } from '../types';
 import { supabase } from '../lib/supabase';
 import { cn } from '../lib/utils';
-import { marketOf, US_MARKET_ENABLED } from '../lib/market';
+import { marketOf, US_CLAIMS_ENABLED } from '../lib/market';
 
 interface ClaimListingModalProps {
   provider: Provider;
@@ -40,10 +40,12 @@ export const ClaimListingModal = ({
   const [ownerName, setOwnerName] = useState('');
   const [ownerPhone, setOwnerPhone] = useState('');
 
-  // US claim gate: while the US market is paused (US_MARKET_ENABLED=false) we do
-  // not accept new claims on US listings. Canadian listings are never affected.
+  // US claim gate. Reads US_CLAIMS_ENABLED, NOT US_MARKET_ENABLED: a US owner
+  // may claim while the US market stays noindexed, which is the whole point of
+  // the claimed-US indexing exception in src/lib/market.ts. Canadian listings
+  // are never affected.
   const isUSGated =
-    !US_MARKET_ENABLED &&
+    !US_CLAIMS_ENABLED &&
     marketOf({ country: (provider as { country?: string | null }).country, state: provider.state }) === 'US';
 
   const handleSubmit = async (e: React.FormEvent) => {
