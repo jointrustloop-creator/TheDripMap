@@ -33,6 +33,7 @@ import {
   Gift,
 } from 'lucide-react';
 import { ResilientImage } from './ResilientImage';
+import { ProviderHero } from './ProviderHero';
 import { MessageClinicButton } from './MessageClinicButton';
 import { BookingRequestButton } from './BookingRequest';
 import { SubmitTestimonialButton } from './SubmitTestimonialButton';
@@ -53,6 +54,7 @@ interface SafetyResult {
 
 interface ProviderStatus {
   isOpen: boolean;
+  known?: boolean;
   text: string;
   todayHours: string;
 }
@@ -85,6 +87,8 @@ interface Props {
   citySlug: string;
   transparencyScore?: number | null;
   transparencyChecks?: TransparencyCheck[] | null;
+  /** Precomputed server side (carries the clinic-website photo attribution). */
+  heroImageAlt?: string;
 }
 
 // Region → regulator line. Localizes the State board criterion in the Safety
@@ -282,6 +286,7 @@ export default function DefinitiveListingLayout({
   profile,
   safetyResults,
   safetyVerified,
+  status,
   timezone,
   displayName,
   displayRating,
@@ -293,7 +298,11 @@ export default function DefinitiveListingLayout({
   citySlug,
   transparencyScore,
   transparencyChecks,
+  heroImageAlt,
 }: Props) {
+  // Regulator-inspected premises line for the hero. Same helper the L5 section
+  // below uses; only a positive, current authorization ever surfaces.
+  const heroPremises = premisesVerification(provider as Parameters<typeof premisesVerification>[0]);
   const photos = Array.isArray(provider.photos)
     ? (provider.photos as unknown[]).filter((p): p is string =>
         typeof p === 'string' && p.length > 0 && !p.includes('picsum.photos') && !p.includes('unsplash.com')
@@ -442,120 +451,32 @@ export default function DefinitiveListingLayout({
 
   return (
     <div className="bg-[#f8f5ee] text-[#19241c] font-[var(--font-hanken)] antialiased">
-      {/* ───────────────────────── STAGE ─────────────────────────
-          IV-therapy themed hero: a deep emerald-to-teal fluid gradient with a
-          hydration glow, a faint droplet field, and slow IV-drip droplets
-          falling from the top. Replaces the former flat solid green.
-          All motion respects prefers-reduced-motion. */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes dlhFall { 0% { transform: translateY(-10px) rotate(45deg); opacity: 0 } 16% { opacity: .62 } 78% { opacity: .26 } 100% { transform: translateY(160px) rotate(45deg); opacity: 0 } }
-        @keyframes dlhFloat { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
-        @keyframes dlhGlow { 0%,100% { box-shadow: 0 0 0 1px rgba(94,234,212,.5), 0 0 14px rgba(94,234,212,.28) } 50% { box-shadow: 0 0 0 1px rgba(94,234,212,.85), 0 0 26px rgba(94,234,212,.5) } }
-        .dlh-chip { animation: dlhGlow 3.2s ease-in-out infinite }
-        .dlh-drip { position: absolute; width: 7px; height: 7px; border-radius: 0 50% 50% 50%; background: linear-gradient(135deg, rgba(174,247,228,.92), rgba(45,212,191,.35)); filter: blur(.3px) }
-        .dlh-bub { position: absolute; border-radius: 9999px; background: radial-gradient(circle at 35% 30%, rgba(190,242,225,.5), rgba(45,212,191,.06) 70%); animation: dlhFloat 7s ease-in-out infinite }
-        @media (prefers-reduced-motion: reduce) { .dlh-chip, .dlh-drip, .dlh-bub { animation: none !important; opacity: .3 } }
-      ` }} />
-      <div className="relative overflow-hidden text-[#f3efe2]" style={{ background: 'linear-gradient(168deg, #0b211a 0%, #123a2c 48%, #0b3633 100%)' }}>
-        {/* Teal hydration key light, upper-left */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(72% 86% at 14% -12%, rgba(45,212,191,.22), transparent 60%)' }} />
-        {/* Warm gold accent glow, upper-right (brand) */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(78% 92% at 92% -16%, rgba(216,184,120,.16), transparent 58%)' }} />
-        {/* Soft droplet field, masked to fade at edges */}
-        <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: [
-          'radial-gradient(circle at 20% 28%, rgba(190,242,225,.10) 0 5px, transparent 6px)',
-          'radial-gradient(circle at 34% 70%, rgba(190,242,225,.07) 0 3px, transparent 4px)',
-          'radial-gradient(circle at 58% 22%, rgba(190,242,225,.06) 0 4px, transparent 5px)',
-          'radial-gradient(circle at 70% 60%, rgba(190,242,225,.05) 0 6px, transparent 7px)',
-          'radial-gradient(circle at 47% 48%, rgba(190,242,225,.05) 0 2px, transparent 3px)',
-        ].join(','), maskImage: 'radial-gradient(ellipse 90% 80% at 50% 30%, black, transparent 85%)', WebkitMaskImage: 'radial-gradient(ellipse 90% 80% at 50% 30%, black, transparent 85%)' }} />
-        {/* Floating bubbles + falling IV drips */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <span className="dlh-bub" style={{ left: '8%', top: '32%', width: '14px', height: '14px', animationDelay: '0s' }} />
-          <span className="dlh-bub" style={{ left: '26%', top: '60%', width: '9px', height: '9px', animationDelay: '1.4s' }} />
-          <span className="dlh-bub" style={{ left: '83%', top: '42%', width: '11px', height: '11px', animationDelay: '.7s' }} />
-          <span className="dlh-drip" style={{ left: '64%', top: 0, animation: 'dlhFall 7s linear infinite', animationDelay: '0s' }} />
-          <span className="dlh-drip" style={{ left: '76%', top: 0, animation: 'dlhFall 8.5s linear infinite', animationDelay: '2.2s' }} />
-          <span className="dlh-drip" style={{ left: '88%', top: 0, animation: 'dlhFall 6.5s linear infinite', animationDelay: '4s' }} />
-          <span className="dlh-drip" style={{ left: '52%', top: 0, animation: 'dlhFall 9s linear infinite', animationDelay: '3.1s' }} />
-        </div>
-        {/* Fine texture, masked */}
-        <div className="absolute inset-0 opacity-[0.035] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #f3efe2 1px, transparent 1px)', backgroundSize: '30px 30px', maskImage: 'radial-gradient(ellipse 80% 70% at 50% 40%, black, transparent 78%)', WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at 50% 40%, black, transparent 78%)' }} />
-        {/* Bottom fluid edge: faint teal lift + gold hairline for a finished transition */}
-        <div className="absolute inset-x-0 bottom-0 h-24 pointer-events-none" style={{ background: 'linear-gradient(0deg, rgba(12,54,51,.5), transparent)' }} />
-        <div className="absolute inset-x-0 bottom-0 h-px pointer-events-none" style={{ background: 'linear-gradient(90deg, transparent, rgba(216,184,120,.5), transparent)' }} />
-        <section className="relative z-[2] max-w-[1140px] mx-auto px-[30px] pt-[26px] pb-[40px]">
-          {/* Breadcrumb */}
-          <nav className="text-[12.5px] text-[#c4c9b8] mb-7">
-            <Link href="/" className="hover:text-[#f3efe2]">Home</Link>
-            <span className="mx-2">·</span>
-            <Link href="/search" className="hover:text-[#f3efe2]">IV therapy</Link>
-            <span className="mx-2">·</span>
-            <Link href={`/cities/${citySlug}`} className="hover:text-[#f3efe2]">{cityLabel}</Link>
-            <span className="mx-2">·</span>
-            <span className="text-[#f3efe2]">{displayName}</span>
-          </nav>
-
-          {/* Identity */}
-          <div className="flex gap-6 md:gap-7 items-center">
-            {/* Logo card: cream surface + object-contain so wordmark logos show
-                in full instead of being cropped into a circle. Gold ring +
-                soft drop shadow read premium. Initials fallback for clinics
-                with no logo asset stays in brand green. */}
-            <div className="flex-none w-[92px] h-[92px] md:w-[104px] md:h-[104px] rounded-[24px] bg-[#fffefa] flex items-center justify-center border border-[rgba(216,184,120,0.5)] ring-1 ring-[rgba(216,184,120,0.18)] shadow-[0_20px_44px_-20px_rgba(0,0,0,0.6)] overflow-hidden">
-              {isRealLogo(provider.imageUrl) ? (
-                <ResilientImage
-                  src={provider.imageUrl}
-                  fallbackSrc={DEFAULT_CLINIC_IMAGE}
-                  alt={`${provider.name} logo`}
-                  width={104}
-                  height={104}
-                  fill={false}
-                  className="w-full h-full object-contain p-[11px]"
-                />
-              ) : (
-                <span className="font-[var(--font-fraunces)] text-[40px] font-light text-[#1f3a27]">{initials || getInitials(provider.name)}</span>
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex gap-[10px] mb-[15px] flex-wrap items-center">
-                {/* Safety Verified is THE trust signal: large, gold, glowing, and
-                    clearly dominant over Claimed. Renders only when the safety
-                    questionnaire is complete (safety_verified -> showSafety). */}
-                {showSafety && (
-                  <a href="#safety-verified" title="Completed TheDripMap's safety questionnaire" className="dlh-chip inline-flex items-center gap-[9px] text-sm md:text-[15px] font-bold py-[10px] px-[20px] rounded-full text-[#3a2c06]" style={{ background: 'linear-gradient(180deg,#f3d690 0%,#d8b878 100%)', boxShadow: '0 12px 30px -8px rgba(216,184,120,0.85), inset 0 1px 0 rgba(255,255,255,0.55)' }}>
-                    <ShieldCheck size={19} className="text-[#3a2c06]" /> Safety Verified
-                  </a>
-                )}
-                {/* Claimed = ownership confirmed. Deliberately small and muted so
-                    it never competes with the Safety Verified mark. */}
-                <span title="Ownership confirmed by the clinic" className="inline-flex items-center gap-[5px] text-[11px] font-medium py-[4px] px-[11px] rounded-full text-[#aeb5a6]" style={{ background: 'rgba(243,239,226,0.06)' }}>
-                  <CheckCircle2 size={12} /> Claimed
-                </span>
-              </div>
-              <h1 className="font-[var(--font-fraunces)] text-[34px] md:text-[46px] leading-[1.03] font-light tracking-tight text-[#fefdf8]">{displayName}</h1>
-              <div className="flex flex-wrap mt-[18px] items-center">
-                {displayRating > 0 && displayReviewCount > 0 && (
-                  <span className="text-sm text-[#c4c9b8] font-medium px-4 flex items-center gap-[7px] first:pl-0 border-l border-[rgba(243,239,226,0.18)] first:border-l-0">
-                    <span className="text-[#d8b878]">★</span> <b className="text-[#f3efe2] font-semibold">{displayRating.toFixed(1)}</b> · {displayReviewCount} reviews
-                  </span>
-                )}
-                <span className="text-sm text-[#c4c9b8] font-medium px-4 flex items-center gap-[7px] first:pl-0 border-l border-[rgba(243,239,226,0.18)] first:border-l-0">
-                  <MapPin size={15} /> {cityLabel}, {stateCode}
-                </span>
-                <span className="text-sm text-[#c4c9b8] font-medium px-4 flex items-center gap-[7px] border-l border-[rgba(243,239,226,0.18)]">
-                  <OpenStatus hours={provider.hours} timezone={timezone} className="flex items-center gap-[7px]" openDotClass="bg-emerald-400" closedDotClass="bg-[#d8b878]" />
-                </span>
-                {provider.price_range && (
-                  <span className="text-sm text-[#c4c9b8] font-medium px-4 flex items-center gap-[7px] border-l border-[rgba(243,239,226,0.18)]">
-                    <b className="text-[#f3efe2] font-semibold">{provider.price_range}</b> typical
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
+      {/* ───────────────────────── HERO ─────────────────────────
+          Shared clinic page header (ProviderHero), the SAME component the
+          unclaimed path renders, so the site has one hero. Photo band when the
+          clinic has a usable image_url; designed monogram panel otherwise.
+          Trust markers (Safety Verified via isSafetyVerified upstream,
+          regulator-inspected premises, Transparency Score, rating) lead. */}
+      <ProviderHero
+        displayName={displayName}
+        city={cityLabel}
+        stateCode={stateCode}
+        imageUrl={provider.imageUrl || null}
+        imageAlt={heroImageAlt || `${provider.name}, ${cityLabel}`}
+        initials={initials || getInitials(provider.name)}
+        safetyVerified={showSafety}
+        premises={heroPremises}
+        transparencyScore={transparencyScore ?? null}
+        rating={displayRating}
+        reviewCount={displayReviewCount}
+        ratingLabel="reviews"
+        isClaimed
+        statusLabel={status.isOpen ? 'Open now' : status.known === false ? 'Hours not listed' : 'Closed'}
+        statusOpen={status.isOpen}
+        priceRange={provider.price_range || null}
+        pageBackground="#f8f5ee"
+        extraBottomPadding
+      />
 
       {/* ───────────────────────── GALLERY ───────────────────────── */}
       {hasGallery && (
