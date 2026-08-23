@@ -15,7 +15,12 @@ export const NEWSLETTER_SEND_PAUSED = process.env.NEWSLETTER_SEND_ENABLED !== 't
 
 export function sendPausedMessage(which: 'outreach' | 'newsletter'): string {
   const env = which === 'outreach' ? 'OUTREACH_SEND_ENABLED' : 'NEWSLETTER_SEND_ENABLED';
-  return `Sending is paused (${env} is not 'true'). This is the default safe state. Set ${env}='true' in Vercel to allow a batch, then unset it again.`;
+  // The redeploy sentence is not padding. Vercel injects env vars at DEPLOY
+  // time, so setting the variable on an already-running deployment changes
+  // nothing and the only symptom is a batch that silently sends zero. Two
+  // people have now been caught by it, once by typing the value into the wrong
+  // field. Say the whole procedure, in order, every time.
+  return `Sending is paused. ${env} must be exactly the string "true" in Vercel, in the VALUE field (not the comment or notes field), and Vercel only picks up an env change on the NEXT deployment, so redeploy after saving it. This paused state is the default and is what protects you from an accidental release. Unset it again once the batch is out.`;
 }
 
 /**

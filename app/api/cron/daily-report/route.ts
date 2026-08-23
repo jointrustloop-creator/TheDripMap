@@ -772,7 +772,14 @@ export async function GET(req: Request) {
     const runway = (rows: Array<Record<string, unknown>>) =>
       rows.filter((p) => !p.is_claimed && !p.outreach_sent && !p.followup_sent && p.email && !p.email_bounced && Number(p.transparency_score) > 0).length;
 
+    // Send gate, reported in plain words. Vercel injects env vars at DEPLOY
+    // time, so a value edited after the last deploy is not live until the next
+    // one, and the only symptom is that a batch silently does nothing. Stating
+    // it here every day means the gate is never something to guess at.
+    const gateOpen = process.env.OUTREACH_SEND_ENABLED === 'true';
+
     lines.push('GROWTH SCOREBOARD');
+    lines.push(`  Send gate:      ${gateOpen ? 'OPEN, batches can be sent from /admin/outreach' : 'CLOSED, nothing can send (OUTREACH_SEND_ENABLED is not the string true in this deployment)'}`);
     lines.push(`  Traffic:        ${views24} listing views in 24h (${arrow} vs the day before), ${views7d} over 7 days`);
     lines.push(`  Claimed:        ${ca.filter((p) => p.is_claimed).length} of ${ca.length} Canadian, ${claimedWeek} new in the last 7 days`);
     lines.push(`  Full 7 of 7:    ${sevens} clinic${sevens === 1 ? '' : 's'}`);
