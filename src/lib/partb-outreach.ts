@@ -233,6 +233,30 @@ export interface QueueOptions {
   states?: string[];
 }
 
+/**
+ * The markets the operator can pick on /admin/outreach. Defined once here so
+ * the API and the UI cannot drift apart, and so a market can never be selected
+ * that the queue builder does not understand.
+ *
+ * Every market runs the SAME rails: suppression tables, two-touch cap, 0/7
+ * skip, one-conversation-per-email dedupe, default-paused kill switch, typed
+ * confirmation code, and recordSentTouch on each success. A new market is a
+ * filter, never an exemption.
+ */
+export const OUTREACH_MARKETS: Array<{ key: string; label: string; blurb: string; opts: QueueOptions }> = [
+  { key: 'CA', label: 'Canada', blurb: 'The core market. 84 percent already first-touched.', opts: { market: 'CA' } },
+  { key: 'US-TX', label: 'Texas (US pilot)', blurb: 'Measured test against the Canadian claim rate.', opts: { market: 'US', states: ['Texas'] } },
+];
+
+export function queueOptionsFor(key?: string | null): QueueOptions {
+  const found = OUTREACH_MARKETS.find((m) => m.key === (key || 'CA'));
+  return found ? found.opts : OUTREACH_MARKETS[0].opts;
+}
+export function marketLabelFor(key?: string | null): string {
+  const found = OUTREACH_MARKETS.find((m) => m.key === (key || 'CA'));
+  return found ? found.label : OUTREACH_MARKETS[0].label;
+}
+
 // Build the full qualifying list (ordered priority-cities-first). The admin
 // route slices the next `limit` for the pending batch.
 export async function computeOutreachQueue(

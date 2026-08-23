@@ -8,8 +8,9 @@ interface BatchRow {
 interface LastSend {
   created_at: string; action: string; actor: string | null; recipient_count: number; recipients: string[] | null; subject: string | null;
 }
+interface MarketOpt { key: string; label: string; blurb: string }
 interface Payload {
-  ok: boolean; resendConfigured: boolean; from: string; sendPaused?: boolean; confirmCode?: string; lastSend?: LastSend | null; counts: Record<string, number>; batchSize: number; remaining: number; batch: BatchRow[];
+  ok: boolean; market: string; marketLabel: string; markets: MarketOpt[]; resendConfigured: boolean; from: string; sendPaused?: boolean; confirmCode?: string; lastSend?: LastSend | null; counts: Record<string, number>; batchSize: number; remaining: number; batch: BatchRow[];
 }
 
 export function OutreachClient() {
@@ -17,27 +18,33 @@ export function OutreachClient() {
   const [err, setErr] = useState<string | null>(null);
   const [open, setOpen] = useState<string | null>(null);
   const [testEmail, setTestEmail] = useState('');
+  const [cc, setCc] = useState('');
+  // Which market the queue is built for. Changing it reloads the batch; it is a
+  // filter on one queue, so every guard applies identically in both.
+  const [market, setMarket] = useState('CA');
   const [busy, setBusy] = useState<string | null>(null);
   const [flash, setFlash] = useState<string | null>(null);
 
-  const load = async () => {
+  const load = async (mkt = market) => {
     setErr(null);
+    setData(null);
     try {
-      const r = await fetch('/api/admin/outreach', { cache: 'no-store' });
+      const r = await fetch(`/api/admin/outreach?market=${encodeURIComponent(mkt)}`, { cache: 'no-store' });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || 'Failed to load');
       setData(j);
     } catch (e) { setErr(e instanceof Error ? e.message : String(e)); }
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(market); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [market]);
 
   const sendTest = async (realFromQueue = false) => {
     setBusy('test'); setFlash(null);
     try {
-      const r = await fetch('/api/admin/outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'test', testEmail, realFromQueue }) });
+      const r = await fetch('/api/admin/outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'test', testEmail, realFromQueue, market, cc: cc.trim() || undefined }) });
       const j = await r.json();
       const who = j.clinic ? ` (real clinic: ${j.clinic.name}, band ${j.clinic.band})` : '';
-      setFlash(j.ok ? `Test sent to ${j.to} via ${j.provider}${who}. Subject: "${j.subject}". Check that inbox.` : `Test failed: ${j.error}`);
+      const ccNote = j.cc ? ` cc ${j.cc}` : '';
+      setFlash(j.ok ? `Test sent to ${j.to}${ccNote} via ${j.provider}${who}. Subject: "${j.subject}". Check that inbox.` : `Test failed: ${j.error}`);
     } catch (e) { setFlash('Test failed: ' + (e instanceof Error ? e.message : String(e))); }
     finally { setBusy(null); }
   };
@@ -59,7 +66,7 @@ export function OutreachClient() {
     if (typed == null) return; // cancelled
     setBusy('send'); setFlash(null);
     try {
-      const r = await fetch('/api/admin/outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'send', confirmCode: typed.trim() }) });
+      const r = await fetch('/api/admin/outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'send', confirmCode: typed.trim(), market }) });
       const j = await r.json();
       if (j.needCode) setFlash(`Not sent — ${j.error}`);
       else if (j.paused) setFlash(`Paused — nothing sent. ${j.message || ''}`);
@@ -78,6 +85,25 @@ export function OutreachClient() {
   return (
     <div>
       <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-1">Score outreach</h1>
+
+      {/* Market picker. Same queue, same guards, different filter. */}
+      <div className="mb-4 flex flex-wrap gap-2">
+        {(data.markets || []).map((m) => (
+          <button
+            key={m.key}
+            onClick={() => setMarket(m.key)}
+            title={m.blurb}
+            className={
+              'px-4 py-2 rounded-xl text-sm font-black border transition-colors ' +
+              (market === m.key
+                ? 'bg-wellness-600 text-white border-wellness-600'
+                : 'bg-white text-slate-600 border-slate-200 hover:border-wellness-300')
+            }
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
       <p className="text-sm text-slate-500 mb-6">Sent via Resend as <b className="text-slate-700">{data.from}</b> (reply-to info@). Never through the Workspace account. Nothing sends until you click. {data.remaining} more clinics queued after this batch.</p>
 
       {!data.resendConfigured && (
@@ -114,8 +140,16 @@ export function OutreachClient() {
           <label className="text-xs font-black uppercase tracking-widest text-slate-400 block mb-1">Send one test email to</label>
           <input value={testEmail} onChange={(e) => setTestEmail(e.target.value)} placeholder="you@example.com" className="w-full px-3 py-2 border-2 border-slate-200 rounded-xl font-medium text-slate-900 focus:outline-none focus:border-wellness-500" />
         </div>
+        <div className="flex-1 min-w-[220px]">
+          <label className="text-xs font-black uppercase tracking-widest text-slate-400 block mb-1">cc (optional)</label>
+          <input value={cc} onChange={(e) => setCc(e.target.value)} placeholder="hubertzyworonek@gmail.com" className="w-full px-3 py-2 border-2 border-slate-200 rounded-xl font-medium text-slate-900 focus:outline-none focus:border-wellness-500" />
+        </div>
         <button onClick={() => sendTest(false)} disabled={busy !== null || !testEmail} className="bg-slate-200 text-slate-800 px-5 py-2.5 rounded-xl font-black text-sm hover:bg-slate-300 disabled:opacity-50">{busy === 'test' ? 'Sending…' : 'Sample test'}</button>
         <button onClick={() => sendTest(true)} disabled={busy !== null || !testEmail} className="bg-slate-900 text-white px-5 py-2.5 rounded-xl font-black text-sm hover:bg-slate-800 disabled:opacity-50">{busy === 'test' ? 'Sending…' : 'Real first-clinic test'}</button>
+        <p className="w-full text-[12px] text-slate-500 leading-relaxed">
+          Filling in cc marks the send as a format review: the subject is prefixed <b>[TEST, format review]</b> and both
+          addresses are recorded in the send log. Use it whenever the copy angle is new.
+        </p>
       </div>
 
       {flash && <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-sm font-bold">{flash}</div>}

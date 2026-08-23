@@ -12,7 +12,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { isAdminRequest } from '../../../../src/lib/admin-auth';
 import { sendMail } from '../../../../src/lib/mailer';
-import { computeOutreachQueue, recordSentTouch, sampleTestEmail } from '../../../../src/lib/partb-outreach';
+import { computeOutreachQueue, recordSentTouch, sampleTestEmail, queueOptionsFor, marketLabelFor, OUTREACH_MARKETS } from '../../../../src/lib/partb-outreach';
 import { OUTREACH_SEND_PAUSED, sendPausedMessage, sendConfirmCode, verifySendCode } from '../../../../src/lib/send-config';
 import { logSend, getLastSend } from '../../../../src/lib/send-log';
 
@@ -34,9 +34,13 @@ function resendConfigured(): boolean {
   return !!process.env.RESEND_API_KEY;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   if (!(await isAdminRequest())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const { drafts, counts } = await computeOutreachQueue(db());
+  // Market is a FILTER on the same queue, never a different code path: whichever
+  // market is selected, the suppression tables, the two-touch cap and the
+  // recording on send are identical.
+  const market = new URL(req.url).searchParams.get('market') || 'CA';
+  const { drafts, counts } = await computeOutreachQueue(db(), queueOptionsFor(market));
   const limit = 25;
   const batch = drafts.slice(0, limit).map((d) => ({
     id: d.id, to: d.to, name: d.name, city: d.city, band: d.band, score: d.score, touch: d.touch, views: d.views, subject: d.subject, html: d.html,
@@ -44,6 +48,9 @@ export async function GET() {
   const lastSend = await getLastSend(db(), 'partb');
   return NextResponse.json({
     ok: true,
+    market,
+    marketLabel: marketLabelFor(market),
+    markets: OUTREACH_MARKETS.map((m) => ({ key: m.key, label: m.label, blurb: m.blurb })),
     resendConfigured: resendConfigured(),
     from: OUTREACH_FROM,
     sendPaused: OUTREACH_SEND_PAUSED,
@@ -61,7 +68,7 @@ export async function POST(req: Request) {
   if (!resendConfigured()) {
     return NextResponse.json({ error: 'RESEND_API_KEY is not set. Part B outreach sends via Resend only.' }, { status: 500 });
   }
-  let body: { action?: string; testEmail?: string; limit?: number; realFromQueue?: boolean; index?: number; confirmCode?: string };
+  let body: { action?: string; testEmail?: string; limit?: number; realFromQueue?: boolean; index?: number; confirmCode?: string; market?: string; cc?: string };
   try { body = await req.json(); } catch { return NextResponse.json({ error: 'invalid json' }, { status: 400 }); }
 
   // TEST: one email to a chosen address. Sends nothing to real clinics.
@@ -75,7 +82,7 @@ export async function POST(req: Request) {
     let s: { subject: string; text: string; html: string };
     let clinic: { name: string; city: string; band: string } | null = null;
     if (body.realFromQueue) {
-      const { drafts } = await computeOutreachQueue(db());
+      const { drafts } = await computeOutreachQueue(db(), queueOptionsFor(body.market));
       const idx = Math.min(Math.max(0, Number(body.index) || 0), Math.max(0, drafts.length - 1));
       const d = drafts[idx];
       if (!d) return NextResponse.json({ error: 'no pending clinics to sample' }, { status: 400 });
@@ -84,11 +91,17 @@ export async function POST(req: Request) {
     } else {
       s = sampleTestEmail('your clinic');
     }
-    const r = await sendMail({ from: OUTREACH_FROM, to, replyTo: OUTREACH_REPLY_TO, subject: s.subject, text: s.text, html: s.html, channel: 'resend' });
+    const cc = (body.cc || '').trim();
+    if (cc && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cc)) return NextResponse.json({ error: 'cc must be a valid address' }, { status: 400 });
+    // Format-review rule (operator, 2026-08-23): any NEW copy angle goes once to
+    // info@ with the operator cc'd before its first real use. Prefixing the
+    // subject makes the review copy unmistakable in the inbox.
+    const subject = cc ? `[TEST, format review] ${s.subject}` : s.subject;
+    const r = await sendMail({ from: OUTREACH_FROM, to, replyTo: OUTREACH_REPLY_TO, subject, text: s.text, html: s.html, ...(cc ? { cc } : {}), channel: 'resend' });
     // Log tests too, so the "what already went out" panel shows the info@ test
     // copies that caused confusion on 2026-08-11.
-    if (r.ok) await logSend(db(), { channel: 'partb', action: 'test', recipients: [to], subject: s.subject, note: 'test send' });
-    return NextResponse.json({ ok: r.ok, action: 'test', realFromQueue: !!body.realFromQueue, clinic, subject: s.subject, to, from: OUTREACH_FROM, provider: r.provider, id: r.id, error: r.error });
+    if (r.ok) await logSend(db(), { channel: 'partb', action: 'test', recipients: [to, ...(cc ? [cc] : [])], subject, note: `test send (${marketLabelFor(body.market)})` });
+    return NextResponse.json({ ok: r.ok, action: 'test', realFromQueue: !!body.realFromQueue, market: body.market || 'CA', clinic, subject, to, cc: cc || null, from: OUTREACH_FROM, provider: r.provider, id: r.id, error: r.error });
   }
 
   // SEND: the pending batch. Records the two-touch state on each success.
@@ -104,7 +117,7 @@ export async function POST(req: Request) {
     }
     const supabase = db();
     const limit = Math.min(Math.max(1, Number(body.limit) || 25), 25);
-    const { drafts } = await computeOutreachQueue(supabase);
+    const { drafts } = await computeOutreachQueue(supabase, queueOptionsFor(body.market));
     const batch = drafts.slice(0, limit);
     const results: Array<{ to: string; sent: boolean; error?: string }> = [];
     for (const d of batch) {
@@ -122,10 +135,11 @@ export async function POST(req: Request) {
     }
     // Audit row: the source of truth the admin screen reads to show "last batch".
     const sentTo = results.filter((r) => r.sent).map((r) => r.to);
-    await logSend(supabase, { channel: 'partb', action: 'send', recipients: sentTo, subject: `Part B batch (${sentTo.length})`, note: `attempted ${results.length}` });
+    await logSend(supabase, { channel: 'partb', action: 'send', recipients: sentTo, subject: `Part B batch, ${marketLabelFor(body.market)} (${sentTo.length})`, note: `attempted ${results.length}, market ${body.market || 'CA'}` });
     return NextResponse.json({
       ok: true,
       action: 'send',
+      market: body.market || 'CA',
       attempted: results.length,
       sent: results.filter((r) => r.sent).length,
       failed: results.filter((r) => !r.sent).length,
