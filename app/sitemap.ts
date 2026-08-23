@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next';
 import { getAllListings, getBlogPosts, getAllCities, slugify, getServiceFilter, BLOG_CANONICAL_OVERRIDES } from '../src/lib/data';
 import { US_MARKET_ENABLED, marketOf } from '../src/lib/market';
 import { priceIndexCitySlugs } from '../src/lib/price-index-data';
+import { getLiveDeals } from '../src/lib/deals';
 
 // 2026-06-11: revalidate every 10 minutes so newly-added providers + cities
 // surface in the sitemap quickly without a manual redeploy. Previously the
@@ -21,7 +22,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${baseUrl}/`,                       priority: 1.0, changeFrequency: 'daily',   lastModified: new Date() },
     { url: `${baseUrl}/search`,                 priority: 0.9, changeFrequency: 'daily',   lastModified: new Date() },
-    { url: `${baseUrl}/deals`,                  priority: 0.85, changeFrequency: 'daily',  lastModified: new Date() },
     { url: `${baseUrl}/cities`,                 priority: 0.9, changeFrequency: 'daily',   lastModified: new Date() },
     { url: `${baseUrl}/canada`,                 priority: 0.9, changeFrequency: 'weekly',  lastModified: new Date() },
     { url: `${baseUrl}/states`,                 priority: 0.85, changeFrequency: 'weekly', lastModified: new Date() },
@@ -45,6 +45,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/transparency`,           priority: 0.6,  changeFrequency: 'monthly', lastModified: new Date() },
     { url: `${baseUrl}/verification`,           priority: 0.8,  changeFrequency: 'monthly', lastModified: new Date() },
   ];
+
+  // /deals is indexable only while at least one live deal exists (the page
+  // emits robots:noindex,follow otherwise, mirroring the thin-page pattern),
+  // so it enters the sitemap under the exact same gate. getLiveDeals is
+  // tolerant: a data error yields [] and the route is simply omitted.
+  const liveDeals = await getLiveDeals();
+  const dealsRoutes: MetadataRoute.Sitemap = liveDeals.length > 0
+    ? [{ url: `${baseUrl}/deals`, priority: 0.85, changeFrequency: 'daily', lastModified: new Date() }]
+    : [];
 
   // /iv-therapy-statistics is a US-framed page ("IV Therapy in the United States").
   // While the US market is off it is noindexed and kept out of the sitemap.
@@ -250,5 +259,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  return [...staticRoutes, ...statsRoutes, ...audienceRoutes, ...symptomRoutes, ...treatmentHubRoutes, ...stateRoutes, ...guideRoutes, ...cityRoutes, ...providerRoutes, ...blogRoutes, ...matrixRoutes, ...priceRoutes];
+  return [...staticRoutes, ...dealsRoutes, ...statsRoutes, ...audienceRoutes, ...symptomRoutes, ...treatmentHubRoutes, ...stateRoutes, ...guideRoutes, ...cityRoutes, ...providerRoutes, ...blogRoutes, ...matrixRoutes, ...priceRoutes];
 }

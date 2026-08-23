@@ -19,6 +19,8 @@ import { ProviderCard } from '@/src/components/ProviderCard';
 import { getCityBySlug, getListingsByCity, getAllCities, getListingsByState, getFeaturedListings, getBlogPostBySlug, slugify, getTorontoGtaTieredListings } from '@/src/lib/data';
 import { marketOf } from '@/src/lib/market';
 import { isSafetyVerified } from '@/src/lib/safety';
+import { liveDealsFromListings, type LiveDeal } from '@/src/lib/deals';
+import DealCard from '@/src/components/DealCard';
 import { RelatedGuides } from '@/src/components/RelatedGuides';
 import { SupabaseUnreachableError } from '@/src/lib/supabase-health';
 import { TemporarilyUnavailable } from '@/src/components/TemporarilyUnavailable';
@@ -513,19 +515,16 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
   // lands) rather than only on /deals. Data-gated: the block renders only when a
   // clinic here actually has an active offer, so it never adds thin content. The
   // offer's canonical Offer schema lives on the provider page (linked), so we do
-  // not duplicate it here.
-  const cityTodayIso = new Date().toISOString().slice(0, 10);
-  type CityOffer = { title?: string; code?: string; expires?: string; active?: boolean };
-  const cityOffers = (listings as Array<{ name: string; slug?: string; is_hidden?: boolean; special_offers?: CityOffer[] }>)
-    .map((l) => {
-      if (l.is_hidden || !l.slug) return null;
-      const o = Array.isArray(l.special_offers)
-        ? l.special_offers.find((x) => x && x.title && x.active !== false && (!x.expires || x.expires >= cityTodayIso))
-        : null;
-      return o ? { name: l.name, slug: l.slug, offer: o } : null;
-    })
-    .filter((x): x is { name: string; slug: string; offer: CityOffer } => x !== null)
-    .slice(0, 6);
+  // not duplicate it here. Filtering + the medical-claims compliance gate live
+  // in src/lib/deals.ts (shared with /deals and the provider page); computed
+  // from the pool already fetched above, so a data error upstream simply
+  // yields [] and this section renders nothing without breaking the page.
+  let cityOffers: LiveDeal[] = [];
+  try {
+    cityOffers = liveDealsFromListings(listings as unknown[]).slice(0, 6);
+  } catch {
+    cityOffers = [];
+  }
   const snapMobile = snapPool.filter((c) => {
     if (c.mobile_service) return true;
     const ty = (c.type || '').toLowerCase();
@@ -709,20 +708,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {cityOffers.map((d) => (
-                <Link key={d.slug} href={`/providers/${d.slug}`} className="group bg-white rounded-[1.5rem] border border-slate-200 p-6 hover:border-wellness-300 hover:shadow-xl transition-all flex flex-col">
-                  <div className="flex items-center gap-2 text-[10.5px] font-black uppercase tracking-[0.14em] text-[#a9772a] mb-3">
-                    <Gift size={13} /> Limited-time offer
-                  </div>
-                  <div className="text-[17px] font-black text-slate-900 leading-snug mb-3 flex-1">{String(d.offer.title || '').replace(/[‒-―−]/g, '-')}</div>
-                  <div className="text-[13px] text-slate-500 flex flex-wrap gap-x-3 mb-4">
-                    {d.offer.code && <span>Code <b className="text-slate-700">{d.offer.code}</b></span>}
-                    {d.offer.expires && <span>Ends {d.offer.expires}</span>}
-                  </div>
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-[14px] font-bold text-slate-900 truncate">{d.name}</span>
-                    <span className="text-[#0F6E56] inline-flex items-center gap-1 text-[13px] font-bold shrink-0">View <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" /></span>
-                  </div>
-                </Link>
+                <DealCard key={d.slug} deal={d} showCity={false} />
               ))}
             </div>
           </section>
