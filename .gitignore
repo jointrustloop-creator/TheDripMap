@@ -34,6 +34,9 @@ npm-debug.log*
 scripts/la-clinics-import.json
 scripts/outreach-drafts.md
 
+# Local audit / scrape working output (og-image capture etc.)
+.audit-tmp/
+
 # GSC raw exports (analytics data — don't commit)
 gsc-export/
 thedripmap.com-Performance-on-Search-*.zip
