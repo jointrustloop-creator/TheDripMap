@@ -39,6 +39,7 @@ import { SubmitTestimonialButton } from './SubmitTestimonialButton';
 import { TreatmentDefinitionDisclosure } from './TreatmentDefinitionDisclosure';
 import { findDefinition } from '../lib/treatment-definitions';
 import { premisesVerification } from '../lib/safety';
+import { liveOffersForProvider } from '../lib/deals';
 import TrackedLink from './TrackedLink';
 import type { Provider, OperatorProfile } from '../types';
 
@@ -379,13 +380,11 @@ export default function DefinitiveListingLayout({
   const stickySubtitle = `${cityLabel}, ${stateCode}`;
 
   // Slow-time offers (operator-approved feature). Render every non-expired
-  // offer the owner set via /finish, stacked. Expiry enforced here at render.
-  const todayIso = new Date().toISOString().slice(0, 10);
-  type Offer = { title?: string; code?: string; expires?: string; active?: boolean };
-  const rawOffers = (provider as { special_offers?: Offer[] }).special_offers;
-  const activeOffers: Offer[] = Array.isArray(rawOffers)
-    ? rawOffers.filter((o) => o && typeof o.title === 'string' && o.title.trim() && o.active !== false && (!o.expires || o.expires >= todayIso))
-    : [];
+  // offer the owner set via /finish, stacked. Filtering (expiry, active flag)
+  // AND the medical-claims compliance gate live in src/lib/deals.ts, shared
+  // with the /deals hub and city-page deal modules so the three surfaces can
+  // never disagree on what counts as a live, displayable offer.
+  const activeOffers = liveOffersForProvider(provider as { special_offers?: unknown });
 
   // Patient/owner-value modules (care team, first-visit walkthrough, FAQ),
   // rolled out to every claimed listing. Each value is derived from real
