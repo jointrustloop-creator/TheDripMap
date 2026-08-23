@@ -52,7 +52,8 @@ import { getCityPriceIndex } from '../../../src/lib/price-index-data';
 import DefinitiveListingLayout from '../../../src/components/DefinitiveListingLayout';
 import { TransparencyPanel } from '../../../src/components/TransparencyPanel';
 import type { TransparencyCheck } from '../../../src/lib/transparency-score';
-import { isSafetyVerified as isSafetyVerifiedFn } from '../../../src/lib/safety';
+import { isSafetyVerified as isSafetyVerifiedFn, premisesVerification } from '../../../src/lib/safety';
+import { ProviderHero } from '../../../src/components/ProviderHero';
 import { OpenStatus } from '../../../src/components/OpenStatus';
 import ListingAnalytics from '../../../src/components/ListingAnalytics';
 import TrackedLink from '../../../src/components/TrackedLink';
@@ -333,6 +334,16 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   // Transparency Score is computed server-side and stored on the row (manage is
   // stripped from this shape, so we read the stored value, never recompute here).
   const transparencyScore = (provider as { transparency_score?: number | null }).transparency_score ?? null;
+  // Hero header inputs, computed once server-side and passed down as plain
+  // values (never the whole decision_drivers object). Alt text credits the
+  // clinic's website only when the og:image ingestion recorded a source.
+  const heroDD = (provider as { decision_drivers?: { image_source?: string | null } | null }).decision_drivers;
+  const heroImageAlt = heroDD?.image_source
+    ? `${provider.name}, ${provider.city} (photo from the clinic's website)`
+    : `${provider.name}, ${provider.city}`;
+  // Regulator-inspected premises line: only a positive, current authorization
+  // ever surfaces (see premisesVerification in src/lib/safety.ts).
+  const heroPremises = premisesVerification(provider as Parameters<typeof premisesVerification>[0]);
   const transparencyChecks = ((provider as { transparency_checks?: TransparencyCheck[] | null }).transparency_checks ?? null);
   const stateCode = provider.state || getStateFromProvider(provider);
   const timezone = TIMEZONE_MAP[stateCode] || 'America/Toronto';
@@ -574,6 +585,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
           citySlug={citySlug}
           transparencyScore={transparencyScore}
           transparencyChecks={transparencyChecks}
+          heroImageAlt={heroImageAlt}
         />
         <Footer />
       </div>
@@ -600,109 +612,31 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
         />
       )}
 
-      {/* MAGAZINE HERO — claimed listings only. Edge-to-edge cover photo with the
-          clinic logo as a small inset avatar and the clinic name in display type.
-          Solves the legacy "logo stretched across 384px" and "name wraps to 2 lines"
-          issues at the same time. */}
-      {/* Tier-split (2026-06-01): the magazine hero is the FREE-tier baseline experience.
-          Any claimed clinic gets it. Paid (Featured) clinics still get all the premium
-          extras (testimonials, schema, instant-book, top placement) below. */}
-      {provider.is_claimed && (() => {
-        // Deterministic gradient per clinic — feels unique without using stock photo.
-        // 6 dark-base gradients with tinted accents; pick from slug hash.
-        const HERO_GRADIENTS = [
-          'from-slate-900 via-wellness-800 to-emerald-950',
-          'from-slate-900 via-sky-800 to-cyan-950',
-          'from-slate-900 via-violet-800 to-indigo-950',
-          'from-slate-900 via-rose-800 to-pink-950',
-          'from-slate-900 via-amber-800 to-orange-950',
-          'from-slate-900 via-teal-800 to-cyan-950',
-        ];
-        let h = 0;
-        const seed = provider.slug || provider.name;
-        for (let i = 0; i < seed.length; i++) h = ((h << 5) - h + seed.charCodeAt(i)) | 0;
-        const gradient = HERO_GRADIENTS[Math.abs(h) % HERO_GRADIENTS.length];
-        return (
-        <section className={cn('relative w-full h-[60vh] min-h-[480px] overflow-hidden bg-gradient-to-br', gradient)}>
-          {/* Decorative orbs for depth without stock photo */}
-          <div className="absolute -top-32 -right-32 w-[600px] h-[600px] bg-white/10 rounded-full blur-[160px] pointer-events-none" />
-          <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] bg-black/30 rounded-full blur-[160px] pointer-events-none" />
-          {/* Subtle dot grid texture */}
-          <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/20 to-slate-950/60" />
-
-          <div className="relative h-full max-w-7xl mx-auto px-6 flex flex-col justify-end pb-12 md:pb-16">
-            <div className="mb-6">
-              <BreadcrumbNav
-                items={breadcrumbItems}
-                className="!text-white/70 !mb-0"
-                activeClassName="text-white"
-              />
-            </div>
-
-            <div className="flex items-end gap-4 md:gap-6 mb-6">
-              {/* Logo as inset avatar — white background, ring, contains object so logos display cleanly */}
-              {provider.imageUrl && (
-                <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl md:rounded-3xl bg-white p-2 md:p-3 shadow-2xl ring-1 ring-white/30 shrink-0 flex items-center justify-center">
-                  <ResilientImage
-                    src={provider.imageUrl}
-                    fallbackSrc={DEFAULT_CLINIC_IMAGE}
-                    alt={`${provider.name} logo`}
-                    width={120}
-                    height={120}
-                    className="w-full h-full object-contain"
-                    fill={false}
-                  />
-                </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {/* Claimed, not "Verified": this pill shows on every claimed
-                      listing regardless of safety_verified, so "Verified Clinic"
-                      overclaimed. The separate Safety Verified pill below is the
-                      only badge that implies the safety attestation. */}
-                  <div className="inline-flex items-center gap-1.5 bg-emerald-500/95 text-white text-[10px] font-black uppercase tracking-[0.15em] px-2.5 py-1 rounded-full shadow-lg">
-                    <CheckCircle2 size={11} /> Claimed Clinic
-                  </div>
-                  {safetyVerified && (
-                    <a href="#safety-verified" className="inline-flex items-center gap-1.5 bg-sky-500/95 hover:bg-sky-400 text-white text-[10px] font-black uppercase tracking-[0.15em] px-2.5 py-1 rounded-full shadow-lg transition-colors" title="Completed TheDripMap's safety questionnaire, reviewed by our team. Tap to see the breakdown.">
-                      <CheckCircle2 size={11} /> Safety Verified · 5/5
-                    </a>
-                  )}
-                </div>
-                <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.05] text-balance">
-                  {displayName}
-                </h1>
-              </div>
-            </div>
-
-            {/* Key facts row, overlaid on photo */}
-            <div className="flex flex-wrap gap-2 md:gap-3">
-              {displayRating > 0 && displayReviewCount > 0 && (
-                <div className="bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 shadow-md">
-                  <Star size={13} fill="currentColor" className="text-amber-500" />
-                  {displayRating} · {displayReviewCount} {ratingSource === 'testimonials' ? 'patient testimonials' : ratingSource === 'google' ? 'Google reviews' : 'reviews'}
-                </div>
-              )}
-              <div className="bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 shadow-md">
-                <MapPin size={13} className="text-wellness-600" />
-                {provider.city}, {stateCode}
-              </div>
-              <div className="bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 shadow-md">
-                <span className={status.isOpen ? 'text-emerald-500' : 'text-amber-500'}>●</span>
-                {status.isOpen ? 'Open now' : status.known ? 'Closed' : 'Hours not listed'}
-              </div>
-              {provider.price_range && (
-                <div className="bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 shadow-md">
-                  <span className="text-wellness-600">$</span>
-                  {provider.price_range}
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-        );
-      })()}
+      {/* CLINIC PAGE HEADER — shared ProviderHero, the same component the
+          claimed path (DefinitiveListingLayout) renders, so the site has one
+          hero. Photo band when the clinic has a usable image_url; designed
+          monogram panel otherwise. Verification markers lead: Safety Verified
+          (gated through isSafetyVerified above), regulator-inspected premises,
+          Transparency Score, and the rating. */}
+      <ProviderHero
+        displayName={displayName}
+        city={provider.city}
+        stateCode={stateCode}
+        imageUrl={provider.imageUrl || null}
+        imageAlt={heroImageAlt}
+        initials={initials}
+        safetyVerified={safetyVerified}
+        premises={heroPremises}
+        transparencyScore={transparencyScore}
+        rating={displayRating}
+        reviewCount={displayReviewCount}
+        ratingLabel={ratingSource === 'testimonials' ? 'patient testimonials' : ratingSource === 'google' ? 'Google reviews' : 'reviews'}
+        isClaimed={provider.is_claimed === true}
+        statusLabel={status.isOpen ? 'Open now' : status.known ? 'Closed' : 'Hours not listed'}
+        statusOpen={status.isOpen}
+        priceRange={provider.price_range || null}
+        pageBackground="#FDFDFB"
+      />
 
       <main className="max-w-7xl mx-auto px-6 py-12">
         {/* BREADCRUMB — only show for unclaimed listings (claimed listings get the breadcrumb inside the hero) */}
@@ -789,25 +723,8 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
           <div className="space-y-16">
             {/* HERO SECTION */}
             <section className="space-y-10">
-              {/* H1 + key facts only render for UNCLAIMED listings — claimed
-                  listings get the magazine hero above with the same content
-                  in display type. */}
-              {!provider.is_claimed && (
-                <div className="flex flex-col md:flex-row gap-8 items-start">
-                  <div>
-                    <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight text-balance max-w-3xl">
-                      {displayName}
-                    </h1>
-
-                    {/* KEY FACTS ROW */}
-                    <div className="flex flex-wrap gap-2">
-                      <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5">
-                        <span>📍</span> {provider.city}, {stateCode}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+              {/* The clinic name (h1), city, and key facts now live in the
+                  ProviderHero header above — not repeated here. */}
 
               {/* IN THEIR WORDS — editorial pull-quote from the owner's onboarding survey.
                   Only renders for claimed clinics that submitted a one-liner. */}
@@ -939,16 +856,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 </div>
               )}
 
-                {/* Secondary city row only renders for unclaimed listings.
-                    Claimed listings get the city in the magazine hero badge row. */}
-                {!provider.is_claimed && (
-                  <div className="flex flex-wrap items-center gap-x-8 gap-y-4 text-base font-bold text-slate-500 mb-8">
-                    <div className="flex items-center gap-2">
-                      <MapPin size={20} className="text-wellness-600" />
-                      {provider.city}, {stateCode}
-                    </div>
-                  </div>
-                )}
+                {/* City line now lives in the ProviderHero key facts row. */}
 
                 {/* PHONE + WEBSITE ROW — only for unclaimed listings.
                     Claimed listings use the contact card above (gated on is_claimed). */}
