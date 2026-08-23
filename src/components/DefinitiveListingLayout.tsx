@@ -12,6 +12,7 @@
  */
 import React from 'react';
 import Link from 'next/link';
+import { ListingDataNotice } from './VerificationDisclaimer';
 import { OpenStatus } from './OpenStatus';
 import {
   CheckCircle2,
@@ -688,7 +689,11 @@ export default function DefinitiveListingLayout({
                     })}
                   </div>
                   <p className="text-[11px] text-[rgba(196,201,184,0.7)] mt-5 relative">
-                    Self-attested by the clinic operator. TheDripMap does not perform on-site audits.
+                    Answers above are provided by the clinic. Where a prescriber is named, we check
+                    that person against their public regulator register and record the date. We do
+                    not perform on-site audits. This is not an endorsement, a safety guarantee, or
+                    medical advice, and registers can change after we check, so confirm current
+                    standing yourself.
                   </p>
                 </div>
               </section>
@@ -1070,6 +1075,15 @@ export default function DefinitiveListingLayout({
               </div>
             </div>
           </aside>
+        </div>
+
+        {/* Blanket data notice (liability hardening 2026-08-23). Every listing
+            page states, at the point of display, where the information comes
+            from and what it is not. The Terms carry the full clauses, but a
+            patient reading a clinic page never opens the Terms, so the
+            qualifier has to travel with the claim. */}
+        <div className="mt-10 pt-6 border-t border-[rgba(25,36,28,0.09)]">
+          <ListingDataNotice />
         </div>
       </div>
     </div>
