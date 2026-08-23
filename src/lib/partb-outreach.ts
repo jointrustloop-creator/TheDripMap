@@ -80,6 +80,19 @@ function joinNatural(arr: string[]): string {
   return `${arr.slice(0, -1).join(', ')}, and ${arr[arr.length - 1]}`;
 }
 const claimUrlFor = (slug: string) => `${SITE}/providers/${slug}?claim=1`;
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+/**
+ * "I wrote in June" beats "I wrote a while back": it is specific, it proves we
+ * keep records, and it dates itself from the row rather than from a phrase
+ * someone has to remember to update. Falls back to a vaguer line when the first
+ * touch has no timestamp, which is true of the rows reconciled by hand.
+ */
+function followupOpener(firstTouchAt: string | null | undefined): string {
+  const d = firstTouchAt ? new Date(firstTouchAt) : null;
+  const when = d && !isNaN(d.getTime()) ? ` in ${MONTHS[d.getUTCMonth()]}` : '';
+  return `I wrote to you${when} and know inboxes get busy, so this is my one follow-up.`;
+}
 function escapeHtml(s: string): string {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
@@ -296,7 +309,7 @@ export async function computeOutreachQueue(
   {
     let g = 0;
     for (;;) {
-      const { data } = await supabase.from('providers').select('id,name,slug,city,state,country,email,email_bounced,is_claimed,is_hidden,transparency_score,transparency_checks,outreach_sent,followup_sent,reply_category,needs_human,decision_drivers').range(g, g + 999);
+      const { data } = await supabase.from('providers').select('id,name,slug,city,state,country,email,email_bounced,is_claimed,is_hidden,transparency_score,transparency_checks,outreach_sent,outreach_sent_at,followup_sent,reply_category,needs_human,decision_drivers').range(g, g + 999);
       if (!data || !data.length) break;
       P = P.concat(data);
       if (data.length < 1000) break;
@@ -337,6 +350,7 @@ export async function computeOutreachQueue(
 
     let subject: string;
     const paras: string[] = [];
+    const isFollowup = touches === 1;
     if (market === 'US') {
       // US copy. Three differences from the Canadian version, all deliberate:
       // (1) it opens by saying the listing exists, because a US owner has
@@ -362,6 +376,14 @@ export async function computeOutreachQueue(
         subject = `Your ${p.city} listing on TheDripMap`;
       } else {
         subject = `${p.name} shows ${score} of 7 transparency details on TheDripMap`;
+      }
+      // A second email must never read like a first one. Without this, a clinic
+      // we already wrote to gets a fresh introduction from a company that
+      // apparently forgot it had made contact, which reads as untracked mass
+      // mail and undoes the whole "we keep careful records" pitch.
+      if (isFollowup) {
+        subject = `Still holding ${p.name}'s listing on TheDripMap`;
+        paras.push(followupOpener(p.outreach_sent_at));
       }
       paras.push(openLine);
       if (reg) paras.push(`${reg.line} Patients have started checking for that themselves, and a listing is where they look first.`);
@@ -397,6 +419,14 @@ export async function computeOutreachQueue(
       if (viewLine) paras.push(viewLine.trim());
       scoreLine = `Your listing on TheDripMap already shows ${score} of 7 transparency details, which puts you ahead of most clinics in ${p.city}. You are ${numWord(unmet.length)} details away from a full 7 of 7: ${joinNatural(unmetPhrases)}.`;
       tailParas.push('Claiming your listing is free and takes a few minutes, and adding those details completes your profile the moment you save.');
+    }
+    // Second touch: say so, up front, before anything else. The hand-written
+    // follow-up that went out on 2026-08-23 opened exactly this way and drew a
+    // reply within two hours; the code path had no such framing at all, so
+    // every queued follow-up would have arrived looking like a first contact.
+    if (isFollowup) {
+      subject = `Still holding ${p.name}'s listing on TheDripMap`;
+      paras.unshift(followupOpener(p.outreach_sent_at));
     }
     const { text, html } = render({
       greeting: `Hi ${p.name} team,`,
