@@ -725,6 +725,70 @@ export async function GET(req: Request) {
   // Drafts + totals
   lines.push(`OUTREACH DRAFTS PREPARED TODAY: ${draftsPreparedToday || 0}`);
   lines.push('');
+
+  // GROWTH SCOREBOARD (2026-08-23). The operator asked to see daily movement on
+  // the three things that actually matter: clinics claimed, traffic, and how
+  // much outreach runway is left. Everything here is a live count, never an
+  // estimate, and each line shows the direction of travel so a flat day reads
+  // as flat rather than as a number with no context.
+  try {
+    const dayAgo = new Date(Date.now() - 864e5).toISOString();
+    const twoDaysAgo = new Date(Date.now() - 2 * 864e5).toISOString();
+    const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString();
+
+    const viewsIn = async (fromIso: string, toIso?: string) => {
+      let q = supabase
+        .from('listing_events')
+        .select('id', { count: 'exact', head: true })
+        .eq('event_type', 'view')
+        .gte('created_at', fromIso);
+      if (toIso) q = q.lt('created_at', toIso);
+      const { count } = await q;
+      return count || 0;
+    };
+    const [views24, viewsPrev24, views7d] = await Promise.all([
+      viewsIn(dayAgo),
+      viewsIn(twoDaysAgo, dayAgo),
+      viewsIn(weekAgo),
+    ]);
+    const arrow = views24 === viewsPrev24 ? 'flat' : views24 > viewsPrev24 ? `up ${views24 - viewsPrev24}` : `down ${viewsPrev24 - views24}`;
+
+    let all: Array<Record<string, unknown>> = [];
+    for (let f = 0; ; f += 1000) {
+      const { data } = await supabase
+        .from('providers')
+        .select('country,state,is_hidden,is_claimed,claimed_at,transparency_score,outreach_sent,followup_sent,email,email_bounced')
+        .range(f, f + 999);
+      if (!data || !data.length) break;
+      all = all.concat(data as Array<Record<string, unknown>>);
+      if (data.length < 1000) break;
+    }
+    const live = all.filter((p) => !p.is_hidden);
+    const ca = live.filter((p) => p.country === 'Canada');
+    const tx = live.filter((p) => p.country === 'United States' && p.state === 'Texas');
+    const claimedWeek = live.filter((p) => p.is_claimed && typeof p.claimed_at === 'string' && p.claimed_at >= weekAgo).length;
+    const sevens = live.filter((p) => Number(p.transparency_score) === 7).length;
+    // Runway: never contacted, has a usable address, worth contacting (not 0/7).
+    const runway = (rows: Array<Record<string, unknown>>) =>
+      rows.filter((p) => !p.is_claimed && !p.outreach_sent && !p.followup_sent && p.email && !p.email_bounced && Number(p.transparency_score) > 0).length;
+
+    lines.push('GROWTH SCOREBOARD');
+    lines.push(`  Traffic:        ${views24} listing views in 24h (${arrow} vs the day before), ${views7d} over 7 days`);
+    lines.push(`  Claimed:        ${ca.filter((p) => p.is_claimed).length} of ${ca.length} Canadian, ${claimedWeek} new in the last 7 days`);
+    lines.push(`  Full 7 of 7:    ${sevens} clinic${sevens === 1 ? '' : 's'}`);
+    lines.push(`  Canada runway:  ${runway(ca)} clinics never contacted (first touch remaining)`);
+    lines.push(`  Texas pilot:    ${tx.filter((p) => p.is_claimed).length} claimed of ${tx.length} listed, ${runway(tx)} never contacted`);
+    if (runway(ca) < 40) {
+      lines.push('  NOTE: Canadian first-touch runway is nearly spent. New supply has to come from');
+      lines.push('        discovery or a new market, not from the existing list.');
+    }
+    lines.push('');
+  } catch (err) {
+    lines.push('GROWTH SCOREBOARD');
+    lines.push(`  Could not compute: ${err instanceof Error ? err.message : String(err)}`);
+    lines.push('');
+  }
+
   lines.push('TOTALS');
   lines.push(`  Verified clinics: ${totalVerified || 0}`);
   lines.push(`  Total listings:   ${totalListings || 0}`);
