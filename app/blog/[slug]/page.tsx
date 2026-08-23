@@ -111,7 +111,17 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     };
   }
 
-  const safeTitle = (post.title && String(post.title).trim()) || fallbackTitle;
+  // SERP title prefers meta_title, then the on-page title (2026-08-20).
+  // meta_title exists precisely so the search-result title can differ from the
+  // H1, and the content engine validates it to 60 chars, but this function read
+  // post.title only. Result: 132 of 151 posts had a hand-written meta_title
+  // that never reached Google, and 118 rendered titles ran past 60 chars and
+  // were truncated in the SERP. The description already honoured metaDescription.
+  const metaTitleRaw = (post.metaTitle && String(post.metaTitle).trim()) || '';
+  // Some stored meta_titles already carry the brand suffix; strip it so the
+  // append below cannot double it up.
+  const metaTitleClean = metaTitleRaw.replace(/\s*\|\s*TheDripMap.*$/i, '').trim();
+  const safeTitle = metaTitleClean || (post.title && String(post.title).trim()) || fallbackTitle;
   const title = `${safeTitle} | TheDripMap`;
   const description = post.metaDescription || post.excerpt || `Read our latest guide on ${safeTitle.toLowerCase()}. Expert insights from TheDripMap Team.`;
 
