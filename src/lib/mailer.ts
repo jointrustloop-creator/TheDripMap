@@ -16,6 +16,9 @@ export interface MailPayload {
   from: string; // e.g. 'TheDripMap <info@thedripmap.com>'
   to: string;
   replyTo?: string;
+  /** Carbon copy. Used by the operator format-review rule: any new email
+   *  format is sent once to info@ with the operator cc'd before first real use. */
+  cc?: string | string[];
   subject: string;
   text: string;
   html?: string; // Optional HTML body (text is still required as fallback).
@@ -64,6 +67,7 @@ export async function sendMail(payload: MailPayload): Promise<MailResult> {
         from: payload.from,
         to: payload.to,
         ...(payload.replyTo ? { replyTo: payload.replyTo } : {}),
+        ...(payload.cc ? { cc: payload.cc } : {}),
         subject: payload.subject,
         text: payload.text,
         ...(payload.html ? { html: payload.html } : {}),
@@ -83,6 +87,7 @@ export async function sendMail(payload: MailPayload): Promise<MailResult> {
         from: payload.from,
         to: payload.to,
         replyTo: payload.replyTo,
+        ...(payload.cc ? { cc: payload.cc } : {}),
         subject: payload.subject,
         text: payload.text,
         ...(payload.html ? { html: payload.html } : {}),
@@ -102,6 +107,7 @@ export async function sendMail(payload: MailPayload): Promise<MailResult> {
         from: payload.from,
         to: payload.to,
         ...(payload.replyTo ? { replyTo: payload.replyTo } : {}),
+        ...(payload.cc ? { cc: payload.cc } : {}),
         subject: payload.subject,
         text: payload.text,
         ...(payload.html ? { html: payload.html } : {}),

@@ -9,6 +9,26 @@
 // Canadian pages are never affected, in either state.
 export const US_MARKET_ENABLED = false;
 
+// Whether US clinic owners may CLAIM their listing. Deliberately separate from
+// US_MARKET_ENABLED, because indexing and claiming are different decisions.
+//
+// Until 2026-08-23 both rode on US_MARKET_ENABLED, which left the codebase
+// contradicting itself: isNoindexedUSProviderPage (below) grants claimed US
+// provider pages an indexing exception precisely so US owners get SEO value
+// from claiming, yet ClaimListingModal refused every US claim, so the exception
+// could never fire for anyone new. It was dead code serving only grandfathered
+// listings.
+//
+// Splitting the switch is the "decouple outreach from indexing" model:
+//   - unclaimed US pages stay noindexed, so the thin-stub dilution that keeps
+//     the US market off does not reach Google;
+//   - a US owner who claims earns an indexable, owner-maintained page, which is
+//     the honest thing we can offer them today;
+//   - claiming is free, so this opens supply without opening the index.
+//
+// Set false to close US claims again. Canadian claims are never affected.
+export const US_CLAIMS_ENABLED = true;
+
 const CA_PROVINCE_ABBR = new Set(['on', 'bc', 'ab', 'qc', 'mb', 'sk', 'ns', 'nb', 'nl', 'pe', 'nt', 'yt', 'nu']);
 const CA_PROVINCE_NAME = new Set([
   'ontario', 'british columbia', 'alberta', 'quebec', 'manitoba', 'saskatchewan',

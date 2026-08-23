@@ -16,15 +16,34 @@ export async function POST(req: Request) {
     const replyTo = data?.replyTo ? String(data.replyTo).trim() : undefined;
     const subject = String(data?.subject || '').trim();
     const text = String(data?.text || '').trim();
+    // HTML body and cc, both needed by the operator format-review rule: a new
+    // email format is sent once to info@ with the operator cc'd, and reviewing
+    // a design requires seeing the actual HTML, not the plain-text fallback.
+    const html = data?.html ? String(data.html) : undefined;
+    const ccRaw = Array.isArray(data?.cc) ? data.cc : data?.cc ? [data.cc] : [];
+    const cc = ccRaw.map((x: unknown) => String(x).trim()).filter(Boolean);
 
     if (!to || !subject || !text) {
       return NextResponse.json({ error: 'Missing to, subject, or text' }, { status: 400 });
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+    const isEmail = (x: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x);
+    if (!isEmail(to)) {
       return NextResponse.json({ error: 'Invalid to address' }, { status: 400 });
     }
+    const badCc = cc.find((x: string) => !isEmail(x));
+    if (badCc) {
+      return NextResponse.json({ error: `Invalid cc address: ${badCc}` }, { status: 400 });
+    }
 
-    const result = await sendMail({ from, to, replyTo, subject, text });
+    const result = await sendMail({
+      from,
+      to,
+      replyTo,
+      subject,
+      text,
+      ...(html ? { html } : {}),
+      ...(cc.length ? { cc } : {}),
+    });
     return NextResponse.json(result);
   } catch (err) {
     console.error('admin/send-email error', err);
