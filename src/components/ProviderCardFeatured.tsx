@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ResilientImage } from './ResilientImage';
+import { ClinicImageBand, ClinicMonogramPanel, coverPhotoOf } from './ClinicImageBand';
 import TrackedLink from './TrackedLink';
 import { MessageClinicButton } from './MessageClinicButton';
 import {
@@ -94,7 +95,11 @@ export const ProviderCardFeatured = ({
 }: ProviderCardFeaturedProps) => {
   const slug = provider.slug || slugify(provider.name);
   const photo = firstRealPhoto(provider);
-  const logo = realLogo(provider);
+  // og:image photo sourced from the clinic's own site (image_url, non-logo).
+  // Used as the cover when no real photo exists in `photos`. A logo-looking
+  // image_url still renders in the logo panel below, never stretched 16:9.
+  const ogPhoto = photo ? null : coverPhotoOf(provider);
+  const logo = ogPhoto ? null : realLogo(provider);
   const openStatus = deriveOpenStatus(provider);
   const dripMenu = deriveDripMenu(provider);
   const prac = practitionerType(provider);
@@ -182,6 +187,13 @@ export const ProviderCardFeatured = ({
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-700"
               fallbackSrc=""
             />
+          ) : ogPhoto ? (
+            <ClinicImageBand
+              src={ogPhoto}
+              alt={`${provider.name} clinic photo`}
+              className="absolute inset-0"
+              fallback={<ClinicMonogramPanel initials={initialsOf(provider.name)} city={provider.city} />}
+            />
           ) : logo ? (
             <div className="absolute inset-0 bg-wellness-50 flex items-center justify-center p-6">
               <ResilientImage
@@ -195,11 +207,7 @@ export const ProviderCardFeatured = ({
               />
             </div>
           ) : (
-            <div className="absolute inset-0 bg-wellness-600 flex items-center justify-center">
-              <span className="text-4xl md:text-5xl font-black text-white/90 tracking-tight">
-                {initialsOf(provider.name)}
-              </span>
-            </div>
+            <ClinicMonogramPanel initials={initialsOf(provider.name)} city={provider.city} />
           )}
         </Link>
 

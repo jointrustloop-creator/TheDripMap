@@ -10,6 +10,7 @@ import { slugify } from '../lib/data';
 import { bookingUrlOf } from '../lib/card-signals';
 import { cn } from '../lib/utils';
 import { ResilientImage } from './ResilientImage';
+import { ClinicImageBand, ClinicMonogramPanel, coverPhotoOf } from './ClinicImageBand';
 import { OpenStatus } from './OpenStatus';
 import { motion } from 'motion/react';
 import { useClaimListing } from '../context/ClaimListingContext';
@@ -103,7 +104,10 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
   // ----------------------------------------------------------------------------
   if (isClaimed) {
     const accent = accentFor(slug || provider.name || 'iv');
-    const logo = hasRealLogo(provider);
+    // A real photo (og:image sourced from the clinic's own site) anchors the
+    // 16:9 cover band; an uploaded brand LOGO stays in the small avatar instead.
+    const coverPhoto = coverPhotoOf(provider);
+    const logo = !coverPhoto && hasRealLogo(provider);
     const logoUrl = provider.imageUrl || provider.image_url || '';
     const rating = Number(provider.rating) || 0;
     const reviews = Number(provider.reviewCount) || 0;
@@ -136,13 +140,24 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
           className
         )}
       >
-        {/* Colour cover band — the per-clinic identity */}
-        <div className={cn('relative h-24 shrink-0', accent.cover)}>
-          <div
-            className="absolute inset-0 opacity-50"
-            style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.28) 1px, transparent 1px)', backgroundSize: '10px 10px' }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+        {/* Cover band — the clinic's own photo when we have one, else the
+            per-clinic colour identity. A broken photo falls back to the colour
+            band, never to a missing-image look. */}
+        <ClinicImageBand
+          src={coverPhoto}
+          alt={`${provider.name} clinic photo`}
+          className="aspect-video"
+          fallbackClassName={cn('h-24', accent.cover)}
+          fallback={
+            <>
+              <div
+                className="absolute inset-0 opacity-50"
+                style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.28) 1px, transparent 1px)', backgroundSize: '10px 10px' }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+            </>
+          }
+        >
           {/* Rating chip + compare, stacked top-right so the left stays clear */}
           <div className="absolute top-3 right-3 z-10 flex flex-col items-end gap-2">
             {rating > 0 && (
@@ -159,7 +174,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
             )}
             <CompareToggle provider={provider} />
           </div>
-        </div>
+        </ClinicImageBand>
 
         {/* Body */}
         <div className="relative px-5 pb-5 pt-0 flex flex-col flex-1">
@@ -380,11 +395,14 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
       )}
     >
       <div className="relative z-10 flex flex-col h-full">
-        {/* Photo Area */}
-        <div className="relative h-[140px] shrink-0">
-          <div className="absolute inset-0 bg-slate-100 flex items-center justify-center text-slate-300 font-black text-5xl select-none">
-            {initials}
-          </div>
+        {/* Photo area — the clinic's own photo when we have one, else a
+            designed wellness monogram panel (deliberate, not missing-image). */}
+        <ClinicImageBand
+          src={coverPhotoOf(provider)}
+          alt={`${provider.name} clinic photo`}
+          className="aspect-video"
+          fallback={<ClinicMonogramPanel initials={initials} city={provider.city} variant="soft" />}
+        >
           <div className="absolute top-4 left-4 flex flex-col gap-2">
             <span className="bg-slate-400 text-white px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-[0.1em] shadow-sm">
               UNCLAIMED LISTING
@@ -393,7 +411,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
           <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
             <CompareToggle provider={provider} />
           </div>
-        </div>
+        </ClinicImageBand>
 
         {/* Card Body */}
         <div className="px-5 pb-5 flex-1 flex flex-col">
