@@ -84,4 +84,18 @@ const s = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABA
 
   console.log(`${slug}: ${before.score}/7 -> ${t.score}/7`);
   console.log('still unmet:', t.unmetLabels.join(' | ') || 'none');
+
+  // Warn when a disclosure was written but earned nothing. On 2026-08-24 a
+  // screening answer was recorded as "Health history and consent form completed
+  // at the time of booking", which satisfies a human but matches none of the
+  // keywords SCREENING_YES looks for ("consent" is not "consult"). The script
+  // printed 5/7 -> 5/7 and moved on, so it looked like a success and the point
+  // was quietly not awarded. Anything that records without changing the score
+  // is either the wrong wording or the wrong field, and should say so.
+  if (t.score === before.score) {
+    console.warn('');
+    console.warn('WARNING: the disclosure was saved but the score did not move.');
+    console.warn('The recorded wording probably does not satisfy the check it was meant to earn.');
+    console.warn('See the matchers in src/lib/transparency-score.ts and rephrase, keeping it truthful.');
+  }
 })().catch((e) => { console.error('ERR', e.message); process.exit(1); });

@@ -212,10 +212,31 @@ export function enrichProvider(p: any): Provider {
   for (const k of Object.keys(rec)) {
     if (k === 'manage_token' || k === 'email' || k.startsWith('outreach_')) delete rec[k];
   }
+  // ALLOWLIST, NOT DENYLIST (2026-08-24). This used to delete `manage` and
+  // `manage_token` and pass everything else through, which meant every field
+  // added to decision_drivers afterwards shipped to the browser by default.
+  // That is exactly what happened: `disclosures`, added on 2026-08-23 to record
+  // who told us a fact and when, carries the source text verbatim, and the
+  // provenance for Glass Skin Med Spa read "Email reply from Roberta Harvey
+  // BScN RN, owner, roberta@glass-skin.ca". The clinic owner's address was
+  // being served in the page source of a public listing.
+  //
+  // A denylist fails OPEN on anything new, and the whole point of
+  // decision_drivers is that we keep adding internal fields to it. So only
+  // these four are published, because these four are the only ones any render
+  // path actually reads:
+  //   source                    -> orphan-stub detection, drives noindex
+  //   image_source              -> "photo from the clinic's website" attribution
+  //   premises                  -> regulator premises status on city pages
+  //   safety_review_expires_at  -> badge expiry (src/lib/deals.ts)
+  // Anything else, including provenance, prescriber records and raw evidence,
+  // stays server side. Adding a field here should be a deliberate decision to
+  // publish it.
+  const DD_PUBLIC = ['source', 'image_source', 'premises', 'safety_review_expires_at'] as const;
   if (rec.decision_drivers && typeof rec.decision_drivers === 'object') {
-    const dd = { ...(rec.decision_drivers as Record<string, unknown>) };
-    delete dd.manage;
-    delete dd.manage_token;
+    const src = rec.decision_drivers as Record<string, unknown>;
+    const dd: Record<string, unknown> = {};
+    for (const k of DD_PUBLIC) if (src[k] !== undefined) dd[k] = src[k];
     rec.decision_drivers = dd;
   }
 
