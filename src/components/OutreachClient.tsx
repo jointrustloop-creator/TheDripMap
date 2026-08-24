@@ -51,14 +51,27 @@ export function OutreachClient() {
 
   const sendBatch = async () => {
     if (!data) return;
+    // Re-fetch before prompting. The confirmation code rotates every 5 minutes
+    // and the server verifies the CURRENT window, but this component captured
+    // its copy when the page loaded. A tab left open for ten minutes therefore
+    // shows a code that is already dead, the send is refused, and the refusal
+    // reads like operator error when it is staleness. Ask for a fresh code (and
+    // a fresh batch, which may also have moved) at the moment of asking.
+    let live = data;
+    try {
+      const fresh = await fetch(`/api/admin/outreach?market=${encodeURIComponent(market)}`, { cache: 'no-store' });
+      const fj = await fresh.json();
+      if (fresh.ok) { live = fj; setData(fj); }
+    } catch { /* fall back to what we already have rather than blocking the send */ }
+    if (!live.batchSize) { setFlash('Nothing pending in this market right now.'); return; }
     // Confirm dialog that SHOWS what already went out and the exact new batch —
     // the visibility that was missing on 2026-08-11 (batch sent twice).
-    const last = data.lastSend;
+    const last = live.lastSend;
     const lastLine = last
       ? `LAST BATCH: ${last.recipient_count} sent ${new Date(last.created_at).toLocaleString()} by ${last.actor || 'operator'}.`
       : 'LAST BATCH: none on record.';
-    const names = data.batch.slice(0, 5).map((b) => b.name).join(', ');
-    const code = data.confirmCode || '';
+    const names = live.batch.slice(0, 5).map((b) => b.name).join(', ');
+    const code = live.confirmCode || '';
     // Typed per-batch code: shows last-batch state + the exact new batch, and
     // requires transcribing the code. The server re-verifies it, so a bare
     // action:'send' (an automated session) is refused.
