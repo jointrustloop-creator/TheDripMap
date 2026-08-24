@@ -44,7 +44,24 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // Never a clinic: references, directories, booking vendors, site builders,
 // agencies, marketplaces, news. These can rank for clinical French terms.
 const NOT_A_CLINIC = /(merckmanuals|msdmanuals|wikipedia|passeportsante|canada\.ca|gouv\.qc\.ca|quebec\.ca|inspq|ramq|yelp|yellowpages|pagesjaunes|tripadvisor|facebook|instagram|linkedin|indeed|glassdoor|groupon|booking|janeapp|mindbody|vagaro|fresha|wellnessliving|squarespace|wix|godaddy|shopify|webflow|stagheaddesigns|latofonts|amazon|ebay|reddit|quora|youtube|pinterest|medium\.com|substack|nih\.gov|pubmed|webmd|healthline)/i;
-const IV_TERMS = /(vitaminoth[eé]rapie|perfusion|intraveineu|soluté|solute|\bIV\b|intravenous|myers|nad\+?|glutathion|drip|hydratation|hydration|injection de vitamines|s[ée]rum)/i;
+// STRONG terms only. The first version of this list also accepted "perfusion",
+// "hydratation", "serum", "solute" and a bare \bIV\b, and that let 11 of 14
+// accepted sites through on nothing: a skincare page promising "hydratation
+// intense", a radiology clinic, a physiotherapist, a prenatal screening lab,
+// and French prose containing "IV" as a Roman numeral. A term earns a place
+// here only if it cannot plausibly mean anything except intravenous nutrient
+// therapy.
+const IV_TERMS = /(vitaminoth[eé]rapie|intraveineu|intravenous|cocktail de myers|myers.{0,10}cocktail|nad\+|glutathion|IV drip|IV therapy|IV infusion|th[eé]rapie IV\b|perfusion (de |d')?vitamin|injection de vitamines)/i;
+
+// A US clinic can still trip a Quebec marker: a Beverly Hills IV bar was
+// accepted on the first run because "QC" and postal-like patterns turn up in
+// stray markup. Anything asserting a US location is out, whatever else matched.
+// Only unambiguous US signals. The first version also matched two-letter state
+// codes after a comma, which was badly wrong: in a Canadian address ", CA"
+// means CANADA, so Clinique M in Montreal and Club Five Health were both
+// flagged American and rejected. Two-letter codes are gone; a US place has to
+// name itself.
+const US_MARKER = /(beverly hills|los angeles|san francisco|new york city|california|texas|florida|arizona|nevada|illinois|georgia|,\s*(USA|U\.S\.A\.|United States)|\b\d{5}(-\d{4})?,?\s*(USA|United States)\b)/i;
 const QC_MARKER = /(qu[eé]bec|montr[eé]al|laval|gatineau|sherbrooke|longueuil|brossard|saint-laurent|repentigny|terrebonne|trois-rivi[eè]res|l[eé]vis|saguenay|granby|blainville|saint-j[eé]r[oô]me|drummondville|\bQC\b|\bJ[0-9][A-Z]|\bH[0-9][A-Z]|\bG[0-9][A-Z])/i;
 const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,24}/g;
 const BAD_LOCAL = /^(no-?reply|donotreply|postmaster|abuse|webmaster|mailer-daemon|sentry|example|user)/i;
@@ -138,14 +155,15 @@ function titleOf(html) {
         }
       }
       const hasIV = IV_TERMS.test(text);
-      const inQC = QC_MARKER.test(text);
+      const isUS = US_MARKER.test(text);
+      const inQC = QC_MARKER.test(text) && !isUS;
       const name = titleOf(html) || (c.titles && c.titles[0]) || null;
       const rec = { domain: c.domain, site: base, name, email, hasIV, inQC, queries: c.queries };
       if (hasIV && inQC && email && !knownEmails.has(email)) {
         st.accepted[c.domain] = rec;
         console.log(`  [${i}/${queue.length}] ACCEPT ${root} | ${name} | ${email}`);
       } else {
-        const why = !hasIV ? 'no IV service term on the page' : !inQC ? 'no Quebec location marker' : !email ? 'no address on its own domain' : 'address already in use';
+        const why = !hasIV ? 'no unambiguous IV therapy term on the page' : isUS ? 'asserts a US location' : !QC_MARKER.test(text) ? 'no Quebec location marker' : !email ? 'no address on its own domain' : 'address already in use';
         st.review[c.domain] = { ...rec, why };
         console.log(`  [${i}/${queue.length}] review ${root}: ${why}`);
       }
