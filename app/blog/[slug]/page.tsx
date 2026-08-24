@@ -515,6 +515,37 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               />
             )}
 
+            {/* Where to go next, when the post has no city of its own.
+                37 of 151 posts were dead ends: a reader arrived from Google,
+                read a national explainer like "What Is in an IV Drip?", and had
+                nowhere to go. Those posts are not city specific and never will
+                be, so tagging them with a city would be dishonest. What they
+                can honestly offer is the national comparison, the price data,
+                and the explanation of what our checks mean. Rendering this from
+                the template rather than editing 37 posts also means every
+                future post is covered the day it publishes. */}
+            {(!post.relatedCities || post.relatedCities.length === 0) && (
+              <div className="mt-20 pt-10 border-t border-slate-100">
+                <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-6">Where to go next</h3>
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {[
+                    { href: '/canada', title: 'Compare clinics in Canada', blurb: 'Every listed clinic, by province and city.' },
+                    { href: '/iv-prices', title: 'What IV drips cost', blurb: 'Published prices, collected and dated.' },
+                    { href: '/verification', title: 'How we verify', blurb: 'What our checks do and do not mean.' },
+                  ].map((c) => (
+                    <Link
+                      key={c.href}
+                      href={c.href}
+                      className="block p-5 bg-white border border-slate-100 rounded-2xl hover:border-wellness-600 transition-all"
+                    >
+                      <span className="block text-sm font-black text-slate-900 mb-1">{c.title}</span>
+                      <span className="block text-[13px] leading-relaxed text-slate-500">{c.blurb}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Related Cities Tags */}
             {post.relatedCities && post.relatedCities.length > 0 && (
               <div className="mt-20 pt-10 border-t border-slate-100">
