@@ -208,9 +208,29 @@ export function enrichProvider(p: any): Provider {
   // /search payload (hurting Core Web Vitals). Strip them from the client shape.
   // No public component reads them; server flows (finish, message-clinic) do
   // their own service-role reads and are unaffected.
+  // Internal columns, never published. The original rule covered manage_token,
+  // email and the outreach_ prefix, which missed every CRM column that does not
+  // happen to start with "outreach_". So reply_category was being served on
+  // public listing pages, carrying our own private note about that business:
+  // "not_interested" on 4 clinics, "interested" on 3. Our commercial opinion of
+  // a clinic, in the page source of that clinic's own page. Found by
+  // scripts/_test-public-shape-leaks.ts, not by reading this function.
+  //
+  // None of these are read by any non-admin component; admin screens and server
+  // flows do their own service-role reads and are unaffected.
+  const INTERNAL_FIELDS = new Set([
+    'manage_token',   // grants edit access via /finish/[token]
+    'email',          // clinic PII and the lead-forward target
+    'followup_sent',
+    'followup_sent_at',
+    'reply_category', // our private assessment of their reply
+    'needs_human',
+    'email_bounced',
+    'forward_leads',
+  ]);
   const rec = enriched as unknown as Record<string, unknown>;
   for (const k of Object.keys(rec)) {
-    if (k === 'manage_token' || k === 'email' || k.startsWith('outreach_')) delete rec[k];
+    if (INTERNAL_FIELDS.has(k) || k.startsWith('outreach_')) delete rec[k];
   }
   // ALLOWLIST, NOT DENYLIST (2026-08-24). This used to delete `manage` and
   // `manage_token` and pass everything else through, which meant every field
