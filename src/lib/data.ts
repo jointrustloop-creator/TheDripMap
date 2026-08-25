@@ -92,6 +92,25 @@ export const getStateFromProvider = (provider: Provider): string => {
 
 // Helper to enrich provider with detailed mock data for UI sections
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+/**
+ * RANKING NOTE (2026-08-25). Every listing surface orders by:
+ *   1. is_featured        promotional position, a labelled slot
+ *   2. safety_verified    the strongest signal we have: a human checked a named
+ *                         prescriber against their public register
+ *   3. transparency_score how much the clinic actually discloses
+ *   4. rating             Google stars, a useful tiebreak but not our signal
+ *   5. is_claimed         weak alone, and already implied by the score
+ *
+ * transparency_score was ABSENT from this sort, so a 7 of 7 register-verified
+ * clinic ranked below a 2 of 7 clinic that merely happened to be claimed. Wrong
+ * for a patient comparing clinics, and it quietly removed the incentive to
+ * complete a listing: if filling it in does not move you up the page, why fill
+ * it in. That incentive is the whole flywheel.
+ *
+ * is_claimed sits BELOW the score deliberately. An unclaimed clinic disclosing
+ * six of seven is more useful than a claimed one disclosing two, and ranking
+ * otherwise on a site that sells itself on transparency would be dishonest.
+ */
 export function enrichProvider(p: any): Provider {
   if (!p) return p;
   
@@ -208,9 +227,29 @@ export function enrichProvider(p: any): Provider {
   // /search payload (hurting Core Web Vitals). Strip them from the client shape.
   // No public component reads them; server flows (finish, message-clinic) do
   // their own service-role reads and are unaffected.
+  // Internal columns, never published. The original rule covered manage_token,
+  // email and the outreach_ prefix, which missed every CRM column that does not
+  // happen to start with "outreach_". So reply_category was being served on
+  // public listing pages, carrying our own private note about that business:
+  // "not_interested" on 4 clinics, "interested" on 3. Our commercial opinion of
+  // a clinic, in the page source of that clinic's own page. Found by
+  // scripts/_test-public-shape-leaks.ts, not by reading this function.
+  //
+  // None of these are read by any non-admin component; admin screens and server
+  // flows do their own service-role reads and are unaffected.
+  const INTERNAL_FIELDS = new Set([
+    'manage_token',   // grants edit access via /finish/[token]
+    'email',          // clinic PII and the lead-forward target
+    'followup_sent',
+    'followup_sent_at',
+    'reply_category', // our private assessment of their reply
+    'needs_human',
+    'email_bounced',
+    'forward_leads',
+  ]);
   const rec = enriched as unknown as Record<string, unknown>;
   for (const k of Object.keys(rec)) {
-    if (k === 'manage_token' || k === 'email' || k.startsWith('outreach_')) delete rec[k];
+    if (INTERNAL_FIELDS.has(k) || k.startsWith('outreach_')) delete rec[k];
   }
   // ALLOWLIST, NOT DENYLIST (2026-08-24). This used to delete `manage` and
   // `manage_token` and pass everything else through, which meant every field
@@ -315,8 +354,13 @@ export async function getListingsByCity(city: string, state?: string, opts?: { s
         .select('*')
         .neq('availability', false)
         .ilike('address', `%${searchCity.substring(0, 5)}%`)
-        .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
-        .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
+        // Ranking: featured, then verified, then how much the clinic discloses,
+        // then stars. See RANKING NOTE above enrichProvider.
+        .order('is_featured', { ascending: false })
+        .order('safety_verified', { ascending: false })
+        .order('transparency_score', { ascending: false, nullsFirst: false })
+        .order('rating', { ascending: false, nullsFirst: false })
+        .order('is_claimed', { ascending: false })
         .limit(100);
       
       if (!zipError && zipData && zipData.length > 0) {
@@ -373,8 +417,13 @@ export async function getListingsByCity(city: string, state?: string, opts?: { s
       }
       
       return query
-        .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
-        .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
+        // Ranking: featured, then verified, then how much the clinic discloses,
+        // then stars. See RANKING NOTE above enrichProvider.
+        .order('is_featured', { ascending: false })
+        .order('safety_verified', { ascending: false })
+        .order('transparency_score', { ascending: false, nullsFirst: false })
+        .order('rating', { ascending: false, nullsFirst: false })
+        .order('is_claimed', { ascending: false })
         .limit(200);
     };
 
@@ -473,8 +522,13 @@ export async function getTorontoGtaTieredListings(): Promise<{
         .neq('availability', false)
         .in('city', TORONTO_CORE_CITIES)
         .or('state.ilike.Ontario,state.ilike.ON')
-        .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
-        .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
+        // Ranking: featured, then verified, then how much the clinic discloses,
+        // then stars. See RANKING NOTE above enrichProvider.
+        .order('is_featured', { ascending: false })
+        .order('safety_verified', { ascending: false })
+        .order('transparency_score', { ascending: false, nullsFirst: false })
+        .order('rating', { ascending: false, nullsFirst: false })
+        .order('is_claimed', { ascending: false })
         .limit(200),
       supabase
         .from('providers')
@@ -482,8 +536,13 @@ export async function getTorontoGtaTieredListings(): Promise<{
         .neq('availability', false)
         .in('city', TORONTO_GTA_NEARBY_CITIES)
         .or('state.ilike.Ontario,state.ilike.ON')
-        .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
-        .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
+        // Ranking: featured, then verified, then how much the clinic discloses,
+        // then stars. See RANKING NOTE above enrichProvider.
+        .order('is_featured', { ascending: false })
+        .order('safety_verified', { ascending: false })
+        .order('transparency_score', { ascending: false, nullsFirst: false })
+        .order('rating', { ascending: false, nullsFirst: false })
+        .order('is_claimed', { ascending: false })
         .limit(200),
     ]);
 
@@ -542,8 +601,13 @@ export async function getListingsByState(state: string, opts?: { strict?: boolea
     }
 
     const { data, error } = await query
-      .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
-      .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
+      // Ranking: featured, then verified, then how much the clinic discloses,
+      // then stars. See RANKING NOTE above enrichProvider.
+      .order('is_featured', { ascending: false })
+      .order('safety_verified', { ascending: false })
+      .order('transparency_score', { ascending: false, nullsFirst: false })
+      .order('rating', { ascending: false, nullsFirst: false })
+      .order('is_claimed', { ascending: false })
       .limit(300);
 
     if (error) throw error;
@@ -613,8 +677,13 @@ export async function getListingBySlug(slug: string) {
     const { data: widerCandidates, error: widerError } = await supabase
       .from('providers')
       .select('*')
-      .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
-      .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
+      // Ranking: featured, then verified, then how much the clinic discloses,
+      // then stars. See RANKING NOTE above enrichProvider.
+      .order('is_featured', { ascending: false })
+      .order('safety_verified', { ascending: false })
+      .order('transparency_score', { ascending: false, nullsFirst: false })
+      .order('rating', { ascending: false, nullsFirst: false })
+      .order('is_claimed', { ascending: false })
       .limit(1000);
 
     if (!widerError && widerCandidates) {
@@ -976,8 +1045,13 @@ export async function getListingsByService(service: string, limit: number = 4) {
       .select('*')
       .neq('availability', false)
       .or(filter)
-      .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
-      .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
+      // Ranking: featured, then verified, then how much the clinic discloses,
+      // then stars. See RANKING NOTE above enrichProvider.
+      .order('is_featured', { ascending: false })
+      .order('safety_verified', { ascending: false })
+      .order('transparency_score', { ascending: false, nullsFirst: false })
+      .order('rating', { ascending: false, nullsFirst: false })
+      .order('is_claimed', { ascending: false })
       .limit(2000);
 
     if (error) throw error;
@@ -1036,8 +1110,13 @@ export async function searchListings(query: string, city?: string) {
     }
 
     const { data, error } = await q
-      .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
-      .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
+      // Ranking: featured, then verified, then how much the clinic discloses,
+      // then stars. See RANKING NOTE above enrichProvider.
+      .order('is_featured', { ascending: false })
+      .order('safety_verified', { ascending: false })
+      .order('transparency_score', { ascending: false, nullsFirst: false })
+      .order('rating', { ascending: false, nullsFirst: false })
+      .order('is_claimed', { ascending: false })
       .limit(2000);
     if (error) throw error;
     
@@ -1108,8 +1187,13 @@ export async function getFeaturedListings(limit: number = 6, city?: string, coun
     }
 
     const { data, error } = await q
-      .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
-      .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
+      // Ranking: featured, then verified, then how much the clinic discloses,
+      // then stars. See RANKING NOTE above enrichProvider.
+      .order('is_featured', { ascending: false })
+      .order('safety_verified', { ascending: false })
+      .order('transparency_score', { ascending: false, nullsFirst: false })
+      .order('rating', { ascending: false, nullsFirst: false })
+      .order('is_claimed', { ascending: false })
       .limit(limit);
 
     if (error) throw error;
@@ -1562,8 +1646,13 @@ export async function getAllListings() {
         .from('providers')
         .select('*')
         .neq('availability', false)
-        .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
-        .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
+        // Ranking: featured, then verified, then how much the clinic discloses,
+        // then stars. See RANKING NOTE above enrichProvider.
+        .order('is_featured', { ascending: false })
+        .order('safety_verified', { ascending: false })
+        .order('transparency_score', { ascending: false, nullsFirst: false })
+        .order('rating', { ascending: false, nullsFirst: false })
+        .order('is_claimed', { ascending: false })
     );
 
     const results = data && data.length > 0 ? data : MOCK_LISTINGS;
@@ -1581,8 +1670,13 @@ export async function getListingsByIds(ids: string[]) {
       .select('*')
       .neq('availability', false)
       .in('id', ids)
-      .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
-      .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false });
+      // Ranking: featured, then verified, then how much the clinic discloses,
+      // then stars. See RANKING NOTE above enrichProvider.
+      .order('is_featured', { ascending: false })
+      .order('safety_verified', { ascending: false })
+      .order('transparency_score', { ascending: false, nullsFirst: false })
+      .order('rating', { ascending: false, nullsFirst: false })
+      .order('is_claimed', { ascending: false });
 
     if (error) throw error;
     return (data || []).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
@@ -1606,8 +1700,13 @@ export async function getListingsByServiceAndCity(service: string, city: string,
       .neq('availability', false)
       .ilike('city', cityPattern)
       .or(filter)
-      .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
-      .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
+      // Ranking: featured, then verified, then how much the clinic discloses,
+      // then stars. See RANKING NOTE above enrichProvider.
+      .order('is_featured', { ascending: false })
+      .order('safety_verified', { ascending: false })
+      .order('transparency_score', { ascending: false, nullsFirst: false })
+      .order('rating', { ascending: false, nullsFirst: false })
+      .order('is_claimed', { ascending: false })
       .limit(2000);
 
     const error = response.error;
@@ -1717,8 +1816,13 @@ export async function getSimilarClinics(currentSlug: string, city: string, state
       .neq('availability', false)
       .eq('city', city)
       .neq('slug', currentSlug)
-      .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
-      .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
+      // Ranking: featured, then verified, then how much the clinic discloses,
+      // then stars. See RANKING NOTE above enrichProvider.
+      .order('is_featured', { ascending: false })
+      .order('safety_verified', { ascending: false })
+      .order('transparency_score', { ascending: false, nullsFirst: false })
+      .order('rating', { ascending: false, nullsFirst: false })
+      .order('is_claimed', { ascending: false })
       .limit(limit);
 
     if (cityError) throw cityError;
@@ -1735,8 +1839,13 @@ export async function getSimilarClinics(currentSlug: string, city: string, state
         .eq('state', state)
         .neq('city', city) // Don't pick up city clinics again
         .neq('slug', currentSlug)
-        .order('is_featured', { ascending: false }).order('is_claimed', { ascending: false })
-        .order('safety_verified', { ascending: false }).order('rating', { ascending: false, nullsFirst: false })
+        // Ranking: featured, then verified, then how much the clinic discloses,
+        // then stars. See RANKING NOTE above enrichProvider.
+        .order('is_featured', { ascending: false })
+        .order('safety_verified', { ascending: false })
+        .order('transparency_score', { ascending: false, nullsFirst: false })
+        .order('rating', { ascending: false, nullsFirst: false })
+        .order('is_claimed', { ascending: false })
         .limit(remaining);
 
       if (stateError) throw stateError;
