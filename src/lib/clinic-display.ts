@@ -15,6 +15,10 @@ const LIST_FIELDS = [
   'id', 'slug', 'name', 'address', 'city', 'state', 'phone', 'type',
   'latitude', 'longitude', 'distance', 'rating', 'reviewCount',
   'is_claimed', 'is_featured', 'safety_verified', 'safety_review_status',
+  // transparency_score crosses the boundary so the search page can RANK by it.
+  // Without it the client re-sorted on distance and stars alone, throwing away
+  // the server ordering and burying well-documented clinics.
+  'transparency_score',
   'price_range', 'specialties', 'subtypes', 'services', 'medical_team',
   'mobile_service', 'hours', 'imageUrl', 'image_url',
 ] as const;

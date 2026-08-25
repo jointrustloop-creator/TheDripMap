@@ -96,15 +96,26 @@ export function ListingController({ initialProviders, cityName, hideHeading = fa
     }
   };
 
-  // Claimed listings always pinned to the top, then distance, then rating.
-  // Without the is_featured tiebreaker, granting location would push claimed
-  // listings down the page based on raw proximity — defeating the value of
-  // the claim. We promise "always shown first" in the UI; this enforces it.
+  // Featured pinned first, then near-and-good, then stars.
+  //
+  // This used to sort on RAW distance, which threw away the server ranking and
+  // meant a clinic disclosing 1 of 7 outranked one disclosing 6 of 7 for being
+  // 400m closer. Nobody chooses a clinic that way. Distance is now BANDED into
+  // 2km buckets, so clinics that are equally near in any way a person would
+  // notice get ordered by what we actually know about them: whether a human
+  // checked their prescriber against a register, then how much they disclose.
+  // Still nearest-first, just at human granularity instead of GPS precision.
+  const distanceBand = (d?: number | null) => Math.floor((d ?? 9999) / 2);
   const sortProviders = (list: Provider[]): Provider[] =>
     list.slice().sort((a, b) => {
       if (a.is_featured !== b.is_featured) return a.is_featured ? -1 : 1;
-      const distDiff = (a.distance ?? 9999) - (b.distance ?? 9999);
-      if (distDiff !== 0) return distDiff;
+      const bandDiff = distanceBand(a.distance) - distanceBand(b.distance);
+      if (bandDiff !== 0) return bandDiff;
+      const av = a.safety_verified === true, bv = b.safety_verified === true;
+      if (av !== bv) return av ? -1 : 1;
+      const scoreDiff = ((b as { transparency_score?: number }).transparency_score ?? 0)
+        - ((a as { transparency_score?: number }).transparency_score ?? 0);
+      if (scoreDiff !== 0) return scoreDiff;
       return (b.rating ?? 0) - (a.rating ?? 0);
     });
 
