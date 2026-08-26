@@ -1026,7 +1026,13 @@ export function getServiceFilter(service: string): string {
     return "name.ilike.%weight%,description.ilike.%weight%,subtypes.cs.{\"Weight\"},subtypes.cs.{\"Metabolism\"},description.ilike.%metabolism%,description.ilike.%slim%,description.ilike.%fat burn%,name.ilike.%lipo%,description.ilike.%MIC%,name.ilike.%MIC%";
   }
   if (s.includes('jet lag') || s.includes('travel') || s.includes('fatigue')) {
-    return "name.ilike.%jet%,description.ilike.%jet%,description.ilike.%travel%,description.ilike.%fatigue%,description.ilike.%energy%,name.ilike.%travel%,subtypes.cs.{\"Travel\"},subtypes.cs.{\"Energy\"},subtypes.cs.{\"Recovery\"},specialties.ilike.%jet%,specialties.ilike.%travel%,specialties.ilike.%energy%,subtypes.ilike.%travel%,subtypes.ilike.%energy%,description.ilike.%hydration%,name.ilike.%wellness%";
+    // NO ilike on specialties/subtypes: both are text[] and Postgres rejects
+    // `text[] ~~* unknown`, which errored the whole .or() — so the jet-lag /
+    // energy treatment pages silently rendered with ZERO listings on every
+    // build ("Supabase error in getListingsByService" ×4 in each build log).
+    // Array columns use cs (containment) with their real element values; the
+    // substring intent is already carried by the name/description clauses.
+    return "name.ilike.%jet%,description.ilike.%jet%,description.ilike.%travel%,description.ilike.%fatigue%,description.ilike.%energy%,name.ilike.%travel%,subtypes.cs.{\"Travel\"},subtypes.cs.{\"Energy\"},subtypes.cs.{\"Recovery\"},specialties.cs.{\"Energy\"},description.ilike.%hydration%,name.ilike.%wellness%";
   }
   
   // Default fallback

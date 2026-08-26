@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import {
   MapPin,
   Zap,
@@ -293,6 +293,18 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
 
   if (!provider || provider.availability === false) {
     notFound();
+  }
+
+  // 301 old-slug variants to the true slug instead of rendering a duplicate.
+  // getListingBySlug fuzzy-matches, so renamed/legacy URLs resolve — but until
+  // now they rendered the full page at the old address with only a canonical
+  // tag pointing home. Search Console filed 329 of those as "alternate page
+  // with proper canonical" and 12 as duplicates Google re-canonicalized itself
+  // (GSC coverage export, 2026-08-26). A permanent redirect consolidates the
+  // signal immediately and stops the duplicate pile growing every time a slug
+  // is cleaned up. UUID lookups take the same hop to the readable URL.
+  if (provider.slug && slug !== provider.slug) {
+    permanentRedirect(`/providers/${provider.slug}`);
   }
 
   const profiles = await getOperatorProfiles();
