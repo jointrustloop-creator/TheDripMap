@@ -19,31 +19,38 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const rawBaseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thedripmap.com';
   const baseUrl = rawBaseUrl.replace(/^https?:\/\/thedripmap\.com/, 'https://www.thedripmap.com');
 
+  // NO lastModified on routes without a real modification date (2026-08-26).
+  // Every entry used to stamp `new Date()`, so all 962 URLs claimed "modified
+  // right now" on every build. Google ignores lastmod from sites caught lying
+  // about it, and unreliable lastmod feeds inefficient recrawl — the same
+  // "crawled - currently not indexed" pile the coverage report shows 421 pages
+  // deep. A missing lastmod is valid and honest; blog posts keep a real one
+  // from their publish/edit dates.
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: `${baseUrl}/`,                       priority: 1.0, changeFrequency: 'daily',   lastModified: new Date() },
-    { url: `${baseUrl}/search`,                 priority: 0.9, changeFrequency: 'daily',   lastModified: new Date() },
-    { url: `${baseUrl}/cities`,                 priority: 0.9, changeFrequency: 'daily',   lastModified: new Date() },
-    { url: `${baseUrl}/canada`,                 priority: 0.9, changeFrequency: 'weekly',  lastModified: new Date() },
-    { url: `${baseUrl}/states`,                 priority: 0.85, changeFrequency: 'weekly', lastModified: new Date() },
-    { url: `${baseUrl}/guide`,                  priority: 0.85, changeFrequency: 'monthly', lastModified: new Date() },
-    { url: `${baseUrl}/quiz`,                   priority: 0.8, changeFrequency: 'monthly', lastModified: new Date() },
-    { url: `${baseUrl}/blog`,                   priority: 0.8, changeFrequency: 'daily',   lastModified: new Date() },
-    { url: `${baseUrl}/about`,                  priority: 0.6, changeFrequency: 'monthly', lastModified: new Date() },
-    { url: `${baseUrl}/for-clinics`,            priority: 0.7, changeFrequency: 'monthly', lastModified: new Date() },
-    { url: `${baseUrl}/for-clinics/open-a-clinic`, priority: 0.7, changeFrequency: 'monthly', lastModified: new Date() },
-    { url: `${baseUrl}/resources`,                    priority: 0.7, changeFrequency: 'monthly', lastModified: new Date() },
-    { url: `${baseUrl}/resources/cost-calculator`,    priority: 0.75, changeFrequency: 'monthly', lastModified: new Date() },
-    { url: `${baseUrl}/resources/safety-checker`,     priority: 0.7, changeFrequency: 'monthly', lastModified: new Date() },
-    { url: `${baseUrl}/resources/clinic-owners`,      priority: 0.6, changeFrequency: 'monthly', lastModified: new Date() },
-    { url: `${baseUrl}/resources/patient-acquisition`,priority: 0.65, changeFrequency: 'monthly', lastModified: new Date() },
-    { url: `${baseUrl}/tools/seo-audit`,              priority: 0.6, changeFrequency: 'monthly', lastModified: new Date() },
-    { url: `${baseUrl}/contact`,                priority: 0.6, changeFrequency: 'monthly', lastModified: new Date() },
-    { url: `${baseUrl}/symptoms`,               priority: 0.7, changeFrequency: 'monthly', lastModified: new Date() },
-    { url: `${baseUrl}/treatments`,             priority: 0.8, changeFrequency: 'monthly', lastModified: new Date() },
-    { url: `${baseUrl}/iv-prices`,              priority: 0.85, changeFrequency: 'weekly',  lastModified: new Date() },
-    { url: `${baseUrl}/canadian-iv-therapy-report`, priority: 0.9, changeFrequency: 'weekly', lastModified: new Date() },
-    { url: `${baseUrl}/transparency`,           priority: 0.6,  changeFrequency: 'monthly', lastModified: new Date() },
-    { url: `${baseUrl}/verification`,           priority: 0.8,  changeFrequency: 'monthly', lastModified: new Date() },
+    { url: `${baseUrl}/`,                       priority: 1.0, changeFrequency: 'daily' },
+    { url: `${baseUrl}/search`,                 priority: 0.9, changeFrequency: 'daily' },
+    { url: `${baseUrl}/cities`,                 priority: 0.9, changeFrequency: 'daily' },
+    { url: `${baseUrl}/canada`,                 priority: 0.9, changeFrequency: 'weekly' },
+    { url: `${baseUrl}/states`,                 priority: 0.85, changeFrequency: 'weekly' },
+    { url: `${baseUrl}/guide`,                  priority: 0.85, changeFrequency: 'monthly' },
+    { url: `${baseUrl}/quiz`,                   priority: 0.8, changeFrequency: 'monthly' },
+    { url: `${baseUrl}/blog`,                   priority: 0.8, changeFrequency: 'daily' },
+    { url: `${baseUrl}/about`,                  priority: 0.6, changeFrequency: 'monthly' },
+    { url: `${baseUrl}/for-clinics`,            priority: 0.7, changeFrequency: 'monthly' },
+    { url: `${baseUrl}/for-clinics/open-a-clinic`, priority: 0.7, changeFrequency: 'monthly' },
+    { url: `${baseUrl}/resources`,                    priority: 0.7, changeFrequency: 'monthly' },
+    { url: `${baseUrl}/resources/cost-calculator`,    priority: 0.75, changeFrequency: 'monthly' },
+    { url: `${baseUrl}/resources/safety-checker`,     priority: 0.7, changeFrequency: 'monthly' },
+    { url: `${baseUrl}/resources/clinic-owners`,      priority: 0.6, changeFrequency: 'monthly' },
+    { url: `${baseUrl}/resources/patient-acquisition`,priority: 0.65, changeFrequency: 'monthly' },
+    { url: `${baseUrl}/tools/seo-audit`,              priority: 0.6, changeFrequency: 'monthly' },
+    { url: `${baseUrl}/contact`,                priority: 0.6, changeFrequency: 'monthly' },
+    { url: `${baseUrl}/symptoms`,               priority: 0.7, changeFrequency: 'monthly' },
+    { url: `${baseUrl}/treatments`,             priority: 0.8, changeFrequency: 'monthly' },
+    { url: `${baseUrl}/iv-prices`,              priority: 0.85, changeFrequency: 'weekly' },
+    { url: `${baseUrl}/canadian-iv-therapy-report`, priority: 0.9, changeFrequency: 'weekly' },
+    { url: `${baseUrl}/transparency`,           priority: 0.6,  changeFrequency: 'monthly' },
+    { url: `${baseUrl}/verification`,           priority: 0.8,  changeFrequency: 'monthly' },
   ];
 
   // /deals is indexable only while at least one live deal exists (the page
@@ -52,18 +59,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // tolerant: a data error yields [] and the route is simply omitted.
   const liveDeals = await getLiveDeals();
   const dealsRoutes: MetadataRoute.Sitemap = liveDeals.length > 0
-    ? [{ url: `${baseUrl}/deals`, priority: 0.85, changeFrequency: 'daily', lastModified: new Date() }]
+    ? [{ url: `${baseUrl}/deals`, priority: 0.85, changeFrequency: 'daily' }]
     : [];
 
   // /iv-therapy-statistics is a US-framed page ("IV Therapy in the United States").
   // While the US market is off it is noindexed and kept out of the sitemap.
   const statsRoutes: MetadataRoute.Sitemap = US_MARKET_ENABLED
-    ? [{ url: `${baseUrl}/iv-therapy-statistics`, priority: 0.6, changeFrequency: 'monthly', lastModified: new Date() }]
+    ? [{ url: `${baseUrl}/iv-therapy-statistics`, priority: 0.6, changeFrequency: 'monthly' }]
     : [];
 
   const symptomRoutes = USE_CASES.map((useCase) => ({
     url: `${baseUrl}/symptoms/${useCase.slug}`,
-    lastModified: new Date(),
     changeFrequency: 'monthly' as const,
     priority: 0.7,
   }));
@@ -82,7 +88,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
   const treatmentHubRoutes = TREATMENT_HUB_SLUGS.map((slug) => ({
     url: `${baseUrl}/treatments/${slug}`,
-    lastModified: new Date(),
     changeFrequency: 'monthly' as const,
     priority: 0.75,
   }));
@@ -100,7 +105,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .filter((c) => (c.count ?? 0) >= CITY_PROVIDER_GATE && c.city && (US_MARKET_ENABLED || marketOf({ state: c.state }) !== 'US'))
     .map((c) => ({
       url: `${baseUrl}/cities/${slugify(c.city)}`,
-      lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.9,
     }));
@@ -111,21 +115,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .filter((s) => US_MARKET_ENABLED || s.country === 'Canada')
     .map((s) => ({
       url: `${baseUrl}/states/${s.slug}`,
-      lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.85,
     }));
 
   const audienceRoutes = AUDIENCES.map((a) => ({
     url: `${baseUrl}/for/${a.slug}`,
-    lastModified: new Date(),
     changeFrequency: 'monthly' as const,
     priority: 0.75,
   }));
 
   const guideRoutes = GUIDES.map((g) => ({
     url: `${baseUrl}/guide/${g.slug}`,
-    lastModified: new Date(),
     changeFrequency: 'monthly' as const,
     priority: 0.75,
   }));
@@ -149,7 +150,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .filter((p) => p.name && !isOrphanStub(p as { is_claimed?: boolean; decision_drivers?: unknown }) && (US_MARKET_ENABLED || (p as { is_claimed?: boolean }).is_claimed === true || marketOf({ country: (p as { country?: string }).country, state: p.state }) !== 'US'))
     .map((p) => ({
       url: `${baseUrl}/providers/${p.slug || slugify(p.name)}`,
-      lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     }));
@@ -161,7 +161,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .filter((post) => !BLOG_CANONICAL_OVERRIDES[post.slug || ''])
     .map((post) => ({
       url: `${baseUrl}/blog/${post.slug}`,
-      lastModified: new Date(),
+      // Real dates only. lastUpdated is set when a post is edited; date is the
+      // publish date. Never "now" — see the note above staticRoutes.
+      lastModified: new Date(post.lastUpdated || post.date || Date.now()),
       changeFrequency: 'monthly' as const,
       priority: 0.6,
     }));
@@ -170,7 +172,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // so adding a city to price-index-data.ts auto-adds it here.
   const priceRoutes = priceIndexCitySlugs().map((slug) => ({
     url: `${baseUrl}/iv-prices/${slug}`,
-    lastModified: new Date(),
     changeFrequency: 'monthly' as const,
     priority: 0.8,
   }));
@@ -252,7 +253,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (matches < MIN_PROVIDERS_FOR_SITEMAP) continue;
       matrixRoutes.push({
         url: `${baseUrl}/iv-therapy/${slug}/${slugify(city)}`,
-        lastModified: new Date(),
         changeFrequency: 'weekly' as const,
         priority: 0.8,
       });
