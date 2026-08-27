@@ -24,6 +24,7 @@ import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../../src/lib/mailer';
 import { REPORT_TO } from '../../../../src/lib/report-recipient';
 import { PlacesSource } from '../../../../src/lib/discovery-places';
+import { firecrawlDiscover } from '../../../../src/lib/discovery-firecrawl';
 import {
   DISCOVERY_QUERIES,
   cityForWeek,
@@ -47,6 +48,93 @@ const PROVINCE: Record<string, string> = {
   Montreal: 'Quebec', Halifax: 'Nova Scotia', Winnipeg: 'Manitoba',
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function runFirecrawl(sb: any, fcKey: string, city: string, province: string | null, dry: boolean) {
+  // Dedupe against EVERYTHING we already list: root domain of every website
+  // (a chain's second location must match on domain, not city) and every email.
+  const knownDomains = new Set<string>();
+  const knownEmails = new Set<string>();
+  for (let f = 0; ; f += 1000) {
+    const { data } = await sb.from('providers').select('website,email').range(f, f + 999);
+    if (!data || !data.length) break;
+    for (const p of data as Array<{ website?: string | null; email?: string | null }>) {
+      if (p.website) {
+        try { knownDomains.add(new URL(p.website).hostname.toLowerCase().replace(/^www\./, '').split('.').slice(-2).join('.')); } catch { /* bad url */ }
+      }
+      if (p.email) knownEmails.add(p.email.toLowerCase().trim());
+    }
+    if (data.length < 1000) break;
+  }
+
+  const r = await firecrawlDiscover(fcKey, city, province, knownDomains, knownEmails);
+
+  const created: string[] = [];
+  const nowIso = new Date().toISOString();
+  if (!dry) {
+    for (const c of r.found) {
+      const slug = `${slugify(c.name)}-${slugify(city)}`;
+      const { error } = await sb.from('providers').insert({
+        name: c.name,
+        slug,
+        city,
+        state: province,
+        country: 'Canada',
+        phone: c.phone,
+        website: c.website,
+        email: c.email,
+        description: honestDescription(c.name, city),
+        is_claimed: false,
+        is_hidden: false,
+        discovery_source: 'firecrawl',
+        // Names come from page <title>s and are sometimes a service phrase, not
+        // the business ("Ketamine Infusion Therapy" for Forbes Medi-Clinic in
+        // the Moncton dry run). The flag keeps these OUT of the outreach queue
+        // until a human confirms the name, because outreach greets clinics by
+        // name and a wrong one reads as spam.
+        discovery_flag: 'firecrawl_needs_review',
+        discovery_seen_at: nowIso,
+      });
+      if (!error) created.push(c.name);
+      else r.notes.push(`insert ${slug}: ${error.message}`);
+    }
+    await sb.from('discovery_runs').insert({
+      city, source: 'firecrawl', api_calls: r.searched, results_seen: r.candidates,
+      new_clinics: created.length, updated: 0, flagged: 0,
+      notes: r.notes.join(' | ') || null,
+    });
+  }
+
+  const lines = [
+    `Discovery run ${dry ? '(DRY) ' : ''}for ${city} — via Firecrawl (Google Places path is billing-blocked)`,
+    '',
+    `Searches: ${r.searched} · unknown domains surfaced: ${r.candidates} · pages verified: ${r.verified}`,
+    `New clinics: ${created.length}${created.length ? ' -> ' + created.join(', ') : ''}`,
+    '',
+    'Each new clinic passed all three checks on its own site: an unambiguous IV',
+    'service, the city named on the page (US locations vetoed), no directory or',
+    'aggregator domains. Names are machine-extracted from page titles, so every',
+    'insert is flagged firecrawl_needs_review and EXCLUDED from outreach until',
+    'a human confirms the name. Firecrawl cannot see address/geo/ratings or',
+    'detect closures; enrichment fills those in later. Nothing was deleted.',
+    r.notes.length ? `Notes: ${r.notes.join(' | ')}` : '',
+  ].filter(Boolean);
+
+  try {
+    await sendMail({
+      from: 'TheDripMap <info@thedripmap.com>',
+      to: REPORT_TO,
+      subject: `[TheDripMap] Discovery ${city}: ${created.length} new (Firecrawl)`,
+      text: lines.join('\n'),
+    });
+  } catch { /* reporting must never fail the run */ }
+
+  return NextResponse.json({
+    ok: true, city, dry, source: 'firecrawl',
+    searches: r.searched, candidates: r.candidates, verified: r.verified,
+    created: created.length, names: created, notes: r.notes,
+  });
+}
+
 export async function GET(req: Request) {
   const expected = process.env.CRON_SECRET;
   if (!expected) return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
@@ -56,8 +144,6 @@ export async function GET(req: Request) {
   if (String(process.env.DISCOVERY_ENABLED || 'true').toLowerCase() === 'false') {
     return NextResponse.json({ ok: true, skipped: 'DISCOVERY_ENABLED=false' });
   }
-  const key = process.env.GOOGLE_PLACES_API_KEY;
-  if (!key) return NextResponse.json({ error: 'GOOGLE_PLACES_API_KEY not set' }, { status: 500 });
 
   const url = new URL(req.url);
   const city = url.searchParams.get('city') || cityForWeek();
@@ -65,6 +151,21 @@ export async function GET(req: Request) {
   const province = PROVINCE[city] || null;
 
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+
+  // FIRECRAWL FIRST (2026-08-27). The Places path below has returned
+  // REQUEST_DENIED on every run since mid-July — the Google Cloud project has
+  // no billing account and standing one up has stalled repeatedly. Firecrawl
+  // is the engine that found the +43 clinic batch in July, we already pay for
+  // it, and it needs no Google anything. Places remains as the fallback so the
+  // day billing exists, removing FIRECRAWL_API_KEY restores the richer source
+  // (address, geo, ratings, closed-detection) with no code change.
+  const fcKey = process.env.FIRECRAWL_API_KEY;
+  if (fcKey) {
+    return runFirecrawl(sb, fcKey, city, province, dry);
+  }
+
+  const key = process.env.GOOGLE_PLACES_API_KEY;
+  if (!key) return NextResponse.json({ error: 'Neither FIRECRAWL_API_KEY nor GOOGLE_PLACES_API_KEY is set' }, { status: 500 });
   const source = new PlacesSource(key);
 
   // 1. Search this week's city within budget.
