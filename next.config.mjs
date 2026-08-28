@@ -87,6 +87,18 @@ const nextConfig = {
         destination: 'https://www.thedripmap.com/:path*',
         permanent: true,
       },
+      // CLINIC RENAMES. A claimed listing is indexable, so renaming one without
+      // a redirect strands a live URL that Google already knows. The in-page
+      // canonical redirect in app/providers/[slug] only catches slugs that
+      // still fuzzy-match the CURRENT name, which a rebrand breaks by
+      // definition. Explicit entry per rename, added at rename time.
+      // 2026-08-27: owner Alisha rebranded thrIVe Infusion Clinic (Hamilton) to
+      // Nura Clinics by Abundance Healthcare and asked us to update it.
+      {
+        source: '/providers/thrive-infusion-clinic-abundance-healthcare-hamilton',
+        destination: '/providers/nura-clinics-by-abundance-healthcare-hamilton',
+        permanent: true,
+      },
       // Singular /provider/* → plural /providers/*. Catch-all (:slug*) so it
       // covers nested paths too, fixing ~459 legacy 404s Google crawled at the
       // old singular path.

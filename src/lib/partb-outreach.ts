@@ -309,7 +309,7 @@ export async function computeOutreachQueue(
   {
     let g = 0;
     for (;;) {
-      const { data } = await supabase.from('providers').select('id,name,slug,city,state,country,email,email_bounced,is_claimed,is_hidden,transparency_score,transparency_checks,outreach_sent,outreach_sent_at,followup_sent,reply_category,needs_human,decision_drivers').range(g, g + 999);
+      const { data } = await supabase.from('providers').select('id,name,slug,city,state,country,email,email_bounced,is_claimed,is_hidden,transparency_score,transparency_checks,outreach_sent,outreach_sent_at,followup_sent,reply_category,needs_human,discovery_flag,decision_drivers').range(g, g + 999);
       if (!data || !data.length) break;
       P = P.concat(data);
       if (data.length < 1000) break;
@@ -333,6 +333,10 @@ export async function computeOutreachQueue(
     if (['not_interested', 'replied', 'closed', 'flagged', 'unsubscribed'].includes((p.reply_category || '').toLowerCase())) continue;
     if (p.needs_human) continue;
     if ((p.decision_drivers || {}).source === 'orphan_claim_stub') continue;
+    // Firecrawl-discovered rows wait for a human name-check before any email:
+    // the greeting uses the name, and machine-extracted titles are sometimes a
+    // service phrase rather than the business.
+    if (p.discovery_flag === 'firecrawl_needs_review') continue;
     const touches = (p.outreach_sent ? 1 : 0) + (p.followup_sent ? 1 : 0);
     if (touches >= 2) { counts.capped_out++; continue; }
     const score = p.transparency_score;
