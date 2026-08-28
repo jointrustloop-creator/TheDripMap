@@ -1,5 +1,61 @@
 # TheDripMap — $10,000/month by November 20, 2026
 
+## ⭐⭐ THE LEADS PLAN (2026-08-28) — CURRENT OPERATING PLAN
+Operator-approved, full mandate: "goal is what you said." Supersedes the
+Trusted Source plan as the ACTIVE plan (that thesis is not dead — it is the
+moat under this one). Daily rhythm: the operator asks "what's for me today"
+and gets ONE clear instruction; everything else runs autonomously with
+tracking.
+
+CORE INSIGHT: clinics do not pay for listings, they pay for patients.
+Evidence: Cory (Theradrip) replied in 18 minutes to one forwarded lead after
+months of silence; Ketamind claimed 16h after an email, thrIVe in 21 minutes.
+One IV patient is worth $150-1,000+ to a clinic. The product is the patient.
+Outbid.lol's lesson applied honestly: transparent + public + cheap entry +
+scoreboard sells fast — applied ONLY to the labelled Featured slot, never to
+organic rank. THE ORGANIC RANKING IS NEVER FOR SALE.
+
+### The 10 steps (status tracked in the session task list, PLAN-1..10)
+1.  DONE  Lens locked: the product is leads. (2026-08-28)
+2.  RUN   Finish follow-up runway -> 60+ claimed. 209 left @25/day (~9 days),
+          converting ~8% on second touch. Operator sends daily.
+3.  NEXT  Lead engine v1 (1 wk): "Get matched" on city pages, quiz routes
+          patient to 2-3 verified clinics, every lead tracked per clinic.
+          leads/clinic/month becomes the sales number. Spec: tasks #91-99.
+4.  TODO  Price Index as PR weapon (2 wks): 5 cities, "Canada IV Price Report
+          2026", press pitches (operator approves press email once).
+5.  TODO  Embeddable "Verified on TheDripMap" badge (3 days): free for
+          claimed+verified clinics; every embed = backlink + brand flywheel.
+6.  TODO  Blog engine on Vercel (1 day once ANTHROPIC_API_KEY is set):
+          Mon/Thu auto-publish, glutathione cost post is the quality bar.
+7.  TODO  Featured-per-city, transparent (1 wk): public /featured page, one
+          slot per city, price + current holder visible. Pricing brief to
+          operator BEFORE anything goes live (standing rule).
+8.  TODO  First 10 paying clinics (wks 4-6): warm pitch with THEIR numbers,
+          $79/mo, cancel anytime, first month free if zero leads (risk
+          reversal absorbs current low traffic). Operator approves pitch once.
+9.  TODO  Lead-fee tier (wks 6-8): mobile IV / NAD+ operators, $25-50 per
+          qualified lead. Only after 3+4+6 produce volume.
+10. TODO  Day-60 scoreboard review: MRR, leads/mo, claims, clicks/day.
+          Double down or kill. If Canada cannot math to $10k/mo, Texas
+          re-enters that day.
+
+### Math + binding constraint
+100 Featured x $79 = $7,900 MRR + lead fees. Constraint is TRAFFIC
+(~12 clicks/day at plan start). Steps 4-6 are the compounding engines; the
+step-8 guarantee prices in low traffic honestly until they compound.
+
+### Hard lines (unchanged)
+- Never sell the organic ranking or the verification verdict.
+- Every new email format: one [TEST, format review] to info@ cc operator first.
+- Monetization copy: operator sees pricing page + first pitch before live.
+
+---
+
+# ARCHIVE — prior plans (kept for context)
+
+# TheDripMap — $10,000/month by November 20, 2026
+
 ## ⭐ THE TRUSTED SOURCE PLAN (2026-08-13) — CURRENT OPERATING PLAN
 Operator-approved execution of the patient-pain deep research
 (docs/research/patient-pain-research-2026-08.md — every claim sourced; visual:
