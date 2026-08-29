@@ -15,7 +15,10 @@
 
 import { getServiceSupabase } from './supabase';
 
-const MODEL = 'claude-sonnet-4-20250514';
+// 2026-08-28: claude-sonnet-4-20250514 was RETIRED by Anthropic on June 15,
+// 2026, so every audit's AI section has been silently falling back to the
+// "temporarily unavailable" notice since then. Sonnet 5 is the current alias.
+const MODEL = 'claude-sonnet-5';
 
 // Shown to the clinic on ANY AI-layer failure (missing key, billing/credits,
 // timeout, malformed response). This is a public lead-gen tool, so we never
