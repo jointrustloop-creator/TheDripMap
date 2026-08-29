@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../src/lib/mailer';
 import { isJunkEmail } from '../../../src/lib/outreach-quality';
+import { CLINIC_MAIL_FOOTER } from '../../../src/lib/lead-forward';
 
 // Auto-forward — LIVE 2026-06-25 (shadow mode 2026-06-12 → 2026-06-25).
 //
@@ -43,15 +44,6 @@ interface ProviderRow {
   decision_drivers: { source?: string } | null;
   forward_leads: boolean | null;
 }
-
-// Identification footer for every clinic-facing lead email (CASL: sender
-// identification + a working unsubscribe mechanism on commercial-adjacent
-// relay mail). Kept in one place so both the lead and booking bodies stay
-// compliant together.
-const CLINIC_MAIL_FOOTER = `--
-TheDripMap, https://www.thedripmap.com, info@thedripmap.com
-You are receiving this because your clinic's listing on TheDripMap is claimed and lead forwarding is on.
-To stop receiving forwarded patient leads, reply with the word UNSUBSCRIBE, or turn off forwarding any time from your listing dashboard.`;
 
 async function computeForwardDecision(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
