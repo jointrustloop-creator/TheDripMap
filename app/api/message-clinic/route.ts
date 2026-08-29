@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../src/lib/mailer';
 import { isJunkEmail } from '../../../src/lib/outreach-quality';
+import { renderLeadEmail } from '../../../src/lib/lead-forward';
 
 // Auto-forward — LIVE 2026-06-25 (shadow mode 2026-06-12 → 2026-06-25).
 //
@@ -43,15 +44,6 @@ interface ProviderRow {
   decision_drivers: { source?: string } | null;
   forward_leads: boolean | null;
 }
-
-// Identification footer for every clinic-facing lead email (CASL: sender
-// identification + a working unsubscribe mechanism on commercial-adjacent
-// relay mail). Kept in one place so both the lead and booking bodies stay
-// compliant together.
-const CLINIC_MAIL_FOOTER = `--
-TheDripMap, https://www.thedripmap.com, info@thedripmap.com
-You are receiving this because your clinic's listing on TheDripMap is claimed and lead forwarding is on.
-To stop receiving forwarded patient leads, reply with the word UNSUBSCRIBE, or turn off forwarding any time from your listing dashboard.`;
 
 async function computeForwardDecision(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -238,6 +230,33 @@ export async function POST(req: Request) {
     let clinicForwardError: string | null = null;
     if (ENABLE_AUTO_FORWARD && decision.status === 'sent' && decision.clinicEmail) {
       try {
+        const rendered = renderLeadEmail({
+          greeting: `Hi ${data.clinicName} team,`,
+          previewText: booking
+            ? `Booking request: ${booking.treatment} — reply to confirm a time.`
+            : `New patient lead from TheDripMap — reply to answer them directly.`,
+          paras: [
+            booking
+              ? `A patient on TheDripMap wants to book with you. Reply to this email to confirm a time and your reply will go directly to ${data.name}.`
+              : `A patient on TheDripMap sent you a new lead. Reply to this email and your reply will go directly to ${data.name}.`,
+          ],
+          details: [
+            ['Name', String(data.name)],
+            ['Email', String(data.email)],
+            ['Phone', data.phone ? String(data.phone) : 'Not provided'],
+            ...(booking
+              ? ([
+                  ['Treatment', booking.treatment],
+                  ['Availability', booking.times.length ? booking.times.join(', ') : 'Not specified'],
+                ] as Array<[string, string]>)
+              : []),
+          ],
+          requestText: String(data.message),
+          buttonLabel: 'View your listing',
+          buttonUrl: clinicUrl,
+          clinicName: String(data.clinicName),
+          clinicEmail: decision.clinicEmail,
+        });
         await sendMail({
           from: 'TheDripMap <info@thedripmap.com>',
           to: decision.clinicEmail,
@@ -245,43 +264,8 @@ export async function POST(req: Request) {
           subject: booking
             ? `Booking request from TheDripMap: ${booking.treatment}, ${data.clinicName}`
             : `New patient lead from TheDripMap, ${data.clinicName}`,
-          text: booking
-            ? `Hi ${data.clinicName} team,
-
-A patient on TheDripMap wants to book with you. Reply to this email to confirm a time and your reply will go directly to ${data.name}.
-
-Booking request:
-Treatment: ${booking.treatment}
-Patient availability: ${booking.times.length ? booking.times.join(', ') : 'Not specified'}
-
-Patient details:
-Name: ${data.name}
-Email: ${data.email}
-Phone: ${data.phone || 'Not provided'}
-
-Full request:
-${data.message}
-
-Listing on TheDripMap: ${clinicUrl}
-
-${CLINIC_MAIL_FOOTER}
-`
-            : `Hi ${data.clinicName} team,
-
-A patient on TheDripMap sent you a new lead. Reply to this email and your reply will go directly to ${data.name}.
-
-Patient details:
-Name: ${data.name}
-Email: ${data.email}
-Phone: ${data.phone || 'Not provided'}
-
-Message:
-${data.message}
-
-Listing on TheDripMap: ${clinicUrl}
-
-${CLINIC_MAIL_FOOTER}
-`,
+          text: rendered.text,
+          html: rendered.html,
         });
         // Lead ledger (lead engine v1): one append-only row per delivery so
         // "we sent you N patients this month" is provable per clinic. The

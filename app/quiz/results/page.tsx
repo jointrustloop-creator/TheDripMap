@@ -7,6 +7,7 @@ import { motion } from 'motion/react';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { ProviderCardFeatured } from '../../../src/components/ProviderCardFeatured';
+import { GetMatchedForm } from '../../../src/components/GetMatchedForm';
 import { SurveyState, OperatorProfile, Provider, City, TreatmentType } from '../../../src/types';
 import {
   getOperatorProfiles,
@@ -628,6 +629,15 @@ function ResultsContent() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Get Matched (lead engine v1): one request, up to 3 claimed clinics
+            reply directly. Renders for match and empty states alike — in the
+            empty state it is the capture that stops the dead end. */}
+        {surveyData.city && (
+          <div className="mt-10">
+            <GetMatchedForm city={titleCase(surveyData.city)} treatment={recommendation.name} />
           </div>
         )}
 
