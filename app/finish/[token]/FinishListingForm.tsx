@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { CheckCircle2, ShieldCheck, Upload, ArrowRight, Loader2, Image as ImageIcon, Sparkles } from 'lucide-react';
 import { Logo } from '../../../src/components/Logo';
+import { BadgeEmbedCard } from '../../../src/components/BadgeEmbedCard';
 
 interface PrefillDrip { name?: string; price?: string | null }
 interface Prefill {
@@ -484,6 +485,10 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
               className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#0F6E56] focus:ring-2 focus:ring-[#0F6E56]/20 outline-none text-sm"
             />
           </SectionCard>
+
+          {/* Badge embed (PLAN-5): a live-status badge + backlink for the
+              clinic's own website. */}
+          <BadgeEmbedCard listingUrl={listingUrl} clinicName={clinicName} />
 
           {/* Bonus - slow-time deal builder. We tell them when they're slow and
               write the deal; it shows on the listing + /deals and expires itself. */}
