@@ -23,11 +23,16 @@ export const MessageClinicModal = ({ provider, isOpen, onClose }: MessageClinicM
   // never tell a patient "sent to the clinic" when it was actually queued
   // for our team to relay.
   const [forwarded, setForwarded] = useState(false);
+  // Claimed same-city clinics offered when this clinic can't receive the
+  // lead directly (unclaimed / bounced email). Filled from the API response.
+  const [alternatives, setAlternatives] = useState<Array<{ name: string; slug: string; city: string }>>([]);
+  // Honeypot: humans never see or fill this. Bots that do get silently dropped.
+  const [website, setWebsite] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const reset = () => {
-    setName(''); setEmail(''); setPhone(''); setMessage('');
-    setIsSuccess(false); setForwarded(false); setError(null);
+    setName(''); setEmail(''); setPhone(''); setMessage(''); setWebsite('');
+    setIsSuccess(false); setForwarded(false); setAlternatives([]); setError(null);
   };
 
   const handleClose = () => {
@@ -54,6 +59,7 @@ export const MessageClinicModal = ({ provider, isOpen, onClose }: MessageClinicM
           email: email.trim(),
           phone: phone.trim(),
           message: message.trim(),
+          website,
         }),
       });
 
@@ -63,6 +69,7 @@ export const MessageClinicModal = ({ provider, isOpen, onClose }: MessageClinicM
       }
       // forwardStatus === 'sent' means the lead went straight to the clinic.
       setForwarded(result.forwardStatus === 'sent');
+      setAlternatives(Array.isArray(result.alternatives) ? result.alternatives : []);
       setIsSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
@@ -106,6 +113,25 @@ export const MessageClinicModal = ({ provider, isOpen, onClose }: MessageClinicM
                       <>We&apos;ve received your message and our team will make sure {provider.name} gets it. You&apos;ll hear back by email soon.</>
                     )}
                   </p>
+                  {!forwarded && alternatives.length > 0 && (
+                    <div className="mb-8 text-left bg-slate-50 border border-slate-100 rounded-2xl p-5">
+                      <p className="text-sm font-bold text-slate-700 mb-3">
+                        Want a faster reply? These {provider.city} clinics receive messages directly:
+                      </p>
+                      <ul className="space-y-2">
+                        {alternatives.map((a) => (
+                          <li key={a.slug}>
+                            <a
+                              href={`/providers/${a.slug}`}
+                              className="text-wellness-600 font-bold hover:underline text-sm"
+                            >
+                              {a.name}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   <button
                     onClick={handleClose}
                     className="bg-slate-900 text-white px-8 py-3.5 rounded-2xl font-bold hover:bg-slate-800 transition-all"
@@ -139,6 +165,18 @@ export const MessageClinicModal = ({ provider, isOpen, onClose }: MessageClinicM
                   </div>
 
                   <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-5">
+                    {/* Honeypot: visually hidden, excluded from tab order and
+                        screen readers. Bots that fill it are silently dropped. */}
+                    <input
+                      type="text"
+                      name="website"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                      tabIndex={-1}
+                      autoComplete="off"
+                      aria-hidden="true"
+                      className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden"
+                    />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="text-sm font-bold text-slate-700 mb-2 block">
