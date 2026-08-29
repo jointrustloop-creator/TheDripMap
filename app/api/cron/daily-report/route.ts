@@ -506,6 +506,31 @@ export async function GET(req: Request) {
   }
   lines.push('');
 
+  // Leads today (lead engine v1). inquiries = what patients sent;
+  // lead_deliveries = what clinic inboxes actually received (the billable
+  // number). Ledger reads 0 until the migration is pasted; never throws.
+  {
+    const dayAgo = new Date(now.getTime() - 24 * 3_600_000).toISOString();
+    const [{ count: leadsToday }, delivered] = await Promise.all([
+      supabase.from('inquiries').select('id', { count: 'exact', head: true }).gte('created_at', dayAgo),
+      supabase.from('lead_deliveries').select('provider_id').gte('delivered_at', dayAgo),
+    ]);
+    lines.push(`LEADS TODAY (${leadsToday ?? 0} patient messages)`);
+    const rows = (delivered.data || []) as Array<{ provider_id: string }>;
+    if (!rows.length) {
+      lines.push(`  Delivered straight to clinic inboxes: 0.`);
+      if ((leadsToday ?? 0) > 0) lines.push('  Any messages above went to unclaimed/unreachable clinics — relay from /admin/leads.');
+    } else {
+      const byProv = new Map<string, number>();
+      for (const r of rows) byProv.set(r.provider_id, (byProv.get(r.provider_id) || 0) + 1);
+      const { data: dp } = await supabase.from('providers').select('id, name, city').in('id', [...byProv.keys()]);
+      const nameOf = new Map((dp || []).map((p: { id: string; name: string; city: string }) => [p.id, `${p.name} (${p.city})`]));
+      lines.push(`  Delivered straight to clinic inboxes: ${rows.length}`);
+      for (const [pid, n] of byProv) lines.push(`    - ${nameOf.get(pid) || pid.slice(0, 8)}: ${n}`);
+    }
+    lines.push('');
+  }
+
   // Badge reviews pending (2026-07-25): Safety Verified now requires operator
   // approval in /admin/badge-reviews. Surface the queue depth here until Telegram
   // is wired. Best-effort: reads 0 if the review column is not present yet.

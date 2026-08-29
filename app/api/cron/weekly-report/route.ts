@@ -373,6 +373,23 @@ export async function GET(req: Request) {
   lines.push('');
   lines.push('LEADS THIS WEEK (patient intent)');
   lines.push(`  Patient messages:  ${messagesThis}${messagesThis > 0 ? ` (${forwardedThis} auto-forwarded to clinics)` : ''}`);
+  // Ledger (lead engine v1): deliveries actually recorded per clinic this
+  // week — the provable "we sent you N patients" number. 0 rows pre-migration.
+  try {
+    const weekAgoIso = new Date(Date.now() - 7 * 24 * 3_600_000).toISOString();
+    const { data: led } = await supabase.from('lead_deliveries').select('provider_id').gte('delivered_at', weekAgoIso);
+    const ledRows = (led || []) as Array<{ provider_id: string }>;
+    if (ledRows.length) {
+      const byProv = new Map<string, number>();
+      for (const r of ledRows) byProv.set(r.provider_id, (byProv.get(r.provider_id) || 0) + 1);
+      const { data: lp } = await supabase.from('providers').select('id, name, city').in('id', [...byProv.keys()]);
+      const nameOf = new Map((lp || []).map((p: { id: string; name: string; city: string }) => [p.id, `${p.name} (${p.city})`]));
+      lines.push(`  Delivered to clinic inboxes (ledger): ${ledRows.length}`);
+      for (const [pid, n] of [...byProv.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10)) {
+        lines.push(`    - ${nameOf.get(pid) || pid.slice(0, 8)}: ${n}`);
+      }
+    }
+  } catch { /* ledger optional pre-migration */ }
   lines.push(`  Contact clicks:    ${totalLeadClicks} (book + call + website)`);
   if (rankedLeads.length) {
     lines.push('  Top clinics by contact clicks:');

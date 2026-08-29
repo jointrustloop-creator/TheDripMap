@@ -58,6 +58,12 @@ async function loadStats() {
     // Best-effort: the review column may not exist before the migration is pasted,
     // in which case the query returns count:null (no throw) and this stays 0.
     const badge = await supabase.from('providers').select('id', { count: 'exact', head: true }).eq('safety_review_status', 'pending');
+    // Lead engine v1: patient inquiries captured + deliveries actually sent to
+    // clinic inboxes (lead_deliveries may not exist pre-migration; stays 0).
+    const [leads30, delivered30] = await Promise.all([
+      supabase.from('inquiries').select('id', { count: 'exact', head: true }).gte('created_at', sinceIso),
+      supabase.from('lead_deliveries').select('id', { count: 'exact', head: true }).gte('delivered_at', sinceIso),
+    ]);
     return {
       providers: provTotal.count ?? 0,
       claimed: claimed.count ?? 0,
@@ -66,6 +72,8 @@ async function loadStats() {
       clicks30,
       active30: per.length,
       badgePending: badge.count ?? 0,
+      leads30: leads30.count ?? 0,
+      delivered30: delivered30.count ?? 0,
     };
   } catch {
     return null;
@@ -139,6 +147,8 @@ export default async function AdminDashboardPage() {
               ['Featured', stats.featured],
               ['Views (30d)', stats.views30],
               ['Clicks (30d)', stats.clicks30],
+              ['Leads (30d)', stats.leads30],
+              ['Delivered to clinics (30d)', stats.delivered30],
               ['Active listings', stats.active30],
             ] as [string, number][]).map(([label, n]) => (
               <div key={label} className="bg-white border border-slate-200 rounded-2xl p-4 group-hover:border-[#0F6E56]/30 transition-colors">

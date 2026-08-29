@@ -36,12 +36,22 @@ type ForwardStatus =
 interface ProviderRow {
   id: string;
   name: string | null;
+  city: string | null;
   email: string | null;
   email_bounced: boolean | null;
   is_claimed: boolean | null;
   decision_drivers: { source?: string } | null;
   forward_leads: boolean | null;
 }
+
+// Identification footer for every clinic-facing lead email (CASL: sender
+// identification + a working unsubscribe mechanism on commercial-adjacent
+// relay mail). Kept in one place so both the lead and booking bodies stay
+// compliant together.
+const CLINIC_MAIL_FOOTER = `--
+TheDripMap, https://www.thedripmap.com, info@thedripmap.com
+You are receiving this because your clinic's listing on TheDripMap is claimed and lead forwarding is on.
+To stop receiving forwarded patient leads, reply with the word UNSUBSCRIBE, or turn off forwarding any time from your listing dashboard.`;
 
 async function computeForwardDecision(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -65,13 +75,13 @@ async function computeForwardDecision(
   {
     const full = await supabase
       .from('providers')
-      .select('id, name, email, email_bounced, is_claimed, decision_drivers, forward_leads')
+      .select('id, name, city, email, email_bounced, is_claimed, decision_drivers, forward_leads')
       .eq('id', clinicId)
       .maybeSingle();
     if (full.error) {
       const lite = await supabase
         .from('providers')
-        .select('id, name, email, email_bounced, is_claimed, decision_drivers')
+        .select('id, name, city, email, email_bounced, is_claimed, decision_drivers')
         .eq('id', clinicId)
         .maybeSingle();
       provider = lite.data
@@ -125,12 +135,38 @@ export async function POST(req: Request) {
       );
     }
 
+    // Honeypot (lead engine v1). The form renders an invisible "website"
+    // field humans never fill. A bot that fills it gets a fake success and
+    // NOTHING is saved or emailed, so it cannot tell it was caught.
+    if (typeof data.website === 'string' && data.website.trim() !== '') {
+      return NextResponse.json({ success: true, forwardStatus: 'sent' });
+    }
+
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       // Use service role here so the suppression-table reads work and
       // so we can update the inquiry row's forward_status post-insert.
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
+
+    // Rate cap (lead engine v1): the same patient email may create at most 5
+    // inquiries in 24h across the whole site. Serverless-safe because it
+    // counts rows, not memory. Fails OPEN on query error: a broken cap must
+    // never block a real patient.
+    try {
+      const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { count, error: capError } = await supabase
+        .from('inquiries')
+        .select('id', { count: 'exact', head: true })
+        .eq('email', String(data.email).trim())
+        .gte('created_at', since);
+      if (!capError && (count || 0) >= 5) {
+        return NextResponse.json(
+          { success: false, error: 'Too many messages from this email today. Please try again tomorrow or email info@thedripmap.com.' },
+          { status: 429 }
+        );
+      }
+    } catch { /* fail open */ }
 
     // Shadow-mode decision: figure out what auto-forward WOULD have done.
     const decision = await computeForwardDecision(supabase, data.clinicId, data.email);
@@ -228,7 +264,7 @@ ${data.message}
 
 Listing on TheDripMap: ${clinicUrl}
 
-If you no longer want auto-forwarded leads, reply with the word UNSUBSCRIBE in the body.
+${CLINIC_MAIL_FOOTER}
 `
             : `Hi ${data.clinicName} team,
 
@@ -244,9 +280,22 @@ ${data.message}
 
 Listing on TheDripMap: ${clinicUrl}
 
-If you no longer want auto-forwarded leads, reply with the word UNSUBSCRIBE in the body.
+${CLINIC_MAIL_FOOTER}
 `,
         });
+        // Lead ledger (lead engine v1): one append-only row per delivery so
+        // "we sent you N patients this month" is provable per clinic. The
+        // table may not exist until the operator pastes the migration;
+        // failure here must never affect the patient or the clinic email.
+        try {
+          await supabase.from('lead_deliveries').insert({
+            inquiry_id: insertedInquiryId,
+            provider_id: data.clinicId,
+            channel: 'auto_forward',
+            source: booking ? 'booking' : 'message_clinic',
+            delivered_to: decision.clinicEmail,
+          });
+        } catch { /* ledger is best-effort until the migration lands */ }
       } catch (err) {
         clinicForwardError = err instanceof Error ? err.message : String(err);
         console.error('Forward to clinic failed:', clinicForwardError);
@@ -284,10 +333,32 @@ ${
 `,
     });
 
+    // Patient alternatives (lead engine v1): when the lead could NOT go
+    // straight to this clinic (unclaimed, bounced, opted out...), offer up to
+    // 3 claimed clinics in the same city whose owners actually receive leads,
+    // so the patient is never left waiting on a manual relay alone.
+    let alternatives: Array<{ name: string; slug: string; city: string }> = [];
+    if (decision.status !== 'sent' && decision.status !== 'shadow_would_send' && decision.provider?.city) {
+      try {
+        const { data: alts } = await supabase
+          .from('providers')
+          .select('name, slug, city')
+          .eq('country', 'Canada')
+          .eq('is_hidden', false)
+          .eq('is_claimed', true)
+          .ilike('city', decision.provider.city)
+          .neq('id', data.clinicId)
+          .not('email', 'is', null)
+          .limit(3);
+        alternatives = (alts || []).filter((a: { slug?: string }) => a.slug) as typeof alternatives;
+      } catch { /* alternatives are best-effort */ }
+    }
+
     return NextResponse.json({
       success: true,
       inquiryId: insertedInquiryId,
       forwardStatus: decision.status,
+      alternatives,
     });
   } catch (error) {
     console.error('Message clinic error:', error);
