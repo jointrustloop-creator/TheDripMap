@@ -19,9 +19,9 @@ import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../src/lib/mailer';
 import { isJunkEmail } from '../../../src/lib/outreach-quality';
 import {
-  CLINIC_MAIL_FOOTER,
   forwardBlocker,
   recordLeadDelivery,
+  renderLeadEmail,
   type ForwardProviderRow,
 } from '../../../src/lib/lead-forward';
 
@@ -145,27 +145,31 @@ export async function POST(req: Request) {
       for (const { clinic, inquiryId } of savedIds) {
         if (!clinic.email) continue;
         try {
+          const rendered = renderLeadEmail({
+            greeting: `Hi ${clinic.name} team,`,
+            previewText: `A patient wants ${treatment} in ${city} and matched with your clinic.`,
+            paras: [
+              `A patient on TheDripMap asked to be matched with a clinic for ${treatment} in ${city}, and your clinic was one of their matches.`,
+            ],
+            details: [
+              ['Name', name],
+              ['Email', email],
+              ['Phone', phone || 'Not provided'],
+              ['Looking for', `${treatment} in ${city}`],
+              ...(notes ? ([['Notes', notes]] as Array<[string, string]>) : []),
+            ],
+            buttonLabel: 'View your listing',
+            buttonUrl: `https://www.thedripmap.com/providers/${clinic.slug || ''}`,
+            clinicName: clinic.name || 'your clinic',
+            clinicEmail: clinic.email,
+          });
           await sendMail({
             from: 'TheDripMap <info@thedripmap.com>',
             to: clinic.email,
             replyTo: email,
             subject: `New patient request from TheDripMap: ${treatment} in ${city}`,
-            text: `Hi ${clinic.name} team,
-
-A patient on TheDripMap asked to be matched with a clinic for ${treatment} in ${city}, and your clinic was one of their matches. Reply to this email and your reply goes directly to them.
-
-Patient details:
-Name: ${name}
-Email: ${email}
-Phone: ${phone || 'Not provided'}
-
-Request:
-${patientMessage}
-
-Your listing: https://www.thedripmap.com/providers/${clinic.slug || ''}
-
-${CLINIC_MAIL_FOOTER}
-`,
+            text: rendered.text,
+            html: rendered.html,
           });
           await recordLeadDelivery(supabase, {
             inquiry_id: inquiryId,

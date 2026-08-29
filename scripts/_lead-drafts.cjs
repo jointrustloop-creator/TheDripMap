@@ -28,6 +28,36 @@ require('dotenv').config({ path: '.env.local', quiet: true });
 const fs = require('fs');
 const { createClient } = require('@supabase/supabase-js');
 
+
+// House-design HTML (approved 2026-08-23): white card, green button, no raw
+// URLs in the body. Self-contained copy for this operator script (.cjs cannot
+// import the TS renderer in src/lib/lead-forward.ts).
+const FONT = "-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+function houseHtml({ greeting, paras, buttonLabel, buttonUrl, footerLine, email }) {
+  const p = (t) => `<p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#3D4F49;">${esc(t)}</p>`;
+  const unsub = `https://www.thedripmap.com/api/newsletter/unsubscribe/${encodeURIComponent(email)}`;
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"></head>`
+    + `<body style="margin:0;padding:0;background-color:#F4F7F5;">`
+    + `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F4F7F5;"><tr><td align="center" style="padding:32px 16px;">`
+    + `<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">`
+    + `<tr><td style="padding:0 8px 18px;"><img src="https://www.thedripmap.com/logo.png" alt="TheDripMap" width="150" style="display:block;border:0;max-width:150px;height:auto;"></td></tr>`
+    + `<tr><td style="background-color:#FFFFFF;border-radius:16px;padding:36px 40px;font-family:${FONT};">`
+    + `<p style="margin:0 0 18px;font-size:16px;line-height:1.6;color:#1A2B26;">${esc(greeting)}</p>`
+    + paras.map(p).join('')
+    + `<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:16px auto 0;"><tr><td align="center" style="background-color:#0F6E56;border-radius:10px;">`
+    + `<a href="${buttonUrl}" style="display:inline-block;padding:14px 34px;font-size:15px;font-weight:700;color:#FFFFFF;text-decoration:none;border-radius:10px;">${esc(buttonLabel)}</a>`
+    + `</td></tr></table>`
+    + `<p style="margin:12px 0 28px;text-align:center;font-size:12.5px;color:#6E837B;">Free, takes about two minutes</p>`
+    + `<p style="margin:0;font-size:15px;color:#3D4F49;">Warm regards,</p>`
+    + `<p style="margin:4px 0 0;font-size:15px;line-height:1.5;color:#1A2B26;"><strong>Deborah</strong><br><span style="font-size:13.5px;color:#6E837B;">Founder, TheDripMap</span><br><a href="https://www.thedripmap.com" style="font-size:13.5px;color:#0F6E56;text-decoration:none;">thedripmap.com</a></p>`
+    + `</td></tr>`
+    + `<tr><td style="padding:22px 24px 0;font-size:12px;line-height:1.6;color:#8A9C94;text-align:center;font-family:${FONT};">`
+    + `${esc(footerLine)}<br>TheDripMap, Caledon, Ontario, Canada &nbsp;&middot;&nbsp; <a href="${unsub}" style="color:#8A9C94;text-decoration:underline;">Unsubscribe</a>`
+    + `</td></tr>`
+    + `</table></td></tr></table></body></html>`;
+}
+
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 const DAYS = 30;
 
@@ -67,6 +97,18 @@ TheDripMap
 https://www.thedripmap.com
 
 If you do not want to hear from us again, reply with the word UNSUBSCRIBE.`,
+    html: houseHtml({
+      greeting: `Hi ${p.name} team,`,
+      paras: [
+        `On ${when}, a patient browsing IV therapy clinics in ${p.city} sent a message to your listing on TheDripMap. Because the listing is not yet claimed, the message is waiting with us instead of in your inbox.`,
+        `Claiming is free and takes about two minutes. Once claimed, patient messages go straight to you and the patient can reply to you directly.`,
+        `If you would rather we pass this patient's message along without claiming, just reply to this email and we will forward it.`,
+      ],
+      buttonLabel: 'Claim your free listing',
+      buttonUrl: 'https://www.thedripmap.com/for-clinics',
+      footerLine: `You are receiving this because ${p.name} is listed on TheDripMap, the Canadian IV therapy matching platform.`,
+      email: p.email,
+    }),
     meta: { providerId: p.id, inquiries: inquiryCount },
   };
 }
