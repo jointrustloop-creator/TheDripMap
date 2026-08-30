@@ -96,6 +96,11 @@ export default async function CanadianIVReportPage() {
     dateModified: generated,
     spatialCoverage: { '@type': 'Place', name: 'Canada' },
     license: `${SITE_URL}/canadian-iv-therapy-report#cite`,
+    distribution: [{
+      '@type': 'DataDownload',
+      encodingFormat: 'text/csv',
+      contentUrl: `${SITE_URL}/canadian-iv-therapy-report/data.csv`,
+    }],
   };
 
   return (
@@ -131,6 +136,27 @@ export default async function CanadianIVReportPage() {
             </div>
           ))}
         </div>
+
+        {/* Key findings: one-line stats a journalist can lift verbatim. All
+            computed live above; the ones needing price data read the dated
+            snapshots. */}
+        <section className="mb-14 bg-slate-900 text-white rounded-3xl p-6 md:p-8">
+          <h2 className="text-xl md:text-2xl font-black tracking-tight mb-4">Key findings</h2>
+          <ul className="space-y-3 text-[15px] leading-relaxed text-slate-200">
+            <li>Canada has <strong className="text-white">{total.toLocaleString()} active IV therapy clinics</strong> across {byProvince.size} provinces, led by {provinces[0]?.name} ({provinces[0]?.count}).</li>
+            {provinces.filter(p => p.per100k).sort((a, b) => (b.per100k || 0) - (a.per100k || 0))[0] && (
+              <li>Per capita, <strong className="text-white">{provinces.filter(p => p.per100k).sort((a, b) => (b.per100k || 0) - (a.per100k || 0))[0].name}</strong> is the densest IV therapy market in the country at {provinces.filter(p => p.per100k).sort((a, b) => (b.per100k || 0) - (a.per100k || 0))[0].per100k?.toFixed(2)} clinics per 100,000 residents.</li>
+            )}
+            <li><strong className="text-white">{pct(mobileCount)}% of clinics offer mobile or at-home service</strong>, and {pct(nadCount)}% market NAD+ on their menu.</li>
+            {priceCities.find(c => c.citySlug === 'toronto') && (
+              <li>A standard IV vitamin drip in Toronto runs <strong className="text-white">${priceCities.find(c => c.citySlug === 'toronto')!.headline.low} to ${priceCities.find(c => c.citySlug === 'toronto')!.headline.high} CAD</strong> (median ${priceCities.find(c => c.citySlug === 'toronto')!.headline.median}) across {priceCities.find(c => c.citySlug === 'toronto')!.headline.clinics} clinics publishing prices.</li>
+            )}
+            <li>Only <strong className="text-white">{pct(claimedCount)}% of listings are owner-verified</strong>, a transparency gap patients cannot see from a clinic&apos;s own website.</li>
+          </ul>
+          <p className="mt-5 text-[12.5px] text-slate-400">
+            Every figure computes live from the national dataset. <a href="/canadian-iv-therapy-report/data.csv" className="text-wellness-300 underline">Download the raw data (CSV)</a>, free to cite with attribution.
+          </p>
+        </section>
 
         {/* Province table */}
         <section className="mb-14">
