@@ -207,9 +207,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   // Canonicalize the city to its resolved slug so variant URLs dedupe to one URL.
   const canonical = `${SITE_URL}/iv-therapy/${t.slug}/${slugify(resolved.name) || safeCity}`;
 
-  const titleCount = count === 1 ? '1 Clinic' : `${count} Clinics`;
-  const title = `${t.name} in ${cityLabel} (${YEAR}) | ${titleCount} | TheDripMap`;
-  const description = `Compare ${count > 0 ? `${count} ` : ''}${t.name.toLowerCase()} providers in ${cityLabel}. See clinics, what to expect, typical pricing, and book your session on TheDripMap.`;
+  // 2026-08-31: never advertise scarcity in the title. "| 0 Clinics |" was
+  // live on thin combos (caught on iron-infusion/oakville while ~100 GSC
+  // impressions sat unclicked) and reads as "nothing here". Counts only
+  // appear when they are a selling point (3+).
+  const title = count >= 3
+    ? `${t.name} in ${cityLabel} (${YEAR}) | ${count} Clinics | TheDripMap`
+    : `${t.name} in ${cityLabel} (${YEAR}): Options & Nearby Clinics | TheDripMap`;
+  const description = count >= 3
+    ? `Compare ${count} ${t.name.toLowerCase()} providers in ${cityLabel}. See clinics, what to expect, typical pricing, and book your session on TheDripMap.`
+    : `${t.name} in ${cityLabel}: how it works, what to expect, and the closest clinics that offer it. Compare options on TheDripMap.`;
 
   return {
     title,
