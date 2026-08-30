@@ -56,6 +56,46 @@ export const DISCOVERY_CITIES = [
   'Halifax',
   'Victoria',
   'Winnipeg',
+  // 2026-08-30 expansion. The rotation used to hold 15 cities visited one per
+  // WEEK, so a given city came round every 15 weeks and the whole engine added
+  // a couple of clinics a month. With outreach fuel exhausted (every CA clinic
+  // holding an email has been contacted), discovery IS the growth ceiling, so
+  // the list covers the rest of the country's real IV markets.
+  'Burnaby',
+  'Surrey',
+  'Richmond',
+  'Markham',
+  'Richmond Hill',
+  'Oakville',
+  'Burlington',
+  'Guelph',
+  'Windsor',
+  'Barrie',
+  'Oshawa',
+  'Kelowna',
+  'Saskatoon',
+  'Regina',
+  'Quebec City',
+  'Laval',
+  'Gatineau',
+  'St. Catharines',
+  'Waterloo',
+  'Cambridge',
+  'Sudbury',
+  'Kingston',
+  'Abbotsford',
+  'Red Deer',
+  'Lethbridge',
+  'Kamloops',
+  'Nanaimo',
+  'Moncton',
+  'Fredericton',
+  "St. John's",
+  'Whitby',
+  'Ajax',
+  'Pickering',
+  'Milton',
+  'Newmarket',
 ];
 
 export const DISCOVERY_QUERIES = (city: string) => [
@@ -75,6 +115,27 @@ export function isoWeek(d = new Date()): number {
 
 export function cityForWeek(d = new Date()): string {
   return DISCOVERY_CITIES[isoWeek(d) % DISCOVERY_CITIES.length];
+}
+
+/** Day index since epoch, so a DAILY rotation advances without a stored cursor. */
+export function dayIndex(d = new Date()): number {
+  return Math.floor(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) / 86400000);
+}
+
+/**
+ * The cities to sweep on one daily run. Consecutive days take consecutive
+ * slices, so the whole list is covered every ceil(len / n) days instead of
+ * once every len WEEKS. With 51 cities at 3 per day that is a full national
+ * pass every 17 days, against 51 weeks under the old weekly single-city
+ * rotation.
+ */
+export function citiesForRun(n = 3, d = new Date()): string[] {
+  const out: string[] = [];
+  const start = (dayIndex(d) * n) % DISCOVERY_CITIES.length;
+  for (let i = 0; i < Math.min(n, DISCOVERY_CITIES.length); i++) {
+    out.push(DISCOVERY_CITIES[(start + i) % DISCOVERY_CITIES.length]);
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------- diff ------
