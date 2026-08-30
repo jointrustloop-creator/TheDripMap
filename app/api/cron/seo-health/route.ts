@@ -91,7 +91,7 @@ export async function GET(req: Request) {
   }
 
   // 2. Crawl
-  const summary = await crawlUrls(sitemapUrls, { concurrency: 24, totalBudgetMs: 240_000 });
+  const summary = await crawlUrls(sitemapUrls, { concurrency: 12, totalBudgetMs: 240_000 });
 
   // 3. Detect
   const issues = detectIssues(summary);

@@ -6,13 +6,15 @@
 // title, meta description.
 //
 // Designed to be fast enough for ~2,142 URLs inside Vercel's 300s cron budget:
-// - Concurrency cap of CRAWL_CONCURRENCY (default 24)
+// - Concurrency cap of CRAWL_CONCURRENCY (default 12; 24 caused enough
+//   self-inflicted contention against our own ISR renders to fake timeouts)
 // - HEAD-only for redirect/status detection
 // - GET only for 2xx where we need the <head>
-// - Per-request timeout of 8s; total wall clock guard at TOTAL_BUDGET_MS
+// - Per-request timeout of 8s, then ONE backed-off retry at 20s; total wall
+//   clock guard at TOTAL_BUDGET_MS
 
 const SITE_URL = 'https://www.thedripmap.com';
-const CRAWL_CONCURRENCY = 24;
+const CRAWL_CONCURRENCY = 12;
 const REQUEST_TIMEOUT_MS = 8000;
 // Leave ~30s headroom under Vercel's 300s cap for diffing + email.
 const DEFAULT_TOTAL_BUDGET_MS = 270_000;
@@ -119,6 +121,11 @@ function extractLocs(xml: string): string[] {
 
 // ---------- per-URL probe ----------
 
+/** Cold-ISR backoff: let an in-flight render finish before the retry hits. */
+const RETRY_BACKOFF_MS = 1500;
+/** The retry gets a longer window than the first attempt (see probeUrl). */
+const RETRY_TIMEOUT_MS = 20000;
+
 async function probeUrl(url: string): Promise<CrawlResult> {
   const first = await probeOnce(url);
   // Retry once when the fetch itself failed (abort/timeout/network) or when the
@@ -137,12 +144,19 @@ async function probeUrl(url: string): Promise<CrawlResult> {
   // missing_meta / 38 missing_canonical false-positive cluster).
   const bodyUnread = first.status >= 200 && first.status < 300 && !first.title;
   if (fetchFailed || bodyUnread) {
-    return probeOnce(url);
+    // 2026-08-30: the retry used to fire INSTANTLY with the same 8s window, so
+    // it landed while the first attempt's ISR render was still in flight and
+    // aborted for the same reason. Two consecutive daily emails reported 8 then
+    // 7 "crawler timeout" city pages that every serve in 135ms to 1.5s when
+    // checked by hand. Wait for the render to land, then give the retry a much
+    // longer window: a page that fails BOTH is worth a human look.
+    await new Promise((r) => setTimeout(r, RETRY_BACKOFF_MS));
+    return probeOnce(url, RETRY_TIMEOUT_MS);
   }
   return first;
 }
 
-async function probeOnce(url: string): Promise<CrawlResult> {
+async function probeOnce(url: string, timeoutMs: number = REQUEST_TIMEOUT_MS): Promise<CrawlResult> {
   const base: CrawlResult = {
     url,
     status: 0,
@@ -163,7 +177,7 @@ async function probeOnce(url: string): Promise<CrawlResult> {
   try {
     for (let i = 0; i < 6; i++) {
       const ctl = new AbortController();
-      const timer = setTimeout(() => ctl.abort(), REQUEST_TIMEOUT_MS);
+      const timer = setTimeout(() => ctl.abort(), timeoutMs);
       lastRes = await fetch(current, {
         method: 'HEAD',
         redirect: 'manual',
@@ -205,7 +219,7 @@ async function probeOnce(url: string): Promise<CrawlResult> {
   // Get the HTML body for head-tag inspection.
   try {
     const ctl = new AbortController();
-    const timer = setTimeout(() => ctl.abort(), REQUEST_TIMEOUT_MS);
+    const timer = setTimeout(() => ctl.abort(), timeoutMs);
     const getRes = await fetch(current, {
       signal: ctl.signal,
       headers: { 'User-Agent': 'TheDripMap-SEO-Health/1.0' },
