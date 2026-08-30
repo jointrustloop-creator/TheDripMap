@@ -28,6 +28,7 @@ import { firecrawlDiscover } from '../../../../src/lib/discovery-firecrawl';
 import {
   DISCOVERY_QUERIES,
   cityForWeek,
+  citiesForRun,
   diffPlaces,
   honestDescription,
   type ExistingLite,
@@ -46,10 +47,23 @@ const PROVINCE: Record<string, string> = {
   Vancouver: 'British Columbia', Victoria: 'British Columbia',
   Calgary: 'Alberta', Edmonton: 'Alberta',
   Montreal: 'Quebec', Halifax: 'Nova Scotia', Winnipeg: 'Manitoba',
+  Burnaby: 'British Columbia', Surrey: 'British Columbia', Richmond: 'British Columbia',
+  Kelowna: 'British Columbia', Abbotsford: 'British Columbia', Kamloops: 'British Columbia',
+  Nanaimo: 'British Columbia',
+  Markham: 'Ontario', 'Richmond Hill': 'Ontario', Oakville: 'Ontario', Burlington: 'Ontario',
+  Guelph: 'Ontario', Windsor: 'Ontario', Barrie: 'Ontario', Oshawa: 'Ontario',
+  'St. Catharines': 'Ontario', Waterloo: 'Ontario', Cambridge: 'Ontario', Sudbury: 'Ontario',
+  Kingston: 'Ontario', Whitby: 'Ontario', Ajax: 'Ontario', Pickering: 'Ontario',
+  Milton: 'Ontario', Newmarket: 'Ontario',
+  Saskatoon: 'Saskatchewan', Regina: 'Saskatchewan',
+  'Quebec City': 'Quebec', Laval: 'Quebec', Gatineau: 'Quebec',
+  'Red Deer': 'Alberta', Lethbridge: 'Alberta',
+  Moncton: 'New Brunswick', Fredericton: 'New Brunswick',
+  "St. John's": 'Newfoundland and Labrador',
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function runFirecrawl(sb: any, fcKey: string, city: string, province: string | null, dry: boolean) {
+async function runFirecrawl(sb: any, fcKey: string, city: string, province: string | null, dry: boolean, opts: { silent?: boolean } = {}) {
   // Dedupe against EVERYTHING we already list: root domain of every website
   // (a chain's second location must match on domain, not city) and every email.
   const knownDomains = new Set<string>();
@@ -119,20 +133,24 @@ async function runFirecrawl(sb: any, fcKey: string, city: string, province: stri
     r.notes.length ? `Notes: ${r.notes.join(' | ')}` : '',
   ].filter(Boolean);
 
-  try {
-    await sendMail({
-      from: 'TheDripMap <info@thedripmap.com>',
-      to: REPORT_TO,
-      subject: `[TheDripMap] Discovery ${city}: ${created.length} new (Firecrawl)`,
-      text: lines.join('\n'),
-    });
-  } catch { /* reporting must never fail the run */ }
+  // In a multi-city sweep the caller sends ONE combined report instead of a
+  // separate email per city.
+  if (!opts.silent) {
+    try {
+      await sendMail({
+        from: 'TheDripMap <info@thedripmap.com>',
+        to: REPORT_TO,
+        subject: `[TheDripMap] Discovery ${city}: ${created.length} new (Firecrawl)`,
+        text: lines.join('\n'),
+      });
+    } catch { /* reporting must never fail the run */ }
+  }
 
-  return NextResponse.json({
+  return {
     ok: true, city, dry, source: 'firecrawl',
     searches: r.searched, candidates: r.candidates, verified: r.verified,
     created: created.length, names: created, notes: r.notes,
-  });
+  };
 }
 
 export async function GET(req: Request) {
@@ -146,11 +164,61 @@ export async function GET(req: Request) {
   }
 
   const url = new URL(req.url);
-  const city = url.searchParams.get('city') || cityForWeek();
   const dry = url.searchParams.get('dry') === '1';
-  const province = PROVINCE[city] || null;
-
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+
+  // MULTI-CITY DAILY SWEEP (2026-08-30). Discovery used to do one city per
+  // WEEK, which at 15 cities meant a national pass every 15 weeks and a couple
+  // of new clinics a month. Outreach fuel is now exhausted (every Canadian
+  // clinic holding an email has been contacted), so discovery is the growth
+  // ceiling for the whole business. Runs daily over several cities, bounded by
+  // a wall-clock guard so it always returns inside Vercel's 300s cap.
+  const fcKeyEarly = process.env.FIRECRAWL_API_KEY;
+  const forced = url.searchParams.get('city');
+  if (fcKeyEarly && !forced) {
+    const perRun = Math.max(1, Math.min(6, Number(url.searchParams.get('cities') || 3)));
+    const cities = citiesForRun(perRun);
+    const started = Date.now();
+    const BUDGET_MS = 230_000;
+    const runs: Array<Record<string, unknown>> = [];
+    for (const c of cities) {
+      if (Date.now() - started > BUDGET_MS) {
+        runs.push({ city: c, skipped: 'time budget reached' });
+        continue;
+      }
+      const res = await runFirecrawl(sb, fcKeyEarly, c, PROVINCE[c] || null, dry, { silent: true });
+      runs.push(res);
+    }
+    const totalNew = runs.reduce((s, r) => s + (Number(r.created) || 0), 0);
+    const names = runs.flatMap((r) => (Array.isArray(r.names) ? (r.names as string[]) : []));
+    try {
+      await sendMail({
+        from: 'TheDripMap <info@thedripmap.com>',
+        to: REPORT_TO,
+        subject: `[TheDripMap] Discovery: ${totalNew} new across ${cities.length} cities`,
+        text: [
+          `Discovery run ${dry ? '(DRY) ' : ''}over ${cities.join(', ')} via Firecrawl.`,
+          '',
+          ...runs.map((r) =>
+            r.skipped
+              ? `  ${r.city}: skipped (${r.skipped})`
+              : `  ${r.city}: ${r.created} new, ${r.candidates} domains seen, ${r.verified} pages verified`,
+          ),
+          '',
+          `Total new clinics: ${totalNew}${names.length ? ' -> ' + names.join(', ') : ''}`,
+          '',
+          'Every insert passed all three checks on its own site (unambiguous IV',
+          'service, the city named on the page, no US location) and is flagged',
+          'firecrawl_needs_review, so it is EXCLUDED from outreach until a human',
+          'confirms the name. Nothing was ever deleted.',
+        ].join('\n'),
+      });
+    } catch { /* reporting must never fail the run */ }
+    return NextResponse.json({ ok: true, dry, source: 'firecrawl', cities, totalNew, runs });
+  }
+
+  const city = forced || cityForWeek();
+  const province = PROVINCE[city] || null;
 
   // FIRECRAWL FIRST (2026-08-27). The Places path below has returned
   // REQUEST_DENIED on every run since mid-July — the Google Cloud project has
@@ -161,7 +229,7 @@ export async function GET(req: Request) {
   // (address, geo, ratings, closed-detection) with no code change.
   const fcKey = process.env.FIRECRAWL_API_KEY;
   if (fcKey) {
-    return runFirecrawl(sb, fcKey, city, province, dry);
+    return NextResponse.json(await runFirecrawl(sb, fcKey, city, province, dry));
   }
 
   const key = process.env.GOOGLE_PLACES_API_KEY;
