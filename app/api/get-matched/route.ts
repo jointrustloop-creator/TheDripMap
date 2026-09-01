@@ -18,6 +18,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../src/lib/mailer';
 import { isJunkEmail } from '../../../src/lib/outreach-quality';
+import { normalizeHours, getStatus } from '../../../src/lib/hours';
 import {
   forwardBlocker,
   recordLeadDelivery,
@@ -37,6 +38,10 @@ export async function POST(req: Request) {
     const city = String(data?.city || '').trim();
     const treatment = String(data?.treatment || '').trim().slice(0, 120);
     const notes = String(data?.notes || '').trim().slice(0, 1500);
+    // "Need it today?" (2026-09-01): honest same-day handling. We never promise
+    // a booking; we bias the match toward clinics that are OPEN RIGHT NOW and
+    // mark the request urgent so it stands out in the clinic inbox.
+    const urgent = data?.urgent === true;
 
     if (!name || !email || !city || !treatment) {
       return NextResponse.json({ success: false, error: 'Missing required fields.' }, { status: 400 });
@@ -73,7 +78,7 @@ export async function POST(req: Request) {
     // Candidate clinics: claimed, visible, in the city. Trust-ranked.
     const { data: cands } = await supabase
       .from('providers')
-      .select('id, name, slug, city, email, email_bounced, is_claimed, decision_drivers, forward_leads, safety_verified, safety_review_status, rating')
+      .select('id, name, slug, city, email, email_bounced, is_claimed, decision_drivers, forward_leads, safety_verified, safety_review_status, rating, working_hours, timezone')
       .eq('country', 'Canada')
       .eq('is_hidden', false)
       .eq('is_claimed', true)
@@ -86,8 +91,24 @@ export async function POST(req: Request) {
       safety_verified: boolean | null;
       safety_review_status: string | null;
       rating: number | null;
+      working_hours: unknown;
+      timezone: string | null;
+    };
+    const isOpenNow = (c: Cand): boolean => {
+      try {
+        const st = getStatus(normalizeHours(c.working_hours), c.timezone || undefined);
+        return st.known && st.isOpen;
+      } catch {
+        return false;
+      }
     };
     const ranked = ((cands || []) as Cand[]).sort((a, b) => {
+      // Urgent requests put open-right-now clinics first; trust order breaks ties.
+      if (urgent) {
+        const ao = isOpenNow(a) ? 1 : 0;
+        const bo = isOpenNow(b) ? 1 : 0;
+        if (ao !== bo) return bo - ao;
+      }
       const av = a.safety_verified === true && a.safety_review_status === 'approved' ? 1 : 0;
       const bv = b.safety_verified === true && b.safety_review_status === 'approved' ? 1 : 0;
       if (av !== bv) return bv - av;
@@ -102,7 +123,7 @@ export async function POST(req: Request) {
     }
 
     const nowIso = new Date().toISOString();
-    const patientMessage = `Looking for: ${treatment} in ${city}.${notes ? ` Notes: ${notes}` : ''}`;
+    const patientMessage = `${urgent ? 'SAME-DAY REQUEST. ' : ''}Looking for: ${treatment} in ${city}.${notes ? ` Notes: ${notes}` : ''}`;
     const savedIds: Array<{ clinic: Cand; inquiryId: string | null }> = [];
 
     if (matched.length) {
@@ -111,7 +132,7 @@ export async function POST(req: Request) {
           name,
           email,
           phone: phone || null,
-          message: `[MATCH · Lead for ${c.name} · clinicId=${c.id}] ${patientMessage}`,
+          message: `[MATCH${urgent ? ' · URGENT' : ''} · Lead for ${c.name} · clinicId=${c.id}] ${patientMessage}`,
           listing_id: c.id,
           created_at: nowIso,
           forward_status: FORWARD_ENABLED ? 'sent' : 'shadow_would_send',
@@ -147,9 +168,13 @@ export async function POST(req: Request) {
         try {
           const rendered = renderLeadEmail({
             greeting: `Hi ${clinic.name} team,`,
-            previewText: `A patient wants ${treatment} in ${city} and matched with your clinic.`,
+            previewText: urgent
+              ? `Same-day request: a patient wants ${treatment} in ${city} today.`
+              : `A patient wants ${treatment} in ${city} and matched with your clinic.`,
             paras: [
-              `A patient on TheDripMap asked to be matched with a clinic for ${treatment} in ${city}, and your clinic was one of their matches.`,
+              urgent
+                ? `A patient on TheDripMap is looking for ${treatment} in ${city} TODAY and matched with your clinic. A quick reply matters most here; if today is not possible, telling them so still helps.`
+                : `A patient on TheDripMap asked to be matched with a clinic for ${treatment} in ${city}, and your clinic was one of their matches.`,
             ],
             details: [
               ['Name', name],
@@ -167,7 +192,9 @@ export async function POST(req: Request) {
             from: 'TheDripMap <info@thedripmap.com>',
             to: clinic.email,
             replyTo: email,
-            subject: `New patient request from TheDripMap: ${treatment} in ${city}`,
+            subject: urgent
+              ? `URGENT same-day request from TheDripMap: ${treatment} in ${city}`
+              : `New patient request from TheDripMap: ${treatment} in ${city}`,
             text: rendered.text,
             html: rendered.html,
           });
@@ -190,7 +217,7 @@ export async function POST(req: Request) {
         from: 'TheDripMap <info@thedripmap.com>',
         to: 'info@thedripmap.com',
         replyTo: email,
-        subject: `Get Matched request: ${treatment} in ${city} (${matched.length} matched)`,
+        subject: `${urgent ? 'URGENT same-day ' : ''}Get Matched request: ${treatment} in ${city} (${matched.length} matched)`,
         text: `Patient: ${name} <${email}>${phone ? ` · ${phone}` : ''}
 Wants: ${treatment} in ${city}
 ${notes ? `Notes: ${notes}\n` : ''}
@@ -202,8 +229,9 @@ Forwarding is ${FORWARD_ENABLED ? 'ON — clinics were emailed directly.' : 'OFF
 
     return NextResponse.json({
       success: true,
-      matched: savedIds.map(({ clinic }) => ({ name: clinic.name, slug: clinic.slug })),
+      matched: savedIds.map(({ clinic }) => ({ name: clinic.name, slug: clinic.slug, openNow: isOpenNow(clinic) })),
       forwarded: FORWARD_ENABLED,
+      urgent,
     });
   } catch (error) {
     console.error('get-matched error:', error);

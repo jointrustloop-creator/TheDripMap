@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Loader2, CheckCircle2, Sparkles, Send } from 'lucide-react';
+import { Loader2, CheckCircle2, Sparkles, Send, Zap } from 'lucide-react';
 
 interface GetMatchedFormProps {
   /** Display name of the city the patient chose in the quiz. */
@@ -21,6 +21,9 @@ export const GetMatchedForm = ({ city, treatment }: GetMatchedFormProps) => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [notes, setNotes] = useState('');
+  // "Need it today?" biases the match toward clinics open right now and marks
+  // the request urgent for the clinic. Honest: a priority flag, not a booking.
+  const [urgent, setUrgent] = useState(false);
   const [website, setWebsite] = useState(''); // honeypot
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [matched, setMatched] = useState<Array<{ name: string; slug: string | null }> | null>(null);
@@ -42,6 +45,7 @@ export const GetMatchedForm = ({ city, treatment }: GetMatchedFormProps) => {
           city,
           treatment,
           notes: notes.trim(),
+          urgent,
           website,
         }),
       });
@@ -71,7 +75,7 @@ export const GetMatchedForm = ({ city, treatment }: GetMatchedFormProps) => {
                 {i < matched.length - 2 ? ', ' : i === matched.length - 2 ? ' and ' : ''}
               </span>
             ))}{' '}
-            in {city}. You&apos;ll hear back by email, usually within 1 to 2 business days.
+            in {city}. {urgent ? 'Your request is flagged same-day, so clinics that are open now see it first. Watch your email closely.' : "You'll hear back by email, usually within 1 to 2 business days."}
           </p>
         ) : (
           <p className="text-slate-500 leading-relaxed max-w-md mx-auto">
@@ -140,6 +144,25 @@ export const GetMatchedForm = ({ city, treatment }: GetMatchedFormProps) => {
             className="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:outline-none focus:border-wellness-500 focus:ring-4 focus:ring-wellness-100 transition-all font-medium text-slate-900 placeholder:text-slate-400"
           />
         </div>
+        <button
+          type="button"
+          onClick={() => setUrgent(!urgent)}
+          aria-pressed={urgent}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left ${
+            urgent ? 'border-amber-400 bg-amber-50' : 'border-slate-200 bg-white hover:border-amber-300'
+          }`}
+        >
+          <span className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${urgent ? 'bg-amber-400 text-white' : 'bg-slate-100 text-slate-400'}`}>
+            <Zap size={15} />
+          </span>
+          <span className="min-w-0">
+            <span className="block text-sm font-black text-slate-900">I need this today</span>
+            <span className="block text-[11.5px] font-semibold text-slate-500">We&apos;ll match clinics that are open right now and flag your request as same-day.</span>
+          </span>
+          <span className={`ml-auto shrink-0 w-10 h-6 rounded-full relative transition-all ${urgent ? 'bg-amber-400' : 'bg-slate-200'}`}>
+            <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${urgent ? 'left-[18px]' : 'left-0.5'}`} />
+          </span>
+        </button>
         {error && (
           <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-sm font-bold">{error}</div>
         )}
