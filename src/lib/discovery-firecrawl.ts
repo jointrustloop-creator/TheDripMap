@@ -32,8 +32,8 @@
  */
 
 const TIMEOUT_MS = 12_000;
-const MAX_SEARCHES = 4;
-const MAX_VERIFY = 8;
+const MAX_SEARCHES = 8;
+const MAX_VERIFY = 14;
 
 /** Never a clinic: references, directories, socials, boookers, site builders. */
 const NOT_A_CLINIC = /(wikipedia|webmd|healthline|merckmanuals|msdmanuals|yelp|yellowpages|pagesjaunes|tripadvisor|facebook|instagram|linkedin|tiktok|youtube|pinterest|reddit|quora|medium\.com|substack|indeed|glassdoor|groupon|booking|janeapp|mindbody|vagaro|fresha|wellnessliving|squarespace|wix|godaddy|shopify|webflow|clutch\.co|bbb\.org|thedripmap|google\.|gstatic|amazonaws)/i;
@@ -140,11 +140,20 @@ export async function firecrawlDiscover(
   knownEmails: Set<string>,
 ): Promise<FirecrawlDiscoveryResult> {
   const notes: string[] = [];
+  // 2026-09-01 deepening: 4 angles were yielding 2-3 accepts/day across 3
+  // cities while outreach fuel runs dry. Synonyms catch operators who never
+  // say "IV therapy" on their homepage; French angles catch Quebec.
+  const FRENCH = /^(montreal|quebec city|laval|gatineau)$/i.test(city);
   const queries = [
     `IV therapy clinic ${city}`,
     `IV drip ${city}`,
     `vitamin infusion clinic ${city}`,
     `NAD+ IV ${city}`,
+    `IV drip bar ${city}`,
+    `IV hydration lounge ${city}`,
+    `naturopath IV vitamin therapy ${city}`,
+    `mobile IV service ${city}`,
+    ...(FRENCH ? [`vitaminothérapie IV ${city}`, `clinique intraveineuse ${city}`] : []),
   ].slice(0, MAX_SEARCHES);
 
   // THE CITY ITSELF, nothing looser. Province/Canada markers were tried and
