@@ -98,11 +98,26 @@ export const DISCOVERY_CITIES = [
   'Newmarket',
 ];
 
-export const DISCOVERY_QUERIES = (city: string) => [
-  `IV therapy ${city}`,
-  `IV drips ${city}`,
-  `vitamin infusion ${city}`,
-];
+// Cities where clinics publish in French; those runs add French query angles.
+const FRENCH_CITIES = new Set(['Montreal', 'Quebec City', 'Laval', 'Gatineau']);
+
+export const DISCOVERY_QUERIES = (city: string) => {
+  const base = [
+    `IV therapy ${city}`,
+    `IV drips ${city}`,
+    `vitamin infusion ${city}`,
+    // 2026-09-01 deepening: the 3-angle set was mining out (2-3 accepts/day
+    // across 3 cities while outreach fuel runs dry). Synonyms surface the
+    // operators who never say "IV therapy" on their homepage.
+    `IV drip bar ${city}`,
+    `NAD+ IV ${city}`,
+    `naturopath IV vitamin ${city}`,
+  ];
+  if (FRENCH_CITIES.has(city)) {
+    base.push(`vitaminothérapie IV ${city}`, `clinique intraveineuse ${city}`);
+  }
+  return base;
+};
 
 /** ISO week number, so the rotation advances without storing a cursor. */
 export function isoWeek(d = new Date()): number {
