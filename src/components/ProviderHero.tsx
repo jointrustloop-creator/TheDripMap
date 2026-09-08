@@ -178,7 +178,8 @@ export function ProviderHero({
         )}
         {priceRange && (
           <span className="inline-flex items-center gap-1.5 bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[13px] font-bold shadow-md">
-            <span className="text-wellness-600">$</span>
+            {/* The value already carries its own money marker ("From $150" or a
+                "$$" tier), so render it as-is rather than prefixing another "$". */}
             {priceRange}
           </span>
         )}
