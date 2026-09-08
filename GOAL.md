@@ -1,6 +1,62 @@
-# TheDripMap — $10,000/month by November 20, 2026
+# TheDripMap — the most trusted, complete, findable Canadian IV platform by December; monetize from strength in Q1 2027
 
-## ⭐⭐ THE LEADS PLAN (2026-08-28) — CURRENT OPERATING PLAN
+## ⭐⭐⭐ FOUNDATION-FIRST REFRAME (2026-09-08) — THE NORTH STAR
+Operator-approved ("the goal change i am ok with"). This does NOT kill the
+$10k/mo target — it sequences it honestly and moves the date to where the math
+can actually close. The old header ($10k by Nov 20) is kept in the archive.
+
+**Why the reframe.** At plan start we were charging toward a Featured tier
+before the platform could deliver what a Featured tier promises. The live
+numbers made that plain: ~5 leads and ~12 clicks/day across 30 days, and of 29
+claimed Canadian clinics only 2 are display-complete. Selling a $79 slot on top
+of that would be selling a promise the product can't keep yet — and the one
+asset we can never rebuild is trust. So we build the foundation to real strength
+first, then charge from strength.
+
+**The goal, in one line:** by end of December 2026, be the platform a Canadian
+patient and a Canadian clinic both reach for first — because it is the most
+TRUSTED (clinics checked against public registers, nothing display-broken),
+the most COMPLETE (every real Canadian IV clinic listed and showing properly),
+and the most FINDABLE (ranking for the money terms). Then, Q1 2027, monetize
+from that strength.
+
+### The three readiness pillars (each has a measurable gate)
+1. **TRUSTED.** Every claimed clinic displays completely and its Safety-Verified
+   verdict reflects answers we actually hold — never a badge silently revoked by
+   a standard change. Verification leans on public registers (CONO/CPSO/CNO,
+   Texas Medical Board for the US pilot), not the clinic's word.
+   GATE: all claimed CA clinics display-complete (photos/hours/price where they
+   exist) AND their /finish answers stored; zero silently-revoked badges.
+2. **COMPLETE.** Every real Canadian IV clinic is listed and rendering right —
+   no "undefined", no cross-city leakage, no broken finish links. Discovery
+   keeps inflow alive so the map keeps filling.
+   GATE: display-integrity sweep clean; discovery adding real clinics weekly;
+   no province conspicuously empty.
+3. **FINDABLE.** Canada money terms climbing in GSC; city pages light enough to
+   rank; the blog wedge (pos 6-10) pulling authority to the pages that convert.
+   GATE: money-term positions trending toward top 20, city pages under the
+   weight budget, no self-cannibalization on the head terms.
+
+### Monetization is readiness-gated, not calendar-gated
+The LEADS PLAN below is the engine that builds all three pillars — keep running
+it. But steps 7-10 (Featured pricing, first paying clinics, lead-fee tier) do
+NOT launch on a date; they launch when the pillars hit their gates, targeted at
+Q1 2027. Charging before then trades durable trust for a few early dollars.
+Day-60 review (~late Oct) becomes a readiness checkpoint, not a go/no-go on
+revenue: are the three gates closing on pace for a Q1 monetization?
+
+### Hard lines (carry over, non-negotiable)
+- Never sell the organic ranking or the Safety-Verified verdict. Ever.
+- Every new email format: one [TEST, format review] to info@ cc operator first.
+- Operator sees the pricing page + first pitch copy before anything goes live.
+- Never silently revoke a clinic's badge; if a standard changes, re-collect and
+  tell them — the Signature Beauty lesson.
+
+---
+
+## ⭐⭐ THE LEADS PLAN (2026-08-28) — THE OPERATING ENGINE
+(Still the HOW. The reframe above is the North Star it feeds. Steps 1-6 build
+the foundation; steps 7-10 are the Q1 monetization, readiness-gated per above.)
 Operator-approved, full mandate: "goal is what you said." Supersedes the
 Trusted Source plan as the ACTIVE plan (that thesis is not dead — it is the
 moat under this one). Daily rhythm: the operator asks "what's for me today"
