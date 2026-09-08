@@ -1186,7 +1186,9 @@ export async function getFeaturedListings(limit: number = 6, city?: string, coun
       .eq('is_featured', true);
 
     if (city && city !== 'All') {
-      q = q.ilike('city', `%${city}%`);
+      // Anchored prefix, not substring: `%${city}%` leaked cross-city
+      // (a "York" filter pulled New York rows). See getListingsByServiceAndCity.
+      q = q.ilike('city', `${city}%`);
     }
     if (countryFilter) {
       q = q.in('country', countryFilter);
@@ -1697,8 +1699,14 @@ export async function getListingsByServiceAndCity(service: string, city: string,
 
   try {
     const filter = getServiceFilter(service);
-    // Use a broader city match (ilike %city%) to handle "New York" vs "New York City"
-    const cityPattern = `%${city}%`;
+    // ANCHORED PREFIX, not substring (2026-09-08 fix). `%${city}%` leaked
+    // cross-city: a "York" query pulled 51 New York (US) clinics plus North
+    // York and East York into a Canadian page, and could trip the matrix
+    // noindex gate with foreign rows. A prefix keeps the only legitimate case
+    // ("New York" matching "New York City") while excluding "York" from
+    // "New York". Verified against live data: "New York%" -> 51 NY rows,
+    // "York%" -> 0, every real city unaffected.
+    const cityPattern = `${city}%`;
 
     const response = await supabase
       .from('providers')
