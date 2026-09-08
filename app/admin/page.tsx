@@ -28,6 +28,7 @@ import {
   Link2,
   ExternalLink,
   ShieldCheck,
+  ClipboardList,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -115,6 +116,7 @@ const GROUPS: Group[] = [
     title: 'Clinics and Data',
     tiles: [
       { href: '/admin/badge-reviews', Icon: ShieldCheck, label: 'Badge Reviews', description: 'Safety Verified review queue. Clinics that completed the safety questionnaire await your Approve / Decline. The badge only turns on here.' },
+      { href: '/admin/listing-gaps', Icon: ClipboardList, label: 'Listing gaps', description: 'What every claimed listing is still missing (answers, photos, hours, price). Record answers an owner gave us by email, or grab their private link to send.' },
       { href: '/admin/insights', Icon: LineChart, label: 'Per-clinic engagement insights', description: 'Views + book / call / website / directions / message clicks per clinic. Filter by last 30 days / month / all-time and claimed vs unclaimed.' },
       { href: '/admin/testimonials', Icon: Star, label: 'Testimonials moderation', description: 'Approve, edit, or reject patient testimonials submitted on claimed listings.' },
     ],

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { AlertCircle } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { parseManageToken, secretsMatch } from '../../../src/lib/manage-token';
+import { isAdminRequest } from '../../../src/lib/admin-auth';
 import { Logo } from '../../../src/components/Logo';
 import { FinishListingForm } from './FinishListingForm';
 
@@ -38,12 +39,27 @@ function InvalidLink() {
 
 interface FinishPageProps {
   params: Promise<{ token: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function FinishPage({ params }: FinishPageProps) {
+export default async function FinishPage({ params, searchParams }: FinishPageProps) {
   const { token } = await params;
+  const sp = (await searchParams) || {};
   const parsed = parseManageToken(token);
   if (!parsed) return <InvalidLink />;
+
+  // OPERATOR MODE (2026-09-08). Many owners answered our questions by EMAIL and
+  // those answers were never stored, so their listing looks unfinished and their
+  // badge silently lapsed (the Signature Beauty case). This lets an operator
+  // record what the owner already told us, through the exact same validated
+  // write path the owner uses — no second source of truth to drift.
+  //
+  // Gated on a real admin session, never the query param alone, so an outsider
+  // holding a manage link can never mark answers as operator-recorded. Two
+  // things change in this mode: owner-engagement tracking is SKIPPED (an
+  // operator open must never look like the owner returned, which would corrupt
+  // the abandoned-claim reminder), and the saved answers carry provenance.
+  const operatorMode = sp.src === 'operator' && (await isAdminRequest());
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -72,18 +88,23 @@ export default async function FinishPage({ params }: FinishPageProps) {
   // this is a genuine open of their onboarding page. Record it on the provider's
   // decision_drivers JSONB (merge-preserving, so it never clobbers the saved form
   // answers under `manage`). Fully swallowed: tracking must NEVER break the page.
-  try {
-    const opens = typeof dd.finishOpenCount === 'number' ? (dd.finishOpenCount as number) : 0;
-    const nowIso = new Date().toISOString();
-    await supabase.from('providers').update({
-      decision_drivers: {
-        ...dd,
-        finishOpenCount: opens + 1,
-        lastFinishOpenAt: nowIso,
-        ...(typeof dd.firstFinishOpenAt === 'string' ? {} : { firstFinishOpenAt: nowIso }),
-      },
-    }).eq('id', parsed.providerId);
-  } catch { /* non-fatal */ }
+  // Skipped in operator mode: an operator recording emailed answers is NOT the
+  // owner returning, and counting it as such would wrongly silence the
+  // abandoned-claim reminder and inflate owner-engagement reporting.
+  if (!operatorMode) {
+    try {
+      const opens = typeof dd.finishOpenCount === 'number' ? (dd.finishOpenCount as number) : 0;
+      const nowIso = new Date().toISOString();
+      await supabase.from('providers').update({
+        decision_drivers: {
+          ...dd,
+          finishOpenCount: opens + 1,
+          lastFinishOpenAt: nowIso,
+          ...(typeof dd.firstFinishOpenAt === 'string' ? {} : { firstFinishOpenAt: nowIso }),
+        },
+      }).eq('id', parsed.providerId);
+    } catch { /* non-fatal */ }
+  }
 
   const prefill = (dd.manage && typeof dd.manage === 'object') ? (dd.manage as Record<string, unknown>) : null;
 
@@ -96,6 +117,7 @@ export default async function FinishPage({ params }: FinishPageProps) {
       hasLogo={!!p.image_url}
       photoCount={Array.isArray(p.photos) ? p.photos.length : 0}
       prefill={prefill}
+      operatorMode={operatorMode}
     />
   );
 }

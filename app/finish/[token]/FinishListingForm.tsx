@@ -30,6 +30,14 @@ interface Props {
   hasLogo: boolean;
   photoCount: number;
   prefill: Record<string, unknown> | null;
+  /**
+   * True when an ADMIN is recording answers the owner already gave us through
+   * another channel (usually an email thread). Set server side from a real admin
+   * session, never from the URL alone. Changes two things: the page says plainly
+   * whose answers these are, and the save carries provenance so a reviewer can
+   * always tell operator-recorded answers from owner-entered ones.
+   */
+  operatorMode?: boolean;
 }
 
 // Who can legally start the line. ND kept (most of our claimed roster is
@@ -125,7 +133,7 @@ function SectionCard({ step, title, hint, children, id }: { step: number; title:
   );
 }
 
-export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo, photoCount, prefill }: Props) {
+export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo, photoCount, prefill, operatorMode = false }: Props) {
   const pf = (prefill || {}) as Prefill;
   const [whoPlaces, setWhoPlaces] = useState<string[]>(pf.team?.whoPlaces || []);
   const [oversight] = useState<string>(pf.team?.oversight || '');
@@ -150,6 +158,10 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
   const [about, setAbout] = useState<string>(pf.about || '');
   const [logo, setLogo] = useState<File | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
+  // Operator mode only: where these answers came from, e.g. "Email from Eva,
+  // 2026-05-28". Stored with the answers so the trail back to the owner's own
+  // words survives, which is what makes an operator-recorded badge reviewable.
+  const [recordedNote, setRecordedNote] = useState<string>('');
 
   const [slowWindows, setSlowWindows] = useState<string[]>(pf.slowWindows || []);
   const [offerTitle, setOfferTitle] = useState<string>(pf.offer?.title || '');
@@ -224,6 +236,16 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
         about: about.trim(),
         offer: { title: offerTitle.trim(), code: offerCode.trim(), expires: offerExpires, active: offerActive },
         slowWindows,
+        // Provenance. Present ONLY when an operator recorded answers the owner
+        // gave through another channel, so these are never mistaken for
+        // owner-entered ones at badge review.
+        ...(operatorMode
+          ? {
+              recordedVia: 'operator',
+              recordedNote: recordedNote.trim().slice(0, 200),
+              recordedAt: new Date().toISOString(),
+            }
+          : {}),
       };
       const fd = new FormData();
       fd.append('answers', JSON.stringify(answers));
@@ -299,21 +321,49 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
       <header className="bg-white border-b border-slate-200">
         <div className="max-w-2xl mx-auto px-6 h-14 flex items-center justify-between gap-2">
           <Logo imgClassName="h-9" />
-          <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold">Owner portal</span>
+          <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold">
+            {operatorMode ? 'Recording for clinic' : 'Owner portal'}
+          </span>
         </div>
       </header>
 
       <main className="max-w-2xl mx-auto px-6 pt-10">
-        {/* Confirmed owner banner */}
+        {/* Confirmed owner banner. In operator mode the page says plainly that
+            these are the CLINIC's answers being transcribed, so nobody mistakes
+            an internal recording session for the owner filling their own form. */}
         <div className="mb-7">
-          <span className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.12em] py-1.5 px-3 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 mb-4">
-            <ShieldCheck size={14} /> You're confirmed as the owner of {clinicName}
-          </span>
+          {operatorMode ? (
+            <div className="mb-4 rounded-2xl border-2 border-amber-300 bg-amber-50 p-4">
+              <div className="text-xs font-black uppercase tracking-[0.12em] text-amber-800 mb-1.5">
+                Operator recording mode
+              </div>
+              <p className="text-[13px] text-amber-900 leading-relaxed">
+                You are entering answers <b>{clinicName}</b> already gave us through another channel.
+                Enter only what the clinic actually told us, never a guess. This save is stamped as
+                operator-recorded, and it does not count as the owner opening their form.
+              </p>
+              <label className="block mt-3">
+                <span className="text-[11px] font-black uppercase tracking-[0.1em] text-amber-800">Where these answers came from</span>
+                <input
+                  value={recordedNote}
+                  onChange={(e) => setRecordedNote(e.target.value)}
+                  placeholder="Email from Eva, 2026-05-28"
+                  className="mt-1 w-full px-3 py-2 border-2 border-amber-200 rounded-xl font-medium text-slate-900 bg-white focus:outline-none focus:border-amber-400"
+                />
+              </label>
+            </div>
+          ) : (
+            <span className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.12em] py-1.5 px-3 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 mb-4">
+              <ShieldCheck size={14} /> You&apos;re confirmed as the owner of {clinicName}
+            </span>
+          )}
           <h1 className="text-[clamp(2rem,6vw,3rem)] font-black text-slate-900 tracking-tight leading-[1.02]">
-            Finish your listing
+            {operatorMode ? `Record answers for ${clinicName}` : 'Finish your listing'}
           </h1>
           <p className="text-slate-500 mt-3 leading-relaxed">
-            All quick taps, about two minutes. Everything you set publishes to your live listing the moment you save, and you can come back to change it anytime.
+            {operatorMode
+              ? 'Everything saved here publishes to the live listing immediately, exactly as if the clinic had entered it, and stays editable from their own link.'
+              : 'All quick taps, about two minutes. Everything you set publishes to your live listing the moment you save, and you can come back to change it anytime.'}
           </p>
           {/* Completion progress */}
           <div className="mt-6">
