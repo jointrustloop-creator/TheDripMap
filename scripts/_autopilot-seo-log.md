@@ -42,3 +42,33 @@
   both blog up-links).
 - NOT done autonomously (destructive, flagged to operator): consolidating or
   redirecting overlapping Toronto blogs Google declines to index.
+
+## 2026-09-08 (nightly SEO mechanic)
+- Findings source: seo_health_runs/seo_health_findings tables (87 runs, 1,866
+  findings). Latest COMPLETED crawl = run 117 (2026-09-06, 981 URLs, 2 issues).
+  Note: runs 119/118/116/115/114 are stuck status='started', finished_at NULL —
+  the daily crawl route is dying mid-run on ~5 of the last 8 nights. Parked for
+  the operator; it is an infra/timeout matter, not a page fix.
+- Verified 13 candidate URLs live (sequential, 600ms, AbortController).
+  DROPPED as false positives: all 35 non_200 (blog + provider pages, every one
+  returns 200 now), all crawl_timeout ("This operation was aborted"), and the
+  treatment x city unexpected_noindex hits (montreal/richmond-hill/victoria all
+  render with no robots meta). Matches the known "crawler aborts slow requests"
+  pattern.
+- REPRODUCED: /cities/new-westminster is IN sitemap.xml yet serves
+  <meta name="robots" content="noindex, follow">. That is a Search Console
+  "Submitted URL marked noindex" error, carried in ~14 runs since 2026-08-20.
+- CLASS FIXED (root cause, not the one URL): getAllCities() in src/lib/data.ts
+  counted EVERY providers row, while getListingsByCity() — what city pages
+  actually render — drops is_hidden rows and availability=false rows. The two
+  counts straddled the shared 3-provider gate. Added the same filter to
+  getAllCities so sitemap.ts, the city page, getTopHubs (data.ts:883) and the
+  matrix pages all read one source of truth.
+- Blast radius checked against live data: 8 CA city counts get more honest
+  (toronto 80->77, which matches the CLAUDE.md live figure; mississauga 21->20,
+  richmond-hill 18->17, north-vancouver 10->9, north-york 5->4, ajax 5->4,
+  new-westminster 3->2, okotoks 2->1). No city drops to zero. Sitemapped CA
+  cities 59 -> 58, losing exactly the contradictory URL.
+- npx tsc --noEmit clean (only the pre-existing src/test.tsx error).
+- Branch seo-nightly-2026-09-08, NOT merged.
+  PR: https://github.com/jointrustloop-creator/TheDripMap/pull/new/seo-nightly-2026-09-08
