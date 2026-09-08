@@ -7,7 +7,7 @@ import { TransparencyChip } from './TransparencyChip';
 import { isSafetyVerified as isSafetyVerifiedFn } from '../lib/safety';
 import { Provider } from '../types';
 import { slugify } from '../lib/data';
-import { bookingUrlOf } from '../lib/card-signals';
+import { bookingUrlOf, priceSignalOf } from '../lib/card-signals';
 import { cn } from '../lib/utils';
 import { ResilientImage } from './ResilientImage';
 import { ClinicImageBand, ClinicMonogramPanel, coverPhotoOf } from './ClinicImageBand';
@@ -118,6 +118,9 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
     const namedServices = (provider.services || []).map((s) => s?.name).filter(Boolean) as string[];
     const tags = specs.length ? specs : namedServices;
     const bookingUrl = bookingUrlOf(provider);
+    // Real starting price from the clinic's own menu, or null. The single
+    // strongest booking cue we promise owners on /for-clinics.
+    const price = priceSignalOf(provider);
 
     const mode: 'credential' | 'services' | 'reputation' | 'basic' =
       credential || lead ? 'credential'
@@ -227,8 +230,20 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
               claimed cards are the highest-traffic browse surface. Each cue is
               honest: open-now is derived from real hours, "Books online" renders
               only when a validated booking URL exists. */}
-          {(provider.hours || bookingUrl) && (
+          {(provider.hours || bookingUrl || price) && (
             <div className="mt-1.5 flex items-center gap-2.5 flex-wrap">
+              {/* Real starting price leads — the strongest booking cue, and the
+                  one we promise owners on /for-clinics. Solid wellness pill so
+                  it pops; renders only when the menu carries a real amount. */}
+              {price && (
+                <span
+                  title="Lowest listed price on this clinic's menu"
+                  className="inline-flex items-baseline gap-1 bg-wellness-600 text-white text-[11px] font-black px-2 py-0.5 rounded-md shadow-sm"
+                >
+                  <span className="text-[8px] font-black uppercase tracking-[0.1em] text-wellness-100">from</span>
+                  ${price.from.toLocaleString()}
+                </span>
+              )}
               {provider.hours && (
                 <OpenStatus
                   hours={provider.hours}
@@ -258,8 +273,13 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
               </span>
             </div>
           ) : isClaimed ? (
-            <div className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-tight text-slate-400">
-              <CheckCircle2 size={11} /> Claimed
+            <div className="mt-2.5">
+              <span
+                title="Ownership confirmed by the clinic"
+                className="inline-flex items-center gap-1.5 bg-wellness-50 text-wellness-700 border border-wellness-200 px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-tight"
+              >
+                <CheckCircle2 size={12} /> Claimed by owner
+              </span>
             </div>
           ) : null}
 

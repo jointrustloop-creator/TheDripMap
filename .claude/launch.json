@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "quotechamp",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "C:\\Users\\Dell\\Desktop\\quotechamp", "run", "dev", "--", "-p", "3005"],
+      "port": 3005
     }
   ]
 }

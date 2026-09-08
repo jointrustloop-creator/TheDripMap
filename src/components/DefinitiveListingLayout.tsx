@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import { ResilientImage } from './ResilientImage';
 import { ProviderHero } from './ProviderHero';
+import { priceSignalOf } from '../lib/card-signals';
 import { MessageClinicButton } from './MessageClinicButton';
 import { BookingRequestButton } from './BookingRequest';
 import { SubmitTestimonialButton } from './SubmitTestimonialButton';
@@ -252,6 +253,11 @@ function settingLabel(profile: OperatorProfile | undefined, provider: Provider):
 }
 
 function priceRangeLabel(provider: Provider): string | null {
+  // Prefer a real, actionable starting price from the clinic's own menu
+  // ("From $150") over the vague $/$$/$$$ tier — the price a patient can act on
+  // and the one we promise owners on /for-clinics.
+  const menu = priceSignalOf(provider);
+  if (menu) return menu.text;
   if (provider.price_range && typeof provider.price_range === 'string') {
     return `${provider.price_range} per drip`;
   }
@@ -473,7 +479,7 @@ export default function DefinitiveListingLayout({
         isClaimed
         statusLabel={status.isOpen ? 'Open now' : status.known === false ? 'Hours not listed' : 'Closed'}
         statusOpen={status.isOpen}
-        priceRange={provider.price_range || null}
+        priceRange={price}
         pageBackground="#f8f5ee"
         extraBottomPadding
       />
