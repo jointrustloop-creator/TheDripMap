@@ -251,7 +251,9 @@ Respond with ONLY minified JSON, exactly these keys:
 
 RULES
 - treatments: only IV drips, injections and infusions actually listed. Include the price ONLY if a dollar figure sits next to that item; ranges are fine ("$150-$250"). Add-on boosters are not treatments.
-- hours: include a day only if its hours are literally stated. Omit days you cannot read.
+- canonical: map ONLY intravenous drips/infusions to a canonical name. Intramuscular shots and injections (anything marked IM, "shot", "injection") must have canonical null, even if the substance matches (a $75 glutathione IM shot is not the glutathione IV drip).
+- hours: include a day only if its hours are a literal clock range (e.g. "9:00 AM - 5:00 PM") or the word Closed. Phrases like "by appointment" or "available upon request" are NOT hours: put null for that day and mention it in notes.
+- mobile_service: true only if in-home/mobile service is offered NOW. "Coming soon" or "launching" means null.
 - practitioners: named clinical people only (nurses, NPs, NDs, physicians, medical directors). Never owners or staff without a clinical credential unless clearly stated as clinical.
 - Never include anything about safety, licensing status, or regulatory standing; that is verified elsewhere.
 
@@ -276,13 +278,15 @@ ${text}`;
     if (!parsed) return { error: `model returned no parseable JSON (stop=${msg.stop_reason}, first 160 chars: ${out.slice(0, 160).replace(/\s+/g, ' ')})` };
 
     const money = (v: unknown) => { const t = s(v); return /\$\s?\d/.test(t) ? t : null; };
-    const canon = (v: unknown) => { const t = s(v); return (CANONICAL_DRIPS as readonly string[]).includes(t) ? t : null; };
+    // Belt to the prompt's suspender: an IM shot / injection never maps to a drip.
+    const isShot = (raw: unknown) => /\bIM\b|injection|\bshot\b/i.test(s(raw));
+    const canon = (v: unknown, raw?: unknown) => { const t = s(v); return !isShot(raw) && (CANONICAL_DRIPS as readonly string[]).includes(t) ? t : null; };
     const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
     const hours: Record<string, string> = {};
     for (const d of DAYS) { const h = s((parsed.hours as Record<string, unknown> | undefined)?.[d]); if (h) hours[d] = h.slice(0, 40); }
     return {
       treatments: (Array.isArray(parsed.treatments) ? parsed.treatments : []).map((t) => ({
-        raw: s(t?.raw).slice(0, 80), canonical: canon(t?.canonical), price: money(t?.price), duration: s(t?.duration).slice(0, 30) || null, evidence: s(t?.evidence).slice(0, 200),
+        raw: s(t?.raw).slice(0, 80), canonical: canon(t?.canonical, t?.raw), price: money(t?.price), duration: s(t?.duration).slice(0, 30) || null, evidence: s(t?.evidence).slice(0, 200),
       })).filter((t) => t.raw && t.evidence).slice(0, 30),
       hours,
       phone: s(parsed.phone).replace(/[^\d+()\-\s]/g, '').slice(0, 30) || null,
@@ -327,7 +331,12 @@ export async function runActivation(
   // AUTO-APPLY, only into empty fields, with provenance.
   if (facts.phone && empty(p.phone)) { update.phone = facts.phone; result.autoApplied.push('phone'); }
   if (facts.booking_url && empty(p.online_booking_url)) { update.online_booking_url = facts.booking_url; result.autoApplied.push('online_booking_url'); }
-  if (Object.keys(facts.hours).length >= 5 && empty(p.working_hours)) { update.working_hours = facts.hours; result.autoApplied.push('working_hours'); }
+  // Hours auto-apply only when at least 5 days are REAL hours: a clock range or
+  // "Closed". "By appointment" / "upon request" never counts (the model is told
+  // to null those, this is the belt to that suspender).
+  const realDay = (h: string) => /closed/i.test(h) || /\d{1,2}(:\d{2})?\s*(am|pm)?\s*[-–to]+\s*\d{1,2}(:\d{2})?\s*(am|pm)/i.test(h);
+  const realHours = Object.fromEntries(Object.entries(facts.hours).filter(([, h]) => realDay(h)));
+  if (Object.keys(realHours).length >= 5 && empty(p.working_hours)) { update.working_hours = realHours; result.autoApplied.push('working_hours'); }
 
   // Re-read decision_drivers right before writing (same race guard auto-enrich uses).
   const { data: fresh } = await sb.from('providers').select('decision_drivers').eq('id', providerId).maybeSingle();
