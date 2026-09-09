@@ -137,8 +137,13 @@ coverage, cost guide): they are the authority, city pages sit at 15-55.
 - 2026-09-09 Step 4 DONE: intent CTAs on the four winners (template-level),
   Price Index CTA on the cost guide, mobile Compare | Call | Book bar on
   claimed clinic pages (verified on a phone viewport).
-- Next: run the engine on the 24 incomplete (operator click, one at a time or
-  all), fix by hand what it cannot, then step 5 (warm outreach) and step 6.
+- 2026-09-09 Step 3 RUNNING: engine applied on 12 of 24 incomplete clinics
+  (empty hours/phone/booking filled with provenance; menus staged for owners:
+  Max Immunity 27, CareMed 19, IV Alchemy 13, DRS Mobile 30, Bar Beauty 17,
+  Diamond 9, Ketamind 5, Aafiyat 2, Dhillon 1). Allies + Nura excluded
+  (wrong-site or front-desk hours). 10 clinics blocked on Anthropic API
+  credit balance; list lives in memory (activation-engine-status).
+- Next: top up credits, finish the 10, then step 5 (warm outreach) and step 6.
 
 ### Content rule from now on
 No random wellness posts. Every piece supports a commercial cluster Google
