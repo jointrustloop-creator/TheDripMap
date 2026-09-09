@@ -5,6 +5,7 @@ import { AlertCircle } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { parseManageToken, secretsMatch } from '../../../src/lib/manage-token';
 import { isAdminRequest } from '../../../src/lib/admin-auth';
+import { assessCompleteness, type CompletenessRow } from '../../../src/lib/display-complete';
 import { Logo } from '../../../src/components/Logo';
 import { FinishListingForm } from './FinishListingForm';
 
@@ -107,9 +108,14 @@ export default async function FinishPage({ params, searchParams }: FinishPagePro
   }
 
   const prefill = (dd.manage && typeof dd.manage === 'object') ? (dd.manage as Record<string, unknown>) : null;
+  // Profile Strength from the ONE display-complete definition, computed on the
+  // saved row (what patients actually see today), not on unsaved form state.
+  const completeness = assessCompleteness(p as CompletenessRow);
 
   return (
     <FinishListingForm
+      profileStrength={completeness.strength}
+      profileMissing={completeness.missing.map((m) => ({ label: m.label, impact: m.impact }))}
       token={token}
       clinicName={p.name}
       city={p.city || ''}

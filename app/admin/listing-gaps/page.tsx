@@ -26,13 +26,10 @@ import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import { isAdminRequest } from '../../../src/lib/admin-auth';
 import { manageUrlFrom } from '../../../src/lib/manage-token';
+import { assessCompleteness, type CompletenessRow } from '../../../src/lib/display-complete';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
-
-// A stock/scraped image is not clinic imagery, so it does not count as a photo.
-const isStockImage = (u?: string | null) =>
-  !u || /picsum|unsplash|placeholder|loremflickr|pravatar/i.test(u);
 
 interface Row {
   id: string;
@@ -88,16 +85,14 @@ export default async function ListingGapsPage() {
     const hasAnswers = !!manage && Object.keys(manage).length > 0;
     const recordedVia = manage && typeof manage.recordedVia === 'string' ? (manage.recordedVia as string) : null;
 
-    const hasHours = !!r.working_hours && Object.keys(r.working_hours as object).length > 0;
-    const hasPrice = !!(r.price_range && String(r.price_range).trim());
+    // ONE definition of display-complete (src/lib/display-complete.ts), shared
+    // with the nightly report and the owner's Profile Strength. "answers" (the
+    // safety questionnaire) is tracked here in addition, because it gates the
+    // badge, but it is not part of display completeness.
+    const c = assessCompleteness(r as unknown as CompletenessRow);
     const photoCount = Array.isArray(r.photos) ? (r.photos as unknown[]).length : 0;
-    const hasPhotos = photoCount > 0 || !isStockImage(r.image_url);
-
-    const missing: string[] = [];
-    if (!hasAnswers) missing.push('answers');
-    if (!hasPhotos) missing.push('photos');
-    if (!hasHours) missing.push('hours');
-    if (!hasPrice) missing.push('price');
+    const missing: string[] = [...(hasAnswers ? [] : ['answers']), ...c.missing.map((m) => m.key)];
+    const strength = c.strength;
 
     const badge = r.safety_verified === true && r.safety_review_status === 'approved'
       ? 'live'
@@ -110,7 +105,7 @@ export default async function ListingGapsPage() {
     const token = (typeof r.manage_token === 'string' && r.manage_token) || ddToken || '';
     const ownerUrl = token ? manageUrlFrom(r.id, token) : null;
 
-    return { r, missing, hasAnswers, recordedVia, badge, ownerUrl, photoCount };
+    return { r, missing, hasAnswers, recordedVia, badge, ownerUrl, photoCount, strength };
   });
 
   // Worst first: no answers is the deepest hole (it is what gates the badge),
@@ -131,8 +126,10 @@ export default async function ListingGapsPage() {
     { label: 'No stored answers', value: noAnswers, tone: noAnswers ? 'text-rose-600' : 'text-emerald-600' },
     { label: 'Badge live', value: badgeLive, tone: 'text-amber-600' },
     { label: 'No hours', value: count('hours'), tone: 'text-slate-700' },
-    { label: 'No price', value: count('price'), tone: 'text-slate-700' },
-    { label: 'No photos', value: count('photos'), tone: 'text-slate-700' },
+    { label: 'No prices', value: count('prices'), tone: 'text-slate-700' },
+    { label: 'No photo', value: count('photo'), tone: 'text-slate-700' },
+    { label: 'No practitioner', value: count('practitioner'), tone: 'text-slate-700' },
+    { label: 'No contact', value: count('contact'), tone: 'text-slate-700' },
   ];
 
   return (

@@ -38,6 +38,10 @@ interface Props {
    * always tell operator-recorded answers from owner-entered ones.
    */
   operatorMode?: boolean;
+  /** Profile Strength (0-100) of the SAVED listing, from src/lib/display-complete.ts. */
+  profileStrength?: number;
+  /** What the saved listing is still missing, worst impact first. */
+  profileMissing?: { label: string; impact: 'critical' | 'major' | 'trust' | 'conversion' }[];
 }
 
 // Who can legally start the line. ND kept (most of our claimed roster is
@@ -133,7 +137,7 @@ function SectionCard({ step, title, hint, children, id }: { step: number; title:
   );
 }
 
-export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo, photoCount, prefill, operatorMode = false }: Props) {
+export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo, photoCount, prefill, operatorMode = false, profileStrength, profileMissing = [] }: Props) {
   const pf = (prefill || {}) as Prefill;
   const [whoPlaces, setWhoPlaces] = useState<string[]>(pf.team?.whoPlaces || []);
   const [oversight] = useState<string>(pf.team?.oversight || '');
@@ -365,6 +369,32 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
               ? 'Everything saved here publishes to the live listing immediately, exactly as if the clinic had entered it, and stays editable from their own link.'
               : 'All quick taps, about two minutes. Everything you set publishes to your live listing the moment you save, and you can come back to change it anytime.'}
           </p>
+          {/* Profile Strength of what patients see TODAY (the saved listing),
+              with the specific gaps and why each matters. Distinct from the
+              live form progress below, which tracks unsaved edits. */}
+          {typeof profileStrength === 'number' && (
+            <div className={`mt-6 rounded-2xl border p-4 ${profileStrength >= 100 ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`}>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Profile strength, as patients see it now</span>
+                <span className={`text-lg font-black tabular-nums ${profileStrength >= 100 ? 'text-emerald-700' : 'text-amber-800'}`}>{profileStrength}/100</span>
+              </div>
+              {profileStrength >= 100 ? (
+                <p className="text-[13px] text-emerald-800">Your listing shows everything patients compare. Keep it current below.</p>
+              ) : (
+                <ul className="mt-1 space-y-0.5">
+                  {profileMissing.map((m) => (
+                    <li key={m.label} className="text-[13px] text-amber-900 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                      <span className="font-bold">{m.label}</span>
+                      <span className="text-amber-700/80">
+                        {m.impact === 'critical' ? 'patients have no way to reach you' : m.impact === 'major' ? 'the first thing patients compare' : m.impact === 'trust' ? 'the strongest trust signal' : 'helps patients choose'}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
           {/* Completion progress */}
           <div className="mt-6">
             <div className="flex items-center justify-between mb-1.5">
