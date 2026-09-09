@@ -253,8 +253,13 @@ ${text}`;
  * Run the engine for one claimed clinic: read site -> extract -> auto-apply the
  * empty low-risk facts with provenance -> stage the rest for owner confirmation.
  */
-export async function runActivation(sb: SupabaseClient, providerId: string): Promise<ActivationResult> {
-  const result: ActivationResult = { ok: false, providerId, sourceUrl: null, pagesRead: [], autoApplied: [], staged: { treatments: 0, practitioners: 0 }, errors: [] };
+export async function runActivation(
+  sb: SupabaseClient,
+  providerId: string,
+  opts: { dryRun?: boolean } = {},
+): Promise<ActivationResult & { facts?: ExtractedFacts; wouldApply?: Record<string, unknown> }> {
+  const result: ActivationResult & { facts?: ExtractedFacts; wouldApply?: Record<string, unknown> } =
+    { ok: false, providerId, sourceUrl: null, pagesRead: [], autoApplied: [], staged: { treatments: 0, practitioners: 0 }, errors: [] };
   const { data: p, error } = await sb.from('providers').select('id, name, city, website, phone, online_booking_url, working_hours, is_claimed, decision_drivers').eq('id', providerId).maybeSingle();
   if (error || !p) { result.errors.push(error?.message || 'provider not found'); return result; }
   if (!p.website) { result.errors.push('no website on record'); return result; }
@@ -303,6 +308,17 @@ export async function runActivation(sb: SupabaseClient, providerId: string): Pro
       : {}),
   };
   result.staged = { treatments: facts.treatments.length, practitioners: facts.practitioners.length };
+
+  // Dry run: everything computed, nothing written. Used to preview a batch for
+  // the operator before any listing changes.
+  if (opts.dryRun) {
+    result.ok = true;
+    result.facts = facts;
+    const { decision_drivers: _dd, ...wouldApply } = update;
+    void _dd;
+    result.wouldApply = wouldApply;
+    return result;
+  }
 
   const { error: uErr } = await sb.from('providers').update(update).eq('id', providerId);
   if (uErr) { result.errors.push(uErr.message); return result; }

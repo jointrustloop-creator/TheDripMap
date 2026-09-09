@@ -19,15 +19,31 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
+// Alternative auth for the operator's batch runner: a machine token minted by
+// the operator side and stored in Vercel as ACTIVATION_RUN_TOKEN. Lets the
+// engine be driven remotely (the extraction key only exists on Vercel) without
+// ever handling the admin password. Constant-time compare; absent token = off.
+function bearerOk(req: NextRequest): boolean {
+  const expected = process.env.ACTIVATION_RUN_TOKEN || '';
+  if (!expected) return false;
+  const got = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '').trim();
+  if (!got || got.length !== expected.length) return false;
+  let diff = 0;
+  for (let i = 0; i < got.length; i++) diff |= got.charCodeAt(i) ^ expected.charCodeAt(i);
+  return diff === 0;
+}
+
 export async function POST(req: NextRequest) {
-  if (!(await isAdminRequest())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!(await isAdminRequest()) && !bearerOk(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   let providerId = '';
   let isForm = false;
+  let dryRun = false;
   const ct = req.headers.get('content-type') || '';
   if (ct.includes('application/json')) {
     const body = await req.json().catch(() => ({}));
     providerId = String(body?.provider_id || body?.providerId || '').trim();
+    dryRun = body?.dry_run === true;
   } else {
     isForm = true;
     const form = await req.formData();
@@ -43,7 +59,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'provider is not claimed' }, { status: 400 });
   }
 
-  const result = await runActivation(sb, providerId);
+  const result = await runActivation(sb, providerId, { dryRun });
   if (isForm) {
     const q = new URLSearchParams({
       ran: providerId,
