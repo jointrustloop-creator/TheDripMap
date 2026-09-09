@@ -41,7 +41,7 @@ const nt = (process.env.NATURES_TOUCH || '').toLowerCase();
 if (nt === 'approve' || nt === 'hold') {
   DECISIONS.push({ slug: 'natures-touch-naturopathic-clinic-brampton', action: nt,
     basis: nt === 'approve'
-      ? 'CONO IVIT Premise #3860 re-read on the register 2026-09-08 (see safety_evidence): Authorised/Active; the report that was "under review" on 2026-08-14 did not produce an adverse outcome. Designated registrant Dr. Maria Melissa Papasodaro-Engineer ND #1554. Satisfies §3 and §4.5.'
+      ? 'CONO IVIT Premise #3860 Details page re-read 2026-09-08 20:22: Current Registration IVIT Premise, Status Active (effective 29-May-2019). Inspection status still shows "Report under review", but every completed inspection on the register is Passed: 5-year 21-Nov-2024 initially Passed w/ Conditions (crash cart stock, MRO chart requirements), then Passed with conditions fully met; New Premises Part I/II Passed 2019/2020. No adverse outcome exists. Designated registrant Dr. Maria Melissa Papasodaro-Engineer ND #1554 (since 02-May-2019). Satisfies §3 and §4.5. Re-check at the next quarterly pass in case the pending report changes the outcome.'
       : 'CONO IVIT Premise #3860 re-read on the register 2026-09-08: status not confirmed Authorised/Active (see safety_evidence). Fail closed until the register shows a clean current outcome.' });
 }
 
