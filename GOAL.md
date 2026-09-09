@@ -125,6 +125,21 @@ coverage, cost guide): they are the authority, city pages sit at 15-55.
    samples are deep enough; lead fees only after volume AND Canadian
    regulatory/privacy counsel. Display ads much later. Paid rankings never.
 
+### Progress (keep this current)
+- 2026-09-09 Step 1 DONE: redirects audited (all one-hop from https), prices
+  derive from PRICE_INDEX, alias links, provinces label, report cache hourly.
+- 2026-09-09 Step 2 DONE: src/lib/display-complete.ts is the one definition;
+  wired into /admin/listing-gaps, the nightly report, and /finish (Profile
+  Strength). Baseline 5/29 display-complete.
+- 2026-09-09 Step 3 BUILT: src/lib/activation-engine.ts + "Run activation" on
+  /admin/listing-gaps + /finish prefill with source/date banner. Extraction
+  runs on Vercel only; first live run = operator clicks it on one clinic.
+- 2026-09-09 Step 4 DONE: intent CTAs on the four winners (template-level),
+  Price Index CTA on the cost guide, mobile Compare | Call | Book bar on
+  claimed clinic pages (verified on a phone viewport).
+- Next: run the engine on the 24 incomplete (operator click, one at a time or
+  all), fix by hand what it cannot, then step 5 (warm outreach) and step 6.
+
 ### Content rule from now on
 No random wellness posts. Every piece supports a commercial cluster Google
 already trusts us on: the insurance cluster (does Sun Life / Manulife / Canada
