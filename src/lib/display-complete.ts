@@ -70,7 +70,12 @@ export function assessCompleteness(row: CompletenessRow): Completeness {
   const hasPhone = !!s(row.phone);
   const hasBooking = /^https?:\/\/[^\s.]+\.[^\s]+/i.test(s(row.online_booking_url));
   const hasHours = !!row.working_hours && Object.keys(row.working_hours).length > 0;
-  const services = Array.isArray(row.services) ? row.services.filter((x) => x && s(x.name)) : [];
+  // services rows are stored two ways: objects {name, price} from /finish and
+  // enrichment, or plain strings from older imports. Both count as a treatment.
+  const rawServices = Array.isArray(row.services) ? (row.services as unknown[]) : [];
+  const services = rawServices
+    .map((x) => (typeof x === 'string' ? { name: x, price: null } : (x as { name?: string | null; price?: string | null })))
+    .filter((x) => x && s(x.name));
   const hasServices = services.length > 0 || (Array.isArray(row.specialties) && row.specialties.length > 0);
   const hasPrices = MONEY_RE.test(s(row.price_range)) || services.some((x) => MONEY_RE.test(s(x.price)));
   const photoCount = Array.isArray(row.photos) ? row.photos.length : 0;
