@@ -107,7 +107,37 @@ export default async function FinishPage({ params, searchParams }: FinishPagePro
     } catch { /* non-fatal */ }
   }
 
-  const prefill = (dd.manage && typeof dd.manage === 'object') ? (dd.manage as Record<string, unknown>) : null;
+  const saved = (dd.manage && typeof dd.manage === 'object' && Object.keys(dd.manage as object).length)
+    ? (dd.manage as Record<string, unknown>)
+    : null;
+
+  // ACTIVATION ENGINE prefill (Activation Plan step 3). When the owner has not
+  // saved answers yet but the engine has read their website, pre-select the
+  // treatments (and prices) it found so the visit becomes "confirm or edit"
+  // instead of "fill in from scratch". FACTS ONLY: drips + delivery. The safety
+  // answers (who administers, who prescribes) are never prefilled from a scrape.
+  const proposed = (!saved && dd.proposed && typeof dd.proposed === 'object')
+    ? (dd.proposed as { source_url?: string; fetched_at?: string; treatments?: Array<{ canonical?: string | null; price?: string | null }>; mobile_service?: boolean | null })
+    : null;
+  let proposedMeta: { sourceUrl: string; fetchedAt: string; count: number } | undefined;
+  let prefill: Record<string, unknown> | null = saved;
+  if (proposed && Array.isArray(proposed.treatments)) {
+    const seen = new Set<string>();
+    const drips: Array<{ name: string; price: string | null }> = [];
+    for (const t of proposed.treatments) {
+      const name = typeof t?.canonical === 'string' ? t.canonical : '';
+      if (!name || seen.has(name)) continue;
+      seen.add(name);
+      drips.push({ name, price: typeof t?.price === 'string' ? t.price.replace(/^\$/, '').split(/[-–]/)[0].trim() : null });
+    }
+    if (drips.length) {
+      prefill = {
+        drips,
+        ...(proposed.mobile_service === true ? { delivery: ['In-clinic', 'Mobile / at-home'] } : {}),
+      };
+      proposedMeta = { sourceUrl: proposed.source_url || p.website || '', fetchedAt: (proposed.fetched_at || '').slice(0, 10), count: drips.length };
+    }
+  }
   // Profile Strength from the ONE display-complete definition, computed on the
   // saved row (what patients actually see today), not on unsaved form state.
   const { data: operatorProfile } = await supabase
@@ -121,6 +151,7 @@ export default async function FinishPage({ params, searchParams }: FinishPagePro
     <FinishListingForm
       profileStrength={completeness.strength}
       profileMissing={completeness.missing.map((m) => ({ label: m.label, impact: m.impact }))}
+      proposedMeta={proposedMeta}
       token={token}
       clinicName={p.name}
       city={p.city || ''}

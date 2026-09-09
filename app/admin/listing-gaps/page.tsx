@@ -98,6 +98,9 @@ export default async function ListingGapsPage() {
     // safety questionnaire) is tracked here in addition, because it gates the
     // badge, but it is not part of display completeness.
     const c = assessCompleteness({ ...(r as unknown as CompletenessRow), operator_profile: profileBy.get(r.id) || null });
+    const proposed = (dd.proposed && typeof dd.proposed === 'object') ? (dd.proposed as { treatments?: unknown[]; fetched_at?: string }) : null;
+    const proposedCount = Array.isArray(proposed?.treatments) ? proposed!.treatments!.length : 0;
+    const proposedAt = (proposed?.fetched_at || '').slice(0, 10);
     const photoCount = Array.isArray(r.photos) ? (r.photos as unknown[]).length : 0;
     const missing: string[] = [...(hasAnswers ? [] : ['answers']), ...c.missing.map((m) => m.key)];
     const strength = c.strength;
@@ -113,7 +116,7 @@ export default async function ListingGapsPage() {
     const token = (typeof r.manage_token === 'string' && r.manage_token) || ddToken || '';
     const ownerUrl = token ? manageUrlFrom(r.id, token) : null;
 
-    return { r, missing, hasAnswers, recordedVia, badge, ownerUrl, photoCount, strength };
+    return { r, missing, hasAnswers, recordedVia, badge, ownerUrl, photoCount, strength, proposedCount, proposedAt };
   });
 
   // Worst first: no answers is the deepest hole (it is what gates the badge),
@@ -169,7 +172,7 @@ export default async function ListingGapsPage() {
         </div>
 
         <div className="bg-white border border-slate-200 rounded-2xl divide-y divide-slate-100 overflow-hidden">
-          {ranked.map(({ r, missing, hasAnswers, recordedVia, badge, ownerUrl, photoCount }) => (
+          {ranked.map(({ r, missing, hasAnswers, recordedVia, badge, ownerUrl, photoCount, proposedCount, proposedAt }) => (
             <div key={r.id} className="p-4 flex flex-wrap items-center gap-x-3 gap-y-2">
               <span
                 title={missing.length ? `Missing ${missing.join(', ')}` : 'Nothing missing'}
@@ -216,6 +219,14 @@ export default async function ListingGapsPage() {
                 >
                   badge {badge}
                 </span>
+                {proposedCount > 0 && (
+                  <span
+                    title={`${proposedCount} treatment(s) read from the clinic's website on ${proposedAt}, waiting for the owner to confirm on their finish page`}
+                    className="text-[10px] font-black uppercase tracking-tight px-2 py-1 rounded-md bg-violet-50 text-violet-700 border border-violet-200"
+                  >
+                    {proposedCount} staged from site
+                  </span>
+                )}
                 {recordedVia === 'operator' && (
                   <span
                     title="These answers were recorded by an operator from another channel, not entered by the owner"
@@ -230,6 +241,21 @@ export default async function ListingGapsPage() {
               </div>
 
               <div className="flex items-center gap-2 ml-auto">
+                {/* Activation engine: read their website, auto-fill empty
+                    low-risk facts, stage treatments/prices for the owner to
+                    confirm. One click, one clinic; safe to re-run. */}
+                {missing.length > 0 && (
+                  <form method="post" action="/api/admin/activation-run">
+                    <input type="hidden" name="provider_id" value={r.id} />
+                    <button
+                      type="submit"
+                      title="Read the clinic's website and stage what we find for the owner to confirm"
+                      className="text-[11px] font-black px-3 py-2 rounded-xl bg-wellness-600 text-white hover:bg-wellness-700"
+                    >
+                      Run activation
+                    </button>
+                  </form>
+                )}
                 {r.slug && (
                   <a
                     href={`/providers/${r.slug}`}
