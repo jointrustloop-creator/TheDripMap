@@ -77,7 +77,10 @@ const s = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABA
         signal: AbortSignal.timeout(150_000),
       });
       const j = await resp.json().catch(() => null);
-      if (!resp.ok || !j) { lines.push(`## ${r.name}  (${r.slug})`, `**HTTP ${resp.status}:** ${j?.error || 'no body'}`, ''); console.log(`HTTP ${resp.status}`); flush(); await sleep(DELAY_MS); continue; }
+      if (!resp.ok || !j) {
+        const why = j?.error || (Array.isArray(j?.errors) ? j.errors.join('; ') : '') || 'no body';
+        lines.push(`## ${r.name}  (${r.slug})`, `**HTTP ${resp.status}:** ${why}`, ''); console.log(`HTTP ${resp.status}: ${why}`); flush(); await sleep(DELAY_MS); continue;
+      }
       res = j as RemoteResult;
     } catch (e) {
       lines.push(`## ${r.name}  (${r.slug})`, `**request failed:** ${e instanceof Error ? e.message : String(e)}`, ''); console.log('failed'); flush(); await sleep(DELAY_MS); continue;
