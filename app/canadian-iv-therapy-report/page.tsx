@@ -13,7 +13,7 @@ import { PRICE_INDEX } from '../../src/lib/price-index-data';
 // The only constants are Statistics Canada 2021 Census population counts,
 // cited inline. Evergreen URL on purpose: annual updates land here so earned
 // backlinks compound on one address.
-export const revalidate = 86400; // regenerate daily
+export const revalidate = 3600; // hourly: the homepage count is live, and a daily cache let the two disagree (631 vs 653 vs 655 were the same definition at different times)
 
 const SITE_URL = 'https://www.thedripmap.com';
 

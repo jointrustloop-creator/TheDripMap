@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { ArrowRight, BookOpen } from 'lucide-react';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
+import { PRICE_INDEX } from '../../../src/lib/price-index-data';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { FAQSection } from '../../../src/components/FAQSection';
 import { QuizCTA } from '../../../src/components/QuizCTA';
@@ -104,6 +105,41 @@ export default async function GuidePage({ params }: GuidePageProps) {
               </section>
             ))}
           </div>
+
+          {/* Cost guide -> the Price Index (Activation Plan step 4). The guide
+              ranks (position ~13) and was a dead end; the logical next answer
+              is the real, current prices by city that the guide is derived
+              from. City chips are rendered from PRICE_INDEX, so a new city
+              appears here the day it is published. */}
+          {guide.slug === 'iv-therapy-cost-guide' && (
+            <aside className="mt-16 rounded-[2rem] bg-wellness-900 text-white p-8 md:p-10 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-wellness-800 rounded-bl-[6rem] -mr-10 -mt-10" aria-hidden="true" />
+              <div className="relative z-10">
+                <div className="text-[11px] font-black uppercase tracking-[0.15em] text-wellness-200 mb-3">The next question</div>
+                <h2 className="text-2xl md:text-3xl font-black tracking-tight mb-3 leading-tight text-white">See real prices in your city</h2>
+                <p className="text-wellness-100 text-sm md:text-[15px] leading-relaxed max-w-xl mb-6">
+                  Every number above comes from the IV Price Index, built from clinics&apos; own published menus. Open your city for the full breakdown by treatment, and the clinics behind each price.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {Object.values(PRICE_INDEX).map((c) => (
+                    <Link
+                      key={c.citySlug}
+                      href={`/iv-prices/${c.citySlug}`}
+                      className="inline-flex items-center gap-1.5 bg-white text-wellness-900 px-4 py-2.5 rounded-xl font-black text-sm hover:bg-wellness-50 transition-all"
+                    >
+                      {c.city} <span className="font-bold text-wellness-700">from CA${c.headline.low}</span>
+                    </Link>
+                  ))}
+                  <Link
+                    href="/iv-prices"
+                    className="inline-flex items-center gap-2 border border-white/30 text-white px-4 py-2.5 rounded-xl font-black text-sm hover:bg-white/10 transition-all"
+                  >
+                    All cities <ArrowRight size={14} />
+                  </Link>
+                </div>
+              </div>
+            </aside>
+          )}
 
           {(guide.relatedTreatments?.length || guide.relatedCities?.length) && (
             <section className="mt-20 pt-12 border-t border-slate-100">

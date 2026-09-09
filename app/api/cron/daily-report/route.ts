@@ -22,6 +22,7 @@ import { sendMail } from '../../../../src/lib/mailer';
 import { REPORT_TO } from '../../../../src/lib/report-recipient';
 import { sendTelegram } from '../../../../src/lib/telegram';
 import { detectBadgeReply, BADGE_CAMPAIGNS } from '../../../../src/lib/badge-reply';
+import { assessCompleteness, completenessSummary, type CompletenessRow } from '../../../../src/lib/display-complete';
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
@@ -270,25 +271,29 @@ export async function GET(req: Request) {
       });
     }
 
-    // CHECK 5. Claimed clinics missing key data (hours / services /
-    // description / logo). Surfaces what needs a manual touch.
+    // CHECK 5. Claimed clinics that are not Display Complete. Uses the ONE
+    // shared definition (src/lib/display-complete.ts) so this list always
+    // agrees with /admin/listing-gaps and the owner's Profile Strength.
     const { data: claimedFull } = await supabase
       .from('providers')
-      .select('id, name, slug, working_hours, specialties, description, image_url, imageUrl')
-      .eq('is_claimed', true);
-    for (const p of (claimedFull || []) as Array<{ id: string; name: string | null; slug: string | null; working_hours: Record<string, unknown> | null; specialties: unknown; description: string | null; image_url: string | null; imageUrl: string | null }>) {
-      const missing: string[] = [];
-      if (!p.working_hours || Object.keys(p.working_hours).length === 0) missing.push('hours');
-      if (!Array.isArray(p.specialties) || p.specialties.length === 0) missing.push('services');
-      if (!p.description || p.description.length < 50) missing.push('description');
-      const img = p.image_url || p.imageUrl || '';
-      const hasImage = img && !img.includes('picsum') && !img.includes('unsplash');
-      if (!hasImage) missing.push('logo/photo');
-      if (missing.length) {
+      .select('id, name, slug, phone, online_booking_url, working_hours, price_range, services, specialties, image_url, photos, medical_team, decision_drivers')
+      .eq('is_claimed', true)
+      .neq('is_hidden', true);
+    // The medical director may live on operator_profiles (older claims), which
+    // the completeness check reads when attached.
+    const claimedRows = (claimedFull || []) as Array<CompletenessRow & { id: string; name: string | null; slug: string | null }>;
+    const { data: claimedProfs } = await supabase
+      .from('operator_profiles')
+      .select('clinic_id, owner_name, profile_data')
+      .in('clinic_id', claimedRows.map((p) => p.id));
+    const profileByClinic = new Map((claimedProfs || []).map((x) => [x.clinic_id as string, x]));
+    for (const p of claimedRows) {
+      const c = assessCompleteness({ ...p, operator_profile: profileByClinic.get(p.id) || null });
+      if (!c.complete) {
         dataCheck.push({
           clinic: p.name || p.slug || '(no name)',
-          problem: `missing ${missing.join(', ')}`,
-          action: `enrich or ask owner to fill in: ${missing.join(', ')}`,
+          problem: `${completenessSummary(c)} (profile strength ${c.strength}/100)`,
+          action: `enrich or ask owner to fill in: ${c.missing.map((m) => m.label.toLowerCase()).join(', ')}`,
         });
       }
     }

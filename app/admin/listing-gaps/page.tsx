@@ -26,13 +26,10 @@ import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import { isAdminRequest } from '../../../src/lib/admin-auth';
 import { manageUrlFrom } from '../../../src/lib/manage-token';
+import { assessCompleteness, type CompletenessRow } from '../../../src/lib/display-complete';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
-
-// A stock/scraped image is not clinic imagery, so it does not count as a photo.
-const isStockImage = (u?: string | null) =>
-  !u || /picsum|unsplash|placeholder|loremflickr|pravatar/i.test(u);
 
 interface Row {
   id: string;
@@ -78,6 +75,14 @@ export default async function ListingGapsPage() {
 
   const rows = (data || []) as Row[];
 
+  // Older claims recorded the medical director on operator_profiles, not the
+  // provider row; the completeness check reads both. One query, mapped by id.
+  const { data: profs } = await sb
+    .from('operator_profiles')
+    .select('clinic_id, owner_name, profile_data')
+    .in('clinic_id', rows.map((r) => r.id));
+  const profileBy = new Map((profs || []).map((p) => [p.clinic_id as string, p]));
+
   const assessed = rows.map((r) => {
     const dd = (r.decision_drivers && typeof r.decision_drivers === 'object')
       ? (r.decision_drivers as Record<string, unknown>)
@@ -88,16 +93,17 @@ export default async function ListingGapsPage() {
     const hasAnswers = !!manage && Object.keys(manage).length > 0;
     const recordedVia = manage && typeof manage.recordedVia === 'string' ? (manage.recordedVia as string) : null;
 
-    const hasHours = !!r.working_hours && Object.keys(r.working_hours as object).length > 0;
-    const hasPrice = !!(r.price_range && String(r.price_range).trim());
+    // ONE definition of display-complete (src/lib/display-complete.ts), shared
+    // with the nightly report and the owner's Profile Strength. "answers" (the
+    // safety questionnaire) is tracked here in addition, because it gates the
+    // badge, but it is not part of display completeness.
+    const c = assessCompleteness({ ...(r as unknown as CompletenessRow), operator_profile: profileBy.get(r.id) || null });
+    const proposed = (dd.proposed && typeof dd.proposed === 'object') ? (dd.proposed as { treatments?: unknown[]; fetched_at?: string }) : null;
+    const proposedCount = Array.isArray(proposed?.treatments) ? proposed!.treatments!.length : 0;
+    const proposedAt = (proposed?.fetched_at || '').slice(0, 10);
     const photoCount = Array.isArray(r.photos) ? (r.photos as unknown[]).length : 0;
-    const hasPhotos = photoCount > 0 || !isStockImage(r.image_url);
-
-    const missing: string[] = [];
-    if (!hasAnswers) missing.push('answers');
-    if (!hasPhotos) missing.push('photos');
-    if (!hasHours) missing.push('hours');
-    if (!hasPrice) missing.push('price');
+    const missing: string[] = [...(hasAnswers ? [] : ['answers']), ...c.missing.map((m) => m.key)];
+    const strength = c.strength;
 
     const badge = r.safety_verified === true && r.safety_review_status === 'approved'
       ? 'live'
@@ -110,7 +116,7 @@ export default async function ListingGapsPage() {
     const token = (typeof r.manage_token === 'string' && r.manage_token) || ddToken || '';
     const ownerUrl = token ? manageUrlFrom(r.id, token) : null;
 
-    return { r, missing, hasAnswers, recordedVia, badge, ownerUrl, photoCount };
+    return { r, missing, hasAnswers, recordedVia, badge, ownerUrl, photoCount, strength, proposedCount, proposedAt };
   });
 
   // Worst first: no answers is the deepest hole (it is what gates the badge),
@@ -131,8 +137,10 @@ export default async function ListingGapsPage() {
     { label: 'No stored answers', value: noAnswers, tone: noAnswers ? 'text-rose-600' : 'text-emerald-600' },
     { label: 'Badge live', value: badgeLive, tone: 'text-amber-600' },
     { label: 'No hours', value: count('hours'), tone: 'text-slate-700' },
-    { label: 'No price', value: count('price'), tone: 'text-slate-700' },
-    { label: 'No photos', value: count('photos'), tone: 'text-slate-700' },
+    { label: 'No prices', value: count('prices'), tone: 'text-slate-700' },
+    { label: 'No photo', value: count('photo'), tone: 'text-slate-700' },
+    { label: 'No practitioner', value: count('practitioner'), tone: 'text-slate-700' },
+    { label: 'No contact', value: count('contact'), tone: 'text-slate-700' },
   ];
 
   return (
@@ -164,7 +172,7 @@ export default async function ListingGapsPage() {
         </div>
 
         <div className="bg-white border border-slate-200 rounded-2xl divide-y divide-slate-100 overflow-hidden">
-          {ranked.map(({ r, missing, hasAnswers, recordedVia, badge, ownerUrl, photoCount }) => (
+          {ranked.map(({ r, missing, hasAnswers, recordedVia, badge, ownerUrl, photoCount, proposedCount, proposedAt }) => (
             <div key={r.id} className="p-4 flex flex-wrap items-center gap-x-3 gap-y-2">
               <span
                 title={missing.length ? `Missing ${missing.join(', ')}` : 'Nothing missing'}
@@ -211,6 +219,14 @@ export default async function ListingGapsPage() {
                 >
                   badge {badge}
                 </span>
+                {proposedCount > 0 && (
+                  <span
+                    title={`${proposedCount} treatment(s) read from the clinic's website on ${proposedAt}, waiting for the owner to confirm on their finish page`}
+                    className="text-[10px] font-black uppercase tracking-tight px-2 py-1 rounded-md bg-violet-50 text-violet-700 border border-violet-200"
+                  >
+                    {proposedCount} staged from site
+                  </span>
+                )}
                 {recordedVia === 'operator' && (
                   <span
                     title="These answers were recorded by an operator from another channel, not entered by the owner"
@@ -225,6 +241,21 @@ export default async function ListingGapsPage() {
               </div>
 
               <div className="flex items-center gap-2 ml-auto">
+                {/* Activation engine: read their website, auto-fill empty
+                    low-risk facts, stage treatments/prices for the owner to
+                    confirm. One click, one clinic; safe to re-run. */}
+                {missing.length > 0 && (
+                  <form method="post" action="/api/admin/activation-run">
+                    <input type="hidden" name="provider_id" value={r.id} />
+                    <button
+                      type="submit"
+                      title="Read the clinic's website and stage what we find for the owner to confirm"
+                      className="text-[11px] font-black px-3 py-2 rounded-xl bg-wellness-600 text-white hover:bg-wellness-700"
+                    >
+                      Run activation
+                    </button>
+                  </form>
+                )}
                 {r.slug && (
                   <a
                     href={`/providers/${r.slug}`}

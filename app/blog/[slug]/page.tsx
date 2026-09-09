@@ -22,6 +22,7 @@ import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
 import { BlogCard } from '../../../src/components/BlogCard';
 import { BlogBookingCTA } from '../../../src/components/BlogBookingCTA';
+import { ArticleFunnelCta, ARTICLE_FUNNELS } from '../../../src/components/ArticleFunnelCta';
 import { ClinicB2BCta } from '../../../src/components/ClinicB2BCta';
 import { getBlogPostBySlug, getBlogPosts, slugify, getListingsByIds, getAllCities, US_MARKET_BLOG_SLUGS, BLOG_CANONICAL_OVERRIDES } from '../../../src/lib/data';
 import { US_MARKET_ENABLED } from '../../../src/lib/market';
@@ -509,11 +510,18 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 city hub (verified clinics + booking buttons); the rest route to
                 the quiz. Canada-first, so only surface a city hub for Canadian
                 cities (cityHub is already gated to those); otherwise use /quiz. */}
-            {post.content && (
+            {/* Activation Plan step 4: our page-1 informational winners end
+                with the logical next answer for THEIR intent (credential-
+                verified clinics, published prices, local comparison), routed
+                to the page that delivers it. Template-level, by slug; every
+                other post keeps the generic booking CTA. */}
+            {post.content && ARTICLE_FUNNELS[String(post.slug)] ? (
+              <ArticleFunnelCta funnel={ARTICLE_FUNNELS[String(post.slug)]} />
+            ) : post.content ? (
               <BlogBookingCTA
                 {...(cityHub ? { cityName: cityHub.name, href: cityHub.href } : { href: '/quiz' })}
               />
-            )}
+            ) : null}
 
             {/* Where to go next, when the post has no city of its own.
                 37 of 151 posts were dead ends: a reader arrived from Google,

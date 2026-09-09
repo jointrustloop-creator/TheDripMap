@@ -1161,7 +1161,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { slug: 'nad-plus-therapy',  label: 'NAD+ Therapy' },
+                { slug: 'nad-plus',          label: 'NAD+ Therapy' },
                 { slug: 'hangover-recovery', label: 'Hangover Recovery' },
                 { slug: 'myers-cocktail',    label: 'Myers Cocktail' },
                 { slug: 'immune-support',    label: 'Immune Support' },

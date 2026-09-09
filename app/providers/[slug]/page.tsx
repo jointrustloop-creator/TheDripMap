@@ -26,6 +26,7 @@ import { ClinicImage } from '../../../src/components/ClinicImage';
 import { ResilientImage } from '../../../src/components/ResilientImage';
 import { ClaimListingTrigger } from '../../../src/components/ClaimListingTrigger';
 import { StickyClaimRail } from '../../../src/components/StickyClaimRail';
+import { PatientActionBar } from '../../../src/components/PatientActionBar';
 import { MessageClinicButton } from '../../../src/components/MessageClinicButton';
 import { BookingRequestButton } from '../../../src/components/BookingRequest';
 import { PatientTestimonials } from '../../../src/components/PatientTestimonials';
@@ -551,7 +552,8 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   // ─────────────────────────────────────────────────────────────
   if (provider.is_claimed) {
     return (
-      <div className="min-h-screen bg-[#f8f5ee]">
+      // pb on phones clears the fixed PatientActionBar so nothing hides under it.
+      <div className="min-h-screen bg-[#f8f5ee] pb-20 lg:pb-0">
         <Navbar />
         {/* ClaimAutoOpener intentionally omitted on the claimed branch — it
             uses useSearchParams() and would need a Suspense boundary, and
@@ -569,6 +571,9 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
         {/* Fires a single 'view' analytics event per session. See
             ListingAnalytics for the 30-min sessionStorage dedupe. */}
         <ListingAnalytics providerId={provider.id} />
+        {/* Patient decision bar on phones: Compare | Call | Book (Activation
+            Plan step 4). Claimed pages only; this branch IS the claimed page. */}
+        <PatientActionBar provider={provider} />
         {/* Visible geo breadcrumb + its BreadcrumbList JSON-LD (emitted by the
             component). The claimed layout has no breadcrumb of its own. */}
         <div className="max-w-7xl mx-auto px-6 pt-6">
