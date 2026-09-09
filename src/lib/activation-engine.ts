@@ -26,8 +26,58 @@
  * throws; returns a structured result the admin UI renders.
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
+import Anthropic from '@anthropic-ai/sdk';
 
 const MODEL = 'claude-opus-5';
+
+// JSON schema the extraction is held to (structured output). Nullable fields
+// use ["type","null"] so the model can say "not on the page" explicitly.
+const FACTS_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['treatments', 'hours', 'phone', 'booking_url', 'practitioners', 'mobile_service', 'notes'],
+  properties: {
+    treatments: {
+      type: 'array',
+      items: {
+        type: 'object', additionalProperties: false,
+        required: ['raw', 'canonical', 'price', 'duration', 'evidence'],
+        properties: {
+          raw: { type: 'string' },
+          canonical: { type: ['string', 'null'] },
+          price: { type: ['string', 'null'] },
+          duration: { type: ['string', 'null'] },
+          evidence: { type: 'string' },
+        },
+      },
+    },
+    hours: {
+      type: 'object', additionalProperties: false,
+      required: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+      properties: {
+        mon: { type: ['string', 'null'] }, tue: { type: ['string', 'null'] }, wed: { type: ['string', 'null'] },
+        thu: { type: ['string', 'null'] }, fri: { type: ['string', 'null'] }, sat: { type: ['string', 'null'] }, sun: { type: ['string', 'null'] },
+      },
+    },
+    phone: { type: ['string', 'null'] },
+    booking_url: { type: ['string', 'null'] },
+    practitioners: {
+      type: 'array',
+      items: {
+        type: 'object', additionalProperties: false,
+        required: ['name', 'credential', 'role', 'evidence'],
+        properties: {
+          name: { type: 'string' },
+          credential: { type: ['string', 'null'] },
+          role: { type: ['string', 'null'] },
+          evidence: { type: 'string' },
+        },
+      },
+    },
+    mobile_service: { type: ['boolean', 'null'] },
+    notes: { type: 'array', items: { type: 'string' } },
+  },
+} as const;
 const FETCH_TIMEOUT_MS = 12_000;
 const MAX_PAGES = 6;
 const MAX_TEXT_CHARS = 45_000;
@@ -209,22 +259,21 @@ WEBSITE TEXT:
 ${text}`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      signal: AbortSignal.timeout(90_000),
-      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 6000,
-        system: 'You extract verifiable facts from a business website into strict JSON. You never invent, infer or embellish. You respond with valid minified JSON only.',
-        messages: [{ role: 'user', content: prompt }],
-      }),
+    // Structured output (same pattern as the blog engine): the model is held
+    // to this schema, so a long menu can never come back as truncated or
+    // prose-wrapped JSON. 16k output budget covers a 30-item menu with evidence.
+    const client = new Anthropic({ apiKey: key, timeout: 100_000 });
+    const msg = await client.messages.create({
+      model: MODEL,
+      max_tokens: 16000,
+      system: 'You extract verifiable facts from a business website into strict JSON. You never invent, infer or embellish.',
+      output_config: { format: { type: 'json_schema', schema: FACTS_SCHEMA } },
+      messages: [{ role: 'user', content: prompt }],
     });
-    if (!res.ok) return { error: `Anthropic ${res.status}: ${(await res.text()).slice(0, 200)}` };
-    const data = await res.json();
-    const out = data?.content?.[0]?.text;
+    if (msg.stop_reason === 'refusal') return { error: 'model refused the extraction' };
+    const out = msg.content.find((b) => b.type === 'text')?.text || '';
     const parsed = out ? safeJsonParse<Partial<ExtractedFacts>>(out) : null;
-    if (!parsed) return { error: 'model returned no parseable JSON' };
+    if (!parsed) return { error: `model returned no parseable JSON (stop=${msg.stop_reason}, first 160 chars: ${out.slice(0, 160).replace(/\s+/g, ' ')})` };
 
     const money = (v: unknown) => { const t = s(v); return /\$\s?\d/.test(t) ? t : null; };
     const canon = (v: unknown) => { const t = s(v); return (CANONICAL_DRIPS as readonly string[]).includes(t) ? t : null; };
