@@ -27,6 +27,12 @@
  * transparency. Never description/services/price/offers/photos. Does NOT grant the
  * badge. Refuses if manage already exists.
  *
+ * POST-RUN REGISTER FINDINGS (2026-09-08, written into the DB record after this
+ * script ran): Public Notifications: none (no current/past tribunal proceedings).
+ * Practice Conditions: ONE, "may practise only in the areas of medicine in which
+ * Dr. HENNEBERRY-FUDGE is educated and experienced" (specialty Psychiatry). The
+ * reviewer decides whether medical direction of IV therapy sits within it.
+ *
  * Run: npx tsx scripts/_backfill-bar-beauty-answers.ts          (dry run)
  *      npx tsx scripts/_backfill-bar-beauty-answers.ts --write  (writes)
  */
