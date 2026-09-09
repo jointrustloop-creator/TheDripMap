@@ -26,6 +26,7 @@ import { ClinicImage } from '../../../src/components/ClinicImage';
 import { ResilientImage } from '../../../src/components/ResilientImage';
 import { ClaimListingTrigger } from '../../../src/components/ClaimListingTrigger';
 import { StickyClaimRail } from '../../../src/components/StickyClaimRail';
+import { PatientActionBar } from '../../../src/components/PatientActionBar';
 import { MessageClinicButton } from '../../../src/components/MessageClinicButton';
 import { BookingRequestButton } from '../../../src/components/BookingRequest';
 import { PatientTestimonials } from '../../../src/components/PatientTestimonials';
@@ -551,7 +552,8 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   // ─────────────────────────────────────────────────────────────
   if (provider.is_claimed) {
     return (
-      <div className="min-h-screen bg-[#f8f5ee]">
+      // pb on phones clears the fixed PatientActionBar so nothing hides under it.
+      <div className="min-h-screen bg-[#f8f5ee] pb-20 lg:pb-0">
         <Navbar />
         {/* ClaimAutoOpener intentionally omitted on the claimed branch — it
             uses useSearchParams() and would need a Suspense boundary, and
@@ -1734,6 +1736,11 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
 
       {/* Persistent claim CTA — desktop floating card + mobile bottom sheet. Unclaimed only. */}
       {!provider.is_claimed && <StickyClaimRail provider={provider} />}
+
+      {/* Patient decision bar on phones: Compare | Call | Book. Claimed pages
+          only (they carry the booking link); unclaimed pages keep the claim
+          rail above so the two bars never collide. */}
+      {provider.is_claimed && <PatientActionBar provider={provider} />}
 
       {/* Auto-open claim modal when URL has ?claim=1 (outreach email link). Unclaimed only.
           Wrapped in Suspense because ClaimAutoOpener uses useSearchParams() —

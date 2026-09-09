@@ -1012,11 +1012,15 @@ export default function DefinitiveListingLayout({
                   // No online booking of their own: our in-product booking
                   // request becomes the primary action (v1 booking engine —
                   // rides the message-clinic pipeline with structured fields).
-                  <BookingRequestButton
-                    provider={provider}
-                    treatments={ivDrips.map((d) => d.name)}
-                    className="block w-full text-center py-[15px] rounded-[13px] font-semibold text-[15px] mb-[10px] bg-[#1f3a27] text-[#f3efe2] hover:bg-[#142619] transition cursor-pointer flex items-center justify-center gap-2"
-                  />
+                  // id="book" is the PatientActionBar's fallback target on
+                  // phones when the clinic has no booking page of its own.
+                  <div id="book" className="scroll-mt-24">
+                    <BookingRequestButton
+                      provider={provider}
+                      treatments={ivDrips.map((d) => d.name)}
+                      className="block w-full text-center py-[15px] rounded-[13px] font-semibold text-[15px] mb-[10px] bg-[#1f3a27] text-[#f3efe2] hover:bg-[#142619] transition cursor-pointer flex items-center justify-center gap-2"
+                    />
+                  </div>
                 )}
                 {!bookingHref && phoneHref && (
                   <TrackedLink
@@ -1042,11 +1046,14 @@ export default function DefinitiveListingLayout({
                     email server-side. Gating on clinicEmail hid this button on
                     every claimed page once enrichProvider began stripping email
                     from public provider objects (2026-07-05 security fix). */}
-                <MessageClinicButton
-                  provider={provider}
-                  className="block w-full text-center py-[15px] rounded-[13px] font-semibold text-[15px] mb-[10px] border border-[rgba(25,36,28,0.15)] hover:bg-[#ebf1e5] transition cursor-pointer flex items-center justify-center gap-2"
-                  label="Message clinic"
-                />
+                {/* id="message": PatientActionBar's fallback when there is no phone. */}
+                <div id="message" className="scroll-mt-24">
+                  <MessageClinicButton
+                    provider={provider}
+                    className="block w-full text-center py-[15px] rounded-[13px] font-semibold text-[15px] mb-[10px] border border-[rgba(25,36,28,0.15)] hover:bg-[#ebf1e5] transition cursor-pointer flex items-center justify-center gap-2"
+                    label="Message clinic"
+                  />
+                </div>
                 <div className="mt-[18px] pt-[18px] border-t border-[rgba(25,36,28,0.09)] text-[13px] text-[#5c685e] leading-[1.55]">
                   {provider.address && (
                     <div>
