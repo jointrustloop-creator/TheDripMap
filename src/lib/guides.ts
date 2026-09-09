@@ -23,6 +23,40 @@ export interface Guide {
   reviewedBy?: string;
 }
 
+import { PRICE_INDEX } from './price-index-data';
+
+// The cost guide quotes the IV Price Index rather than hand-typed numbers, so
+// the guide, the /iv-prices pages and the city FAQs can never disagree (they
+// did: the guide still said CA$175 for Toronto after the index moved to
+// CA$150). Derived once at module load from the same snapshots.
+const PI_TORONTO = PRICE_INDEX.toronto;
+const PI_CALGARY = PRICE_INDEX.calgary;
+const PI_EDMONTON = PRICE_INDEX.edmonton;
+const ca = (n: number) => `CA$${Math.round(n)}`;
+const medianOf = (nums: number[]) => {
+  const s = [...nums].sort((a, b) => a - b);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : Math.round((s[m - 1] + s[m]) / 2);
+};
+// Same national figure the /iv-prices hub computes: the median of each city's
+// standard-drip median.
+const NATIONAL_MEDIAN = medianOf(Object.values(PRICE_INDEX).map((c) => c.headline.median));
+const NATIONAL_LOW = Math.min(...Object.values(PRICE_INDEX).map((c) => c.headline.low));
+const NATIONAL_HIGH = Math.max(...Object.values(PRICE_INDEX).map((c) => c.headline.high));
+const priceLine = (city: string, label: string, r: { low: number; median: number; high: number; clinics: number } | undefined) =>
+  r ? `${city}, ${label}: ${ca(r.low)} to ${ca(r.high)}, median ${ca(r.median)} (${r.clinics} clinics)` : null;
+const rowOf = (idx: typeof PI_TORONTO, treatment: string) => idx.rows.find((r) => r.treatment === treatment);
+const COST_GUIDE_BULLETS = [
+  priceLine('Toronto', 'standard IV vitamin drip', PI_TORONTO.headline),
+  priceLine('Calgary', 'standard IV vitamin drip', PI_CALGARY.headline),
+  priceLine('Edmonton', 'standard IV vitamin drip', PI_EDMONTON.headline),
+  priceLine('Toronto', 'NAD+', rowOf(PI_TORONTO, 'NAD+')),
+  priceLine('Toronto', "Myers' Cocktail", rowOf(PI_TORONTO, "Myers' Cocktail")),
+  priceLine('Toronto', 'glutathione', rowOf(PI_TORONTO, 'Glutathione')),
+  priceLine('Toronto', 'beauty / glow drips', rowOf(PI_TORONTO, 'Beauty / glow')),
+  priceLine('Edmonton', 'hydration', rowOf(PI_EDMONTON, 'Hydration')),
+].filter((s): s is string => !!s);
+
 export const GUIDES: Guide[] = [
   {
     slug: 'how-to-choose-iv-therapy-clinic',
@@ -112,29 +146,21 @@ export const GUIDES: Guide[] = [
   {
     slug: 'iv-therapy-cost-guide',
     author: 'TheDripMap Editorial Team',
-    lastUpdated: '2026-07-05',
+    lastUpdated: '2026-09-09',
     title: 'How Much Does IV Therapy Cost in Canada? Real 2026 Prices',
     // CTR rewrite 2026-08-20: was 66 chars with the site suffix, so Google
     // truncated it. Now leads with the real price range from our own index.
+    // Figures below are DERIVED from PRICE_INDEX (see the top of this file).
     metaTitle: 'IV Therapy Cost Canada 2026: CA$150 to CA$350',
-    metaDescription: 'A standard IV drip runs a median of CA$175 in Toronto, CA$200 in Calgary and CA$150 in Edmonton. Real 2026 prices from clinic menus, by treatment and city.',
-    intro: `A standard IV vitamin drip in Canada costs a median of about CA$175, but the spread is wide: the same drip is priced anywhere from CA$75 to CA$399 depending on the clinic. Those numbers come from TheDripMap's IV Price Index, built from Canadian clinics' own published menus, not estimates. This guide breaks down what you should actually expect to pay by city and treatment, what drives the differences, and how insurance works in Canada.`,
+    metaDescription: `A standard IV drip runs a median of ${ca(PI_TORONTO.headline.median)} in Toronto, ${ca(PI_CALGARY.headline.median)} in Calgary and ${ca(PI_EDMONTON.headline.median)} in Edmonton. Real 2026 prices from clinic menus, by treatment and city.`,
+    intro: `A standard IV vitamin drip in Canada costs a median of about ${ca(NATIONAL_MEDIAN)}, but the spread is wide: the same drip is priced anywhere from ${ca(NATIONAL_LOW)} to ${ca(NATIONAL_HIGH)} depending on the clinic. Those numbers come from TheDripMap's IV Price Index, built from Canadian clinics' own published menus, not estimates. This guide breaks down what you should actually expect to pay by city and treatment, what drives the differences, and how insurance works in Canada.`,
     sections: [
       {
         heading: 'What Canadians pay right now, by city',
         paragraphs: [
           `These figures are aggregated from clinics' own published menus in our IV Price Index (updated 2026). Each range covers only treatments where at least 3 clinics in that city post a price, so no single clinic's pricing skews the number.`,
         ],
-        bullets: [
-          'Toronto, standard IV vitamin drip: CA$119 to CA$399, median CA$175 (9 clinics)',
-          'Calgary, standard IV vitamin drip: CA$75 to CA$260, median CA$200 (3 clinics)',
-          'Edmonton, standard IV vitamin drip: CA$75 to CA$295, median CA$150 (7 clinics)',
-          'Toronto, NAD+: CA$79 to CA$799, median CA$250 (5 clinics)',
-          "Toronto, Myers' Cocktail: CA$106 to CA$300, median CA$250 (4 clinics)",
-          'Toronto, glutathione: CA$60 to CA$389, median CA$189 (10 clinics)',
-          'Toronto, beauty / glow drips: CA$349 to CA$470, median CA$464 (3 clinics)',
-          'Edmonton, hydration: CA$125 to CA$175, median CA$160 (4 clinics)',
-        ],
+        bullets: COST_GUIDE_BULLETS,
         subsections: [
           {
             heading: 'Why the spread matters',

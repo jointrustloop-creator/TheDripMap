@@ -139,7 +139,7 @@ export default async function ForClinicsPage() {
             </div>
             <div>
               <div className="text-3xl md:text-4xl font-black text-wellness-400 mb-1">{stats.states.toLocaleString()}</div>
-              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">states &amp; provinces</div>
+              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">provinces</div>
             </div>
             <div>
               <div className="text-3xl md:text-4xl font-black text-wellness-400 mb-1">$0</div>

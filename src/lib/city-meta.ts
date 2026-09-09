@@ -28,6 +28,14 @@
  * No promised medical outcomes.
  */
 import { Provider } from '../types';
+import { PRICE_INDEX } from './price-index-data';
+
+// City price FAQs quote the IV Price Index directly so they can never drift
+// from /iv-prices (the Toronto FAQ still said CA$175 after the index moved to
+// CA$150). Derived once at module load.
+const TORONTO_PI = PRICE_INDEX.toronto;
+const TORONTO_NAD = TORONTO_PI.rows.find((r) => r.treatment === 'NAD+');
+const caMoney = (n: number) => `CA$${Math.round(n)}`;
 
 export interface CityRegulationNote {
   headline: string;
@@ -137,7 +145,7 @@ const metas: Record<string, CityMeta> = {
       treatments: [
         'hangover-recovery',
         'myers-cocktail',
-        'nad-plus-therapy',
+        'nad-plus',
         'immune-support',
         'hydration',
         'beauty-glow',
@@ -219,7 +227,7 @@ const metas: Record<string, CityMeta> = {
       treatments: [
         'hangover-recovery',
         'myers-cocktail',
-        'nad-plus-therapy',
+        'nad-plus',
         'immune-support',
         'hydration',
         'beauty-glow',
@@ -311,7 +319,7 @@ const metas: Record<string, CityMeta> = {
       treatments: [
         'hangover-recovery',
         'myers-cocktail',
-        'nad-plus-therapy',
+        'nad-plus',
         'immune-support',
         'hydration',
         'beauty-glow',
@@ -376,11 +384,12 @@ const metas: Record<string, CityMeta> = {
       },
       {
         question: 'How much does IV therapy cost in Toronto?',
-        // Real figures from the Toronto IV Price Index (published clinic menus,
-        // June 2026 snapshot). Keep in sync with src/lib/price-index-data.ts
-        // when the snapshot is refreshed.
+        // Derived from the Toronto IV Price Index (src/lib/price-index-data.ts)
+        // so this answer updates itself when the snapshot is refreshed.
         answer:
-          'Based on published menu prices from 17 Toronto clinics (June 2026), a standard IV vitamin drip runs CA$119 to CA$399, with a median of CA$175. NAD+ varies most, roughly CA$79 to CA$799 depending on dose, with a median around CA$250. Each clinic sets its own pricing, so always confirm the current rate before booking.',
+          `Based on published menu prices from ${TORONTO_PI.clinicCount} Toronto clinics (${TORONTO_PI.asOf}), a standard IV vitamin drip runs ${caMoney(TORONTO_PI.headline.low)} to ${caMoney(TORONTO_PI.headline.high)}, with a median of ${caMoney(TORONTO_PI.headline.median)}.`
+          + (TORONTO_NAD ? ` NAD+ varies most, roughly ${caMoney(TORONTO_NAD.low)} to ${caMoney(TORONTO_NAD.high)} depending on dose, with a median around ${caMoney(TORONTO_NAD.median)}.` : '')
+          + ' Each clinic sets its own pricing, so always confirm the current rate before booking.',
       },
       {
         question: 'Do Toronto clinics offer mobile or in-home IV therapy?',
@@ -408,7 +417,7 @@ const metas: Record<string, CityMeta> = {
       treatments: [
         'hangover-recovery',
         'myers-cocktail',
-        'nad-plus-therapy',
+        'nad-plus',
         'immune-support',
         'hydration',
         'beauty-glow',
