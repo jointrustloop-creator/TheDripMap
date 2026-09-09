@@ -54,6 +54,102 @@ revenue: are the three gates closing on pace for a Q1 monetization?
 
 ---
 
+## ⭐⭐⭐ THE ACTIVATION PLAN (2026-09-09) — THE OPERATING ROADMAP
+Operator handed control ("take control knowing what we know"). Built from a
+3-month GSC read by an outside SEO advisor, reviewed point by point and agreed.
+It does not replace the North Star above; it is the order of work that reaches
+it. Sequence: **Claim → Complete → Perform → Monetize.** The missing layer
+between SEO traffic and any paid product is clinic activation (a claimed
+clinic whose page is actually complete), so that comes before analytics, and
+analytics comes before Pro.
+
+### What the GSC data said (3 months to 2026-09)
+899 clicks / 114k impressions; last 28d 336 clicks vs 186 in the first 28d on
+flat impressions (CTR 0.52% -> 0.91%, position 30 -> 24.5) while indexed pages
+fell 3,788 -> 1,258: fewer, better pages are winning (the Canada-first noindex
+was right). Mobile = 40% of impressions but 71% of clicks (position 14.6 vs 33.7
+desktop): design for a phone user deciding now. 536 provider pages earned
+31k impressions; the top unclaimed ones (Inside Health Oakville 1,241,
+Edmonton Iron Clinic 406, Gray Clinic Winnipeg 258, Timeless Mississauga 256,
+AMRE Burnaby 151, Revive Regina 140) are the warm outreach list. Only page-1
+pages are informational (alcohol-after-IV, who-can-legally-give-IV, insurance
+coverage, cost guide): they are the authority, city pages sit at 15-55.
+
+### The order of work (each step ships as its own PR; operator merges)
+1. **SEO cleanup (no new pages).** /provider/ -> /providers/ one-hop 301s;
+   non-www -> www (Vercel Domains panel, operator flips); consolidate
+   /treatments/nad-plus vs nad-plus-therapy; sitemap = canonical URLs only;
+   internal links never point at a redirect/noindex/404. Fix the data
+   inconsistencies: Price Index CA$150 vs cost guide CA$175, 653 vs 631 clinics
+   (label the definitions), kill "states & provinces" on Canadian pages.
+2. **One "Display Complete" definition**, used everywhere (listing-gaps page,
+   nightly report, finish-form progress, owner dashboard): contact or booking +
+   hours + services with at least one price + photo/logo + a named practitioner.
+   Safety Verified stays separate: earned, human-reviewed, never part of it.
+3. **Clinic Activation Engine.** Build the review-and-approve layer on the
+   enrichment scraper that already exists (enrichment_source / hours_source /
+   price_source): "We found 14 treatments, these hours and these prices,
+   confirm or edit," each item labelled "found on your website on <date>", the
+   confirmed version stamped owner_confirmed. Profile Strength score + one
+   action, "Finish my profile." FACTS ONLY are auto-populated (menu, prices,
+   hours, contact, booking, photos). Safety answers (who administers, who
+   prescribes) are NEVER auto-populated; they stay owner-attested + register-
+   verified. First KPI: **29 claimed CA -> 25+ display-complete.** The 26
+   incomplete are fixed by hand where the engine cannot, and they are the user
+   research (known so far: drop-off is at the onboarding email, not the form;
+   16 never opened their finish link).
+4. **Article-to-clinic funnels.** Template-level CTA modules (never hand-edit
+   post bodies) on the four winners: legal -> compare credential-verified
+   clinics near you; insurance -> clinics with pricing/receipts; alcohol ->
+   compare local clinics and prices; cost guide -> real prices in your city.
+   Sticky mobile bar on city/provider pages: Compare | Call | Book.
+5. **Warm outreach, "give first."** To the top-impression UNCLAIMED clinics:
+   "We already built your profile, found your services, hours and prices; it
+   appeared N times in Google; claim it and confirm." New copy = one [TEST] to
+   the operator first. N comes from GSC per-page data (advisor export by hand
+   for the first 20-30; the GSC API key automates it). Cold Canada is spent
+   (436 at the two-touch cap); Texas pilot continues in parallel.
+6. **Performance analytics on the owner page.** Views, book/call/website/
+   directions clicks (listing_events already tracks these); add quiz matches,
+   claim start vs complete, source-page dimension, offer clicks. Incomplete
+   clinic sees "187 patients saw your profile; it is 42% complete; add your
+   booking link, prices and hours." Complete clinic sees the baseline.
+7. **Pro, validated not launched.** Only for complete clinics with a traffic
+   baseline: "You had 187 views and 23 booking actions. Want competitor
+   pricing, search demand, conversion trends and opportunity alerts?" $79 CAD
+   founding. Pricing brief + pitch copy to the operator BEFORE anything is
+   live (pricing is still hidden site-wide until that approval). Success =
+   three owners voluntarily pay; then build around what they care about.
+8. **Later, in this order:** productized SEO fix off the free audit (one-time
+   only, no monthly retainers); Market Intelligence ($99-499/mo) once city
+   samples are deep enough; lead fees only after volume AND Canadian
+   regulatory/privacy counsel. Display ads much later. Paid rankings never.
+
+### Content rule from now on
+No random wellness posts. Every piece supports a commercial cluster Google
+already trusts us on: the insurance cluster (does Sun Life / Manulife / Canada
+Life / Blue Cross cover IV or iron infusion, HSA/HCSA, naturopath receipts:
+already ranking 4.9-6.9), Price -> Treatment -> City -> Clinic, and the
+commercial city wins (Richmond Hill and Mississauga to page 1, keep milking
+Montreal incl. "glutathione IV Montreal", Oakville iron-infusion comparison).
+
+### 30-day targets (from 2026-09-09)
+25+ display-complete claimed CA clinics; 20+ Safety Verified (14 today); 10
+owners using the analytics page; 5 willing to pay, 3 paying founders; 20+
+current prices in each major city; every booking/call/outbound event tracked;
+Richmond Hill + Mississauga moving to page 1; Montreal still climbing. Claims
+grow via the warm list + Texas, not cold Canada.
+
+### What only the operator can do (the unlock list)
+- GSC_SERVICE_ACCOUNT_KEY in Vercel + the service account added as a user on
+  the sc-domain:thedripmap.com property (steps in src/lib/seo-health-gsc.ts).
+- Non-www -> www redirect in the Vercel Domains panel.
+- The advisor's 3-month GSC export (Pages + Queries) dropped in Downloads.
+- Reply "approved" to each [TEST] email (concierge pitch, finish nudge, Pro).
+- Merge PRs as they arrive; click "Approve and send (2)" at /admin/newsletter.
+
+---
+
 ## ⭐⭐ THE LEADS PLAN (2026-08-28) — THE OPERATING ENGINE
 (Still the HOW. The reframe above is the North Star it feeds. Steps 1-6 build
 the foundation; steps 7-10 are the Q1 monetization, readiness-gated per above.)
