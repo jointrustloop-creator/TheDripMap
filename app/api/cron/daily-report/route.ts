@@ -279,8 +279,16 @@ export async function GET(req: Request) {
       .select('id, name, slug, phone, online_booking_url, working_hours, price_range, services, specialties, image_url, photos, medical_team, decision_drivers')
       .eq('is_claimed', true)
       .neq('is_hidden', true);
-    for (const p of (claimedFull || []) as Array<CompletenessRow & { name: string | null; slug: string | null }>) {
-      const c = assessCompleteness(p);
+    // The medical director may live on operator_profiles (older claims), which
+    // the completeness check reads when attached.
+    const claimedRows = (claimedFull || []) as Array<CompletenessRow & { id: string; name: string | null; slug: string | null }>;
+    const { data: claimedProfs } = await supabase
+      .from('operator_profiles')
+      .select('clinic_id, owner_name, profile_data')
+      .in('clinic_id', claimedRows.map((p) => p.id));
+    const profileByClinic = new Map((claimedProfs || []).map((x) => [x.clinic_id as string, x]));
+    for (const p of claimedRows) {
+      const c = assessCompleteness({ ...p, operator_profile: profileByClinic.get(p.id) || null });
       if (!c.complete) {
         dataCheck.push({
           clinic: p.name || p.slug || '(no name)',

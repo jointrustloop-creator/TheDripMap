@@ -110,7 +110,12 @@ export default async function FinishPage({ params, searchParams }: FinishPagePro
   const prefill = (dd.manage && typeof dd.manage === 'object') ? (dd.manage as Record<string, unknown>) : null;
   // Profile Strength from the ONE display-complete definition, computed on the
   // saved row (what patients actually see today), not on unsaved form state.
-  const completeness = assessCompleteness(p as CompletenessRow);
+  const { data: operatorProfile } = await supabase
+    .from('operator_profiles')
+    .select('owner_name, profile_data')
+    .eq('clinic_id', parsed.providerId)
+    .maybeSingle();
+  const completeness = assessCompleteness({ ...(p as CompletenessRow), operator_profile: operatorProfile || null });
 
   return (
     <FinishListingForm

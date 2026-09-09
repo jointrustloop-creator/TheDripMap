@@ -52,6 +52,17 @@ export interface CompletenessRow {
   medical_team?: Array<{ name?: string | null }> | null;
   decision_drivers?: {
     manage?: { team?: { prescriberName?: string; leadName?: string } };
+    prescriber_verification?: { name?: string | null } | null;
+  } | null;
+  /**
+   * The clinic's operator_profiles row, when the caller has it. Older claims
+   * recorded the medical director there (profile_data.medicalDirectorName)
+   * rather than on the provider row, e.g. Bay Wellness. Callers fetch it by
+   * clinic_id and attach; absent means "not checked", not "none".
+   */
+  operator_profile?: {
+    owner_name?: string | null;
+    profile_data?: { medicalDirectorName?: string | null } | null;
   } | null;
 }
 
@@ -67,7 +78,11 @@ export function assessCompleteness(row: CompletenessRow): Completeness {
   const team = Array.isArray(row.medical_team) ? row.medical_team : [];
   const manageTeam = row.decision_drivers?.manage?.team;
   const hasPractitioner =
-    team.some((m) => m && s(m.name)) || !!s(manageTeam?.prescriberName) || !!s(manageTeam?.leadName);
+    team.some((m) => m && s(m.name))
+    || !!s(manageTeam?.prescriberName)
+    || !!s(manageTeam?.leadName)
+    || !!s(row.decision_drivers?.prescriber_verification?.name)
+    || !!s(row.operator_profile?.profile_data?.medicalDirectorName);
 
   const items: CompletenessItem[] = [
     { key: 'contact', label: 'Booking link or phone', present: hasPhone || hasBooking, weight: 20, impact: 'critical' },

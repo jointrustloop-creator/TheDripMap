@@ -75,6 +75,14 @@ export default async function ListingGapsPage() {
 
   const rows = (data || []) as Row[];
 
+  // Older claims recorded the medical director on operator_profiles, not the
+  // provider row; the completeness check reads both. One query, mapped by id.
+  const { data: profs } = await sb
+    .from('operator_profiles')
+    .select('clinic_id, owner_name, profile_data')
+    .in('clinic_id', rows.map((r) => r.id));
+  const profileBy = new Map((profs || []).map((p) => [p.clinic_id as string, p]));
+
   const assessed = rows.map((r) => {
     const dd = (r.decision_drivers && typeof r.decision_drivers === 'object')
       ? (r.decision_drivers as Record<string, unknown>)
@@ -89,7 +97,7 @@ export default async function ListingGapsPage() {
     // with the nightly report and the owner's Profile Strength. "answers" (the
     // safety questionnaire) is tracked here in addition, because it gates the
     // badge, but it is not part of display completeness.
-    const c = assessCompleteness(r as unknown as CompletenessRow);
+    const c = assessCompleteness({ ...(r as unknown as CompletenessRow), operator_profile: profileBy.get(r.id) || null });
     const photoCount = Array.isArray(r.photos) ? (r.photos as unknown[]).length : 0;
     const missing: string[] = [...(hasAnswers ? [] : ['answers']), ...c.missing.map((m) => m.key)];
     const strength = c.strength;
