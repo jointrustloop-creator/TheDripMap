@@ -328,13 +328,20 @@ export async function runActivation(
   const update: Record<string, unknown> = {};
   const empty = (v: unknown) => v == null || (typeof v === 'string' && !v.trim()) || (typeof v === 'object' && Object.keys(v as object).length === 0);
 
-  // AUTO-APPLY, only into empty fields, with provenance.
-  if (facts.phone && empty(p.phone)) { update.phone = facts.phone; result.autoApplied.push('phone'); }
+  // AUTO-APPLY, only into empty fields, with provenance. A phone that cannot be
+  // a real North American number (an earlier scrape once stored 409-100-0188,
+  // exchange 100 does not exist) counts as empty: patients need to reach them.
+  const validNanp = (v: unknown) => /^\+?1?[\s.-]?\(?[2-9]\d{2}\)?[\s.-]?[2-9]\d{2}[\s.-]?\d{4}$/.test(s(v));
+  if (facts.phone && validNanp(facts.phone) && (empty(p.phone) || !validNanp(p.phone))) {
+    update.phone = facts.phone; result.autoApplied.push(empty(p.phone) ? 'phone' : 'phone (replaced invalid)');
+  }
   if (facts.booking_url && empty(p.online_booking_url)) { update.online_booking_url = facts.booking_url; result.autoApplied.push('online_booking_url'); }
   // Hours auto-apply only when at least 5 days are REAL hours: a clock range or
   // "Closed". "By appointment" / "upon request" never counts (the model is told
   // to null those, this is the belt to that suspender).
-  const realDay = (h: string) => /closed/i.test(h) || /\d{1,2}(:\d{2})?\s*(am|pm)?\s*[-–to]+\s*\d{1,2}(:\d{2})?\s*(am|pm)/i.test(h);
+  // A real day = "Closed", or two clock times (with a dash, "to", or just a
+  // space between them: sites print "9AM 5PM" in table cells).
+  const realDay = (h: string) => /closed/i.test(h) || /\d{1,2}(:\d{2})?\s*(am|pm)?\s*(?:[-–]|to|\s)\s*\d{1,2}(:\d{2})?\s*(am|pm)/i.test(h);
   const realHours = Object.fromEntries(Object.entries(facts.hours).filter(([, h]) => realDay(h)));
   if (Object.keys(realHours).length >= 5 && empty(p.working_hours)) { update.working_hours = realHours; result.autoApplied.push('working_hours'); }
 
@@ -354,6 +361,8 @@ export async function runActivation(
       practitioners: facts.practitioners,
       mobile_service: facts.mobile_service,
       hours: facts.hours,
+      phone: facts.phone,
+      booking_url: facts.booking_url,
       notes: facts.notes,
     },
     ...(result.autoApplied.length
