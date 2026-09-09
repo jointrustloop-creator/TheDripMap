@@ -14,29 +14,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { isAdminRequest } from '../../../../src/lib/admin-auth';
 import { runActivation } from '../../../../src/lib/activation-engine';
+import { machineTokenOk } from '../../../../src/lib/machine-token';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
-// Alternative auth for the operator's batch runner: a machine token minted by
-// the operator side and stored in Vercel as ACTIVATION_RUN_TOKEN. Lets the
-// engine be driven remotely (the extraction key only exists on Vercel) without
-// ever handling the admin password. Constant-time compare; absent token = off.
-function bearerOk(req: NextRequest): boolean {
-  // Trim both sides: a value added through the CLI can carry a trailing
-  // newline, and a raw length compare would then fail forever.
-  const expected = (process.env.ACTIVATION_RUN_TOKEN || '').trim();
-  if (!expected) return false;
-  const got = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '').trim();
-  if (!got || got.length !== expected.length) return false;
-  let diff = 0;
-  for (let i = 0; i < got.length; i++) diff |= got.charCodeAt(i) ^ expected.charCodeAt(i);
-  return diff === 0;
-}
-
 export async function POST(req: NextRequest) {
-  if (!(await isAdminRequest()) && !bearerOk(req)) {
+  // Admin cookie, or the operator-side machine token (src/lib/machine-token.ts).
+  if (!(await isAdminRequest()) && !machineTokenOk(req.headers.get('authorization'))) {
     // Safe diagnostics for the operator-side runner (never the value): is a
     // token configured on this deployment, and did the presented one match in
     // length? Only returned when a Bearer header was actually presented.

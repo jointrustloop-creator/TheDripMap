@@ -10,8 +10,10 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Sb = any;
 
+export type SendLogChannel = 'partb' | 'newsletter' | 'finish_nudge';
+
 export interface SendLogInput {
-  channel: 'partb' | 'newsletter';
+  channel: SendLogChannel;
   action: 'send' | 'test';
   actor?: string;
   recipients: string[];
@@ -45,7 +47,7 @@ export async function logSend(sb: Sb, input: SendLogInput): Promise<void> {
 }
 
 /** The most recent 'send' (not 'test') for a channel, or null. */
-export async function getLastSend(sb: Sb, channel: 'partb' | 'newsletter'): Promise<LastSend | null> {
+export async function getLastSend(sb: Sb, channel: SendLogChannel): Promise<LastSend | null> {
   try {
     const { data, error } = await sb
       .from('email_send_log')
