@@ -571,6 +571,9 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
         {/* Fires a single 'view' analytics event per session. See
             ListingAnalytics for the 30-min sessionStorage dedupe. */}
         <ListingAnalytics providerId={provider.id} />
+        {/* Patient decision bar on phones: Compare | Call | Book (Activation
+            Plan step 4). Claimed pages only; this branch IS the claimed page. */}
+        <PatientActionBar provider={provider} />
         {/* Visible geo breadcrumb + its BreadcrumbList JSON-LD (emitted by the
             component). The claimed layout has no breadcrumb of its own. */}
         <div className="max-w-7xl mx-auto px-6 pt-6">
@@ -1736,11 +1739,6 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
 
       {/* Persistent claim CTA — desktop floating card + mobile bottom sheet. Unclaimed only. */}
       {!provider.is_claimed && <StickyClaimRail provider={provider} />}
-
-      {/* Patient decision bar on phones: Compare | Call | Book. Claimed pages
-          only (they carry the booking link); unclaimed pages keep the claim
-          rail above so the two bars never collide. */}
-      {provider.is_claimed && <PatientActionBar provider={provider} />}
 
       {/* Auto-open claim modal when URL has ?claim=1 (outreach email link). Unclaimed only.
           Wrapped in Suspense because ClaimAutoOpener uses useSearchParams() —
