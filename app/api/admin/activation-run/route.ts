@@ -24,7 +24,9 @@ export const maxDuration = 120;
 // engine be driven remotely (the extraction key only exists on Vercel) without
 // ever handling the admin password. Constant-time compare; absent token = off.
 function bearerOk(req: NextRequest): boolean {
-  const expected = process.env.ACTIVATION_RUN_TOKEN || '';
+  // Trim both sides: a value added through the CLI can carry a trailing
+  // newline, and a raw length compare would then fail forever.
+  const expected = (process.env.ACTIVATION_RUN_TOKEN || '').trim();
   if (!expected) return false;
   const got = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '').trim();
   if (!got || got.length !== expected.length) return false;
@@ -34,7 +36,19 @@ function bearerOk(req: NextRequest): boolean {
 }
 
 export async function POST(req: NextRequest) {
-  if (!(await isAdminRequest()) && !bearerOk(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!(await isAdminRequest()) && !bearerOk(req)) {
+    // Safe diagnostics for the operator-side runner (never the value): is a
+    // token configured on this deployment, and did the presented one match in
+    // length? Only returned when a Bearer header was actually presented.
+    const presented = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '').trim();
+    const expected = (process.env.ACTIVATION_RUN_TOKEN || '').trim();
+    return NextResponse.json(
+      presented
+        ? { error: 'Unauthorized', tokenConfigured: expected.length > 0, lengthMatch: presented.length === expected.length }
+        : { error: 'Unauthorized' },
+      { status: 401 },
+    );
+  }
 
   let providerId = '';
   let isForm = false;
