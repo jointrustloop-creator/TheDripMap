@@ -128,7 +128,11 @@ export default async function FinishPage({ params, searchParams }: FinishPagePro
       const name = typeof t?.canonical === 'string' ? t.canonical : '';
       if (!name || seen.has(name)) continue;
       seen.add(name);
-      drips.push({ name, price: typeof t?.price === 'string' ? t.price.replace(/^\$/, '').split(/[-–]/)[0].trim() : null });
+      // First dollar figure only: sites publish "$185—195", "$200 to $300",
+      // "$250 + HST", "Starting from $300". The form stores digits; a raw
+      // "185—195" would have been saved as "$185195".
+      const firstMoney = typeof t?.price === 'string' ? t.price.match(/\$\s?(\d[\d,]*(?:\.\d{1,2})?)/) : null;
+      drips.push({ name, price: firstMoney ? firstMoney[1].replace(/,/g, '') : null });
     }
     if (drips.length) {
       prefill = {
