@@ -55,6 +55,8 @@ function joinNatural(arr: string[]): string {
   return `${arr.slice(0, -1).join(', ')}, and ${arr[arr.length - 1]}`;
 }
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+// "Whistler Medical Aesthetics' page", not "Aesthetics's page".
+const possessive = (name: string) => (/s$/i.test(name.trim()) ? `${name.trim()}'` : `${name.trim()}'s`);
 const unsubUrl = (email: string) => `${SITE}/api/newsletter/unsubscribe/${encodeURIComponent(email)}`;
 const claimUrlFor = (slug: string) => `${SITE}/providers/${slug}?claim=1`;
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -90,10 +92,10 @@ export function buildWarmOutreach(input: WarmOutreachInput): WarmOutreachEmail {
   if (priorTouches > 0) {
     const d = firstTouchAt ? new Date(firstTouchAt) : null;
     const when = d && !isNaN(d.getTime()) ? ` in ${MONTHS[d.getUTCMonth()]}` : ' before';
-    paras.push(`I wrote to you${when} about ${name}'s listing on TheDripMap. This time I am not writing with a question. We went ahead and built your profile.`);
+    paras.push(`I wrote to you${when} about ${possessive(name)} listing on TheDripMap. This time I am not writing with a question. We went ahead and built your profile.`);
   }
   const viewsLine = views90d >= MIN_VIEWS
-    ? `Patients in ${city} opened ${name}'s page on TheDripMap ${views90d} times in the last ${VIEW_WINDOW_DAYS} days`
+    ? `Patients in ${city} opened ${possessive(name)} page on TheDripMap ${views90d} times in the last ${VIEW_WINDOW_DAYS} days`
     : `Patients in ${city} compare IV therapy clinics on TheDripMap before they book`;
   const gscLine = gscImpressions ? `, and the page appeared in Google search ${gscImpressions.toLocaleString('en-CA')} times over the summer` : '';
   paras.push(`${viewsLine}${gscLine}. Rather than ask you to fill in a blank page, we did the first pass: we read your website ${readDate} and found ${joinNatural(foundBits)}. Every item is labelled with where we found it, and none of it shows to patients until you confirm it.`);
@@ -105,7 +107,7 @@ export function buildWarmOutreach(input: WarmOutreachInput): WarmOutreachEmail {
   const closing = 'If you would rather I fix something before you claim, reply to this email and tell me what.';
   const subject = priorTouches >= 2
     ? `${name}: we went ahead and built your profile on TheDripMap`
-    : `We built ${name}'s profile on TheDripMap. Claim it and confirm`;
+    : `We built ${possessive(name)} profile on TheDripMap. Claim it and confirm`;
   const previewText = `We read your website and pre-filled your page. Two minutes to confirm.`;
   const footerText = `You are receiving this because ${name} is listed on TheDripMap, the Canadian IV therapy matching platform. ${MAILING}. To stop receiving these emails, unsubscribe here: ${unsubUrl(email)}`;
 

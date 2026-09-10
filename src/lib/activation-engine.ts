@@ -144,6 +144,18 @@ function stripHtml(html: string): string {
     .trim();
 }
 
+// Wix and similar builders serve pages whose readable text is buried under
+// inline CSS the <style> strip does not catch (Edmonton Iron Clinic, Timeless,
+// Insight all read as "@font-face ... " on 2026-09-10 and extracted nothing).
+// If what is left still looks like a stylesheet, treat the page as unreadable
+// so the Firecrawl fallback fires instead of feeding CSS to the extractor.
+function looksLikeCss(t: string): boolean {
+  const sample = t.slice(0, 20_000);
+  if (sample.length < 500) return false;
+  const cssTokens = (sample.match(/[{};]|@font-face|@media|font-family|url\(/gi) || []).length;
+  return cssTokens > sample.length / 80;
+}
+
 // Same-host links likely to hold the menu, prices, team, hours or booking.
 const CANDIDATE_RE = /menu|price|pricing|rates|service|treatment|drip|iv-|infusion|team|about|staff|our-doctor|practitioner|contact|hours|book/i;
 function candidateLinks(html: string, base: URL): string[] {
@@ -195,9 +207,10 @@ export async function readClinicSite(website: string): Promise<{ text: string; p
   const PAGE_CHARS = 12_000;
   const homeHtml = await fetchText(start);
   let homeText = homeHtml ? stripHtml(homeHtml) : '';
-  if (homeText.length < 500) {
+  if (homeText.length < 500 || looksLikeCss(homeText)) {
     const fc = await firecrawlText(start);
-    if (fc) homeText = fc;
+    // A CSS-only read is worse than nothing: never hand it to the extractor.
+    homeText = fc || (looksLikeCss(homeText) ? '' : homeText);
   }
   if (homeText) { pages.push(start); chunks.push(`=== PAGE: ${start} ===\n${homeText.slice(0, PAGE_CHARS)}`); }
 
@@ -208,7 +221,10 @@ export async function readClinicSite(website: string): Promise<{ text: string; p
     if (chunks.join('\n').length > MAX_TEXT_CHARS) break;
     const html = await fetchText(link);
     if (!html) continue;
-    const t = stripHtml(html);
+    let t = stripHtml(html);
+    // Same builder problem on sub-pages: a menu page that reads as CSS gets the
+    // rendered fallback too, otherwise the whole site is a lost cause.
+    if (looksLikeCss(t)) t = (await firecrawlText(link)) || '';
     if (t.length < 200) continue;
     pages.push(link);
     chunks.push(`=== PAGE: ${link} ===\n${t.slice(0, PAGE_CHARS)}`);
