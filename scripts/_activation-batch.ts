@@ -35,8 +35,11 @@ const BASE = (arg('--base') || process.env.ACTIVATION_BASE_URL || '').replace(/\
 const LIMIT = arg('--limit') ? Number(arg('--limit')) : Infinity;
 const ONLY = arg('--only') ? new Set(arg('--only')!.split(',').map((x) => x.trim())) : null;
 const TOKEN = process.env.ACTIVATION_RUN_TOKEN || '';
+// --unclaimed: warm-outreach mode (step 5). Targets the UNCLAIMED slugs given
+// with --only (required), so their profile is built before we write to them.
+const UNCLAIMED = process.argv.includes('--unclaimed');
 const DELAY_MS = 1500;
-const OUT = path.join(process.cwd(), 'scripts', `_activation-preview-${new Date().toISOString().slice(0, 10)}${WRITE ? '-WRITE' : ''}.md`);
+const OUT = path.join(process.cwd(), 'scripts', `_activation-preview-${new Date().toISOString().slice(0, 10)}${UNCLAIMED ? '-unclaimed' : ''}${WRITE ? '-WRITE' : ''}.md`);
 
 type RemoteResult = {
   ok: boolean; sourceUrl: string | null; pagesRead: string[]; autoApplied: string[];
@@ -49,18 +52,19 @@ const s = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABA
 
 (async () => {
   if (!BASE || !TOKEN) { console.error('Need --base <deployment url> and ACTIVATION_RUN_TOKEN in .env.local'); process.exit(1); }
-  const { data } = await s.from('providers').select('*').eq('country', 'Canada').eq('is_claimed', true).eq('is_hidden', false).order('name');
+  if (UNCLAIMED && !ONLY) { console.error('--unclaimed needs --only <slugs>: warm outreach is a chosen list, never every unclaimed clinic'); process.exit(1); }
+  const { data } = await s.from('providers').select('*').eq('country', 'Canada').eq('is_claimed', !UNCLAIMED).eq('is_hidden', false).order('name');
   const rows = (data || []) as Array<Record<string, unknown> & { id: string; slug: string; name: string; website?: string | null }>;
   const { data: profs } = await s.from('operator_profiles').select('clinic_id, owner_name, profile_data').in('clinic_id', rows.map((r) => r.id));
   const profBy = new Map((profs || []).map((p) => [p.clinic_id as string, p]));
-  let targets = rows.filter((r) => !assessCompleteness({ ...(r as unknown as CompletenessRow), operator_profile: profBy.get(r.id) || null }).complete);
+  let targets = UNCLAIMED ? rows : rows.filter((r) => !assessCompleteness({ ...(r as unknown as CompletenessRow), operator_profile: profBy.get(r.id) || null }).complete);
   if (ONLY) targets = targets.filter((r) => ONLY.has(r.slug));
   targets = targets.slice(0, LIMIT);
 
   const lines: string[] = [
     `# Activation ${WRITE ? 'RUN (written)' : 'PREVIEW (dry run, nothing written)'} — ${new Date().toISOString().slice(0, 16)}Z — ${BASE}`,
     '',
-    `${targets.length} incomplete claimed Canadian clinic(s). Auto-apply only fills EMPTY phone / booking link / hours; treatments, prices and practitioners are staged for the OWNER to confirm. Safety answers are never touched.`,
+    `${targets.length} ${UNCLAIMED ? 'UNCLAIMED (warm outreach)' : 'incomplete claimed'} Canadian clinic(s). Auto-apply only fills EMPTY phone / booking link / hours; treatments, prices and practitioners are staged for the OWNER to confirm. Safety answers are never touched.`,
     '',
   ];
   const flush = () => fs.writeFileSync(OUT, lines.join('\n'));
@@ -73,7 +77,7 @@ const s = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABA
       const resp = await fetch(`${BASE}/api/admin/activation-run`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${TOKEN}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ provider_id: r.id, dry_run: !WRITE }),
+        body: JSON.stringify({ provider_id: r.id, dry_run: !WRITE, ...(UNCLAIMED ? { allow_unclaimed: true } : {}) }),
         signal: AbortSignal.timeout(150_000),
       });
       const j = await resp.json().catch(() => null);

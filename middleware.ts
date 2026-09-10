@@ -91,7 +91,7 @@ export async function middleware(req: NextRequest) {
   // token can never reach any other admin route; each route re-checks it too.
   // Keep this list identical to MACHINE_TOKEN_PATHS in src/lib/machine-token.ts
   // (not imported: this file runs on the Edge runtime).
-  if (pathname === '/api/admin/activation-run' || pathname === '/api/admin/finish-nudge') {
+  if (pathname === '/api/admin/activation-run' || pathname === '/api/admin/finish-nudge' || pathname === '/api/admin/warm-outreach') {
     const runToken = (process.env.ACTIVATION_RUN_TOKEN || '').trim();
     const presented = auth.replace(/^Bearer\s+/i, '').trim();
     if (runToken && presented && timingSafeEqual(presented, runToken)) {
