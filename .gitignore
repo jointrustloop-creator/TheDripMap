@@ -51,3 +51,4 @@ _temp_*
 # Activation/nudge previews are operator-side scratch, never committed
 scripts/_activation-preview-*.md
 scripts/_finish-nudge-preview-*.md
+scripts/_warm-outreach-preview-*.md

@@ -39,11 +39,17 @@ export async function POST(req: NextRequest) {
   let providerId = '';
   let isForm = false;
   let dryRun = false;
+  // Warm outreach (Activation Plan step 5) pre-builds the profile of an
+  // UNCLAIMED clinic before we write to them: "we already found your menu,
+  // claim it and confirm". JSON callers opt in explicitly; the form on
+  // /admin/listing-gaps only ever runs claimed clinics.
+  let allowUnclaimed = false;
   const ct = req.headers.get('content-type') || '';
   if (ct.includes('application/json')) {
     const body = await req.json().catch(() => ({}));
     providerId = String(body?.provider_id || body?.providerId || '').trim();
     dryRun = body?.dry_run === true;
+    allowUnclaimed = body?.allow_unclaimed === true;
   } else {
     isForm = true;
     const form = await req.formData();
@@ -54,8 +60,8 @@ export async function POST(req: NextRequest) {
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
   const { data: prov } = await sb.from('providers').select('id, is_claimed').eq('id', providerId).maybeSingle();
   if (!prov) return NextResponse.json({ error: 'provider not found' }, { status: 404 });
-  // Only claimed clinics: the point is an owner confirming their own facts.
-  if ((prov as { is_claimed?: boolean }).is_claimed !== true) {
+  // Claimed clinics by default: the point is an owner confirming their own facts.
+  if ((prov as { is_claimed?: boolean }).is_claimed !== true && !allowUnclaimed) {
     return NextResponse.json({ error: 'provider is not claimed' }, { status: 400 });
   }
 
