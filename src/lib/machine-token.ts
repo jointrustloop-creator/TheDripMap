@@ -11,6 +11,7 @@ export const MACHINE_TOKEN_PATHS = new Set<string>([
   '/api/admin/activation-run',
   '/api/admin/finish-nudge',
   '/api/admin/warm-outreach',
+  '/api/admin/send-mail',
 ]);
 
 /** Constant-time compare of the presented Bearer token. Absent env = off. */
