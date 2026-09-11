@@ -190,7 +190,7 @@ export async function buildWarmQueue(
   }
 
   let q = sb.from('providers')
-    .select('id, slug, name, city, email, email_bounced, is_claimed, is_hidden, outreach_sent, outreach_sent_at, followup_sent, reply_category, needs_human, decision_drivers')
+    .select('id, slug, name, city, email, email_bounced, is_claimed, is_hidden, outreach_sent, outreach_sent_at, followup_sent, reply_category, needs_human, discovery_flag, decision_drivers')
     .eq('country', 'Canada').eq('is_claimed', false).eq('is_hidden', false);
   if (opts.only?.length) q = q.in('slug', opts.only);
   const { data: rows, error } = await q;
@@ -203,6 +203,10 @@ export async function buildWarmQueue(
     if (v < MIN_VIEWS && !gsc && !opts.only?.length) continue;
     counts.considered++;
     const dd = (p.decision_drivers || {}) as any;
+    // Same rule as the cold queue: a machine-discovered row waits for a human
+    // name and country check before any email (2026-09-11: 22 UK/US clinics
+    // had been filed under Canadian city names by discovery).
+    if (p.discovery_flag === 'firecrawl_needs_review' || p.discovery_flag === 'wrong_country') { counts.replied++; continue; }
     if (dd.warm_outreach?.sent_at && !opts.includeSent) { counts.already_sent++; continue; }
     const email = (p.email || '').toLowerCase().trim();
     if (!email) { counts.no_email++; continue; }
