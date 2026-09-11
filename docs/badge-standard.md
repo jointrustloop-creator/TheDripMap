@@ -41,6 +41,15 @@ Safety Verified = the safety standard below is met. Neither implies the other.
 
 ---
 
+> **Provinces other than Ontario (added 2026-09-11).** The standard is the same
+> two questions; only the register changes. For an ND outside Ontario the
+> reviewer checks the ND's own provincial college register for IV/parenteral
+> authorization, e.g. **CCHPBC** (College of Complementary Health Professionals
+> of BC, which absorbed CNPBC in 2024) for British Columbia. The finish form's
+> ND option reads "ND with IV authorization" and the owner confirms their
+> provincial college's authorization; the stored value for older rows is
+> "CONO-authorized ND (IVIT)" and both are accepted by isNDCredential().
+
 ## 2. Who may ADMINISTER an IV (Ontario)
 
 Any one of: **RN**, **NP**, **Physician (MD/DO)**, or a **CONO-authorized ND**
