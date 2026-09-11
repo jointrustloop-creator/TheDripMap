@@ -60,6 +60,14 @@
     {
       "path": "/api/cron/blog-engine",
       "schedule": "30 12 * * 1,4"
+    },
+    {
+      "path": "/api/cron/partb-daily",
+      "schedule": "0 14 * * 1-5"
+    },
+    {
+      "path": "/api/cron/newsletter-welcome",
+      "schedule": "0 15 * * *"
     }
   ]
 }
