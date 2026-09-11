@@ -144,7 +144,15 @@ coverage, cost guide): they are the authority, city pages sit at 15-55.
   front-desk hours). Owner nudge (finish_nudge_v1, operator-approved after
   [TEST]) sent to 23 of 29 claimed CA owners the same day; one per clinic,
   ever. Watch: finish-page saves + replies to info@ over the next 7 days.
-- Next: step 5 (warm outreach, needs GSC data) and step 6 (owner analytics).
+- 2026-09-11 Step 5 DONE: GSC key parked (operator cannot do console work;
+  first-party listing views used instead, plus the six advisor-named clinics).
+  Engine pre-built 68 unclaimed warm profiles (hours/booking/phone filled from
+  their own sites where empty, menus staged); warm_outreach_v1 approved after
+  [TEST] and sent to 50 clinics as a one-time third touch (operator exception
+  2026-09-10). Success measure: claims from this list within 14 days.
+- Nudge results within 24h: 7 of 23 opened, 4 completed (Nura by email,
+  Aafiyat, Erin Mills, Ketamind on the finish page). Claimed CA complete 5 -> 9.
+- Next: step 6 (owner analytics on the finish page), then the Pro pricing brief.
 
 ### Content rule from now on
 No random wellness posts. Every piece supports a commercial cluster Google
