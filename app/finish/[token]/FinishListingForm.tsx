@@ -56,8 +56,36 @@ interface Props {
 const WHO_PLACES = ['RN', 'NP', 'ND', 'MD / DO', 'PA', 'Paramedic'];
 // 2026-08 two-part model (docs/badge-standard.md): the prescriber/overseer must
 // be one of these. An RN administers but is NOT a prescriber, so RN is not here.
-const PRESCRIBER_CREDS = ['Physician (MD/DO)', 'Nurse Practitioner (NP)', 'CONO-authorized ND (IVIT)'];
+// The ND option is province-neutral (2026-09-11): a BC owner (regulated by
+// CCHPBC, not CONO) could not honestly tick an Ontario-only confirmation.
+// isNDCredential() in src/lib/safety.ts matches old and new labels alike.
+const PRESCRIBER_CREDS = ['Physician (MD/DO)', 'Nurse Practitioner (NP)', 'ND with IV authorization'];
 const isNdCred = (c: string) => /\bnd\b|naturopath/i.test(c);
+
+// Phones hand us 3 to 6 MB photos and the upload endpoint accepts at most
+// 4.5 MB per request in total, so a "few photos" save failed with a bare
+// "Something went wrong". Downscale in the browser first; a photo that cannot
+// be decoded is sent as-is.
+const MAX_EDGE = 1600;
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
+async function shrinkImage(file: File): Promise<File> {
+  if (!file.type.startsWith('image/') || file.size < 600 * 1024) return file;
+  try {
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, MAX_EDGE / Math.max(bmp.width, bmp.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bmp.width * scale);
+    canvas.height = Math.round(bmp.height * scale);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return file;
+    ctx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    const blob: Blob | null = await new Promise((r) => canvas.toBlob(r, 'image/jpeg', 0.82));
+    if (!blob || blob.size >= file.size) return file;
+    return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+  } catch {
+    return file;
+  }
+}
 // "Licensed compounding pharmacy" covers a US 503A or a provincial pharmacy;
 // "503B outsourcing facility" is the US sterile-batch signal. Either reads as
 // in-the-know to the owner.
@@ -261,12 +289,23 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
       const fd = new FormData();
       fd.append('answers', JSON.stringify(answers));
       fd.append('token', token);
-      if (logo) fd.append('logo', logo);
-      photos.slice(0, 5).forEach((p) => fd.append('photos', p));
+      const smallLogo = logo ? await shrinkImage(logo) : null;
+      const smallPhotos: File[] = [];
+      for (const p of photos.slice(0, 5)) smallPhotos.push(await shrinkImage(p));
+      const totalBytes = (smallLogo?.size || 0) + smallPhotos.reduce((n, p) => n + p.size, 0);
+      if (totalBytes > MAX_UPLOAD_BYTES) {
+        setError('Those images are too large to send together (about 4 MB total). Try fewer photos, or save now and add the rest in a second visit.');
+        setSaving(false);
+        return;
+      }
+      if (smallLogo) fd.append('logo', smallLogo);
+      smallPhotos.forEach((p) => fd.append('photos', p));
       const res = await fetch('/api/finish-listing', { method: 'POST', body: fd });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.ok) {
-        setError(data.error || 'Something went wrong. Please try again.');
+        setError(data.error || (res.status === 413
+          ? 'The photos were too large to upload. Try fewer or smaller photos, or email them to info@thedripmap.com and we will add them.'
+          : 'Something went wrong. Please try again, or email info@thedripmap.com and we will record your answers for you.'));
         setSaving(false);
         return;
       }
@@ -462,7 +501,7 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
               <input
                 value={prescriberRegNum}
                 onChange={(e) => setPrescriberRegNum(e.target.value)}
-                placeholder="College registration # (CPSO / CNO / CONO)"
+                placeholder="College registration # (CPSO, CNO, CONO, CCHPBC, or your province's college)"
                 maxLength={40}
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#0F6E56] focus:ring-2 focus:ring-[#0F6E56]/20 outline-none text-sm"
               />
@@ -470,7 +509,7 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
             {isNdCred(prescriberCredential) && (
               <label className="flex items-start gap-2 mb-3 text-[13px] text-slate-700 cursor-pointer">
                 <input type="checkbox" checked={prescriberNdIvit} onChange={(e) => setPrescriberNdIvit(e.target.checked)} className="mt-0.5" />
-                <span>I confirm this ND holds the College of Naturopaths of Ontario (CONO) <b>IVIT authorization</b> to prescribe/administer IV therapy.</span>
+                <span>I confirm this ND holds their provincial college&apos;s <b>authorization to prescribe and administer IV therapy</b> (CONO IVIT in Ontario, CCHPBC in British Columbia, or the equivalent in your province).</span>
               </label>
             )}
             <p className="text-[11.5px] text-slate-400 mb-5">
