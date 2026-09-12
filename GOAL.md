@@ -54,6 +54,48 @@ revenue: are the three gates closing on pace for a Q1 monetization?
 
 ---
 
+## ⭐⭐⭐ THE SEPTEMBER SPRINT (2026-09-12 to 2026-09-30) — THE SHORT GOAL
+Operator: "make it a new short goal to execute on all 5". Claims and completions
+first; everything that gets stronger with more finished clinics (badge kit,
+media pitches, resource-page asks, Pro, Demand Pulse editions) WAITS for the
+milestone. Canada only: the Texas cron is paused, US rows stay a quiet noindexed
+archive until Canadian money terms reach page 1 to 2.
+
+### The five moves (in order; each reports "done" with a number)
+1. **Ontario master list from the regulator.** Harvest CONO's IVIT premises
+   register (every Ontario location licensed for IV therapy), diff against
+   providers, insert the missing ones as verified clinics; then CCHPBC (BC) and
+   the Alberta college. Target: +150 to 300 in-scope Canadian clinics.
+2. **"We built your profile" as the FIRST touch for every new clinic.** Engine
+   reads the site and stages the menu; the warm email says what we found
+   (4.4 percent day-one claim rate vs 2.3 cold). Target: 6 to 10 claims from
+   move 1's list.
+3. **Claims from the page itself for the 416 capped clinics.** A block at the
+   top of every unclaimed listing: "Is this your clinic? We already found N
+   treatments and your hours. Claim it and confirm." Zero emails; uses the
+   profiles the engine built. Target: first page-sourced claim within 14 days.
+4. **Claimed Canadian clinics: 9 complete -> 20.** Record emailed answers in
+   operator mode, one personal note each to owners who opened but did not save,
+   fix whatever stalls the form. THE milestone that unlocks the holds above.
+5. **Free ranking wins:** Winnipeg Price Index + city page (109 imp/wk at pos
+   47 to 53), Calgary city refresh (520 imp/wk at pos 23), cost-guide internal
+   links (pos 11.4, one spot off page 1).
+
+### Held until move 4 hits 20 complete
+Owner badge email (link_partner_badge_v1, tested 2026-09-12), media data pitch
+(link_media_pitch_v1, tested), resource-page ask (link_resource_ask_v1,
+tested), any repeat email to already-touched clinics, US expansion, Pro.
+
+### Scoreboard to hit by 2026-09-30 (honest, not inflated)
+800+ Canadian clinics listed (631 today) · 45+ claimed CA (29) · 20 complete
+(9) · a link programme with a real list behind it.
+
+### Progress
+- 2026-09-12: sprint written; Texas cron paused (DAILY_MARKETS empty); three
+  link email formats tested and HELD; Demand Pulse phase 0 collecting.
+
+---
+
 ## ⭐⭐⭐ THE ACTIVATION PLAN (2026-09-09) — THE OPERATING ROADMAP
 Operator handed control ("take control knowing what we know"). Built from a
 3-month GSC read by an outside SEO advisor, reviewed point by point and agreed.

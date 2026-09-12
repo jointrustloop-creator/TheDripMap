@@ -28,10 +28,11 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
-// Operator-approved markets for unattended daily sends. Texas only, per the
-// 2026-09-08 go ("open and ok with starting texas outreach"). Other US states
-// wait for an explicit go; Canada's cold queue is spent and stays manual.
-const DAILY_MARKETS = ['US-TX'];
+// Operator-approved markets for unattended daily sends. PAUSED 2026-09-12
+// (September Sprint, GOAL.md): Canada-only positioning; the US archive stays
+// noindexed until Canadian money terms reach page 1 to 2. To resume Texas,
+// put 'US-TX' back here; the route, rails and log are unchanged.
+const DAILY_MARKETS: string[] = [];
 const PER_MARKET_LIMIT = 25;
 const OUTREACH_FROM = process.env.OUTREACH_FROM || 'TheDripMap <hello@thedripmap.com>';
 const OUTREACH_REPLY_TO = 'info@thedripmap.com';
