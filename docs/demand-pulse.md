@@ -65,7 +65,7 @@ Intent events per clinic, in addition to the six click events:
 | reach_prices / reach_hours / reach_practitioner / reach_book | visitor scrolled a section into view (once per session) | session |
 | message_topic | a patient message was sent | topic category only |
 
-Storage: `listing_events` under carrier event type `booking_click`, payload in
+Storage: `listing_events` under carrier event type `directions_click`, payload in
 `referrer` as an `i:` token (src/lib/intent.ts). Readers exclude `i:%` rows from
 click metrics. The proper table is scripts/create-intent-events.sql; apply it
 when SQL access exists and switch writer + reader.

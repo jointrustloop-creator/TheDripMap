@@ -152,7 +152,18 @@ coverage, cost guide): they are the authority, city pages sit at 15-55.
   2026-09-10). Success measure: claims from this list within 14 days.
 - Nudge results within 24h: 7 of 23 opened, 4 completed (Nura by email,
   Aafiyat, Erin Mills, Ketamind on the finish page). Claimed CA complete 5 -> 9.
-- Next: step 6 (owner analytics on the finish page), then the Pro pricing brief.
+- 2026-09-12 Step 6 reframed as DEMAND PULSE (docs/demand-pulse.md, operator
+  approved): Phase 0 instrumentation shipped (impressions, quiz matches,
+  compare adds, view source, section reach, message topics). Traffic is too
+  thin for a weekly per-clinic pulse (1 of 26 claimed clinics >= 5 views/wk),
+  so Pulse v1 is MONTHLY and city-level, first edition ~2026-10-06 after four
+  weeks of data, [TEST] to the operator first. City Scoreboard (earned only,
+  never for sale) rides on the same data as Phase 2b.
+- Also 2026-09-11/12: daily Texas cron (25/weekday) + newsletter welcome cron
+  live; warm outreach total 64; Hydrate Victoria + Hydrate IV Bar Cypress
+  claimed; 22 wrong-country discoveries hidden + guard added.
+- Next: watch intent data weekly; Pulse v1 build in early October; Texas queue
+  runs dry ~Sep 16, next-state decision is the operator's.
 
 ### Content rule from now on
 No random wellness posts. Every piece supports a commercial cluster Google

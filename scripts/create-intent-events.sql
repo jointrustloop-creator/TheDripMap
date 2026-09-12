@@ -1,6 +1,6 @@
 -- Demand Pulse: the proper home for intent events (2026-09-12).
 -- NOT YET APPLIED. Until it is, intent rows live in listing_events under the
--- carrier event type 'booking_click' with the payload encoded in `referrer`
+-- carrier event type 'directions_click' with the payload encoded in `referrer`
 -- as an "i:" token (see src/lib/intent.ts). When this table exists, point
 -- the writer (app/api/track/route.ts, app/api/message-clinic/route.ts) and
 -- the reader (scripts/_intent-report.ts) here, then backfill with:

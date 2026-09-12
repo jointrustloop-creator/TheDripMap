@@ -125,6 +125,7 @@ export async function GET(req: Request) {
   const { data: eventsRaw } = await supabase
     .from('listing_events')
     .select('provider_id, event_type')
+    .not('referrer', 'like', 'i:%') // Demand Pulse intent rows are not clicks (src/lib/intent.ts)
     .gte('created_at', weekStart.toISOString());
 
   // Direct-contact "lead" clicks — the patient-intent signal that powers the

@@ -16,6 +16,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { createClient } from '@supabase/supabase-js';
 import { getPerProviderCounts } from '../../src/lib/analytics-query';
+import { sendLedger, type SendDay } from '../../src/lib/send-ledger';
 import {
   Target,
   Sparkles,
@@ -123,8 +124,18 @@ const GROUPS: Group[] = [
   },
 ];
 
+// Emails that left the platform, per day and stream, from the send log.
+async function loadLedger(): Promise<SendDay[]> {
+  try {
+    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+    return await sendLedger(supabase, 7);
+  } catch {
+    return [];
+  }
+}
+
 export default async function AdminDashboardPage() {
-  const stats = await loadStats();
+  const [stats, ledger] = await Promise.all([loadStats(), loadLedger()]);
   return (
     <main className="max-w-7xl mx-auto px-6 py-12">
       <div className="mb-10">
@@ -160,6 +171,46 @@ export default async function AdminDashboardPage() {
             ))}
           </div>
         </Link>
+      )}
+
+      {ledger.length > 0 && (
+        <section className="mb-12">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-[11px] font-black uppercase tracking-[0.22em] text-[#0F6E56]">Emails sent · last 7 days</h2>
+            <Link href="/admin/outreach" className="text-xs font-bold text-slate-400 hover:text-[#0F6E56]">Outreach &rarr;</Link>
+          </div>
+          <div className="bg-white border border-slate-200 rounded-2xl overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100">
+                  <th className="text-left px-4 py-3">Day</th>
+                  <th className="text-right px-4 py-3">Cold outreach</th>
+                  <th className="text-right px-4 py-3">Warm (profile built)</th>
+                  <th className="text-right px-4 py-3">Owner nudge</th>
+                  <th className="text-right px-4 py-3">Newsletter</th>
+                  <th className="text-right px-4 py-3">Replies</th>
+                  <th className="text-right px-4 py-3 text-slate-900">Total</th>
+                  <th className="text-right px-4 py-3">Tests to you</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ledger.map((d) => (
+                  <tr key={d.day} className="border-b border-slate-50 last:border-0 tabular-nums">
+                    <td className="px-4 py-2.5 font-bold text-slate-700">{d.day}</td>
+                    <td className="px-4 py-2.5 text-right text-slate-600">{d.cold || ''}</td>
+                    <td className="px-4 py-2.5 text-right text-slate-600">{d.warm || ''}</td>
+                    <td className="px-4 py-2.5 text-right text-slate-600">{d.nudge || ''}</td>
+                    <td className="px-4 py-2.5 text-right text-slate-600">{d.newsletter || ''}</td>
+                    <td className="px-4 py-2.5 text-right text-slate-600">{d.replies || ''}</td>
+                    <td className="px-4 py-2.5 text-right font-black text-slate-900">{d.total}</td>
+                    <td className="px-4 py-2.5 text-right text-slate-400">{d.tests || ''}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-[11px] text-slate-400 mt-2">Toronto days. Every send path writes to the same log, including the daily Texas cron (weekdays 9am Central) and the newsletter welcome cron.</p>
+        </section>
       )}
 
       {stats && stats.badgePending > 0 && (

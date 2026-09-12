@@ -13,20 +13,22 @@
  *   message_topic     what a patient message was about (category only)
  *
  * STORAGE, and why it looks odd: listing_events.event_type has a CHECK
- * constraint and there is no DDL access from the operator side, so intent
- * rows ride in listing_events under the CARRIER event type ('booking_click',
- * which nothing else has ever written) with the payload encoded in the
- * `referrer` column as an `i:` token. Every reader excludes rows whose
- * referrer starts with 'i:' from click metrics. scripts/create-intent-events.sql
- * is the proper table; when it can be applied, switch the writer and the
- * reader here and nothing else changes.
+ * constraint (view, book_click, call_click, website_click, directions_click,
+ * message_click; verified 2026-09-12, 'booking_click' is NOT in it) and there
+ * is no DDL access from the operator side, so intent rows ride in
+ * listing_events under the CARRIER event type 'directions_click' (the rarest
+ * real click) with the payload encoded in the `referrer` column as an `i:`
+ * token. Every reader excludes rows whose referrer starts with 'i:' from
+ * click metrics. scripts/create-intent-events.sql is the proper table; when
+ * it can be applied, switch the writer and the reader here and nothing else
+ * changes.
  *
  * Privacy: tokens carry a random per-tab session id, a city slug, a
  * treatment slug, a source path and a topic word. Never an email, name,
  * query string, or user agent.
  */
 
-export const INTENT_CARRIER_EVENT = 'booking_click';
+export const INTENT_CARRIER_EVENT = 'directions_click';
 export const INTENT_PREFIX = 'i:';
 
 export const INTENT_KINDS = [

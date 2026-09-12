@@ -96,6 +96,10 @@ export async function POST(req: NextRequest) {
     if (!ALLOWED_EVENTS.has(event_type)) {
       return NextResponse.json({ error: 'invalid event_type' }, { status: 400 });
     }
+    // 'booking_click' (sent by BookingRequest) is not in the table's CHECK
+    // constraint and had been silently dropped since it shipped; it is the
+    // same intent as book_click, so store it as that.
+    if (event_type === 'booking_click') storedEventType = 'book_click';
     referrer = coarseReferrer(body.referrer);
   }
 

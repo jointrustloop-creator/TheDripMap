@@ -145,6 +145,7 @@ export async function getRecentEvents(opts: {
   let q = sb
     .from('listing_events')
     .select('id, provider_id, event_type, created_at, referrer')
+    .not('referrer', 'like', 'i:%')
     .order('created_at', { ascending: false })
     .limit(limit);
   if (opts.eventType) q = q.eq('event_type', opts.eventType);
@@ -175,6 +176,7 @@ export async function getPerProviderCounts(opts: {
     let q = sb
       .from('listing_events')
       .select('provider_id, event_type')
+      .not('referrer', 'like', 'i:%')
       .range(from, from + pageSize - 1);
     if (opts.sinceIso) q = q.gte('created_at', opts.sinceIso);
     if (opts.untilIso) q = q.lte('created_at', opts.untilIso);
