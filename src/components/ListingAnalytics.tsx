@@ -10,7 +10,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { trackEvent } from '../lib/analytics-client';
+import { trackEvent, trackIntentOnce, internalSourcePath } from '../lib/analytics-client';
 
 const TTL_MS = 30 * 60 * 1000; // 30 minutes
 
@@ -42,6 +42,11 @@ export default function ListingAnalytics({ providerId }: Props) {
     }
 
     trackEvent(providerId, 'view');
+    // Demand Pulse: which of OUR pages sent this view (blog post, city page,
+    // search, price index). External sources stay hostname-only in the view
+    // row above; this only fires for internal navigation.
+    const src = internalSourcePath();
+    if (src) trackIntentOnce(`src_${providerId}_${src}`, providerId, 'view_src', { src });
   }, [providerId]);
 
   return null;

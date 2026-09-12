@@ -57,6 +57,7 @@ import { isSafetyVerified as isSafetyVerifiedFn, premisesVerification } from '..
 import { ProviderHero } from '../../../src/components/ProviderHero';
 import { OpenStatus } from '../../../src/components/OpenStatus';
 import ListingAnalytics from '../../../src/components/ListingAnalytics';
+import ListingReachTracker from '../../../src/components/ListingReachTracker';
 import TrackedLink from '../../../src/components/TrackedLink';
 
 // Revalidate every 5 min. Bumped from 60 → 300 on 2026-05-31 alongside the
@@ -571,6 +572,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
         {/* Fires a single 'view' analytics event per session. See
             ListingAnalytics for the 30-min sessionStorage dedupe. */}
         <ListingAnalytics providerId={provider.id} />
+        <ListingReachTracker providerId={provider.id} />
         {/* Patient decision bar on phones: Compare | Call | Book (Activation
             Plan step 4). Claimed pages only; this branch IS the claimed page. */}
         <PatientActionBar provider={provider} />
@@ -617,6 +619,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
           (30-minute TTL) for both claimed and unclaimed listings so we
           can power profile insights without a third-party pixel. */}
       <ListingAnalytics providerId={provider.id} />
+        <ListingReachTracker providerId={provider.id} />
 
       <script
         type="application/ld+json"

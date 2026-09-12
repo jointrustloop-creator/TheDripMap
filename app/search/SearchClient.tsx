@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { trackIntentOnce } from '../../src/lib/analytics-client';
 import {
   Search,
   Filter,
@@ -114,6 +115,18 @@ export default function SearchClient({ initialProviders, cities: initialCities, 
   const [siteStats, setSiteStats] = useState<ListingStats | null>(initialStats);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  // Demand Pulse: which clinics were SHOWN for which city and chips (an
+  // "impression"). Top 12 of the rendered order, once per clinic per session
+  // per city+chips. Free-text queries are deliberately not recorded.
+  useEffect(() => {
+    if (isLoading) return;
+    const shown = groups ? [...groups.lists, ...groups.notListed, ...groups.unknown] : filteredProviders;
+    const city = selectedCity === 'All' ? 'all' : String(selectedCity);
+    const chips = activeChips.slice(0, 2).join('+') || 'any';
+    for (const p of shown.slice(0, 12)) {
+      trackIntentOnce(`imp_${p.id}_${city}_${chips}`, p.id, 'impression', { c: city, t: chips });
+    }
+  }, [isLoading, groups, filteredProviders, selectedCity, activeChips]);
 
   // Pre-apply counts for the hard filter (Mobile) + the flagship facet, so the
   // visitor sees what they're narrowing to BEFORE clicking. Computed over the

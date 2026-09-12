@@ -7,6 +7,7 @@ import { motion } from 'motion/react';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { ProviderCardFeatured } from '../../../src/components/ProviderCardFeatured';
+import { trackIntentOnce } from '../../../src/lib/analytics-client';
 import { GetMatchedForm } from '../../../src/components/GetMatchedForm';
 import { SurveyState, OperatorProfile, Provider, City, TreatmentType } from '../../../src/types';
 import {
@@ -375,6 +376,20 @@ function ResultsContent() {
       }).catch(() => {});
     } catch { /* never block the page on logging */ }
   }, [isLoading, recommendation, rankedClinics.length, surveyData.city, surveyData.state]);
+
+  // Demand Pulse: each clinic shown as a quiz match, with the city asked for and
+  // the treatment recommended. Once per clinic per session per city+treatment.
+  const loggedMatchRef = React.useRef<string>('');
+  React.useEffect(() => {
+    if (isLoading || !recommendation || matchedClinics.length === 0) return;
+    const city = surveyData.city || '';
+    const key = `${city}|${recommendation.name}|${matchedClinics.map((c) => c.id).join(',')}`;
+    if (loggedMatchRef.current === key) return;
+    loggedMatchRef.current = key;
+    for (const c of matchedClinics) {
+      trackIntentOnce(`qm_${c.id}_${city}_${recommendation.name}`, c.id, 'quiz_match', { c: city, t: recommendation.name });
+    }
+  }, [isLoading, recommendation, matchedClinics, surveyData.city]);
 
   // Location transparency: getListingsByCity silently broadens an empty city to
   // state level, so detect when nothing in the shown set is actually in the

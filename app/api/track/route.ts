@@ -14,6 +14,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { INTENT_CARRIER_EVENT, isValidIntentToken } from '../../../src/lib/intent';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -78,11 +79,25 @@ export async function POST(req: NextRequest) {
   if (!UUID_RE.test(provider_id)) {
     return NextResponse.json({ error: 'invalid provider_id' }, { status: 400 });
   }
-  if (!ALLOWED_EVENTS.has(event_type)) {
-    return NextResponse.json({ error: 'invalid event_type' }, { status: 400 });
-  }
 
-  const referrer = coarseReferrer(body.referrer);
+  // Intent events (Demand Pulse phase 0, see src/lib/intent.ts): the client
+  // sends event_type 'intent' with an encoded token; it is stored under the
+  // carrier event type with the token in `referrer`. Readers exclude rows
+  // whose referrer starts with "i:" from click metrics.
+  let storedEventType = event_type;
+  let referrer: string | null;
+  if (event_type === 'intent') {
+    if (!isValidIntentToken(body.referrer)) {
+      return NextResponse.json({ error: 'invalid intent token' }, { status: 400 });
+    }
+    storedEventType = INTENT_CARRIER_EVENT;
+    referrer = body.referrer;
+  } else {
+    if (!ALLOWED_EVENTS.has(event_type)) {
+      return NextResponse.json({ error: 'invalid event_type' }, { status: 400 });
+    }
+    referrer = coarseReferrer(body.referrer);
+  }
 
   // Insert. Fire-and-forget — never throws back to the client. If the
   // service-role env vars are missing we silently 204 so a misconfigured
@@ -96,7 +111,7 @@ export async function POST(req: NextRequest) {
       });
       await supabase.from('listing_events').insert({
         provider_id,
-        event_type,
+        event_type: storedEventType,
         referrer,
       });
     }

@@ -86,7 +86,9 @@ export async function countEvents(opts: {
   const sb = opts.client ?? defaultClient();
   if (!sb) return 0;
 
-  let q = sb.from('listing_events').select('id', { count: 'exact', head: true });
+  // Intent rows (Demand Pulse, src/lib/intent.ts) share this table under a
+  // carrier event type; they are never click metrics.
+  let q = sb.from('listing_events').select('id', { count: 'exact', head: true }).not('referrer', 'like', 'i:%');
   if (opts.eventType) q = q.eq('event_type', opts.eventType);
   if (opts.sinceIso) q = q.gte('created_at', opts.sinceIso);
   if (opts.untilIso) q = q.lte('created_at', opts.untilIso);
@@ -112,7 +114,7 @@ export async function countEventsByType(opts: {
   const out = zeroCounts();
   if (!sb) return out;
 
-  let q = sb.from('listing_events').select('event_type');
+  let q = sb.from('listing_events').select('event_type').not('referrer', 'like', 'i:%');
   if (opts.sinceIso) q = q.gte('created_at', opts.sinceIso);
   if (opts.untilIso) q = q.lte('created_at', opts.untilIso);
   if (opts.providerId) q = q.eq('provider_id', opts.providerId);

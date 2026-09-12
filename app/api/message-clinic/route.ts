@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../src/lib/mailer';
 import { isJunkEmail } from '../../../src/lib/outreach-quality';
 import { renderLeadEmail } from '../../../src/lib/lead-forward';
+import { encodeIntent, classifyMessageTopic, INTENT_CARRIER_EVENT } from '../../../src/lib/intent';
 
 // Auto-forward — LIVE 2026-06-25 (shadow mode 2026-06-12 → 2026-06-25).
 //
@@ -210,6 +211,14 @@ export async function POST(req: Request) {
         insertError = r2.error;
         insertedInquiryId = (r2.data?.id as string) || null;
       }
+    }
+    // Demand Pulse: the TOPIC of the message (price, availability, mobile,
+    // safety, insurance, treatment, other), category only, never the text.
+    if (!insertError) {
+      try {
+        const token = encodeIntent('message_topic', { k: classifyMessageTopic(data.message) });
+        if (token) await supabase.from('listing_events').insert({ provider_id: data.clinicId, event_type: INTENT_CARRIER_EVENT, referrer: token });
+      } catch { /* analytics never blocks a lead */ }
     }
     if (insertError) {
       console.error('Supabase insert error:', insertError);
