@@ -632,7 +632,7 @@ export default function DefinitiveListingLayout({
 
             {/* ── Meet your provider (data-driven; gated to showcase for now) ── */}
             {team.length > 0 && (
-              <section className="mb-[46px]">
+              <section className="mb-[46px]" data-reach="practitioner">
                 <div className="text-[11.5px] tracking-[0.18em] uppercase text-[#b08a3e] font-semibold inline-flex items-center gap-[10px] mb-[14px] before:content-[''] before:w-[22px] before:h-[1px] before:bg-[#b08a3e]">Your care team</div>
                 <h2 className="font-[var(--font-fraunces)] text-[28px] font-normal tracking-tight mb-5 leading-[1.15]">The people who look after you</h2>
                 <div className="grid gap-[14px]">
@@ -751,7 +751,7 @@ export default function DefinitiveListingLayout({
 
             {/* ── Drip menu ── */}
             {(ivDrips.length > 0 || otherServices.length > 0) && (
-              <section className="mb-[46px]">
+              <section className="mb-[46px]" data-reach="prices">
                 <div className="text-[11.5px] tracking-[0.18em] uppercase text-[#b08a3e] font-semibold inline-flex items-center gap-[10px] mb-[14px] before:content-[''] before:w-[22px] before:h-[1px] before:bg-[#b08a3e]">Drip menu</div>
                 <h2 className="font-[var(--font-fraunces)] text-[28px] font-normal tracking-tight mb-4 leading-[1.15]">{ivDrips.length > 0 ? 'IV therapy at this clinic' : 'Services offered'}</h2>
                 {menuIsTemplateSourced && (
@@ -862,7 +862,7 @@ export default function DefinitiveListingLayout({
               <section className="mb-[46px]">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-[30px]">
                   {hoursToRender.length > 0 && (
-                    <div>
+                    <div data-reach="hours">
                       <div className="text-[11.5px] tracking-[0.18em] uppercase text-[#b08a3e] font-semibold inline-flex items-center gap-[10px] mb-[14px] before:content-[''] before:w-[22px] before:h-[1px] before:bg-[#b08a3e]">Hours</div>
                       {hoursToRender.map(({ key, label, value }) => {
                         const closed = isClosedHours(value);
@@ -1014,7 +1014,7 @@ export default function DefinitiveListingLayout({
                   // rides the message-clinic pipeline with structured fields).
                   // id="book" is the PatientActionBar's fallback target on
                   // phones when the clinic has no booking page of its own.
-                  <div id="book" className="scroll-mt-24">
+                  <div id="book" className="scroll-mt-24" data-reach="book">
                     <BookingRequestButton
                       provider={provider}
                       treatments={ivDrips.map((d) => d.name)}

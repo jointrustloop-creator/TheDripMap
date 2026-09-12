@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { trackIntent } from './analytics-client';
 
 const STORAGE_KEY = 'tdm_compare_ids';
 const MAX_COMPARE = 3;
@@ -51,6 +52,8 @@ export function useCompare() {
       return { added: false, reason: 'max' as const };
     } else {
       next = [...current, id];
+      // Demand Pulse: a compare add is the strongest pre-contact intent we see.
+      trackIntent(id, 'compare_add');
     }
     writeIds(next);
     return { added: !current.includes(id), reason: null };
