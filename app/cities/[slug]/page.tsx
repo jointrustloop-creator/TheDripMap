@@ -201,7 +201,13 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   // (still in the H1 + description) for brevity; the number + "Prices" carry the
   // click. Length-guarded so long city names fall back to a tighter form.
   let title: string;
-  if (localCount > 0) {
+  // Cities with a Price Index lead with the real price floor (Sept 2026:
+  // Calgary drew 520 impressions a week at position 23 and one click; a number
+  // in the title is the one thing a page-2 result can do about CTR).
+  const priceFloor = getCityPriceIndex(safeSlug)?.headline?.low;
+  if (localCount > 0 && priceFloor && `IV Therapy ${name}: ${localCount} Clinics, Prices from $${priceFloor} (${titleYear})`.length <= 60) {
+    title = `IV Therapy ${name}: ${localCount} Clinics, Prices from $${priceFloor} (${titleYear})`;
+  } else if (localCount > 0) {
     title = `IV Therapy ${name}: Compare ${localCount} Clinics & Prices (${titleYear})`;
     if (title.length > 60) title = `IV Therapy ${name}: ${localCount} Clinics & Prices (${titleYear})`;
     if (title.length > 60) title = `IV Therapy in ${cityStateLabel} (${titleYear}) | ${localCount} Clinics`;

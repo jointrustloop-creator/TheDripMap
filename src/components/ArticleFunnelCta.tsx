@@ -85,6 +85,16 @@ export function ArticleFunnelCta({ funnel }: { funnel: ArticleFunnel }) {
           {funnel.label} <ArrowRight size={16} />
         </Link>
       </div>
+      {/* The cost guide sits one place off page 1 (pos 11.4, Sept 2026). The
+          page-1 posts in this cluster are the strongest internal links we own,
+          so each one now points at it, from the template, never the body. */}
+      <p className="relative z-10 mt-6 text-[13px] text-wellness-200">
+        Wondering what a session should cost first?{' '}
+        <Link href="/guide/iv-therapy-cost-guide" className="font-bold text-white underline underline-offset-4 hover:text-wellness-50">
+          Read the IV therapy cost guide for Canada
+        </Link>
+        .
+      </p>
     </aside>
   );
 }

@@ -69,7 +69,7 @@ Two ways to finish, whichever is easier:
 1. Your private page, two minutes, no login: ${finishUrl}
 2. Reply to this email with the answers in plain words and I will enter them for you today.
 
-If the form itself is giving you trouble, tell me what happened and I will fix it; the last owner who wrote in helped us find a real bug.
+If the form itself is giving you trouble, tell me what happened and I will fix it.
 
 Warm regards,
 

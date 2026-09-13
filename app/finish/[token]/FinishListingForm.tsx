@@ -224,6 +224,8 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState('');
+  // Photos that could not be uploaded after the answers saved (see save()).
+  const [photoNote, setPhotoNote] = useState('');
 
   const toggle = (arr: string[], setArr: (v: string[]) => void, val: string) =>
     setArr(arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]);
@@ -286,28 +288,41 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
             }
           : {}),
       };
-      const fd = new FormData();
-      fd.append('answers', JSON.stringify(answers));
-      fd.append('token', token);
+      // ANSWERS FIRST, PHOTOS SECOND (2026-09-13). An owner reported "an error
+      // message anytime we try to click save": iPhone HEIC photos cannot be
+      // decoded by shrinkImage, so several of them went up raw and the whole
+      // request, answers included, died on the 4.5 MB payload limit. Now the
+      // answers save in their own small request; each photo follows in its own
+      // request; a photo that fails never costs the owner their answers.
       const smallLogo = logo ? await shrinkImage(logo) : null;
-      const smallPhotos: File[] = [];
-      for (const p of photos.slice(0, 5)) smallPhotos.push(await shrinkImage(p));
-      const totalBytes = (smallLogo?.size || 0) + smallPhotos.reduce((n, p) => n + p.size, 0);
-      if (totalBytes > MAX_UPLOAD_BYTES) {
-        setError('Those images are too large to send together (about 4 MB total). Try fewer photos, or save now and add the rest in a second visit.');
-        setSaving(false);
-        return;
-      }
-      if (smallLogo) fd.append('logo', smallLogo);
-      smallPhotos.forEach((p) => fd.append('photos', p));
-      const res = await fetch('/api/finish-listing', { method: 'POST', body: fd });
+      const answersFd = new FormData();
+      answersFd.append('answers', JSON.stringify(answers));
+      answersFd.append('token', token);
+      if (smallLogo && smallLogo.size <= MAX_UPLOAD_BYTES) answersFd.append('logo', smallLogo);
+      const res = await fetch('/api/finish-listing', { method: 'POST', body: answersFd });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.ok) {
         setError(data.error || (res.status === 413
-          ? 'The photos were too large to upload. Try fewer or smaller photos, or email them to info@thedripmap.com and we will add them.'
+          ? 'The logo file is too large to upload. Try a smaller image, or email it to info@thedripmap.com and we will add it.'
           : 'Something went wrong. Please try again, or email info@thedripmap.com and we will record your answers for you.'));
         setSaving(false);
         return;
+      }
+      const skipped: string[] = [];
+      for (const raw of photos.slice(0, 5)) {
+        const isHeic = /heic|heif/i.test(raw.type) || /\.(heic|heif)$/i.test(raw.name);
+        const p = isHeic ? raw : await shrinkImage(raw);
+        if (isHeic || p.size > MAX_UPLOAD_BYTES) { skipped.push(raw.name); continue; }
+        const photoFd = new FormData();
+        photoFd.append('answers', JSON.stringify(answers));
+        photoFd.append('token', token);
+        photoFd.append('photos', p);
+        const pr = await fetch('/api/finish-listing', { method: 'POST', body: photoFd }).catch(() => null);
+        if (!pr || !pr.ok) skipped.push(raw.name);
+      }
+      if (skipped.length) {
+        // Saved is saved: tell them exactly which photos did not make it and why.
+        setPhotoNote(`Your answers are saved. ${skipped.length} photo${skipped.length === 1 ? '' : 's'} could not be uploaded (${skipped.join(', ')}): iPhone HEIC files and very large images are not supported yet. Email them to info@thedripmap.com and we will add them.`);
       }
       setDone(true);
       setSaving(false);
@@ -332,6 +347,7 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
               <p className="text-slate-500 leading-relaxed mb-8">
                 Your changes are live now. Your safety answers go to our team for review, and once approved your listing carries the Safety Verified badge, the gold shield that lifts you above unverified clinics in your city. This page is always yours, so come back to update anything anytime.
               </p>
+              {photoNote && <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6 text-left">{photoNote}</p>}
               <div className="flex flex-col gap-3">
                 <a href={listingUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 bg-[#0F6E56] text-white px-7 py-4 rounded-xl font-black hover:bg-[#0A5742] transition-all">
                   See your verified listing <ArrowRight size={18} />
@@ -350,6 +366,7 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
               <p className="text-slate-500 leading-relaxed mb-8">
                 Your listing is updated and live. To be reviewed for the Safety Verified badge, the gold shield patients look for, just answer two quick safety questions: who starts the IV and your medical oversight. Our team reviews your answers before the badge goes live. It takes about twenty seconds.
               </p>
+              {photoNote && <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6 text-left">{photoNote}</p>}
               <div className="flex flex-col gap-3">
                 <button onClick={() => { setDone(false); if (typeof window !== 'undefined') setTimeout(() => { document.getElementById('safety-section')?.scrollIntoView({ behavior: 'smooth' }); }, 50); }} className="inline-flex items-center justify-center gap-2 bg-amber-500 text-white px-7 py-4 rounded-xl font-black hover:bg-amber-600 transition-all">
                   Earn my Safety Verified badge <ShieldCheck size={18} />

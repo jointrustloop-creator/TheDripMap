@@ -87,8 +87,10 @@ Owner badge email (link_partner_badge_v1, tested 2026-09-12), media data pitch
 tested), any repeat email to already-touched clinics, US expansion, Pro.
 
 ### Scoreboard to hit by 2026-09-30 (honest, not inflated)
-800+ Canadian clinics listed (631 today) · 45+ claimed CA (29) · 20 complete
-(9) · a link programme with a real list behind it.
+800+ Canadian clinics listed (631 on 09-12; 688 on 09-13) · 45+ claimed CA
+(31) · 20 complete (6 by the one display-complete definition on 09-13; the
+"9" quoted earlier counted nudge completions and was wrong) · a link
+programme with a real list behind it.
 
 ### Progress
 - 2026-09-12: sprint written; Texas cron paused (DAILY_MARKETS empty); three
@@ -97,8 +99,16 @@ tested), any repeat email to already-touched clinics, US expansion, Pro.
   authorized; we listed 94; 57 inserted (scripts/_cono-ivit-harvest.ts +
   _cono-ivit-insert.ts), 2 skipped as second locations; 53 with registered
   email, 43 with websites. Ontario coverage of authorized premises: 94 -> 151
-  of 154. Engine building the 43; warm first touch queued for operator go.
-  BC (CCHPBC) and Alberta next.
+  of 154. Engine built the 43; warm first touch SENT to 35 on 09-13 (operator
+  "send"). BC register cannot identify IV clinics (certification retired
+  2026-04-01); Alberta register needs per-registrant enumeration (deferred).
+- 2026-09-13 MOVE 3 shipped: unclaimed pages show "We already built this page
+  from your website" (counts only) with claim-and-confirm. MOVE 5: Winnipeg
+  Price Index BLOCKED (17 clinics scraped, 0 publish prices; n>=3 gate), so
+  Winnipeg gets no index yet; Calgary/Toronto/Edmonton city titles now lead
+  with the real price floor; cost guide linked from every funnel CTA. MOVE 4:
+  regulator practitioner backfill (CONO registrants -> medical_team) in
+  progress; scoreboard corrected to 6 complete.
 
 ---
 
