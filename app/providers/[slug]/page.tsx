@@ -239,22 +239,6 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   // What the activation engine pre-built for an UNCLAIMED clinic (staged on
   // decision_drivers.proposed, never shown to patients). Counts only: the
   // owner is told what exists; confirming it is what publishes it.
-  // The public-safe shape (src/lib/data.ts) publishes only counts + host.
-  const prebuilt = (() => {
-    if (provider.is_claimed) return null;
-    const d = (provider as { decision_drivers?: Record<string, unknown> | null }).decision_drivers || {};
-    const pb = d.prebuilt as { treatments: number; priced: number; hours: boolean; booking: boolean; fetched_at: string; host: string } | undefined;
-    if (!pb) return null;
-    const bits: string[] = [];
-    if (pb.treatments) bits.push(`${pb.treatments} treatment${pb.treatments === 1 ? '' : 's'}${pb.priced ? ` (${pb.priced} with prices)` : ''}`);
-    if (pb.hours) bits.push('your opening hours');
-    if (pb.booking) bits.push('your booking link');
-    if (!bits.length) return null;
-    const d2 = new Date(pb.fetched_at);
-    const readOn = isNaN(d2.getTime()) ? 'recently' : d2.toLocaleDateString('en-CA', { month: 'long', day: 'numeric', timeZone: 'America/Toronto' });
-    const summary = bits.length === 1 ? bits[0] : bits.length === 2 ? `${bits[0]} and ${bits[1]}` : `${bits.slice(0, -1).join(', ')}, and ${bits[bits.length - 1]}`;
-    return { summary, host: pb.host || 'your website', readOn };
-  })();
   const isOrphanStub = dd?.source === 'orphan_claim_stub' && provider.is_claimed !== true;
 
   // US market off: noindex US provider pages, EXCEPT claimed ones (owner-
@@ -630,6 +614,22 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
     );
   }
 
+  // The public-safe shape (src/lib/data.ts) publishes only counts + host.
+  const prebuilt = (() => {
+    if (provider.is_claimed) return null;
+    const d = (provider as { decision_drivers?: Record<string, unknown> | null }).decision_drivers || {};
+    const pb = d.prebuilt as { treatments: number; priced: number; hours: boolean; booking: boolean; fetched_at: string; host: string } | undefined;
+    if (!pb) return null;
+    const bits: string[] = [];
+    if (pb.treatments) bits.push(`${pb.treatments} treatment${pb.treatments === 1 ? '' : 's'}${pb.priced ? ` (${pb.priced} with prices)` : ''}`);
+    if (pb.hours) bits.push('your opening hours');
+    if (pb.booking) bits.push('your booking link');
+    if (!bits.length) return null;
+    const d2 = new Date(pb.fetched_at);
+    const readOn = isNaN(d2.getTime()) ? 'recently' : d2.toLocaleDateString('en-CA', { month: 'long', day: 'numeric', timeZone: 'America/Toronto' });
+    const summary = bits.length === 1 ? bits[0] : bits.length === 2 ? `${bits[0]} and ${bits[1]}` : `${bits.slice(0, -1).join(', ')}, and ${bits[bits.length - 1]}`;
+    return { summary, host: pb.host || 'your website', readOn };
+  })();
   return (
     <div className="min-h-screen bg-[#FDFDFB]">
       <Navbar />
