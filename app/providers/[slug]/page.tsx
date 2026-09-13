@@ -236,6 +236,25 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   // owner verifies the claim. Keep them out of Google's index until then.
   // Matches the same filter used by app/sitemap.ts so the two stay in sync.
   const dd = (provider as { decision_drivers?: { source?: string } | null }).decision_drivers;
+  // What the activation engine pre-built for an UNCLAIMED clinic (staged on
+  // decision_drivers.proposed, never shown to patients). Counts only: the
+  // owner is told what exists; confirming it is what publishes it.
+  // The public-safe shape (src/lib/data.ts) publishes only counts + host.
+  const prebuilt = (() => {
+    if (provider.is_claimed) return null;
+    const d = (provider as { decision_drivers?: Record<string, unknown> | null }).decision_drivers || {};
+    const pb = d.prebuilt as { treatments: number; priced: number; hours: boolean; booking: boolean; fetched_at: string; host: string } | undefined;
+    if (!pb) return null;
+    const bits: string[] = [];
+    if (pb.treatments) bits.push(`${pb.treatments} treatment${pb.treatments === 1 ? '' : 's'}${pb.priced ? ` (${pb.priced} with prices)` : ''}`);
+    if (pb.hours) bits.push('your opening hours');
+    if (pb.booking) bits.push('your booking link');
+    if (!bits.length) return null;
+    const d2 = new Date(pb.fetched_at);
+    const readOn = isNaN(d2.getTime()) ? 'recently' : d2.toLocaleDateString('en-CA', { month: 'long', day: 'numeric', timeZone: 'America/Toronto' });
+    const summary = bits.length === 1 ? bits[0] : bits.length === 2 ? `${bits[0]} and ${bits[1]}` : `${bits.slice(0, -1).join(', ')}, and ${bits[bits.length - 1]}`;
+    return { summary, host: pb.host || 'your website', readOn };
+  })();
   const isOrphanStub = dd?.source === 'orphan_claim_stub' && provider.is_claimed !== true;
 
   // US market off: noindex US provider pages, EXCEPT claimed ones (owner-
@@ -697,12 +716,33 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
             the magazine hero above already shows the "Verified Clinic" pill prominently. */}
         {!provider.is_claimed && (
           <div className="mb-12 space-y-6">
-            <ClaimListingTrigger
-              provider={provider}
-              className="w-full bg-slate-900 hover:bg-slate-800 text-white py-5 px-8 rounded-3xl text-center font-black text-lg shadow-xl shadow-slate-100 flex items-center justify-center gap-3 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
-            >
-              <span>⚠️ Is this your clinic? Claim it free in 2 minutes →</span>
-            </ClaimListingTrigger>
+            {prebuilt ? (
+              /* September Sprint move 3: the owner sees, on their own page, that the
+                 profile is already built from their website. This is the only way
+                 to reach the clinics we can never email again (two-touch cap). */
+              <div className="rounded-3xl border border-[#0F6E56]/25 bg-[#F0F7F4] p-6 md:p-8 shadow-xl shadow-slate-100">
+                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0F6E56] mb-2">Is this your clinic?</div>
+                <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight leading-tight mb-2">
+                  We already built this page from your website.
+                </h2>
+                <p className="text-sm text-slate-600 leading-relaxed mb-5">
+                  On {prebuilt.readOn} we read {prebuilt.host} and found {prebuilt.summary}. Nothing shows to patients until you confirm it. Claiming is free and takes about two minutes: confirm the list, remove anything we got wrong, add who administers and who prescribes, and the page is complete.
+                </p>
+                <ClaimListingTrigger
+                  provider={provider}
+                  className="w-full sm:w-auto bg-[#0F6E56] hover:bg-[#0c5a46] text-white py-4 px-8 rounded-2xl text-center font-black text-base shadow-lg flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+                >
+                  <span>Claim and confirm what we found →</span>
+                </ClaimListingTrigger>
+              </div>
+            ) : (
+              <ClaimListingTrigger
+                provider={provider}
+                className="w-full bg-slate-900 hover:bg-slate-800 text-white py-5 px-8 rounded-3xl text-center font-black text-lg shadow-xl shadow-slate-100 flex items-center justify-center gap-3 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+              >
+                <span>⚠️ Is this your clinic? Claim it free in 2 minutes →</span>
+              </ClaimListingTrigger>
+            )}
 
             {/* "Missing from this listing" — applies social pressure on the clinic owner.
                 Only renders for unclaimed listings. */}

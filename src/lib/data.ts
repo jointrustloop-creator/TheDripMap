@@ -276,6 +276,25 @@ export function enrichProvider(p: any): Provider {
     const src = rec.decision_drivers as Record<string, unknown>;
     const dd: Record<string, unknown> = {};
     for (const k of DD_PUBLIC) if (src[k] !== undefined) dd[k] = src[k];
+    // September Sprint move 3 (2026-09-13): an UNCLAIMED page tells its owner
+    // that the activation engine already built the profile. Only COUNTS and
+    // the source host are published, never treatment names, prices, evidence
+    // or the staged data itself; those stay staged until the owner confirms.
+    const proposed = src.proposed as { source_url?: string; fetched_at?: string; treatments?: Array<{ canonical?: string | null; price?: string | null }>; booking_url?: string | null } | undefined;
+    if (proposed?.fetched_at && rec.is_claimed !== true) {
+      const seen = new Set<string>();
+      let treatments = 0; let priced = 0;
+      for (const t of proposed.treatments || []) {
+        const c = typeof t?.canonical === 'string' ? t.canonical : '';
+        if (!c || seen.has(c)) continue;
+        seen.add(c); treatments++;
+        if (typeof t?.price === 'string' && /\$\s?\d/.test(t.price)) priced++;
+      }
+      const enriched = Array.isArray(src.enriched_fields) ? (src.enriched_fields as string[]) : [];
+      let host = '';
+      try { host = new URL(String(proposed.source_url || rec.website || '')).hostname.replace(/^www\./, ''); } catch { /* none */ }
+      dd.prebuilt = { treatments, priced, hours: enriched.includes('working_hours'), booking: enriched.includes('online_booking_url') || !!proposed.booking_url, fetched_at: String(proposed.fetched_at).slice(0, 10), host };
+    }
     rec.decision_drivers = dd;
   }
 
