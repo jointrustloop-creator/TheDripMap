@@ -93,6 +93,12 @@ tested), any repeat email to already-touched clinics, US expansion, Pro.
 ### Progress
 - 2026-09-12: sprint written; Texas cron paused (DAILY_MARKETS empty); three
   link email formats tested and HELD; Demand Pulse phase 0 collecting.
+- 2026-09-13 MOVE 1 (Ontario) DONE: CONO IVIT register = 312 premises, 154
+  authorized; we listed 94; 57 inserted (scripts/_cono-ivit-harvest.ts +
+  _cono-ivit-insert.ts), 2 skipped as second locations; 53 with registered
+  email, 43 with websites. Ontario coverage of authorized premises: 94 -> 151
+  of 154. Engine building the 43; warm first touch queued for operator go.
+  BC (CCHPBC) and Alberta next.
 
 ---
 
