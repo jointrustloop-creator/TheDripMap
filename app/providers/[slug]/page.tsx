@@ -1035,7 +1035,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                       : [...new Set(provider.specialties)].map((s) => ({ name: s, price: null }));
                     return (
                       <>
-                        <div className="flex items-end justify-between gap-4 mb-2">
+                        <div className="flex items-end justify-between gap-4 mb-2" data-reach="prices">
                           <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Drip Menu</h2>
                           {useStructured && (
                             <span className="text-xs font-bold text-slate-400 uppercase tracking-widest hidden sm:inline">
@@ -1098,7 +1098,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                   })()
                 ) : (
                   <>
-                    <h2 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">Services</h2>
+                    <h2 className="text-3xl font-black text-slate-900 mb-2 tracking-tight" data-reach="prices">Services</h2>
                     <p className="text-sm text-slate-500 font-medium mb-6 max-w-2xl">
                       Tap a service to see what it is.{' '}
                       <Link href="/treatments" className="text-wellness-600 hover:underline font-bold">

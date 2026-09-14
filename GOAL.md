@@ -107,8 +107,15 @@ programme with a real list behind it.
   Price Index BLOCKED (17 clinics scraped, 0 publish prices; n>=3 gate), so
   Winnipeg gets no index yet; Calgary/Toronto/Edmonton city titles now lead
   with the real price floor; cost guide linked from every funnel CTA. MOVE 4:
-  regulator practitioner backfill (CONO registrants -> medical_team) in
-  progress; scoreboard corrected to 6 complete.
+  regulator practitioner backfill DONE (76 Ontario listings now name their
+  IV ND with CONO registration number); personal notes sent to 7 owners who
+  opened but never saved (Wildflower, IV Alchemy, Dr. Dhillon, Diamond, Max
+  Immunity, AMRE, Purete); Kristen (Hydrate Victoria) answers recorded by
+  email, badge review queued; finish-form save bug (phone/HEIC photos killing
+  the whole request) fixed: answers save first, photos follow one by one.
+  Scoreboard corrected to 6 complete.
+- NOTE 2026-09-13: Vercel's GitHub hook skipped two pushes; deploy was
+  triggered from the CLI. Confirm a deployment exists after every push.
 
 ---
 
