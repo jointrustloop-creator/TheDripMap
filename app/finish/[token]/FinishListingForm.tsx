@@ -309,12 +309,21 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
         return;
       }
       const skipped: string[] = [];
+      const batch = Date.now();
+      let idx = 0;
       for (const raw of photos.slice(0, 5)) {
+        idx += 1;
         const isHeic = /heic|heif/i.test(raw.type) || /\.(heic|heif)$/i.test(raw.name);
         const p = isHeic ? raw : await shrinkImage(raw);
         if (isHeic || p.size > MAX_UPLOAD_BYTES) { skipped.push(raw.name); continue; }
+        // Photo-only request (2026-09-14): the server appends this one photo
+        // under its own unique label and does NOT re-save answers or notify.
+        // The first version of this loop re-sent the answers with every photo,
+        // which fired one operator email per photo and, because every photo
+        // took the same storage path, overwrote each photo with the next one.
         const photoFd = new FormData();
-        photoFd.append('answers', JSON.stringify(answers));
+        photoFd.append('mode', 'photo');
+        photoFd.append('photo_label', `photo-${batch}-${idx}`);
         photoFd.append('token', token);
         photoFd.append('photos', p);
         const pr = await fetch('/api/finish-listing', { method: 'POST', body: photoFd }).catch(() => null);

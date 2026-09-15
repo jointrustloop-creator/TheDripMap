@@ -106,6 +106,20 @@ function composeDescription(name: string, city: string, a: Answers): string {
   return parts.join(' ').slice(0, 900);
 }
 
+/** Same storage object with different ?v cache-busters is one photo, not many. */
+function dedupePhotos(urls: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const u of urls) {
+    if (typeof u !== 'string' || !u) continue;
+    const base = u.split('?')[0];
+    if (seen.has(base)) continue;
+    seen.add(base);
+    out.push(u);
+  }
+  return out;
+}
+
 async function uploadImage(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,
@@ -175,6 +189,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'invalid or missing token' }, { status: 401 });
   }
 
+  // ---- Photo-only request (2026-09-14) ----
+  // The form saves answers first, then sends each photo in its own request
+  // with mode=photo. Here we only append that photo (unique label, so it never
+  // overwrites an earlier one), bust the cache, and return. No answers rewrite,
+  // no operator email: the answers request already sent the one notification.
+  if (String(form.get('mode') || '') === 'photo') {
+    const rawLabel = String(form.get('photo_label') || '').replace(/[^a-z0-9-]/gi, '').slice(0, 40);
+    const label = /^photo-\d+-\d+$/.test(rawLabel) ? rawLabel : `photo-${Date.now()}-1`;
+    const one = form.getAll('photos').filter((f): f is File => f instanceof File)[0];
+    if (!one) return NextResponse.json({ error: 'no photo' }, { status: 400 });
+    const u = await uploadImage(supabase, providerId, one, label);
+    if (!u) return NextResponse.json({ error: 'photo not accepted' }, { status: 400 });
+    const existing = Array.isArray(provider.photos) ? (provider.photos as string[]) : [];
+    const merged = dedupePhotos([`${u}?v=${Math.floor(Date.now() / 1000)}`, ...existing]).slice(0, 12);
+    const { error: photoErr } = await supabase.from('providers').update({ photos: merged }).eq('id', providerId);
+    if (photoErr) return NextResponse.json({ error: 'could not save photo' }, { status: 500 });
+    try { revalidatePath(`/providers/${provider.slug}`); } catch { /* non-fatal */ }
+    return NextResponse.json({ ok: true, photos: merged.length });
+  }
+
   // ---- Map constrained answers -> real listing fields ----
   const drips = (answers.drips || []).filter((d) => d && typeof d.name === 'string' && d.name.trim());
   // Duration was collected by the form but silently dropped until 2026-08-15
@@ -211,9 +245,11 @@ export async function POST(req: NextRequest) {
     newLogoUrl = await uploadImage(supabase, providerId, logoFile, 'logo');
   }
   const newPhotoUrls: string[] = [];
+  const photoBatch = Date.now();
   for (let i = 0; i < photoFiles.length; i++) {
-    const u = await uploadImage(supabase, providerId, photoFiles[i], `photo-${i + 1}`);
-    if (u) newPhotoUrls.push(`${u}?v=${Math.floor(Date.now() / 1000)}`);
+    // Unique per save so a second save never overwrites the first save's photos.
+    const u = await uploadImage(supabase, providerId, photoFiles[i], `photo-${photoBatch}-${i + 1}`);
+    if (u) newPhotoUrls.push(`${u}?v=${Math.floor(photoBatch / 1000)}`);
   }
 
   // ---- Build the update (only set fields we actually have) ----
@@ -231,7 +267,7 @@ export async function POST(req: NextRequest) {
   if (newLogoUrl) update.image_url = newLogoUrl;
   if (newPhotoUrls.length) {
     const existingPhotos = Array.isArray(provider.photos) ? (provider.photos as string[]) : [];
-    update.photos = [...newPhotoUrls, ...existingPhotos].slice(0, 12);
+    update.photos = dedupePhotos([...newPhotoUrls, ...existingPhotos]).slice(0, 12);
   }
 
   // Slow-time offer -> special_offers (rendered on the listing + deals feed).
