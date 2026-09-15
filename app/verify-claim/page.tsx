@@ -78,7 +78,7 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
 
   const { data: provider, error: provErr } = await supabase
     .from('providers')
-    .select('id, name, slug, city, is_claimed')
+    .select('id, name, slug, city, is_claimed, is_hidden, decision_drivers')
     .eq('id', claim.listing_id)
     .maybeSingle();
 
@@ -94,9 +94,15 @@ async function processClaim(token: string | undefined): Promise<Outcome> {
   // Stage 1 tier-split (2026-06-01): claim flips is_claimed ONLY. is_featured
   // stays false until manual operator upgrade or a paid Featured purchase,
   // unblocking a real "claimed (free) vs Featured (paid)" distinction.
+  // Unhide ONLY an orphan claim stub. /api/notify-operator creates those hidden
+  // (2026-09-15 hardening) so an unauthenticated POST cannot publish a listing;
+  // verifying ownership is what publishes it. Every other hidden row was hidden
+  // deliberately (wrong country, hijacked domain) and a claim must not revive it.
+  const stubSource = (provider.decision_drivers as { source?: string } | null)?.source;
+  const unhideStub = provider.is_hidden === true && stubSource === 'orphan_claim_stub';
   const { error: updProvErr } = await supabase
     .from('providers')
-    .update({ is_claimed: true })
+    .update({ is_claimed: true, ...(unhideStub ? { is_hidden: false } : {}) })
     .eq('id', provider.id);
 
   if (updProvErr) {
