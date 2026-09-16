@@ -13,7 +13,7 @@ import { REPORT_TO } from './report-recipient';
 import { firecrawlDiscover } from './discovery-firecrawl';
 import { honestDescription } from './discovery';
 import { slugify } from './data';
-import { notCanadianReason } from './discovery-guard';
+import { notCanadianReason, badCandidateName } from './discovery-guard';
 
 /** Province for each rotation city, so inserts carry the right region. */
 export const PROVINCE: Record<string, string> = {
@@ -32,6 +32,11 @@ export const PROVINCE: Record<string, string> = {
   'Red Deer': 'Alberta', Lethbridge: 'Alberta',
   Moncton: 'New Brunswick', Fredericton: 'New Brunswick',
   "St. John's": 'Newfoundland and Labrador',
+  // Added 2026-09-15: these eight are in the rotation but had no mapping, so
+  // every clinic discovered in them was inserted with a null province.
+  Saskatoon: 'Saskatchewan', Regina: 'Saskatchewan',
+  Kingston: 'Ontario', Whitby: 'Ontario', Ajax: 'Ontario',
+  Pickering: 'Ontario', Milton: 'Ontario', Newmarket: 'Ontario',
 };
 
 export interface DiscoveryRunResult {
@@ -69,8 +74,11 @@ export async function runFirecrawl(sb: any, fcKey: string, city: string, provinc
       // Victoria TX, Halifax UK: 22 such clinics reached the table before this
       // check. A candidate whose phone area code is not Canadian, or whose site
       // is on a UK/AU/IE domain, is rejected and noted, never inserted.
-      const notCanada = notCanadianReason(c.phone, c.website);
+      const notCanada = notCanadianReason(c.phone, c.website, c.name);
       if (notCanada) { r.notes.push(`rejected ${c.name}: ${notCanada}`); continue; }
+      // The name comes from the page <title>; junk titles never become rows.
+      const badName = badCandidateName(c.name);
+      if (badName) { r.notes.push(`rejected ${c.name}: ${badName}`); continue; }
       const slug = `${slugify(c.name)}-${slugify(city)}`;
       const { error } = await sb.from('providers').insert({
         name: c.name,
