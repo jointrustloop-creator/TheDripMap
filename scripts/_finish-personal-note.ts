@@ -105,7 +105,8 @@ async function deliver(sb: Sb, p: Record<string, unknown>, note: Note, isTest: b
   const r = await fetch(SEND_URL, {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${TOKEN}` },
-    body: JSON.stringify({ to, subject: isTest ? `[TEST] ${note.subject}` : note.subject, text: body, cc: isTest ? 'hubertzyworonek@gmail.com' : undefined }),
+    // Real sends go over Resend (never Workspace SMTP for batches).
+    body: JSON.stringify({ to, subject: isTest ? `[TEST] ${note.subject}` : note.subject, text: body, cc: isTest ? 'hubertzyworonek@gmail.com' : undefined, channel: isTest ? 'auto' : 'resend' }),
   });
   console.log(isTest ? 'TEST' : 'SENT', p.slug, r.status, (await r.text()).slice(0, 140));
   if (!r.ok || isTest) return false;
@@ -172,7 +173,7 @@ async function main() {
     }
     if (await deliver(sb, p, note, flag('test'))) sent++;
     if (flag('test')) break;                      // one rendered copy is enough
-    await new Promise((res) => setTimeout(res, 1200));
+    await new Promise((res) => setTimeout(res, 30000)); // space batch sends
   }
   console.log(`\neligible ${candidates.length} | queued ${queued} | skipped ${skipped} (complete, no link, or suppressed)${isSend ? ` | sent ${sent}` : ''}`);
 }

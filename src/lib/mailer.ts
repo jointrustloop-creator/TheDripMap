@@ -27,6 +27,9 @@ export interface MailPayload {
   // touches Workspace SMTP — REQUIRED for bulk outreach, which must not run
   // through info@'s Workspace account (rate limits + suspension risk).
   channel?: 'auto' | 'resend' | 'smtp';
+  // Extra RFC headers, e.g. List-Unsubscribe on batch mail (Gmail and Outlook
+  // treat bulk mail without it more harshly). Passed to both transports.
+  headers?: Record<string, string>;
 }
 
 export interface MailResult {
@@ -71,6 +74,7 @@ export async function sendMail(payload: MailPayload): Promise<MailResult> {
         subject: payload.subject,
         text: payload.text,
         ...(payload.html ? { html: payload.html } : {}),
+        ...(payload.headers ? { headers: payload.headers } : {}),
       });
       if (result?.error) return { ok: false, provider: 'resend', error: result.error.message };
       return { ok: true, provider: 'resend', id: result?.data?.id };
@@ -91,6 +95,7 @@ export async function sendMail(payload: MailPayload): Promise<MailResult> {
         subject: payload.subject,
         text: payload.text,
         ...(payload.html ? { html: payload.html } : {}),
+        ...(payload.headers ? { headers: payload.headers } : {}),
       });
       return { ok: true, provider: 'smtp', id: info.messageId };
     } catch (err) {

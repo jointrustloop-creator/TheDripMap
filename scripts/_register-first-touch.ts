@@ -120,7 +120,9 @@ async function main() {
     const r = await fetch(`${BASE}/api/admin/send-mail`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', authorization: `Bearer ${TOKEN}` },
-      body: JSON.stringify({ to, subject: isTest ? `[TEST] ${subject}` : subject, text: body, cc: isTest ? 'hubertzyworonek@gmail.com' : undefined }),
+      // Real sends go over Resend (never Workspace SMTP for batches); the test
+      // copy to our own inbox can use the default so it lands in Sent.
+      body: JSON.stringify({ to, subject: isTest ? `[TEST] ${subject}` : subject, text: body, cc: isTest ? 'hubertzyworonek@gmail.com' : undefined, channel: isTest ? 'auto' : 'resend' }),
     });
     console.log(isTest ? 'TEST' : 'SENT', p.slug, r.status, (await r.text()).slice(0, 120));
     if (!isTest && r.ok) {
@@ -132,7 +134,8 @@ async function main() {
       sent++;
     }
     if (isTest) break; // one rendered copy is enough
-    await new Promise((res) => setTimeout(res, 1200));
+    // 18 near-identical emails in 40 seconds is a bulk signature. Space them.
+    await new Promise((res) => setTimeout(res, 30000));
   }
   if (flag('send')) console.log(`\ndone: ${sent} sent`);
 }

@@ -39,6 +39,13 @@ export async function POST(req: NextRequest) {
   }
   if (/[–—]/.test(text)) return NextResponse.json({ error: 'no en/em dashes in outgoing copy' }, { status: 400 });
   const cc = typeof body?.cc === 'string' && body.cc ? body.cc : undefined;
+  // Batch senders pass channel:'resend'. The mailer's rule: bulk outreach must
+  // never run through info@'s Workspace SMTP (rate limits, suspension risk,
+  // and Gmail's bulk heuristics). 58 batch sends went out over SMTP before
+  // this existed (2026-09-18); one-off replies keep the default so they land
+  // in the Sent folder.
+  const channel: 'auto' | 'resend' | 'smtp' = body?.channel === 'resend' || body?.channel === 'smtp' ? body.channel : 'auto';
+  const isBatch = channel === 'resend';
   const res = await sendMail({
     from: FROM,
     to,
@@ -47,6 +54,8 @@ export async function POST(req: NextRequest) {
     subject,
     text: toPlainText(text),
     html: textToHtml(text),
+    channel,
+    ...(isBatch ? { headers: { 'List-Unsubscribe': `<mailto:${OPERATOR_EMAIL}?subject=unsubscribe>` } } : {}),
   });
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
   await logSend(sb, { channel: 'partb', action: 'send', recipients: [to], subject, note: `operator reply via send-mail (${res.provider})` });
