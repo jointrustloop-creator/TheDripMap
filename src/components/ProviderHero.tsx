@@ -44,8 +44,13 @@ export interface ProviderHeroProps {
   displayName: string;
   city: string;
   stateCode: string;
-  /** providers.image_url (enriched imageUrl). Null or stock => designed panel. */
+  /** providers.image_url (enriched imageUrl). Null or stock => designed panel.
+   *  Since 2026-09-18 a LOGO here (our /logo. upload path) is never used as the
+   *  photo band: Erin Mills' 253x86 wordmark was being stretched to 1265x320
+   *  behind the title. Logos render as a tile beside the name instead. */
   imageUrl: string | null;
+  /** First real clinic photo (providers.photos[0]); when present it carries the band. */
+  heroPhoto?: string | null;
   /** Precomputed server side; carries the "(photo from the clinic's website)" attribution when decision_drivers.image_source exists. */
   imageAlt: string;
   initials: string;
@@ -74,6 +79,7 @@ export function ProviderHero({
   city,
   stateCode,
   imageUrl,
+  heroPhoto = null,
   imageAlt,
   initials,
   safetyVerified,
@@ -90,7 +96,13 @@ export function ProviderHero({
   extraBottomPadding = false,
 }: ProviderHeroProps) {
   const [imageFailed, setImageFailed] = useState(false);
-  const hasImage = isUsableHeroImage(imageUrl) && !imageFailed;
+  const [logoFailed, setLogoFailed] = useState(false);
+  // A logo is identified by our own upload path; enrichment photos from a
+  // clinic's website live under other paths and may still carry the band.
+  const isLogo = !!imageUrl && /\/logo\.[a-z0-9]+(\?|$)/i.test(imageUrl);
+  const bandSrc = heroPhoto && isUsableHeroImage(heroPhoto) ? heroPhoto : (!isLogo && isUsableHeroImage(imageUrl) ? imageUrl : null);
+  const hasImage = !!bandSrc && !imageFailed;
+  const logoSrc = isLogo && isUsableHeroImage(imageUrl) && !logoFailed ? imageUrl : null;
 
   const content = (
     <div
@@ -140,8 +152,15 @@ export function ProviderHero({
       </div>
 
       <div className="flex items-end gap-4 md:gap-5">
-        {/* Monogram tile leads the no-image state; hidden when a photo carries the header */}
-        {!hasImage && (
+        {/* Logo tile when the clinic uploaded one: white card, logo contained,
+            never stretched. Otherwise the monogram tile leads the no-photo
+            state and hides when a photo carries the header. */}
+        {logoSrc ? (
+          <div className="flex flex-none w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-white ring-1 ring-white/40 shadow-2xl items-center justify-center overflow-hidden p-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={logoSrc} alt={`${displayName} logo`} loading="lazy" onError={() => setLogoFailed(true)} className="max-w-full max-h-full object-contain" />
+          </div>
+        ) : !hasImage && (
           <div
             aria-hidden
             className="hidden sm:flex flex-none w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-white/10 backdrop-blur-sm ring-1 ring-white/25 shadow-2xl items-center justify-center"
@@ -194,11 +213,12 @@ export function ProviderHero({
             Lazy loaded; a broken URL falls back to the designed panel below. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={imageUrl as string}
+          src={bandSrc as string}
           alt={imageAlt}
           loading="lazy"
           onError={() => setImageFailed(true)}
-          className="absolute inset-0 w-full h-full object-cover"
+          // Favour the upper third so portraits keep their faces.
+          className="absolute inset-0 w-full h-full object-cover object-[center_30%]"
         />
         {/* Legibility scrim for the overlaid name and trust markers */}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-slate-950/10 pointer-events-none" />

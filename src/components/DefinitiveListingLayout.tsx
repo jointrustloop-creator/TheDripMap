@@ -316,9 +316,13 @@ export default function DefinitiveListingLayout({
         typeof p === 'string' && p.length > 0 && !p.includes('picsum.photos') && !p.includes('unsplash.com')
       )
     : [];
-  const galleryPhotos = photos.slice(0, 5);
+  // The first photo carries the hero band (ProviderHero); the gallery shows the
+  // rest and adapts to the count instead of forcing a five-slot mosaic that
+  // cropped small portrait uploads (2026-09-18 redesign, Erin Mills review).
+  const heroPhoto = photos[0] || null;
+  const galleryPhotos = photos.slice(1, 6);
   const allPhotos = photos.slice(0, 12);
-  const hasGallery = galleryPhotos.length >= 3;
+  const hasGallery = galleryPhotos.length >= 1;
 
   const drips = buildDripMenu(provider);
   const dripDefs = new Map(drips.map((d) => [d.name, findDefinition(d.name)]));
@@ -473,6 +477,7 @@ export default function DefinitiveListingLayout({
         city={cityLabel}
         stateCode={stateCode}
         imageUrl={provider.imageUrl || null}
+        heroPhoto={heroPhoto}
         imageAlt={heroImageAlt || `${provider.name}, ${cityLabel}`}
         initials={initials || getInitials(provider.name)}
         safetyVerified={showSafety}
@@ -493,32 +498,31 @@ export default function DefinitiveListingLayout({
       {hasGallery && (
         <div className="relative z-[3] -mt-[22px]">
           <div className="max-w-[1140px] mx-auto px-[30px]">
-            <div className="grid grid-cols-2 md:grid-cols-[1.6fr_1fr_1fr] grid-rows-[160px_110px_110px] md:grid-rows-[128px_128px] gap-3 relative">
-              {galleryPhotos.map((photo, idx) => {
-                const isLeader = idx === 0;
-                const cornerClasses = [
-                  'rounded-tl-[18px] rounded-bl-[18px] md:rounded-tl-[20px] md:rounded-bl-[20px]', // first
-                  '',
-                  'rounded-tr-[20px]',                                                              // top-right
-                  '',
-                  'rounded-bl-[18px] md:rounded-bl-none md:rounded-br-[20px]',                      // bottom-right
-                ];
-                return (
-                  <div
-                    key={photo + idx}
-                    className={`relative overflow-hidden border border-[rgba(25,36,28,0.09)] ${isLeader ? 'col-span-2 md:col-span-1 row-span-1 md:row-span-2' : ''} ${cornerClasses[idx] || ''}`}
-                  >
-                    <ResilientImage
-                      src={photo}
-                      fallbackSrc={DEFAULT_CLINIC_IMAGE}
-                      alt={`${provider.name} photo ${idx + 1}`}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 33vw"
-                      className="object-cover"
-                    />
-                  </div>
-                );
-              })}
+            {/* Adaptive gallery: equal tiles in a row of up to four, each a
+                4:3 frame so a portrait headshot is not squeezed into a wide
+                slot. Rounded as one object, faces favoured by object-position. */}
+            <div
+              className={`grid gap-3 relative rounded-[20px] overflow-hidden ${
+                galleryPhotos.length === 1 ? 'grid-cols-1' : galleryPhotos.length === 2 ? 'grid-cols-2' : galleryPhotos.length === 3 ? 'grid-cols-3' : 'grid-cols-2 md:grid-cols-4'
+              }`}
+            >
+              {galleryPhotos.slice(0, 4).map((photo, idx) => (
+                <div
+                  key={photo + idx}
+                  className={`relative overflow-hidden border border-[rgba(25,36,28,0.09)] bg-[#efe9dc] ${
+                    galleryPhotos.length === 1 ? 'aspect-[21/9]' : 'aspect-[4/3]'
+                  }`}
+                >
+                  <ResilientImage
+                    src={photo}
+                    fallbackSrc={DEFAULT_CLINIC_IMAGE}
+                    alt={`${provider.name} photo ${idx + 2}`}
+                    fill
+                    sizes={galleryPhotos.length === 1 ? '100vw' : '(max-width: 768px) 50vw, 25vw'}
+                    className="object-cover object-[center_30%]"
+                  />
+                </div>
+              ))}
               {allPhotos.length > 5 && (
                 <button className="absolute right-[18px] bottom-[16px] bg-[#fffefa] border border-[rgba(25,36,28,0.15)] rounded-[10px] py-[9px] px-[15px] text-[13px] font-semibold inline-flex items-center gap-[7px] shadow-sm cursor-default">
                   <LayoutGrid size={15} /> {allPhotos.length} photos
@@ -529,8 +533,9 @@ export default function DefinitiveListingLayout({
         </div>
       )}
 
-      {/* Gallery fallback: a branded cover when the clinic has no photos yet, so the page never shows an empty grid. */}
-      {!hasGallery && (
+      {/* Gallery fallback: a branded cover when the clinic has no photos at all
+          (one photo now carries the hero band, so this must key on zero). */}
+      {photos.length === 0 && (
         <div className="relative z-[3] -mt-[22px]">
           <div className="max-w-[1140px] mx-auto px-[30px]">
             <div className="flex items-center gap-6 rounded-[20px] p-[26px_30px] border border-[rgba(216,184,120,0.4)]" style={{ background: 'linear-gradient(120deg, #14342a 0%, #1f4a39 100%)' }}>
