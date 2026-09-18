@@ -80,9 +80,62 @@ async function enumerate() {
   console.log(`done: ${Object.keys(s.registrants).length} registrants`);
 }
 
-const args = process.argv.slice(2);
-if (args.includes('--detail')) {
-  console.log('phase 2 not implemented yet: run enumeration first, then extend this script with the detail-page parser');
-  process.exit(1);
+/**
+ * Phase 2: read each registrant's detail page. The page embeds a JSON literal
+ * (fwkParseStringTemplate(..., {...})) with rn (registration number), rl
+ * (name), pr (register + standing), sp (special authorizations as an HTML
+ * list; "IV Therapy" is the one we want), pdcv (practice details visibility)
+ * and, when practice details are public, a MoreInfo call for the location.
+ * Writes detail into the same store, resumable.
+ */
+interface Detail { rn: string; name: string; standing: string; sp: string[]; iv: boolean; pdcv: string; location: string | null; fetchedAt: string }
+
+function parseDetail(html: string): Omit<Detail, 'location' | 'fetchedAt'> | null {
+  const m = html.match(/fwkParseStringTemplate\(\$\("#detailtemplate"\)\.html\(\),\s*(\{[\s\S]*?\})\s*\)/);
+  if (!m) return null;
+  let j: Record<string, string>;
+  try { j = JSON.parse(m[1]); } catch { return null; }
+  const spList = String(j.sp || '').replace(/<\/li>/g, '\n').replace(/<[^>]+>/g, '').split('\n').map((s) => s.trim()).filter(Boolean);
+  return {
+    rn: String(j.rn || ''), name: String(j.fun || j.rl || ''), standing: String(j.pr || ''),
+    sp: spList, iv: spList.some((s) => /\bIV Therapy\b/i.test(s)), pdcv: String(j.pdcv || ''),
+  };
 }
-enumerate().then(() => process.exit(0)).catch((e) => { console.error(e); process.exit(1); });
+
+async function detail() {
+  const s = load();
+  s.detail = s.detail || {};
+  const ids = Object.keys(s.registrants).filter((rg) => !(s.detail as Record<string, unknown>)[rg]);
+  console.log(`registrants ${Object.keys(s.registrants).length}, detail remaining ${ids.length}`);
+  await warm();
+  let n = 0;
+  for (const rg of ids) {
+    try {
+      const r = await fetch(`${BASE}/Client/PublicDirectory/Registrant/${rg}`, { headers: { ...UA, cookie } });
+      if (r.status === 403) { console.log(`  ${rg}: 403, backing off 60s`); await sleep(60000); await warm(); ids.push(rg); continue; }
+      const html = await r.text();
+      const d = parseDetail(html);
+      if (!d) { (s.detail as Record<string, unknown>)[rg] = { error: 'unparsed', fetchedAt: new Date().toISOString() }; }
+      else {
+        let location: string | null = null;
+        if (d.pdcv !== 'hidden') {
+          try {
+            const mi = await fetch(`${BASE}/Client/PublicDirectory/MoreInfo/${rg}`, { method: 'POST', headers: { ...UA, cookie, 'X-Requested-With': 'XMLHttpRequest', referer: `${BASE}/Client/PublicDirectory/Registrant/${rg}` } });
+            if (mi.ok) location = (await mi.text()).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 400) || null;
+          } catch { /* location is a bonus, not a requirement */ }
+        }
+        (s.detail as Record<string, unknown>)[rg] = { ...d, location, fetchedAt: new Date().toISOString() } as Detail;
+      }
+    } catch (e) {
+      console.log(`  ${rg}: ${e instanceof Error ? e.message : e}`); await sleep(5000); await warm();
+    }
+    if (++n % 20 === 0) { save(s); const iv = Object.values(s.detail as Record<string, Detail>).filter((d) => d && d.iv).length; console.log(`  ${n}/${ids.length} detail pages, IV-authorized so far ${iv}`); }
+    await sleep(3000);
+  }
+  save(s);
+  const all = Object.values(s.detail as Record<string, Detail>);
+  console.log(`done: ${all.length} detail pages, ${all.filter((d) => d && d.iv).length} with IV Therapy authorization, ${all.filter((d) => d && d.location).length} with a public practice location`);
+}
+
+const args = process.argv.slice(2);
+(args.includes('--detail') ? detail() : enumerate()).then(() => process.exit(0)).catch((e) => { console.error(e); process.exit(1); });
