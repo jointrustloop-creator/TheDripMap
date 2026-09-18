@@ -53,11 +53,25 @@ function parseHours(value: string): Record<string, string> | null {
 /** "Dr. Jenna Dhillon, ND (Naturopathic Doctor) - no registration..." -> name + title */
 function parsePractitioner(value: string): { name: string; title: string } | null {
   const head = dedash(value).split(/\s+(?:to|[-])\s+|\(/)[0].trim();
-  const m = head.match(/^((?:Dr\.?\s+)?[A-Z][A-Za-z'.-]+(?:\s+[A-Z][A-Za-z'.-]+){1,3})\s*,\s*([A-Za-z.\-\s()]{2,30})$/);
-  if (!m) return null;
-  const name = m[1].trim();
-  const title = m[2].replace(/\s*\(.*$/, '').trim();
+  // The credential tail can itself contain commas ("Dr. Mariah Pilling, B.Sc.,
+  // N.D."). The first version required a comma-free tail and silently dropped
+  // that clinic, which would have had us email VP Health asking for a
+  // practitioner name we had already verified. Split on the FIRST comma and
+  // keep the rest as the credential.
+  const i = head.indexOf(',');
+  if (i < 0) return null;
+  const name = head.slice(0, i).trim();
+  const tail = head.slice(i + 1).trim().replace(/\s*\(.*$/, '');
+  if (!/^(?:Dr\.?\s+)?[A-Z][A-Za-z'.-]+(?:\s+[A-Z][A-Za-z'.-]+){1,3}$/.test(name)) return null;
   if (name.split(/\s+/).length < 2) return null;   // need a surname
+  // Keep the most specific regulated credential rather than a degree list.
+  // Drop the dots BEFORE matching: "N.D." has no word boundary after the final
+  // period, so a dotted credential slipped past and VP Health came out as
+  // "BSC" (their first degree) instead of ND.
+  const flat = tail.replace(/\./g, '');
+  const cred = flat.match(/\b(NP-PHC|NP|ND|MD|DO|RN|CCFP)\b/i);
+  const title = (cred ? cred[1] : flat.split(',')[0]).toUpperCase().trim().slice(0, 12);
+  if (!title || title.length < 2) return null;
   return { name, title };
 }
 
