@@ -81,10 +81,11 @@ A quick personal one from me, not a campaign. ${opens >= 3 ? `You have opened yo
 
 If I had to pick one: ${LABEL[top]}. ${WHY[top]}
 
-Two ways to finish, whichever is easier:
+Two ways to finish, whichever is easier. This link opens your own page, with no login and no account to create:
 
-1. Your private page, two minutes, no login: ${finishUrl}
-2. Reply to this email with the answers in plain words and I will enter them for you today.
+[Finish your listing](${finishUrl})
+
+Or just reply to this email with the answers in plain words and I will enter them for you today.
 
 If the form itself is giving you trouble, tell me what happened and I will fix it.
 
