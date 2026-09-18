@@ -479,3 +479,10 @@ Outreach and SEO are the only two levers that matter right now.
 - Track progress toward milestones when asked
 - Every code change must serve one of the 3 priorities above
 - If a task does not move toward $10k/month goal, question it
+
+### 2026-09-18 progress (site audit + compliance pass, commit 6efcb53)
+- External 16-item audit verified line by line: 9 right, 3 right in substance, 1 judgment call, 3 wrong (no "June 2026 / $175 / 17 clinics" snapshot exists; "9 Provinces" is the true count; /deals was index,follow and in the sitemap, only the inbound link was missing; US URLs were never deleted, they are 200 + noindex by design).
+- Three site-wide audits run and applied: schema + technical SEO (36 findings), interlinking + AI search (33), medical claims (systemic marketing-era voice in treatment-content, use-cases, symptom-treatments, guides, and 297 city bodies).
+- Landed: Toronto body rewritten; 294 city bodies cleaned (dashes, "directory", detox, oncology, booking promises, false verification line, named-hospital endorsements); all 333 city meta descriptions; public tag deny-list; /about truthful; scraped ratings no longer in review-snippet schema; duplicate schema blocks removed; prices on homepage/guide/city intros derived from PRICE_INDEX; footer links the national report + city indexes + provinces; llms.txt generated from the index.
+- Scoreboard unchanged by this pass: CA claimed 31, complete 14.
+- Next: Hubert's indexation-integrity brief (Phase 0 report delivered 2026-09-18, awaiting go); the open items in memory project_site_audit_2026_09_18.
