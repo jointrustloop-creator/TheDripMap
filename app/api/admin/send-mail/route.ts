@@ -18,27 +18,13 @@ import { isAdminRequest } from '../../../../src/lib/admin-auth';
 import { machineTokenOk } from '../../../../src/lib/machine-token';
 import { sendMail } from '../../../../src/lib/mailer';
 import { logSend } from '../../../../src/lib/send-log';
+import { textToHtml, toPlainText } from '../../../../src/lib/email-render';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const FROM = 'TheDripMap <info@thedripmap.com>';
 const OPERATOR_EMAIL = 'info@thedripmap.com';
-const FONT = "-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-
-function escapeHtml(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-/** Escape, then turn bare http(s) URLs into anchors whose visible text is the URL itself. */
-function textToHtml(text: string): string {
-  const paras = text.replace(/\r\n/g, '\n').split(/\n{2,}/);
-  const body = paras.map((p) => {
-    const esc = escapeHtml(p).replace(/\n/g, '<br>');
-    const linked = esc.replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)])/g, (u) => `<a href="${u}" style="color:#0F6E56;">${u}</a>`);
-    return `<p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#1A2B26;">${linked}</p>`;
-  }).join('');
-  return `<div style="font-family:${FONT};max-width:640px;">${body}</div>`;
-}
 
 export async function POST(req: NextRequest) {
   if (!(await isAdminRequest()) && !machineTokenOk(req.headers.get('authorization'))) {
@@ -59,7 +45,7 @@ export async function POST(req: NextRequest) {
     ...(cc ? { cc } : {}),
     replyTo: typeof body?.replyTo === 'string' && body.replyTo ? body.replyTo : OPERATOR_EMAIL,
     subject,
-    text,
+    text: toPlainText(text),
     html: textToHtml(text),
   });
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
