@@ -231,7 +231,8 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     str.length <= max ? str : `${str.slice(0, max).replace(/\s+\S*$/, '').trim()}…`;
   const description = provider.is_featured && Number(provider.reviewCount) > 0
     ? clampDesc(`${displayName} in ${cityLabel}: ${provider.rating} stars from ${provider.reviewCount} reviews. IV drips include ${topSpecialties}. Book on TheDripMap.`)
-    : clampDesc(`${displayName} in ${cityLabel}. IV drips include ${topSpecialties}. Compare prices and book your session on TheDripMap.`);
+    // No booking promise: we route to the clinic (live check 2026-09-18).
+    : clampDesc(`${displayName} in ${cityLabel}. IV drips include ${topSpecialties}. Compare prices, hours and practitioners on TheDripMap, then contact the clinic.`);
 
   // Orphan-claim stubs are placeholders created when a setup-form submission
   // doesn't match any existing listing. They have no real content until the

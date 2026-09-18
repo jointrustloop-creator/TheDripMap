@@ -122,7 +122,7 @@ export default async function CityPriceIndexPage({ params }: { params: Promise<{
         <h1 className="text-[clamp(2rem,5vw,3.25rem)] font-black text-slate-900 tracking-tight leading-[1.05]">
           IV therapy cost in {i.city}: real prices
         </h1>
-        <p className="mt-2 text-sm text-slate-500">Updated {i.asOf}. By the TheDripMap editorial team, from published clinic menus.</p>
+        <p className="mt-2 text-sm text-slate-500">Updated {i.asOf}. By the TheDripMap editorial team, compiled from published clinic menus.</p>
         <p className="mt-4 text-lg text-slate-600 leading-relaxed">
           Across <b className="text-slate-900">{i.clinicCount} {i.city} IV therapy clinics</b> with published menus, a standard IV vitamin drip costs a <b className="text-slate-900">median of {dollars(h.median)}</b>, typically {dollars(h.low)} to {dollars(h.high)} ({curLong}, as of {i.asOf}). Specialty drips like NAD+ and beauty blends run higher. Here is the real range by drip.
         </p>

@@ -154,12 +154,12 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   // Toronto uses the same definition as the page body (the amalgamated city:
   // Toronto plus its former municipalities), so the title's number matches the
   // answer-first block instead of undercounting it (93 vs 109, 2026-09-18 audit).
-  const coreCities = slug === 'toronto'
-    ? new Set(TORONTO_CORE_CITIES.map((c) => c.toLowerCase()))
-    : new Set([name.toLowerCase()]);
-  const localCount = listings.filter(
-    (l) => coreCities.has(((l as { city?: string }).city || '').toLowerCase())
-  ).length;
+  // The body's Toronto number comes from getTorontoGtaTieredListings, whose
+  // query differs from getListingsByCity (live check 2026-09-18: title 91,
+  // body 107). Use the same function so the two can never disagree.
+  const localCount = slug === 'toronto'
+    ? (await getTorontoGtaTieredListings()).core.length
+    : listings.filter((l) => ((l as { city?: string }).city || '').toLowerCase() === name.toLowerCase()).length;
 
   // Even for a totally unknown city slug, emit title + description + canonical
   // so the page is never tagless. Mark noindex when there is literally no data

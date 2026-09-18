@@ -12,7 +12,9 @@ export const revalidate = 3600;
 
 const SITE_URL = 'https://www.thedripmap.com';
 
-const title = 'IV Therapy by State — Browse Clinics in Florida, NY, TX, CA & More | TheDripMap';
+// Canada-only hub: the old title named Florida, New York, Texas and California
+// and carried an em dash (live check 2026-09-18).
+const title = 'IV Therapy by Province: Clinics Across Canada | TheDripMap';
 const description = 'Browse IV therapy clinics by state. Find top-rated providers across Florida, New York, Texas, California, Virginia, and Ontario.';
 
 export const metadata: Metadata = {
@@ -25,7 +27,7 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/states`,
     type: 'website',
     siteName: 'TheDripMap',
-    images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: 'IV Therapy by State' }],
+    images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: 'IV Therapy by Province' }],
   },
   twitter: {
     card: 'summary_large_image',
