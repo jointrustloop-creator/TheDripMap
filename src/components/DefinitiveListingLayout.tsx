@@ -319,8 +319,10 @@ export default function DefinitiveListingLayout({
   // The first photo carries the hero band (ProviderHero); the gallery shows the
   // rest and adapts to the count instead of forcing a five-slot mosaic that
   // cropped small portrait uploads (2026-09-18 redesign, Erin Mills review).
-  const heroPhoto = photos[0] || null;
-  const galleryPhotos = photos.slice(1, 6);
+  // The hero picks the first photo wide enough for its band (client-side
+  // probe); the gallery shows every photo, so a portrait headshot that the
+  // hero rejects still appears here at its own proportions.
+  const galleryPhotos = photos.slice(0, 4);
   const allPhotos = photos.slice(0, 12);
   const hasGallery = galleryPhotos.length >= 1;
 
@@ -477,7 +479,7 @@ export default function DefinitiveListingLayout({
         city={cityLabel}
         stateCode={stateCode}
         imageUrl={provider.imageUrl || null}
-        heroPhoto={heroPhoto}
+        heroPhotos={photos}
         imageAlt={heroImageAlt || `${provider.name}, ${cityLabel}`}
         initials={initials || getInitials(provider.name)}
         safetyVerified={showSafety}
@@ -516,7 +518,7 @@ export default function DefinitiveListingLayout({
                   <ResilientImage
                     src={photo}
                     fallbackSrc={DEFAULT_CLINIC_IMAGE}
-                    alt={`${provider.name} photo ${idx + 2}`}
+                    alt={`${provider.name} photo ${idx + 1}`}
                     fill
                     sizes={galleryPhotos.length === 1 ? '100vw' : '(max-width: 768px) 50vw, 25vw'}
                     className="object-cover object-[center_30%]"

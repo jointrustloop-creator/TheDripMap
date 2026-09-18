@@ -23,7 +23,7 @@
  * Content rules: no en or em dashes, no medical or outcome claims.
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ShieldCheck, CheckCircle2, MapPin, Star } from 'lucide-react';
 import { TransparencyChip } from './TransparencyChip';
 
@@ -49,8 +49,10 @@ export interface ProviderHeroProps {
    *  photo band: Erin Mills' 253x86 wordmark was being stretched to 1265x320
    *  behind the title. Logos render as a tile beside the name instead. */
   imageUrl: string | null;
-  /** First real clinic photo (providers.photos[0]); when present it carries the band. */
-  heroPhoto?: string | null;
+  /** Clinic photos (providers.photos). The first one that is wide enough
+   *  (at least 900 px and landscape-ish) carries the band; a small portrait
+   *  headshot never does, it would be blurred and cropped to nothing. */
+  heroPhotos?: string[];
   /** Precomputed server side; carries the "(photo from the clinic's website)" attribution when decision_drivers.image_source exists. */
   imageAlt: string;
   initials: string;
@@ -79,7 +81,7 @@ export function ProviderHero({
   city,
   stateCode,
   imageUrl,
-  heroPhoto = null,
+  heroPhotos = [],
   imageAlt,
   initials,
   safetyVerified,
@@ -100,7 +102,28 @@ export function ProviderHero({
   // A logo is identified by our own upload path; enrichment photos from a
   // clinic's website live under other paths and may still carry the band.
   const isLogo = !!imageUrl && /\/logo\.[a-z0-9]+(\?|$)/i.test(imageUrl);
-  const bandSrc = heroPhoto && isUsableHeroImage(heroPhoto) ? heroPhoto : (!isLogo && isUsableHeroImage(imageUrl) ? imageUrl : null);
+  // Probe the clinic photos in order and keep the first one wide enough for a
+  // 1265x320 band. Until one qualifies (or none does) the designed panel shows,
+  // so the page never flashes a stretched thumbnail.
+  const [bandFromPhotos, setBandFromPhotos] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    const candidates = heroPhotos.filter(isUsableHeroImage);
+    (async () => {
+      for (const src of candidates) {
+        const ok = await new Promise<boolean>((resolve) => {
+          const im = new Image();
+          im.onload = () => resolve(im.naturalWidth >= 900 && im.naturalWidth / Math.max(1, im.naturalHeight) >= 1.2);
+          im.onerror = () => resolve(false);
+          im.src = src;
+        });
+        if (cancelled) return;
+        if (ok) { setBandFromPhotos(src); return; }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [heroPhotos]);
+  const bandSrc = bandFromPhotos || (!isLogo && isUsableHeroImage(imageUrl) ? imageUrl : null);
   const hasImage = !!bandSrc && !imageFailed;
   const logoSrc = isLogo && isUsableHeroImage(imageUrl) && !logoFailed ? imageUrl : null;
 

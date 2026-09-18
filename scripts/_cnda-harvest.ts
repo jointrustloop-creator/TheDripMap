@@ -64,11 +64,17 @@ async function enumerate() {
       // flag it so phase 1b can split it into three-letter prefixes.
       if (recs.length >= 25) console.log(`  CAP? ${p}: ${recs.length}`);
     } catch (e) {
-      console.log(`  ${p}: ${e instanceof Error ? e.message : e}`);
-      await sleep(5000); await warm();
+      const msg = e instanceof Error ? e.message : String(e);
+      console.log(`  ${p}: ${msg}`);
+      // The directory returns 403 to bursts (first run: 108 of 121 requests at
+      // 700 ms spacing). Back off a full minute, re-warm the session, and
+      // retry the same prefix rather than skipping it.
+      await sleep(msg.includes('403') ? 60000 : 5000); await warm();
+      todo.push(p);
+      continue;
     }
     if (++n % 25 === 0) { save(s); console.log(`  ${n}/${todo.length} prefixes, ${Object.keys(s.registrants).length} registrants`); }
-    await sleep(700);
+    await sleep(3000);
   }
   save(s);
   console.log(`done: ${Object.keys(s.registrants).length} registrants`);
