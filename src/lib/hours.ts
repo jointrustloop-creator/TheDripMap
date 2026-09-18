@@ -13,11 +13,18 @@ export interface StatusResult {
  * DB working_hours (capitalized keys, array values) to getStatus — passing raw
  * data made every such clinic read "Closed" (2026-08-09 audit: 398 providers).
  */
+const DAY_ALIASES: Record<string, string> = {
+  mon: 'monday', tue: 'tuesday', wed: 'wednesday', thu: 'thursday', fri: 'friday', sat: 'saturday', sun: 'sunday',
+};
+
 export function normalizeHours(raw: unknown): Record<string, string> {
   const out: Record<string, string> = {};
   if (raw && typeof raw === 'object') {
     for (const [day, val] of Object.entries(raw as Record<string, unknown>)) {
-      const k = day.toLowerCase();
+      // Owners' forms and imports store "mon".."sun" as often as full names;
+      // 7 claimed pages said "Hours not listed" over populated hours until
+      // 2026-09-18 because getStatus only looks for the full names.
+      const k = DAY_ALIASES[day.toLowerCase().slice(0, 3)] || day.toLowerCase();
       if (Array.isArray(val)) {
         if (typeof val[0] === 'string' && val[0].trim() !== '') out[k] = val[0];
       } else if (typeof val === 'string' && val.trim() !== '') {

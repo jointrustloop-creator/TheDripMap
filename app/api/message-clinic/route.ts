@@ -266,7 +266,11 @@ export async function POST(req: Request) {
           clinicName: String(data.clinicName),
           clinicEmail: decision.clinicEmail,
         });
-        await sendMail({
+        // sendMail reports failure as { ok: false }, it does not throw. The
+        // inquiry row was inserted above with forward_status 'sent' on the
+        // DECISION; only a confirmed send may leave it that way (ops audit
+        // 2026-09-18: a row said sent while the owner never got the lead).
+        const sent = await sendMail({
           from: 'TheDripMap <info@thedripmap.com>',
           to: decision.clinicEmail,
           replyTo: data.email,
@@ -276,6 +280,7 @@ export async function POST(req: Request) {
           text: rendered.text,
           html: rendered.html,
         });
+        if (!sent.ok) throw new Error(sent.error || `${sent.provider} rejected the send`);
         // Lead ledger (lead engine v1): one append-only row per delivery so
         // "we sent you N patients this month" is provable per clinic. The
         // table may not exist until the operator pastes the migration;
@@ -292,6 +297,13 @@ export async function POST(req: Request) {
       } catch (err) {
         clinicForwardError = err instanceof Error ? err.message : String(err);
         console.error('Forward to clinic failed:', clinicForwardError);
+        if (insertedInquiryId) {
+          try {
+            await supabase.from('inquiries')
+              .update({ forward_status: 'failed', forwarded_to_clinic_at: null })
+              .eq('id', insertedInquiryId);
+          } catch { /* the operator email below still carries the failure */ }
+        }
       }
     }
 
@@ -301,7 +313,8 @@ export async function POST(req: Request) {
       from: 'TheDripMap <info@thedripmap.com>',
       to: 'info@thedripmap.com',
       replyTo: data.email,
-      subject: booking ? `New BOOKING request: ${data.clinicName}` : `New patient lead: ${data.clinicName}`,
+      subject: (clinicForwardError ? 'ACTION NEEDED, forward failed: ' : '')
+        + (booking ? `New BOOKING request: ${data.clinicName}` : `New patient lead: ${data.clinicName}`),
       text: `New patient inquiry for clinic: ${data.clinicName}
 Listing: ${clinicUrl}
 

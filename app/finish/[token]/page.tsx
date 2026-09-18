@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { AlertCircle } from 'lucide-react';
+import { headers } from 'next/headers';
 import { createClient } from '@supabase/supabase-js';
 import { parseManageToken, secretsMatch } from '../../../src/lib/manage-token';
 import { isAdminRequest } from '../../../src/lib/admin-auth';
@@ -62,6 +63,17 @@ export default async function FinishPage({ params, searchParams }: FinishPagePro
   // the abandoned-claim reminder), and the saved answers carry provenance.
   const operatorMode = sp.src === 'operator' && (await isAdminRequest());
 
+  // Automated opens are not owner engagement either. The flow-smoke cron
+  // fetches the newest claimed clinic's finish link every run and, until
+  // 2026-09-18, each run counted as the owner coming back (finishOpenCount
+  // inflated, abandoned-claim reminder silenced). Our crawlers send a named
+  // UA; generic bots are excluded on the same test.
+  let automatedOpen = false;
+  try {
+    const ua = (await headers()).get('user-agent') || '';
+    automatedOpen = /dripmap-|bot|crawl|spider|headless|curl\/|python-requests/i.test(ua);
+  } catch { /* no request context, treat as a human open */ }
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return <InvalidLink />;
@@ -92,7 +104,7 @@ export default async function FinishPage({ params, searchParams }: FinishPagePro
   // Skipped in operator mode: an operator recording emailed answers is NOT the
   // owner returning, and counting it as such would wrongly silence the
   // abandoned-claim reminder and inflate owner-engagement reporting.
-  if (!operatorMode) {
+  if (!operatorMode && !automatedOpen) {
     try {
       const opens = typeof dd.finishOpenCount === 'number' ? (dd.finishOpenCount as number) : 0;
       const nowIso = new Date().toISOString();

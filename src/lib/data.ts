@@ -41,6 +41,8 @@ export const STATE_MAP: Record<string, string> = {
   'prince-edward-island': 'PE', 'yukon': 'YT', 'northwest-territories': 'NT', 'nunavut': 'NU'
 };
 
+export const CA_PROVINCE_ABBRS = new Set(['ON', 'BC', 'AB', 'QC', 'MB', 'SK', 'NS', 'NB', 'NL', 'PE', 'YT', 'NT', 'NU']);
+
 export const GTA_CITIES = ['Toronto', 'Ajax', 'Brampton', 'Mississauga', 'Oakville', 'Richmond Hill', 'Vaughan'];
 
 // Toronto-as-city + former municipalities that amalgamated into the City of
@@ -453,9 +455,16 @@ export async function getListingsByCity(city: string, state?: string, opts?: { s
           // before normalization, .eq('country', 'US') silently mismatched 530 of 587 US
           // providers, triggering the state-wide fallback and bloating city counts
           // (e.g., Houston showed 37 Texas providers instead of 8 Houston ones).
-          const isUSState = Object.values(STATE_MAP).includes(stateAbbr.toUpperCase()) && stateAbbr.toUpperCase() !== 'ON';
+          // STATE_MAP holds every Canadian province too (since 2026-08-08). Only
+          // Ontario was exempted here, so Vancouver/Calgary queries got
+          // country = United States, returned zero, and fell back to the whole
+          // province: /cities/vancouver said 135 clinics for 26 (audit 2026-09-18).
+          const isCAProvince = CA_PROVINCE_ABBRS.has(stateAbbr.toUpperCase());
+          const isUSState = !isCAProvince && Object.values(STATE_MAP).includes(stateAbbr.toUpperCase());
           if (isUSState) {
             query = query.eq('country', 'United States');
+          } else if (isCAProvince) {
+            query = query.eq('country', 'Canada');
           }
         }
       }
@@ -628,8 +637,7 @@ export async function getListingsByState(state: string, opts?: { strict?: boolea
     // Country detection must be driven by an explicit province list, NOT by
     // "is it in STATE_MAP" (STATE_MAP now holds Canadian provinces too, so that
     // test would classify Alberta as a US state and return zero clinics).
-    const CA_ABBRS = new Set(['ON', 'BC', 'AB', 'QC', 'MB', 'SK', 'NS', 'NB', 'NL', 'PE', 'YT', 'NT', 'NU']);
-    const isCAProvince = CA_ABBRS.has(stateAbbr.toUpperCase());
+    const isCAProvince = CA_PROVINCE_ABBRS.has(stateAbbr.toUpperCase());
     const isUSState = !isCAProvince && Object.values(STATE_MAP).includes(stateAbbr.toUpperCase());
 
     let query = supabase
@@ -644,18 +652,24 @@ export async function getListingsByState(state: string, opts?: { strict?: boolea
       query = query.eq('country', 'Canada');
     }
 
-    const { data, error } = await query
-      // Ranking: featured, then verified, then how much the clinic discloses,
-      // then stars. See RANKING NOTE above enrichProvider.
+    // Ranking: featured, then verified, then how much the clinic discloses,
+    // then stars. See RANKING NOTE above enrichProvider. Paginated: the old
+    // .limit(300) silently cut Ontario (395 active) to 291 on /states/ontario.
+    const ranked = query
       .order('is_featured', { ascending: false })
       .order('safety_verified', { ascending: false })
       .order('transparency_score', { ascending: false, nullsFirst: false })
       .order('rating', { ascending: false, nullsFirst: false })
       .order('is_claimed', { ascending: false })
-      .limit(300);
-
-    if (error) throw error;
-    return (data || []).filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
+      .order('id');
+    let rows: Record<string, unknown>[] = [];
+    for (let offset = 0; ; offset += 1000) {
+      const { data, error } = await ranked.range(offset, offset + 999);
+      if (error) throw error;
+      rows = rows.concat((data || []) as Record<string, unknown>[]);
+      if (!data || data.length < 1000) break;
+    }
+    return rows.filter((p: { is_hidden?: boolean } | null | undefined) => !p?.is_hidden).map(enrichProvider);
   } catch (err) {
     console.error('Error fetching listings by state:', err);
     failIfStrict(opts?.strict, 'getListingsByState', err);
@@ -776,9 +790,12 @@ export async function getAllCities(): Promise<{ city: string, state: string, sta
     // (caught 2026-06-11 sitemap audit).
     let data: { id: string; city: string | null; state: string | null }[] = [];
     for (let offset = 0; ; offset += 1000) {
+      // Hidden rows (duplicates, hijacked domains, UK "London" discoveries)
+      // must not be counted: /cities said 736 clinics for 702 (audit 2026-09-18).
       const response = await supabase
         .from('providers')
         .select('id, city, state, country')
+        .neq('is_hidden', true)
         .order('id')
         .range(offset, offset + 999);
       if (response.error) {

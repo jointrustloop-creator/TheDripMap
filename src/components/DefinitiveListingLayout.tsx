@@ -511,9 +511,9 @@ export default function DefinitiveListingLayout({
               {galleryPhotos.slice(0, 4).map((photo, idx) => (
                 <div
                   key={photo + idx}
-                  className={`relative overflow-hidden border border-[rgba(25,36,28,0.09)] bg-[#efe9dc] ${
-                    galleryPhotos.length === 1 ? 'aspect-[21/9]' : 'aspect-[4/3]'
-                  }`}
+                  // Fixed, modest height (Hubert 2026-09-18: "half the size"):
+                  // the tiles are supporting shots under the hero, not a second hero.
+                  className={`relative overflow-hidden border border-[rgba(25,36,28,0.09)] bg-[#efe9dc] h-[120px] md:h-[150px]`}
                 >
                   <ResilientImage
                     src={photo}

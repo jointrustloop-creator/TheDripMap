@@ -163,7 +163,12 @@ export function classifyReply(input: ClassifyInput): ClassifyResult {
   const body = (input.body || '').slice(0, 4000);
   const fromEmail = (input.fromEmail || '').toLowerCase();
   const headers = input.headers || {};
-  const haystack = `${subject}\n${body}`;
+  // Classify the sender's OWN words only. The quoted history under a reply
+  // carries our footer, and our footer says "unsubscribe": on 2026-08-23 that
+  // matched, and Glass Skin and Nura (a claimed owner asking to list hours)
+  // were auto-suppressed and marked bounced. 8 of 10 reply-sourced opt-outs
+  // were this false positive (ops audit 2026-09-18).
+  const haystack = `${subject}\n${ownText(body)}`;
 
   // 1) Hard bounce: from-address pattern OR subject pattern.
   if (any(BOUNCE_FROM_PATTERNS, fromEmail) || any(BOUNCE_SUBJECT_PATTERNS, subject)) {
@@ -265,17 +270,30 @@ export function classifyReply(input: ClassifyInput): ClassifyResult {
 }
 
 /**
- * Short, safe snippet for storage. Strips quoted history (lines starting
- * with ">"), collapses whitespace, caps length. Defensive against very
- * long quoted threads inflating the DB row.
+ * The part of a reply the sender actually typed: everything above the first
+ * quote marker ("On ... wrote:", "From:", "-----Original Message-----", a
+ * "> " block) and never our own footer. Used for classification so keywords
+ * in quoted history can never trigger an opt-out.
+ */
+export function ownText(body: string | null | undefined): string {
+  if (!body) return '';
+  const lines = body.replace(/\r\n/g, '\n').split('\n');
+  const out: string[] = [];
+  for (const raw of lines) {
+    const ln = raw.trim();
+    if (/^on\s.+\bwrote:?\s*$/i.test(ln)) break;
+    if (/^from:\s/i.test(ln) || /^-{2,}\s*original message\s*-{2,}$/i.test(ln) || /^_{5,}$/.test(ln)) break;
+    if (/^sent from my (iphone|android|samsung|galaxy)/i.test(ln)) break;
+    if (ln.startsWith('>')) continue;
+    out.push(raw);
+  }
+  return out.join('\n');
+}
+
+/**
+ * Short, safe snippet for storage: the sender's own text, whitespace
+ * collapsed, capped. Defensive against long quoted threads inflating the row.
  */
 export function buildSnippet(body: string | null | undefined, maxChars = 500): string {
-  if (!body) return '';
-  const lines = body
-    .split(/\r?\n/)
-    .filter((ln) => !ln.trim().startsWith('>'))
-    .filter((ln) => !/^on\s+.+\bwrote:\s*$/i.test(ln.trim()))
-    .filter((ln) => !/^from:\s/i.test(ln.trim()));
-  const collapsed = lines.join(' ').replace(/\s+/g, ' ').trim();
-  return collapsed.slice(0, maxChars);
+  return ownText(body).replace(/\s+/g, ' ').trim().slice(0, maxChars);
 }

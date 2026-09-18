@@ -88,7 +88,7 @@ export async function countEvents(opts: {
 
   // Intent rows (Demand Pulse, src/lib/intent.ts) share this table under a
   // carrier event type; they are never click metrics.
-  let q = sb.from('listing_events').select('id', { count: 'exact', head: true }).not('referrer', 'like', 'i:%');
+  let q = sb.from('listing_events').select('id', { count: 'exact', head: true }).or('referrer.is.null,referrer.not.like.i:%');
   if (opts.eventType) q = q.eq('event_type', opts.eventType);
   if (opts.sinceIso) q = q.gte('created_at', opts.sinceIso);
   if (opts.untilIso) q = q.lte('created_at', opts.untilIso);
@@ -114,7 +114,7 @@ export async function countEventsByType(opts: {
   const out = zeroCounts();
   if (!sb) return out;
 
-  let q = sb.from('listing_events').select('event_type').not('referrer', 'like', 'i:%');
+  let q = sb.from('listing_events').select('event_type').or('referrer.is.null,referrer.not.like.i:%');
   if (opts.sinceIso) q = q.gte('created_at', opts.sinceIso);
   if (opts.untilIso) q = q.lte('created_at', opts.untilIso);
   if (opts.providerId) q = q.eq('provider_id', opts.providerId);
@@ -145,7 +145,7 @@ export async function getRecentEvents(opts: {
   let q = sb
     .from('listing_events')
     .select('id, provider_id, event_type, created_at, referrer')
-    .not('referrer', 'like', 'i:%')
+    .or('referrer.is.null,referrer.not.like.i:%')
     .order('created_at', { ascending: false })
     .limit(limit);
   if (opts.eventType) q = q.eq('event_type', opts.eventType);
@@ -176,7 +176,7 @@ export async function getPerProviderCounts(opts: {
     let q = sb
       .from('listing_events')
       .select('provider_id, event_type')
-      .not('referrer', 'like', 'i:%')
+      .or('referrer.is.null,referrer.not.like.i:%')
       .range(from, from + pageSize - 1);
     if (opts.sinceIso) q = q.gte('created_at', opts.sinceIso);
     if (opts.untilIso) q = q.lte('created_at', opts.untilIso);
