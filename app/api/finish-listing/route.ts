@@ -17,6 +17,7 @@
  * choices, so there is nothing to review before it goes live.
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { createHash } from 'crypto';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../src/lib/mailer';
@@ -199,11 +200,18 @@ export async function POST(req: NextRequest) {
     const label = /^photo-\d+-\d+$/.test(rawLabel) ? rawLabel : `photo-${Date.now()}-1`;
     const one = form.getAll('photos').filter((f): f is File => f instanceof File)[0];
     if (!one) return NextResponse.json({ error: 'no photo' }, { status: 400 });
+    // Content-hash dedupe (2026-09-18): Erin Mills uploaded the same headshot
+    // twice under two filenames and the gallery showed it twice. Hash the bytes
+    // and treat a repeat as already saved.
+    const hash = createHash('sha1').update(Buffer.from(await one.arrayBuffer())).digest('hex');
+    const ddNow = (provider.decision_drivers && typeof provider.decision_drivers === 'object') ? (provider.decision_drivers as Record<string, unknown>) : {};
+    const hashes = Array.isArray(ddNow.photo_hashes) ? (ddNow.photo_hashes as string[]) : [];
+    if (hashes.includes(hash)) return NextResponse.json({ ok: true, photos: Array.isArray(provider.photos) ? (provider.photos as unknown[]).length : 0, duplicate: true });
     const u = await uploadImage(supabase, providerId, one, label);
     if (!u) return NextResponse.json({ error: 'photo not accepted' }, { status: 400 });
     const existing = Array.isArray(provider.photos) ? (provider.photos as string[]) : [];
     const merged = dedupePhotos([`${u}?v=${Math.floor(Date.now() / 1000)}`, ...existing]).slice(0, 12);
-    const { error: photoErr } = await supabase.from('providers').update({ photos: merged }).eq('id', providerId);
+    const { error: photoErr } = await supabase.from('providers').update({ photos: merged, decision_drivers: { ...ddNow, photo_hashes: [...hashes, hash].slice(-24) } }).eq('id', providerId);
     if (photoErr) return NextResponse.json({ error: 'could not save photo' }, { status: 500 });
     try { revalidatePath(`/providers/${provider.slug}`); } catch { /* non-fatal */ }
     return NextResponse.json({ ok: true, photos: merged.length });

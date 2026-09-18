@@ -625,7 +625,7 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
           </SectionCard>
 
           {/* 5 - make it yours */}
-          <SectionCard step={5} title="Make it yours" hint="Real photos beat stock every time. Listings with photos get far more bookings.">
+          <SectionCard step={5} title="Make it yours" hint="Real photos beat stock every time. Use photos at least 1200 pixels wide, such as your reception, a treatment room and your team. Small images look blurry on the page.">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <label className="cursor-pointer border-2 border-dashed border-slate-200 rounded-2xl p-5 text-center hover:border-[#0F6E56]/40 transition-all">
                 <ImageIcon size={22} className="mx-auto text-[#0F6E56] mb-2" />
