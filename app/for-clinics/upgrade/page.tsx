@@ -12,8 +12,8 @@ import { Check, X, Sparkles, TrendingUp, Eye, Star, Calendar, MessageSquare, Ima
 const SITE_URL = 'https://www.thedripmap.com';
 const PRICE = 99; // monthly USD
 
-const title = 'Upgrade to a Featured Listing — TheDripMap';
-const description = `Featured listings get top placement on city + treatment pages, image-rich profiles, instant-book CTAs, and patient testimonials. $${PRICE}/month, cancel anytime.`;
+const title = 'Upgrade to a Featured Listing | TheDripMap';
+const description = `Featured listings get top placement on city + treatment pages, image-rich profiles, contact CTAs, and patient testimonials. $${PRICE}/month, cancel anytime.`;
 
 // Featured is dark (FEATURED_UPGRADE_ENABLED = false): unpublished, noindexed,
 // and returns 404. No pricing metadata while dark.
@@ -43,7 +43,7 @@ const BENEFITS = [
   {
     icon: TrendingUp,
     title: 'Top placement, always',
-    body: `Featured clinics pin to the top of every city, treatment, and search page they qualify for — above unclaimed competitors regardless of sort.`,
+    body: `Featured clinics pin to the top of every city, treatment, and search page they qualify for, above unclaimed competitors regardless of sort.`,
   },
   {
     icon: ImageIcon,
@@ -52,8 +52,8 @@ const BENEFITS = [
   },
   {
     icon: Calendar,
-    title: 'Direct-booking CTAs',
-    body: `Visible "Book Appointment" + "Call Clinic" + "Message Clinic" buttons in the right rail — every visitor sees how to reach you immediately.`,
+    title: 'Contact CTAs',
+    body: `Visible "Call Clinic" and "Message Clinic" buttons in the right rail, so every visitor sees how to reach you immediately.`,
   },
   {
     icon: MessageSquare,
@@ -63,12 +63,12 @@ const BENEFITS = [
   {
     icon: Eye,
     title: 'Full operator profile',
-    body: `Custom intro, primary specialty, drip menu, hours, walk-in policy — all editable. Visitors see your story, not just your name.`,
+    body: `Custom intro, primary specialty, drip menu, hours, walk-in policy, all editable. Visitors see your story, not just your name.`,
   },
   {
     icon: Star,
     title: 'Magazine-style hero',
-    body: `Top of your page gets a custom photo hero with rating, reviews, and your one-liner pull-quote — built to convert.`,
+    body: `Top of your page gets a custom photo hero with rating, reviews, and your one-liner pull-quote, built to convert.`,
   },
 ];
 
@@ -85,7 +85,7 @@ const COMPARISON: Row[] = [
   { feature: 'Edit your own profile', unclaimed: false, claimed: true, featured: true },
   { feature: 'Operator profile + one-liner', unclaimed: false, claimed: true, featured: true },
   { feature: 'Patient testimonials surface', unclaimed: false, claimed: true, featured: true },
-  { feature: 'Direct-booking + call CTAs', unclaimed: false, claimed: 'Limited', featured: true },
+  { feature: 'Contact + call CTAs', unclaimed: false, claimed: 'Limited', featured: true },
   { feature: 'Pinned to top of city/treatment pages', unclaimed: false, claimed: false, featured: true },
   { feature: 'Magazine-style profile hero', unclaimed: false, claimed: false, featured: true },
   { feature: 'Lead leads forwarded by email', unclaimed: false, claimed: false, featured: true },
@@ -107,7 +107,7 @@ export default function UpgradePage() {
           <div>
             <div className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.2em] mb-6 border border-amber-100">
               <Sparkles size={14} />
-              Featured listing — for paying clinics
+              Featured listing: for paying clinics
             </div>
             <h1 className="text-5xl md:text-6xl font-black text-slate-900 mb-6 tracking-tighter leading-[0.95]">
               Stop losing leads to{' '}
@@ -116,7 +116,7 @@ export default function UpgradePage() {
               </span>
             </h1>
             <p className="text-xl text-slate-500 leading-relaxed mb-8">
-              Featured listings sit above every other clinic on every page they qualify for — city pages, treatment pages, search results, match-quiz results. Real photos, real CTAs, real reviews. Built to convert visitors into your patients.
+              Featured listings sit above every other clinic on every page they qualify for: city pages, treatment pages, search results, match-quiz results. Real photos, real CTAs, real reviews. Built to convert visitors into your patients.
             </p>
             <div className="flex flex-wrap gap-4 text-sm font-bold text-slate-700">
               <span className="bg-white border border-slate-200 px-4 py-2 rounded-full">
@@ -208,22 +208,22 @@ export default function UpgradePage() {
           </h2>
           <div className="space-y-4">
             <Faq q="How does billing work?">
-              We invoice monthly via Stripe or e-transfer. First clinics get hand-onboarded — once we hit volume we'll move to a self-serve dashboard.
+              We invoice monthly via Stripe or e-transfer. First clinics get hand-onboarded; once we hit volume we'll move to a self-serve dashboard.
             </Faq>
             <Faq q="Can I cancel anytime?">
-              Yes. Cancel and your listing reverts to a Claimed (free) listing — no penalty, no lock-in.
+              Yes. Cancel and your listing reverts to a Claimed (free) listing, no penalty, no lock-in.
             </Faq>
             <Faq q="How long until I see leads?">
-              Most Featured clinics see their first inbound message within 2 weeks of going live. Volume scales with your city's traffic — we'll share your city's monthly traffic stats during onboarding.
+              Most Featured clinics see their first inbound message within 2 weeks of going live. Volume scales with your city's traffic; we'll share your city's monthly traffic stats during onboarding.
             </Faq>
             <Faq q="Do you charge per lead?">
               No. Flat $${PRICE}/month, unlimited leads. The more visitors TheDripMap drives to your area, the better your ROI.
             </Faq>
             <Faq q="What if I already claimed my listing?">
-              Perfect — that's the starting point. Featured is the next tier up. Submit the form above and we'll upgrade your existing claimed listing within 24h.
+              Perfect, that's the starting point. Featured is the next tier up. Submit the form above and we'll upgrade your existing claimed listing within 24h.
             </Faq>
             <Faq q="Is there a contract or commitment?">
-              Month-to-month, no minimum. Most clinics stay because the leads pay for themselves several times over — but you're never locked in.
+              Month-to-month, no minimum. You're never locked in.
             </Faq>
           </div>
         </section>

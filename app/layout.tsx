@@ -47,8 +47,12 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thedripmap.com'
 // Hardcoded (not env-driven) on purpose: the brand display name should not
 // vary by environment. Vercel had NEXT_PUBLIC_SITE_NAME=TheDripMap set which
 // was overriding the default and re-introducing the bug on prod.
-const siteName = 'The Drip Map';
-const siteNameAlternate = 'TheDripMap';
+// "TheDripMap" is the brand everywhere else: footer, emails, the sender name,
+// Article publisher, city Dataset creator. The homepage was the one place
+// still saying "The Drip Map" (2026-09-18 schema audit), so it is now the
+// alternate, not the primary.
+const siteName = 'TheDripMap';
+const siteNameAlternate = 'The Drip Map';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -107,7 +111,13 @@ export default function RootLayout({
     "alternateName": siteNameAlternate,
     "url": siteUrl,
     "logo": `${siteUrl}/logo.png`,
+    // One canonical entity sentence, reused verbatim on /about, in the
+    // footer and in llms.txt so search and AI engines resolve one entity.
+    "description": "TheDripMap is Canada's IV therapy matching platform. It lists IV therapy clinics by city, publishes real menu prices in the Canada IV Price Index, and verifies named practitioners against the provincial college registers. It does not sell treatments or take bookings.",
+    "email": "info@thedripmap.com",
+    "contactPoint": { "@type": "ContactPoint", "email": "info@thedripmap.com", "contactType": "customer support", "areaServed": "CA", "availableLanguage": "en" },
     "areaServed": { "@type": "Country", "name": "Canada" },
+    "knowsAbout": ["IV therapy", "IV vitamin drips", "NAD+ infusions", "IV therapy prices in Canada", "naturopathic IV therapy regulation in Canada"],
     "sameAs": [
       "https://www.instagram.com/thedripmap"
     ]

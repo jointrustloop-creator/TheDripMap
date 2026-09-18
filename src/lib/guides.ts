@@ -46,6 +46,9 @@ const NATIONAL_HIGH = Math.max(...Object.values(PRICE_INDEX).map((c) => c.headli
 const priceLine = (city: string, label: string, r: { low: number; median: number; high: number; clinics: number } | undefined) =>
   r ? `${city}, ${label}: ${ca(r.low)} to ${ca(r.high)}, median ${ca(r.median)} (${r.clinics} clinics)` : null;
 const rowOf = (idx: typeof PI_TORONTO, treatment: string) => idx.rows.find((r) => r.treatment === treatment);
+// Toronto specialty highs quoted in the FAQs, read from the same snapshot.
+const TORONTO_NAD_HIGH = rowOf(PI_TORONTO, 'NAD+')?.high ?? PI_TORONTO.headline.high;
+const TORONTO_BEAUTY_HIGH = rowOf(PI_TORONTO, 'Beauty / glow')?.high ?? PI_TORONTO.headline.high;
 const COST_GUIDE_BULLETS = [
   priceLine('Toronto', 'standard IV vitamin drip', PI_TORONTO.headline),
   priceLine('Calgary', 'standard IV vitamin drip', PI_CALGARY.headline),
@@ -62,9 +65,9 @@ export const GUIDES: Guide[] = [
     slug: 'how-to-choose-iv-therapy-clinic',
     author: 'TheDripMap Editorial Team',
     lastUpdated: '2026-05-24',
-    title: 'How to Choose an IV Therapy Clinic — A Practical Guide',
-    metaTitle: 'How to Choose an IV Therapy Clinic — Guide for Patients',
-    metaDescription: 'Step-by-step guide to choosing a safe, effective IV therapy clinic. What credentials to look for, questions to ask, red flags to avoid.',
+    title: 'How to Choose an IV Therapy Clinic: A Practical Guide',
+    metaTitle: 'How to Choose an IV Therapy Clinic: Guide for Patients',
+    metaDescription: 'Step-by-step guide to choosing a safe, transparent IV therapy clinic. What credentials to look for, questions to ask, red flags to avoid.',
     intro: `Choosing the right IV therapy clinic is more important than most patients realize. While many clinics deliver a similar menu of drips, the medical oversight, sterility standards, ingredient sourcing, and overall experience vary widely. This guide walks through the criteria that actually matter, the questions you should ask before your first appointment, and the red flags that should make you walk away.`,
     sections: [
       {
@@ -77,7 +80,7 @@ export const GUIDES: Guide[] = [
       {
         heading: 'Cleanliness, environment, and protocols',
         paragraphs: [
-          `IV therapy is a medical procedure, not a spa service — even when delivered in a lounge environment. The clinic should follow infection-control standards comparable to a doctor's office: single-use sterile catheters, fresh tubing for every patient, sealed and refrigerated medications, and proper sharps disposal.`,
+          `IV therapy is a medical procedure, not a spa service, even when delivered in a lounge environment. The clinic should follow infection-control standards comparable to a doctor's office: single-use sterile catheters, fresh tubing for every patient, sealed and refrigerated medications, and proper sharps disposal.`,
           `When you walk in, take a quick look. Is the space clean? Is the IV station set up after the previous patient leaves? Are gloves changed between clients? These small signals tell you a lot about whether the clinic takes safety seriously.`,
         ],
       },
@@ -85,14 +88,14 @@ export const GUIDES: Guide[] = [
         heading: 'Transparency about ingredients and pricing',
         paragraphs: [
           `A good clinic publishes its drip menu with full ingredient lists and prices on its website. You should be able to see exactly what's in the "Hangover Recovery" or "NAD+ Plus" drip before you arrive, and what each add-on costs. Vague descriptions like "proprietary blend" or hidden pricing are red flags.`,
-          `Reputable clinics will also discuss potential interactions with your medications, allergies, and existing conditions during intake — not skip it to keep the experience feeling spa-like.`,
+          `Reputable clinics will also discuss potential interactions with your medications, allergies, and existing conditions during intake, not skip it to keep the experience feeling spa-like.`,
         ],
       },
       {
         heading: 'Questions to ask before booking',
         bullets: [
           'Who is your medical director, and are they on site or just on file?',
-          'Who will be inserting my IV — RN, NP, paramedic, or other?',
+          'Who will be inserting my IV: RN, NP, paramedic, or other?',
           'Where do you source your IV fluids and ingredients?',
           'Will you review my medications and medical history before treatment?',
           'What happens if I have a reaction during the drip?',
@@ -104,7 +107,7 @@ export const GUIDES: Guide[] = [
         bullets: [
           'No identifiable medical director or unlicensed staff administering IVs',
           'Pressure to add expensive upgrades without explanation',
-          'No medical intake — they just hook you up after a quick form',
+          'No medical intake; they just hook you up after a quick form',
           'Vague ingredient descriptions or "proprietary blends" with no quantities',
           'Reusing catheters, tubing, or single-use supplies',
           'Negative reviews specifically mentioning safety, hygiene, or staff training',
@@ -113,7 +116,7 @@ export const GUIDES: Guide[] = [
       {
         heading: 'Reviews and reputation',
         paragraphs: [
-          `Google reviews and word-of-mouth are decent proxies for clinic quality, but read carefully. Focus on reviews that mention specific details — staff names, the intake process, ingredient explanations — rather than generic five-star "felt great" reviews that could be from anyone. Pay closer attention to negative reviews; they often surface real problems that positive reviews paper over.`,
+          `Google reviews and word-of-mouth are decent proxies for clinic quality, but read carefully. Focus on reviews that mention specific details (staff names, the intake process, ingredient explanations) rather than generic five-star "felt great" reviews that could be from anyone. Pay closer attention to negative reviews; they often surface real problems that positive reviews paper over.`,
         ],
       },
     ],
@@ -128,7 +131,7 @@ export const GUIDES: Guide[] = [
       },
       {
         question: 'How much does a typical IV therapy session cost?',
-        answer: 'Standard hydration and wellness drips usually range from $150 to $300. Specialized treatments like NAD+ therapy or high-dose vitamin C can run $400 to $1,200. Mobile (in-home) service typically adds $50 to $100 over in-clinic pricing.',
+        answer: `A standard IV vitamin drip in Canada runs a median of about ${ca(NATIONAL_MEDIAN)}, with published menus ranging from ${ca(NATIONAL_LOW)} to ${ca(NATIONAL_HIGH)} across the cities in TheDripMap's IV Price Index. Specialty drips run higher: in Toronto, NAD+ reaches ${ca(TORONTO_NAD_HIGH)} per session. Mobile (in-home) service usually carries a service premium on top of in-clinic pricing.`,
       },
     ],
     relatedTreatments: [
@@ -190,7 +193,7 @@ export const GUIDES: Guide[] = [
         heading: 'What drives the price differences',
         paragraphs: [
           `Three things explain most of the variation between clinics: the cost of the ingredients (NAD+ alone is dramatically more expensive than B vitamins), the time the infusion takes (slow drips occupy a chair for hours and tie up nursing staff), and the operating cost of the clinic itself (downtown Toronto rent versus a suburban Alberta strip mall drives very different overhead).`,
-          `A menu that lists CA$99 hangover IVs is either a loss-leader to get you in the door or skimping on ingredients. A menu that charges CA$400 for the same is not necessarily a rip-off; it may include better sourcing, more medical oversight, or premium add-ons baked in. Read the ingredient list, not just the price.`,
+          `A low menu price is not automatically a red flag; the low end of the Toronto index sits at ${ca(PI_TORONTO.headline.low)} for a standard drip. A menu that charges CA$400 for a similar drip is not necessarily a rip-off either; it may include better sourcing, more medical oversight, or premium add-ons baked in. Read the ingredient list, not just the price.`,
         ],
       },
       {
@@ -218,7 +221,7 @@ export const GUIDES: Guide[] = [
     faqs: [
       {
         question: 'How much does IV therapy cost in Toronto?',
-        answer: "A standard IV vitamin drip in Toronto runs CA$119 to CA$399 with a median around CA$175, based on 9 clinics' published menus in TheDripMap's IV Price Index. Specialty drips run higher: NAD+ reaches CA$799 and beauty drips around CA$470.",
+        answer: `A standard IV vitamin drip in Toronto runs ${ca(PI_TORONTO.headline.low)} to ${ca(PI_TORONTO.headline.high)} with a median around ${ca(PI_TORONTO.headline.median)}, based on ${PI_TORONTO.clinicCount} clinics' published menus in TheDripMap's IV Price Index (${PI_TORONTO.asOf}). Specialty drips run higher: NAD+ reaches ${ca(TORONTO_NAD_HIGH)} and beauty drips around ${ca(TORONTO_BEAUTY_HIGH)}.`,
       },
       {
         question: 'Why does the same drip cost different amounts at different clinics?',
@@ -238,7 +241,7 @@ export const GUIDES: Guide[] = [
       },
       {
         question: 'What is the cheapest way to try IV therapy?',
-        answer: 'Check the price range for your city first, then compare a basic hydration or standard vitamin drip across 2 or 3 nearby clinics. In our data the low end for a standard drip is CA$75 to CA$119 in major Canadian cities, and first-visit promotions are common.',
+        answer: `Check the price range for your city first, then compare a basic hydration or standard vitamin drip across 2 or 3 nearby clinics. In our index the low end for a standard drip is ${ca(PI_TORONTO.headline.low)} in Toronto and ${ca(NATIONAL_LOW)} across the Canadian cities we track, and first-visit promotions are common.`,
       },
     ],
     relatedTreatments: [
@@ -260,30 +263,30 @@ export const GUIDES: Guide[] = [
     slug: 'iv-therapy-vs-oral-supplements',
     author: 'TheDripMap Editorial Team',
     lastUpdated: '2026-05-24',
-    title: 'IV Therapy vs Oral Supplements — Which Actually Works?',
-    metaTitle: 'IV Therapy vs Oral Supplements — Bioavailability & Cost Compared',
+    title: 'IV Therapy vs Oral Supplements: Which Actually Works?',
+    metaTitle: 'IV Therapy vs Oral Supplements: Bioavailability and Cost Compared',
     metaDescription: 'Direct comparison of IV therapy and oral supplements. Bioavailability, speed of effect, cost per dose, and when each is the better choice.',
-    intro: `The case for IV therapy hinges almost entirely on one word: bioavailability — the percentage of a nutrient that actually makes it into your bloodstream. Oral supplements have to survive your stomach acid, intestinal transport limits, and first-pass metabolism by your liver. IV therapy skips all of that. But that doesn't mean IV is always the right answer. Here's an honest comparison of when each approach makes sense.`,
+    intro: `The case for IV therapy hinges almost entirely on one word: bioavailability, the percentage of a nutrient that actually makes it into your bloodstream. Oral supplements have to survive your stomach acid, intestinal transport limits, and first-pass metabolism by your liver. IV therapy skips all of that. But that doesn't mean IV is always the right answer. Here's an honest comparison of when each approach makes sense.`,
     sections: [
       {
-        heading: 'Bioavailability — the core difference',
+        heading: 'Bioavailability: the core difference',
         paragraphs: [
-          `When you take an oral supplement, your body absorbs somewhere between 10% and 50% of the active ingredient, depending on the nutrient, the formulation, what you ate with it, and your individual gut. Vitamin C, for example, has saturable intestinal transport — you can only absorb about 200mg per dose orally, regardless of how much you swallow.`,
+          `When you take an oral supplement, your body absorbs somewhere between 10% and 50% of the active ingredient, depending on the nutrient, the formulation, what you ate with it, and your individual gut. Vitamin C, for example, has saturable intestinal transport, so you can only absorb about 200mg per dose orally, regardless of how much you swallow.`,
           `IV administration bypasses your digestive system entirely. The nutrient enters your bloodstream directly, bypassing digestion. This bypasses the digestive step that limits how much of an oral supplement is absorbed.`,
         ],
       },
       {
         heading: 'Where IV therapy wins clearly',
         paragraphs: [
-          `Some nutrients are simply impractical to deliver in meaningful doses orally. Glutathione is degraded almost completely in the digestive tract — IV is the only reliable way to raise circulating levels. NAD+ has similar issues. High-dose vitamin C (5,000mg or more) can only be reached through IV.`,
-          `IV therapy also wins when speed matters. If you're severely dehydrated, hungover, or fighting an early-stage cold, IV restores fluids and delivers nutrients in 30 minutes — oral hydration and supplementation would take many hours to produce comparable effects.`,
+          `Some nutrients are simply impractical to deliver in meaningful doses orally. Glutathione is degraded almost completely in the digestive tract, which is why clinics give it by IV; raising the blood level is not the same as a proven benefit. NAD+ has similar absorption issues. High-dose vitamin C (5,000mg or more) can only be reached through IV.`,
+          `IV therapy also wins when speed matters for fluids. If you're severely dehydrated or cannot keep fluids down, IV restores fluids in about 30 minutes, where oral hydration takes hours.`,
         ],
       },
       {
         heading: 'Where oral supplements win clearly',
         paragraphs: [
           `For daily maintenance, oral supplementation is dramatically more cost-effective. A bottle of high-quality multivitamin or B-complex costs $20 to $40 and lasts a month. The equivalent IV drips would run $1,500+ for monthly use. For most people, daily multivitamin + occasional IV makes more financial sense than weekly IVs.`,
-          `Oral supplementation also wins for slow-build nutrients like vitamin D, magnesium, and omega-3 fatty acids — these need consistent daily intake to maintain tissue levels, and a once-a-month IV doesn't replicate that effect.`,
+          `Oral supplementation also wins for slow-build nutrients like vitamin D, magnesium, and omega-3 fatty acids; these need consistent daily intake to maintain tissue levels, and a once-a-month IV doesn't replicate that effect.`,
         ],
       },
       {
@@ -292,8 +295,8 @@ export const GUIDES: Guide[] = [
           {
             heading: 'IV therapy is the right choice when:',
             paragraphs: [
-              `You need fast effect (hangover, illness onset, post-workout recovery, before a big event).`,
-              `The nutrient is poorly absorbed orally (glutathione, NAD+, high-dose C).`,
+              `You need fluids fast (severe dehydration, or you cannot keep fluids down).`,
+              `The nutrient is poorly absorbed orally (glutathione, NAD+, high-dose C) and you have a reason to want the higher blood level.`,
               `You can't tolerate oral intake (nausea, gut issues, post-surgery).`,
               `You want a known, exact dose without absorption variability.`,
             ],
@@ -319,7 +322,7 @@ export const GUIDES: Guide[] = [
     faqs: [
       {
         question: 'Does IV vitamin C actually do anything an orange can\'t?',
-        answer: 'Yes, at the right dose. An orange gives you about 70mg of vitamin C — within normal range. A high-dose IV can deliver 5,000 to 25,000mg in a single session, reaching plasma levels you cannot achieve through diet or oral supplementation due to gut absorption limits.',
+        answer: 'Yes, at the right dose. An orange gives you about 70mg of vitamin C, within normal range. A high-dose IV can deliver 5,000 to 25,000mg in a single session, reaching plasma levels you cannot achieve through diet or oral supplementation due to gut absorption limits.',
       },
       {
         question: 'Will an IV magnesium drip replace my daily magnesium supplement?',
@@ -327,7 +330,7 @@ export const GUIDES: Guide[] = [
       },
       {
         question: 'Is IV therapy "more natural" than oral supplements?',
-        answer: 'Neither is more or less natural than the other — both deliver isolated vitamins and minerals in concentrated form. The choice should be based on bioavailability needs, speed of effect, and budget, not perceived naturalness.',
+        answer: 'Neither is more or less natural than the other; both deliver isolated vitamins and minerals in concentrated form. The choice should be based on bioavailability needs, speed of effect, and budget, not perceived naturalness.',
       },
     ],
     relatedTreatments: [
@@ -345,15 +348,15 @@ export const GUIDES: Guide[] = [
     slug: 'first-time-iv-therapy-what-to-expect',
     author: 'TheDripMap Editorial Team',
     lastUpdated: '2026-05-24',
-    title: 'First-Time IV Therapy — What to Expect, Step by Step',
-    metaTitle: 'First-Time IV Therapy — What to Expect on Your First Visit',
+    title: 'First-Time IV Therapy: What to Expect, Step by Step',
+    metaTitle: 'First-Time IV Therapy: What to Expect on Your First Visit',
     metaDescription: 'Nervous about your first IV therapy session? A complete walkthrough of intake, the actual drip, how long it takes, and how you\'ll feel after.',
-    intro: `Your first IV therapy session can feel intimidating if you've never had an IV before. The good news is that the entire experience is far gentler than most people expect — closer to a long massage than a medical procedure. This guide walks you through exactly what happens from the moment you arrive until you walk out the door, so you know what to expect at each step.`,
+    intro: `Your first IV therapy session can feel intimidating if you've never had an IV before. The good news is that the entire experience is far gentler than most people expect, closer to a long massage than a medical procedure. This guide walks you through exactly what happens from the moment you arrive until you walk out the door, so you know what to expect at each step.`,
     sections: [
       {
         heading: 'Before your appointment',
         paragraphs: [
-          `Hydrate well in the 24 hours leading up to your visit. Properly hydrated veins are easier to access, which makes the IV insertion smoother and faster. Drink water, avoid heavy alcohol or caffeine in the hours immediately before, and have a light meal an hour or two before — going in on an empty stomach is generally fine but can leave some people lightheaded.`,
+          `Hydrate well in the 24 hours leading up to your visit. Properly hydrated veins are easier to access, which makes the IV insertion smoother and faster. Drink water, avoid heavy alcohol or caffeine in the hours immediately before, and have a light meal an hour or two before. Going in on an empty stomach is generally fine but can leave some people lightheaded.`,
           `If you're on any medications, supplements, or have allergies, write them down or have your phone notes ready. The clinic will ask during intake, and it's faster than trying to remember on the spot.`,
         ],
       },
@@ -367,7 +370,7 @@ export const GUIDES: Guide[] = [
       {
         heading: 'The IV insertion',
         paragraphs: [
-          `You'll be seated in a comfortable reclining chair (or your own bed, for mobile service). The nurse will tie a tourniquet around your upper arm, clean the insertion site with alcohol, and insert a small catheter — typically into a vein in your forearm or the back of your hand. The needle itself only stays in for a few seconds; what remains is a flexible plastic catheter no thicker than a coffee stir stick.`,
+          `You'll be seated in a comfortable reclining chair (or your own bed, for mobile service). The nurse will tie a tourniquet around your upper arm, clean the insertion site with alcohol, and insert a small catheter, typically into a vein in your forearm or the back of your hand. The needle itself only stays in for a few seconds; what remains is a flexible plastic catheter no thicker than a coffee stir stick.`,
           `The insertion feels like a quick pinch followed by a brief pressure sensation. Most people describe it as far less painful than a blood draw. If your veins are hard to access (which the nurse can usually tell within seconds), they may try a different spot or use a warm compress to bring veins to the surface.`,
         ],
       },
@@ -375,35 +378,35 @@ export const GUIDES: Guide[] = [
         heading: 'During the drip',
         paragraphs: [
           `Once the catheter is in and the drip is running, you can relax completely. Most clinics have Wi-Fi, magazines, snacks, charging stations, and entertainment. You can read, work on your laptop, take a call, or just nap. Sessions typically run 30 to 60 minutes for standard drips, or longer for NAD+ or high-dose treatments.`,
-          `You may feel some sensations as the drip runs: a brief warmth as B vitamins infuse, a "vitamin smell" or metallic taste with vitamin C, a flushing or chest warmth with magnesium. These are all normal. If anything feels uncomfortable, tell the nurse immediately — they can slow the rate or stop the infusion.`,
+          `You may feel some sensations as the drip runs: a brief warmth as B vitamins infuse, a "vitamin smell" or metallic taste with vitamin C, a flushing or chest warmth with magnesium. These are all normal. If anything feels uncomfortable, tell the nurse immediately; they can slow the rate or stop the infusion.`,
         ],
       },
       {
         heading: 'After the drip',
         paragraphs: [
           `The nurse will remove the catheter, apply pressure for 30 seconds, and put on a small bandage. You can keep it on for an hour or two; you may have a small bruise at the insertion site for a few days, especially if you bruise easily.`,
-          `There's no recovery time. You can drive, work, exercise, and resume your normal day. Most clients feel a subtle but noticeable lift within an hour — clearer-headed, more energetic, less foggy. The full effect typically builds over the following 24 to 48 hours, especially for vitamin and antioxidant drips.`,
+          `There's no recovery time. You can drive, work, exercise, and resume your normal day. Some clients describe feeling clearer-headed or more energetic afterward, which is mostly rehydration and subjective; others notice nothing, and that is normal too.`,
         ],
       },
       {
         heading: 'What to watch for',
         bullets: [
-          'Mild bruising or tenderness at the insertion site — normal, resolves in days',
-          'Slight lightheadedness as you stand up — common, drink water',
-          'Vitamin smell or taste in your mouth for an hour or two — normal',
-          'Significant pain, swelling, or redness at the insertion site — contact the clinic',
-          'Any allergic reaction signs (rash, throat tightness, difficulty breathing) — seek immediate medical attention',
+          'Mild bruising or tenderness at the insertion site: normal, resolves in days',
+          'Slight lightheadedness as you stand up: common, drink water',
+          'Vitamin smell or taste in your mouth for an hour or two: normal',
+          'Significant pain, swelling, or redness at the insertion site: contact the clinic',
+          'Any allergic reaction signs (rash, throat tightness, difficulty breathing): seek immediate medical attention',
         ],
       },
     ],
     faqs: [
       {
         question: 'Does the IV needle hurt?',
-        answer: 'Most people describe it as a quick pinch followed by mild pressure — less painful than a typical blood draw. The needle itself only stays in for seconds; what remains is a soft flexible catheter you barely feel.',
+        answer: 'Most people describe it as a quick pinch followed by mild pressure, less painful than a typical blood draw. The needle itself only stays in for seconds; what remains is a soft flexible catheter you barely feel.',
       },
       {
         question: 'How long does a first session take?',
-        answer: 'Plan for 60 to 90 minutes total — intake (15 to 30 minutes), the drip itself (30 to 60 minutes), and a few minutes to wrap up. Returning visits are faster since intake is already on file.',
+        answer: 'Plan for 60 to 90 minutes total: intake (15 to 30 minutes), the drip itself (30 to 60 minutes), and a few minutes to wrap up. Returning visits are faster since intake is already on file.',
       },
       {
         question: 'Can I work during the drip?',
@@ -425,15 +428,15 @@ export const GUIDES: Guide[] = [
     slug: 'mobile-iv-therapy-vs-clinic',
     author: 'TheDripMap Editorial Team',
     lastUpdated: '2026-05-24',
-    title: 'Mobile IV Therapy vs Clinic — Which Should You Choose?',
-    metaTitle: 'Mobile IV Therapy vs Clinic — Pros, Cons, Pricing Comparison',
+    title: 'Mobile IV Therapy vs Clinic: Which Should You Choose?',
+    metaTitle: 'Mobile IV Therapy vs Clinic: Pros, Cons, Pricing Comparison',
     metaDescription: 'Should you go to an IV clinic or have a nurse come to you? Detailed comparison of mobile vs in-clinic IV therapy: cost, convenience, safety.',
-    intro: `Mobile IV therapy — where a licensed nurse comes to your home, office, or hotel — has exploded in popularity over the past few years. For some clients it's a clear win; for others, the in-clinic experience offers benefits that mobile can't match. Here's the practical comparison to help you decide which fits your situation.`,
+    intro: `Mobile IV therapy, where a licensed nurse comes to your home, office, or hotel, has exploded in popularity over the past few years. For some clients it's a clear win; for others, the in-clinic experience offers benefits that mobile can't match. Here's the practical comparison to help you decide which fits your situation.`,
     sections: [
       {
         heading: 'The case for mobile IV therapy',
         paragraphs: [
-          `Mobile is the obvious choice when leaving the house isn't appealing or possible. Severe hangovers, post-flight exhaustion, recovery from a tough workout, or simply not wanting to drive — mobile brings the entire experience to your couch, bed, or hotel room. You can be in pajamas. You can nap. You don't have to commute.`,
+          `Mobile is the obvious choice when leaving the house isn't appealing or possible. Severe hangovers, post-flight exhaustion, recovery from a tough workout, or simply not wanting to drive: mobile brings the entire experience to your couch, bed, or hotel room. You can be in pajamas. You can nap. You don't have to commute.`,
           `Mobile is also the standard choice for group events: bachelorette parties, wedding mornings, corporate wellness days. Many providers offer group rates that make mobile cheaper per person than booking everyone into a clinic.`,
         ],
       },
@@ -441,13 +444,13 @@ export const GUIDES: Guide[] = [
         heading: 'The case for in-clinic IV therapy',
         paragraphs: [
           `In-clinic visits give you access to a wider menu, faster service, and lower per-session pricing. Most clinics have refrigerated stock of every ingredient and can mix custom protocols on demand. Mobile providers usually carry a limited inventory and require you to choose from a shorter menu.`,
-          `In-clinic is also typically the safer choice for first-time clients. The full clinic environment — multiple staff on site, complete emergency equipment, easier escalation if something goes wrong — provides a higher level of medical backup than a single nurse arriving alone with a kit.`,
+          `In-clinic is also typically the safer choice for first-time clients. The full clinic environment (multiple staff on site, complete emergency equipment, easier escalation if something goes wrong) provides a higher level of medical backup than a single nurse arriving alone with a kit.`,
         ],
       },
       {
         heading: 'Pricing comparison',
         paragraphs: [
-          `Mobile typically adds $50 to $100 per session over the equivalent in-clinic drip. Some mobile services also have minimums — for example, a $250 minimum charge even if the drip alone would be $175. For occasional use these premiums are negligible. For regular use, they add up: a weekly mobile habit can cost $400 to $500 more per month than the equivalent clinic visits.`,
+          `Mobile typically adds $50 to $100 per session over the equivalent in-clinic drip. Some mobile services also have minimums, for example a $250 minimum charge even if the drip alone would be $175. For occasional use these premiums are negligible. For regular use, they add up: a weekly mobile habit can cost $400 to $500 more per month than the equivalent clinic visits.`,
           `Group bookings are where mobile pricing flips. Three or more people getting drips together at one location often costs less per person via mobile than three separate clinic appointments.`,
         ],
       },
@@ -482,7 +485,7 @@ export const GUIDES: Guide[] = [
     faqs: [
       {
         question: 'Is mobile IV therapy safe?',
-        answer: 'Yes — when the provider is properly licensed, uses sterile single-use supplies, follows medical intake procedures, and has clear emergency protocols. Verify these before booking, just as you would for a clinic.',
+        answer: 'Yes, when the provider is properly licensed, uses sterile single-use supplies, follows medical intake procedures, and has clear emergency protocols. Verify these before booking, just as you would for a clinic.',
       },
       {
         question: 'How much extra does mobile IV therapy cost?',
@@ -490,7 +493,7 @@ export const GUIDES: Guide[] = [
       },
       {
         question: 'Can mobile IV providers handle group events?',
-        answer: 'Yes — group bookings are a major part of the mobile IV market. Bachelorette parties, weddings, and corporate wellness events are common. Group pricing per person is often cheaper than individual clinic visits.',
+        answer: 'Yes, group bookings are a major part of the mobile IV market. Bachelorette parties, weddings, and corporate wellness events are common. Group pricing per person is often cheaper than individual clinic visits.',
       },
     ],
     relatedTreatments: [
@@ -557,7 +560,7 @@ export const GUIDES: Guide[] = [
       },
     ],
     faqs: [
-      { question: 'Do I need my family doctor’s referral for an IV drip in Canada?', answer: 'Usually no. Private IV clinics are direct-access. You book directly, complete an intake, and a qualified professional at the clinic authorizes the drip.' },
+      { question: 'Do I need my family doctor’s referral for an IV drip in Canada?', answer: 'Usually no. Private IV clinics are direct-access. You contact the clinic yourself, complete an intake, and a qualified professional at the clinic authorizes the drip.' },
       { question: 'Do I need a prescription for a vitamin drip?', answer: 'For a standard wellness vitamin drip, the authorization is typically handled inside the clinic after your intake. For iron infusions or prescription add-ons, a prescriber’s order, and often bloodwork, is required.' },
       { question: 'Can I just walk in?', answer: 'Many clinics accept walk-ins for standard drips, but you still complete a health intake and can be declined if a drip is not appropriate for you.' },
       { question: 'Is a naturopath allowed to give IV therapy in Canada?', answer: 'In several provinces, naturopathic doctors administer IV therapy within their regulated scope. It varies by province, so confirm with the clinic.' },

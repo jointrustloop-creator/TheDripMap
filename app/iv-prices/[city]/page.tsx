@@ -24,7 +24,8 @@ export async function generateMetadata({ params }: { params: Promise<{ city: str
   const h = idx.headline;
   // "Cost" + "prices" both verbatim: the GSC query cluster is "iv therapy
   // {city} cost" / "how much" (pos 45-88 as of 2026-07-04), not "prices".
-  const title = `IV Therapy Cost in ${idx.city} (2026): Real Prices From ${idx.clinicCount} Clinics | TheDripMap`;
+  // Under 60 characters for Toronto (was 75). The brand shows via og:site_name.
+  const title = `IV Therapy Cost in ${idx.city} (2026): Real Prices, ${idx.clinicCount} Clinics`;
   const description = `A standard IV vitamin drip in ${idx.city} runs a median of $${h.median} (about $${h.low} to $${h.high}), based on ${idx.clinicCount} published clinic menus. Compare ${idx.rows.length} drips by real price.`;
   const url = `${SITE}/iv-prices/${idx.citySlug}`;
   return {
@@ -77,20 +78,28 @@ export default async function CityPriceIndexPage({ params }: { params: Promise<{
     description: `Published prices for ${i.rows.length} IV therapy drips across ${i.clinicCount} clinics in ${i.city}, with low, median, and high in ${curLong}.`,
     url: `${SITE}/iv-prices/${i.citySlug}`,
     creator: { '@type': 'Organization', name: 'TheDripMap', url: SITE },
+    publisher: { '@type': 'Organization', name: 'TheDripMap', url: SITE },
+    // The snapshot month doubles as the modification date until per-row
+    // timestamps exist; AI engines look for it (2026-09-18 audit).
+    dateModified: (() => { const d = new Date(`1 ${i.asOf}`); return Number.isNaN(d.getTime()) ? undefined : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`; })(),
     // Dataset rich-result recommended properties (GSC "Datasets" warning,
     // 2026-08-05). license, temporalCoverage and spatialCoverage are the three
     // Google flags as recommended-but-missing; the other Dataset blocks on the
     // site already carry them, so these two were the outliers.
     license: `${SITE}/iv-prices#methodology`,
-    temporalCoverage: i.asOf,
+    // ISO 8601 month for schema; the human label stays in the visible copy.
+    temporalCoverage: (() => { const d = new Date(`1 ${i.asOf}`); return Number.isNaN(d.getTime()) ? i.asOf : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; })(),
     spatialCoverage: { '@type': 'Place', name: `${i.city}, Canada` },
     isAccessibleForFree: true,
     variableMeasured: i.rows.map((r) => ({
       '@type': 'PropertyValue',
       name: `${r.treatment} price in ${i.city} (${i.currency})`,
-      median: r.median,
+      // PropertyValue has no "median" property; value carries the median and
+      // min/max carry the range (2026-09-18 schema audit).
+      value: r.median,
       minValue: r.low,
       maxValue: r.high,
+      unitText: i.currency,
     })),
   };
   const faqLd = {
@@ -113,6 +122,7 @@ export default async function CityPriceIndexPage({ params }: { params: Promise<{
         <h1 className="text-[clamp(2rem,5vw,3.25rem)] font-black text-slate-900 tracking-tight leading-[1.05]">
           IV therapy cost in {i.city}: real prices
         </h1>
+        <p className="mt-2 text-sm text-slate-500">Updated {i.asOf}. By the TheDripMap editorial team, from published clinic menus.</p>
         <p className="mt-4 text-lg text-slate-600 leading-relaxed">
           Across <b className="text-slate-900">{i.clinicCount} {i.city} IV therapy clinics</b> with published menus, a standard IV vitamin drip costs a <b className="text-slate-900">median of {dollars(h.median)}</b>, typically {dollars(h.low)} to {dollars(h.high)} ({curLong}, as of {i.asOf}). Specialty drips like NAD+ and beauty blends run higher. Here is the real range by drip.
         </p>

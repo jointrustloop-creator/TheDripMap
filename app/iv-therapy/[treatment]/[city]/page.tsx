@@ -214,8 +214,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = count >= 3
     ? `${t.name} in ${cityLabel} (${YEAR}) | ${count} Clinics | TheDripMap`
     : `${t.name} in ${cityLabel} (${YEAR}): Options & Nearby Clinics | TheDripMap`;
+  // Keep the treatment name's casing ("NAD+ IV", not "nad+ iv") and never
+  // promise booking: we route to the clinic, we do not take bookings.
   const description = count >= 3
-    ? `Compare ${count} ${t.name.toLowerCase()} providers in ${cityLabel}. See clinics, what to expect, typical pricing, and book your session on TheDripMap.`
+    ? `Compare ${count} ${t.name} providers in ${cityLabel}. See clinics, what to expect and typical pricing, then contact the clinic. TheDripMap, the Canadian IV therapy matching platform.`
     : `${t.name} in ${cityLabel}: how it works, what to expect, and the closest clinics that offer it. Compare options on TheDripMap.`;
 
   return {
@@ -233,9 +235,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     robots: (count < 3 || isNoindexedUSPage({ state: resolved.stateAbbr || resolved.state })) ? { index: false, follow: true } : undefined,
     openGraph: {
       title: `${t.name} in ${cityLabel} (${YEAR}) | TheDripMap`,
-      description: `Find ${t.name.toLowerCase()} clinics in ${cityLabel}.`,
+      description,
       url: canonical,
       type: 'website',
+      images: [`${SITE_URL}/og-image.png`],
+    },
+    // Without this the root layout's generic card was used (2026-09-18 audit).
+    twitter: {
+      card: 'summary_large_image',
+      title: `${t.name} in ${cityLabel} (${YEAR}) | TheDripMap`,
+      description,
       images: [`${SITE_URL}/og-image.png`],
     },
   };
@@ -313,7 +322,7 @@ export default async function TreatmentCityPage({ params }: PageProps) {
   const claimedNote = claimedCount > 0 ? `, ${claimedCount} claimed` : '';
   const verifiedNote = safetyVerifiedCount > 0 ? `${claimedCount > 0 ? ' and' : ','} ${safetyVerifiedCount} Safety Verified` : '';
   const intro = count > 0
-    ? `There ${count === 1 ? 'is' : 'are'} ${count} ${t.name.toLowerCase()} ${count === 1 ? 'provider' : 'providers'} in ${cityLabel} on TheDripMap${claimedNote}${verifiedNote}.${topNames.length ? ` Options include ${topNames.join(', ')}.` : ''} ${summarySentence ? summarySentence + '.' : ''} Compare what each clinic offers below, then book directly.`
+    ? `There ${count === 1 ? 'is' : 'are'} ${count} ${t.name.toLowerCase()} ${count === 1 ? 'provider' : 'providers'} in ${cityLabel} on TheDripMap${claimedNote}${verifiedNote}.${topNames.length ? ` Options include ${topNames.join(', ')}.` : ''} ${summarySentence ? summarySentence + '.' : ''} Compare what each clinic offers below, then contact the clinic.`
     : `We're still adding ${t.name.toLowerCase()} providers in ${cityLabel}. ${summarySentence ? summarySentence + '.' : ''} In the meantime, browse nearby clinics or explore the treatment guide below.`;
 
   // Data-driven FAQs. Each answer leads with a fact computed from the live clinic
@@ -334,13 +343,14 @@ export default async function TreatmentCityPage({ params }: PageProps) {
 
   let chooseA = `Compare credentials, transparent ingredients and pricing, and reviews.`;
   if (cs.topRated) chooseA += ` In ${resolved.name}, ${cs.topRated.name} is currently the highest-rated option at ${Number(cs.topRated.rating).toFixed(1)} stars across ${cs.topRated.reviewCount} reviews.`;
-  if (cs.claimedCount > 0) chooseA += ` ${cs.claimedCount} ${resolved.name} ${cs.claimedCount === 1 ? 'clinic has' : 'clinics have'} claimed and verified ${cs.claimedCount === 1 ? 'its' : 'their'} listing on TheDripMap.`;
-  else chooseA += ` Look for clinics that have claimed and verified their listing.`;
+  // "Claimed" is not "verified": Safety Verified is a separate human review.
+  if (cs.claimedCount > 0) chooseA += ` ${cs.claimedCount} ${resolved.name} ${cs.claimedCount === 1 ? 'clinic has' : 'clinics have'} claimed ${cs.claimedCount === 1 ? 'its' : 'their'} listing on TheDripMap.`;
+  else chooseA += ` Look for clinics that have claimed their listing and, where shown, carry the Safety Verified badge.`;
 
   let bookA = `Most ${resolved.name} clinics work by appointment, and some in-clinic locations also take walk-ins.`;
   if (cs.mobileCount > 0) bookA += ` The ${cs.mobileCount} mobile ${cs.mobileCount === 1 ? 'option is' : 'options are'} appointment-based, so book the visit ahead.`;
   else bookA += ` Check each listing for current hours and booking details.`;
-  bookA += ` Weekends and holidays tend to fill up fastest.`;
+  bookA += ` Confirm hours with the clinic before you go.`;
 
   const faqs = [
     { q: `How much does ${tl} cost in ${resolved.name}?`, a: noDash(costA) },
@@ -354,13 +364,23 @@ export default async function TreatmentCityPage({ params }: PageProps) {
   // Match against the matrix display name first, then the filter keyword.
   const oneLineDef = findDefinition(t.name) || findDefinition(t.filter);
 
+  // The treatment page slug for internal linking (matrix slug -> /treatments
+  // slug). Declared here because the DefinedTerm below needs it: it used to
+  // point at /iv-therapy/<slug>, which 308-redirects (2026-09-18 schema audit).
+  const treatmentPageSlug =
+    t.slug === 'hangover-recovery' ? 'hangover'
+    : t.slug === 'athletic-recovery' ? 'recovery'
+    : t.slug === 'mobile-iv' ? 'hydration'
+    : t.slug === 'vitamin-c' ? 'high-dose-vitamin-c'
+    : t.slug;
+
   const definedTermJsonLd = oneLineDef ? {
     '@context': 'https://schema.org',
     '@type': 'DefinedTerm',
     name: oneLineDef.name,
     description: oneLineDef.definition,
     inDefinedTermSet: `${SITE_URL}/treatments`,
-    url: oneLineDef.slug ? `${SITE_URL}/iv-therapy/${oneLineDef.slug}` : `${SITE_URL}/treatments`,
+    url: `${SITE_URL}/treatments/${treatmentPageSlug}`,
   } : null;
 
   const itemListJsonLd = count > 0 ? {
@@ -386,25 +406,9 @@ export default async function TreatmentCityPage({ params }: PageProps) {
     mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
   };
 
-  // The treatment page slug for internal linking (matrix slug -> /treatments slug).
-  const treatmentPageSlug =
-    t.slug === 'hangover-recovery' ? 'hangover'
-    : t.slug === 'athletic-recovery' ? 'recovery'
-    : t.slug === 'mobile-iv' ? 'hydration'
-    : t.slug === 'vitamin-c' ? 'high-dose-vitamin-c'
-    : t.slug;
-
-  // BreadcrumbList JSON-LD for the treatment x city page.
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
-      { '@type': 'ListItem', position: 2, name: 'Treatments', item: `${SITE_URL}/treatments` },
-      { '@type': 'ListItem', position: 3, name: t.name, item: `${SITE_URL}/treatments/${treatmentPageSlug}` },
-      { '@type': 'ListItem', position: 4, name: cityLabel, item: canonical },
-    ],
-  };
+  // BreadcrumbList JSON-LD is emitted by <BreadcrumbNav> below. A second,
+  // hand-built copy used to be emitted here too and the two disagreed
+  // (2026-09-18 schema audit). One breadcrumb per page.
 
   const otherTreatments = MATRIX_TREATMENTS.filter((x) => x.slug !== t.slug).slice(0, 6);
 
@@ -413,7 +417,6 @@ export default async function TreatmentCityPage({ params }: PageProps) {
       <Navbar />
       {itemListJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />}
       {definedTermJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermJsonLd) }} />}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <main className="max-w-6xl mx-auto px-6 py-12">

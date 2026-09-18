@@ -111,6 +111,20 @@ export const getStateFromProvider = (provider: Provider): string => {
  * six of seven is more useful than a claimed one disclosing two, and ranking
  * otherwise on a site that sells itself on transparency would be dishonest.
  */
+/**
+ * Tags a clinic may declare but the platform must never display (2026-09-18).
+ * Prescription drugs by name, substances without Health Canada approval, and
+ * oncology services. Rendering them as tags is promotion, and a matching
+ * platform must not promote a prescription drug. Matching keeps the raw row.
+ */
+// "detox" is on the list because a menu item named "Liver Detox IV" is a
+// treatment claim in a tag, and it surfaced on the Toronto page the same day
+// the body copy making that claim was removed.
+const UNPUBLISHABLE_TAG = /semaglutide|tirzepatide|glp-?1|ozempic|wegovy|mounjaro|zepbound|bpc-?157|tb-?500|peptide|ozone|oncolog|cancer|chemo|tumou?r|hcg\b|testosterone|\btrt\b|hormone replacement|ketamine|stem cell|exosome|prp\b|botox|filler|detox/i;
+export function isUnpublishableTag(tag: unknown): boolean {
+  return typeof tag === 'string' && UNPUBLISHABLE_TAG.test(tag);
+}
+
 export function enrichProvider(p: any): Provider {
   if (!p) return p;
   
@@ -125,7 +139,14 @@ export function enrichProvider(p: any): Provider {
   // every treatment filter match every clinic (NAD+ == Weight Loss == everyone).
   // Fall back to a single honest generic tag only when a clinic has none, so
   // cards/pages are never empty (every provider here IS an IV therapy clinic).
-  const specialties = rawSpecialties.length > 0 ? [...new Set(rawSpecialties)] : ['IV Therapy'];
+  //
+  // Public tag filter (2026-09-18 audit): clinics declare their own specialties
+  // and some declare prescription drugs by name, substances not approved by
+  // Health Canada, or oncology services. Rendering those as tags makes the
+  // platform advertise them. They stay on the row for internal matching and
+  // are simply never shown.
+  const publishable = rawSpecialties.filter((s: string) => !isUnpublishableTag(s));
+  const specialties = publishable.length > 0 ? [...new Set(publishable)] : ['IV Therapy'];
     
   const amenities = (Array.isArray(p.amenities) 
     ? p.amenities 
@@ -206,7 +227,11 @@ export function enrichProvider(p: any): Provider {
     // pricing reaches the Drip Menu). Otherwise fall back to specialty strings.
     services: (Array.isArray(p.services) && p.services.some((sv: unknown) =>
       sv && typeof sv === 'object' && 'name' in (sv as Record<string, unknown>) && 'price' in (sv as Record<string, unknown>)
-    )) ? p.services : specialties,
+    ))
+      // Same public filter as specialties: a priced "Semaglutide" menu line is
+      // still a prescription drug advertised on our page.
+      ? p.services.filter((sv: unknown) => !(sv && typeof sv === 'object' && isUnpublishableTag((sv as { name?: unknown }).name)))
+      : specialties,
     reviews_data: p.reviews_data || [],
     medical_team: p.medical_team || [],
     special_offers: p.special_offers || []

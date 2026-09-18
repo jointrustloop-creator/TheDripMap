@@ -11,7 +11,7 @@ export const revalidate = 86400;
 
 const SITE_URL = 'https://www.thedripmap.com';
 
-const title = 'IV Therapy Guides — Cost, How to Choose, What to Expect | TheDripMap';
+const title = 'IV Therapy Guides: Cost, How to Choose, What to Expect | TheDripMap';
 const description = 'In-depth guides to IV therapy: how to choose a clinic, what treatments cost, what to expect on your first visit, and how IV compares to oral supplements.';
 
 export const metadata: Metadata = {
@@ -48,10 +48,10 @@ export default function GuidesIndexPage() {
     })),
   };
 
-  // Use intro for the preview — richer than metaDescription. Cap at ~240 chars.
+  // Use intro for the preview, richer than metaDescription. Cap at ~240 chars.
   const guides = GUIDES.map((g) => ({
     slug: g.slug,
-    title: g.title.split(' — ')[0],
+    title: g.title,
     preview:
       g.intro.length > 240 ? g.intro.slice(0, 235).trim() + '…' : g.intro,
     sectionCount: g.sections.length,
@@ -89,7 +89,7 @@ export default function GuidesIndexPage() {
           </p>
         </section>
 
-        {/* Guide grid — first card is "Start here" hero */}
+        {/* Guide grid, first card is "Start here" hero */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-24">
           {guides.map((g, idx) => (
             <Link
@@ -164,7 +164,7 @@ export default function GuidesIndexPage() {
                 Treatments
               </h3>
               <p className="text-sm text-slate-600 leading-relaxed mb-4">
-                NAD+, Myers Cocktail, Hangover, Beauty Glow and 6 more — full
+                NAD+, Myers Cocktail, Hangover, Beauty Glow and 6 more: full
                 details, costs, and clinics that offer each protocol.
               </p>
               <span className="text-xs font-black text-wellness-600 uppercase tracking-widest group-hover:underline">

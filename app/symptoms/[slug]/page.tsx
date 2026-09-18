@@ -16,8 +16,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const useCase = await getUseCaseBySlug(slug);
   if (!useCase) return { title: 'Not Found' };
 
-  const title = `IV Therapy for ${useCase.title} — Protocols & Local Clinics | TheDripMap`;
-  const description = `Clinically-reviewed protocols for ${useCase.title.toLowerCase()} via IV therapy. Find clinics near you specializing in ${useCase.title.toLowerCase()} support.`;
+  const title = `IV Therapy for ${useCase.title}: What Is in the Drip and Local Clinics | TheDripMap`;
+  const description = `What a drip for ${useCase.title.toLowerCase()} typically contains, what it can and cannot do, and clinics near you.`;
 
   return {
     title,
@@ -125,14 +125,14 @@ export default async function UseCasePage({ params }: PageProps) {
           <div className="flex flex-col md:flex-row items-center gap-12">
             <div className="flex-1">
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8 tracking-tight">
-                IV Therapy for {useCase.title} — What to Expect
+                IV Therapy for {useCase.title}: What to Expect
               </h1>
               <div className="prose prose-lg text-gray-600 max-w-none leading-relaxed">
                 <p className="mb-6">{useCase.description}</p>
                 
                 {useCase.whyItWorks && (
                   <div className="mt-12">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Why IV therapy works for {useCase.title}</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Why clinics offer IV therapy for {useCase.title}</h2>
                     <div className="whitespace-pre-wrap">{useCase.whyItWorks}</div>
                   </div>
                 )}

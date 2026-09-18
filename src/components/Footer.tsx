@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Instagram, Facebook, Linkedin, Twitter, ArrowRight } from 'lucide-react';
+import { Instagram, ArrowRight } from 'lucide-react';
 import { Logo } from './Logo';
 
 // Canada-only footer. No US block. Static (no per-page data fetch) so it stays
@@ -19,6 +19,12 @@ const TREATMENTS = [
 
 const GUIDES = [
   { label: 'IV Price Index (Canada)', href: '/iv-prices', strong: true },
+  // The three city indexes and the national report are the most citable
+  // pages on the site; the report had zero inbound links (2026-09-18 audit).
+  { label: 'Toronto IV Prices', href: '/iv-prices/toronto' },
+  { label: 'Calgary IV Prices', href: '/iv-prices/calgary' },
+  { label: 'Edmonton IV Prices', href: '/iv-prices/edmonton' },
+  { label: 'Canadian IV Therapy Report', href: '/canadian-iv-therapy-report', strong: true },
   { label: 'IV Therapy Insurance Coverage in Canada', href: '/blog/iv-therapy-insurance-coverage-canada' },
   { label: 'Who Can Legally Give IV Therapy by Province', href: '/blog/who-can-legally-give-iv-canada-rules-by-province-2026' },
   { label: 'Mobile IV Therapy Toronto & GTA', href: '/blog/mobile-iv-therapy-toronto-gta' },
@@ -33,11 +39,19 @@ const CANADIAN_HUBS = [
   { label: 'Ottawa', href: '/cities/ottawa' },
   { label: 'Edmonton', href: '/cities/edmonton' },
   { label: 'Montreal', href: '/cities/montreal' },
+  { label: 'Mississauga', href: '/cities/mississauga' },
+  // Province pages had no link from any hub (2026-09-18 audit).
+  { label: 'Ontario', href: '/states/ontario' },
+  { label: 'British Columbia', href: '/states/british-columbia' },
+  { label: 'Alberta', href: '/states/alberta' },
 ];
 
 const COMPANY = [
   { label: 'About', href: '/about' },
   { label: 'Blog', href: '/blog' },
+  // /deals had no inbound link from any hub (2026-09-18 audit), so search
+  // engines could not reach it. One footer link fixes the orphan.
+  { label: 'Clinic Deals', href: '/deals' },
   { label: 'Contact', href: '/contact' },
 ];
 
@@ -89,15 +103,9 @@ export const Footer = () => {
             >
               <Instagram size={16} strokeWidth={2} />
             </a>
-            <a href="#" aria-label="TheDripMap on Facebook" className="inline-flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200 text-slate-400 hover:text-wellness-700 hover:border-wellness-200 hover:bg-wellness-50 transition-all">
-              <Facebook size={16} strokeWidth={2} />
-            </a>
-            <a href="#" aria-label="TheDripMap on LinkedIn" className="inline-flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200 text-slate-400 hover:text-wellness-700 hover:border-wellness-200 hover:bg-wellness-50 transition-all">
-              <Linkedin size={16} strokeWidth={2} />
-            </a>
-            <a href="#" aria-label="TheDripMap on X" className="inline-flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200 text-slate-400 hover:text-wellness-700 hover:border-wellness-200 hover:bg-wellness-50 transition-all">
-              <Twitter size={16} strokeWidth={2} />
-            </a>
+            {/* Facebook, LinkedIn and X icons removed 2026-09-18: all three were
+                href="#" dead links. Add them back only with real profile URLs
+                and mirror them in the Organization sameAs list. */}
           </div>
         </div>
 

@@ -249,9 +249,9 @@ export default async function ServicePage({ params }: { params: Promise<{ servic
 
   return (
     <>
-      {faqJsonLd && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      )}
+      {/* FAQPage JSON-LD is emitted once, by <FAQSection> inside the client
+          page. This server copy duplicated it in the rendered DOM
+          (2026-09-18 schema audit). */}
       <Suspense fallback={fallback}>
         <ServicePageClient
           serviceSlug={service}

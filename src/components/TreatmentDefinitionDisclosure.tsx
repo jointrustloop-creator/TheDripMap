@@ -59,7 +59,12 @@ export function TreatmentDefinitionDisclosure({
     );
   }
 
-  const learnMoreHref = definition.slug ? `/iv-therapy/${definition.slug}` : null;
+  // /iv-therapy/<slug> 308-redirects to /treatments/<slug>; link the
+  // destination so internal links never chain (2026-09-18 audit).
+  const TREATMENT_PAGE_SLUG: Record<string, string> = {
+    'hangover-recovery': 'hangover', 'athletic-recovery': 'recovery', 'mobile-iv': 'hydration', 'vitamin-c': 'high-dose-vitamin-c',
+  };
+  const learnMoreHref = definition.slug ? `/treatments/${TREATMENT_PAGE_SLUG[definition.slug] ?? definition.slug}` : null;
 
   if (variant === 'unclaimed') {
     return (

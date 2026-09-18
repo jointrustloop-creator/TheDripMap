@@ -24,6 +24,7 @@ import { ClinicianSection } from '../src/components/ClinicianSection';
 import { TrustSignals } from '../src/components/TrustSignals';
 import { getBlogPosts, getSiteStats, getPopularCities, getFeaturedListings, getOperatorProfiles } from '../src/lib/data';
 import { US_MARKET_ENABLED } from '../src/lib/market';
+import { PRICE_INDEX } from '../src/lib/price-index-data';
 import { isSafetyVerified } from '../src/lib/safety';
 import { Metadata } from 'next';
 
@@ -894,7 +895,17 @@ export default async function HomePage() {
         const faqs: Array<{ q: string; a: string; href?: string; hrefLabel?: string }> = [
           {
             q: 'How much does IV therapy cost?',
-            a: `Most clinics charge between $100 and $400 per drip depending on the formula: basic hydration sits at the low end, vitamin cocktails in the middle, and NAD+ at the top. Published menus in Canadian metros typically run $120 to $350 in Vancouver, $150 to $200 in Calgary, and $190 to $400 in Toronto. Listings on The Drip Map show each clinic's own menu and prices where the clinic has provided them.`,
+            // Derived from the measured Price Index, never hand-typed: the
+            // old sentence said "$190 to $400 in Toronto" while the index and
+            // the Toronto page said $99 to $399 (2026-09-18 schema audit).
+            a: (() => {
+              const cities = ['toronto', 'calgary', 'edmonton']
+                .map((k) => PRICE_INDEX[k])
+                .filter(Boolean)
+                .map((i) => `$${i.headline.low} to $${i.headline.high} in ${i.city} (median $${i.headline.median}, ${i.clinicCount} clinics)`);
+              const asOf = PRICE_INDEX.toronto?.asOf ? `, as of ${PRICE_INDEX.toronto.asOf}` : '';
+              return `Most clinics charge between $100 and $400 per drip depending on the formula: basic hydration sits at the low end, vitamin cocktails in the middle, and NAD+ at the top. Published menus for a standard drip run ${cities.join('; ')}${asOf}. Listings on TheDripMap show each clinic's own menu and prices where the clinic has provided them.`;
+            })(),
             href: '/guide/iv-therapy-cost-guide',
             hrefLabel: 'Read the full cost guide',
           },

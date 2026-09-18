@@ -7,7 +7,9 @@ import { ShieldCheck, Zap, Heart, Clock, Star, MapPin, CheckCircle2 } from 'luci
 import { IVAnimation } from '../../src/components/IVAnimation';
 import { getSiteStats } from '../../src/lib/data';
 
-const aboutTitle = "Our Mission & Clinical Standards | TheDripMap";
+// "Clinical Standards" implied we set standards for clinics. We do not: the
+// provincial colleges do. We verify listings against those registers.
+const aboutTitle = "Our Mission & How We Verify Clinics | TheDripMap";
 const aboutDescription = "Learn about TheDripMap, Canada's IV therapy matching platform. We help patients compare clinics and match with the right IV therapy provider.";
 const aboutOgImage = 'https://www.thedripmap.com/og-image.png';
 
@@ -44,8 +46,23 @@ export default async function AboutPage() {
             Our <span className="text-wellness-600">Mission</span>
           </h1>
           <p className="text-xl text-slate-500 leading-relaxed">
-            TheDripMap is Canada&apos;s IV therapy matching platform. Our goal is to help you find the right provider for your goals and lifestyle, across {stats.total} clinics and {stats.cities} cities.
+            TheDripMap is Canada&apos;s IV therapy matching platform. It lists IV therapy clinics by city, publishes real menu prices in the Canada IV Price Index, and verifies named practitioners against the provincial college registers. It does not sell treatments or take bookings.
           </p>
+          {/* One dated, self-contained fact for search and AI engines. Every
+              number is live from getSiteStats; nothing hand-typed. */}
+          <p className="mt-4 text-base text-slate-500 leading-relaxed">
+            As of {new Date().toLocaleDateString('en-CA', { month: 'long', year: 'numeric' })}, TheDripMap lists {stats.total} IV therapy clinics across {stats.cities} Canadian cities and {stats.states} provinces. Questions: info@thedripmap.com
+          </p>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'AboutPage',
+              name: 'About TheDripMap',
+              url: 'https://www.thedripmap.com/about',
+              mainEntity: { '@type': 'Organization', name: 'TheDripMap', url: 'https://www.thedripmap.com', email: 'info@thedripmap.com' },
+            }) }}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-20 items-center mb-20">
@@ -58,7 +75,7 @@ export default async function AboutPage() {
               Finding a reputable IV therapy provider can be difficult. With so many options available, it&apos;s hard to know which clinics prioritize medical supervision, follow strict safety protocols, and offer the best value for your money.
             </p>
             <p className="text-lg text-slate-500 leading-relaxed">
-              TheDripMap was created to bring transparency and trust to the IV therapy industry. We&apos;ve analyzed hundreds of clinics across Canada to provide you with the most accurate and up-to-date information.
+              TheDripMap was created to bring transparency and trust to the IV therapy industry. We list IV therapy clinics across Canada and show what each clinic publishes about its drips, prices, hours and practitioners, checked against the provincial college register wherever a practitioner is named.
             </p>
           </div>
         </div>
@@ -98,7 +115,7 @@ export default async function AboutPage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {[
-                { icon: <Clock size={16} />, title: 'Real-time Booking', desc: 'Instant access to clinic schedules' },
+                { icon: <Clock size={16} />, title: 'Verified Practitioners', desc: 'Named prescribers checked against the provincial college register' },
                 { icon: <MapPin size={16} />, title: 'Mobile Options', desc: 'IV therapy delivered to your door' },
                 { icon: <Star size={16} />, title: 'Guided Matching', desc: 'Personalized matching quiz' },
                 { icon: <CheckCircle2 size={16} />, title: '100% Free', desc: 'No hidden fees for patients' }

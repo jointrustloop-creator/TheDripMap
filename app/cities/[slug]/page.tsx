@@ -16,7 +16,7 @@ import { QuizCTA } from '@/src/components/QuizCTA';
 import { ListingController } from '@/src/components/ListingController';
 import { slimProviderForList } from '@/src/lib/clinic-display';
 import { ProviderCard } from '@/src/components/ProviderCard';
-import { getCityBySlug, getListingsByCity, getAllCities, getListingsByState, getFeaturedListings, getBlogPostBySlug, slugify, getTorontoGtaTieredListings } from '@/src/lib/data';
+import { getCityBySlug, getListingsByCity, getAllCities, getListingsByState, getFeaturedListings, getBlogPostBySlug, slugify, getTorontoGtaTieredListings, TORONTO_CORE_CITIES } from '@/src/lib/data';
 import { marketOf } from '@/src/lib/market';
 import { isSafetyVerified } from '@/src/lib/safety';
 import { liveDealsFromListings, type LiveDeal } from '@/src/lib/deals';
@@ -151,8 +151,14 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   // Real in-city count: getListingsByCity broadens to state level when a city
   // has zero exact matches, so filter back to this city for honest metadata
   // (the title/description must not promise clinics that are actually nearby).
+  // Toronto uses the same definition as the page body (the amalgamated city:
+  // Toronto plus its former municipalities), so the title's number matches the
+  // answer-first block instead of undercounting it (93 vs 109, 2026-09-18 audit).
+  const coreCities = slug === 'toronto'
+    ? new Set(TORONTO_CORE_CITIES.map((c) => c.toLowerCase()))
+    : new Set([name.toLowerCase()]);
   const localCount = listings.filter(
-    (l) => ((l as { city?: string }).city || '').toLowerCase() === name.toLowerCase()
+    (l) => coreCities.has(((l as { city?: string }).city || '').toLowerCase())
   ).length;
 
   // Even for a totally unknown city slug, emit title + description + canonical
@@ -494,7 +500,9 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
     },
     {
       question: `Do clinics in ${cityData.name} offer mobile services?`,
-      answer: `Yes, many providers in ${cityData.name} offer mobile IV therapy where medical professionals bring treatments directly to your home, office, or hotel. You can identify these by looking for the "Mobile Service" badge in the listings.`
+      // Was a fixed "Yes, many providers..." on every city, including cities
+      // with zero mobile listings (2026-09-18 audit). Now always true.
+      answer: `Some providers offer mobile IV therapy, where a nurse or naturopathic doctor brings the drip to your home, office, or hotel. Look for the "Mobile Service" badge in the ${cityData.name} listings; if none carry it, the clinics listed work from a physical location and you can check nearby cities for mobile options.`
     },
     {
       question: `What is the average cost of IV therapy in ${cityData.name}?`,
@@ -502,7 +510,7 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
       // range only appears for cities without collected menu data yet.
       answer: cityPriceIndex
         ? `Based on published menu prices from ${cityPriceIndex.clinicCount} ${cityData.name} clinics (${cityPriceIndex.asOf}), a ${cityPriceIndex.headline.treatment.toLowerCase()} runs ${cur(cityPriceIndex.headline.low)} to ${cur(cityPriceIndex.headline.high)}, with a median of ${cur(cityPriceIndex.headline.median)}. See the full ${cityData.name} IV Price Index on TheDripMap for per-treatment ranges.`
-        : `While prices vary by provider and specific protocol, most standard hydration and wellness drips in ${cityData.name} range from $150 to $300. Specialized treatments like NAD+ therapy typically start at $500.`
+        : `Prices vary by provider and protocol. Standard hydration and vitamin drips in ${cityData.name} are typically in the low hundreds of dollars, and NAD+ varies widely with dose. Each listing shows the clinic's own menu and prices where the clinic has published them.`
     }
   ];
   const faqs = [...curatedFaqs, ...genericFaqs].slice(0, 6);
@@ -598,10 +606,14 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: `IV therapy clinics in ${cityData.name}`,
-    numberOfItems: Math.min(listings.length, 12),
+    // numberOfItems is the real list size; only the first 12 are itemised.
+    numberOfItems: listings.length,
     itemListElement: (listings as ListingRow[]).slice(0, 12).map((l, i) => {
+      const claimed = (l as { is_claimed?: boolean }).is_claimed === true;
       const lb: Record<string, unknown> = {
-        '@type': 'MedicalBusiness',
+        // MedicalBusiness only for a listing an owner has claimed; an
+        // unverified scrape is a LocalBusiness (2026-09-18 schema audit).
+        '@type': claimed ? 'MedicalBusiness' : 'LocalBusiness',
         name: l.name,
         url: `https://www.thedripmap.com/providers/${l.slug || ''}`,
         address: l.address || [l.city, l.state].filter(Boolean).join(', '),
@@ -610,7 +622,9 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
       if (l.website) lb.sameAs = l.website;
       const rating = l.rating != null ? Number(l.rating) : null;
       const reviews = l.reviews != null ? Number(l.reviews) : null;
-      if (rating && reviews) {
+      // Third-party (Google) ratings are never marked up as our own review
+      // snippet. Same gate the treatment-city and blog ItemLists already use.
+      if (rating && reviews && (l as { is_featured?: boolean }).is_featured === true) {
         lb.aggregateRating = {
           '@type': 'AggregateRating',
           ratingValue: rating,
@@ -728,11 +742,22 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
               <section className="mb-12 max-w-4xl space-y-4">
                 <p className="text-lg text-slate-600 leading-relaxed">{intro.localContext}</p>
                 <p className="text-lg text-slate-600 leading-relaxed">
-                  With {isBroadened
+                  With {isToronto
+                    // One definition of "Toronto" on this page (2026-09-18 audit):
+                    // the amalgamated city is the core count, the GTA is named
+                    // separately. `count` here is the whole GTA set and used to
+                    // read "276 clinics in Toronto" beside a title saying 93.
+                    ? `${torontoCore.length} clinics in Toronto and ${torontoNearby.length} more across the GTA`
+                    : isBroadened
                     ? (exactCityCount > 0
                         ? `${exactCityCount} ${exactCityCount === 1 ? 'clinic' : 'clinics'} in ${cityData.name} and more nearby`
                         : `top-rated clinics near ${cityData.name}`)
-                    : `${count} ${count === 1 ? 'clinic' : 'clinics'} in ${cityData.name}`}, popular treatments include {intro.popularTreatments.join(', ')}. {intro.pricing}
+                    : `${count} ${count === 1 ? 'clinic' : 'clinics'} in ${cityData.name}`}, popular treatments include {intro.popularTreatments.join(', ')}. {cityPriceIndex
+                    // Where a measured index exists it wins over the hand-typed
+                    // intro sentence, which said "$175 to $350" on Toronto while
+                    // the index on the same page said median $150 (2026-09-18).
+                    ? `Published menus put a ${cityPriceIndex.headline.treatment.toLowerCase()} at $${cityPriceIndex.headline.low} to $${cityPriceIndex.headline.high}, median $${cityPriceIndex.headline.median}, across ${cityPriceIndex.clinicCount} clinics as of ${cityPriceIndex.asOf}.`
+                    : intro.pricing}
                 </p>
               </section>
             );
@@ -806,33 +831,10 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
                 {cityPriceIndex.note ? ` ${cityPriceIndex.note}` : ''}
               </p>
 
-              {/* Dataset JSON-LD so the price table is a citable dataset for
-                  search and AI engines (AEO), scoped to this module. */}
-              <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                  __html: JSON.stringify({
-                    '@context': 'https://schema.org',
-                    '@type': 'Dataset',
-                    name: `IV Therapy Price Index, ${cityData.name} (${cityPriceIndex.asOf})`,
-                    description: `Published IV therapy menu prices in ${cityData.name}, Canada: low, median and high per treatment across ${cityPriceIndex.clinicCount} clinics. Collected from public clinic menus by TheDripMap, the IV therapy matching platform for Canada.`,
-                    url: `https://www.thedripmap.com/iv-prices/${cityPriceIndex.citySlug}`,
-                    creator: { '@type': 'Organization', name: 'TheDripMap', url: 'https://www.thedripmap.com' },
-                    temporalCoverage: cityPriceIndex.asOf,
-                    spatialCoverage: { '@type': 'Place', name: `${cityData.name}, Canada` },
-                    // Recommended by Google's Dataset rich result (GSC warning
-                    // 2026-08-05); points at the published methodology.
-                    license: 'https://www.thedripmap.com/iv-prices#methodology',
-                    isAccessibleForFree: true,
-                    variableMeasured: cityPriceIndex.rows.map((r) => ({
-                      '@type': 'PropertyValue',
-                      name: `${r.treatment} (median)`,
-                      value: r.median,
-                      unitText: cityPriceIndex.currency,
-                    })),
-                  }),
-                }}
-              />
+              {/* The Dataset JSON-LD for this index lives on /iv-prices/[city],
+                  its canonical page. A second copy here under a different name
+                  and shape made the same data look like two datasets
+                  (2026-09-18 schema audit). The link below is the citation. */}
 
               <Link
                 href={`/iv-prices/${cityPriceIndex.citySlug}`}

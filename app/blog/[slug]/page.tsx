@@ -230,16 +230,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     return { name, href: `/cities/${match}` };
   })();
 
-  // BreadcrumbList JSON-LD for blog detail.
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.thedripmap.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.thedripmap.com/blog" },
-      { "@type": "ListItem", "position": 3, "name": post.title, "item": `https://www.thedripmap.com/blog/${slug}` },
-    ]
-  };
+  // BreadcrumbList JSON-LD comes from <BreadcrumbNav> below; a second hand-built
+  // copy was emitted here and disagreed with it (2026-09-18 schema audit).
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -249,11 +241,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     ...(post.imageUrl ? { "image": post.imageUrl } : {}),
     "datePublished": post.date,
     "dateModified": post.lastUpdated || post.date,
-    "author": {
-      "@type": "Person",
-      "name": post.author || "TheDripMap Team",
-      "jobTitle": post.authorRole || "TheDripMap Editorial"
-    },
+    // A team is not a Person. Only a real named author gets Person; otherwise
+    // the publisher Organization is the author (2026-09-18 schema audit).
+    "author": post.author && !/team|editorial|thedripmap/i.test(post.author)
+      ? { "@type": "Person", "name": post.author, ...(post.authorRole ? { "jobTitle": post.authorRole } : {}) }
+      : { "@type": "Organization", "name": "TheDripMap", "url": "https://www.thedripmap.com" },
     "publisher": {
       "@type": "Organization",
       "name": "TheDripMap",
@@ -349,10 +341,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       {itemListJsonLd && (
         <script

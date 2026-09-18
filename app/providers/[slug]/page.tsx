@@ -209,7 +209,9 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   const specialtyList = Array.isArray(provider.specialties)
     ? provider.specialties.filter((s): s is string => typeof s === 'string' && s.length > 0)
     : [];
-  const topSpecialties = specialtyList.slice(0, 3).join(', ') || 'hydration, NAD+, immune support';
+  // Drop the generic fallback tag so the description never reads
+  // "IV drips include IV Therapy." (2026-09-18 audit).
+  const topSpecialties = specialtyList.filter((s) => !/^iv therapy$/i.test(s.trim())).slice(0, 3).join(', ') || 'hydration, NAD+, immune support';
 
   // Canonicalize to the provider's TRUE slug, not the requested URL slug.
   // getListingBySlug() fuzzy-matches, so several URL variants can resolve to
@@ -466,12 +468,15 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   const hasGeo = provider.latitude != null && provider.longitude != null;
   const medicalBusinessJsonLd = {
     "@context": "https://schema.org",
-    "@type": ["LocalBusiness", "MedicalBusiness"],
+    // MedicalBusiness only once an owner has claimed the listing. An
+    // unclaimed scrape whose own description says "not claimed or verified"
+    // must not be typed as a medical business (2026-09-18 schema audit).
+    "@type": provider.is_claimed ? ["LocalBusiness", "MedicalBusiness"] : ["LocalBusiness", "HealthAndBeautyBusiness"],
     "name": provider.name,
     ...(provider.description ? { "description": provider.description } : {}),
     ...(provider.imageUrl ? { "image": provider.imageUrl } : {}),
     ...(provider.phone ? { "telephone": provider.phone } : {}),
-    "url": `https://www.thedripmap.com/providers/${slug}`,
+    "url": `https://www.thedripmap.com/providers/${provider.slug || slug}`,
     "address": {
       "@type": "PostalAddress",
       ...(provider.address ? { "streetAddress": provider.address } : {}),

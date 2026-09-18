@@ -14,7 +14,7 @@
  * Copy is verbatim from scripts/directory-submission-quick-fills.md lines
  * 4217-4247. Hyphens (-) are fine, em-dashes and en-dashes are not allowed.
  *
- * Slugs point to /iv-therapy/{slug}/{city} matrix pages — only slugs that
+ * Slugs point to /iv-therapy/{slug}/{city} matrix pages; only slugs that
  * exist in MATRIX_TREATMENT_SLUGS (app/sitemap.ts) are linked. Treatments
  * without a corresponding slug simply omit the Learn more link.
  */
@@ -47,7 +47,7 @@ export const TREATMENT_DEFINITIONS: Record<string, TreatmentDefinition> = {
   'glutathione': {
     name: 'Glutathione',
     definition:
-      'An antioxidant the body makes naturally, given by IV or injection and often part of skin-brightening and detox-style protocols.',
+      'An antioxidant the body makes naturally, given by IV or injection and often marketed for skin brightening; evidence for that is limited.',
     slug: 'glutathione',
   },
   'hydration': {
@@ -66,7 +66,7 @@ export const TREATMENT_DEFINITIONS: Record<string, TreatmentDefinition> = {
     name: 'Energy / B12',
     definition:
       'Infusions or injections featuring B vitamins, especially B12, commonly used to address everyday tiredness.',
-    // No dedicated matrix slug for energy/B12 — omit Learn more link.
+    // No dedicated matrix slug for energy/B12; omit Learn more link.
   },
   'beauty + glow': {
     name: 'Beauty + glow',
@@ -122,7 +122,7 @@ export const TREATMENT_DEFINITIONS: Record<string, TreatmentDefinition> = {
     name: 'Vitamin injections (IM)',
     definition:
       'Quick intramuscular shots such as B12 or vitamin D, offered as a faster alternative to a full IV drip.',
-    // No matrix slug for IM injections — omit.
+    // No matrix slug for IM injections; omit.
   },
   'general wellness': {
     name: 'General wellness',

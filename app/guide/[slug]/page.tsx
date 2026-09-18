@@ -36,12 +36,15 @@ export default async function GuidePage({ params }: GuidePageProps) {
     description: guide.metaDescription,
     url: `${SITE_URL}/guide/${guide.slug}`,
     author: { '@type': 'Organization', name: guide.author || 'TheDripMap Editorial Team' },
-    ...(guide.lastUpdated ? { dateModified: guide.lastUpdated } : {}),
+    // Article needs datePublished; lastUpdated is the only date the guide
+    // carries, so it serves as both until a publish date is recorded.
+    ...(guide.lastUpdated ? { datePublished: guide.lastUpdated, dateModified: guide.lastUpdated } : {}),
     ...(guide.reviewedBy ? { reviewedBy: { '@type': 'Person', name: guide.reviewedBy } } : {}),
     publisher: {
       '@type': 'Organization',
       name: 'TheDripMap',
-      logo: { '@type': 'ImageObject', url: `${SITE_URL}/og-image.png` },
+      // The logo, not the 1200x630 share banner (2026-09-18 schema audit).
+      logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo.png` },
     },
     mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/guide/${guide.slug}` },
   };
@@ -178,7 +181,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
             </section>
           )}
 
-          {/* Related guides — cross-link the sibling guides so the guide cluster
+          {/* Related guides: cross-link the sibling guides so the guide cluster
               links to itself (topical authority + crawl paths). */}
           {GUIDES.filter((g) => g.slug !== guide.slug).length > 0 && (
             <section className="mt-12 pt-12 border-t border-slate-100">
@@ -202,7 +205,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
         <div className="mt-20">
           <QuizCTA
             title="Ready to find your perfect IV therapy match?"
-            subtitle="Answer 5 quick questions and we'll match you with the best clinic for your goals, location, and budget."
+            subtitle="Answer 5 quick questions and shortlist clinics that fit your goals, location and budget."
           />
         </div>
 

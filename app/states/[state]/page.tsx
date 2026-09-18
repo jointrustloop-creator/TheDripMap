@@ -82,7 +82,11 @@ export default async function StatePage({ params }: StatePageProps) {
     },
     {
       question: `What does IV therapy cost in ${state.name}?`,
-      answer: `Across the ${total} ${state.name} ${total === 1 ? 'clinic' : 'clinics'} listed, each sets its own pricing. Most standard hydration and wellness drips run $150 to $300, and higher-dose options like NAD+ start around $400.${stTopCity ? ` ${stTopCity.city} has the most listings with ${stTopCity.count}.` : ''} Confirm current pricing with the clinic.`,
+      // No hand-typed price bands here: they drifted from the measured index
+      // (2026-09-18 audit). Point at the index instead. The top-city count is
+      // dropped because it used a city-exact count that disagreed with the
+      // city page's own title.
+      answer: `Across the ${total} ${state.name} ${total === 1 ? 'clinic' : 'clinics'} listed, each sets its own pricing. Standard hydration and vitamin drips are typically in the low hundreds of dollars, and NAD+ varies widely with dose. Where TheDripMap has a measured price index for a city, it is linked from that city's page with low, median and high per treatment.${stTopCity ? ` ${stTopCity.city} has the most listings in the province.` : ''} Confirm current pricing with the clinic.`,
     },
     {
       question: `Are mobile IV therapy services available in ${state.name}?`,
@@ -102,7 +106,12 @@ export default async function StatePage({ params }: StatePageProps) {
       <main className="max-w-7xl mx-auto px-6 py-12">
         <BreadcrumbNav
           items={[
-            { label: 'States', href: '/states' },
+            // Canadian provinces sit under Canada, matching the city and
+            // provider breadcrumbs (Home > Canada > Ontario). US states keep
+            // the States hub.
+            state.country === 'Canada' || /^(ontario|british columbia|alberta|quebec|manitoba|saskatchewan|nova scotia|new brunswick|newfoundland and labrador|prince edward island)$/i.test(state.name)
+              ? { label: 'Canada', href: '/canada' }
+              : { label: 'States', href: '/states' },
             { label: state.name },
           ]}
         />

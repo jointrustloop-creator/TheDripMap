@@ -329,7 +329,9 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
                   ))}
                 </div>
                 <p className="mt-2 text-[13px] font-bold text-slate-700">
-                  <span className="text-slate-900 font-black">{reviews} reviews</span> · {rating.toFixed(1)} rating
+                  {reviews > 0
+                    ? <><span className="text-slate-900 font-black">{reviews} reviews</span> · {rating.toFixed(1)} rating</>
+                    : <span className="text-slate-500">Rating not yet published</span>}
                 </p>
                 <p className="mt-0.5 text-[12px] font-semibold text-slate-400">
                   {provider.city}{provider.state ? `, ${provider.state}` : ''}

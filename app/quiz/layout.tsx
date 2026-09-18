@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import React from "react";
 
-const quizTitle = "IV Therapy Matching Quiz — Find Your Perfect Drip | TheDripMap";
+const quizTitle = "IV Therapy Matching Quiz: Find Your Drip | TheDripMap";
 const quizDescription = "Answer 5 quick questions and get matched to the right IV therapy clinic for your goals, symptoms, and budget. Takes 60 seconds.";
 const quizOgImage = 'https://www.thedripmap.com/og-image.png';
 

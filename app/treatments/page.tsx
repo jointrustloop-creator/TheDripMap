@@ -12,6 +12,13 @@ import { BreadcrumbNav } from '../../src/components/BreadcrumbNav';
 import { getTreatmentContent } from '../../src/lib/treatment-content';
 import { getAllDefinitionsAlphabetical } from '../../src/lib/treatment-definitions';
 
+// Glossary slugs are matrix slugs; /iv-therapy/<slug> 308-redirects to
+// /treatments/<slug>, so link the destination directly (2026-09-18 audit).
+const TREATMENT_PAGE_SLUG: Record<string, string> = {
+  'hangover-recovery': 'hangover', 'athletic-recovery': 'recovery', 'mobile-iv': 'hydration', 'vitamin-c': 'high-dose-vitamin-c',
+};
+const treatmentHref = (slug: string) => `/treatments/${TREATMENT_PAGE_SLUG[slug] ?? slug}`;
+
 const STORAGE_BASE =
   'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/';
 
@@ -19,9 +26,9 @@ const SITE_URL = 'https://www.thedripmap.com';
 
 export const revalidate = 86400;
 
-const title = 'All IV Therapy Treatments — Find the Right Drip | TheDripMap';
+const title = 'All IV Therapy Treatments: Find the Right Drip | TheDripMap';
 const description =
-  'Browse every IV therapy protocol we cover — NAD+, Myers Cocktail, hangover recovery, immune support, beauty glow, weight loss, jet lag, athletic recovery, and more. Compare what each treatment does, costs, and which clinics offer it.';
+  'Browse every IV therapy protocol we cover: NAD+, Myers Cocktail, hangover recovery, immune support, beauty glow, weight loss, jet lag, athletic recovery, and more. Compare what each drip contains, what it costs, and which clinics offer it.';
 
 export const metadata: Metadata = {
   title,
@@ -94,7 +101,7 @@ export default function TreatmentsIndexPage() {
   // Glossary entries (alphabetical) sourced from the shared definitions map.
   const glossary = getAllDefinitionsAlphabetical();
 
-  // DefinedTermSet JSON-LD — cleanest schema for a definitions index that
+  // DefinedTermSet JSON-LD: cleanest schema for a definitions index that
   // search engines and AI assistants can cite directly.
   const definedTermSetJsonLd = {
     '@context': 'https://schema.org',
@@ -109,7 +116,7 @@ export default function TreatmentsIndexPage() {
       name: d.name,
       description: d.definition,
       inDefinedTermSet: `${SITE_URL}/treatments#glossary`,
-      url: d.slug ? `${SITE_URL}/iv-therapy/${d.slug}` : `${SITE_URL}/treatments`,
+      url: d.slug ? `${SITE_URL}${treatmentHref(d.slug)}` : `${SITE_URL}/treatments`,
     })),
   };
 
@@ -148,7 +155,7 @@ export default function TreatmentsIndexPage() {
           </p>
         </section>
 
-        {/* Treatment grid — image-bg cards (mirrors the /cities pattern) */}
+        {/* Treatment grid: image-bg cards (mirrors the /cities pattern) */}
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
           {TREATMENTS.map((t) => {
             const Icon = t.icon;
@@ -203,7 +210,7 @@ export default function TreatmentsIndexPage() {
           })}
         </section>
 
-        {/* Glossary — plain-language one-line definitions, alphabetical.
+        {/* Glossary: plain-language one-line definitions, alphabetical.
             Server-rendered so search engines + AI assistants can cite the
             definitions directly. Anchor target = #glossary for internal links. */}
         <section id="glossary" className="mb-24 scroll-mt-24">
@@ -236,7 +243,7 @@ export default function TreatmentsIndexPage() {
                   <p>{entry.definition}</p>
                   {entry.slug && (
                     <Link
-                      href={`/iv-therapy/${entry.slug}`}
+                      href={treatmentHref(entry.slug)}
                       className="inline-flex items-center gap-1 mt-2 text-wellness-700 font-bold text-sm hover:underline"
                     >
                       Learn more about {entry.name.toLowerCase()}

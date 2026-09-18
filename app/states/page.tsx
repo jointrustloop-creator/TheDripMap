@@ -36,8 +36,10 @@ export const metadata: Metadata = {
 };
 
 export default async function StatesIndexPage() {
+  // Canada only, matching sitemap.ts: the five US states were noindexed and out
+  // of the sitemap yet still linked and listed here (2026-09-18 audit).
   const stateCounts = await Promise.all(
-    STATES.map(async (s) => {
+    STATES.filter((s) => (s as { country?: string }).country === 'Canada').map(async (s) => {
       const providers = await getListingsByState(s.name);
       return { ...s, count: providers.length };
     })
@@ -48,8 +50,8 @@ export default async function StatesIndexPage() {
   const itemListJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'IV Therapy by State',
-    numberOfItems: STATES.length,
+    name: 'IV Therapy by Province',
+    numberOfItems: sortedStates.length,
     itemListElement: sortedStates.map((s, i) => ({
       '@type': 'ListItem',
       position: i + 1,
@@ -69,13 +71,13 @@ export default async function StatesIndexPage() {
 
         <section className="mt-12 mb-8">
           <h1 className="text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-            IV Therapy by State
+            IV Therapy by Province
           </h1>
         </section>
 
         <section className="mb-16 max-w-3xl">
           <p className="text-lg text-slate-600 leading-relaxed">
-            Browse IV therapy clinics by province and state. Find top-rated providers across Canada.
+            Browse IV therapy clinics by province. Every listing shows the clinic's own drip menu, prices and named practitioners where the clinic has published them.
           </p>
         </section>
 

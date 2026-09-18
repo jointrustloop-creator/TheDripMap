@@ -10,14 +10,14 @@ import { SymptomImage } from '@/src/components/SymptomImage';
 import { ResilientImage } from '@/src/components/ResilientImage';
 
 export const metadata: Metadata = {
-  title: 'IV Therapy for Symptoms & Conditions — Treatment Protocols | TheDripMap',
-  description: 'Comprehensive guide to IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',
+  title: 'IV Drips by Symptom: What Is in Them and Where to Find Clinics | TheDripMap',
+  description: 'What a drip for hangovers, fatigue, immunity and more typically contains, what it can and cannot do, and clinics near you.',
   alternates: {
     canonical: 'https://www.thedripmap.com/symptoms',
   },
   openGraph: {
-    title: 'IV Therapy for Symptoms & Conditions — Treatment Protocols | TheDripMap',
-    description: 'Comprehensive guide to IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',
+    title: 'IV Drips by Symptom: What Is in Them and Where to Find Clinics | TheDripMap',
+    description: 'What a drip for hangovers, fatigue, immunity and more typically contains, what it can and cannot do, and clinics near you.',
     url: 'https://www.thedripmap.com/symptoms',
     siteName: 'TheDripMap',
     images: [
@@ -32,8 +32,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'IV Therapy for Symptoms & Conditions — Treatment Protocols | TheDripMap',
-    description: 'Comprehensive guide to IV therapy protocols for hangovers, fatigue, immunity, and more. Find the right drip for your specific symptoms.',
+    title: 'IV Drips by Symptom: What Is in Them and Where to Find Clinics | TheDripMap',
+    description: 'What a drip for hangovers, fatigue, immunity and more typically contains, what it can and cannot do, and clinics near you.',
     images: ['https://www.thedripmap.com/og-image.png'],
   },
 };

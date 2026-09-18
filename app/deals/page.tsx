@@ -55,6 +55,13 @@ export async function generateMetadata(): Promise<Metadata> {
       description: 'Live IV therapy offers published by clinics that claimed their listing on TheDripMap.',
       url: `${SITE_URL}/deals`,
       type: 'website',
+      images: [`${SITE_URL}/og-image.png`],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'IV Therapy Deals in Canada | TheDripMap',
+      description: 'Live IV therapy offers published by clinics that claimed their listing on TheDripMap.',
+      images: [`${SITE_URL}/og-image.png`],
     },
   };
 }
@@ -121,7 +128,7 @@ export default async function DealsPage() {
           </h1>
           <p className="text-lg text-slate-500 leading-relaxed">
             Every offer on this page was published by a clinic that claimed its listing on TheDripMap.
-            We are a directory: we do not sell treatments, mark up prices, or run promotions of our own.
+            We are a matching platform: we do not sell treatments, mark up prices, or run promotions of our own.
             Clinics switch these on when they have openings, so check back before you book.
           </p>
         </div>

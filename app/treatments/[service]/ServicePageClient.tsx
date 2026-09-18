@@ -262,7 +262,7 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug, initial
   }
 
   // Prefer the treatment's own researched FAQs; fall back to a sensible generic
-  // set (kept accurate — uses the real session duration + cost range) only if a
+  // set (kept accurate, uses the real session duration + cost range) only if a
   // treatment has none defined.
   // Hub FAQs (honest-triage voice, Move 1 of the 2026-08-15 audit) override
   // both the legacy content faqs and the generic marketing fallback below,
@@ -320,7 +320,7 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug, initial
               {currentCity && currentCity !== 'All' ? (
                 <> in <span className="text-slate-900">{currentCity}</span></>
               ) : (
-                <> — Find Clinics Near You</>
+                <>: Find Clinics Near You</>
               )}
             </h1>
             <p className="text-xl text-slate-500 leading-relaxed mb-10">
@@ -401,7 +401,7 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug, initial
           </section>
         )}
 
-        {/* City Chip Row — quick local filter */}
+        {/* City Chip Row: quick local filter */}
         {topCities.length > 0 && (
           <section className="mb-14">
             <div className="flex items-center gap-3 mb-4">
@@ -484,10 +484,10 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug, initial
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-black text-amber-900 mb-1">
-                      No {service.name} clinics in {currentCity} yet — showing top-rated nationwide.
+                      No {service.name} clinics in {currentCity} yet, showing top-rated nationwide.
                     </p>
                     <p className="text-xs text-amber-800 font-medium leading-relaxed">
-                      Mobile IV providers in some listings will travel beyond their home city — check individual clinic pages for service area.
+                      Mobile IV providers in some listings will travel beyond their home city; check individual clinic pages for service area.
                     </p>
                   </div>
                   <button
@@ -511,7 +511,7 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug, initial
                 No {service.name} clinics found in {currentCity}
               </h3>
               <p className="text-slate-500 mb-8 max-w-md mx-auto">
-                Try a nearby city — these hubs all have active {service.name} providers:
+                Try a nearby city; these hubs all have active {service.name} providers:
               </p>
               <div className="flex flex-wrap gap-2.5 justify-center mb-8 max-w-2xl mx-auto">
                 {topCities.slice(0, 6).map((c) => (
@@ -641,7 +641,7 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug, initial
             <div className="relative z-10 max-w-2xl">
               <h2 className="text-4xl font-black mb-6 tracking-tight">About {service.name} IV Therapy</h2>
               <p className="text-lg text-slate-300 leading-relaxed">
-                {service.name} IV therapy delivers a targeted combination of vitamins, minerals, and nutrients directly into your bloodstream for 100% absorption and rapid results. Speak with a participating clinic for details on protocols, pricing, and what to expect.
+                {service.name} IV therapy delivers a combination of vitamins, minerals, and fluids directly into your bloodstream, bypassing digestion. Speak with a participating clinic for details on what is in the drip, pricing, and what to expect.
               </p>
             </div>
           </section>
@@ -651,7 +651,7 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug, initial
         <QuizCTA 
           className="mb-24" 
           title={`Not sure if ${service.name} is right for you?`}
-          subtitle={`Match with the best ${service.name} protocol for your exact health goals, symptoms, and body type.`}
+          subtitle="Shortlist clinics that fit your goals, location and budget."
         />
 
         <FAQSection faqs={faqs} title={`${service.name} IV Therapy FAQ`} />

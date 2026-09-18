@@ -424,9 +424,12 @@ export default function DefinitiveListingLayout({
   ];
 
   // Common questions — grounded in real fields. FAQPage schema mirrors these.
+  // Never assert oversight we have not verified. A named lead is a fact from the
+  // owner; the generic line used to claim "overseen by licensed clinical staff"
+  // for every claimed clinic regardless of badge status (2026-09-18 audit).
   const careLine = isRnLed && team[0]?.name
-    ? `${displayName} is led by ${team[0].name}, and visits are overseen by licensed clinical staff.`
-    : 'Visits are overseen by licensed clinical staff.';
+    ? `${displayName} is led by ${team[0].name}. Ask who will administer your drip and which licence they hold; the answer should be verifiable on the provincial college register.`
+    : 'Ask who will administer your drip and which licence they hold. The answer should be verifiable on the provincial college register in under two minutes.';
   const faqItems: { q: string; a: string }[] = [
     provider.price_range ? {
       q: 'How much does a visit cost?',
@@ -442,7 +445,9 @@ export default function DefinitiveListingLayout({
       q: 'Where are you located?',
       a: `${displayName} is at ${provider.address}. Directions are one tap away in the booking panel.`,
     } : null,
-    { q: 'Can I use my HSA or FSA card?', a: 'Many guests pay with an HSA or FSA card. Check with the clinic about your specific plan before your visit.' },
+    // HSA/FSA is a US concept; Canadian coverage runs through extended health
+    // plans and naturopathic medicine benefits. Keep the question honest.
+    { q: 'Can I claim this on my extended health benefits?', a: 'Sometimes. If the drip is administered by a naturopathic doctor, many extended health plans cover it under naturopathic medicine benefits, and iron infusions for a diagnosed deficiency may be covered with documentation. Ask the clinic for a receipt coded for your plan and confirm with your insurer.' },
   ].filter(Boolean) as { q: string; a: string }[];
 
   const showcaseFaqJsonLd = faqItems.length > 0 ? {
