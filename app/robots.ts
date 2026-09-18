@@ -8,7 +8,11 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/admin/'],
+      // /verify-claim completes a clinic claim when the URL is loaded, and
+      // /finish and /get-verified carry private tokens. All three already emit
+      // noindex; the disallow exists so a crawler holding a token URL cannot
+      // trigger the action (GSC showed token URLs being crawled, 2026-09-18).
+      disallow: ['/api/', '/admin/', '/verify-claim', '/get-verified', '/finish/'],
     },
     sitemap: `${baseUrl}/sitemap.xml`,
   };
