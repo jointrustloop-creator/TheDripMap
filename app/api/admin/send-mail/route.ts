@@ -25,6 +25,7 @@ export const dynamic = 'force-dynamic';
 
 const FROM = 'TheDripMap <info@thedripmap.com>';
 const OPERATOR_EMAIL = 'info@thedripmap.com';
+const SITE = 'https://www.thedripmap.com';
 
 export async function POST(req: NextRequest) {
   if (!(await isAdminRequest()) && !machineTokenOk(req.headers.get('authorization'))) {
@@ -46,16 +47,22 @@ export async function POST(req: NextRequest) {
   // in the Sent folder.
   const channel: 'auto' | 'resend' | 'smtp' = body?.channel === 'resend' || body?.channel === 'smtp' ? body.channel : 'auto';
   const isBatch = channel === 'resend';
+  // Every email through here carries the CASL block (identification, mailing
+  // address, one-click unsubscribe) unless the caller marks it transactional
+  // (a verification link or a receipt). Operator replies and outreach are
+  // never transactional. Hubert 2026-09-19.
+  const transactional = body?.transactional === true;
+  const render = transactional ? {} : { footerFor: to, clinicName: typeof body?.clinicName === 'string' ? body.clinicName : null };
   const res = await sendMail({
     from: FROM,
     to,
     ...(cc ? { cc } : {}),
     replyTo: typeof body?.replyTo === 'string' && body.replyTo ? body.replyTo : OPERATOR_EMAIL,
     subject,
-    text: toPlainText(text),
-    html: textToHtml(text),
+    text: toPlainText(text, render),
+    html: textToHtml(text, render),
     channel,
-    ...(isBatch ? { headers: { 'List-Unsubscribe': `<mailto:${OPERATOR_EMAIL}?subject=unsubscribe>` } } : {}),
+    ...(transactional ? {} : { headers: { 'List-Unsubscribe': `<${SITE}/api/newsletter/unsubscribe/${encodeURIComponent(to)}>, <mailto:${OPERATOR_EMAIL}?subject=unsubscribe>` } }),
   });
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
   await logSend(sb, { channel: 'partb', action: 'send', recipients: [to], subject, note: `operator reply via send-mail (${res.provider})` });

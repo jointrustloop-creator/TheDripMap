@@ -23,8 +23,9 @@ function escapeHtml(s: string): string {
 }
 
 /** The recipient's plain-text copy must never contain markdown syntax. */
-export function toPlainText(text: string): string {
-  return text.replace(/\r\n/g, '\n').replace(MD_LINK, (_m, label, url) => `${label}: ${url}`);
+export function toPlainText(text: string, opts: RenderOptions = {}): string {
+  const plain = text.replace(/\r\n/g, '\n').replace(MD_LINK, (_m, label, url) => `${label}: ${url}`);
+  return opts.footerFor ? `${plain}\n\n--\n${complianceFooterText(opts.footerFor, opts.clinicName)}` : plain;
 }
 
 /** A bare URL longer than this is shortened for display; the href stays whole. */
@@ -53,7 +54,40 @@ const SIGNATURE_HTML =
   + `<div style="font-size:12px;color:#8A948F;margin-top:6px;">Canada's matching platform for IV therapy clinics</div>`
   + `</td></tr></table>`;
 
-export function textToHtml(text: string): string {
+const SITE = 'https://www.thedripmap.com';
+const MAILING = 'TheDripMap, Caledon, Ontario, Canada';
+const unsubUrl = (email: string) => `${SITE}/api/newsletter/unsubscribe/${encodeURIComponent(email)}`;
+
+/**
+ * The CASL block every operator email carries: who we are, a mailing address,
+ * and a working one-click opt-out that writes to email_suppressions (the list
+ * every send path reads). Added by the renderer itself so no script can forget
+ * it again (Hubert 2026-09-19: the [TEST] had no unsubscribe paragraph; the
+ * audit had already found 35 register and personal-note sends without one).
+ */
+export function complianceFooterText(recipientEmail: string, clinicName?: string | null): string {
+  const because = clinicName
+    ? `You are receiving this because ${clinicName} is listed on TheDripMap, the Canadian IV therapy matching platform.`
+    : 'You are receiving this because you contacted TheDripMap or your clinic is listed on it, the Canadian IV therapy matching platform.';
+  return `${because} ${MAILING}. To stop receiving these emails, unsubscribe here: ${unsubUrl(recipientEmail)}`;
+}
+
+function complianceFooterHtml(recipientEmail: string, clinicName?: string | null): string {
+  const because = clinicName
+    ? `You are receiving this because ${escapeHtml(clinicName)} is listed on TheDripMap, the Canadian IV therapy matching platform.`
+    : 'You are receiving this because you contacted TheDripMap or your clinic is listed on it, the Canadian IV therapy matching platform.';
+  return `<p style="margin:26px 0 0;padding-top:16px;border-top:1px solid #E6E2D8;font-size:12px;line-height:1.55;color:#8A948F;">`
+    + `${because} ${escapeHtml(MAILING)}. `
+    + `<a href="${escapeHtml(unsubUrl(recipientEmail))}" style="color:#8A948F;text-decoration:underline;">Unsubscribe</a> to stop receiving these emails.</p>`;
+}
+
+export interface RenderOptions {
+  /** Recipient address; when present the CASL footer with a one-click opt-out is appended. */
+  footerFor?: string | null;
+  clinicName?: string | null;
+}
+
+export function textToHtml(text: string, opts: RenderOptions = {}): string {
   const paras = text.replace(/\r\n/g, '\n').split(/\n{2,}/);
   const body = paras.map((p) => {
     const trimmed = p.trim();
@@ -85,5 +119,6 @@ export function textToHtml(text: string): string {
   return `<div style="background:#F8F5EE;padding:28px 16px;font-family:${FONT};">`
     + `<div style="max-width:600px;margin:0 auto;background:#FFFFFF;border:1px solid #E6E2D8;border-radius:14px;padding:32px 36px;font-size:15px;line-height:1.65;color:#1A2B26;">`
     + body
+    + (opts.footerFor ? complianceFooterHtml(opts.footerFor, opts.clinicName) : '')
     + `</div></div>`;
 }
