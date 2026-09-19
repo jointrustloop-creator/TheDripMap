@@ -25,16 +25,26 @@ interface Props {
   /** From findDefinition(name); null/undefined = render plain chip with no disclosure. */
   definition?: TreatmentDefinition | null;
   /** Optional price ($X / "$X") rendered on the right of the claimed chip. */
-  price?: string | null;
+  price?: string | number | null;
   variant?: Variant;
+}
+
+// A price reaches here from JSONB the owner or an operator wrote. A number
+// instead of "$165" once crashed the prerender of a provider page and took the
+// whole Vercel build down with it (2026-09-18), so it is normalised, not trusted.
+function priceLabel(price: string | number | null | undefined): string | null {
+  if (price === null || price === undefined || price === '') return null;
+  const s = String(price).trim();
+  return s.startsWith('$') ? s : `$${s}`;
 }
 
 export function TreatmentDefinitionDisclosure({
   name,
   definition,
-  price,
+  price: rawPrice,
   variant = 'claimed',
 }: Props) {
+  const price = priceLabel(rawPrice);
   // No definition → render the same chip the caller used to render, untouched.
   if (!definition) {
     if (variant === 'unclaimed') {
@@ -52,7 +62,7 @@ export function TreatmentDefinitionDisclosure({
         <span className="min-w-0 truncate">{name}</span>
         {price && (
           <span className="ml-auto text-[12.5px] text-[#5c685e] font-semibold whitespace-nowrap">
-            {price.startsWith('$') ? price : `$${price}`}
+            {price}
           </span>
         )}
       </div>
@@ -112,7 +122,7 @@ export function TreatmentDefinitionDisclosure({
         />
         {price && (
           <span className="ml-auto text-[12.5px] text-[#5c685e] font-semibold whitespace-nowrap">
-            {price.startsWith('$') ? price : `$${price}`}
+            {price}
           </span>
         )}
       </summary>
