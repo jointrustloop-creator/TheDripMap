@@ -511,9 +511,11 @@ export default function DefinitiveListingLayout({
               {galleryPhotos.slice(0, 4).map((photo, idx) => (
                 <div
                   key={photo + idx}
-                  // Fixed, modest height (Hubert 2026-09-18: "half the size"):
-                  // the tiles are supporting shots under the hero, not a second hero.
-                  className={`relative overflow-hidden border border-[rgba(25,36,28,0.09)] bg-[#efe9dc] h-[120px] md:h-[150px]`}
+                  // Modest frame, whole photo inside it (Hubert 2026-09-18: the
+                  // tiles are supporting shots under the hero, and a cropped
+                  // zoom into a headshot looked awkward). object-contain never
+                  // crops; the frame colour fills whatever the photo does not.
+                  className={`relative overflow-hidden rounded-[14px] border border-[rgba(25,36,28,0.09)] bg-[#efe9dc] h-[150px] md:h-[190px] p-2`}
                 >
                   <ResilientImage
                     src={photo}
@@ -521,7 +523,7 @@ export default function DefinitiveListingLayout({
                     alt={`${provider.name} photo ${idx + 1}`}
                     fill
                     sizes={galleryPhotos.length === 1 ? '100vw' : '(max-width: 768px) 50vw, 25vw'}
-                    className="object-cover object-[center_30%]"
+                    className="object-contain p-2"
                   />
                 </div>
               ))}
