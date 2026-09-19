@@ -15,7 +15,7 @@ const FONT = "-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 const MD_LINK = /\[([^\]\n]{1,80})\]\((https?:\/\/[^\s)]+)\)/g;
 const LINK_STYLE = 'color:#0F6E56;text-decoration:underline;';
 const BUTTON_STYLE = 'display:inline-block;background:#0F6E56;color:#FFFFFF;text-decoration:none;'
-  + 'padding:13px 26px;border-radius:8px;font-size:15px;font-weight:600;';
+  + 'padding:14px 28px;border-radius:10px;font-size:15px;font-weight:700;letter-spacing:0.01em;';
 const SLOT = (i: number) => `@@LINK${i}@@`;
 
 function escapeHtml(s: string): string {
@@ -37,16 +37,34 @@ export function shortenForDisplay(url: string): string {
   return `${host}${path.slice(0, 24)}...`;
 }
 
+// The sign-off every operator email ends with. When the text ends with it,
+// the renderer replaces those two lines with a proper signature block
+// (Hubert 2026-09-18: "hoping button will show nice and trust signature").
+const SIGNOFF = /^Deborah\n+Founder,?\s+TheDripMap\s*$/i;
+const SIGNATURE_HTML =
+  `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:30px 0 0;border-top:1px solid #E6E2D8;padding-top:18px;">`
+  + `<tr><td style="vertical-align:top;padding:18px 14px 0 0;">`
+  + `<img src="https://www.thedripmap.com/icon-192.png" width="44" height="44" alt="TheDripMap" style="display:block;border-radius:10px;">`
+  + `</td><td style="vertical-align:top;padding-top:18px;font-family:${FONT};">`
+  + `<div style="font-size:15px;font-weight:700;color:#1A2B26;">Deborah</div>`
+  + `<div style="font-size:13px;color:#5B6B66;margin-top:2px;">Founder, TheDripMap</div>`
+  + `<div style="font-size:13px;margin-top:6px;"><a href="https://www.thedripmap.com" style="color:#0F6E56;text-decoration:none;">thedripmap.com</a>`
+  + ` <span style="color:#B8B2A6;">&middot;</span> <a href="mailto:info@thedripmap.com" style="color:#0F6E56;text-decoration:none;">info@thedripmap.com</a></div>`
+  + `<div style="font-size:12px;color:#8A948F;margin-top:6px;">Canada's matching platform for IV therapy clinics</div>`
+  + `</td></tr></table>`;
+
 export function textToHtml(text: string): string {
   const paras = text.replace(/\r\n/g, '\n').split(/\n{2,}/);
   const body = paras.map((p) => {
     const trimmed = p.trim();
     if (!trimmed) return '';
 
+    if (SIGNOFF.test(trimmed)) return SIGNATURE_HTML;
+
     // A paragraph that is nothing but one labelled link becomes a button.
     const solo = trimmed.match(new RegExp(`^${MD_LINK.source}$`));
     if (solo) {
-      return `<p style="margin:0 0 20px;"><a href="${escapeHtml(solo[2])}" style="${BUTTON_STYLE}">${escapeHtml(solo[1])}</a></p>`;
+      return `<p style="margin:8px 0 26px;"><a href="${escapeHtml(solo[2])}" style="${BUTTON_STYLE}">${escapeHtml(solo[1])}</a></p>`;
     }
 
     // Protect labelled links, linkify what is left, then restore. One pass
@@ -60,7 +78,12 @@ export function textToHtml(text: string): string {
     const linked = esc.replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)])/g,
       (u) => `<a href="${u}" style="${LINK_STYLE}">${escapeHtml(shortenForDisplay(u))}</a>`);
     const restored = linked.replace(/@@LINK(\d+)@@/g, (_m, i) => slots[Number(i)] || '');
-    return `<p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#1A2B26;">${restored}</p>`;
+    return `<p style="margin:0 0 18px;font-size:15px;line-height:1.65;color:#1A2B26;">${restored}</p>`;
   }).join('');
-  return `<div style="font-family:${FONT};max-width:620px;font-size:15px;line-height:1.6;color:#1A2B26;">${body}</div>`;
+  // A quiet card on the site's cream ground: readable line length, real
+  // padding, and the same look in Gmail, Outlook and Apple Mail.
+  return `<div style="background:#F8F5EE;padding:28px 16px;font-family:${FONT};">`
+    + `<div style="max-width:600px;margin:0 auto;background:#FFFFFF;border:1px solid #E6E2D8;border-radius:14px;padding:32px 36px;font-size:15px;line-height:1.65;color:#1A2B26;">`
+    + body
+    + `</div></div>`;
 }
