@@ -46,6 +46,7 @@ Only what survives all four is a fair thing to ask for. In practice that is usua
 - Say "matching platform", never "directory".
 - Links use the labelled form `[Readable label](https://...)`. A raw finish link is a UUID plus a 32 character secret and looks like spam. A paragraph containing only a labelled link renders as a button. See `src/lib/email-render.ts`.
 - Everything with a link goes through `scripts/_send-mail.ts`. The Gmail connector rewrites URLs into Google redirect strings and must never send.
+- **The CASL block is automatic (since 2026-09-19).** `/api/admin/send-mail` appends identification, the Caledon mailing address and a one-click unsubscribe to every email (HTML and plain text) plus a `List-Unsubscribe` header, unless the call passes `transactional: true` (verification links and receipts only). Pass `clinicName` so the block names the clinic. Never paste a second footer into the body. Anything that does not go through send-mail (partb, warm, nudge in src/lib) carries its own block and must keep it.
 - **Batches go over Resend, never Workspace SMTP.** Pass `channel: 'resend'` to `/api/admin/send-mail` for any send to more than one clinic, and space sends by 30 seconds. Workspace SMTP is for one-off replies only. Found 2026-09-18: 58 batch sends had gone over SMTP, which is a suspension risk for info@ and the likeliest reason 18 register emails got zero opens.
 
 ## Gate 6: approval
