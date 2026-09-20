@@ -168,6 +168,18 @@ export const ProviderCardFeatured = ({
           : 'border-slate-200 shadow-sm hover:shadow-md'
       )}
     >
+      {/* Safety Verified bar across the whole card, matching ProviderCard and
+          ExploreCard so the badge reads the same everywhere. */}
+      {isSafety && (
+        <div
+          title="A named prescriber checked against their public college register, plus the clinic's safety answers, reviewed by TheDripMap"
+          className="flex items-center gap-2 bg-amber-400 text-amber-950 px-4 py-2 text-[11px] font-black uppercase tracking-[0.14em]"
+        >
+          <ShieldCheck size={14} className="shrink-0" />
+          Safety Verified
+          <span className="ml-auto normal-case tracking-normal font-semibold text-amber-900/80 text-[10.5px] truncate">prescriber checked against the register</span>
+        </div>
+      )}
       <div className={cn('flex flex-col', isPrimary && 'md:flex-row')}>
         {/* Visual anchor: photo cover -> logo panel -> initials panel. Solid
             brand-tinted panel (no washy gradient dead space). */}

@@ -6,6 +6,7 @@ import { Provider } from '../types';
 import { ProviderCard } from './ProviderCard';
 import dynamic from 'next/dynamic';
 import { calculateDistance, getUserLocation } from '../lib/geo';
+import { isSafetyVerified } from '../lib/safety';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 import {
@@ -109,10 +110,14 @@ export function ListingController({ initialProviders, cityName, hideHeading = fa
   const sortProviders = (list: Provider[]): Provider[] =>
     list.slice().sort((a, b) => {
       if (a.is_featured !== b.is_featured) return a.is_featured ? -1 : 1;
+      // Safety Verified sits above the distance banding (Hubert 2026-09-20:
+      // verified clinics display as featured). It is earned, never sold, so
+      // ranking it first keeps the "organic ranking not for sale" rule.
+      const av = isSafetyVerified(a as { safety_verified?: boolean; safety_review_status?: string | null });
+      const bv = isSafetyVerified(b as { safety_verified?: boolean; safety_review_status?: string | null });
+      if (av !== bv) return av ? -1 : 1;
       const bandDiff = distanceBand(a.distance) - distanceBand(b.distance);
       if (bandDiff !== 0) return bandDiff;
-      const av = a.safety_verified === true, bv = b.safety_verified === true;
-      if (av !== bv) return av ? -1 : 1;
       const scoreDiff = ((b as { transparency_score?: number }).transparency_score ?? 0)
         - ((a as { transparency_score?: number }).transparency_score ?? 0);
       if (scoreDiff !== 0) return scoreDiff;

@@ -90,17 +90,35 @@ export function ExploreCard({ provider: p, active, onHover, onSelect }: ExploreC
       onMouseLeave={() => onHover?.(null)}
       onClick={() => onSelect?.(p.id)}
       className={cn(
-        'group relative bg-white rounded-3xl border p-5 transition-all cursor-pointer',
+        'group relative bg-white rounded-3xl border p-5 transition-all cursor-pointer overflow-hidden',
         active
           ? 'border-wellness-400 ring-2 ring-wellness-400/40 shadow-lg'
-          : 'border-slate-100 hover:border-wellness-200 hover:shadow-md'
+          : sv
+            ? 'border-amber-300 ring-2 ring-amber-300/60 shadow-[0_20px_44px_-24px_rgba(245,158,11,0.42)] hover:shadow-lg'
+            : 'border-slate-100 hover:border-wellness-200 hover:shadow-md'
       )}
     >
-      {/* Badge row — Safety Verified is the most prominent quality signal */}
+      {/* Safety Verified: full-width amber bar, same as every other card
+          surface (Hubert 2026-09-20: verified must read as featured). */}
+      {sv && (
+        <div
+          title="A named prescriber checked against their public college register, plus the clinic's safety answers, reviewed by TheDripMap"
+          className="-mx-5 -mt-5 mb-4 flex items-center gap-2 bg-amber-400 text-amber-950 px-4 py-2 text-[11px] font-black uppercase tracking-[0.14em]"
+        >
+          <ShieldCheck size={14} className="shrink-0" />
+          Safety Verified
+          <span className="ml-auto normal-case tracking-normal font-semibold text-amber-900/80 text-[10.5px] truncate">prescriber checked against the register</span>
+        </div>
+      )}
+      {/* Badge row */}
       <div className="flex items-center justify-between mb-2.5">
-        {verified ? (
+        {sv ? (
+          <span className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-black uppercase tracking-[0.14em] px-2.5 py-1 rounded-full">
+            <ShieldCheck size={12} /> Verified clinic
+          </span>
+        ) : verified ? (
           <span className="inline-flex items-center gap-1.5 bg-wellness-600 text-white text-[10px] font-black uppercase tracking-[0.14em] px-2.5 py-1 rounded-full">
-            <ShieldCheck size={12} /> {sv ? 'Safety Verified' : 'Claimed'}
+            <ShieldCheck size={12} /> Claimed
           </span>
         ) : (
           <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-500 text-[10px] font-bold uppercase tracking-[0.14em] px-2.5 py-1 rounded-full">

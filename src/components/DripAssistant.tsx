@@ -157,7 +157,7 @@ function ClinicMiniCard({ c }: { c: Clinic }) {
         <div className="flex items-center justify-between gap-2 mt-2">
           <div className="flex flex-wrap gap-1">
             {c.verified ? (
-              <span className="inline-flex items-center gap-0.5 text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100 px-1.5 py-0.5 rounded-full"><ShieldCheck size={9} /> Verified</span>
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-black uppercase tracking-wider bg-amber-400 text-amber-950 border border-amber-500 px-1.5 py-0.5 rounded-full"><ShieldCheck size={9} /> Safety Verified</span>
             ) : c.claimed ? (
               <span className="text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100 px-1.5 py-0.5 rounded-full">Claimed</span>
             ) : (

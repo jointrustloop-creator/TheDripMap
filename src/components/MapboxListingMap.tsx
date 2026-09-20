@@ -4,10 +4,11 @@ import Map, { Marker, Popup, NavigationControl } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Phone, Star } from 'lucide-react';
+import { Phone, Star, ShieldCheck } from 'lucide-react';
 import { Provider } from '../types';
 import { slugify } from '../lib/data';
 import { cn } from '../lib/utils';
+import { isSafetyVerified as isSafetyVerifiedFn } from '../lib/safety';
 
 interface MapboxListingMapProps {
   providers: Provider[];
@@ -79,6 +80,9 @@ export const MapboxListingMap = ({ providers, hoveredProviderId, onMarkerClick, 
           const isHovered = hoveredProviderId === p.id;
           // Verified = free-tier claimed OR featured (the sitewide signal).
           const isVerified = p.is_claimed === true || p.is_featured === true;
+          // Safety Verified pins are amber and largest, so the map tells the
+          // same story as the cards (Hubert 2026-09-20).
+          const sv = isSafetyVerifiedFn(p as { safety_verified?: boolean; safety_review_status?: string | null });
           return (
             <Marker
               key={p.id}
@@ -94,11 +98,13 @@ export const MapboxListingMap = ({ providers, hoveredProviderId, onMarkerClick, 
                 className={cn(
                   'rounded-full border-2 border-white shadow-md cursor-pointer transition-all',
                   // Verified clinics get the green pin; unclaimed listings stay blue.
-                  isVerified ? 'bg-emerald-500' : 'bg-blue-500',
-                  // Size: hovered pins are largest; otherwise verified pins are
-                  // larger than unclaimed (and sit above them) so the green stands out.
+                  sv ? 'bg-amber-400 border-amber-600' : isVerified ? 'bg-emerald-500' : 'bg-blue-500',
+                  // Size: hovered pins are largest; then Safety Verified, then
+                  // claimed, then unclaimed, each sitting above the last.
                   isHovered
                     ? 'w-10 h-10 ring-4 ring-wellness-300 z-10 scale-110'
+                    : sv
+                      ? 'w-10 h-10 z-[2] ring-2 ring-amber-200 hover:scale-110'
                     : isVerified
                       ? 'w-9 h-9 z-[1] hover:scale-110'
                       : 'w-7 h-7 hover:scale-110'
@@ -134,6 +140,11 @@ export const MapboxListingMap = ({ providers, hoveredProviderId, onMarkerClick, 
                   <span className="text-xl font-black text-wellness-700 tracking-tight">
                     {initialsOf(selectedProvider.name)}
                   </span>
+                </div>
+              )}
+              {isSafetyVerifiedFn(selectedProvider as { safety_verified?: boolean; safety_review_status?: string | null }) && (
+                <div className="mb-1.5 inline-flex items-center gap-1 bg-amber-400 text-amber-950 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-[0.12em]">
+                  <ShieldCheck size={10} /> Safety Verified
                 </div>
               )}
               <h4 className="font-black text-sm text-slate-900 line-clamp-2 mb-1.5 leading-snug">{selectedProvider.name}</h4>

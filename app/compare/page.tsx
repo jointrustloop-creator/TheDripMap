@@ -12,7 +12,9 @@ import {
   Globe,
   Home,
   Clock,
+  ShieldCheck,
 } from 'lucide-react';
+import { isSafetyVerified } from '../../src/lib/safety';
 import { Navbar } from '../../src/components/Navbar';
 import { Footer } from '../../src/components/Footer';
 import { ResilientImage } from '../../src/components/ResilientImage';
@@ -150,13 +152,18 @@ export default async function ComparePage({ searchParams }: { searchParams: Sear
             );
           })}
 
-          {/* Row: claim status */}
+          {/* Row: verification. Safety Verified is the badge patients are told
+              to look for; claimed is a weaker signal; unclaimed is neither. */}
           <RowLabel label="Verified" />
           {providers.map((p) => (
             <Cell key={p.id}>
-              {p.is_featured ? (
+              {isSafetyVerified(p as { safety_verified?: boolean; safety_review_status?: string | null }) ? (
+                <span className="inline-flex items-center gap-1.5 bg-amber-400 text-amber-950 px-3 py-1.5 rounded-full text-xs font-black border border-amber-500">
+                  <ShieldCheck size={12} /> Safety Verified
+                </span>
+              ) : p.is_claimed || p.is_featured ? (
                 <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full text-xs font-black border border-emerald-100">
-                  <CheckCircle2 size={12} /> Claimed & verified
+                  <CheckCircle2 size={12} /> Claimed by owner
                 </span>
               ) : (
                 <span className="text-xs text-slate-400 font-bold">Unclaimed listing</span>

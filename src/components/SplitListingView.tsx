@@ -2,10 +2,11 @@
 
 import React, { useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Map as MapIcon, Star } from 'lucide-react';
+import { Map as MapIcon, Star, ShieldCheck } from 'lucide-react';
 import { Provider } from '../types';
 import { ProviderCard } from './ProviderCard';
 import { cn } from '../lib/utils';
+import { isSafetyVerified } from '../lib/safety';
 
 // Dynamically import map to avoid SSR issues
 const MapboxListingMap = dynamic(() => import('./MapboxListingMap'), {
@@ -45,6 +46,7 @@ export const SplitListingView = ({ providers, cityName }: SplitListingViewProps)
   const providersWithCoords = providers.filter((p) => p.latitude && p.longitude);
   const allHaveCoords = providersWithCoords.length === providers.length;
   const featuredCount = providers.filter((p) => p.is_featured).length;
+  const verifiedCount = providers.filter((p) => isSafetyVerified(p as { safety_verified?: boolean; safety_review_status?: string | null })).length;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-6 mb-12">
@@ -55,10 +57,14 @@ export const SplitListingView = ({ providers, cityName }: SplitListingViewProps)
             {providersWithCoords.length} of {providers.length} {providers.length === 1 ? 'clinic' : 'clinics'} mapped — the rest are missing coordinates.
           </div>
         )}
-        {featuredCount > 0 && (
-          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-700 px-3">
-            <Star size={12} fill="currentColor" className="text-emerald-500" />
-            <span>{featuredCount} featured · always shown first</span>
+        {(verifiedCount > 0 || featuredCount > 0) && (
+          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-amber-700 px-3">
+            {verifiedCount > 0 ? <ShieldCheck size={12} className="text-amber-500" /> : <Star size={12} fill="currentColor" className="text-emerald-500" />}
+            <span>
+              {verifiedCount > 0
+                ? `${verifiedCount} Safety Verified · shown first`
+                : `${featuredCount} featured · always shown first`}
+            </span>
           </div>
         )}
         {providers.map((provider) => {

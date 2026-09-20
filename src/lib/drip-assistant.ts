@@ -10,6 +10,7 @@ import { getServiceSupabase } from './supabase';
 import { TREATMENT_CONTENT } from './treatment-content';
 import { getStatus, normalizeHours } from './hours';
 import { getKnowledge } from './agent-knowledge-base';
+import { isSafetyVerified } from './safety';
 
 export interface AssistantClinic {
   name: string;
@@ -118,7 +119,9 @@ function isMobileProvider(p: { type?: string | null; specialties?: string[] | nu
 interface ProviderRow {
   name: string; slug: string | null; city: string | null; state: string | null;
   rating: number | string | null; reviews: number | string | null;
-  is_featured: boolean | null; type: string | null; specialties: string[] | null;
+  is_featured: boolean | null; is_claimed?: boolean | null;
+  safety_verified?: boolean | null; safety_review_status?: string | null;
+  type: string | null; specialties: string[] | null;
   mobile_service: boolean | null; website: string | null; phone: string | null;
   description: string | null; working_hours: Record<string, unknown> | null; id: string;
   latitude?: number | string | null; longitude?: number | string | null;
@@ -130,7 +133,7 @@ function toClinic(p: ProviderRow, verified: boolean, distanceMi: number | null =
     name: p.name, slug: p.slug, city: p.city, state: p.state,
     rating: p.rating != null ? Number(p.rating) : null,
     reviews: p.reviews != null ? Number(p.reviews) : null,
-    verified, claimed: !!p.is_featured, mobile: isMobileProvider(p),
+    verified, claimed: !!(p.is_featured || p.is_claimed), mobile: isMobileProvider(p),
     website: p.website, phone: p.phone,
     distanceMi: distanceMi != null ? Math.round(distanceMi * 10) / 10 : null,
     bookingUrl: p.online_booking_url || null,
@@ -173,7 +176,7 @@ async function searchProviders(input: {
 
   let q = sb
     .from('providers')
-    .select('id, name, slug, city, state, rating, reviews, is_featured, type, specialties, mobile_service, website, phone, description, working_hours, latitude, longitude, online_booking_url')
+    .select('id, name, slug, city, state, rating, reviews, is_featured, is_claimed, safety_verified, safety_review_status, type, specialties, mobile_service, website, phone, description, working_hours, latitude, longitude, online_booking_url')
     .neq('availability', false);
   if (hasCity) q = q.ilike('city', `%${input.city!.trim()}%`);
   if (input.verified_only) q = q.eq('is_featured', true);
@@ -252,19 +255,12 @@ async function searchProviders(input: {
     };
   }
 
-  // verified = claimed + all 5 safety flags. Look up profiles for the top slice.
+  // "Verified" in the assistant means the real Safety Verified badge, the same
+  // isSafetyVerified() gate every card uses. It used to be derived from the
+  // old operator_profiles flags, so the assistant could call a clinic verified
+  // that has no badge, or miss one that does (2026-09-20).
   const top = ranked.slice(0, 6);
-  const claimedIds = top.filter((x) => x.r.is_featured).map((x) => x.r.id);
-  const verifiedSet = new Set<string>();
-  if (claimedIds.length) {
-    const { data: profs } = await sb.from('operator_profiles').select('clinic_id, profile_data').in('clinic_id', claimedIds);
-    for (const pr of (profs as { clinic_id: string; profile_data: Record<string, unknown> | null }[]) || []) {
-      const pd = pr.profile_data || {};
-      if (SAFETY_FLAGS.every((f) => pd[f] === true)) verifiedSet.add(pr.clinic_id);
-    }
-  }
-
-  const clinics = top.slice(0, 4).map((x) => toClinic(x.r, verifiedSet.has(x.r.id), x.dist));
+  const clinics = top.slice(0, 4).map((x) => toClinic(x.r, isSafetyVerified(x.r), x.dist));
   const forModel = JSON.stringify({
     count: ranked.length,
     rankedBy: near ? 'distance' : 'relevance',
@@ -288,14 +284,14 @@ async function getProvider(input: { slug?: string }): Promise<ToolOutcome> {
   const sb = getServiceSupabase();
   const { data: p } = await sb
     .from('providers')
-    .select('id, name, slug, city, state, rating, reviews, is_featured, type, specialties, mobile_service, website, phone, description, working_hours')
+    .select('id, name, slug, city, state, rating, reviews, is_featured, is_claimed, safety_verified, safety_review_status, type, specialties, mobile_service, website, phone, description, working_hours')
     .eq('slug', input.slug)
     .maybeSingle();
   if (!p) {
     // Try a fuzzy name match so "is Refresh Med Spa verified?" works.
     const { data: alt } = await sb
       .from('providers')
-      .select('id, name, slug, city, state, rating, reviews, is_featured, type, specialties, mobile_service, website, phone, description, working_hours, online_booking_url')
+      .select('id, name, slug, city, state, rating, reviews, is_featured, is_claimed, safety_verified, safety_review_status, type, specialties, mobile_service, website, phone, description, working_hours, online_booking_url')
       .ilike('name', `%${input.slug.replace(/-/g, ' ')}%`)
       .order('is_featured', { ascending: false })
       .limit(1)
@@ -316,7 +312,7 @@ async function providerOutcome(p: ProviderRow, sb: ReturnType<typeof getServiceS
   // Badge gates on providers.safety_verified column only (2026-06-08).
   // verifiedCount is retained so the assistant can still mention "N/5 checks"
   // when describing where the clinic stands in the attestation flow.
-  const verified = (p as { safety_verified?: boolean }).safety_verified === true;
+  const verified = isSafetyVerified(p);
   const clinic = toClinic(p, verified);
   const forModel = JSON.stringify({
     found: true, name: p.name, city: p.city, state: p.state,
@@ -582,7 +578,7 @@ async function bookAppointment(input: { slug?: string }): Promise<ToolOutcome> {
   const sb = getServiceSupabase();
   const { data: p } = await sb
     .from('providers')
-    .select('id, name, slug, city, state, rating, reviews, is_featured, type, specialties, mobile_service, website, phone, description, working_hours, online_booking_url')
+    .select('id, name, slug, city, state, rating, reviews, is_featured, is_claimed, safety_verified, safety_review_status, type, specialties, mobile_service, website, phone, description, working_hours, online_booking_url')
     .eq('slug', input.slug)
     .maybeSingle();
 
@@ -634,7 +630,7 @@ async function compareProviders(input: { slugs?: unknown }): Promise<ToolOutcome
   const sb = getServiceSupabase();
   const { data, error } = await sb
     .from('providers')
-    .select('id, name, slug, city, state, rating, reviews, is_featured, safety_verified, type, specialties, mobile_service, website, phone, description, working_hours, latitude, longitude, online_booking_url')
+    .select('id, name, slug, city, state, rating, reviews, is_featured, is_claimed, safety_verified, safety_review_status, type, specialties, mobile_service, website, phone, description, working_hours, latitude, longitude, online_booking_url')
     .in('slug', slugs);
   if (error) return { forModel: JSON.stringify({ error: 'compare query failed' }) };
   const rows = (data as ProviderRow[]) || [];
@@ -645,7 +641,7 @@ async function compareProviders(input: { slugs?: unknown }): Promise<ToolOutcome
   // Verified set sourced from the providers.safety_verified column (2026-06-08).
   const verifiedSet = new Set<string>();
   for (const r of rows) {
-    if ((r as { safety_verified?: boolean }).safety_verified === true) verifiedSet.add(r.id);
+    if (isSafetyVerified(r as { safety_verified?: boolean; safety_review_status?: string | null })) verifiedSet.add(r.id);
   }
 
   // Best-effort price lookup from TREATMENT_CONTENT — uses each clinic's first

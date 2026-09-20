@@ -4,8 +4,9 @@ import { APIProvider, Map, AdvancedMarker, Pin, InfoWindow, useAdvancedMarkerRef
 import { Provider } from '../types';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Phone, Star } from 'lucide-react';
+import { Phone, Star, ShieldCheck } from 'lucide-react';
 import { slugify } from '../lib/data';
+import { isSafetyVerified } from '../lib/safety';
 
 interface GoogleListingMapProps {
   providers: Provider[];
@@ -34,6 +35,10 @@ const MarkerWithInfoWindow = ({ provider }: { provider: Provider }) => {
   const slug = provider.slug || slugify(provider.name);
 
   if (!provider.latitude || !provider.longitude) return null;
+  // Amber pin for Safety Verified, green for claimed, blue for unclaimed:
+  // the same ladder as the cards and the Mapbox map.
+  const sv = isSafetyVerified(provider as { safety_verified?: boolean; safety_review_status?: string | null });
+  const claimed = provider.is_claimed === true || provider.is_featured === true;
 
   return (
     <>
@@ -43,10 +48,11 @@ const MarkerWithInfoWindow = ({ provider }: { provider: Provider }) => {
         onClick={() => setInfoWindowShown(true)}
         title={provider.name}
       >
-        <Pin 
-          background={provider.is_featured ? "#10B981" : "#4285F4"} 
-          glyphColor="#fff" 
-          borderColor={provider.is_featured ? "#059669" : "#1D4ED8"}
+        <Pin
+          background={sv ? '#F59E0B' : claimed ? '#10B981' : '#4285F4'}
+          glyphColor="#fff"
+          borderColor={sv ? '#B45309' : claimed ? '#059669' : '#1D4ED8'}
+          scale={sv ? 1.25 : 1}
         />
       </AdvancedMarker>
       {infoWindowShown && (
@@ -72,8 +78,13 @@ const MarkerWithInfoWindow = ({ provider }: { provider: Provider }) => {
                 </span>
               </div>
             )}
+            {sv && (
+              <div className="mb-1.5 inline-flex items-center gap-1 bg-amber-400 text-amber-950 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-[0.12em]">
+                <ShieldCheck size={10} /> Safety Verified
+              </div>
+            )}
             <h4 className="font-black text-sm text-slate-900 line-clamp-2 mb-1.5 leading-snug">{provider.name}</h4>
-            {provider.is_featured && provider.rating > 0 && (
+            {claimed && provider.rating > 0 && (
               <div className="flex items-center gap-1 mb-2">
                 <Star size={12} className="text-amber-400 fill-amber-400" />
                 <span className="text-[10px] font-bold text-slate-600">

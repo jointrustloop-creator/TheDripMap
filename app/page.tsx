@@ -628,8 +628,16 @@ export default async function HomePage() {
                 <Link
                   key={c.slug || c.name}
                   href={`/providers/${c.slug}`}
-                  className="group relative overflow-hidden rounded-3xl bg-white border border-slate-200/80 shadow-[0_8px_24px_-12px_rgba(15,40,30,0.10)] hover:shadow-[0_26px_50px_-30px_rgba(15,40,30,0.45)] hover:-translate-y-1 hover:border-[#d3dfca] transition-all duration-300 flex flex-col"
+                  className={`group relative overflow-hidden rounded-3xl bg-white border shadow-[0_8px_24px_-12px_rgba(15,40,30,0.10)] hover:shadow-[0_26px_50px_-30px_rgba(15,40,30,0.45)] hover:-translate-y-1 transition-all duration-300 flex flex-col ${isSafetyVerified ? 'border-amber-300 ring-2 ring-amber-300/60' : 'border-slate-200/80 hover:border-[#d3dfca]'}`}
                 >
+                  {/* Safety Verified bar, the same bar every card surface uses. */}
+                  {isSafetyVerified && (
+                    <div className="flex items-center gap-2 bg-amber-400 text-amber-950 px-4 py-2 text-[11px] font-black uppercase tracking-[0.14em]">
+                      <Check size={13} strokeWidth={3} className="shrink-0" />
+                      Safety Verified
+                      <span className="ml-auto normal-case tracking-normal font-semibold text-amber-900/80 text-[10.5px] truncate">prescriber checked against the register</span>
+                    </div>
+                  )}
                   {/* Photo hero — uniform aspect-[16/10] across all 4 cards,
                       object-cover keeps a centered focal point with no
                       stretching or letterbox. The hero is NOT clipped by
@@ -673,12 +681,6 @@ export default async function HomePage() {
                           </span>
                         )}
                       </div>
-                    )}
-                    {/* Safety Verified badge — only on truly verified clinics. */}
-                    {isSafetyVerified && (
-                      <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1f3a27] text-white text-[10px] font-bold uppercase tracking-[0.06em] shadow-[0_4px_12px_rgba(20,38,25,0.35)]">
-                        <Check size={11} strokeWidth={3} /> Safety Verified
-                      </span>
                     )}
                     {/* Logo chip — small white circle overlapping the hero base.
                         When the clinic has a real logo file under

@@ -220,23 +220,31 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
 
         {/* Body */}
         <div className="relative px-5 pb-5 pt-0 flex flex-col flex-1">
-          {/* Logo / monogram avatar overlapping the band */}
-          <div className={cn(
-            'relative -mt-9 mb-3 h-16 w-16 rounded-2xl ring-4 ring-white shadow-lg flex items-center justify-center overflow-hidden',
-            accent.monoBg
-          )}>
-            {/* The logo, when present, is the band above; the avatar keeps the
-                monogram so the mark is never shown twice. */}
-            <span className={cn('text-2xl font-black', accent.monoText)}>{initials}</span>
-            {isSafetyVerified ? (
-              <span title="Completed TheDripMap's safety questionnaire" className="absolute -bottom-1.5 -right-1.5 h-6 w-6 rounded-full bg-amber-400 ring-2 ring-white flex items-center justify-center text-amber-950 shadow">
+          {/* Avatar overlapping the band. The outer wrapper is NOT clipped so
+              the corner check is never cut off (it was, on every claimed card,
+              because the badge sat inside the overflow-hidden tile). When the
+              logo already fills the band, the tile becomes the Safety Verified
+              shield instead of repeating the initials next to the logo. */}
+          <div className="relative -mt-9 mb-3 h-16 w-16">
+            <div className={cn(
+              'h-16 w-16 rounded-2xl ring-4 ring-white shadow-lg flex items-center justify-center overflow-hidden',
+              logo && isSafetyVerified ? 'bg-amber-400' : accent.monoBg
+            )}>
+              {logo && isSafetyVerified ? (
+                <ShieldCheck size={30} className="text-amber-950" />
+              ) : (
+                <span className={cn('text-2xl font-black', accent.monoText)}>{initials}</span>
+              )}
+            </div>
+            {!(logo && isSafetyVerified) && (isSafetyVerified ? (
+              <span title="Safety Verified by TheDripMap" className="absolute -bottom-1.5 -right-1.5 h-6 w-6 rounded-full bg-amber-400 ring-2 ring-white flex items-center justify-center text-amber-950 shadow">
                 <ShieldCheck size={12} />
               </span>
             ) : (
               <span title="Ownership confirmed by the clinic" className="absolute -bottom-1.5 -right-1.5 h-5 w-5 rounded-full bg-slate-200 ring-2 ring-white flex items-center justify-center text-slate-500">
                 <CheckCircle2 size={11} />
               </span>
-            )}
+            ))}
           </div>
 
           {/* Name + location */}
@@ -299,13 +307,9 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
 
           {/* Trust signal, visible in EVERY card mode. Safety Verified leads as
               a prominent gold badge; Claimed shows subtly only on its own. */}
-          {isSafetyVerified ? (
-            <div className="mt-2.5">
-              <span title="Completed TheDripMap's safety questionnaire" className="inline-flex items-center gap-1.5 bg-amber-400 text-amber-950 border border-amber-500 px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-tight shadow-sm">
-                <ShieldCheck size={12} /> Safety Verified
-              </span>
-            </div>
-          ) : isClaimed ? (
+          {/* Safety Verified is the full-width bar at the top of the card;
+              only the claimed-not-verified state needs a pill here. */}
+          {isSafetyVerified ? null : isClaimed ? (
             <div className="mt-2.5">
               <span
                 title="Ownership confirmed by the clinic"
