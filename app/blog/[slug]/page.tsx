@@ -20,10 +20,10 @@ import { ResilientImage } from '../../../src/components/ResilientImage';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { BreadcrumbNav } from '../../../src/components/BreadcrumbNav';
-import { BlogCard } from '../../../src/components/BlogCard';
 import { BlogBookingCTA } from '../../../src/components/BlogBookingCTA';
 import { ArticleFunnelCta, ARTICLE_FUNNELS } from '../../../src/components/ArticleFunnelCta';
 import { ClinicB2BCta } from '../../../src/components/ClinicB2BCta';
+import { BlogSidebar, headingId } from '../../../src/components/BlogSidebar';
 import { getBlogPostBySlug, getBlogPosts, slugify, getListingsByIds, getAllCities, US_MARKET_BLOG_SLUGS, BLOG_CANONICAL_OVERRIDES } from '../../../src/lib/data';
 import { US_MARKET_ENABLED } from '../../../src/lib/market';
 import { SupabaseUnreachableError } from '../../../src/lib/supabase-health';
@@ -183,9 +183,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     ? await getListingsByIds(post.relatedClinics)
     : [];
 
-  // Only claimed/verified listings may be presented as "Featured" — unclaimed
-  // clinics are never shown as featured and never display ratings/reviews.
-  const featuredClinics = relatedClinics.filter((c) => c.is_featured === true);
 
   // Build a set of city slugs that actually have a /cities/<slug> page so
   // the Related Locations chips don't link out to 404s for cities we wrote
@@ -478,7 +475,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline markdown-body">
               {post.content ? (
                 <article className="markdown-body">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      // Anchor ids so the sidebar table of contents can jump.
+                      h2: ({ children }) => <h2 id={headingId(String(children))} className="scroll-mt-28">{children}</h2>,
+                      h3: ({ children }) => <h3 id={headingId(String(children))} className="scroll-mt-28">{children}</h3>,
+                    }}
+                  >
                     {String(post.content)}
                   </ReactMarkdown>
                 </article>
@@ -561,77 +565,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             )}
           </article>
 
-          {/* Sidebar */}
-          <aside className="lg:col-span-4 space-y-12">
-            {/* Featured Clinics — claimed/verified listings only */}
-            {featuredClinics.length > 0 && (
-              <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl p-8">
-                <h3 className="text-xl font-black text-slate-900 mb-8 tracking-tight">Featured Clinics</h3>
-                <div className="space-y-6">
-                  {featuredClinics.map((clinic) => (
-                    <Link 
-                      key={clinic.id}
-                      href={`/providers/${clinic.slug || slugify(clinic.name)}`}
-                      className="group flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 transition-all"
-                    >
-                      <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0">
-                        <ResilientImage 
-                          src={clinic.imageUrl || `https://picsum.photos/seed/${clinic.id}/200/200`} 
-                          alt={clinic.name} 
-                          fill 
-                          className="object-cover"
-                          fallbackSrc="https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/clinic-logo-placeholder.png"
-                        />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-slate-900 group-hover:text-wellness-600 transition-colors line-clamp-1">{clinic.name}</h4>
-                        <div className="flex items-center gap-1 text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
-                          <MapPin size={10} /> {clinic.city}
-                        </div>
-                        <div className="flex items-center gap-1 mt-2">
-                          <Star size={10} className="text-amber-500 fill-amber-500" />
-                          <span className="text-xs font-bold text-slate-700">{clinic.rating}</span>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-                <Link 
-                  href="/search"
-                  className="w-full mt-8 bg-wellness-600 text-white px-6 py-4 rounded-xl font-bold text-sm hover:bg-wellness-700 transition-all shadow-lg shadow-wellness-100 flex items-center justify-center gap-2"
-                >
-                  Explore All Clinics <ArrowRight size={16} />
-                </Link>
-              </div>
-            )}
-
-            {/* Newsletter / CTA */}
-            <div className="bg-wellness-900 text-white rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-wellness-800 rounded-bl-[5rem] -mr-8 -mt-8" />
-              <div className="relative z-10">
-                <h3 className="text-2xl font-black mb-4 tracking-tight">Find Your Perfect Match</h3>
-                <p className="text-wellness-100 text-sm leading-relaxed mb-8">
-                  Take our clinical diagnostic quiz and get matched with the best IV therapy providers in your city.
-                </p>
-                <Link 
-                  href="/quiz"
-                  className="w-full bg-wellness-600 text-white px-6 py-4 rounded-xl font-bold text-sm hover:bg-wellness-700 transition-all shadow-lg flex items-center justify-center gap-2"
-                >
-                  <Zap size={16} /> Get Matched Now
-                </Link>
-              </div>
-            </div>
-
-            {/* Related Posts */}
-            <div>
-              <h3 className="text-xl font-black text-slate-900 mb-8 tracking-tight">More from the Blog</h3>
-              <div className="space-y-8">
-                {relatedPosts.map((post, idx) => (
-                  <BlogCard key={idx} post={post} />
-                ))}
-              </div>
-            </div>
-          </aside>
+          {/* Sidebar: sticky, data-backed (src/components/BlogSidebar.tsx) */}
+          <BlogSidebar slug={String(post.slug)} content={String(post.content || "")} cityHub={cityHub} relatedPosts={relatedPosts} />
         </div>
       </main>
 

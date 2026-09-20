@@ -55,7 +55,11 @@ export async function generateMetadata({ params }: { params: Promise<{ service: 
   const service = SERVICES.find(s => s.slug === serviceSlug || (s.aliases && s.aliases.includes(serviceSlug)));
   const serviceName = service ? ((service as { titleName?: string }).titleName || service.name) : serviceSlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
-  const title = `${serviceName} IV Therapy Clinics Near Me | TheDripMap`;
+  // 2026-09-20: the hub titles read "Clinics Near Me" and drew 1 click on
+  // 3,252 impressions (Search Console, 3 months). The query intent is cost
+  // and what the drip is, so the title says that, under 60 characters.
+  const base = `${serviceName} IV in Canada: Cost, Evidence, Clinics (2026)`;
+  const title = base.length <= 60 ? base : `${serviceName} IV: Cost and Clinics in Canada (2026)`;
   // Hub pages carry the honest-triage voice (2026-08-15 Move 1): the
   // description promises comparison + real data + verification, not a booking
   // pitch. Non-hub slugs keep the legacy line.
