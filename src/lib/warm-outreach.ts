@@ -25,7 +25,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 const SITE = 'https://www.thedripmap.com';
 const MAILING = 'TheDripMap, Caledon, Ontario, Canada';
-const SENDER = 'Deborah';
+const SENDER = 'Deborah Triandafilou';
 const FONT = "-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 const VIEW_WINDOW_DAYS = 90;
 const MIN_VIEWS = 3;

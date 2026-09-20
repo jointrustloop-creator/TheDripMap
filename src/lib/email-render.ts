@@ -24,7 +24,9 @@ function escapeHtml(s: string): string {
 
 /** The recipient's plain-text copy must never contain markdown syntax. */
 export function toPlainText(text: string, opts: RenderOptions = {}): string {
-  const plain = text.replace(/\r\n/g, '\n').replace(MD_LINK, (_m, label, url) => `${label}: ${url}`);
+  const plain = text.replace(/\r\n/g, '\n').replace(MD_LINK, (_m, label, url) => `${label}: ${url}`)
+    // The plain-text copy carries the same full signature as the HTML block.
+    .replace(/(^|\n)Deborah\n+Founder,?\s+TheDripMap\s*$/i, '$1Deborah Triandafilou\nFounder, TheDripMap\nthedripmap.com');
   return opts.footerFor ? `${plain}\n\n--\n${complianceFooterText(opts.footerFor, opts.clinicName)}` : plain;
 }
 
@@ -47,7 +49,7 @@ const SIGNATURE_HTML =
   + `<tr><td style="vertical-align:top;padding:18px 14px 0 0;">`
   + `<img src="https://www.thedripmap.com/icon-192.png" width="44" height="44" alt="TheDripMap" style="display:block;border-radius:10px;">`
   + `</td><td style="vertical-align:top;padding-top:18px;font-family:${FONT};">`
-  + `<div style="font-size:15px;font-weight:700;color:#1A2B26;">Deborah</div>`
+  + `<div style="font-size:15px;font-weight:700;color:#1A2B26;">Deborah Triandafilou</div>`
   + `<div style="font-size:13px;color:#5B6B66;margin-top:2px;">Founder, TheDripMap</div>`
   + `<div style="font-size:13px;margin-top:6px;"><a href="https://www.thedripmap.com" style="color:#0F6E56;text-decoration:none;">thedripmap.com</a>`
   + ` <span style="color:#B8B2A6;">&middot;</span> <a href="mailto:info@thedripmap.com" style="color:#0F6E56;text-decoration:none;">info@thedripmap.com</a></div>`

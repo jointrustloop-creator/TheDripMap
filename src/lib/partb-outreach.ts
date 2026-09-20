@@ -13,7 +13,7 @@
 
 const MAILING = 'TheDripMap, Caledon, Ontario, Canada';
 const SITE = 'https://www.thedripmap.com';
-const SENDER = 'Deborah';
+const SENDER = 'Deborah Triandafilou';
 
 export type OutreachMarket = 'CA' | 'US';
 

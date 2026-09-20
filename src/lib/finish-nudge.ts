@@ -23,7 +23,7 @@ import { manageUrlForProvider } from './manage-token';
 
 const SITE = 'https://www.thedripmap.com';
 const MAILING = 'TheDripMap, Caledon, Ontario, Canada';
-const SENDER = 'Deborah';
+const SENDER = 'Deborah Triandafilou';
 const FONT = "-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 
 export const FINISH_NUDGE_TEMPLATE_ID = 'finish_nudge_v1';
