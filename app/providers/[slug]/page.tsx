@@ -48,7 +48,6 @@ import { Provider } from '../../../src/types';
 import { cn } from '../../../src/lib/utils';
 import { getStatus } from '../../../src/lib/hours';
 import SmartSummary from '../../../src/components/SmartSummary';
-import { calculateValueMetrics } from '../../../src/lib/price-utils';
 import { getCityPriceIndex } from '../../../src/lib/price-index-data';
 import DefinitiveListingLayout from '../../../src/components/DefinitiveListingLayout';
 import { TransparencyPanel } from '../../../src/components/TransparencyPanel';
@@ -224,7 +223,10 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   // Title: "<Name> | IV Therapy in <City> | TheDripMap" — region dropped
   // 2026-06-15 so titles stay near/under 60 chars (78% previously exceeded 65
   // once the full state name was appended). Pipe separators, no em-dash.
-  const title = `${displayName} | IV Therapy in ${cityLabel} | TheDripMap`;
+  // Under 60 chars where the name allows; long clinic names drop the brand
+  // rather than the city (Google truncates around 60).
+  const fullTitle = `${displayName} | IV Therapy in ${cityLabel} | TheDripMap`;
+  const title = fullTitle.length <= 60 ? fullTitle : `${displayName} | IV Therapy in ${cityLabel}`;
   // Descriptions clamp to <=155 chars (98% previously exceeded 165 and were
   // truncated by Google). Written short, then hard-cut at a word boundary.
   const clampDesc = (str: string, max = 155): string =>
@@ -409,7 +411,6 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
 
   const allListings = await getAllListings();
   const initials = getInitials(provider.name, provider.city, allListings);
-  const valueMetrics = calculateValueMetrics(provider);
   
   const similarClinics = await getSimilarClinics(slug, provider.city, stateCode);
   const patientTestimonials = provider.is_featured
@@ -702,7 +703,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               <div className="h-px flex-1 bg-wellness-100" />
             </div>
             <p className="text-sm text-slate-600 leading-relaxed mb-5">
-              Across {cityPrices.clinicCount} {cityPrices.city} clinics with published menus, a standard IV vitamin drip runs a median of <b className="text-slate-900">${cityPrices.headline.median}</b> (about ${cityPrices.headline.low} to ${cityPrices.headline.high}). These are city-wide published prices, not necessarily {provider.name}&apos;s own — confirm directly with the clinic.
+              Across {cityPrices.clinicCount} {cityPrices.city} clinics with published menus, a standard IV vitamin drip runs a median of <b className="text-slate-900">${cityPrices.headline.median}</b> (about ${cityPrices.headline.low} to ${cityPrices.headline.high}). These are city-wide published prices, not necessarily {provider.name}&apos;s own, so confirm directly with the clinic.
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
               {cityPrices.rows.slice(0, 6).map((r) => (
@@ -1286,17 +1287,20 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               
               if (!hasFacts) return null;
               
-              const priceDisplay = provider.price_range || provider.priceRange || '$$';
+              // Only a real published range is shown. The old "(Premium)" label
+              // came from the LENGTH of the price string, so "$60-125" read as
+              // Premium (audit C6-9), and "$$" was invented when no range existed.
+              const priceDisplay = provider.price_range || provider.priceRange || null;
               
               return (
                 <section className="pt-8 border-t border-slate-100">
                   <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Clinic details</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {priceDisplay && (
-                      <DetailCard 
-                        label="Price Range" 
-                        value={`${priceDisplay} (${valueMetrics.label})`} 
-                        icon={<Zap size={24} />} 
+                      <DetailCard
+                        label="Price Range"
+                        value={priceDisplay}
+                        icon={<Zap size={24} />}
                       />
                     )}
                     {isMobile && (
@@ -1484,11 +1488,11 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 {[
                   {
                     q: `What services does ${provider.name} offer?`,
-                    a: `${provider.name} in ${provider.city} specializes in ${provider.specialties?.slice(0, 3).join(', ')} and other IV wellness treatments designed for rapid recovery and cellular health.`
+                    a: `${provider.name} in ${provider.city} lists ${provider.specialties?.slice(0, 3).join(', ')}. This listing is not yet claimed by the clinic, so confirm the current menu and prices with them directly.`
                   },
                   {
                     q: `How long does an appointment take?`,
-                    a: `Most IV treatments take between 45 to 60 minutes depending on the protocol. Specialized infusions like NAD+ may require up to 2-4 hours for cellular absorption.`
+                    a: `It depends on the drip. A standard vitamin drip usually runs 30 to 90 minutes and NAD+ infusions take longer. Ask ${provider.name} when you book.`
                   },
                   {
                     q: `Is mobile IV therapy available?`,

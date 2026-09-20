@@ -206,9 +206,17 @@ export default async function DealsPage() {
           ) : (
             <>
               <div className="flex items-end justify-between gap-4 mb-6">
-                <h2 className="text-[22px] md:text-[26px] font-black text-slate-900 tracking-tight">
-                  All live offers
-                </h2>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h2 className="text-[22px] md:text-[26px] font-black text-slate-900 tracking-tight">
+                    All live offers
+                  </h2>
+                  {/* The page revalidates every 10 minutes, so this date is the
+                      real render date, not a static label (Hubert 2026-09-20). */}
+                  <span className="inline-flex items-center gap-1.5 text-[12px] font-bold text-[#0F6E56] bg-[#e7f1ec] border border-[#0F6E56]/15 rounded-full px-3 py-1">
+                    <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0F6E56] opacity-60" /><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#0F6E56]" /></span>
+                    Live as of {new Date().toLocaleDateString('en-CA', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/Toronto' })}
+                  </span>
+                </div>
                 <span className="hidden sm:inline-flex items-center gap-1.5 text-[12.5px] font-bold text-slate-500">
                   <BadgeCheck size={14} className="text-[#0F6E56]" /> Claimed clinics only, wording as the clinic wrote it
                 </span>

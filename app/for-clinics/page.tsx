@@ -250,7 +250,7 @@ export default async function ForClinicsPage() {
               </span>
               <div className="relative flex items-center justify-between mb-7 mt-4">
                 <span className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-wellness-600">
-                  <ShieldCheck size={14} /> Claimed &amp; Verified
+                  <ShieldCheck size={14} /> Claimed by owner
                 </span>
                 <span className="text-[11px] font-bold text-wellness-600">Where bookings happen</span>
               </div>

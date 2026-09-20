@@ -7,7 +7,7 @@ import { Footer } from '../../../src/components/Footer';
 const EMERALD = '#0F6E56';
 const title = 'How to Get More Patients for Your IV Therapy Clinic (2026 Guide) | TheDripMap';
 const description =
-  'A practical, data-backed playbook for IV therapy clinic owners: local SEO, reviews, directories, booking conversion, retention and paid ads — with real benchmarks and sources.';
+  'A practical, data-backed playbook for IV therapy clinic owners: local SEO, reviews, listings, booking conversion, retention and paid ads, with real benchmarks and sources.';
 
 export const metadata: Metadata = {
   title,
@@ -132,7 +132,7 @@ export default function PatientAcquisitionPage() {
         {/* PRODUCT TIE-IN CTA */}
         <section className="max-w-3xl mx-auto px-6 pb-12">
           <div className="rounded-3xl p-8 md:p-10 text-white text-center" style={{ backgroundColor: '#0A3D2B' }}>
-            <h2 className="text-2xl md:text-3xl font-black tracking-tight mb-3">TheDripMap is one of those high-intent directories.</h2>
+            <h2 className="text-2xl md:text-3xl font-black tracking-tight mb-3">TheDripMap is one of those high-intent places patients already search.</h2>
             <p className="text-emerald-50/80 leading-relaxed max-w-xl mx-auto mb-6">
               Patients searching IV therapy in your city land here. Claiming your free listing puts your real photos, services, hours and verified safety details in front of them — no ad spend required.
             </p>

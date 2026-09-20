@@ -140,7 +140,7 @@ export default function VerificationPage() {
           How we verify clinics
         </h1>
         <p className="text-lg text-slate-600 leading-relaxed mb-4">
-          Most directories take a clinic at its word. We would rather check, and then tell you exactly
+          Most listing sites take a clinic at its word. We would rather check, and then tell you exactly
           what we checked. This page lists every level of verification we use, which public register
           each one is checked against, how often we look again, and, just as importantly, what each
           level does not claim.

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
+import { isRetiredUseCase } from '@/src/lib/use-cases';
 import Link from 'next/link';
 import { getUseCaseBySlug, getListingsByService, getAllUseCases, slugify } from '@/src/lib/data';
 import * as Icons from 'lucide-react';
@@ -58,6 +59,9 @@ import { SymptomImage } from '@/src/components/SymptomImage';
 
 export default async function UseCasePage({ params }: PageProps) {
   const { slug } = await params;
+  // Retired condition pages (migraine, weight loss...) redirect permanently
+  // to the treatment hub instead of 404ing an indexed URL.
+  if (isRetiredUseCase(slug)) permanentRedirect('/treatments');
   const useCase = await getUseCaseBySlug(slug);
   if (!useCase) notFound();
 

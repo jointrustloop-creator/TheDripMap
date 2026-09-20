@@ -16,6 +16,17 @@ export interface UseCase {
 
 const SUPABASE_BASE_URL = 'https://qaqzwfnjajyejehmdvuw.supabase.co/storage/v1/object/public/blog-images/';
 
+/**
+ * Retired 2026-09-20 (Hubert delegated the /symptoms decision: "best practice,
+ * legal rules must follow"). Pages built around a medical condition or a
+ * regulated claim (Health Canada and provincial college advertising standards:
+ * no treatment, cure or weight-loss claims for a wellness drip) are withdrawn:
+ * they redirect to /treatments and leave the sitemap. Lifestyle situations
+ * (hangover, jet lag, event prep, dehydration...) stay, evidence-framed.
+ */
+export const RETIRED_USE_CASE_SLUGS = new Set(['migraine', 'morning-sickness', 'weight-loss', 'immunity', 'stomach-flu', 'cold-and-flu']);
+export const isRetiredUseCase = (slug: string) => RETIRED_USE_CASE_SLUGS.has(slug);
+
 export const USE_CASES: UseCase[] = [
   {
     slug: 'hangover',
@@ -103,7 +114,7 @@ export const USE_CASES: UseCase[] = [
       { question: 'Does IV therapy for fatigue help with mental clarity?', answer: 'Many people report improved focus and reduced "brain fog" along with increased physical energy.' },
       { question: 'Is IV therapy for fatigue suitable for everyone?', answer: 'It is commonly used by healthy adults looking to support their daily energy levels.' },
       { question: 'How much does IV therapy for fatigue cost?', answer: 'Prices usually start around $150 and can go up to $400 for more complex nutrient blends.' },
-      { question: 'How quickly will I feel relief from fatigue symptoms?', answer: 'Many people feel a sustained lift in energy within 2 to 4 hours of their session.' },
+      { question: 'How quickly will I feel relief from fatigue symptoms?', answer: 'Some people describe feeling more energetic the same day; others notice little. There is no reliable timeline, and results vary by person and cause.' },
       { question: 'Is IV therapy for fatigue covered by insurance?', answer: 'Most insurance providers do not cover IV therapy for general fatigue or wellness support.' }
     ]
   },
@@ -234,7 +245,7 @@ export const USE_CASES: UseCase[] = [
     description: 'True beauty often starts from within, and hydration is the foundation of a healthy complexion. IV therapy is a popular choice for those seeking a "lit-from-within" radiance, commonly used for skin brightening and overall rejuvenation. By delivering high doses of antioxidants like glutathione and Vitamin C, many people use these drips to support their skin\'s natural defense against environmental stress and oxidative damage. It is often favored before big events or as part of a regular skincare routine to help maintain a hydrated, youthful appearance. Many people report that their skin looks more plump and vibrant after a session of deep hydration.',
     whyItWorks: 'The honest version: the marketed skin benefits of these drips are not established in good clinical evidence. Glutathione is a real antioxidant your own cells make, vitamin C genuinely matters for collagen, and neither fact is proof that infusing them changes how your skin looks. Where people report changes with glutathione they are described as gradual and temporary, which makes any effect an ongoing paid subscription rather than a result.\n\nThe specific skin-brightening or whitening pitch carries an actual regulatory record: no injectable drug is approved for skin lightening by the US FDA, which has warned these are unapproved products, and Canada has had documented contamination incidents with injectable glutathione supplied to clinics. If you consider one anyway, the highest-value question is where the product in the vial is compounded.',
     comparisons: 'Topical skincare and sunscreen have the evidence for skin appearance. An IV is marketed as working "from the inside out", but there is no good evidence that infusing glutathione or vitamin C changes how skin looks in people who are not deficient.',
-    typicalPatient: 'Typical users include brides and grooms preparing for their wedding, professionals who are frequently on camera, and anyone who wants to support their anti-aging skincare routine with deep hydration and potent antioxidants. It is also popular among those who spend a lot of time outdoors and want to support their skin after sun exposure.',
+    typicalPatient: 'Typical users include brides and grooms preparing for their wedding, professionals who are frequently on camera, and anyone who wants to support their skincare routine with deep hydration and potent antioxidants. It is also popular among those who spend a lot of time outdoors and want to support their skin after sun exposure.',
     ingredients: ['Glutathione', 'Vitamin C', 'Biotin', 'Hydration fluids', 'B-Complex vitamins'],
     ingredientsDetailed: [
       { name: 'Glutathione', role: 'An antioxidant your own cells produce; marketed for skin effects that remain unproven, and the one ingredient where asking about product sourcing matters most.' },
@@ -308,7 +319,7 @@ export const USE_CASES: UseCase[] = [
       { question: 'What is the best ingredient for a stomach flu IV?', answer: 'A balanced saline solution and electrolytes are the most critical components for restoring fluid balance.' },
       { question: 'Can I get IV therapy for stomach flu at home?', answer: 'Yes, mobile IV services are highly recommended for those who are too unwell to travel to a clinic.' },
       { question: 'How much does IV therapy for stomach flu cost?', answer: 'Prices typically range from $175 to $375, often depending on whether mobile service is required.' },
-      { question: 'How quickly will I feel relief from stomach flu symptoms?', answer: 'Most people report feeling significantly more hydrated and less lightheaded within 45 to 60 minutes.' },
+      { question: 'How quickly will I feel relief from stomach flu symptoms?', answer: 'Rehydration itself happens during the drip, so lightheadedness from fluid loss often eases the same day. How you feel afterward depends on what caused the illness.' },
       { question: 'Is IV therapy for stomach flu covered by insurance?', answer: 'Typically, this is an out-of-pocket wellness service, though some HSA/FSA plans may be accepted.' }
     ]
   },
@@ -453,8 +464,11 @@ export const USE_CASES: UseCase[] = [
       { question: 'Is IV therapy for brain fog safe for students?', answer: 'It is commonly used by healthy adults, including students looking for a natural way to support their studies.' },
       { question: 'How often should I get IV therapy for brain fog?', answer: 'Many people find a session every few weeks or during particularly demanding periods to be very helpful.' },
       { question: 'How much does IV therapy for brain fog cost?', answer: 'Standard brain fog drips range from $175 to $350, while specialized NAD+ sessions can cost $500 or more.' },
-      { question: 'How quickly will I feel relief from brain fog symptoms?', answer: 'Many individuals report a "lifting" of mental cloudiness within 2 to 6 hours of their session.' },
+      { question: 'How quickly will I feel relief from brain fog symptoms?', answer: 'There is no reliable timeline. Some people describe feeling clearer the same day; the evidence for IV therapy and brain fog is limited.' },
       { question: 'Is IV therapy for brain fog covered by insurance?', answer: 'IV therapy for cognitive support is generally considered a wellness service and is not covered by insurance.' }
     ]
   }
 ];
+
+/** The use cases that are published: everything not retired. */
+export const PUBLIC_USE_CASES: UseCase[] = USE_CASES.filter((u) => !RETIRED_USE_CASE_SLUGS.has(u.slug));

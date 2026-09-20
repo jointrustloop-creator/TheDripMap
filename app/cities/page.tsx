@@ -10,7 +10,7 @@ import { getAllCities, slugify } from '@/src/lib/data';
 import { US_MARKET_ENABLED, marketOf } from '@/src/lib/market';
 import { getCityPhoto, getCityGradient, getCityInitial } from '@/src/lib/city-images';
 
-const citiesTitle = 'Cities Archive — Browse IV Therapy Locations | TheDripMap';
+const citiesTitle = 'IV Therapy Clinics by City in Canada | TheDripMap';
 const citiesDescription =
   'Explore our complete matching platform for cities providing IV therapy. Find top-rated clinics and mobile services across Canada.';
 const citiesOgImage = 'https://www.thedripmap.com/og-image.png';

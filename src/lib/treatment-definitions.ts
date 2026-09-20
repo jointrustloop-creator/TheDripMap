@@ -41,7 +41,7 @@ export const TREATMENT_DEFINITIONS: Record<string, TreatmentDefinition> = {
   'nad+ therapy': {
     name: 'NAD+ therapy',
     definition:
-      'A slow IV infusion of NAD+, a coenzyme found in every cell, popular in wellness and anti-aging circles.',
+      'A slow IV infusion of NAD+, a coenzyme found in every cell, popular in wellness and longevity circles.',
     slug: 'nad-plus',
   },
   'glutathione': {
@@ -83,9 +83,9 @@ export const TREATMENT_DEFINITIONS: Record<string, TreatmentDefinition> = {
     slug: 'glutathione',
   },
   'anti-aging': {
-    name: 'Anti-aging',
+    name: 'Longevity and skin',
     definition:
-      'Antioxidant and NAD+ based formulas centered on cellular health and the visible signs of aging.',
+      'Antioxidant and NAD+ based formulas that clinics market for skin and healthy aging. Evidence for visible results is limited.',
     slug: 'nad-plus',
   },
   'hangover recovery': {

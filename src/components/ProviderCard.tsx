@@ -8,6 +8,7 @@ import { isSafetyVerified as isSafetyVerifiedFn } from '../lib/safety';
 import { Provider } from '../types';
 import { slugify } from '../lib/data';
 import { bookingUrlOf, priceSignalOf } from '../lib/card-signals';
+import { practitionerType } from '../lib/practitioner';
 import { cn } from '../lib/utils';
 import { ResilientImage } from './ResilientImage';
 import { ClinicImageBand, ClinicMonogramPanel, coverPhotoOf, isRealClinicImage } from './ClinicImageBand';
@@ -53,18 +54,23 @@ function hasRealLogo(provider: Provider): boolean {
   return true;
 }
 
-// Conservative credential line — only assert what the data actually supports.
-// Order matters: most specific first. Returns null when nothing is derivable.
+// One classifier for every surface (src/lib/practitioner.ts), so the card,
+// the quiz ranking and the compare table never disagree about a clinic.
 function credentialOf(provider: Provider): string | null {
+  return practitionerType(provider).label;
+}
+
+// The named lead for the "Led by" line: the prescriber the owner named on
+// /finish first (that is the person we register-check), else the first
+// listed team member.
+function leadOf(provider: Provider): { name: string; role?: string } | null {
+  const dd = (provider as { decision_drivers?: { manage?: { team?: Record<string, unknown> } } }).decision_drivers || {};
+  const t = (dd.manage?.team || {}) as Record<string, unknown>;
+  const name = typeof t.prescriberName === 'string' && t.prescriberName.trim() ? t.prescriberName.trim() : null;
+  if (name) return { name, role: typeof t.prescriberCredential === 'string' ? t.prescriberCredential.replace(/\s*\(.*\)\s*$/, '') : undefined };
   const team = (provider.medical_team || []) as Array<{ name?: string; role?: string }>;
-  const teamBlob = team.map((t) => `${t?.name || ''} ${t?.role || ''}`).join(' ');
-  const hay = `${provider.description || ''} ${(provider.specialties || []).join(' ')} ${teamBlob}`;
-  if (/medical director|\bMD\b|\bD\.?O\.?\b|physician/i.test(hay)) return 'Physician-led care';
-  if (/nurse practitioner|\bNP\b/i.test(hay)) return 'NP on staff';
-  if (/registered nurse|\bRN\b/i.test(hay)) return 'RN on staff';
-  if (/naturopath|\bN\.?D\.?\b/i.test(hay)) return 'Naturopath-led';
-  if (team.length > 0) return 'Medically supervised';
-  return null;
+  const first = team.find((m) => m && m.name);
+  return first ? { name: first.name as string, role: first.role } : null;
 }
 
 const getInitials = (name: string) => {
@@ -120,7 +126,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
     const reviews = Number(provider.reviewCount) || 0;
     const credential = credentialOf(provider);
     const team = (provider.medical_team || []) as Array<{ name?: string; role?: string }>;
-    const lead = team[0];
+    const lead = leadOf(provider);
     const specs = (provider.specialties || []).filter(Boolean);
     const namedServices = (provider.services || []).map((s) => s?.name).filter(Boolean) as string[];
     const tags = specs.length ? specs : namedServices;

@@ -895,7 +895,8 @@ export default async function IndividualCityPage({ params }: CityPageProps) {
                       const clinic = listingById.get(d.provider_id) as { name?: string; slug?: string } | undefined;
                       return (
                         <li key={i} className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-4 py-2.5 text-sm">
-                          <span className="font-bold text-slate-800">{d.published_name}</span>
+                          {/* Menu names are the clinic's own text; dashes are normalised for house style. */}
+                          <span className="font-bold text-slate-800">{String(d.published_name).replace(/\s*[–—]+\s*/g, ' ').replace(/[“”]/g, '"').trim()}</span>
                           <span className="font-black text-slate-900 tabular-nums">CA${d.price_cad}</span>
                           {clinic?.slug && (
                             <Link href={`/providers/${clinic.slug}`} className="text-wellness-700 font-bold hover:underline">

@@ -10,7 +10,7 @@ import { getLiveDeals } from '../src/lib/deals';
 // columbus, whitby, halifax + 19 pre-existing) were missing from the cached
 // XML despite passing the 3-provider gate.
 export const revalidate = 600;
-import { USE_CASES } from '../src/lib/use-cases';
+import { PUBLIC_USE_CASES } from '../src/lib/use-cases';
 import { STATES } from '../src/lib/states';
 import { GUIDES } from '../src/lib/guides';
 import { AUDIENCES } from '../src/lib/audiences';
@@ -68,7 +68,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ? [{ url: `${baseUrl}/iv-therapy-statistics`, priority: 0.6, changeFrequency: 'monthly' }]
     : [];
 
-  const symptomRoutes = USE_CASES.map((useCase) => ({
+  const symptomRoutes = PUBLIC_USE_CASES.map((useCase) => ({
     url: `${baseUrl}/symptoms/${useCase.slug}`,
     changeFrequency: 'monthly' as const,
     priority: 0.7,

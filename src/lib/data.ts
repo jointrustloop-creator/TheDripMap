@@ -1693,14 +1693,14 @@ export async function getCityBySlug(slug: string) {
   }
 }
 
-import { USE_CASES } from './use-cases';
+import { PUBLIC_USE_CASES } from './use-cases';
 
 export async function getUseCaseBySlug(slug: string) {
-  return USE_CASES.find(u => u.slug === slug) || null;
+  return PUBLIC_USE_CASES.find(u => u.slug === slug) || null;
 }
 
 export async function getAllUseCases() {
-  return USE_CASES;
+  return PUBLIC_USE_CASES;
 }
 
 export async function getAllListings() {

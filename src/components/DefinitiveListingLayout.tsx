@@ -280,7 +280,16 @@ function ownerQuote(profile: OperatorProfile | undefined): { text: string; name?
   const name = typeof pd.ownerName === 'string' ? pd.ownerName : (profile?.owner_name as string | undefined);
   const credentials = typeof pd.medicalDirectorCredentials === 'string' ? pd.medicalDirectorCredentials : undefined;
   const fullName = name + (credentials && !name?.includes(credentials) ? `, ${credentials}` : '');
-  return { text, name: fullName?.trim(), title: 'Medical Director' };
+  // The title follows the credential on file. "Medical Director" used to be
+  // hard-coded for whoever wrote the quote, which labelled an RN as Medical
+  // Director on both Signature pages (audit C6-4, 2026-09-18).
+  const cred = (credentials || '').toUpperCase();
+  const title = /\bMD\b|\bDO\b|PHYSICIAN/.test(cred) ? 'Medical Director'
+    : /\bNP\b|NURSE PRACTITIONER/.test(cred) ? 'Nurse Practitioner'
+    : /\bRN\b|REGISTERED NURSE/.test(cred) ? 'Registered Nurse'
+    : /\bND\b|NATUROPATH/.test(cred) ? 'Naturopathic Doctor'
+    : 'Owner';
+  return { text, name: fullName?.trim(), title };
 }
 
 function getInitials(name?: string): string {
@@ -420,13 +429,33 @@ export default function DefinitiveListingLayout({
     : [];
   const isRnLed = team.some((m) => /\bRN\b|registered nurse/i.test(`${m.name} ${m.role}`));
 
-  // First-visit walkthrough — logistics only, reassuring, no medical claims.
-  const sessionLength = '30 to 60 minutes';
+  // First-visit walkthrough. Every line is either the owner's own answer from
+  // /finish (session length, who places the IV, consultation) or a question the
+  // patient should ask. The old fixed copy ("Most visits take about 30 to 60
+  // minutes", "Licensed clinical staff look after you") was rendered as fact on
+  // all 31 claimed pages and in their FAQ schema (audit C6-5, 2026-09-18).
+  const manageRaw = (provider as { decision_drivers?: { manage?: Record<string, unknown> } }).decision_drivers?.manage || {};
+  const fv = (manageRaw.firstVisit && typeof manageRaw.firstVisit === 'object' ? manageRaw.firstVisit : {}) as Record<string, unknown>;
+  const teamAns = (manageRaw.team && typeof manageRaw.team === 'object' ? manageRaw.team : {}) as Record<string, unknown>;
+  const ownerLength = typeof fv.length === 'string' && fv.length.trim() ? fv.length.trim() : null;
+  const sessionLength = ownerLength || 'as long as the drip you choose needs, often 30 to 90 minutes';
+  const consultAns = typeof fv.consult === 'string' ? fv.consult.trim() : '';
+  const consultLine = /^no\b|not required/i.test(consultAns)
+    ? `${displayName} says no consultation is required before a drip. Share your health history at check-in anyway.`
+    : consultAns
+      ? `${displayName} has a consultation or screening first: ${consultAns.replace(/\s*\(clinic website\)\s*$/i, '')}.`
+      : 'Expect to be asked about your goals and health history before anything is placed. If you are not asked, ask why.';
+  const whoPlaces = Array.isArray(teamAns.whoPlaces) ? (teamAns.whoPlaces as string[]).filter(Boolean) : [];
+  const staffLine = whoPlaces.length
+    ? `${displayName} says your IV is placed by ${whoPlaces.join(' or ')} staff. Ask for the name and licence of the person looking after you.`
+    : isRnLed && team[0]?.name
+      ? `${team[0].name} leads the clinical team. Ask who will place your IV and which licence they hold.`
+      : 'Ask who will place your IV and which licence they hold; the answer should be on the provincial college register.';
   const firstVisitSteps: { head: string; sub: string }[] = [
-    { head: 'Check in', sub: 'Share your goals and a quick health history so your visit can be tailored to you.' },
-    { head: 'Get comfortable', sub: `Settle into a lounge chair. Most visits take about ${sessionLength}.` },
-    { head: 'Your session', sub: isRnLed ? 'A licensed nurse looks after you and stays close through the session.' : 'Licensed clinical staff look after you through the session.' },
-    { head: 'Back to your day', sub: 'Most guests head straight back to work or their plans afterward.' },
+    { head: 'Check in', sub: consultLine },
+    { head: 'Get comfortable', sub: ownerLength ? `${displayName} says a visit takes about ${ownerLength}.` : 'Plan for as long as your drip needs, often 30 to 90 minutes. Ask when you book.' },
+    { head: 'Your session', sub: staffLine },
+    { head: 'Back to your day', sub: 'Most people go straight back to work or their plans afterward.' },
   ];
 
   // Common questions — grounded in real fields. FAQPage schema mirrors these.
@@ -446,7 +475,7 @@ export default function DefinitiveListingLayout({
       q: 'Do I need an appointment?',
       a: 'Booking online is the fastest way to reserve a chair, and it only takes a moment. You can also call the clinic directly.',
     } : null,
-    { q: 'How long does a session take?', a: `Plan for about ${sessionLength}, depending on the drip you choose.` },
+    { q: 'How long does a session take?', a: ownerLength ? `${displayName} says about ${ownerLength}. It depends on the drip you choose.` : `Plan for ${sessionLength}. Ask the clinic when you book.` },
     provider.address ? {
       q: 'Where are you located?',
       a: `${displayName} is at ${provider.address}. Directions are one tap away in the booking panel.`,

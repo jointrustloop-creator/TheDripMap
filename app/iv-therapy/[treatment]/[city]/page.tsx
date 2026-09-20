@@ -213,7 +213,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   // appear when they are a selling point (3+).
   const title = count >= 3
     ? `${t.name} in ${cityLabel} (${YEAR}) | ${count} Clinics | TheDripMap`
-    : `${t.name} in ${cityLabel} (${YEAR}): Options & Nearby Clinics | TheDripMap`;
+    : `${t.name} in ${cityLabel} (${YEAR}) | TheDripMap`;
   // Keep the treatment name's casing ("NAD+ IV", not "nad+ iv") and never
   // promise booking: we route to the clinic, we do not take bookings.
   const description = count >= 3

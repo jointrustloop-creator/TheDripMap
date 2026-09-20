@@ -38,6 +38,15 @@ function formatValidity(expires?: string): string | null {
   return d.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+/** "Ends in 12 days" when the expiry is within a month; the urgency is real, from the owner's own date. */
+function endsSoon(expires?: string): string | null {
+  if (!expires || !/^\d{4}-\d{2}-\d{2}$/.test(expires)) return null;
+  const days = Math.ceil((new Date(`${expires}T23:59:59`).getTime() - Date.now()) / 86400000);
+  if (days < 0 || days > 30) return null;
+  if (days === 0) return 'Ends today';
+  return `Ends in ${days} ${days === 1 ? 'day' : 'days'}`;
+}
+
 /** "Save 10%", "20% off", "$25 off": the figure the owner wrote, nothing invented. */
 export function offerHeadline(title: string): { big: string; small: string } | null {
   const pct = title.match(/(\d{1,2})\s*%\s*off/i) || title.match(/save\s*(\d{1,2})\s*%/i);
@@ -92,9 +101,15 @@ export function DealCard({ deal, showCity = true }: { deal: LiveDeal; showCity?:
               </span>
             )}
             {validity && (
-              <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1">
-                <CalendarDays size={12} /> Until {validity}
-              </span>
+              endsSoon(deal.offer.expires) ? (
+                <span className="inline-flex items-center gap-1.5 text-[12px] font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-2.5 py-1">
+                  <CalendarDays size={12} /> {endsSoon(deal.offer.expires)}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1">
+                  <CalendarDays size={12} /> Until {validity}
+                </span>
+              )
             )}
           </div>
         )}

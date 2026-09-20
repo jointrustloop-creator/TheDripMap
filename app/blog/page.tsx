@@ -153,7 +153,7 @@ export default async function BlogPage() {
                 Treatments
               </h3>
               <p className="text-sm text-slate-600 leading-relaxed mb-4">
-                NAD+, Myers Cocktail, Hangover, Beauty Glow and 6 more — full details and clinics that offer each protocol.
+                NAD+, Myers Cocktail, Hangover, Beauty Glow and 6 more, with full details and clinics that offer each protocol.
               </p>
               <span className="text-xs font-black text-wellness-600 uppercase tracking-widest group-hover:underline">
                 See protocols →
