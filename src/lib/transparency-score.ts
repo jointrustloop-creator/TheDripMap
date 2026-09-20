@@ -40,7 +40,11 @@ export const TRANSPARENCY_TOOLTIP =
 const INGREDIENT_RE = /\b(glutathione|nad\+?|vitamin\s*c|ascorbic|vitamin\s*d|vitamin\s*b|b-?12|b-?complex|methylcobalamin|magnesium|calcium|zinc|selenium|amino\s*acid|glutamine|taurine|arginine|lysine|carnitine|biotin|iron|ferric|saline|electrolyte|glutathi|alpha\s*lipoic|coq10|nicotinamide)\b/i;
 
 // Words that indicate a screening/consult is disclosed as happening.
-const SCREENING_YES = /\b(requir|recommend|yes|intake|screen|assess|consult)\b/i;
+// Word PREFIXES: "Required", "Consultation", "screening" and "assessment" all
+// count. The trailing \b that used to close this group meant the form's own
+// option "Required" and a recorded "Consultation with the nurse" never matched
+// (found 2026-09-19 on Signature Beauty Lounge, 6/7 with the fact on file).
+const SCREENING_YES = /\b(requir|recommend|yes|intake|screen|assess|consult)/i;
 const SCREENING_NO = /^\s*(no|none|not required|n\/a)\s*$/i;
 
 type Raw = Record<string, unknown>;
