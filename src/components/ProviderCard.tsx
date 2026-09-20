@@ -10,7 +10,7 @@ import { slugify } from '../lib/data';
 import { bookingUrlOf, priceSignalOf } from '../lib/card-signals';
 import { cn } from '../lib/utils';
 import { ResilientImage } from './ResilientImage';
-import { ClinicImageBand, ClinicMonogramPanel, coverPhotoOf } from './ClinicImageBand';
+import { ClinicImageBand, ClinicMonogramPanel, coverPhotoOf, isRealClinicImage } from './ClinicImageBand';
 import { OpenStatus } from './OpenStatus';
 import { motion } from 'motion/react';
 import { useClaimListing } from '../context/ClaimListingContext';
@@ -106,7 +106,14 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
     const accent = accentFor(slug || provider.name || 'iv');
     // A real photo (og:image sourced from the clinic's own site) anchors the
     // 16:9 cover band; an uploaded brand LOGO stays in the small avatar instead.
-    const coverPhoto = coverPhotoOf(provider);
+    // Owner-uploaded photos (finish page) come first, then a site photo. With
+    // neither, a real logo becomes the band itself, large on a clean panel,
+    // instead of a 64px circle on a dark strip: on /cities/richmond-hill the
+    // Featured, 7/7 Signature card looked poorer than every unclaimed card
+    // below it for exactly that reason (Hubert 2026-09-20).
+    const uploaded = (Array.isArray((provider as { photos?: unknown }).photos) ? ((provider as { photos?: string[] }).photos as string[]) : [])
+      .find((u) => typeof u === 'string' && isRealClinicImage(u) && !/\/logo\./i.test(u));
+    const coverPhoto = uploaded || coverPhotoOf(provider);
     const logo = !coverPhoto && hasRealLogo(provider);
     const logoUrl = provider.imageUrl || provider.image_url || '';
     const rating = Number(provider.rating) || 0;
@@ -143,6 +150,20 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
           className
         )}
       >
+        {/* Safety Verified is the one signal patients are told to look for, so
+            on a verified card it is a full-width bar above everything else,
+            not a pill lost in the body (Hubert 2026-09-20: "MUST be even more
+            visible"). */}
+        {isSafetyVerified && (
+          <div
+            title="A named prescriber checked against their public college register, plus the clinic's safety answers, reviewed by TheDripMap"
+            className="relative z-10 flex items-center gap-2 bg-amber-400 text-amber-950 px-4 py-2 text-[11px] font-black uppercase tracking-[0.14em]"
+          >
+            <ShieldCheck size={14} className="shrink-0" />
+            Safety Verified
+            <span className="ml-auto normal-case tracking-normal font-semibold text-amber-900/80 text-[10.5px] truncate">prescriber checked against the register</span>
+          </div>
+        )}
         {/* Cover band — the clinic's own photo when we have one, else the
             per-clinic colour identity. A broken photo falls back to the colour
             band, never to a missing-image look. */}
@@ -150,15 +171,33 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
           src={coverPhoto}
           alt={`${provider.name} clinic photo`}
           className="aspect-video"
-          fallbackClassName={cn('h-24', accent.cover)}
+          fallbackClassName={cn(logo ? 'h-36 bg-[#f8f5ee]' : 'h-24', logo ? '' : accent.cover)}
           fallback={
-            <>
-              <div
-                className="absolute inset-0 opacity-50"
-                style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.28) 1px, transparent 1px)', backgroundSize: '10px 10px' }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
-            </>
+            logo ? (
+              <div className="absolute inset-0 flex items-center justify-center p-5">
+                <div
+                  className="absolute inset-0 opacity-60"
+                  style={{ backgroundImage: 'radial-gradient(rgba(25,36,28,0.10) 1px, transparent 1px)', backgroundSize: '10px 10px' }}
+                />
+                <ResilientImage
+                  src={logoUrl}
+                  fallbackSrc=""
+                  alt={`${provider.name} logo`}
+                  width={220}
+                  height={110}
+                  unoptimized
+                  className="relative max-h-[84%] max-w-[70%] w-auto h-auto object-contain drop-shadow-sm"
+                />
+              </div>
+            ) : (
+              <>
+                <div
+                  className="absolute inset-0 opacity-50"
+                  style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.28) 1px, transparent 1px)', backgroundSize: '10px 10px' }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+              </>
+            )
           }
         >
           {/* Rating chip + compare, stacked top-right so the left stays clear */}
@@ -184,21 +223,11 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
           {/* Logo / monogram avatar overlapping the band */}
           <div className={cn(
             'relative -mt-9 mb-3 h-16 w-16 rounded-2xl ring-4 ring-white shadow-lg flex items-center justify-center overflow-hidden',
-            logo ? 'bg-white' : accent.monoBg
+            accent.monoBg
           )}>
-            {logo ? (
-              <ResilientImage
-                src={logoUrl}
-                fallbackSrc=""
-                alt={`${provider.name} logo`}
-                width={64}
-                height={64}
-                unoptimized
-                className="h-full w-full object-contain p-2"
-              />
-            ) : (
-              <span className={cn('text-2xl font-black', accent.monoText)}>{initials}</span>
-            )}
+            {/* The logo, when present, is the band above; the avatar keeps the
+                monogram so the mark is never shown twice. */}
+            <span className={cn('text-2xl font-black', accent.monoText)}>{initials}</span>
             {isSafetyVerified ? (
               <span title="Completed TheDripMap's safety questionnaire" className="absolute -bottom-1.5 -right-1.5 h-6 w-6 rounded-full bg-amber-400 ring-2 ring-white flex items-center justify-center text-amber-950 shadow">
                 <ShieldCheck size={12} />
@@ -219,7 +248,11 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
           <div className="mt-1 flex items-center gap-1.5 text-[13px] font-semibold text-slate-500">
             <MapPin size={13} className="text-slate-400 shrink-0" />
             <span className="truncate">
-              {provider.distance ? `${provider.distance} mi` : provider.city}
+              {provider.distance
+                ? `${provider.distance} mi`
+                : (provider as { address?: string | null }).address
+                  ? `${(provider as { address?: string | null }).address}, ${provider.city}`
+                  : provider.city}
             </span>
             <span className="w-1 h-1 rounded-full bg-slate-300 shrink-0" />
             <span className="shrink-0">{isMobile ? 'Mobile' : 'Clinic'}</span>
@@ -285,40 +318,54 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
 
           <div className="my-3 h-px bg-slate-100" />
 
-          {/* Adaptive body — each card leads with its strongest real asset */}
-          <div className="min-h-[80px]">
-            {mode === 'credential' && (
-              <>
+          {/* Body. Every real asset shows: reviews, the Transparency Score,
+              the credential line, then the services. The old "one mode per
+              card" rule hid the services on any clinic with a credential, so
+              on /cities/toronto two of three badge holders showed no menu at
+              all while the unclaimed cards beside them did (Hubert 2026-09-20). */}
+          <div className="min-h-[80px] space-y-2.5">
+            {(rating > 0 || typeof (provider as { transparency_score?: number | null }).transparency_score === 'number') && (
+              <div className="flex items-center gap-2.5 flex-wrap">
+                {rating > 0 && (
+                  <span className="inline-flex items-center gap-1 text-[12.5px] font-bold text-slate-700">
+                    <StarIcon size={13} className="text-amber-500" fill="currentColor" />
+                    {rating.toFixed(1)}
+                    {reviews > 0 && <span className="text-slate-400 font-semibold">({reviews.toLocaleString()} reviews)</span>}
+                  </span>
+                )}
+                <TransparencyChip score={(provider as { transparency_score?: number | null }).transparency_score} />
+              </div>
+            )}
+
+            {(credential || lead?.name) && (
+              <div>
                 {credential && (
                   <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-tight">
                     <Stethoscope size={12} /> {credential}
                   </span>
                 )}
                 {lead?.name && (
-                  <p className={cn('text-[13px] font-bold text-slate-700', credential ? 'mt-2.5' : '')}>
+                  <p className={cn('text-[13px] font-bold text-slate-700', credential ? 'mt-2' : '')}>
                     Led by <span className="text-slate-900">{lead.name}</span>
                     {lead.role ? <span className="font-semibold text-slate-400"> · {lead.role}</span> : null}
                   </p>
                 )}
-              </>
+              </div>
             )}
 
-            {mode === 'services' && (
-              <>
-                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">Popular services</div>
-                <div className="flex flex-wrap gap-1.5">
-                  {tags.slice(0, 4).map((t, i) => (
-                    <span key={i} className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-50 text-slate-700 border border-slate-200 truncate max-w-[150px]">
-                      {t}
-                    </span>
-                  ))}
-                  {tags.length > 4 && (
-                    <span className="px-2.5 py-1 rounded-lg text-[11px] font-black text-wellness-700 bg-wellness-50 border border-wellness-100">
-                      +{tags.length - 4}
-                    </span>
-                  )}
-                </div>
-              </>
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {tags.slice(0, 4).map((t, i) => (
+                  <span key={i} className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-50 text-slate-700 border border-slate-200 truncate max-w-[150px]">
+                    {t}
+                  </span>
+                ))}
+                {tags.length > 4 && (
+                  <span className="px-2.5 py-1 rounded-lg text-[11px] font-black text-wellness-700 bg-wellness-50 border border-wellness-100">
+                    +{tags.length - 4}
+                  </span>
+                )}
+              </div>
             )}
 
             {mode === 'reputation' && (
