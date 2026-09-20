@@ -51,22 +51,22 @@ I run TheDripMap, a matching platform where patients across Canada find IV thera
 
 ${p.name} appears on the College of Naturopaths of Ontario register of premises authorized for intravenous infusion therapy, so I built you a page and named ${leadLine}. Nothing there is invented: the practitioner names and registration numbers come straight from the College register.
 
-Your page is live here: ${BASE}/providers/${p.slug}
+[See your ${p.name} page](${BASE}/providers/${p.slug})
 
 What it is missing is the part only you can give: the drips you actually offer, at least one price, and your opening hours. A patient who finds you today can see that you are authorized, but cannot tell what a visit costs, so most of them keep looking.
 
-Two ways to fill it in, whichever is easier:
+Two ways to fill it in, whichever is easier. The first is your private page, two minutes, no login:
 
-1. Your private page, two minutes, no login: ${finishUrl}
-2. Reply to this email with the details in plain words and I will enter them for you.
+[Finish your listing](${finishUrl})
+
+Or reply to this email with the details in plain words and I will enter them for you.
 
 There is no charge for any of this. We do not sell ranking or placement, and the listing stays whether you reply or not.
 
 Warm regards,
 
 Deborah
-Founder, TheDripMap
-thedripmap.com`;
+Founder, TheDripMap`;
   return { subject, text };
 }
 
