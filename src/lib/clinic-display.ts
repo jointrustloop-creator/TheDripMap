@@ -32,6 +32,25 @@ export function slimProviderForList(p: Provider): Provider {
   // Cards line-clamp the description; anything past ~300 chars never renders.
   const desc = typeof rec.description === 'string' ? rec.description : '';
   if (desc) slim.description = desc.length > 300 ? `${desc.slice(0, 300).trimEnd()}…` : desc;
+  // The card's practitioner label and "Led by" line read the owner's /finish
+  // answers and the register check (src/lib/practitioner.ts). Only those few
+  // public facts cross the boundary, never the rest of decision_drivers
+  // (2026-09-20: without this every city card fell back to keyword guessing
+  // and read "Clinical team listed" for register-checked ND and MD clinics).
+  const dd = (rec.decision_drivers && typeof rec.decision_drivers === 'object' ? rec.decision_drivers : {}) as Record<string, unknown>;
+  const team = ((dd.manage as Record<string, unknown> | undefined)?.team || {}) as Record<string, unknown>;
+  const pv = (dd.prescriber_verification || {}) as Record<string, unknown>;
+  const slimTeam: Record<string, unknown> = {};
+  for (const k of ['prescriberName', 'prescriberCredential', 'prescriberNdIvit', 'whoPlaces']) if (team[k] !== undefined) slimTeam[k] = team[k];
+  if (Object.keys(slimTeam).length || pv.verified) {
+    slim.decision_drivers = {
+      ...(Object.keys(slimTeam).length ? { manage: { team: slimTeam } } : {}),
+      ...(pv.verified ? { prescriber_verification: { credential: pv.credential, verified: true } } : {}),
+    };
+  }
+  // Owner-uploaded photos anchor the claimed card band (first real photo only).
+  const photos = Array.isArray(rec.photos) ? (rec.photos as unknown[]).filter((u) => typeof u === 'string').slice(0, 2) : [];
+  if (photos.length) slim.photos = photos;
   return slim as unknown as Provider;
 }
 
