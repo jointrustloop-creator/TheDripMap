@@ -90,6 +90,17 @@ const AUTO_REPLY_HEADER_PATTERNS: Array<[string, RegExp]> = [
   ['auto-response-suppress', /./],
 ];
 
+// Clinic front-desk autoresponders rarely set a header or an OOO subject; the
+// body gives them away. Wellness Haus sat as "interested" for three months on
+// "Thank you for reaching out... a member of our team will review your
+// inquiry" (found 2026-09-20).
+const AUTO_REPLY_BODY_PATTERNS: RegExp[] = [
+  /\bwe have received your (message|email|inquiry|enquiry)\b/i,
+  /\b(a member of our team|our team|someone) will (review|respond|get back|be in touch)\b/i,
+  /\bthis is an automated (response|reply|message)\b/i,
+  /\bthank you for (reaching out|contacting us)\b[\s\S]{0,200}\b(respond|get back to you|reply) (as soon as|within|shortly)\b/i,
+];
+
 const AUTO_REPLY_SUBJECT_PATTERNS: RegExp[] = [
   /out\s+of\s+(the\s+)?office/i,
   /auto[\-\s]?reply/i,
@@ -198,6 +209,14 @@ export function classifyReply(input: ClassifyInput): ClassifyResult {
       confidence: 'high',
       needsHuman: false,
       reason: 'auto-reply subject pattern',
+    };
+  }
+  if (any(AUTO_REPLY_BODY_PATTERNS, ownText(body))) {
+    return {
+      category: 'auto_reply',
+      confidence: 'medium',
+      needsHuman: false,
+      reason: 'autoresponder wording in the body',
     };
   }
 
