@@ -244,16 +244,23 @@ export async function computeNewsletterQueue(supabase: SupabaseClient): Promise<
   const providerCountByCity = new Map<string, number>();
   const claimedByCity = new Map<string, string>();
   const providerEmails = new Set<string>();
+  // Slug forms of the same Canadian data, used to read the PAGE a subscriber
+  // signed up on. Geo-IP gives us the caller's town, which for small places is
+  // a name we have never seen ("McNab/Braeside"), so a city test alone holds
+  // back real Ontario patients. The page they were reading is our own content
+  // and is a better signal than their township name.
+  const caCitySlugs = new Set<string>();
+  const caProviderSlugs = new Set<string>();
   {
     let from = 0;
     // eslint-disable-next-line no-constant-condition
     while (true) {
       const { data } = await supabase
         .from('providers')
-        .select('name, city, country, email, is_claimed, is_hidden')
+        .select('name, slug, city, country, email, is_claimed, is_hidden')
         .range(from, from + 999);
       if (!data || data.length === 0) break;
-      for (const p of data as Array<{ name?: string | null; city?: string | null; country?: string | null; email?: string | null; is_claimed?: boolean | null; is_hidden?: boolean | null }>) {
+      for (const p of data as Array<{ name?: string | null; slug?: string | null; city?: string | null; country?: string | null; email?: string | null; is_claimed?: boolean | null; is_hidden?: boolean | null }>) {
         if (p.email) providerEmails.add(String(p.email).trim().toLowerCase());
         if (p.is_hidden) continue;
         const isUS = String(p.country || '').trim().toLowerCase().startsWith('united');
@@ -262,6 +269,8 @@ export async function computeNewsletterQueue(supabase: SupabaseClient): Promise<
         if (!c) continue;
         const lc = c.toLowerCase();
         caCities.add(lc);
+        caCitySlugs.add(slugify(c));
+        if (p.slug) caProviderSlugs.add(String(p.slug).trim().toLowerCase());
         providerCountByCity.set(lc, (providerCountByCity.get(lc) || 0) + 1);
         if (p.is_claimed && p.name && !claimedByCity.has(lc)) claimedByCity.set(lc, p.name);
       }
@@ -337,14 +346,34 @@ export async function computeNewsletterQueue(supabase: SupabaseClient): Promise<
   const excluded: { email: string; city: string | null; reason: string }[] = [];
   let alreadySent = 0;
 
-  const isCanadian = (city: string | null): boolean => {
+  // The page a subscriber signed up on, when it names a place we cover. Only
+  // Canadian rows feed caCitySlugs / caProviderSlugs (US providers are skipped
+  // above), so a match here means the signup happened on Canadian content. A
+  // blog post or a generic hub names no place and returns null, which leaves
+  // the city test to decide and keeps the whole check fail-closed.
+  const canadianPage = (source: string | null): boolean | null => {
+    const path = (source || '').trim().toLowerCase().split('?')[0].replace(/\/+$/, '');
+    if (!path.startsWith('/')) return null;
+    const parts = path.split('/').filter(Boolean);
+    if (parts[0] === 'providers' && parts[1]) return caProviderSlugs.has(parts[1]) ? true : null;
+    // /cities/<city>, /iv-prices/<city>, /iv-therapy/<treatment>/<city>
+    let citySlug: string | null = null;
+    if ((parts[0] === 'cities' || parts[0] === 'iv-prices') && parts[1]) citySlug = parts[1];
+    else if (parts[0] === 'iv-therapy' && parts[2]) citySlug = parts[2];
+    else if (parts[0] === 'iv-therapy' && parts[1] && !parts[2]) citySlug = parts[1];
+    if (!citySlug) return null;
+    return caCitySlugs.has(citySlug) ? true : null;
+  };
+
+  const isCanadian = (city: string | null, source: string | null): boolean => {
     const lc = (city || '').trim().toLowerCase();
-    if (!lc) return false;
     if (US_DENY.has(lc)) return false;
-    if (caCities.has(lc)) return true;
-    if (CA_PROVINCE_TOKENS.has(lc)) return true;
-    if (CA_EXTRA.has(lc)) return true;
-    return false;
+    if (lc) {
+      if (caCities.has(lc)) return true;
+      if (CA_PROVINCE_TOKENS.has(lc)) return true;
+      if (CA_EXTRA.has(lc)) return true;
+    }
+    return canadianPage(source) === true;
   };
 
   for (const s of subs) {
@@ -363,7 +392,7 @@ export async function computeNewsletterQueue(supabase: SupabaseClient): Promise<
       excluded.push({ email: s.email, city: s.city, reason: 'clinic address (not a patient)' });
       continue;
     }
-    if (!isCanadian(s.city)) {
+    if (!isCanadian(s.city, s.signupSource)) {
       const lc = (s.city || '').trim().toLowerCase();
       excluded.push({ email: s.email, city: s.city, reason: US_DENY.has(lc) ? 'US subscriber' : 'city not recognized as Canadian (held for review)' });
       continue;

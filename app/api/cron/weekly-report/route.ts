@@ -305,13 +305,25 @@ export async function GET(req: Request) {
     .lte('created_at', threeDaysAgo.toISOString())
     .order('created_at', { ascending: true });
   const pendingAging = (pendingClaimsRaw || []) as Array<{ listing_id: string; email: string; created_at: string }>;
+  // Every pending claim whose link lapses within a week, aging or not. These
+  // are owners who started a claim and stopped; once the token expires the
+  // interest is gone and nothing else in the report would have said so.
+  const weekOut = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const { data: expiringRaw } = await supabase
+    .from('claim_requests')
+    .select('listing_id, email, expires_at')
+    .eq('status', 'pending')
+    .lte('expires_at', weekOut.toISOString())
+    .gte('expires_at', now.toISOString())
+    .order('expires_at', { ascending: true });
+  const expiringClaims = (expiringRaw || []) as Array<{ listing_id: string; email: string; expires_at: string }>;
   const pendingNameMap = new Map<string, string>();
-  if (pendingAging.length) {
-    const { data: pn } = await supabase
-      .from('providers')
-      .select('id, name')
-      .in('id', pendingAging.map((p) => p.listing_id));
-    for (const p of (pn || []) as Array<{ id: string; name: string }>) pendingNameMap.set(p.id, p.name);
+  {
+    const ids = Array.from(new Set([...pendingAging, ...expiringClaims].map((p) => p.listing_id)));
+    if (ids.length) {
+      const { data: pn } = await supabase.from('providers').select('id, name').in('id', ids);
+      for (const p of (pn || []) as Array<{ id: string; name: string }>) pendingNameMap.set(p.id, p.name);
+    }
   }
   const claimedNotFinished = Math.max(0, verifiedCount - completedQuestionnaire);
   const finishedNoBadge = funnelRows.filter((p) => {
@@ -327,11 +339,22 @@ export async function GET(req: Request) {
   lines.push(`  New verifications: ${verifsThis.length}`);
   lines.push(`  Outreach drafts:   ${draftsThis || 0}`);
   lines.push('');
-  // WATCH ITEMS: manual reminders that must not silently expire. Clear the
-  // relevant line here once resolved. Workspace billing added 2026-08-09 after
-  // the Google Workspace payment on file failed.
-  lines.push('WATCH ITEMS (clear each line when resolved)');
-  lines.push('  Workspace billing status: UNRESOLVED. The Google Workspace payment on file failed; update the card in Google Admin so info@thedripmap.com never expires.');
+  // WATCH ITEMS: only items DERIVED FROM DATA belong here, never a hardcoded
+  // reminder. A fixed string cannot clear itself, so it keeps shouting long
+  // after the thing is fixed and trains the reader to skip the section. The
+  // Workspace billing line lived here from 2026-08-09 to 2026-09-21 and was
+  // still declaring UNRESOLVED weeks after the account was current.
+  // A pending claim that expires unclaimed is a warm owner we lose in silence,
+  // which is exactly what a watch item is for.
+  lines.push('WATCH ITEMS (computed, not typed)');
+  if (expiringClaims.length) {
+    for (const c of expiringClaims) {
+      const days = Math.max(0, Math.round((Date.parse(c.expires_at) - now.getTime()) / 86400000));
+      lines.push(`  Claim link expires in ${days} day(s): ${pendingNameMap.get(c.listing_id) || c.listing_id} (${c.email}). Resend or verify before it lapses.`);
+    }
+  } else {
+    lines.push('  Nothing to watch this week.');
+  }
   lines.push('');
   lines.push('TREND vs LAST WEEK');
   lines.push(`  Claims:        ${trend(claimsThis.length, claimsPrior.length)}`);
