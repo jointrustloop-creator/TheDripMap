@@ -240,7 +240,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         return false;
       });
   };
-  const cityContains = (pCity: unknown, city: string): boolean => normTxt(pCity).includes(normTxt(city));
+  // ANCHORED PREFIX, not substring. getListingsByServiceAndCity matches
+  // `ilike('city', '<City>%')` since the 2026-09-08 cross-city fix; this mirror
+  // still used `includes`, so "North Vancouver" and "West Vancouver" rows were
+  // counted toward /iv-therapy/<t>/vancouver. That pushed 4 Vancouver combos
+  // over the 3-provider gate in the sitemap while the page itself counted 0-2
+  // and emitted robots:noindex — the exact "Unexpected noindex" pairs the
+  // self-crawl carried (nad-plus, beauty-glow, athletic-recovery, iron-infusion).
+  // Verified against live data 2026-09-21: switching to a prefix removes those 4
+  // mismatches and hides no indexable page (0 regressions across 13 treatments
+  // x 16 Canadian matrix cities).
+  const cityContains = (pCity: unknown, city: string): boolean => normTxt(pCity).startsWith(normTxt(city));
 
   // Same gate the page applies: list the URL only when 3+ clinics match.
   const MIN_PROVIDERS_FOR_SITEMAP = 3;
