@@ -25,6 +25,7 @@ import { getListingsByServiceAndCity, getListingsByService, getTopHubs } from '.
 import { Provider } from '../../../src/types';
 import { getTreatmentContent } from '../../../src/lib/treatment-content';
 import { slugify } from '../../../src/lib/data';
+import { isSafetyVerified } from '../../../src/lib/safety';
 
 const SERVICES = [
   { name: 'NAD+ Plus',      slug: 'nad-plus',       icon: <Activity size={24} />,     aliases: ['nad', 'nad-plus-therapy'] },
@@ -68,16 +69,25 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug, initial
     if (!service) return;
 
     const loadData = async () => {
-      // Read the visitor's location from session storage: city (for the query)
-      // plus country + coordinates (to keep nearby clinics ranked first).
-      let cityToUse = currentCity;
+      // A DETECTED location ranks clinics; only a CHOSEN city filters them.
+      //
+      // This used to read the detected city out of session storage and run the
+      // city query with it, so a national hub silently collapsed to one city's
+      // listings. On /treatments/glutathione a Toronto visitor got 6 unclaimed
+      // Toronto clinics in place of the 24 Canada-first clinics the server had
+      // rendered, and every claimed and Safety Verified clinic vanished because
+      // the GTA ones are filed under Vaughan, Markham, North York and
+      // Mississauga, not Toronto (Hubert, 2026-09-21). The per-city page at
+      // /iv-therapy/<treatment>/<city> is where a single city belongs; this
+      // page is the Canada hub. Detected coordinates still promote nearby
+      // clinics inside the ranking below.
+      const cityToUse = currentCity; // explicit choice only (?city= or the picker)
       let userCountry: string | null = null;
       let userCoords: { lat: number; lng: number } | null = null;
       try {
         const cached = sessionStorage.getItem('tdm_location');
         if (cached) {
           const parsed = JSON.parse(cached);
-          if (!cityToUse && parsed.city) cityToUse = parsed.city;
           if (parsed.country) userCountry = parsed.country;
           const lat = Number(parsed.latitude);
           const lng = Number(parsed.longitude);
@@ -87,24 +97,22 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug, initial
         console.error('Failed to parse cached location', e);
       }
 
-      // The server already rendered a Canada-first national list. Without any
-      // city or location context there is nothing to personalize, so keep the
-      // server content instead of refetching the same national query.
-      if (!cityToUse && !userCoords && !userCountry && initialListings.length > 0) {
-        setIsLoading(false);
-        return;
-      }
       setIsLoading(listings.length === 0);
 
+      const isCityFiltered = !!cityToUse && cityToUse !== 'All';
+      // Without a chosen city the server's Canada-first list is already the
+      // right set, so re-rank it rather than refetching the identical query.
+      const reuseServerList = !isCityFiltered && initialListings.length > 0;
       const [serviceListings, hubs] = await Promise.all([
-        cityToUse && cityToUse !== 'All'
-          ? getListingsByServiceAndCity(service.name, cityToUse, 60)
-          : getListingsByService(service.name, 60),
-        getTopHubs(8)
+        isCityFiltered
+          ? getListingsByServiceAndCity(service.name, cityToUse!, 60)
+          : reuseServerList
+            ? Promise.resolve(initialListings)
+            : getListingsByService(service.name, 60),
+        initialHubs.length > 0 ? Promise.resolve(initialHubs) : getTopHubs(8),
       ]);
 
       const finalResults = [...serviceListings];
-      const isCityFiltered = !!cityToUse && cityToUse !== 'All';
       let broadened = false;
 
       // Tiered fallback so a tiny city (Bracebridge, etc.) never shows 0 cards:
@@ -168,24 +176,45 @@ export default function ServicePageClient({ serviceSlug: rawServiceSlug, initial
             Math.cos((aLat * Math.PI) / 180) * Math.cos((bLat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
           return 2 * R * Math.asin(Math.sqrt(s));
         };
-        const rank = (p: Provider) => {
-          let s = 0;
-          // Push other-country clinics far down (known-country only; unknown stays neutral).
-          if ((userIsCA || userIsUS) && p.country) {
-            const same = userIsCA ? isCA(p.country) : isUS(p.country);
-            if (!same) s += 100000;
-          }
+        // Sorting on RAW distance threw the whole server ranking away: the
+        // server returns featured, then Safety Verified, then by how much the
+        // clinic discloses, and this re-sort put an unclaimed listing above a
+        // Safety Verified one for being a few hundred metres closer. On
+        // /treatments/glutathione that pushed every verified Canadian clinic
+        // below a row of unclaimed listings (Hubert, 2026-09-21). The city
+        // pages fixed this on 2026-09-20 (src/components/ListingController.tsx);
+        // this page was missed.
+        //
+        // Distance is now BANDED into 25 km buckets, which is the granularity a
+        // person actually notices on a national page: everything across one
+        // metro area lands in the same band and is then ordered by what we know
+        // about the clinic. Still nearest-first, just not at GPS precision.
+        const otherCountry = (p: Provider) => {
+          if (!(userIsCA || userIsUS) || !p.country) return false;
+          return !(userIsCA ? isCA(p.country) : isUS(p.country));
+        };
+        const bandOf = (p: Provider) => {
           const lat = p.latitude == null ? NaN : Number(p.latitude);
           const lng = p.longitude == null ? NaN : Number(p.longitude);
-          if (userCoords && Number.isFinite(lat) && Number.isFinite(lng)) {
-            s += distKm(userCoords.lat, userCoords.lng, lat, lng);
-          } else {
-            s += 4000; // unknown distance: mid-pack, never ahead of a located nearby clinic
-          }
-          if (p.is_featured) s -= 5; // small tiebreaker among near-equidistant clinics
-          return s;
+          if (!userCoords || !Number.isFinite(lat) || !Number.isFinite(lng)) return 999;
+          return Math.floor(distKm(userCoords.lat, userCoords.lng, lat, lng) / 25);
         };
-        finalResults.sort((a, b) => rank(a) - rank(b));
+        const verified = (p: Provider) =>
+          isSafetyVerified(p as { safety_verified?: boolean; safety_review_status?: string | null });
+        finalResults.sort((a, b) => {
+          const oa = otherCountry(a), ob = otherCountry(b);
+          if (oa !== ob) return oa ? 1 : -1;
+          if (!!a.is_featured !== !!b.is_featured) return a.is_featured ? -1 : 1;
+          const va = verified(a), vb = verified(b);
+          if (va !== vb) return va ? -1 : 1;
+          const bandDiff = bandOf(a) - bandOf(b);
+          if (bandDiff !== 0) return bandDiff;
+          if (!!a.is_claimed !== !!b.is_claimed) return a.is_claimed ? -1 : 1;
+          const scoreDiff = ((b as { transparency_score?: number }).transparency_score ?? 0)
+            - ((a as { transparency_score?: number }).transparency_score ?? 0);
+          if (scoreDiff !== 0) return scoreDiff;
+          return (Number(b.rating) || 0) - (Number(a.rating) || 0);
+        });
       }
 
       setListings(finalResults);

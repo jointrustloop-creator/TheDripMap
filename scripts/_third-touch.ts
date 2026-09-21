@@ -71,10 +71,22 @@ function build(p: Record<string, any>, ev: { views: number; clicks: number }, to
   const claimUrl = `${BASE}/providers/${p.slug}?claim=1`;
   const isCono = p.discovery_source === 'cono_ivit_register' || !!(p.decision_drivers || {}).cono_premise;
   if (SEGMENT === 'engaged') {
-    const activity = ev.clicks > 0
-      ? `${p.name}'s page on TheDripMap was opened ${plural(ev.views, 'time')} in the last 90 days, with ${plural(ev.clicks, 'click')} through to call you, visit your site or book.`
-      : `${p.name}'s page on TheDripMap was opened ${plural(ev.views, 'time')} in the last 90 days.`;
-    const subject = `${p.name} was viewed ${plural(ev.views, 'time')} on TheDripMap this summer`;
+    // A clinic qualifies as engaged on views >= 3 OR clicks >= 1, so some of
+    // these have a click but only one or two views. Leading with the view count
+    // there writes our own worst headline ("was viewed 1 time"), which reads as
+    // no demand at all and undersells a clinic that actually had someone try to
+    // contact them. When the click is the stronger fact, lead with the click.
+    const leadWithClick = ev.clicks > 0 && ev.views < 3;
+    const activity = leadWithClick
+      ? (ev.clicks === 1
+          ? `In the last 90 days someone reading ${p.name}'s page on TheDripMap clicked through to call you, visit your site or book.`
+          : `In the last 90 days patients reading ${p.name}'s page on TheDripMap clicked through to call you, visit your site or book ${plural(ev.clicks, 'time')}.`)
+      : ev.clicks > 0
+        ? `${p.name}'s page on TheDripMap was opened ${plural(ev.views, 'time')} in the last 90 days, with ${plural(ev.clicks, 'click')} through to call you, visit your site or book.`
+        : `${p.name}'s page on TheDripMap was opened ${plural(ev.views, 'time')} in the last 90 days.`;
+    const subject = leadWithClick
+      ? `A patient clicked through to ${p.name} from TheDripMap`
+      : `${p.name} was viewed ${plural(ev.views, 'time')} on TheDripMap this summer`;
     const text = `Hi ${p.name} team,
 
 ${openerFor(touches, true)}
