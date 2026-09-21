@@ -100,7 +100,17 @@ export async function GET(req: Request) {
     if (!sample?.slug) throw new Error('no claimed clinic slug to test');
     const { status, text } = await fetchText(`${SITE}/providers/${sample.slug}`);
     if (status !== 200) throw new Error(`/providers/${sample.slug} HTTP ${status}`);
-    if (!/<title>[^<]*TheDripMap/i.test(text)) throw new Error(`/providers/${sample.slug} missing a TheDripMap <title>`);
+    // The brand suffix is DROPPED by design when the full title would exceed 60
+    // characters (app/providers/[slug]/page.tsx), so a long clinic name renders
+    // "<Name> | IV Therapy in <City>" with no "TheDripMap". Asserting the brand
+    // made this check fail every run on River Oaks Galleria Med Spa while the
+    // page was perfectly healthy. What actually matters is that a real,
+    // clinic-specific title rendered rather than a Next.js fallback.
+    const titleMatch = /<title>([^<]*)<\/title>/i.exec(text);
+    const pageTitle = (titleMatch?.[1] || '').trim();
+    if (!/IV Therapy/i.test(pageTitle)) {
+      throw new Error(`/providers/${sample.slug} has no clinic <title> (got "${pageTitle || 'none'}")`);
+    }
     return `/providers/${sample.slug}: 200 + title`;
   }));
 

@@ -23,6 +23,7 @@
  */
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { getCityPriceIndex } from './price-index-data';
 
 export interface BlogTopic {
   slug: string;
@@ -34,6 +35,13 @@ export interface BlogTopic {
   citySlug?: string; // /cities/<slug>
   angle: string; // one-paragraph brief for the model
   relatedCities: string[];
+  /**
+   * When set, the facts block carries the dated Price Index rows for this city
+   * and the post MAY quote those dollar figures, and only those (2026-09-21:
+   * cost queries are the largest unserved demand in Search Console, and the
+   * index is the one price source we can stand behind).
+   */
+  priceCitySlug?: string;
 }
 
 /**
@@ -43,6 +51,83 @@ export interface BlogTopic {
  * listings, and none has an existing best-iv-therapy post.
  */
 export const TOPIC_QUEUE: BlogTopic[] = [
+  // 2026-09-21 demand queue, from the Search Console export of 2026-09-20:
+  // cost queries (~900 impressions, 2 clicks), iron infusion (2,720 / 5),
+  // NAD+ (3,800 / 2), glutathione Montreal (our best CTR), "how long does an
+  // IV drip take" (position 65). Cost posts are grounded on the Price Index
+  // via priceCitySlug; the rest carry no dollar figures.
+  {
+    slug: 'iv-therapy-cost-edmonton-2026',
+    workingTitle: 'How Much Does IV Therapy Cost in Edmonton? Published Prices (2026)',
+    category: 'Cost & Insurance',
+    kind: 'city', city: 'Edmonton', citySlug: 'edmonton', priceCitySlug: 'edmonton',
+    relatedCities: ['Edmonton', 'Calgary', 'Red Deer'],
+    angle: 'Answer first: the published price range for a standard drip in Edmonton from the Price Index, then the per-drip table in prose, then what explains the gap (dose, volume and add-ons, who assesses you, mobile premium), what is usually not included (assessment fee, GST, memberships), and what to ask before paying. Close with how to check who prescribes on a clinic page. Quote only the index figures, dated.',
+  },
+  {
+    slug: 'nad-iv-therapy-cost-toronto-2026',
+    workingTitle: 'NAD+ IV Therapy in Toronto: What It Costs and What to Expect (2026)',
+    category: 'Cost & Insurance',
+    kind: 'city', city: 'Toronto', citySlug: 'toronto', priceCitySlug: 'toronto',
+    relatedCities: ['Toronto', 'Mississauga', 'Vaughan'],
+    angle: 'NAD+ is priced by dose, so the same menu word can mean a 250 mg or a 1,000 mg infusion; use the Toronto Price Index NAD+ row (and the standard drip row for contrast) to show the spread and explain it. Cover session length (a slow drip, often 2 hours or more), the flushing sensation clinics warn about, who should be assessed first, and what the evidence does and does not support, neutrally. No outcome promises.',
+  },
+  {
+    slug: 'nad-iv-therapy-calgary-2026',
+    workingTitle: 'NAD+ IV Therapy in Calgary: Cost, Time, and How to Choose a Clinic (2026)',
+    category: 'Cost & Insurance',
+    kind: 'city', city: 'Calgary', citySlug: 'calgary', priceCitySlug: 'calgary',
+    relatedCities: ['Calgary', 'Edmonton', 'Red Deer'],
+    angle: 'Same structure as the Toronto NAD+ post for Calgary: the index NAD+ row and standard drip row, dose as the price driver, session length, assessment first, evidence stated neutrally, and how to check the prescriber on a clinic page. Alberta scope note: physicians, nurse practitioners, and naturopathic doctors holding the College IV authorization.',
+  },
+  {
+    slug: 'private-iron-infusion-ontario-2026',
+    workingTitle: 'Private Iron Infusion in Ontario: How It Works, Who Gives It, and OHIP (2026)',
+    category: 'Cost & Insurance',
+    kind: 'evergreen',
+    relatedCities: ['Oakville', 'Toronto', 'Mississauga'],
+    angle: 'Iron infusion is a medical treatment for diagnosed iron deficiency, not a wellness drip. Explain the difference plainly: it needs bloodwork and a prescription, it is given in hospital outpatient clinics and by some private clinics, OHIP covers the hospital route while private clinics charge for the visit and the drug, and extended plans sometimes reimburse the drug. Describe how a private appointment typically works (referral or requisition, bloodwork, the infusion visit, monitoring). No prices. Point readers to ask their physician and to check the prescriber on any clinic page.',
+  },
+  {
+    slug: 'iron-infusion-insurance-coverage-canada-2026',
+    workingTitle: 'Is Iron Infusion Covered by Insurance in Canada? OHIP, Canada Life, Sun Life (2026)',
+    category: 'Cost & Insurance',
+    kind: 'evergreen',
+    relatedCities: ['Toronto', 'Vancouver', 'Calgary'],
+    angle: 'Answer the three questions people type: is iron infusion covered by OHIP (hospital route yes, private clinic visit no), by Canada Life and Sun Life (the iron drug may be a drug benefit with a prescription; the infusion fee usually is not; check the plan), and what paperwork helps (prescription, receipt with DIN, physician letter). Neutral, no plan-specific promises, no prices.',
+  },
+  {
+    slug: 'glutathione-iv-montreal-2026',
+    workingTitle: 'Glutathione IV in Montreal: What It Is, What to Ask, and Where to Look (2026)',
+    category: 'City Guides',
+    kind: 'city', city: 'Montreal', citySlug: 'montreal',
+    relatedCities: ['Montreal', 'Laval', 'Toronto'],
+    angle: 'Montreal is our highest click-through city for glutathione searches. Explain what glutathione IV is, what the evidence supports and does not (skin brightening claims are not established), Quebec scope (who may prescribe and administer), and how to compare Montreal clinics using the facts block clinics. No prices.',
+  },
+  {
+    slug: 'how-long-does-an-iv-drip-take-2026',
+    workingTitle: 'How Long Does an IV Drip Take? Times by Drip Type (2026)',
+    category: 'Educational',
+    kind: 'evergreen',
+    relatedCities: ['Toronto', 'Vancouver', 'Calgary'],
+    angle: 'A practical answer: a hydration or vitamin drip commonly runs 30 to 60 minutes, larger bags and high-dose vitamin C longer, NAD+ 2 hours or more because it must run slowly, plus check-in and assessment time. Explain what makes a drip run slower (dose, tolerance, vein), why a clinic should not rush it, and what to bring. No prices.',
+  },
+  {
+    slug: 'who-can-legally-give-iv-alberta-2026',
+    workingTitle: 'Who Can Legally Give IV Therapy in Alberta? (2026)',
+    category: 'Educational',
+    kind: 'evergreen',
+    relatedCities: ['Calgary', 'Edmonton', 'Red Deer'],
+    angle: 'Province edition of our best-performing post: in Alberta, physicians (CPSA), nurse practitioners and registered nurses (CRNA) within their scope and with an order, and naturopathic doctors who hold the College of Naturopathic Doctors of Alberta IV special authorization. Explain what a patient can check on each public register and what a clinic should be able to show. No prices, no legal advice beyond the registers.',
+  },
+  {
+    slug: 'who-can-legally-give-iv-quebec-2026',
+    workingTitle: 'Who Can Legally Give IV Therapy in Quebec? (2026)',
+    category: 'Educational',
+    kind: 'evergreen',
+    relatedCities: ['Montreal', 'Laval', 'Quebec City'],
+    angle: 'Quebec edition: physicians (CMQ), nurses (OIIQ) acting on a prescription, and the fact that naturopathy is not a regulated profession in Quebec, so a naturopath cannot prescribe or give IV therapy there. Explain what patients can check on the CMQ and OIIQ registers and what to ask a Montreal clinic. Neutral and careful. No prices.',
+  },
   ...[
     ['Winnipeg', 'winnipeg', ['Winnipeg', 'Toronto', 'Calgary']],
     ['Burlington', 'burlington', ['Burlington', 'Hamilton', 'Oakville']],
@@ -99,6 +184,22 @@ export interface TopicFacts {
   allowedClinicNames: string[];
   /** Relative internal links the post may use. */
   linkAllowlist: string[];
+  /** Dollar amounts that appear in the facts block; the only ones a post may quote. */
+  allowedDollarFigures: number[];
+}
+
+/** The Price Index rows as prose the model can quote, plus the figures the QA gate will accept. */
+function priceFacts(citySlug: string): { lines: string[]; figures: number[]; link: string } | null {
+  const idx = getCityPriceIndex(citySlug);
+  if (!idx) return null;
+  const figures = new Set<number>();
+  const lines = [
+    `PRICE INDEX for ${idx.city} (${idx.asOf}, ${idx.currency}, published clinic menu prices, one representative price per clinic per drip; ${idx.clinicCount} clinics publish at least one price). You may quote these dollar figures and no others:`,
+    ...idx.rows.map((r) => { figures.add(r.low); figures.add(r.median); figures.add(r.high); return `- ${r.treatment}: ${r.clinics} clinics, low $${r.low}, median $${r.median}, high $${r.high}`; }),
+    idx.note ? `Index note: ${idx.note}` : '',
+    `Full index page: /iv-prices/${idx.citySlug}. Always say prices are published menu prices, dated ${idx.asOf}, not quotes, and that dose and add-ons explain most gaps.`,
+  ].filter(Boolean);
+  return { lines, figures: [...figures], link: `/iv-prices/${idx.citySlug}` };
 }
 
 interface ProviderLite {
@@ -121,6 +222,10 @@ export async function buildFacts(sb: SupabaseClient, topic: BlogTopic): Promise<
     '/blog/7-questions-before-iv-therapy',
     ...topic.relatedCities.map((c) => `/cities/${c.toLowerCase().replace(/\s+/g, '-')}`),
   ];
+  const price = topic.priceCitySlug ? priceFacts(topic.priceCitySlug) : null;
+  if (price) linkAllowlist.push(price.link);
+  const priceLines = price ? ['', ...price.lines] : [];
+  const allowedDollarFigures = price ? price.figures : [];
 
   if (topic.kind === 'city' && topic.city) {
     const { data } = await sb
@@ -153,8 +258,9 @@ export async function buildFacts(sb: SupabaseClient, topic: BlogTopic): Promise<
           `- ${p.name}: ${p.rating} stars from ${p.reviews} Google reviews${p.is_claimed ? ' (owner-verified listing on TheDripMap)' : ''}${p.safety_verified ? ' (holds our human-reviewed safety badge)' : ''}`,
       ),
       `Browse-all page for this city: /cities/${topic.citySlug}.`,
+      ...priceLines,
     ];
-    return { block: lines.join('\n'), allowedClinicNames: top.map((p) => p.name), linkAllowlist };
+    return { block: lines.join('\n'), allowedClinicNames: top.map((p) => p.name), linkAllowlist, allowedDollarFigures };
   }
 
   // Evergreen: site-wide grounding only.
@@ -169,8 +275,9 @@ export async function buildFacts(sb: SupabaseClient, topic: BlogTopic): Promise<
     `who administers, who prescribes or oversees, health screening before treatment, emergency protocol,`,
     `ingredient sourcing, published pricing, and staff credentials checkable with the provincial regulator.`,
     `Some clinics have had their prescriber checked against the public regulator register (see /verification).`,
+    ...priceLines,
   ].join('\n');
-  return { block, allowedClinicNames: [], linkAllowlist };
+  return { block, allowedClinicNames: [], linkAllowlist, allowedDollarFigures };
 }
 
 export interface GeneratedPost {
@@ -203,8 +310,13 @@ export function qaGates(post: GeneratedPost, topic: BlogTopic, facts: TopicFacts
   const words = post.content_markdown.split(/\s+/).filter(Boolean).length;
   if (words < 800 || words > 2200) fails.push(`word count ${words} (must be 800-2200)`);
 
-  // No dollar figures: v1 topics carry no price payload, so any price is invented.
-  if (/\$\s?\d/.test(all)) fails.push('contains a dollar figure (no price data was supplied)');
+  // Dollar figures: none unless the topic carries a Price Index payload, and
+  // then only the figures that appear in it. Anything else is invented.
+  const dollars = [...all.matchAll(/\$\s?(\d[\d,]*)/g)].map((m) => Number(m[1].replace(/,/g, '')));
+  if (dollars.length && !facts.allowedDollarFigures.length) fails.push('contains a dollar figure (no price data was supplied)');
+  for (const d of dollars) {
+    if (facts.allowedDollarFigures.length && !facts.allowedDollarFigures.includes(d)) fails.push(`dollar figure $${d} is not in the Price Index facts`);
+  }
 
   // Market superlatives that cannot be verified.
   if (/(one of the (highest|largest|biggest|most)|per[- ]capita|fastest[- ]growing market)/i.test(all))
@@ -250,7 +362,7 @@ export function systemPrompt(): string {
     '- Never use en dashes or em dashes anywhere. Use commas, periods, or the word "to".',
     '- Never use the word "directory". TheDripMap is a "matching platform".',
     '- Every local or numeric claim must come from the FACTS BLOCK in the user message. If a fact is not there, do not state it.',
-    '- Never state any price or dollar figure.',
+    '- Never state any price or dollar figure unless the FACTS BLOCK contains a PRICE INDEX; then quote only those exact figures, always as published menu prices with their date.',
     '- Never name a clinic that is not listed in the facts block.',
     '- Never make medical claims; treatments are described neutrally and readers are pointed to the clinic prescriber and their own clinician.',
     '- No superlative market claims (largest, highest per-capita, fastest-growing).',

@@ -174,7 +174,16 @@ async function main() {
     console.log(isTest ? 'TEST' : (ok ? 'SENT' : 'FAILED'), p.slug, r.status, res.slice(0, 100));
     if (!isTest && ok) {
       const dd = p.decision_drivers || {};
-      await s.from('providers').update({ decision_drivers: { ...dd, third_touch: { sent_at: new Date().toISOString(), template: TEMPLATE, views90d: e.views, clicks90d: e.clicks } } }).eq('id', p.id);
+      const sentAt = new Date().toISOString();
+      // followup_sent_at is the column every OTHER system reads as "we last
+      // talked to this clinic": the engine heartbeat, the weekly summary, the
+      // cooldown checks in other outreach scripts. Writing only the JSON key
+      // made 50 real sends invisible on 2026-09-20 and the heartbeat reported
+      // outreach stalled. A touch is not recorded until this column moves too.
+      await s.from('providers').update({
+        followup_sent_at: sentAt,
+        decision_drivers: { ...dd, third_touch: { sent_at: sentAt, template: TEMPLATE, views90d: e.views, clicks90d: e.clicks } },
+      }).eq('id', p.id);
       sent++;
     }
     if (isTest) break;
