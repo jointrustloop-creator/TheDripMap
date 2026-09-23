@@ -712,6 +712,17 @@ export async function getListingBySlug(slug: string) {
       throw new SupabaseUnreachableError(slugError.message);
     }
     if (!slugError && slugMatch) {
+      // A hidden row has NO page. Every list view already filters is_hidden,
+      // but this function did not, so all 41 hidden clinics kept a live,
+      // indexable page at their own URL: clinics an owner asked us to remove,
+      // 22 UK and US clinics filed under Canadian city names, duplicates we
+      // merged, and the cancer centre taken out of scope in the 2026-09-18
+      // audit. Found 2026-09-22 when Youth Bar's page stayed up minutes after
+      // their CEO asked to be taken off. Return null so the route calls
+      // notFound(), and stop here rather than falling through to the fuzzy
+      // search, which would otherwise serve the canonical clinic at a
+      // duplicate's URL and recreate the duplicate page we hid.
+      if ((slugMatch as { is_hidden?: boolean }).is_hidden) return null;
       return enrichProvider(slugMatch);
     }
 
@@ -727,7 +738,7 @@ export async function getListingBySlug(slug: string) {
       .limit(100);
 
     if (!nameError && nameMatches && nameMatches.length > 0) {
-      const match = nameMatches.find(p => matchesSlug(p, slug));
+      const match = nameMatches.filter((p) => !(p as { is_hidden?: boolean }).is_hidden).find(p => matchesSlug(p, slug));
       if (match) return enrichProvider(match);
     }
     
@@ -745,7 +756,7 @@ export async function getListingBySlug(slug: string) {
       .limit(1000);
 
     if (!widerError && widerCandidates) {
-      const match = widerCandidates.find(p => matchesSlug(p, slug));
+      const match = widerCandidates.filter((p) => !(p as { is_hidden?: boolean }).is_hidden).find(p => matchesSlug(p, slug));
       if (match) return enrichProvider(match);
     }
 
