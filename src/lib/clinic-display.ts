@@ -21,6 +21,14 @@ const LIST_FIELDS = [
   'transparency_score',
   'price_range', 'specialties', 'subtypes', 'services', 'medical_team',
   'mobile_service', 'hours', 'imageUrl', 'image_url',
+  // bookingUrlOf() (src/lib/card-signals.ts) reads online_booking_url. It was
+  // missing from this allowlist from 2026-08-15 to 2026-09-25, so every card on
+  // /cities and /search lost its Book button and its "Books online" cue for
+  // six weeks while the provider page kept both. 86 Canadian clinics, 19 of
+  // them claimed, have a valid booking link. Found while chasing why contact
+  // clicks fell a third over the same period. Same lesson as the QuoteChamp
+  // lean-read bug: a payload cut must carry every field the decider reads.
+  'online_booking_url',
 ] as const;
 
 export function slimProviderForList(p: Provider): Provider {
