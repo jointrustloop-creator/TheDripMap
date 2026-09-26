@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Send, Loader2, CheckCircle2, MessageSquare } from 'lucide-react';
 import { Provider } from '../types';
@@ -9,13 +9,24 @@ interface MessageClinicModalProps {
   provider: Provider;
   isOpen: boolean;
   onClose: () => void;
+  // Pre-filled question, used by the "Ask their price" entry point. The
+  // patient can still edit it; it only saves them the typing.
+  initialMessage?: string;
+  heading?: string;
+  subheading?: string;
 }
 
-export const MessageClinicModal = ({ provider, isOpen, onClose }: MessageClinicModalProps) => {
+export const MessageClinicModal = ({ provider, isOpen, onClose, initialMessage, heading, subheading }: MessageClinicModalProps) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
+  // Seed the question each time the modal opens with a pre-fill, never while
+  // the patient is typing.
+  useEffect(() => {
+    if (isOpen && initialMessage && !message.trim()) setMessage(initialMessage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, initialMessage]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   // True only when the lead was auto-forwarded straight to the clinic
@@ -148,10 +159,10 @@ export const MessageClinicModal = ({ provider, isOpen, onClose }: MessageClinicM
                       </div>
                       <div className="min-w-0">
                         <h3 className="text-lg font-black text-slate-900 tracking-tight truncate">
-                          Message {provider.name}
+                          {heading || `Message ${provider.name}`}
                         </h3>
                         <p className="text-xs font-bold text-slate-500 truncate">
-                          We&apos;ll forward your message and connect you.
+                          {subheading || "We'll forward your message and connect you."}
                         </p>
                       </div>
                     </div>

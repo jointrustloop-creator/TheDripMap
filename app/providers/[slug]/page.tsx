@@ -28,6 +28,7 @@ import { ClaimListingTrigger } from '../../../src/components/ClaimListingTrigger
 import { StickyClaimRail } from '../../../src/components/StickyClaimRail';
 import { PatientActionBar } from '../../../src/components/PatientActionBar';
 import { MessageClinicButton } from '../../../src/components/MessageClinicButton';
+import { AskPriceButton } from '../../../src/components/AskPriceButton';
 import { BookingRequestButton } from '../../../src/components/BookingRequest';
 import { PatientTestimonials } from '../../../src/components/PatientTestimonials';
 import { ClaimAutoOpener } from '../../../src/components/ClaimAutoOpener';
@@ -1730,6 +1731,9 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                       </TrackedLink>
                     )}
                     <BookingRequestButton provider={provider} />
+                    {/* Pre-filled price question; renders only when this page
+                        shows no price of its own. */}
+                    <AskPriceButton provider={provider} variant="page" />
                     <MessageClinicButton provider={provider} variant="secondary" />
                   </div>
 

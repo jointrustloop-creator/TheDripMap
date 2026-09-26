@@ -37,6 +37,7 @@ import { ResilientImage } from './ResilientImage';
 import { ProviderHero } from './ProviderHero';
 import { priceSignalOf } from '../lib/card-signals';
 import { MessageClinicButton } from './MessageClinicButton';
+import { AskPriceButton } from './AskPriceButton';
 import { BookingRequestButton } from './BookingRequest';
 import { SubmitTestimonialButton } from './SubmitTestimonialButton';
 import { TreatmentDefinitionDisclosure } from './TreatmentDefinitionDisclosure';
@@ -1091,6 +1092,9 @@ export default function DefinitiveListingLayout({
                     from public provider objects (2026-07-05 security fix). */}
                 {/* id="message": PatientActionBar's fallback when there is no phone. */}
                 <div id="message" className="scroll-mt-24">
+                  {/* Pre-filled price question; renders only when this page
+                      shows no price of its own. */}
+                  <AskPriceButton provider={provider} variant="page" />
                   <MessageClinicButton
                     provider={provider}
                     className="block w-full text-center py-[15px] rounded-[13px] font-semibold text-[15px] mb-[10px] border border-[rgba(25,36,28,0.15)] hover:bg-[#ebf1e5] transition cursor-pointer flex items-center justify-center gap-2"

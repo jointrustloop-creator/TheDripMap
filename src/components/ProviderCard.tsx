@@ -17,6 +17,7 @@ import { motion } from 'motion/react';
 import { useClaimListing } from '../context/ClaimListingContext';
 import { CompareToggle } from './CompareToggle';
 import TrackedLink from './TrackedLink';
+import { AskPriceButton } from './AskPriceButton';
 
 interface ProviderCardProps {
   provider: Provider;
@@ -437,6 +438,9 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
                 <Phone size={17} />
               </TrackedLink>
             )}
+            {/* Renders only when the card shows no price (AskPriceButton
+                returns null otherwise): the question patients actually have. */}
+            <AskPriceButton provider={provider} variant="card" />
           </div>
 
           {/* Owner nudge: claimed but not yet Safety Verified. Self-serve path
@@ -565,6 +569,9 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
               );
             })}
           </div>
+          {/* The muted card deliberately carries no call or book button; the one
+              question worth a button here is the price nobody published. */}
+          <AskPriceButton provider={provider} variant="card-text" />
         </div>
 
         {/* Card Footer */}
