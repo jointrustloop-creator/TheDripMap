@@ -10,7 +10,7 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Sb = any;
 
-export type SendLogChannel = 'partb' | 'newsletter' | 'finish_nudge';
+export type SendLogChannel = 'partb' | 'newsletter' | 'finish_nudge' | 'click_alert';
 
 export interface SendLogInput {
   channel: SendLogChannel;
