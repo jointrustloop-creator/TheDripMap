@@ -516,8 +516,13 @@ export async function GET(req: Request) {
   // number). Ledger reads 0 until the migration is pasted; never throws.
   {
     const dayAgo = new Date(now.getTime() - 24 * 3_600_000).toISOString();
+    // The inquiries table also holds newsletter signups ([SUBSCRIBE]) and the
+    // newsletter send ledger ([NEWSLETTER-SENT]). Counting every row reported
+    // "2 patient messages" on 2026-09-24 when the only rows were two welcome
+    // sends. A patient message is a row that is neither.
     const [{ count: leadsToday }, delivered] = await Promise.all([
-      supabase.from('inquiries').select('id', { count: 'exact', head: true }).gte('created_at', dayAgo),
+      supabase.from('inquiries').select('id', { count: 'exact', head: true }).gte('created_at', dayAgo)
+        .not('message', 'like', '[SUBSCRIBE]%').not('message', 'like', '[NEWSLETTER-SENT]%'),
       supabase.from('lead_deliveries').select('provider_id').gte('delivered_at', dayAgo),
     ]);
     lines.push(`LEADS TODAY (${leadsToday ?? 0} patient messages)`);
