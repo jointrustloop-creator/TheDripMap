@@ -50,6 +50,12 @@ const OPT_OUT_PATTERNS: RegExp[] = [
   /\bremove\s+from\s+(your|the)\s+list\b/i,
   /\bopt[\s\-_]?out\b/i,
   /\btake\s+me\s+off\b/i,
+  // A removal request is an opt-out. "can you take us off this map? ...
+  // Thank you" was filed as INTERESTED on 2026-09-22 because "can you"
+  // read as a question and "Thank you," as positive sentiment.
+  /\btake\s+us\s+off\b/i,
+  /\bremove\s+(us|our\s+(listing|clinic|page|business|practice))\b/i,
+  /\bdelist\b/i,
   /\bplease\s+stop\b/i,
   /\bdo\s+not\s+(email|contact|message)\b/i,
   /\bstop\s+(emailing|contacting|messaging)\b/i,
@@ -137,6 +143,9 @@ const QUESTION_PATTERNS: RegExp[] = [
 
 const NEGATIVE_PATTERNS: RegExp[] = [
   /\bnot\s+interested\b/i,
+  // A clinic that stopped offering the service is a delisting, never a lead.
+  /\bno\s+longer\s+(offer|offering|provide|providing|do|doing)\b/i,
+  /\bwe\s+(don'?t|do\s+not)\s+(offer|do|provide)\s+(iv|drips?|infusions?)\b/i,
   /\bno\s+thanks?\b/i,
   /\bnot\s+(at\s+)?this\s+time\b/i,
   /\bwe(\'re|\s+are)\s+(good|all\s+set)\b/i,
