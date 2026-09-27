@@ -68,6 +68,15 @@ export function ListingController({ initialProviders, cityName, hideHeading = fa
   // Same filter set as /search (shared src/lib/filters.ts). Hard + facet narrow;
   // soft chips regroup into visible labelled groups and never hide.
   const [activeChips, setActiveChips] = useState<string[]>([]);
+  // Render cap. /cities/toronto served 296 cards in one response, 2.5 MB of
+  // HTML of which 0.8 MB was inline SVG icons and 0.85 MB class attributes
+  // (2026-09-27). Google ranked the same page at 10 on mobile and 26 on
+  // desktop. The first screenful is what a visitor and a crawler judge; the
+  // rest loads on request. Every clinic is still on the page, the map still
+  // gets every pin, and the ranking order above is untouched.
+  const PAGE = 36;
+  const [visibleCount, setVisibleCount] = useState(PAGE);
+  useEffect(() => { setVisibleCount(PAGE); }, [activeChips]);
   const toggleChip = (id: string) => {
     setActiveChips((prev) => {
       const on = !prev.includes(id);
@@ -304,13 +313,26 @@ export function ListingController({ initialProviders, cityName, hideHeading = fa
             ) : (
               // 2026-06-14: every listing (claimed + unclaimed) renders through
               // ProviderCard. One card component = a consistent grid.
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {narrowed.map((provider) => (
-                  <div key={provider.id}>
-                    <ProviderCard provider={provider} />
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {narrowed.slice(0, visibleCount).map((provider) => (
+                    <div key={provider.id}>
+                      <ProviderCard provider={provider} />
+                    </div>
+                  ))}
+                </div>
+                {narrowed.length > visibleCount && (
+                  <div className="mt-10 text-center">
+                    <button
+                      type="button"
+                      onClick={() => setVisibleCount((n) => n + PAGE)}
+                      className="inline-flex items-center gap-2 bg-white border-2 border-slate-200 text-slate-900 px-6 py-3.5 rounded-2xl font-black text-sm hover:border-slate-900 transition-colors"
+                    >
+                      Show {Math.min(PAGE, narrowed.length - visibleCount)} more of {narrowed.length} clinics
+                    </button>
                   </div>
-                ))}
-              </div>
+                )}
+              </>
             )}
           </motion.div>
         ) : (

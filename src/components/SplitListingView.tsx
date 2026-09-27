@@ -34,13 +34,21 @@ interface SplitListingViewProps {
 export const SplitListingView = ({ providers, cityName }: SplitListingViewProps) => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const cardRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
+  // Same render cap as the grid (see ListingController): the map gets every
+  // pin, the column shows the first screenfuls and grows on request. A pin
+  // click on a clinic past the cap expands the column to reach it.
+  const PAGE = 36;
+  const [visibleCount, setVisibleCount] = useState(PAGE);
 
   const handleMarkerClick = (id: string) => {
     setHoveredId(id);
-    const el = cardRefs.current.get(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+    const idx = providers.findIndex((p) => p.id === id);
+    if (idx >= visibleCount) setVisibleCount(Math.ceil((idx + 1) / PAGE) * PAGE);
+    // Let the newly rendered card mount before scrolling to it.
+    setTimeout(() => {
+      const el = cardRefs.current.get(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, idx >= visibleCount ? 60 : 0);
   };
 
   const providersWithCoords = providers.filter((p) => p.latitude && p.longitude);
@@ -67,7 +75,7 @@ export const SplitListingView = ({ providers, cityName }: SplitListingViewProps)
             </span>
           </div>
         )}
-        {providers.map((provider) => {
+        {providers.slice(0, visibleCount).map((provider) => {
           const isHovered = hoveredId === provider.id;
           return (
             <div
@@ -89,6 +97,17 @@ export const SplitListingView = ({ providers, cityName }: SplitListingViewProps)
             </div>
           );
         })}
+        {providers.length > visibleCount && (
+          <div className="pt-2 pb-4 text-center">
+            <button
+              type="button"
+              onClick={() => setVisibleCount((n) => n + PAGE)}
+              className="inline-flex items-center gap-2 bg-white border-2 border-slate-200 text-slate-900 px-6 py-3.5 rounded-2xl font-black text-sm hover:border-slate-900 transition-colors"
+            >
+              Show {Math.min(PAGE, providers.length - visibleCount)} more of {providers.length} clinics
+            </button>
+          </div>
+        )}
       </div>
 
       {/* RIGHT: Sticky map. Hidden on mobile (cards stack instead). */}
