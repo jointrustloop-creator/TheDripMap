@@ -42,7 +42,7 @@ import { BookingRequestButton } from './BookingRequest';
 import { SubmitTestimonialButton } from './SubmitTestimonialButton';
 import { TreatmentDefinitionDisclosure } from './TreatmentDefinitionDisclosure';
 import { findDefinition } from '../lib/treatment-definitions';
-import { premisesVerification } from '../lib/safety';
+import { premisesVerification, prescriberRegisterCheck } from '../lib/safety';
 import { liveOffersForProvider } from '../lib/deals';
 import TrackedLink from './TrackedLink';
 import type { Provider, OperatorProfile } from '../types';
@@ -367,6 +367,7 @@ export default function DefinitiveListingLayout({
   // confirmed none.
   const confirmedSafety = safetyResults.filter((c) => c.passed);
   const showSafety = safetyVerified && confirmedSafety.length > 0;
+  const registerCheck = safetyVerified ? prescriberRegisterCheck(provider as Parameters<typeof prescriberRegisterCheck>[0]) : null;
 
   // Current weekday for hours highlighting (lowercased).
   const todayKey = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase() as typeof FACT_HOURS_ORDER[number];
@@ -721,6 +722,16 @@ export default function DefinitiveListingLayout({
                       <small className="text-[12.5px] text-[#c4c9b8] block mt-[2px]">What {displayName} confirmed on our safety review</small>
                     </div>
                   </div>
+                  {/* The operator's own register check, dated and linked to the
+                      college register (change order 2026-09-28). Rendered only
+                      when one is on file; the clinic's answers never produce it. */}
+                  {registerCheck && (
+                    <p className="relative mt-[14px] text-[13px] text-[#f3efe2]">
+                      <ShieldCheck size={14} className="inline-block -mt-[2px] mr-[6px] text-[#d8b878]" />
+                      {registerCheck.sentence}.{' '}
+                      <a href={registerCheck.url} target="_blank" rel="noopener noreferrer" className="underline decoration-[rgba(216,184,120,0.6)] hover:text-white">Open the register</a>
+                    </p>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-[14px_26px] mt-[22px] relative">
                     {confirmedSafety.map((c) => {
                       const regOverride = (provider as unknown as { regulator_override?: string | null }).regulator_override;

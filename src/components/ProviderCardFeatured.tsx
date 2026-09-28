@@ -22,7 +22,7 @@ import {
   Star as StarIcon,
 } from 'lucide-react';
 import { TransparencyChip } from './TransparencyChip';
-import { isSafetyVerified as isSafetyVerifiedFn } from '../lib/safety';
+import { isSafetyVerified as isSafetyVerifiedFn, prescriberRegisterCheck } from '../lib/safety';
 import { Provider, OperatorProfile } from '../types';
 import { slugify } from '../lib/data';
 import { bookingUrlOf } from '../lib/card-signals';
@@ -110,6 +110,7 @@ export const ProviderCardFeatured = ({
   const bookingUrl = bookingUrlOf(provider);
   const isClaimed = provider.is_claimed === true || provider.is_featured === true;
   const isSafety = isSafetyVerifiedFn(provider as { safety_verified?: boolean; safety_review_status?: string | null });
+  const registerCheck = isSafety ? prescriberRegisterCheck(provider as Parameters<typeof prescriberRegisterCheck>[0]) : null;
   const isFeatured = provider.is_featured === true;
   const oneLiner = operatorProfile?.profile_data?.oneLiner;
 
@@ -172,12 +173,24 @@ export const ProviderCardFeatured = ({
           ExploreCard so the badge reads the same everywhere. */}
       {isSafety && (
         <div
-          title="A named prescriber checked against their public college register, plus the clinic's safety answers, reviewed by TheDripMap"
+          title={registerCheck ? registerCheck.sentence : "A named prescriber checked against their public college register, plus the clinic's safety answers, reviewed by TheDripMap"}
           className="flex items-center gap-2 bg-amber-400 text-amber-950 px-4 py-2 text-[11px] font-black uppercase tracking-[0.14em]"
         >
           <ShieldCheck size={14} className="shrink-0" />
           Safety Verified
-          <span className="ml-auto normal-case tracking-normal font-semibold text-amber-900/80 text-[10.5px] truncate">prescriber checked against the register</span>
+          {registerCheck ? (
+            <a
+              href={registerCheck.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="ml-auto normal-case tracking-normal font-semibold text-amber-900/80 text-[10.5px] truncate underline decoration-amber-700/40 hover:text-amber-950"
+            >
+              {registerCheck.sentence}
+            </a>
+          ) : (
+            <span className="ml-auto normal-case tracking-normal font-semibold text-amber-900/80 text-[10.5px] truncate">prescriber checked against the register</span>
+          )}
         </div>
       )}
       <div className={cn('flex flex-col', isPrimary && 'md:flex-row')}>

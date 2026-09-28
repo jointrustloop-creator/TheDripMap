@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Star as StarIcon, Navigation, ShieldCheck, CheckCircle2, MapPin, Stethoscope, Phone, Calendar } from 'lucide-react';
 import { TransparencyChip } from './TransparencyChip';
-import { isSafetyVerified as isSafetyVerifiedFn } from '../lib/safety';
+import { isSafetyVerified as isSafetyVerifiedFn, prescriberRegisterCheck } from '../lib/safety';
 import { Provider } from '../types';
 import { slugify } from '../lib/data';
 import { bookingUrlOf, priceSignalOf } from '../lib/card-signals';
@@ -102,6 +102,7 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
   // Safety Verified is a separate, stronger signal than Claimed. The shield is
   // reserved for it; Claimed gets only a subtle check.
   const isSafetyVerified = isSafetyVerifiedFn(provider as { safety_verified?: boolean; safety_review_status?: string | null });
+  const registerCheck = isSafetyVerified ? prescriberRegisterCheck(provider as Parameters<typeof prescriberRegisterCheck>[0]) : null;
   const isFeatured = provider.is_featured === true;
 
   const initials = getInitials(provider.name);
@@ -163,12 +164,26 @@ export const ProviderCard = ({ provider, className }: ProviderCardProps) => {
             visible"). */}
         {isSafetyVerified && (
           <div
-            title="A named prescriber checked against their public college register, plus the clinic's safety answers, reviewed by TheDripMap"
+            title={registerCheck ? registerCheck.sentence : "A named prescriber checked against their public college register, plus the clinic's safety answers, reviewed by TheDripMap"}
             className="relative z-10 flex items-center gap-2 bg-amber-400 text-amber-950 px-4 py-2 text-[11px] font-black uppercase tracking-[0.14em]"
           >
             <ShieldCheck size={14} className="shrink-0" />
             Safety Verified
-            <span className="ml-auto normal-case tracking-normal font-semibold text-amber-900/80 text-[10.5px] truncate">prescriber checked against the register</span>
+            {/* The check date and the college register it was made against
+                (change order 2026-09-28). Link opens the register itself. */}
+            {registerCheck ? (
+              <a
+                href={registerCheck.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="ml-auto normal-case tracking-normal font-semibold text-amber-900/80 text-[10.5px] truncate underline decoration-amber-700/40 hover:text-amber-950"
+              >
+                {registerCheck.sentence}
+              </a>
+            ) : (
+              <span className="ml-auto normal-case tracking-normal font-semibold text-amber-900/80 text-[10.5px] truncate">prescriber checked against the register</span>
+            )}
           </div>
         )}
         {/* Cover band — the clinic's own photo when we have one, else the

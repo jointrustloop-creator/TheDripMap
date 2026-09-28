@@ -15,6 +15,7 @@ import {
   ExternalLink,
   Phone,
   Droplets,
+  ShieldCheck,
 } from 'lucide-react';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
@@ -53,7 +54,7 @@ import { getCityPriceIndex } from '../../../src/lib/price-index-data';
 import DefinitiveListingLayout from '../../../src/components/DefinitiveListingLayout';
 import { TransparencyPanel } from '../../../src/components/TransparencyPanel';
 import type { TransparencyCheck } from '../../../src/lib/transparency-score';
-import { isSafetyVerified as isSafetyVerifiedFn, premisesVerification } from '../../../src/lib/safety';
+import { isSafetyVerified as isSafetyVerifiedFn, premisesVerification, prescriberRegisterCheck } from '../../../src/lib/safety';
 import { ProviderHero } from '../../../src/components/ProviderHero';
 import { OpenStatus } from '../../../src/components/OpenStatus';
 import ListingAnalytics from '../../../src/components/ListingAnalytics';
@@ -354,6 +355,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
   });
   const safetyVerifiedCount = safetyResults.filter(c => c.passed).length;
   const safetyVerified = isSafetyVerifiedFn(provider as { safety_verified?: boolean; safety_review_status?: string | null });
+  const registerCheck = safetyVerified ? prescriberRegisterCheck(provider as Parameters<typeof prescriberRegisterCheck>[0]) : null;
   // Transparency Score is computed server-side and stored on the row (manage is
   // stripped from this shape, so we read the stored value, never recompute here).
   const transparencyScore = (provider as { transparency_score?: number | null }).transparency_score ?? null;
@@ -1171,6 +1173,15 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                 <p className="text-sm text-slate-500 font-medium mb-8 max-w-2xl">
                   {provider.name} completed TheDripMap's safety questionnaire. Here is what they confirmed.
                 </p>
+                {/* The operator's own register check, dated and linked to the
+                    college register (change order 2026-09-28). */}
+                {registerCheck && (
+                  <p className="-mt-4 mb-8 text-sm font-bold text-sky-800 max-w-2xl">
+                    <ShieldCheck size={15} className="inline-block -mt-0.5 mr-1.5 text-sky-600" />
+                    {registerCheck.sentence}.{' '}
+                    <a href={registerCheck.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-sky-600">Open the register</a>
+                  </p>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {safetyResults.filter((c) => c.passed).map((c) => (
                     <div key={c.key} className="flex items-start gap-3 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">

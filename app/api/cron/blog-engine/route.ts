@@ -23,6 +23,7 @@ import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { sendMail } from '../../../../src/lib/mailer';
 import { REPORT_TO } from '../../../../src/lib/report-recipient';
+import { pingIndexNow } from '../../../../src/lib/indexnow';
 import {
   TOPIC_QUEUE,
   buildFacts,
@@ -163,6 +164,12 @@ export async function GET(req: Request) {
       ]);
       return NextResponse.json({ ok: false, slug: topic.slug, error: error.message }, { status: 500 });
     }
+    // Change order 2026-09-28: every publish pings IndexNow (post + blog index
+    // + the city pages it is tied to). Fire-and-forget; never fails the run.
+    await pingIndexNow(
+      [`/blog/${topic.slug}`, '/blog', ...(topic.relatedCities || []).map((c) => `/cities/${String(c).toLowerCase().replace(/[^a-z0-9]+/g, '-')}`)],
+      `blog publish ${topic.slug}`,
+    );
   }
 
   const words = post.content_markdown.split(/\s+/).filter(Boolean).length;

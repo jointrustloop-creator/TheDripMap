@@ -217,6 +217,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       .filter((c) => (c.count ?? 0) >= 3 && (CA_PROVINCES.has((c.stateAbbr || '').toLowerCase().trim()) || CA_PROVINCES.has((c.state || '').toLowerCase().trim())))
       .map((c) => slugify(c.city))
   );
+  // Change order 2026-09-28, item 3: every blog post that NAMES a Canadian
+  // city links that city's page. Derived at render time from the post text,
+  // so no blog body is edited. Cities already linked in the body, and the
+  // slug-matched hub below, are not repeated.
+  const namedCities = (() => {
+    const hay = `${post.title || ''} ${post.content || ''}`;
+    const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return allCities
+      .filter((c) => (c.count ?? 0) >= 3 && (CA_PROVINCES.has((c.stateAbbr || '').toLowerCase().trim()) || CA_PROVINCES.has((c.state || '').toLowerCase().trim())))
+      .filter((c) => c.city.length > 3 && new RegExp(`\\b${esc(c.city)}\\b`, 'i').test(hay))
+      .filter((c) => !String(post.content || '').includes(`/cities/${slugify(c.city)}`))
+      .map((c) => ({ name: c.city, href: `/cities/${slugify(c.city)}` }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  })();
   const cityHub = (() => {
     const tokens = `-${slug}-`;
     const match = [...caCitySlugs]
@@ -471,6 +485,16 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 </span>
                 <ArrowRight size={18} className="text-wellness-500 group-hover:translate-x-1 transition-transform shrink-0" />
               </Link>
+            )}
+            {namedCities.filter((c) => c.href !== cityHub?.href).length > 0 && (
+              <nav aria-label="Cities mentioned in this guide" className="mb-8 flex flex-wrap items-center gap-2 text-sm">
+                <span className="font-bold text-slate-500 mr-1">Clinics by city:</span>
+                {namedCities.filter((c) => c.href !== cityHub?.href).map((c) => (
+                  <Link key={c.href} href={c.href} className="inline-flex items-center gap-1 bg-white border border-slate-200 hover:border-wellness-300 hover:text-wellness-700 text-slate-700 font-bold px-3 py-1.5 rounded-xl transition-colors no-underline">
+                    <MapPin size={13} className="text-wellness-600" /> {c.name}
+                  </Link>
+                ))}
+              </nav>
             )}
             <div className="prose prose-lg max-w-none prose-slate prose-headings:font-black prose-headings:tracking-tight prose-a:text-wellness-600 prose-a:no-underline hover:prose-a:underline markdown-body">
               {post.content ? (

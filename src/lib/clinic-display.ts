@@ -53,7 +53,9 @@ export function slimProviderForList(p: Provider): Provider {
   if (Object.keys(slimTeam).length || pv.verified) {
     slim.decision_drivers = {
       ...(Object.keys(slimTeam).length ? { manage: { team: slimTeam } } : {}),
-      ...(pv.verified ? { prescriber_verification: { credential: pv.credential, verified: true } } : {}),
+      // verified_at crosses too so the card can print "verified on <college>
+      // on <date>" (change order 2026-09-28). Still no name or number.
+      ...(pv.verified ? { prescriber_verification: { credential: pv.credential, verified: true, verified_at: pv.verified_at ?? null } } : {}),
     };
   }
   // Owner-uploaded photos anchor the claimed card band (first real photo only).

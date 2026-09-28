@@ -288,6 +288,15 @@ export default async function BadgeReviewsPage() {
                   >
                     {rec?.verified ? `verified${rec.verifiedAt ? ` ${rec.verifiedAt}` : ''}` : 'not verified'}
                   </span>
+                  {/* Change order 2026-09-28: a badge that is on with no register
+                      check on file is flagged here, never removed. Approve now
+                      refuses until the check is recorded, so this only shows
+                      the clinics approved before that gate existed. */}
+                  {c.safety_verified === true && c.safety_review_status === 'approved' && !rec?.verified && (
+                    <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[11px] font-black" title="Look the prescriber up on the college register and record it with the verified toggle">
+                      badge on, no register check on file
+                    </span>
+                  )}
                   <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-bold">
                     score {typeof c.transparency_score === 'number' ? `${c.transparency_score} of 7` : 'not scored'}
                   </span>

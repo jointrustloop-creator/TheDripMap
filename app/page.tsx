@@ -22,7 +22,7 @@ import { BlogCard } from '../src/components/BlogCard';
 import { QuickMatch } from '../src/components/QuickMatch';
 import { ClinicianSection } from '../src/components/ClinicianSection';
 import { TrustSignals } from '../src/components/TrustSignals';
-import { getBlogPosts, getSiteStats, getPopularCities, getFeaturedListings, getOperatorProfiles } from '../src/lib/data';
+import { getBlogPosts, getSiteStats, getPopularCities, getFeaturedListings, getOperatorProfiles, getAllCities, slugify } from '../src/lib/data';
 import { US_MARKET_ENABLED } from '../src/lib/market';
 import { PRICE_INDEX } from '../src/lib/price-index-data';
 import { isSafetyVerified } from '../src/lib/safety';
@@ -80,6 +80,12 @@ export default async function HomePage() {
   const metroCities = (
     US_MARKET_ENABLED ? popularCities : popularCities.filter((c) => c.country === 'Canada')
   ).slice(0, US_MARKET_ENABLED ? 12 : 8);
+  // Every sitemapped Canadian city (3+ clinics), for the all-cities link list.
+  const CA_ABBRS = new Set(['on', 'qc', 'bc', 'ab', 'mb', 'sk', 'ns', 'nb', 'nl', 'pe', 'yt', 'nt', 'nu']);
+  const allCityLinks = (await getAllCities())
+    .filter((c) => (c.count ?? 0) >= 3 && c.city && (CA_ABBRS.has((c.stateAbbr || '').toLowerCase()) || /ontario|quebec|british columbia|alberta|manitoba|saskatchewan|nova scotia|new brunswick|newfoundland|prince edward/i.test(c.state || '')))
+    .map((c) => ({ name: c.city, slug: slugify(c.city), count: c.count }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
   // Featured row integrity: the homepage "Who we trust" shelf must only show
   // clinics that LEGITIMATELY hold the Safety Verified badge AND are claimed. We
   // gate on isSafetyVerified() (strict: approved review + complete questionnaire)
@@ -782,6 +788,19 @@ export default async function HomePage() {
               </Link>
             ))}
           </div>
+
+          {/* Change order 2026-09-28, item 3: the homepage links EVERY city page
+              in the sitemap, not only the eight tiles. Same gate as the sitemap
+              (Canadian, 3+ clinics) so no link points at a noindexed page. */}
+          {allCityLinks.length > 0 && (
+            <nav aria-label="All cities" className="mt-8 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+              {allCityLinks.map((c) => (
+                <Link key={c.slug} href={`/cities/${c.slug}`} className="font-bold text-slate-600 hover:text-[#0F6E56] transition-colors">
+                  {c.name} <span className="text-slate-400 font-medium">{c.count}</span>
+                </Link>
+              ))}
+            </nav>
+          )}
 
           {/* Mobile-only fallback for the All N+ cities link hidden in the header */}
           <div className="text-center mt-10 md:hidden">

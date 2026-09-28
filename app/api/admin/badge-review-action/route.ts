@@ -26,6 +26,7 @@ import { sendMail } from '../../../../src/lib/mailer';
 import { manageUrlForProvider } from '../../../../src/lib/manage-token';
 import { buildCompletionRequestEmail, missingSafetyParts } from '../../../../src/lib/badge-review';
 import { isSafetyComplete } from '../../../../src/lib/safety';
+import { pingIndexNow } from '../../../../src/lib/indexnow';
 import { computeTransparencyScore } from '../../../../src/lib/transparency-score';
 
 export const runtime = 'nodejs';
@@ -78,6 +79,18 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
+    // Change order 2026-09-28, item 4: the standard (docs/badge-standard.md §4)
+    // requires the reviewer to look the registration number up on the public
+    // college register before approving. The form for that exists on this
+    // page ("record prescriber", verified toggle); approval now refuses until
+    // it has been used. 5 of 19 badges had been approved without it.
+    const pv = (existingDD as { prescriber_verification?: { verified?: boolean; verified_at?: string | null } }).prescriber_verification;
+    if (!pv || pv.verified !== true) {
+      return NextResponse.json(
+        { error: 'no public-register check on file: record the prescriber with the verified toggle (after looking the registration number up on the college register) before approving the badge.' },
+        { status: 400 },
+      );
+    }
     // Approvals EXPIRE (2026-08 ruling): stamp a review-by date one year out so
     // the badge is re-checked rather than trusted forever. isSafetyVerified()
     // lapses the badge once this passes, returning the clinic to review.
@@ -100,6 +113,8 @@ export async function POST(req: NextRequest) {
     if (count !== null && count !== 1) {
       return NextResponse.json({ error: `unexpected update scope: ${count} rows` }, { status: 500 });
     }
+    // A badge turning on changes the clinic page and every list it sits in.
+    await pingIndexNow([`/providers/${provider.slug}`], 'badge approved');
     return back;
   }
 

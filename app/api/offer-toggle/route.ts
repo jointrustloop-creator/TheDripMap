@@ -10,6 +10,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
+import { pingIndexNow } from '../../../src/lib/indexnow';
 import { createClient } from '@supabase/supabase-js';
 import { parseManageToken, secretsMatch } from '../../../src/lib/manage-token';
 
@@ -53,5 +54,6 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: 'could not update' }, { status: 500 });
 
   try { revalidatePath(`/providers/${provider.slug}`); revalidatePath('/deals'); } catch { /* non-fatal */ }
+  await pingIndexNow([`/providers/${provider.slug}`, '/deals'], 'offer toggle');
   return NextResponse.json({ ok: true, active });
 }

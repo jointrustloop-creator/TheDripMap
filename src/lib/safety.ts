@@ -86,6 +86,46 @@ export function isSafetyVerified(
   return true;
 }
 
+/**
+ * The public register a prescriber's number was checked against, derived from
+ * the recorded credential and the clinic's province (change order 2026-09-28,
+ * item 4). Recorded checks did not consistently store the college name, so it
+ * is derived here in one place for every public surface.
+ */
+export function registerFor(credential: string | null | undefined, state: string | null | undefined): { college: string; url: string } | null {
+  const c = (credential || '').toLowerCase();
+  const s = (state || '').trim().toUpperCase();
+  const prov = s.length === 2 ? s : ({ ONTARIO: 'ON', QUEBEC: 'QC', 'BRITISH COLUMBIA': 'BC', ALBERTA: 'AB', MANITOBA: 'MB', SASKATCHEWAN: 'SK', 'NOVA SCOTIA': 'NS', 'NEW BRUNSWICK': 'NB' } as Record<string, string>)[s] || s;
+  if (/cchpbc/.test(c) || (isNDCredential(c) && prov === 'BC')) return { college: 'CCHPBC (College of Complementary Health Professionals of BC)', url: 'https://cchpbc.ca/registrant-search/' };
+  if (/cono/.test(c) || (isNDCredential(c) && prov === 'ON')) return { college: 'College of Naturopaths of Ontario', url: 'https://cono.alinityapp.com/client/publicdirectory' };
+  if (isNDCredential(c) && prov === 'AB') return { college: 'College of Naturopathic Doctors of Alberta', url: 'https://www.cnda.net/find-a-naturopathic-doctor/' };
+  if (/cpso/.test(c) || ((/\bmd\b|\bdo\b|physician/.test(c)) && prov === 'ON')) return { college: 'CPSO (College of Physicians and Surgeons of Ontario)', url: 'https://doctors.cpso.on.ca/' };
+  if ((/\bmd\b|\bdo\b|physician/.test(c)) && prov === 'BC') return { college: 'CPSBC (College of Physicians and Surgeons of BC)', url: 'https://www.cpsbc.ca/public/registrant-directory' };
+  if ((/\bmd\b|\bdo\b|physician/.test(c)) && prov === 'AB') return { college: 'CPSA (College of Physicians and Surgeons of Alberta)', url: 'https://search.cpsa.ca/' };
+  if ((/nurse practitioner|\bnp\b/.test(c)) && prov === 'ON') return { college: 'College of Nurses of Ontario', url: 'https://www.cno.org/en/find-a-nurse/' };
+  if ((/nurse practitioner|\bnp\b/.test(c)) && prov === 'BC') return { college: 'BCCNM (BC College of Nurses and Midwives)', url: 'https://www.bccnm.ca/Public/Pages/registrant-lookup.aspx' };
+  if ((/nurse practitioner|\bnp\b/.test(c)) && prov === 'AB') return { college: 'College of Registered Nurses of Alberta', url: 'https://www.nurses.ab.ca/protecting-the-public/verify-a-nurse/' };
+  return null;
+}
+
+/**
+ * "Prescriber registration verified on <college> on <date>" for the public
+ * badge, or null when no register check is on file. Reads the operator-only
+ * prescriber_verification record; never the clinic's own questionnaire.
+ */
+export function prescriberRegisterCheck(
+  p: { state?: string | null; decision_drivers?: { prescriber_verification?: { verified?: boolean; verified_at?: string | null; credential?: string | null } | null } | null } | null | undefined
+): { college: string; url: string; date: string; sentence: string } | null {
+  const pv = p?.decision_drivers?.prescriber_verification;
+  if (!pv || pv.verified !== true || !pv.verified_at) return null;
+  const reg = registerFor(pv.credential, p?.state);
+  if (!reg) return null;
+  const d = new Date(pv.verified_at);
+  if (Number.isNaN(d.getTime())) return null;
+  const date = d.toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/Toronto' });
+  return { ...reg, date, sentence: `Prescriber registration verified on ${reg.college} on ${date}` };
+}
+
 // Completeness for the CURRENT (2026-08) two-part questionnaire: who administers
 // AND a qualified prescriber (MD/NP, or CONO-authorized ND with IVIT) named WITH
 // a college registration number. An RN alone never satisfies oversight. This

@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { getAllListings, getBlogPosts, getAllCities, slugify, getServiceFilter, BLOG_CANONICAL_OVERRIDES } from '../src/lib/data';
+import { getAllListings, getBlogPosts, getAllCities, getCityLastmods, slugify, getServiceFilter, BLOG_CANONICAL_OVERRIDES } from '../src/lib/data';
 import { US_MARKET_ENABLED, marketOf } from '../src/lib/market';
 import { priceIndexCitySlugs } from '../src/lib/price-index-data';
 import { getLiveDeals } from '../src/lib/deals';
@@ -99,15 +99,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // app/cities/[slug]/page.tsx). The pair keeps Google's index focused on
   // the cities that actually have enough inventory to satisfy a searcher.
   const CITY_PROVIDER_GATE = 3;
+  // Change order 2026-09-28: every city URL carries a real lastmod, the
+  // newest thing that changed the page (see getCityLastmods). Omitted, never
+  // faked, when nothing dated is known for a city.
+  const cityLastmods = await getCityLastmods();
   const cityRoutes = cities
     // US market off: keep US city pages out of the sitemap (they also emit
     // robots:noindex). Canadian cities are unaffected. Reversible via the flag.
     .filter((c) => (c.count ?? 0) >= CITY_PROVIDER_GATE && c.city && (US_MARKET_ENABLED || marketOf({ state: c.state }) !== 'US'))
-    .map((c) => ({
-      url: `${baseUrl}/cities/${slugify(c.city)}`,
-      changeFrequency: 'weekly' as const,
-      priority: 0.9,
-    }));
+    .map((c) => {
+      const lastModified = cityLastmods.get(slugify(c.city));
+      return {
+        url: `${baseUrl}/cities/${slugify(c.city)}`,
+        changeFrequency: 'weekly' as const,
+        priority: 0.9,
+        ...(lastModified ? { lastModified } : {}),
+      };
+    });
 
   const stateRoutes = STATES
     // US market off: only Ontario (the sole Canadian "state") stays sitemapped;

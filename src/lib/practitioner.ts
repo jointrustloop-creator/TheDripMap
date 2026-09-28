@@ -1,4 +1,5 @@
 import { Provider } from '../types';
+import { prescriberRegisterCheck } from './safety';
 
 // Practitioner / medical-oversight classification, derived from the clinic's
 // listed medical team plus credential signals in its name, description,
@@ -25,9 +26,18 @@ export interface PractitionerInfo {
   // True for MD / NP / DO — the prescriber-level oversight a flagged visitor
   // should be steered toward.
   isPrescriberLevel: boolean;
+  // "Prescriber registration verified on <college> on <date>" with the
+  // register URL, when an operator check is on file (change order 2026-09-28).
+  registerNote: { sentence: string; url: string; college: string; date: string } | null;
 }
 
 export function practitionerType(provider: Provider): PractitionerInfo {
+  const base = classify(provider);
+  const check = prescriberRegisterCheck(provider as Parameters<typeof prescriberRegisterCheck>[0]);
+  return { ...base, registerNote: check ? { sentence: check.sentence, url: check.url, college: check.college, date: check.date } : null };
+}
+
+function classify(provider: Provider): Omit<PractitionerInfo, 'registerNote'> {
   // Structured answers first: the prescriber credential the owner gave on
   // /finish (and that we may have checked against the register), then who
   // places the IV. Only when neither exists do we fall back to keyword

@@ -19,6 +19,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'crypto';
 import { revalidatePath } from 'next/cache';
+import { pingIndexNow } from '../../../src/lib/indexnow';
 import { createClient } from '@supabase/supabase-js';
 import { sendMail } from '../../../src/lib/mailer';
 import { parseManageToken, secretsMatch } from '../../../src/lib/manage-token';
@@ -214,6 +215,7 @@ export async function POST(req: NextRequest) {
     const { error: photoErr } = await supabase.from('providers').update({ photos: merged, decision_drivers: { ...ddNow, photo_hashes: [...hashes, hash].slice(-24) } }).eq('id', providerId);
     if (photoErr) return NextResponse.json({ error: 'could not save photo' }, { status: 500 });
     try { revalidatePath(`/providers/${provider.slug}`); } catch { /* non-fatal */ }
+    await pingIndexNow([`/providers/${provider.slug}`, ...(provider.city ? [`/cities/${String(provider.city).toLowerCase().replace(/[^a-z0-9]+/g, '-')}`] : [])], 'finish page save');
     return NextResponse.json({ ok: true, photos: merged.length });
   }
 
@@ -361,6 +363,7 @@ export async function POST(req: NextRequest) {
   // Bust the ISR cache for this listing + the deals hub so the owner's changes
   // (and offer) appear immediately instead of waiting out the revalidate window.
   try { revalidatePath(`/providers/${provider.slug}`); revalidatePath('/deals'); } catch { /* non-fatal */ }
+  await pingIndexNow([`/providers/${provider.slug}`, '/deals', ...(provider.city ? [`/cities/${String(provider.city).toLowerCase().replace(/[^a-z0-9]+/g, '-')}`] : [])], 'finish page publish');
 
   // Mark the onboarding row submitted (non-fatal).
   try {

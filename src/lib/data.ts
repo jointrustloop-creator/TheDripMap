@@ -772,6 +772,50 @@ export async function getListingBySlug(slug: string) {
   }
 }
 
+/**
+ * Last content update per Canadian city page, keyed by city slug, for the
+ * sitemap's lastmod (change order 2026-09-28, item 1).
+ *
+ * Source of truth is cities.updated_at when that column exists (see
+ * scripts/sql/add-cities-updated-at.sql). Until then, and as a floor, the
+ * date is the newest thing that actually changes the rendered page: the
+ * newest clinic added to the city, or the newest blog post tied to it.
+ * Never "now": a lastmod that lies teaches Google to ignore it.
+ */
+export async function getCityLastmods(): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  if (!isSupabaseConfigured()) return out;
+  const bump = (slug: string, iso: string | null | undefined) => {
+    if (!slug || !iso) return;
+    const t = Date.parse(iso);
+    if (Number.isNaN(t)) return;
+    const cur = out.get(slug);
+    if (!cur || Date.parse(cur) < t) out.set(slug, new Date(t).toISOString());
+  };
+  try {
+    // Tolerant of the column not existing yet: select * and read what is there.
+    const cities = await fetchAllRows(() => supabase.from('cities').select('*'));
+    for (const c of (cities || []) as Array<{ slug?: string; updated_at?: string | null; created_at?: string | null }>) {
+      if (!c.slug) continue;
+      bump(c.slug, c.updated_at || c.created_at);
+    }
+    const providers = await fetchAllRows(() =>
+      supabase.from('providers').select('city, country, created_at').neq('is_hidden', true)
+    );
+    for (const p of (providers || []) as Array<{ city?: string | null; country?: string | null; created_at?: string | null }>) {
+      if (!p.city || String(p.country || '').toLowerCase().startsWith('united')) continue;
+      bump(slugify(p.city), p.created_at);
+    }
+    const { data: posts } = await supabase.from('blog_posts').select('date, related_cities').not('slug', 'like', '_draft-%');
+    for (const b of (posts || []) as Array<{ date?: string | null; related_cities?: string[] | null }>) {
+      for (const name of b.related_cities || []) bump(slugify(String(name)), b.date);
+    }
+  } catch {
+    /* a missing lastmod is valid; never fail the sitemap over it */
+  }
+  return out;
+}
+
 export async function getAllCities(): Promise<{ city: string, state: string, stateAbbr: string, count: number }[]> {
   const getMockCities = () => {
     const cityCounts = new Map<string, { city: string, stateAbbr: string, count: number }>();
