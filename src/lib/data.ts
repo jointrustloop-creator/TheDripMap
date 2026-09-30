@@ -303,6 +303,16 @@ export function enrichProvider(p: any): Provider {
     const src = rec.decision_drivers as Record<string, unknown>;
     const dd: Record<string, unknown> = {};
     for (const k of DD_PUBLIC) if (src[k] !== undefined) dd[k] = src[k];
+    // Change order 2026-09-28, item 4: the badge prints "Prescriber
+    // registration verified on <college> on <date>". That needs three fields
+    // of the operator's register check and nothing else: the credential (which
+    // college), verified, and when. The prescriber's name, registration number,
+    // who checked it and the evidence text stay server side. Deliberately
+    // published; the same three the city cards already carried.
+    const pv = src.prescriber_verification as { credential?: unknown; verified?: unknown; verified_at?: unknown } | undefined;
+    if (pv && pv.verified === true) {
+      dd.prescriber_verification = { credential: pv.credential ?? null, verified: true, verified_at: pv.verified_at ?? null };
+    }
     // September Sprint move 3 (2026-09-13): an UNCLAIMED page tells its owner
     // that the activation engine already built the profile. Only COUNTS and
     // the source host are published, never treatment names, prices, evidence
