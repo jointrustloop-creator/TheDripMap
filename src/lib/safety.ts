@@ -96,15 +96,18 @@ export function registerFor(credential: string | null | undefined, state: string
   const c = (credential || '').toLowerCase();
   const s = (state || '').trim().toUpperCase();
   const prov = s.length === 2 ? s : ({ ONTARIO: 'ON', QUEBEC: 'QC', 'BRITISH COLUMBIA': 'BC', ALBERTA: 'AB', MANITOBA: 'MB', SASKATCHEWAN: 'SK', 'NOVA SCOTIA': 'NS', 'NEW BRUNSWICK': 'NB' } as Record<string, string>)[s] || s;
-  if (/cchpbc/.test(c) || (isNDCredential(c) && prov === 'BC')) return { college: 'CCHPBC (College of Complementary Health Professionals of BC)', url: 'https://cchpbc.ca/registrant-search/' };
+  // Every URL below was fetched and returned 200 on 2026-09-30 (CNO's
+  // registry answers 403 to scripts but is the college's own "Find a Nurse"
+  // link from cno.org). The first version shipped six dead links.
+  if (/cchpbc/.test(c) || (isNDCredential(c) && prov === 'BC')) return { college: 'CCHPBC (College of Complementary Health Professionals of BC)', url: 'https://cchpbc.ca/public/practitioner-search/' };
   if (/cono/.test(c) || (isNDCredential(c) && prov === 'ON')) return { college: 'College of Naturopaths of Ontario', url: 'https://cono.alinityapp.com/client/publicdirectory' };
-  if (isNDCredential(c) && prov === 'AB') return { college: 'College of Naturopathic Doctors of Alberta', url: 'https://www.cnda.net/find-a-naturopathic-doctor/' };
-  if (/cpso/.test(c) || ((/\bmd\b|\bdo\b|physician/.test(c)) && prov === 'ON')) return { college: 'CPSO (College of Physicians and Surgeons of Ontario)', url: 'https://doctors.cpso.on.ca/' };
-  if ((/\bmd\b|\bdo\b|physician/.test(c)) && prov === 'BC') return { college: 'CPSBC (College of Physicians and Surgeons of BC)', url: 'https://www.cpsbc.ca/public/registrant-directory' };
+  if (isNDCredential(c) && prov === 'AB') return { college: 'College of Naturopathic Doctors of Alberta', url: 'https://cnda.alinityapp.com/Client/PublicDirectory' };
+  if (/cpso/.test(c) || ((/\bmd\b|\bdo\b|physician/.test(c)) && prov === 'ON')) return { college: 'CPSO (College of Physicians and Surgeons of Ontario)', url: 'https://register.cpso.on.ca/' };
+  if ((/\bmd\b|\bdo\b|physician/.test(c)) && prov === 'BC') return { college: 'CPSBC (College of Physicians and Surgeons of BC)', url: 'https://www.cpsbc.ca/directory' };
   if ((/\bmd\b|\bdo\b|physician/.test(c)) && prov === 'AB') return { college: 'CPSA (College of Physicians and Surgeons of Alberta)', url: 'https://search.cpsa.ca/' };
-  if ((/nurse practitioner|\bnp\b/.test(c)) && prov === 'ON') return { college: 'College of Nurses of Ontario', url: 'https://www.cno.org/en/find-a-nurse/' };
-  if ((/nurse practitioner|\bnp\b/.test(c)) && prov === 'BC') return { college: 'BCCNM (BC College of Nurses and Midwives)', url: 'https://www.bccnm.ca/Public/Pages/registrant-lookup.aspx' };
-  if ((/nurse practitioner|\bnp\b/.test(c)) && prov === 'AB') return { college: 'College of Registered Nurses of Alberta', url: 'https://www.nurses.ab.ca/protecting-the-public/verify-a-nurse/' };
+  if ((/nurse practitioner|\bnp\b/.test(c)) && prov === 'ON') return { college: 'College of Nurses of Ontario', url: 'https://registry.cno.org/' };
+  if ((/nurse practitioner|\bnp\b/.test(c)) && prov === 'BC') return { college: 'BCCNM (BC College of Nurses and Midwives)', url: 'https://registry.bccnm.ca/' };
+  if ((/nurse practitioner|\bnp\b/.test(c)) && prov === 'AB') return { college: 'College of Registered Nurses of Alberta', url: 'https://www.nurses.ab.ca/find-a-nurse/' };
   return null;
 }
 
