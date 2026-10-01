@@ -802,6 +802,11 @@ export async function getCityLastmods(): Promise<Map<string, string>> {
     const cur = out.get(slug);
     if (!cur || Date.parse(cur) < t) out.set(slug, new Date(t).toISOString());
   };
+  // Each source is isolated: the live sitemap served ZERO city lastmods for
+  // two days after this shipped because one query hit the database's
+  // connection-pool timeout and the single try/catch dropped all three
+  // sources together (Vercel logs 2026-09-30, PGRST003). The city row alone
+  // is enough for an honest date; the other two only move it later.
   try {
     // Tolerant of the column not existing yet: select * and read what is there.
     const cities = await fetchAllRows(() => supabase.from('cities').select('*'));
@@ -809,6 +814,8 @@ export async function getCityLastmods(): Promise<Map<string, string>> {
       if (!c.slug) continue;
       bump(c.slug, c.updated_at || c.created_at);
     }
+  } catch { /* a missing lastmod is valid; never fail the sitemap over it */ }
+  try {
     const providers = await fetchAllRows(() =>
       supabase.from('providers').select('city, country, created_at').neq('is_hidden', true)
     );
@@ -816,13 +823,13 @@ export async function getCityLastmods(): Promise<Map<string, string>> {
       if (!p.city || String(p.country || '').toLowerCase().startsWith('united')) continue;
       bump(slugify(p.city), p.created_at);
     }
+  } catch { /* same */ }
+  try {
     const { data: posts } = await supabase.from('blog_posts').select('date, related_cities').not('slug', 'like', '_draft-%');
     for (const b of (posts || []) as Array<{ date?: string | null; related_cities?: string[] | null }>) {
       for (const name of b.related_cities || []) bump(slugify(String(name)), b.date);
     }
-  } catch {
-    /* a missing lastmod is valid; never fail the sitemap over it */
-  }
+  } catch { /* same */ }
   return out;
 }
 
