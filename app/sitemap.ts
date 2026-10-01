@@ -9,7 +9,14 @@ import { getLiveDeals } from '../src/lib/deals';
 // sitemap was statically prerendered at build time, so 22 cities (including
 // columbus, whitby, halifax + 19 pre-existing) were missing from the cached
 // XML despite passing the 3-provider gate.
-export const revalidate = 600;
+// 2026-10-01: rendered on every request. The 10-minute ISR entry sat STALE
+// for 40 minutes at a time on Vercel with no regeneration function ever
+// invoked, so the city lastmods added on 2026-09-28 never appeared live
+// while the same code produced 59 of 59 locally. A sitemap is fetched by
+// crawlers a few times a day; rendering it fresh each time costs seconds
+// and makes any failure show up in the function log instead of in a cached
+// copy nobody can see into.
+export const dynamic = 'force-dynamic';
 import { PUBLIC_USE_CASES } from '../src/lib/use-cases';
 import { STATES } from '../src/lib/states';
 import { GUIDES } from '../src/lib/guides';

@@ -814,7 +814,7 @@ export async function getCityLastmods(): Promise<Map<string, string>> {
       if (!c.slug) continue;
       bump(c.slug, c.updated_at || c.created_at);
     }
-  } catch { /* a missing lastmod is valid; never fail the sitemap over it */ }
+  } catch (e) { console.log('[sitemap] city lastmod: cities query failed:', e instanceof Error ? e.message : String(e)); }
   try {
     const providers = await fetchAllRows(() =>
       supabase.from('providers').select('city, country, created_at').neq('is_hidden', true)
@@ -823,13 +823,15 @@ export async function getCityLastmods(): Promise<Map<string, string>> {
       if (!p.city || String(p.country || '').toLowerCase().startsWith('united')) continue;
       bump(slugify(p.city), p.created_at);
     }
-  } catch { /* same */ }
+  } catch (e) { console.log('[sitemap] city lastmod: providers query failed:', e instanceof Error ? e.message : String(e)); }
   try {
-    const { data: posts } = await supabase.from('blog_posts').select('date, related_cities').not('slug', 'like', '_draft-%');
+    const { data: posts, error } = await supabase.from('blog_posts').select('date, related_cities').not('slug', 'like', '_draft-%');
+    if (error) throw error;
     for (const b of (posts || []) as Array<{ date?: string | null; related_cities?: string[] | null }>) {
       for (const name of b.related_cities || []) bump(slugify(String(name)), b.date);
     }
-  } catch { /* same */ }
+  } catch (e) { console.log('[sitemap] city lastmod: blog query failed:', e instanceof Error ? e.message : String(e)); }
+  console.log(`[sitemap] city lastmod map: ${out.size} entries`);
   return out;
 }
 
