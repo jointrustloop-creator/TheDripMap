@@ -113,7 +113,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${baseUrl}/cities/${slugify(c.city)}`,
         changeFrequency: 'weekly' as const,
         priority: 0.9,
-        ...(lastModified ? { lastModified } : {}),
+        // A Date, as the blog entries pass: the live XML carried 185 blog
+        // lastmods and 0 city ones from the same build when cities passed an
+        // ISO string (2026-09-30).
+        ...(lastModified ? { lastModified: new Date(lastModified) } : {}),
       };
     });
 
