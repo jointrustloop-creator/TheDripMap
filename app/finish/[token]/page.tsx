@@ -154,6 +154,14 @@ export default async function FinishPage({ params, searchParams }: FinishPagePro
       proposedMeta = { sourceUrl: proposed.source_url || p.website || '', fetchedAt: (proposed.fetched_at || '').slice(0, 10), count: drips.length };
     }
   }
+  // Business facts (2026-10-01): the phone and street address the row holds
+  // today, so the owner confirms or corrects them instead of typing from
+  // scratch. Saved form answers win over the row.
+  const savedBiz = (prefill && typeof prefill.business === 'object' && prefill.business) ? (prefill.business as Record<string, unknown>) : {};
+  prefill = {
+    ...(prefill || {}),
+    business: { phone: p.phone || '', address: p.address || '', ...savedBiz },
+  };
   // Profile Strength from the ONE display-complete definition, computed on the
   // saved row (what patients actually see today), not on unsaved form state.
   const { data: operatorProfile } = await supabase

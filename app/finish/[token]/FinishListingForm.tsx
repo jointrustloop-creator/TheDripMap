@@ -20,6 +20,7 @@ interface Prefill {
   about?: string;
   offer?: { title?: string; code?: string; expires?: string; active?: boolean };
   slowWindows?: string[];
+  business?: { phone?: string; address?: string };
 }
 
 interface Props {
@@ -193,6 +194,11 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
   });
   const [boosters, setBoosters] = useState<string[]>(pf.boosters || []);
   const [delivery, setDelivery] = useState<string[]>(pf.delivery || []);
+  // 2026-10-01: phone + street address. Prefilled from the row so the owner
+  // confirms or corrects; a mobile-only service leaves the address blank.
+  const [bizPhone, setBizPhone] = useState<string>(pf.business?.phone || '');
+  const [bizAddress, setBizAddress] = useState<string>(pf.business?.address || '');
+  const mobileOnly = delivery.includes('Mobile / at-home') && !delivery.includes('In-clinic');
   const [consult, setConsult] = useState<string>(pf.firstVisit?.consult || '');
   const [length, setLength] = useState<string>(pf.firstVisit?.length || '');
   const [booking, setBooking] = useState<string>(pf.firstVisit?.booking || '');
@@ -275,6 +281,7 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
         drips: selectedDrips.map((n) => ({ name: n, price: prices[n] ? prices[n].trim() : null })),
         boosters,
         delivery,
+        business: { phone: bizPhone.trim(), address: mobileOnly ? '' : bizAddress.trim() },
         firstVisit: { consult, length, booking },
         payment,
         about: about.trim(),
@@ -614,6 +621,31 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
           <SectionCard step={3} title="How you run visits">
             <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">How do patients get their drip?</div>
             <div className="flex flex-wrap gap-2 mb-5">{DELIVERY.map((o) => <Chip key={o} active={delivery.includes(o)} onClick={() => toggle(delivery, setDelivery, o)}>{o}</Chip>)}</div>
+            <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Phone and address</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-1">
+              <input
+                value={bizPhone}
+                onChange={(e) => setBizPhone(e.target.value)}
+                placeholder="Phone patients should call"
+                maxLength={25}
+                inputMode="tel"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#0F6E56] focus:ring-2 focus:ring-[#0F6E56]/20 outline-none text-sm"
+              />
+              {mobileOnly ? (
+                <div className="px-4 py-3 rounded-xl border border-dashed border-slate-200 text-sm text-slate-500">
+                  Mobile only, so no address. Your page says you come to patients in {city || 'your city'} and area.
+                </div>
+              ) : (
+                <input
+                  value={bizAddress}
+                  onChange={(e) => setBizAddress(e.target.value)}
+                  placeholder="Street address, e.g. 120 Front St W, Unit 4"
+                  maxLength={120}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#0F6E56] focus:ring-2 focus:ring-[#0F6E56]/20 outline-none text-sm"
+                />
+              )}
+            </div>
+            <p className="text-[12px] text-slate-500 mb-5">These show on your page and count toward your Transparency Score.</p>
             <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Do first-timers get a consultation?</div>
             <div className="flex flex-wrap gap-2 mb-5">{CONSULT.map((o) => <Chip key={o} active={consult === o} onClick={() => setConsult(consult === o ? '' : o)}>{o}</Chip>)}</div>
             <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Typical session length</div>

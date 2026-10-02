@@ -48,6 +48,21 @@ interface Answers {
   about?: string;
   offer?: { title?: string; code?: string; expires?: string; active?: boolean };
   slowWindows?: string[];
+  // 2026-10-01: phone + street address, the two business facts the form never
+  // asked for (Hyndford Hydration had a Tennessee number on file from discovery
+  // and no way to correct it). Address stays blank for a mobile-only service.
+  business?: { phone?: string; address?: string };
+}
+
+// Phone: keep digits and the usual separators only, so a pasted number can
+// never carry markup. Address: plain text, capped, no medical-claim scrub needed.
+function cleanPhone(input: unknown): string {
+  if (typeof input !== 'string') return '';
+  return input.replace(/[^\d+()\-.\s]/g, '').replace(/\s+/g, ' ').trim().slice(0, 25);
+}
+function cleanAddress(input: unknown): string {
+  if (typeof input !== 'string') return '';
+  return input.replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 120);
 }
 
 // Light scrub: trim, cap length, drop obvious medical-claim verbs so owner free
@@ -275,6 +290,23 @@ export async function POST(req: NextRequest) {
   if (price_range) update.price_range = price_range;
   if (description) update.description = description;
   if (newLogoUrl) update.image_url = newLogoUrl;
+  // Business facts (2026-10-01). A given value replaces what discovery found;
+  // a blank leaves the row alone, except that a blank address from a
+  // mobile-only service is the truth and clears any stale one.
+  const bizPhone = cleanPhone(answers.business?.phone);
+  const bizAddress = cleanAddress(answers.business?.address);
+  const deliveryAnswer = (answers.delivery || []).filter((d): d is string => typeof d === 'string');
+  const mobileOnly = deliveryAnswer.includes('Mobile / at-home') && !deliveryAnswer.includes('In-clinic');
+  if (bizPhone.replace(/\D/g, '').length >= 7) update.phone = bizPhone;
+  if (bizAddress) update.address = bizAddress;
+  else if (mobileOnly) update.address = null;
+  // The delivery answer is the owner's word on whether they come to you. The
+  // providers.type column ('In-Clinic' | 'Mobile' | 'Both') is what cards, the
+  // mobile filter and enrichProvider's mobile_service flag read, so keep it in
+  // step whenever the question was answered.
+  const hasMobile = deliveryAnswer.includes('Mobile / at-home');
+  const hasClinic = deliveryAnswer.includes('In-clinic');
+  if (hasMobile || hasClinic) update.type = hasMobile && hasClinic ? 'Both' : hasMobile ? 'Mobile' : 'In-Clinic';
   if (newPhotoUrls.length) {
     const existingPhotos = Array.isArray(provider.photos) ? (provider.photos as string[]) : [];
     update.photos = dedupePhotos([...newPhotoUrls, ...existingPhotos]).slice(0, 12);
@@ -388,6 +420,7 @@ export async function POST(req: NextRequest) {
 Drips: ${dripList}
 Boosters: ${boosterList}
 Delivery: ${deliveryList}
+Phone: ${bizPhone || 'unchanged'} | Address: ${bizAddress || (mobileOnly ? 'none (mobile only)' : 'unchanged')}
 Price range: ${price_range || 'not set'}
 Lead practitioner: ${leadName || 'not provided'}
 Who places IVs: ${whoPlaces}

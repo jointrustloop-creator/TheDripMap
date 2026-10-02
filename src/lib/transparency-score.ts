@@ -133,7 +133,19 @@ export function computeTransparencyScore(providerRaw: Raw | null | undefined): T
   const check5 = priceRange !== '' || anyServicePrice || anyDripPrice;
 
   // 6. Business details confirmed: phone, address, and website all present.
-  const check6 = str(p.phone) !== '' && str(p.address) !== '' && str(p.website) !== '';
+  //    Fairness rule (2026-10-01, Hyndford Hydration in Nanaimo): a mobile-only
+  //    service has no storefront, so it could never earn this point. When the
+  //    owner's delivery answer is mobile/at-home without in-clinic (or, with no
+  //    delivery answer, the row's type is 'Mobile' or an enriched row carries
+  //    mobile_service), the city stands in for the street address. Clinics
+  //    with a storefront still need the address. Mirrors the
+  //    phone-counts-as-booking fairness rule in check 7.
+  const delivery = arr(manage.delivery).map((x) => str(x));
+  const mobileOnly = delivery.length > 0
+    ? delivery.includes('Mobile / at-home') && !delivery.includes('In-clinic')
+    : p.type === 'Mobile' || p.mobile_service === true;
+  const placeKnown = str(p.address) !== '' || (mobileOnly && str(p.city) !== '');
+  const check6 = str(p.phone) !== '' && placeKnown && str(p.website) !== '';
 
   // 7. Booking path available: an online booking link OR any stated booking
   //    method (a phone is a valid booking method, so mobile/phone only clinics

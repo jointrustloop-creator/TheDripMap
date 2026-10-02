@@ -249,6 +249,7 @@ function settingLabel(profile: OperatorProfile | undefined, provider: Provider):
   if (typeof env === 'string' && env.trim()) {
     return walkIns ? `${env.trim()} · walk-ins welcome` : `${env.trim()}, by appointment`;
   }
+  if (provider.mobile_service && !provider.address) return 'Mobile only, comes to you';
   if (provider.mobile_service) return 'Mobile / in-home service';
   return null;
 }
@@ -394,9 +395,17 @@ export default function DefinitiveListingLayout({
       })
     : [];
 
+  // A mobile-only service has no storefront: its lat/lng is the city centroid
+  // from geocoding, so a map pin and "Get directions" would send a patient to
+  // the middle of town (2026-10-01, Hyndford Hydration). Show the service area
+  // instead.
+  const mobileOnly = !!provider.mobile_service && !provider.address;
+
   // Directions URL (Google Maps). Prefer lat/lng if both, else address string.
   const addressLine = provider.address || '';
-  const directionsHref = provider.latitude && provider.longitude
+  const directionsHref = mobileOnly
+    ? null
+    : provider.latitude && provider.longitude
     ? `https://www.google.com/maps/dir/?api=1&destination=${provider.latitude},${provider.longitude}`
     : addressLine
     ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addressLine + ', ' + provider.city + ', ' + stateCode)}`
@@ -933,7 +942,15 @@ export default function DefinitiveListingLayout({
                       })}
                     </div>
                   )}
-                  {(provider.address || (provider.latitude && provider.longitude)) && (
+                  {mobileOnly && (
+                    <div>
+                      <div className="text-[11.5px] tracking-[0.18em] uppercase text-[#b08a3e] font-semibold inline-flex items-center gap-[10px] mb-[14px] before:content-[''] before:w-[22px] before:h-[1px] before:bg-[#b08a3e]">Service area</div>
+                      <div className="text-[14.5px] text-[#5c685e] leading-[1.55]">
+                        <b className="text-[#19241c] font-semibold">Mobile only.</b> {provider.name} comes to you at home, at a hotel or at an event in {cityLabel} and the surrounding area. There is no clinic to visit.
+                      </div>
+                    </div>
+                  )}
+                  {!mobileOnly && (provider.address || (provider.latitude && provider.longitude)) && (
                     <div>
                       <div className="text-[11.5px] tracking-[0.18em] uppercase text-[#b08a3e] font-semibold inline-flex items-center gap-[10px] mb-[14px] before:content-[''] before:w-[22px] before:h-[1px] before:bg-[#b08a3e]">Location</div>
                       {provider.latitude && provider.longitude ? (
@@ -1116,6 +1133,11 @@ export default function DefinitiveListingLayout({
                   {provider.address && (
                     <div>
                       <MapPin size={15} className="inline-block -mt-1 mr-1 text-[#2f5436]" /> {provider.address}
+                    </div>
+                  )}
+                  {mobileOnly && (
+                    <div>
+                      <MapPin size={15} className="inline-block -mt-1 mr-1 text-[#2f5436]" /> Mobile only, serving {cityLabel} and area
                     </div>
                   )}
                   {directionsHref && (
