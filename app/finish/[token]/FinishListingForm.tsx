@@ -53,7 +53,10 @@ interface Props {
 
 // Who can legally start the line. ND kept (most of our claimed roster is
 // Canada, where NDs run IV clinics); MD/DO + PA cover the US.
-const WHO_PLACES = ['RN', 'NP', 'ND', 'MD / DO', 'PA', 'Paramedic'];
+// LPN added 2026-10-01: Hyndford Hydration's owner pointed out it was missing
+// the day she claimed. LPNs start IVs in BC and Alberta under the same
+// delegation rules as RNs; it is an administer option, never a prescriber one.
+const WHO_PLACES = ['RN', 'LPN', 'NP', 'ND', 'MD / DO', 'PA', 'Paramedic'];
 // 2026-08 two-part model (docs/badge-standard.md): the prescriber/overseer must
 // be one of these. An RN administers but is NOT a prescriber, so RN is not here.
 // The ND option is province-neutral (2026-09-11): a BC owner (regulated by
