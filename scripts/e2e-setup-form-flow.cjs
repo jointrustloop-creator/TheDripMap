@@ -112,21 +112,27 @@ function step(name, ok, detail = '') {
     const notifyRes = await fetch(`${SITE}/api/notify-operator`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      // Exactly the fields the real form sends for a clinic we do not have
+      // (2026-10-06). Before that date this test sent a city the real form
+      // never collected, so it passed while every real new-clinic claim failed.
       body: JSON.stringify({
         clinicName: CLINIC_NAME,
         ownerName: OWNER_NAME,
         email: OWNER_EMAIL,
-        specialty: 'IV Therapy',
         listingId: null,
         providerSlug: null,
         address: null,
         city: CLINIC_CITY,
-        state: null,
+        state: 'E2E Province',
+        country: 'Canada',
+        website: 'e2e-setup.example.com',
       }),
     });
     const notifyBody = await notifyRes.json();
     results.push(step('/api/notify-operator returned 200', notifyRes.status === 200,
       JSON.stringify(notifyBody).slice(0, 160)));
+    results.push(step('Response says the verification email actually went (verificationSent=true)',
+      notifyBody?.verificationSent === true, `verificationSent=${notifyBody?.verificationSent}`));
     results.push(step('Response says orphan=true', notifyBody?.orphan === true,
       `orphan=${notifyBody?.orphan}`));
     results.push(step('Response includes a real providerSlug',
@@ -153,7 +159,28 @@ function step(name, ok, detail = '') {
         prov?.is_claimed === false && prov?.is_featured === false,
         `is_claimed=${prov?.is_claimed} is_featured=${prov?.is_featured}`));
       results.push(step('Stub email matches submission', prov?.email === OWNER_EMAIL));
+      const { data: prov2 } = await s.from('providers')
+        .select('country, website, state, is_hidden').eq('id', createdProviderId).maybeSingle();
+      results.push(step('Stub country uses the table spelling (Canada)', prov2?.country === 'Canada', `country=${prov2?.country}`));
+      results.push(step('Stub website saved with a scheme', prov2?.website === 'https://e2e-setup.example.com/', `website=${prov2?.website}`));
+      results.push(step('Stub is hidden until verified', prov2?.is_hidden === true, `is_hidden=${prov2?.is_hidden}`));
     }
+
+    // STEP 3b: the case that broke production. No city: the endpoint must say
+    // so (422, verificationSent=false) and create nothing.
+    console.log('\n[STEP 3b] POST without a city must be refused honestly...');
+    const NOCITY_EMAIL = `e2e-nocity-${RUN_ID}@thedripmap.com`;
+    const noCityRes = await fetch(`${SITE}/api/notify-operator`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clinicName: `${CLINIC_NAME} No City`, ownerName: OWNER_NAME, email: NOCITY_EMAIL, listingId: null, city: null }),
+    });
+    const noCityBody = await noCityRes.json().catch(() => ({}));
+    results.push(step('No-city submission returns 422 city_required', noCityRes.status === 422 && noCityBody?.reason === 'city_required',
+      `status=${noCityRes.status} body=${JSON.stringify(noCityBody).slice(0, 120)}`));
+    results.push(step('No-city submission does not claim an email went', noCityBody?.verificationSent === false));
+    const { data: noCityClaims } = await s.from('claim_requests').select('id').eq('email', NOCITY_EMAIL);
+    results.push(step('No-city submission created no claim row', !noCityClaims || noCityClaims.length === 0));
 
     // STEP 4: Confirm a claim_requests row exists and is linked to the stub.
     console.log('\n[STEP 4] Verify claim_requests row...');

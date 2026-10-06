@@ -6,10 +6,20 @@ import { Logo } from '../../../src/components/Logo';
 
 export default function SuccessPage() {
   const [email, setEmail] = useState<string | null>(null);
+  // "sent" only when the server confirmed the verification email went out.
+  // Anything else gets the honest version: we have the request and a person
+  // follows up. (Until 2026-10-06 this page always said "we just emailed you",
+  // even when nothing had been sent.)
+  // null until the query string is read, so the first paint never claims an
+  // email went out.
+  const [sent, setSent] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const savedEmail = localStorage.getItem('operator_email');
-    setEmail(savedEmail);
+    try {
+      setEmail(localStorage.getItem('operator_email'));
+    } catch { /* storage blocked: the page still reads fine without it */ }
+    const verify = new URLSearchParams(window.location.search).get('verify');
+    setSent(verify === 'sent');
   }, []);
 
   return (
@@ -32,30 +42,36 @@ export default function SuccessPage() {
           </div>
 
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight">
-            Check your inbox
+            {sent === null ? 'Thanks for claiming your clinic' : sent ? 'Check your inbox' : 'We have your claim'}
           </h1>
 
+          {sent !== null && (
           <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm mb-10 text-left">
             <p className="text-lg text-slate-600 leading-relaxed mb-6">
-              We just emailed you a link to confirm you own this clinic. Click it to verify, and we will send your private link to finish the listing yourself. It takes about two minutes and goes live the instant you save.
+              {sent
+                ? 'We just emailed you a link to confirm you own this clinic. Click it to verify, and we will send your private link to finish the listing yourself. It takes about two minutes and goes live the instant you save.'
+                : 'Your details reached us, but we could not send your verification link automatically. A person on our team will email you within one business day to finish the claim. There is nothing more you need to do.'}
             </p>
-            
+
             {email && (
               <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
                 <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-slate-100 text-slate-400 shadow-sm">
                   <Mail size={18} />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-0.5">Verification link sent to</p>
+                  <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-0.5">{sent ? 'Verification link sent to' : 'We will write to'}</p>
                   <p className="font-bold text-slate-900">{email}</p>
                 </div>
               </div>
             )}
-            
+
             <p className="text-slate-500 mt-6 text-sm">
-              No email after a few minutes? Check your spam folder, or write to info@thedripmap.com and we will help.
+              {sent
+                ? 'No email after a few minutes? Check your spam folder, or write to info@thedripmap.com and we will help.'
+                : 'Want it sooner? Write to info@thedripmap.com from the same address.'}
             </p>
           </div>
+          )}
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link 

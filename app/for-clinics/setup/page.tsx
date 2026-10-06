@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ShieldCheck, ArrowRight, Building2, User, Mail, Info, Sparkles } from 'lucide-react';
+import { ShieldCheck, ArrowRight, Building2, User, Mail, Info, Sparkles, MapPin, Globe } from 'lucide-react';
 import { Navbar } from '../../../src/components/Navbar';
 import { Footer } from '../../../src/components/Footer';
 import { supabase, isSupabaseConfigured } from '../../../src/lib/supabase';
@@ -14,13 +14,22 @@ function SetupContent() {
   const clinicCity = searchParams.get('clinicCity');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const [formData, setFormData] = useState({
     clinicName: clinicName || '',
     ownerName: '',
     email: '',
   });
+  // 2026-10-06: a clinic that is not on TheDripMap yet gets a new listing, and
+  // a listing needs a city (providers.city is NOT NULL). This form never asked,
+  // so every such claim failed silently while the next page said "check your
+  // inbox". Ask for the place outright; claims of an existing listing skip it.
+  const isNewClinic = !clinicId;
+  const [place, setPlace] = useState({ city: clinicCity || '', region: '', country: '', website: '' });
 
-  const canSubmit = !!formData.clinicName.trim() && !!formData.ownerName.trim() && !!formData.email.trim();
+  const canSubmit =
+    !!formData.clinicName.trim() && !!formData.ownerName.trim() && !!formData.email.trim() &&
+    (!isNewClinic || (!!place.city.trim() && !!place.country));
 
   // CANONICAL CLAIM PATH: claiming is intentionally light — it only has to
   // prove the clinic is yours and get your private link out to you. Everything
@@ -35,6 +44,7 @@ function SetupContent() {
       return;
     }
     setIsSubmitting(true);
+    setSubmitError('');
     try {
       // operator_profiles is a best-effort audit trail; never block the claim on it.
       const { error: pingError } = await supabase.from('operator_profiles').select('id').limit(1);
@@ -55,11 +65,13 @@ function SetupContent() {
       }
 
       // Canonical: create the claim_requests row + send the verification email.
-      let claimSucceeded = false;
+      // The next page says "check your inbox" ONLY when the server confirms the
+      // email actually went (verificationSent), never on a bare 200.
+      let verificationSent = false;
       try {
         let providerSlug: string | null = null;
-        let providerCity: string | null = clinicCity || null;
-        let providerState: string | null = null;
+        let providerCity: string | null = (isNewClinic ? place.city.trim() : '') || clinicCity || null;
+        let providerState: string | null = isNewClinic ? (place.region.trim() || null) : null;
         let providerAddress: string | null = null;
         if (clinicId) {
           const { data: prov } = await supabase
@@ -87,19 +99,26 @@ function SetupContent() {
             address: providerAddress,
             city: providerCity,
             state: providerState,
+            ...(isNewClinic ? { country: place.country, website: place.website.trim() || null } : {}),
           }),
         });
-        claimSucceeded = notifyRes.ok;
-        if (!notifyRes.ok) console.error('notify-operator returned non-OK:', notifyRes.status);
+        const body = await notifyRes.json().catch(() => ({} as Record<string, unknown>));
+        verificationSent = notifyRes.ok && body?.verificationSent === true;
+        if (!notifyRes.ok) console.error('notify-operator returned non-OK:', notifyRes.status, body?.reason);
+        if (notifyRes.status === 422 && body?.reason === 'city_required') {
+          // Recoverable on this page: say what is missing and stay.
+          setSubmitError('Please add the city your clinic is in, then try again.');
+          return;
+        }
       } catch (notifyErr) {
         console.error('Failed to call /api/notify-operator:', notifyErr);
       }
 
       localStorage.setItem('operator_email', formData.email);
-      router.push(`/for-clinics/success${claimSucceeded ? '?verify=sent' : ''}`);
+      router.push(`/for-clinics/success?verify=${verificationSent ? 'sent' : 'pending'}`);
     } catch (err: unknown) {
       console.error('Final registration error:', err);
-      router.push('/for-clinics/success');
+      router.push('/for-clinics/success?verify=pending');
     } finally {
       setIsSubmitting(false);
     }
@@ -176,6 +195,75 @@ function SetupContent() {
             />
             <p className="text-xs text-slate-400">We send your verification link here. Use the email on your clinic domain if you can, it verifies faster.</p>
           </div>
+
+          {isNewClinic && (
+            <div className="space-y-6 pt-2 border-t border-slate-100">
+              <p className="text-[13px] text-slate-500 leading-relaxed pt-4">
+                Not on TheDripMap yet? Tell us where you are and we create your listing. It stays hidden until you verify your email.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                    <MapPin size={16} /> City
+                  </label>
+                  <input
+                    type="text"
+                    value={place.city}
+                    onChange={(e) => setPlace({ ...place, city: e.target.value })}
+                    placeholder="e.g. Calgary"
+                    maxLength={80}
+                    className="w-full p-4 rounded-2xl border border-slate-200 focus:border-wellness-600 focus:ring-2 focus:ring-wellness-100 outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Province or state</label>
+                  <input
+                    type="text"
+                    value={place.region}
+                    onChange={(e) => setPlace({ ...place, region: e.target.value })}
+                    placeholder="e.g. Alberta"
+                    maxLength={80}
+                    className="w-full p-4 rounded-2xl border border-slate-200 focus:border-wellness-600 focus:ring-2 focus:ring-wellness-100 outline-none transition-all"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <span className="text-sm font-bold text-slate-700 block">Country</span>
+                <div className="flex gap-3" role="radiogroup" aria-label="Country">
+                  {['Canada', 'United States'].map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      role="radio"
+                      aria-checked={place.country === c}
+                      onClick={() => setPlace({ ...place, country: c })}
+                      className={`flex-1 p-4 rounded-2xl border font-bold text-sm transition-all ${place.country === c ? 'bg-wellness-600 text-white border-wellness-600' : 'bg-white text-slate-600 border-slate-200 hover:border-wellness-600/40'}`}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                  <Globe size={16} /> Website <span className="font-normal text-slate-400">(optional)</span>
+                </label>
+                <input
+                  type="url"
+                  inputMode="url"
+                  value={place.website}
+                  onChange={(e) => setPlace({ ...place, website: e.target.value })}
+                  placeholder="yourclinic.com"
+                  maxLength={200}
+                  className="w-full p-4 rounded-2xl border border-slate-200 focus:border-wellness-600 focus:ring-2 focus:ring-wellness-100 outline-none transition-all"
+                />
+              </div>
+            </div>
+          )}
+
+          {submitError && (
+            <p role="alert" className="text-sm font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-2xl px-4 py-3">{submitError}</p>
+          )}
 
           <button
             onClick={handleSubmit}
