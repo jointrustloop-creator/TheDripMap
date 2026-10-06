@@ -83,8 +83,19 @@ export async function GET(req: Request) {
 
   // Pick the first topic not already published. Safe against re-runs and
   // against the operator publishing one of these by hand in the meantime.
-  const { data: existingRows } = await sb.from('blog_posts').select('slug');
-  const existing = new Set((existingRows || []).map((r: { slug: string }) => r.slug));
+  const { data: existingRows, error: existingErr } = await sb.from('blog_posts').select('slug');
+  // Fail closed (2026-10-01): during a database blip this query errored, the
+  // set came back empty, and the engine regenerated an already published
+  // topic (Edmonton cost) only for the insert to fail. Without the list we
+  // cannot know what is new, so stop and say so.
+  if (existingErr || !existingRows) {
+    await report('[TheDripMap] Blog engine: skipped, could not read existing posts', [
+      `The blog_posts lookup failed (${existingErr?.message?.slice(0, 200) || 'no rows returned'}), so the engine could not tell which topics are already published.`,
+      'Nothing was generated or published. The next scheduled run retries.',
+    ]);
+    return NextResponse.json({ ok: false, skipped: 'existing posts unreadable' }, { status: 503 });
+  }
+  const existing = new Set(existingRows.map((r: { slug: string }) => r.slug));
   const topic = forcedSlug
     ? TOPIC_QUEUE.find((t) => t.slug === forcedSlug)
     : TOPIC_QUEUE.find((t) => !existing.has(t.slug));

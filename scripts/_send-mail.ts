@@ -1,7 +1,10 @@
 /**
  * Operator-side one-off reply through the platform mailer (clean links).
- *   npx tsx scripts/_send-mail.ts --base https://www.thedripmap.com --to owner@clinic.ca --subject "Re: ..." --file reply.txt [--cc x@y.z]
+ *   npx tsx scripts/_send-mail.ts --base https://www.thedripmap.com --to owner@clinic.ca --subject "Re: ..." --file reply.txt [--cc x@y.z] [--reply-to patient@x.com] [--clinic-name "Clinic"]
  * Body comes from a text file so quoting is never an issue. Authenticates with ACTIVATION_RUN_TOKEN.
+ * --reply-to: where the recipient's reply goes (a patient-lead relay sets the
+ * patient, so the clinic answers them directly). --clinic-name: names the
+ * clinic in the automatic CASL block.
  */
 import * as fs from 'fs';
 import * as dotenv from 'dotenv';
@@ -16,7 +19,7 @@ if (!BASE || !TOKEN || !to || !subject || !file) { console.error('Need --base, -
 
 async function main() {
   const text = fs.readFileSync(file!, 'utf8');
-  const r = await fetch(`${BASE}/api/admin/send-mail`, { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${TOKEN}` }, body: JSON.stringify({ to, subject, text, cc: val('cc') }) });
+  const r = await fetch(`${BASE}/api/admin/send-mail`, { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${TOKEN}` }, body: JSON.stringify({ to, subject, text, cc: val('cc'), replyTo: val('reply-to'), clinicName: val('clinic-name') }) });
   console.log(r.status, (await r.text()).slice(0, 400));
 }
 main().catch((e) => { console.error(e); process.exit(1); });

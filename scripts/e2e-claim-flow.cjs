@@ -23,7 +23,7 @@ function step(name, ok, detail = '') {
     // STEP 0: Pick a low-profile unclaimed provider that hasn't been outreached
     console.log('[STEP 0] Selecting test provider (long-tail, not outreached)...');
     const { data: candidates } = await s.from('providers')
-      .select('id, slug, name, is_featured, is_claimed, outreach_sent')
+      .select('id, slug, name, is_featured, is_claimed, outreach_sent, claimed_at')
       .eq('is_featured', false)
       .neq('outreach_sent', true)
       .or('rating.is.null,rating.lt.4.0')
@@ -130,8 +130,12 @@ function step(name, ok, detail = '') {
       step('Deleted test claim_requests row', !error, error?.message);
     }
     if (testProvider?.id) {
-      const { error } = await s.from('providers').update({ is_claimed: false, is_featured: false }).eq('id', testProvider.id);
-      step('Reset providers.is_claimed=false, is_featured=false', !error, error?.message);
+      // verify-claim stamps claimed_at when it is null; put back the pre-test
+      // value too (found 2026-10-06: the borrowed listing kept a claim date).
+      const { error } = await s.from('providers')
+        .update({ is_claimed: false, is_featured: false, claimed_at: testProvider.claimed_at ?? null })
+        .eq('id', testProvider.id);
+      step('Reset providers.is_claimed=false, is_featured=false, claimed_at restored', !error, error?.message);
       const { data: final } = await s.from('providers').select('is_claimed, is_featured').eq('id', testProvider.id).maybeSingle();
       step('Verified rollback: provider back to is_claimed=false, is_featured=false',
         final?.is_claimed === false && final?.is_featured === false,

@@ -365,7 +365,9 @@ export function systemPrompt(): string {
     '- Never state any price or dollar figure unless the FACTS BLOCK contains a PRICE INDEX; then quote only those exact figures, always as published menu prices with their date.',
     '- Never name a clinic that is not listed in the facts block.',
     '- Never make medical claims; treatments are described neutrally and readers are pointed to the clinic prescriber and their own clinician.',
-    '- No superlative market claims (largest, highest per-capita, fastest-growing).',
+    // The QA gate rejects these exact phrases, so name them here (2026-10-05:
+    // the Calgary NAD+ post was discarded for one of them).
+    '- No superlative market claims. Never write the phrases "one of the most", "one of the highest", "one of the largest", "one of the biggest", "per capita", "per-capita" or "fastest-growing market", in any context, even harmless ones like "one of the most common questions". Say "a common question" instead.',
     '- Internal links only, in markdown, and only to paths in the LINK ALLOWLIST.',
     '- Tone: calm, specific, practical. The reader is a Canadian patient comparing clinics before booking. First person plural ("we track") is fine.',
     '- Google star ratings from the facts block may be cited, attributed to Google, never presented as our endorsement.',
@@ -386,7 +388,9 @@ export function userPrompt(topic: BlogTopic, facts: TopicFacts): string {
     'LINK ALLOWLIST (relative paths only; use 3 to 6 of them where natural):',
     facts.linkAllowlist.join('\n'),
     '',
-    'Also produce: meta_title (<=60 chars, includes the year 2026 where natural), meta_description (<=160 chars, concrete), and a 1-2 sentence excerpt.',
+    // The gate stops at 160; asking for 150 leaves room for the model's
+    // habit of overshooting by a few characters (2026-10-05: 161 discarded a post).
+    'Also produce: meta_title (<=55 chars, includes the year 2026 where natural), meta_description (<=150 chars, concrete; count them), and a 1-2 sentence excerpt.',
   ].join('\n');
 }
 
