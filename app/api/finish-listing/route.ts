@@ -52,6 +52,23 @@ interface Answers {
   // asked for (Hyndford Hydration had a Tennessee number on file from discovery
   // and no way to correct it). Address stays blank for a mobile-only service.
   business?: { phone?: string; address?: string };
+  // 2026-10-06: opening hours per weekday, free text ("9:00 AM - 5:00 PM",
+  // "Closed", "By appointment"). Only the days given are written; the rest of
+  // working_hours is kept.
+  hours?: Record<string, string>;
+}
+
+const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+function cleanHours(input: unknown): Record<string, string> {
+  const out: Record<string, string> = {};
+  if (!input || typeof input !== 'object') return out;
+  for (const [k, v] of Object.entries(input as Record<string, unknown>)) {
+    const day = String(k).toLowerCase();
+    if (!DAY_KEYS.includes(day) || typeof v !== 'string') continue;
+    const val = v.replace(/[<>]/g, '').replace(/[–—]/g, '-').replace(/\s+/g, ' ').trim().slice(0, 40);
+    if (val) out[day] = val;
+  }
+  return out;
 }
 
 // Phone: keep digits and the usual separators only, so a pasted number can
@@ -307,6 +324,16 @@ export async function POST(req: NextRequest) {
   const hasMobile = deliveryAnswer.includes('Mobile / at-home');
   const hasClinic = deliveryAnswer.includes('In-clinic');
   if (hasMobile || hasClinic) update.type = hasMobile && hasClinic ? 'Both' : hasMobile ? 'Mobile' : 'In-Clinic';
+  const hoursGiven = cleanHours(answers.hours);
+  if (Object.keys(hoursGiven).length) {
+    const existingHours = (provider.working_hours && typeof provider.working_hours === 'object') ? (provider.working_hours as Record<string, unknown>) : {};
+    const lowered: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(existingHours)) lowered[String(k).toLowerCase()] = v;
+    update.working_hours = { ...lowered, ...hoursGiven };
+    // hours_source lives in decision_drivers (the activation engine and Places
+    // enrichment write it there); the owner's own entry outranks both.
+    update.decision_drivers = { ...(update.decision_drivers as Record<string, unknown>), hours_source: `owner ${new Date().toISOString().slice(0, 10)}` };
+  }
   if (newPhotoUrls.length) {
     const existingPhotos = Array.isArray(provider.photos) ? (provider.photos as string[]) : [];
     update.photos = dedupePhotos([...newPhotoUrls, ...existingPhotos]).slice(0, 12);

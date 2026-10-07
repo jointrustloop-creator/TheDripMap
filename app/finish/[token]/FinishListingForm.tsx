@@ -21,7 +21,14 @@ interface Prefill {
   offer?: { title?: string; code?: string; expires?: string; active?: boolean };
   slowWindows?: string[];
   business?: { phone?: string; address?: string };
+  hours?: Record<string, string>;
 }
+
+// Opening hours (2026-10-06): Hyndford Hydration's owner could not find where
+// to set hers because the form never asked. Free text per day so "9:00 AM -
+// 9:00 PM by appointment" and "Closed" both fit; the page shows it as typed.
+const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
+const DAY_LABEL: Record<string, string> = { monday: 'Monday', tuesday: 'Tuesday', wednesday: 'Wednesday', thursday: 'Thursday', friday: 'Friday', saturday: 'Saturday', sunday: 'Sunday' };
 
 interface Props {
   token: string;
@@ -199,6 +206,12 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
   const [bizPhone, setBizPhone] = useState<string>(pf.business?.phone || '');
   const [bizAddress, setBizAddress] = useState<string>(pf.business?.address || '');
   const mobileOnly = delivery.includes('Mobile / at-home') && !delivery.includes('In-clinic');
+  const [hours, setHours] = useState<Record<string, string>>(() => {
+    const h: Record<string, string> = {};
+    for (const d of DAYS) h[d] = (pf.hours && typeof pf.hours[d] === 'string') ? pf.hours[d] : '';
+    return h;
+  });
+  const copyMondayToWeekdays = () => setHours((h) => ({ ...h, tuesday: h.monday, wednesday: h.monday, thursday: h.monday, friday: h.monday }));
   const [consult, setConsult] = useState<string>(pf.firstVisit?.consult || '');
   const [length, setLength] = useState<string>(pf.firstVisit?.length || '');
   const [booking, setBooking] = useState<string>(pf.firstVisit?.booking || '');
@@ -282,6 +295,7 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
         boosters,
         delivery,
         business: { phone: bizPhone.trim(), address: mobileOnly ? '' : bizAddress.trim() },
+        hours: Object.fromEntries(DAYS.map((d) => [d, hours[d].trim()]).filter(([, v]) => v)),
         firstVisit: { consult, length, booking },
         payment,
         about: about.trim(),
@@ -646,6 +660,25 @@ export function FinishListingForm({ token, clinicName, city, listingUrl, hasLogo
               )}
             </div>
             <p className="text-[12px] text-slate-500 mb-5">These show on your page and count toward your Transparency Score.</p>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide">Opening hours</div>
+              <button type="button" onClick={copyMondayToWeekdays} className="text-[12px] font-bold text-[#0F6E56] hover:underline">Copy Monday to Tuesday through Friday</button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-1">
+              {DAYS.map((d) => (
+                <label key={d} className="flex items-center gap-3">
+                  <span className="w-24 text-sm font-semibold text-slate-700">{DAY_LABEL[d]}</span>
+                  <input
+                    value={hours[d]}
+                    onChange={(e) => setHours({ ...hours, [d]: e.target.value })}
+                    placeholder="9:00 AM - 5:00 PM, or Closed"
+                    maxLength={40}
+                    className="flex-1 px-3 py-2 rounded-xl border border-slate-200 focus:border-[#0F6E56] focus:ring-2 focus:ring-[#0F6E56]/20 outline-none text-sm"
+                  />
+                </label>
+              ))}
+            </div>
+            <p className="text-[12px] text-slate-500 mb-5">Write them the way you would say them. "By appointment" is fine. Leave a day blank to leave it unchanged.</p>
             <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Do first-timers get a consultation?</div>
             <div className="flex flex-wrap gap-2 mb-5">{CONSULT.map((o) => <Chip key={o} active={consult === o} onClick={() => setConsult(consult === o ? '' : o)}>{o}</Chip>)}</div>
             <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Typical session length</div>

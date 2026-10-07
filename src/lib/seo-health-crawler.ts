@@ -14,7 +14,7 @@
 //   clock guard at TOTAL_BUDGET_MS
 
 const SITE_URL = 'https://www.thedripmap.com';
-const CRAWL_CONCURRENCY = 12;
+const CRAWL_CONCURRENCY = 4; // 12 caused Supabase pool timeouts (PGRST003) and false 404s in the nightly report (2026-10-01)
 const REQUEST_TIMEOUT_MS = 8000;
 // Leave ~30s headroom under Vercel's 300s cap for diffing + email.
 const DEFAULT_TOTAL_BUDGET_MS = 270_000;

@@ -158,9 +158,20 @@ export default async function FinishPage({ params, searchParams }: FinishPagePro
   // today, so the owner confirms or corrects them instead of typing from
   // scratch. Saved form answers win over the row.
   const savedBiz = (prefill && typeof prefill.business === 'object' && prefill.business) ? (prefill.business as Record<string, unknown>) : {};
+  // Opening hours the row holds today (any source), lowercased by day, so the
+  // owner sees and corrects what the page shows rather than typing blind.
+  const rowHours: Record<string, string> = {};
+  if (p.working_hours && typeof p.working_hours === 'object') {
+    for (const [day, v] of Object.entries(p.working_hours as Record<string, unknown>)) {
+      const val = Array.isArray(v) ? v[0] : v;
+      if (typeof val === 'string' && val.trim()) rowHours[day.toLowerCase()] = val.trim();
+    }
+  }
+  const savedHours = (prefill && typeof prefill.hours === 'object' && prefill.hours) ? (prefill.hours as Record<string, string>) : {};
   prefill = {
     ...(prefill || {}),
     business: { phone: p.phone || '', address: p.address || '', ...savedBiz },
+    hours: { ...rowHours, ...savedHours },
   };
   // Profile Strength from the ONE display-complete definition, computed on the
   // saved row (what patients actually see today), not on unsaved form state.
