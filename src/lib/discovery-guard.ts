@@ -44,6 +44,22 @@ export function notCanadianReason(phone: string | null | undefined, website: str
 }
 
 /**
+ * Page-text country check (2026-10-06). The phone and domain checks above let
+ * three UK clinics on .com domains through as London and Cambridge, Ontario
+ * listings (Future Care Medical, OSO Clinic, Cambridge Aesthetics): their
+ * homepages showed prices in pounds or a +44 number but no phone we parsed.
+ * Strong signals only; a Canadian page never prices in pounds or lists a +44,
+ * +61, +64 or +353 number for itself.
+ */
+export function notCanadianPageReason(text: string | null | undefined): string | null {
+  const t = String(text || '');
+  if (/£\s?\d/.test(t)) return 'prices in pounds sterling';
+  if (/\+\s?44[\s(]*0?\)?\s?\d/.test(t)) return 'UK phone number (+44)';
+  if (/\+\s?(61|64|353)[\s(]*0?\)?\s?\d/.test(t)) return 'Australian, New Zealand or Irish phone number';
+  return null;
+}
+
+/**
  * Firecrawl takes the candidate name from the page <title>, which is often not
  * a business name at all ("Homepage", "Welcome to our site", "Home | ..."). A
  * junk name is worse than no row: outreach greets clinics by name, and the row

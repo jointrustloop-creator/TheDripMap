@@ -30,6 +30,7 @@
  * publish none), and the Places path never had emails either. A listing
  * without an email is still useful to patients; outreach just skips it.
  */
+import { badCandidateName, notCanadianPageReason } from './discovery-guard';
 
 const TIMEOUT_MS = 12_000;
 const MAX_SEARCHES = 8;
@@ -113,11 +114,67 @@ function pickEmail(html: string, root: string): string | null {
   return best ? best.email : null;
 }
 
+/** Decode the HTML entities page titles carry ("&amp;", "&#8211;", "&#039;"). */
+export function decodeEntities(s: string): string {
+  return s
+    .replace(/&#(\d+);/g, (_, d) => String.fromCharCode(Number(d)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16)))
+    .replace(/&amp;/gi, '&').replace(/&quot;/gi, '"').replace(/&apos;/gi, "'")
+    .replace(/&nbsp;/gi, ' ').replace(/&lt;/gi, '<').replace(/&gt;/gi, '>')
+    .replace(/&ndash;|&mdash;/gi, '-')
+    .replace(/[–—]/g, '-') // house style: no en/em dashes, even in names
+    .replace(/[®™]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function titleOf(html: string): string | null {
   const m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
   if (!m) return null;
-  const t = m[1].replace(/\s+/g, ' ').trim().split(/\s*[|\-–—]\s*/)[0].slice(0, 90).trim();
+  // Decode BEFORE splitting, so "&#8211;" separates like a real dash does.
+  const t = decodeEntities(m[1]).split(/\s*[|\-]\s+|\s+[|\-]\s*/)[0].slice(0, 90).trim();
   return t || null;
+}
+
+/** schema.org business name, when the page carries one. */
+function schemaName(html: string): string | null {
+  const m = html.match(/"@type"\s*:\s*"(?:MedicalClinic|LocalBusiness|MedicalBusiness|HealthAndBeautyBusiness|DaySpa|Physician|MedicalOrganization|HealthClub)"[\s\S]{0,400}?"name"\s*:\s*"([^"]{2,90})"/i);
+  return m ? decodeEntities(m[1]) : null;
+}
+
+/** og:site_name, which is the brand on most sites and a slogan on a few. */
+function siteName(html: string): string | null {
+  const m = html.match(/<meta[^>]+property=["']og:site_name["'][^>]*content=["']([^"']{2,90})["']/i)
+    || html.match(/<meta[^>]+content=["']([^"']{2,90})["'][^>]*property=["']og:site_name["']/i);
+  return m ? decodeEntities(m[1]) : null;
+}
+
+/** How many of a candidate name's words appear in the site's own domain label. */
+function domainAffinity(name: string, url: string): number {
+  let label = '';
+  try { label = new URL(url).hostname.replace(/^www\./, '').split('.')[0].replace(/[^a-z0-9]/gi, '').toLowerCase(); } catch { return 0; }
+  return name.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 3 && label.includes(w)).length;
+}
+
+/**
+ * The listing name (2026-10-06). Until now this was the first chunk of the page
+ * <title>, so rows went live as "Home", "Massage Therapy Victoria, BC" and
+ * "Botox, Wellness &amp; HRT St. Catharines". Candidates: schema.org name,
+ * og:site_name, <title>, the search result title. The winner is the one whose
+ * words best match the site's own domain (echohealth.ca picks "Echo Health"
+ * over "Home"); ties keep that order. Rows stay flagged for a human either way.
+ */
+export function bestName(html: string, url: string, searchTitle?: string | null): string | null {
+  const cands = [schemaName(html), siteName(html), titleOf(html), searchTitle ? decodeEntities(searchTitle).split(/\s*[|\-]\s+|\s+[|\-]\s*/)[0].slice(0, 90).trim() : null]
+    .filter((x): x is string => !!x && !badCandidateName(x));
+  if (!cands.length) return null;
+  let best = cands[0];
+  let bestScore = domainAffinity(best, url);
+  for (const c of cands.slice(1)) {
+    const sc = domainAffinity(c, url);
+    if (sc > bestScore) { best = c; bestScore = sc; }
+  }
+  return best;
 }
 
 function pickPhone(html: string): string | null {
@@ -202,6 +259,8 @@ export async function firecrawlDiscover(
     if (!IV_TERMS.test(text)) continue;
     if (US_MARKER.test(text)) continue;
     if (!cityRe.test(text)) continue;
+    const foreign = notCanadianPageReason(text);
+    if (foreign) { notes.push(`rejected ${cand.url}: ${foreign}`); continue; }
     let email = pickEmail(html, root);
     let phone = pickPhone(html);
     if (!email) {
@@ -215,7 +274,7 @@ export async function firecrawlDiscover(
     // An email we already hold means this is an existing operator under a new
     // domain — dedupe, do not insert.
     if (email && knownEmails.has(email)) continue;
-    const name = titleOf(html) || cand.title;
+    const name = bestName(html, cand.url, cand.title);
     if (!name || name.length < 3) continue;
     found.push({ name, website: cand.url, email: email || null, phone });
     if (email) knownEmails.add(email);
