@@ -49,6 +49,18 @@ Safety Verified = the safety standard below is met. Neither implies the other.
 > ND option reads "ND with IV authorization" and the owner confirms their
 > provincial college's authorization; the stored value for older rows is
 > "CONO-authorized ND (IVIT)" and both are accepted by isNDCredential().
+>
+> **What the BC register can show (2026-10-06).** CCHPBC lists one
+> certification program, Prescriptive Authority, so its register cannot show IV
+> training for anyone. BC limits and conditions (since April 2023) require
+> Prescriptive Authority, IV therapy certification and current NALS for ND IV
+> therapy. The register check for a BC ND is therefore: Full class, Practising,
+> licence number matching the owner's (the register masks all but the last two
+> digits; numbers were reissued 2026-09-01), and a current Prescriptive
+> Authority certification. With the owner's "ND with IV authorization"
+> attestation that meets this standard; without Prescriptive Authority on the
+> register, do not approve. Applied to AMRE (Burnaby), Vida + Flow (Penticton)
+> and Hydrate IV Wellness Centre (Victoria) on 2026-10-06.
 
 ## 2. Who may ADMINISTER an IV (Ontario)
 

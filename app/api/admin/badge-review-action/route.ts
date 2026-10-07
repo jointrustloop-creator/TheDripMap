@@ -25,7 +25,7 @@ import { isAdminRequest } from '../../../../src/lib/admin-auth';
 import { sendMail } from '../../../../src/lib/mailer';
 import { manageUrlForProvider } from '../../../../src/lib/manage-token';
 import { buildCompletionRequestEmail, missingSafetyParts } from '../../../../src/lib/badge-review';
-import { isSafetyComplete } from '../../../../src/lib/safety';
+import { isSafetyComplete, deriveSafetyFlags } from '../../../../src/lib/safety';
 import { pingIndexNow } from '../../../../src/lib/indexnow';
 import { computeTransparencyScore } from '../../../../src/lib/transparency-score';
 
@@ -112,6 +112,29 @@ export async function POST(req: NextRequest) {
     if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 });
     if (count !== null && count !== 1) {
       return NextResponse.json({ error: `unexpected update scope: ${count} rows` }, { status: 500 });
+    }
+    // The page renders the Safety Verified block only when the clinic's
+    // operator profile carries at least one confirmed flag, and those flags were
+    // only ever derived on a /finish save. Answers recorded by an operator never
+    // produced them, so six approved badges (AMRE, Soma and Soul, Insight,
+    // Nature's Touch, Bar Beauty, DRS Mobile) were invisible on their own pages
+    // until 2026-10-06. Derive them here too, so approval always means visible.
+    try {
+      const derived = deriveSafetyFlags(manage);
+      const { data: prof } = await sb.from('operator_profiles').select('id, profile_data').eq('clinic_id', provider.id).maybeSingle();
+      if (prof) {
+        await sb.from('operator_profiles').update({ profile_data: { ...((prof.profile_data as Record<string, unknown>) || {}), ...derived } }).eq('id', prof.id);
+      } else {
+        const leadName = ((manage as { team?: { leadName?: string } } | null)?.team?.leadName || '').trim();
+        await sb.from('operator_profiles').insert({
+          clinic_id: provider.id,
+          owner_name: leadName || (provider.name as string),
+          email: (provider as { email?: string }).email || 'info@thedripmap.com',
+          profile_data: derived,
+        });
+      }
+    } catch (e) {
+      console.error('badge approve: profile flags failed (badge may not render)', e instanceof Error ? e.message : e);
     }
     // A badge turning on changes the clinic page and every list it sits in.
     await pingIndexNow([`/providers/${provider.slug}`], 'badge approved');
