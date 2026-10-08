@@ -358,7 +358,9 @@ export async function GET(req: Request) {
         detail = 'claim has no listing_id';
       } else if (!ob) {
         detail = 'no onboarding_requests row for this clinic';
-      } else if (ob.status !== 'sent' || !ob.sent_at) {
+      } else if (!['sent', 'submitted'].includes(String(ob.status)) || !ob.sent_at) {
+        // 'submitted' means the email went and the owner already finished the
+        // form (iGood 2026-10-07 was flagged MISSING three minutes after it sent).
         detail = `onboarding not marked sent (status=${ob.status || 'none'})`;
       } else if (!c.verified_at) {
         detail = 'claim missing verified_at';
